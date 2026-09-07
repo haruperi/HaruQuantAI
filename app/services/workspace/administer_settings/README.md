@@ -62,5 +62,5 @@ retained; re-mounting resumes on the same tables.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.workspace.administer_settings.administer_settings
+uv run python -m app.services.workspace.administer_settings._usage
 ```

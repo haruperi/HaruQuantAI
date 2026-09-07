@@ -9,6 +9,7 @@ from app.contracts.common.models import (
     CapabilityIdentifier,
     ContentHash,
     DecimalValue,
+    JobState,
     JsonObject,
     JsonValue,
     UtcTimestamp,
@@ -546,10 +547,42 @@ class NotificationReceipt(WireModel):
     receipt_id: Uuid7
     delivery_id: NonEmptyStr
     channel_id: Uuid7
-    status: Literal["DELIVERED", "FAILED", "SUPPRESSED_RATE_LIMIT", "DISABLED"]
+    status: Literal[
+        "PENDING",
+        "DELIVERED",
+        "FAILED",
+        "UNKNOWN",
+        "SUPPRESSED_RATE_LIMIT",
+        "DISABLED",
+    ]
     rendered_hash: ContentHash
     sent_at: UtcTimestamp | None = None
     error: NonEmptyStr | None = None
+    schema_version: Literal[1] = 1
+
+
+class JobRecord(WireModel):
+    """Authoritative state of one accepted logical job."""
+
+    job_id: NonEmptyStr
+    idempotency_key: NonEmptyStr
+    state: JobState
+    version: int = Field(ge=1)
+    progress: DecimalValue = "0"
+    message: str = ""
+    created_at: UtcTimestamp
+    updated_at: UtcTimestamp
+    schema_version: Literal[1] = 1
+
+
+class ProgressEvent(WireModel):
+    """Ordered progress observation emitted after durable state changes."""
+
+    job_id: NonEmptyStr
+    sequence: int = Field(ge=1)
+    progress: DecimalValue
+    message: str
+    occurred_at: UtcTimestamp
     schema_version: Literal[1] = 1
 
 
@@ -1134,6 +1167,8 @@ WIRE_MODELS: dict[str, type[WireModel]] = {
     "NotificationTemplate": NotificationTemplate,
     "NotificationSession": NotificationSession,
     "NotificationReceipt": NotificationReceipt,
+    "JobRecord": JobRecord,
+    "ProgressEvent": ProgressEvent,
     "ProjectProgress": ProjectProgress,
     "ProjectHistoryEntry": ProjectHistoryEntry,
     "NetworkTrainingPlan": NetworkTrainingPlan,

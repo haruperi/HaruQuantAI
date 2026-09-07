@@ -5,6 +5,10 @@ from typing import TYPE_CHECKING
 from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
+    from app.contracts.orchestration.deliver_notifications import (
+        DeliverNotificationsCapability,
+    )
+    from app.contracts.orchestration.jobs import ManageJobsCapability
     from app.contracts.orchestration.ports import (
         DefineProjectsCapability,
         EvaluateConditionsCapability,
@@ -14,7 +18,6 @@ if TYPE_CHECKING:
         TrackRunHistoryCapability,
         TrainNetworksCapability,
     )
-
 DEFINE_PROJECTS_CAPABILITY: CapabilityKey[DefineProjectsCapability] = CapabilityKey(
     name="orchestration.define-projects",
     major=1,
@@ -50,4 +53,13 @@ TRACK_RUN_HISTORY_CAPABILITY: CapabilityKey[TrackRunHistoryCapability] = Capabil
 TRAIN_NETWORKS_CAPABILITY: CapabilityKey[TrainNetworksCapability] = CapabilityKey(
     name="orchestration.train-networks",
     major=1,
+)
+
+MANAGE_JOBS_CAPABILITY: CapabilityKey[ManageJobsCapability] = CapabilityKey(
+    name="orchestration.manage-jobs",
+    major=1,
+)
+
+DELIVER_NOTIFICATIONS_CAPABILITY: CapabilityKey[DeliverNotificationsCapability] = (
+    CapabilityKey(name="orchestration.deliver-notifications", major=1)
 )

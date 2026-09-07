@@ -56,4 +56,4 @@ Removing this feature withdraws its scoped `data.import-quantdata@1` provider. E
 
 ## Evidence
 
-Run `uv run python -m app.services.data.quantdata_manager_source.quantdata_manager_source` for the executable scenario harness. Automated tests live in `tests/services/data/quantdata_manager_source/`.
+Run `uv run python -m app.services.data.quantdata_manager_source._usage` for the executable scenario harness. Automated tests live in `tests/services/data/quantdata_manager_source/`.

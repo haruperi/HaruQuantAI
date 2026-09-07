@@ -177,6 +177,7 @@ def test_logging_section_parsing_and_defaults() -> None:
     assert config_default.logging.max_bytes == 10 * 1024 * 1024
     assert config_default.logging.backup_count == 5
     assert config_default.logging.capture_capacity == 1000
+    assert config_default.logging.queue_capacity == 1000
 
     # Test explicit [logging] section
     config_explicit = load_config_from_toml_string(

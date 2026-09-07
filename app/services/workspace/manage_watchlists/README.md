@@ -72,7 +72,7 @@ follow explicit owner policy.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.workspace.manage_watchlists.manage_watchlists
+uv run python -m app.services.workspace.manage_watchlists._usage
 ```
 
 ## Failure Behavior

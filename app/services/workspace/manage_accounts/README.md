@@ -67,5 +67,5 @@ provider; consumers fail closed. Account and session rows are retained
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.workspace.manage_accounts.accounts
+uv run python -m app.services.workspace.manage_accounts._usage
 ```

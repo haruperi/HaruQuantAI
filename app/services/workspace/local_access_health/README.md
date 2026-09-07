@@ -37,7 +37,7 @@ Issue local credentials and report health/readiness.
 Run the executable usage demonstration:
 
 ```bash
-uv run python -m app.services.workspace.local_access_health.local_access_health
+uv run python -m app.services.workspace.local_access_health._usage
 ```
 
 ## Runtime Effects

@@ -58,4 +58,4 @@ Removing this feature withdraws its scoped `data.prepare-profiles@1` provider. V
 
 ## Evidence
 
-Run `uv run python -m app.services.data.profile_source_preparation.profile_source_preparation` for the executable scenario harness. Automated tests live in `tests/services/data/profile_source_preparation/`.
+Run `uv run python -m app.services.data.profile_source_preparation._usage` for the executable scenario harness. Automated tests live in `tests/services/data/profile_source_preparation/`.

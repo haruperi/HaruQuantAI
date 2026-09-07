@@ -111,7 +111,7 @@ cleared on disposal.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.interfaces.serve_api_events.transport
+uv run python -m app.services.interfaces.serve_api_events._usage
 ```
 
 ## Failure Behavior

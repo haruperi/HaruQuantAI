@@ -55,4 +55,4 @@ Removing this feature withdraws its scoped `catalogue.catalog-instruments@1` pro
 
 ## Evidence
 
-Run `uv run python -m app.services.catalogue.instrument_catalogue.instrument_catalogue` for the executable scenario harness. Automated tests live in `tests/services/catalogue/instrument_catalogue/`.
+Run `uv run python -m app.services.catalogue.instrument_catalogue._usage` for the executable scenario harness. Automated tests live in `tests/services/catalogue/instrument_catalogue/`.

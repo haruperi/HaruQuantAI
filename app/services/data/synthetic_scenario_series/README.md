@@ -58,4 +58,4 @@ Removing this feature withdraws its scoped `data.generate-scenarios@1` provider.
 
 ## Evidence
 
-Run `uv run python -m app.services.data.synthetic_scenario_series.synthetic_scenario_series` for the executable scenario harness. Automated unit tests live in `tests/services/data/synthetic_scenario_series/`.
+Run `uv run python -m app.services.data.synthetic_scenario_series._usage` for the executable scenario harness. Automated unit tests live in `tests/services/data/synthetic_scenario_series/`.

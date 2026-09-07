@@ -40,7 +40,7 @@ Constrain plugin analysis, metric, and filter execution by providing immutable r
 Run the executable usage demonstration:
 
 ```bash
-uv run python -m app.services.plugins.analysis_boundary.plugin_analysis_boundary
+uv run python -m app.services.plugins.analysis_boundary._usage
 ```
 
 ## Runtime Effects

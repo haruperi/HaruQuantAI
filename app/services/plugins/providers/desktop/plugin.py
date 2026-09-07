@@ -9,9 +9,9 @@ from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )
-from app.utils.notifications.desktop import (  # type: ignore[import-untyped]
-    DesktopConfig,
-    DesktopNotifier,
+from app.services.plugins.providers._notification import (
+    NotificationBackend,
+    validate_backend,
 )
 
 if TYPE_CHECKING:
@@ -22,7 +22,7 @@ if TYPE_CHECKING:
 class _DesktopDeliveryAdapter:
     """Adapts internal DesktopNotifier to NotificationDeliveryCapabilityV1 protocol."""
 
-    def __init__(self, notifier: DesktopNotifier) -> None:
+    def __init__(self, notifier: NotificationBackend) -> None:
         self._notifier = notifier
         self._active = True
 
@@ -64,7 +64,7 @@ def create_provider(
 
     Args:
         dependencies: Must be empty.
-        config: Must contain only 'configuration' with DesktopConfig.
+        config: Must contain only 'configuration' with a notification backend.
         scope: EffectScope managing provider lifecycle.
 
     Returns:
@@ -77,12 +77,7 @@ def create_provider(
         msg = "desktop notification provider requires only 'configuration'"
         raise ValueError(msg)
 
-    configuration = config["configuration"]
-    if not isinstance(configuration, DesktopConfig):
-        msg = "desktop notification provider requires only 'configuration'"
-        raise ValueError(msg)  # noqa: TRY004
-
-    notifier = DesktopNotifier(configuration)
+    notifier = validate_backend(config["configuration"], "desktop")
     adapter = _DesktopDeliveryAdapter(notifier)
     scope.callback(adapter.close)
     return adapter

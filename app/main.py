@@ -180,6 +180,7 @@ async def async_main(argv: Sequence[str] | None = None) -> int:  # noqa: C901, P
         max_bytes=base_log_cfg.max_bytes,
         backup_count=base_log_cfg.backup_count,
         capture_capacity=base_log_cfg.capture_capacity,
+        queue_capacity=base_log_cfg.queue_capacity,
     )
     logging_handle = configure_logging(log_cfg)
 

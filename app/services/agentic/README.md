@@ -1,1765 +1,3004 @@
 # Agentic
 
 > **Package:** `app/services/agentic/`
+> **Status:** `Partial` — documentary target; runtime acceptance is **NOT_REVALIDATED**.
+> **Last updated:** `2026-09-06`
 > **Domain ID:** `D-AGT`
-> **Status:** `Missing` — authoritative target specification; no legacy implementation status carries forward
-> **Last updated:** `2026-09-03`
-> **Feature count:** `20` focused service features
-> **Built-in LLM profiles:** `22` across `7` role families
-> **Architecture decisions:** `ADR-AGT-001` and `ADR-AGT-001-A1`
 
-> This README is the Agentic domain package's **single source of truth** for domain boundaries, focused feature capabilities, semantic contract ownership, role contributions, workflows, state ownership, configuration, implementation sequence, deletion behavior, acceptance evidence, and current status. Update it before modifying or adding Agentic code.
+> This README is the domain target registry for boundaries, composable feature capabilities, requirements, ownership, workflows, acceptance, and removal. Update it before changing the affected implementation. It does not certify that a target package, contract, test, usage demonstration or provider is already implemented.
+
+**Selected scope:** 20 features · 81 owned functional requirements · 41 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
+
+**Sources:** [Unified Specification](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
 
 ## Code-Aligned Implementation Convention
 
-Agentic uses the repository's current feature substrate. Every feature lives directly under `app/services/agentic/<feature>/`, declares one immutable `SPEC: FeatureSpec` in `manifest.py`, parses only its exact strict `config.py` keys, mounts through `feature.py`, publishes versioned capability contracts from `app/contracts/agentic/`, and owns every reversible effect through `FeatureContext`/`FeatureScope`.
+This domain README defines target behavior; `PROJECT.md` retains system scope, cross-domain policy, system NFRs and release gates, and `ARCHITECTURE.md` retains universal package/runtime constraints. Feature-local READMEs, manifests, contracts, migrations and evidence mirror rather than silently redefine this target. For focused work, load §1, the affected §4 card, applicable §5 and §9 rules, and §7. Follow the [Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md).
 
-There are no domain YAML manifests, package-root facades, shared Agentic settings modules, shared Agentic persistence packages, agent-per-folder service hierarchies, import-time registration, or cross-feature implementation imports. Role profiles are immutable contributions registered by their owning feature through `agentic.roles@1` with exact disposal. Receiver domains own the canonical contracts they validate or execute.
+Implement one feature directly in its selected owner folder and discover it through the `haruquantai.features` Python entry-point group. Declare one immutable `SPEC = FeatureSpec(...)` in `manifest.py`; do not introduce a domain registry or YAML manifest. The feature contains pure `__init__.py`, a runtime-validated `README.md`, strict `config.py` with `.from_dict()`, lifecycle `feature.py`, focused logic modules and required `_usage.py`. Add `_persistence.py` only when the feature performs database operations. Effects and dependencies flow through `FeatureContext` and `FeatureScope`; durable state is declared by `FeatureSpec.state`. Existing compatible public contracts and owners are reused, not copied into a parallel implementation.
 
-Every implemented feature contains:
+Each core logic module documents its public API. Every service feature has one required `_usage.py` containing its bounded offline `if __name__ == "__main__":` scenarios; production logic modules do not contain demonstrations. Optional `_persistence.py` owns all feature-local database operations when durable state is required. The paths below are documentary targets pending current-code reconciliation, not claims of executable files. Tests verify the scenarios independently.
 
-```text
-app/services/agentic/<feature>/
-├── README.md
-├── __init__.py          # empty or module docstring only
-├── manifest.py          # immutable SPEC; no behavior
-├── config.py            # strict immutable parser; unknown keys fail
-├── feature.py           # mount/create_feature lifecycle adapter
-├── <primary_module>.py  # focused business responsibility + executable usage
-└── optional focused files owned by that feature only
-```
-
-Feature-level tests live at `tests/services/agentic/<feature>/`. The designated primary module contains the executable usage demonstration; automated tests and usage evidence are separate. D-IFACE/API owns external transport and authentication. UI owns widget rendering and context-contribution collection. The code-backed delivery authority is `docs/dev/feature_implementation_pipeline.md`.
-
----
+FR and acceptance IDs are trace identities, not runtime registrations. Required-provider keys below reproduce the register’s required graph. Optional providers are operation-gated: they must be declared and tested without making an absent future extension a universal startup dependency. The plan’s P1–P16 execution phases are distinct from specification U0–U13 release milestones; a U label is not proof of readiness or a new feature task.
 
 ## 1. Purpose and Boundary
 
 ### Purpose
 
-Agentic converts governed evidence into typed, attributable, challenge-tested research and decision-support artifacts and receiver-owned candidate requests. It coordinates LLM reasoning, context, specialist delegation, research design, DSL authoring, challenge, synthesis, and outcome calibration while keeping deterministic domains authoritative.
-
-The website includes one context-aware LLM agent named exactly **Chat Bot** (`chat_bot`). Chat Bot can understand a bounded typed snapshot of the current page and widgets, answer safe contextual questions, and delegate to an eligible specialist. It is not a CEO, Firm Coordinator, risk authority, strategy authority, trader, broker controller, or UI mutation engine.
-
-### Authority hierarchy
-
-1. The authenticated human Owner defines mandates and supplies exact human actions where policy requires them.
-2. System, Workspace, Data, Catalogue, Indicators, Analytics, Research, Simulation, Optimization, Strategy, Portfolio, Risk, Trading, Brokers, and D-IFACE retain their semantic and consequential authority.
-3. Agentic interprets, challenges, designs, composes, and proposes through public capability contracts.
-4. Model/workflow frameworks such as Google ADK are optional replaceable providers behind HaruQuantAI contracts.
-5. Model output, retrieved content, browser context, memory, and peer messages are untrusted until the owning deterministic rules validate their permitted use.
+Provide governed research assistance and bounded specialist workflows while keeping deterministic domain owners authoritative. The operator-facing assistant is named Chat Bot; roles create attributed evidence, claims and reviewable proposals rather than trading authority.
 
 ### Owns
 
-- the 20 focused feature capabilities in the registry below;
-- Agentic tasks, workflows, checkpoints, budgets, provenance, operations, incidents, leases, human actions, context bundles, memory, role contributions, claim graphs, deliberation, synthesis, research-search accounting, Agentic-authored candidates, and calibration evidence;
-- provider-neutral model invocation and role/profile policy;
-- the Chat Bot conversational and specialist-delegation semantics;
-- Agentic-side research campaign and near-duplicate accounting;
-- staged sandbox-artifact metadata when code fallback is explicitly allowed.
+Mandate enforcement; trace/incident operations; role contributions; tool governance and leases; structured model invocation; durable Agentic workflows; context and memory; profile evaluation; Chat Bot assistance; claims, deliberation and synthesis; governed research design/search; HSL/spec and proposal composition; portfolio advice; sandbox fallback; outcome calibration.
 
 ### Does not own
 
-- UI widget rendering, DOM, browser state, navigation execution, or workspace-context capture;
-- external HTTP/SSE/WebSocket authentication and transport;
-- canonical market/document/account data, source licensing, instruments, sessions, indicators, analytics, research results, simulation runs, optimization trials, strategy definitions, portfolio decisions, risk approvals, orders, fills, broker state, or production deployment;
-- receiver-owned request/result contracts after handoff;
-- an alternate policy, persistence, calculation, lifecycle, or execution engine for another domain.
+Broker credentials, order construction, Risk approval, kill-switch clearing, live deployment, deterministic metric recomputation, independent holdout allowances or self-granted model/role eligibility. Twenty features and twenty-two role profiles are different inventories.
 
-### Deletion boundary
+### Shared Contracts
 
-Deleting `app/services/agentic/` removes new Agentic reasoning, Chat Bot assistance, specialist workflows, Agentic research design, and Agentic-authored candidates. It must not prevent the kernel, composition substrate, UI shell, or deterministic domains from starting; weaken Risk/Trading/Brokers safety; change already accepted strategies; delete receiver-owned evidence; or fabricate fallback decisions. Consumers expose explicit capability-unavailable or degraded states.
+**Owned by this domain.** Status is an evidence state. Contract modules are selected public boundaries; an unbound symbol/DTO must be reconciled before implementing its production consumer. Do not infer a callable signature from the English title.
+
+| Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
+| --- | --- | --- | --- | --- |
+| NOT_REVALIDATED | `agentic.mandate@1` | `enforce_mandate(request)`<br>[`app/contracts/agentic/mandate.py`](../../contracts/agentic/mandate.py) | 1 | Mandate Enforcement |
+| NOT_REVALIDATED | `agentic.operations@1` | `operate_agentic_runs(request)`<br>[`app/contracts/agentic/operations.py`](../../contracts/agentic/operations.py) | 1 | Operations, Incidents and Replay Validation |
+| NOT_REVALIDATED | `agentic.roles@1` | `manage_role_contributions(request)`<br>[`app/contracts/agentic/roles.py`](../../contracts/agentic/roles.py) | 1 | Role Contribution Registry |
+| NOT_REVALIDATED | `agentic.tool-governance@1` | `govern_tool_calls(request)`<br>[`app/contracts/agentic/tool_governance.py`](../../contracts/agentic/tool_governance.py) | 1 | Tool Governance and Human Actions |
+| NOT_REVALIDATED | `agentic.model-inference@1` | `invoke_model(request)`<br>[`app/contracts/agentic/model_inference.py`](../../contracts/agentic/model_inference.py) | 1 | Provider-Neutral Model Invocation |
+| NOT_REVALIDATED | `agentic.workflows@1` | `run_agentic_workflows(request)`<br>[`app/contracts/agentic/workflows.py`](../../contracts/agentic/workflows.py) | 1 | Durable Agentic Workflow Runtime |
+| NOT_REVALIDATED | `agentic.context@1` | `assemble_agentic_context(request)`<br>[`app/contracts/agentic/context.py`](../../contracts/agentic/context.py) | 1 | Point-in-Time Context Assembly |
+| NOT_REVALIDATED | `agentic.memory@1` | `manage_agentic_memory(request)`<br>[`app/contracts/agentic/memory.py`](../../contracts/agentic/memory.py) | 1 | Governed Memory |
+| NOT_REVALIDATED | `agentic.profile-evaluation@1` | `evaluate_agentic_profiles(request)`<br>[`app/contracts/agentic/profile_evaluation.py`](../../contracts/agentic/profile_evaluation.py) | 1 | Profile and Topology Evaluation |
+| NOT_REVALIDATED | `agentic.operator-assistance@1` | `assist_operator(request)`<br>[`app/contracts/agentic/operator_assistance.py`](../../contracts/agentic/operator_assistance.py) | 1 | Chat Bot and Specialist Delegation |
+| NOT_REVALIDATED | `agentic.claims@1` | `manage_claim_graphs(request)`<br>[`app/contracts/agentic/claims.py`](../../contracts/agentic/claims.py) | 1 | Claim-and-Evidence Graph |
+| NOT_REVALIDATED | `agentic.deliberation@1` | `deliberate_research(request)`<br>[`app/contracts/agentic/deliberation.py`](../../contracts/agentic/deliberation.py) | 1 | Independent Challenge and Deliberation |
+| NOT_REVALIDATED | `agentic.synthesis@1` | `synthesize_research(request)`<br>[`app/contracts/agentic/synthesis.py`](../../contracts/agentic/synthesis.py) | 1 | Evidence-Preserving Research Synthesis |
+| NOT_REVALIDATED | `agentic.research-search@1` | `govern_research_search(request)`<br>[`app/contracts/agentic/research_search.py`](../../contracts/agentic/research_search.py) | 1 | Agentic Research Request Accounting |
+| NOT_REVALIDATED | `agentic.research-design@1` | `design_research(request)`<br>[`app/contracts/agentic/research_design.py`](../../contracts/agentic/research_design.py) | 1 | Falsifiable Research Design |
+| NOT_REVALIDATED | `agentic.strategy-specs@1` | `compose_strategy_specs(request)`<br>[`app/contracts/agentic/strategy_specs.py`](../../contracts/agentic/strategy_specs.py) | 1 | HSL Strategy and Indicator Composition |
+| NOT_REVALIDATED | `agentic.portfolio-advisory@1` | `advise_portfolio(request)`<br>[`app/contracts/agentic/portfolio_advisory.py`](../../contracts/agentic/portfolio_advisory.py) | 1 | Expiring Portfolio and Risk Advisory |
+| NOT_REVALIDATED | `agentic.strategy-proposals@1` | `compose_strategy_proposals(request)`<br>[`app/contracts/agentic/strategy_proposals.py`](../../contracts/agentic/strategy_proposals.py) | 1 | Strategy Proposal Composition and Handoff |
+| NOT_REVALIDATED | `agentic.sandbox-artifacts@1` | `author_sandbox_artifacts(request)`<br>[`app/contracts/agentic/sandbox_artifacts.py`](../../contracts/agentic/sandbox_artifacts.py) | 1 | Sandboxed Source Artifact Fallback |
+| NOT_REVALIDATED | `agentic.outcome-calibration@1` | `calibrate_agentic_outcomes(request)`<br>[`app/contracts/agentic/outcome_calibration.py`](../../contracts/agentic/outcome_calibration.py) | 1 | Post-Horizon Outcome Calibration |
+
+**Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
+
+| Capability | Owner | Binding | Consuming feature | Used for |
+| --- | --- | --- | --- | --- |
+| `workspace.manage-accounts@1` | Workspace | Required | [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | Verify accounts, principals and sessions |
+| `workspace.administer-settings@1` | Workspace | Required | [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | Version user-visible system settings |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs) | Execute bounded feature-owned transactions |
+| `workspace.manage-accounts@1` | Workspace | Required | [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls) | Verify accounts, principals and sessions |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls) | Execute bounded feature-owned transactions |
+| `orchestration.resource-admission@1` | Orchestration | Required | [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls) | Admit finite work under one resource ledger |
+| `orchestration.resource-admission@1` | Orchestration | Required | [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models) | Admit finite work under one resource ledger |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows) | Execute bounded feature-owned transactions |
+| `orchestration.manage-jobs@1` | Orchestration | Required | [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows) | Persist and control shared jobs and attempts |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-MANAGE_MEMORY`](#feat-agt-manage-memory) | Execute bounded feature-owned transactions |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles) | Execute bounded feature-owned transactions |
+| `workspace.manage-accounts@1` | Workspace | Required | [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator) | Verify accounts, principals and sessions |
+| `workspace.conversations@1` | Workspace | Required | [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator) | Retain scoped conversations without losing canonical evidence |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims) | Execute bounded feature-owned transactions |
+| `research.campaigns@1` | Research | Required | [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search) | Account for research campaigns and hypothesis families |
+| `research.holdout@1` | Research | Required | [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search) | Reserve scarce holdout access atomically |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search) | Execute bounded feature-owned transactions |
+| `research.protocols@1` | Research | Required | [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research) | Preregister research samples and evaluation protocols |
+| `strategy.version-strategies@1` | Strategy | Required | [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs) | Accept immutable strategy revisions and reviewed patches |
+| `strategy.define-indicators@1` | Strategy | Required | [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs) | Accept declarative custom indicator definitions |
+| `portfolio.compose-portfolios@1` | Portfolio | Required | [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio) | Version portfolio composition and capital policy |
+| `portfolio.analyze-portfolio-risk@1` | Portfolio | Required | [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio) | Explain diversification, exposure and portfolio scenarios |
+| `risk.research-evidence@1` | Risk | Required | [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio) | Expose risk evidence and owner-controlled review |
+| `strategy.proposal-intake@1` | Strategy | Required | [`FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`](#feat-agt-compose-strategy-proposals) | Receive non-executable strategy proposals |
+| `plugins.sandbox-permissions@1` | Plugins | Required | [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts) | Attest bounded plugin permissions and sandbox leases |
+| `plugins.isolate-analysis@1` | Plugins | Required | [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts) | Build and test untrusted code in isolation |
+| `workspace.artifacts@1` | Workspace | Required | [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts) | Publish and retain immutable artifact bytes |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts) | Execute bounded feature-owned transactions |
+| `workspace.persistence@1` | Workspace | Required | [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes) | Execute bounded feature-owned transactions |
+| `analytics.compute-metrics@1` | Analytics | Required | [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes) | Compute versioned canonical performance and risk metrics |
+
+**Operation-gated providers.** For each §4 feature, its linked source card’s complete “Operation-gated providers” table defines applicability, exact provider identity and absence behavior. This is scoped incorporation, not permission to treat all 233 register-wide operation edges as optional for every feature. Resolve those provider IDs to their primary capability keys in the corresponding domain README; bind actual operations in the acceptance record. An omitted local duplicate table does not waive a source dependency.
+
+### Persisted State Ownership
+
+Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+| Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-MANAGE_MEMORY`](#feat-agt-manage-memory) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-DELIBERATE_RESEARCH`](#feat-agt-deliberate-research) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`](#feat-agt-compose-strategy-proposals) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+
+A feature’s exact durable namespace, schema version and migrations are taken from its reconciled manifest and contract, not guessed from its folder name. External consumers access semantic state only through the owner capability. Workspace persistence/artifact custody never acquires that semantic ownership.
+
+### Four-Level Structural Hierarchy
+
+| Code level | Represents | Domain example |
+| --- | --- | --- |
+| Package | Domain boundary | `app/services/agentic/` |
+| Module folder | Composable feature owner | `app/services/agentic/enforce_mandate/` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) |
+| File | Manifest, strict configuration, lifecycle or focused use case | `manifest.py`, `config.py`, `feature.py`, focused logic module |
+| Class / function / method | One or more traced requirement behaviors | `FR-AGT-VALIDATE_MANDATE` and its acceptance oracle |
+
+### Domain Capability Map
+
+The table in §2 is the complete domain capability map. Edges below illustrate dependency direction, not a new orchestrator or private import relationship.
+
+```mermaid
+flowchart LR
+    Caller["Caller / consuming feature"] --> Contract["Versioned public contract"]
+    Provider["Removable domain feature"] -->|provides| Contract
+    Provider --> Scope["Scoped effects and disposal"]
+    Provider --> State["Own records only, when declared"]
+```
+
+## 2. Final Package Structure and Feature Independence
+
+Feature owners are independent and physically removable. The selected package is a target binding: reconcile known current aliases and preserve compatible existing identities before creating a folder. Folder absence does not prove behavior absence. Removing a feature withdraws its contributions; it does not delete another feature’s source or retained evidence.
+
+| Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | Mandate Enforcement | `app/services/agentic/enforce_mandate/` | U1 | 3 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs) | Operations, Incidents and Replay Validation | `app/services/agentic/operate_runs/` | U1 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles) | Role Contribution Registry | `app/services/agentic/register_roles/` | U1 | 3 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls) | Tool Governance and Human Actions | `app/services/agentic/govern_tool_calls/` | U1 | 5 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models) | Provider-Neutral Model Invocation | `app/services/agentic/invoke_models/` | U1 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows) | Durable Agentic Workflow Runtime | `app/services/agentic/run_workflows/` | U2 | 5 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context) | Point-in-Time Context Assembly | `app/services/agentic/assemble_context/` | U2 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-MANAGE_MEMORY`](#feat-agt-manage-memory) | Governed Memory | `app/services/agentic/manage_memory/` | U8 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles) | Profile and Topology Evaluation | `app/services/agentic/evaluate_profiles/` | U2 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator) | Chat Bot and Specialist Delegation | `app/services/agentic/assist_operator/` | U2 | 5 | 3 | NOT_REVALIDATED |
+| [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims) | Claim-and-Evidence Graph | `app/services/agentic/manage_claims/` | U2 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-DELIBERATE_RESEARCH`](#feat-agt-deliberate-research) | Independent Challenge and Deliberation | `app/services/agentic/deliberate_research/` | U4 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research) | Evidence-Preserving Research Synthesis | `app/services/agentic/synthesize_research/` | U2 | 3 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search) | Agentic Research Request Accounting | `app/services/agentic/govern_research_search/` | U3 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research) | Falsifiable Research Design | `app/services/agentic/design_research/` | U3 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs) | HSL Strategy and Indicator Composition | `app/services/agentic/compose_strategy_specs/` | U3 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio) | Expiring Portfolio and Risk Advisory | `app/services/agentic/advise_portfolio/` | U7 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`](#feat-agt-compose-strategy-proposals) | Strategy Proposal Composition and Handoff | `app/services/agentic/compose_strategy_proposals/` | U3 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts) | Sandboxed Source Artifact Fallback | `app/services/agentic/author_sandbox_artifacts/` | U9 | 5 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes) | Post-Horizon Outcome Calibration | `app/services/agentic/calibrate_outcomes/` | U8 | 4 | 2 | NOT_REVALIDATED |
+
+```text
+app/services/agentic/
+├── README.md  # this domain target registry
+├── __init__.py  # docstring only
+├── enforce_mandate/  # FEAT-AGT-ENFORCE_MANDATE
+├── operate_runs/  # FEAT-AGT-OPERATE_RUNS
+├── register_roles/  # FEAT-AGT-REGISTER_ROLES
+├── govern_tool_calls/  # FEAT-AGT-GOVERN_TOOL_CALLS
+├── invoke_models/  # FEAT-AGT-INVOKE_MODELS
+├── run_workflows/  # FEAT-AGT-RUN_WORKFLOWS
+├── assemble_context/  # FEAT-AGT-ASSEMBLE_CONTEXT
+├── manage_memory/  # FEAT-AGT-MANAGE_MEMORY
+├── evaluate_profiles/  # FEAT-AGT-EVALUATE_PROFILES
+├── assist_operator/  # FEAT-AGT-ASSIST_OPERATOR
+├── manage_claims/  # FEAT-AGT-MANAGE_CLAIMS
+├── deliberate_research/  # FEAT-AGT-DELIBERATE_RESEARCH
+├── synthesize_research/  # FEAT-AGT-SYNTHESIZE_RESEARCH
+├── govern_research_search/  # FEAT-AGT-GOVERN_RESEARCH_SEARCH
+├── design_research/  # FEAT-AGT-DESIGN_RESEARCH
+├── compose_strategy_specs/  # FEAT-AGT-COMPOSE_STRATEGY_SPECS
+├── advise_portfolio/  # FEAT-AGT-ADVISE_PORTFOLIO
+├── compose_strategy_proposals/  # FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS
+├── author_sandbox_artifacts/  # FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS
+└── calibrate_outcomes/  # FEAT-AGT-CALIBRATE_OUTCOMES
+```
+
+Every feature folder contains `README.md`, docstring-only `__init__.py`, `manifest.py`, `config.py`, `feature.py` and its focused logic modules. Shared contract definitions live outside those removable packages. The primary logic-module designation in §4 is a target for usage ownership; adapt a compatible existing module rather than duplicate its service.
+
+### Feature Capability Dependency Direction
+
+A required edge means “consumer requires the provider’s public capability.” It never means “import the provider package.” Optional operation closure is resolved by the composition/runtime boundary and rechecked at invocation. Physical removal must cause the declared unavailable or blocked state while unrelated capabilities remain usable.
+
+## 3. Workflows
+
+Workflows connect existing features; they do not create additional feature owners. “Internal” means all participating behavior is domain-local. “Cross-Domain” means collaboration through public contracts. Participant lists below are **not** a substitute for the plan’s execution schedule or the workflow’s validated operation graph.
+
+### Domain-local reading sequence — Answer with owner evidence
+
+**Input boundary:** Authenticated current context, mandate and an explicit bounded operator request.
+
+**Output boundary:** Attributed evidence-backed answer, reviewable draft or typed refusal/unavailable outcome with no implied mutation.
+
+**Capabilities to inspect:** [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) → [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles) → [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows) → [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context) → [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims) → [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research) → [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator).
+
+This is a domain-oriented explanation, not an additional canonical `WF-*` identity. Apply every FR of the participating operation, not only its first validation step. Validate scope and immutable references, resolve admitted providers, perform owner work, verify the owner receipt, and then expose the result. Invalid input, provider absence, stale revision and cancellation retain separate typed outcomes.
+
+| Evidence | Workflow | Scope | Lead | First U gate | Acceptance |
+| --- | --- | --- | --- | --- | --- |
+| PENDING | [`WF-WB-CHAT_REVIEW`](#wf-wb-chat-review) | Cross-Domain | [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator) | U2 | `ATW-WB-CHAT_REVIEW` |
+| PENDING | [`WF-WB-IDEA_TO_STRATEGY`](#wf-wb-idea-to-strategy) | Cross-Domain | [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs) | U3 | `ATW-WB-IDEA_TO_STRATEGY` |
+| PENDING | [`WF-AGT-ASSIST_OPERATOR`](#wf-agt-assist-operator) | Cross-Domain | [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator) | U2 | `ATW-AGT-ASSIST_OPERATOR` |
+| PENDING | [`WF-AGT-REVIEW_EVIDENCE`](#wf-agt-review-evidence) | Cross-Domain | [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows) | U2 | `ATW-AGT-REVIEW_EVIDENCE` |
+| PENDING | [`WF-AGT-RESEARCH_OBJECTIVE`](#wf-agt-research-objective) | Cross-Domain | [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows) | U4 | `ATW-AGT-RESEARCH_OBJECTIVE` |
+| PENDING | [`WF-AGT-DESIGN_RESEARCH`](#wf-agt-design-research) | Cross-Domain | [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research) | U3 | `ATW-AGT-DESIGN_RESEARCH` |
+| PENDING | [`WF-AGT-GOVERNED_SEARCH`](#wf-agt-governed-search) | Cross-Domain | [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search) | U6 | `ATW-AGT-GOVERNED_SEARCH` |
+| PENDING | [`WF-AGT-COMPOSE_STRATEGY_SPEC`](#wf-agt-compose-strategy-spec) | Cross-Domain | [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs) | U3 | `ATW-AGT-COMPOSE_STRATEGY_SPEC` |
+| PENDING | [`WF-AGT-ADVISE_PORTFOLIO`](#wf-agt-advise-portfolio) | Cross-Domain | [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio) | U7 | `ATW-AGT-ADVISE_PORTFOLIO` |
+| PENDING | [`WF-AGT-COMPOSE_STRATEGY_PROPOSAL`](#wf-agt-compose-strategy-proposal) | Cross-Domain | [`FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`](#feat-agt-compose-strategy-proposals) | U3 | `ATW-AGT-COMPOSE_STRATEGY_PROPOSAL` |
+| PENDING | [`WF-AGT-AUTHOR_SANDBOX_ARTIFACT`](#wf-agt-author-sandbox-artifact) | Cross-Domain | [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts) | U9 | `ATW-AGT-AUTHOR_SANDBOX_ARTIFACT` |
+| PENDING | [`WF-AGT-EVALUATE_PROFILE`](#wf-agt-evaluate-profile) | Cross-Domain | [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles) | U2 | `ATW-AGT-EVALUATE_PROFILE` |
+| PENDING | [`WF-AGT-CALIBRATE_OUTCOME`](#wf-agt-calibrate-outcome) | Cross-Domain | [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes) | U8 | `ATW-AGT-CALIBRATE_OUTCOME` |
+| PENDING | [`WF-AGT-RESPOND_INCIDENT`](#wf-agt-respond-incident) | Cross-Domain | [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs) | U1 | `ATW-AGT-RESPOND_INCIDENT` |
+
+<a id="wf-wb-chat-review"></a>
+### `WF-WB-CHAT_REVIEW` — Review a real result through Chat Bot
+
+**Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator), [`FEAT-UI-32`](../../ui/README.md#feat-ui-32), [`FEAT-UI-15`](../../ui/README.md#feat-ui-15), [`FEAT-UI-CHAT_BOT`](../../ui/README.md#feat-ui-chat-bot), [`FEAT-IFACE-AGENTIC_GATEWAY`](../interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-ANA-QUERY_RESULTS`](../analytics/README.md#feat-ana-query-results), [`FEAT-WS-MANAGE_CONVERSATIONS`](../workspace/README.md#feat-ws-manage-conversations).
+
+**This domain contributes:** [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-CHAT_REVIEW` — Change the browser-displayed metric to an incorrect value: answer refreshes owner truth and cites exact evidence, same-conversation specialist attribution; stale or denied evidence cannot produce a claimed fact.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-chat-review).
+
+<a id="wf-wb-idea-to-strategy"></a>
+### `WF-WB-IDEA_TO_STRATEGY` — Research idea to reviewed strategy
+
+**Lead owner:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs). **Release gate:** U3. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs), [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator), [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research), [`FEAT-RES-GOVERN_CAMPAIGNS`](../research/README.md#feat-res-govern-campaigns), [`FEAT-RES-DEFINE_PROTOCOLS`](../research/README.md#feat-res-define-protocols), [`FEAT-STRAT-DEFINE_AST`](../strategy/README.md#feat-strat-define-ast), [`FEAT-STRAT-CATALOG_BLOCKS`](../strategy/README.md#feat-strat-catalog-blocks), [`FEAT-STRAT-VERSION_STRATEGIES`](../strategy/README.md#feat-strat-version-strategies), [`FEAT-IFACE-AGENTIC_GATEWAY`](../interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-UI-CHAT_BOT`](../../ui/README.md#feat-ui-chat-bot), [`FEAT-UI-STRATEGY_STUDIO`](../../ui/README.md#feat-ui-strategy-studio), [`FEAT-SIM-EXECUTE_TICKS`](../simulator/README.md#feat-sim-execute-ticks).
+
+**This domain contributes:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs), [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator), [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-IDEA_TO_STRATEGY` — Draft with explicit unvalidated assumptions; validate, bounded repair, exact patch closure review and CAS acceptance; separately authorize a bounded tick backtest; no save/holdout/live authority implied by prose.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-idea-to-strategy).
+
+<a id="wf-agt-assist-operator"></a>
+### `WF-AGT-ASSIST_OPERATOR` — Context-Aware Chat Bot
+
+**Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator), [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate), [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models), [`FEAT-UI-15`](../../ui/README.md#feat-ui-15), [`FEAT-IFACE-AGENTIC_GATEWAY`](../interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-WS-MANAGE_CONVERSATIONS`](../workspace/README.md#feat-ws-manage-conversations).
+
+**This domain contributes:** [`FEAT-AGT-ASSIST_OPERATOR`](#feat-agt-assist-operator), [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate), [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-ASSIST_OPERATOR` — Fresh verified scope and deterministic direct/specialist route; reply preserves attribution, refusals and evidence; no prose-triggered mutation.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-assist-operator).
+
+<a id="wf-agt-review-evidence"></a>
+### `WF-AGT-REVIEW_EVIDENCE` — Deterministic Evidence Review
+
+**Lead owner:** [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows). **Release gate:** U2. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-ANA-QUERY_RESULTS`](../analytics/README.md#feat-ana-query-results).
+
+**This domain contributes:** [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-REVIEW_EVIDENCE` — Owner-authored immutable evidence → typed claims → cited synthesis; absent mandatory evidence yields refusal, not recomputation.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-review-evidence).
+
+<a id="wf-agt-research-objective"></a>
+### `WF-AGT-RESEARCH_OBJECTIVE` — Adaptive Research Council
+
+**Lead owner:** [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows). **Release gate:** U4. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-DELIBERATE_RESEARCH`](#feat-agt-deliberate-research), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles).
+
+**This domain contributes:** [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-DELIBERATE_RESEARCH`](#feat-agt-deliberate-research), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-RESEARCH_OBJECTIVE` — Deterministic-only/specialist/challenge/council policies, blind first pass, correlation disclosure, bounded budget and preserved dissent; no council enablement without positive evaluated utility.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-research-objective).
+
+<a id="wf-agt-design-research"></a>
+### `WF-AGT-DESIGN_RESEARCH` — Hypothesis to Receiver Request
+
+**Lead owner:** [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research). **Release gate:** U3. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research), [`FEAT-RES-GOVERN_CAMPAIGNS`](../research/README.md#feat-res-govern-campaigns), [`FEAT-RES-DEFINE_PROTOCOLS`](../research/README.md#feat-res-define-protocols), [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls).
+
+**This domain contributes:** [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research), [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-DESIGN_RESEARCH` — Falsifiable hypothesis, explicit sample/cost/seed/baseline, strict owner schema and separate execution authority.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-design-research).
+
+<a id="wf-agt-governed-search"></a>
+### `WF-AGT-GOVERNED_SEARCH` — Bounded Optimization Design
+
+**Lead owner:** [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search). **Release gate:** U6. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search), [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research), [`FEAT-RES-GOVERN_CAMPAIGNS`](../research/README.md#feat-res-govern-campaigns), [`FEAT-RES-GOVERN_HOLDOUTS`](../research/README.md#feat-res-govern-holdouts), [`FEAT-OPT-SEARCH_PARAMETERS`](../optimization/README.md#feat-opt-search-parameters), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research).
+
+**This domain contributes:** [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search), [`FEAT-AGT-DESIGN_RESEARCH`](#feat-agt-design-research), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-GOVERNED_SEARCH` — Same-family variants and receiver retries reconcile accepted attempts/actual costs; authoritative holdout receipt and all outcomes retained.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-governed-search).
+
+<a id="wf-agt-compose-strategy-spec"></a>
+### `WF-AGT-COMPOSE_STRATEGY_SPEC` — JSON DSL Candidate
+
+**Lead owner:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs). **Release gate:** U3. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs), [`FEAT-STRAT-DEFINE_AST`](../strategy/README.md#feat-strat-define-ast), [`FEAT-STRAT-CATALOG_BLOCKS`](../strategy/README.md#feat-strat-catalog-blocks), [`FEAT-STRAT-VERSION_STRATEGIES`](../strategy/README.md#feat-strat-version-strategies), [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls).
+
+**This domain contributes:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs), [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-COMPOSE_STRATEGY_SPEC` — HSL research_draft versus supported evidence is explicit; no arbitrary source fallback; valid intake receipt or structured DSL gap.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-compose-strategy-spec).
+
+<a id="wf-agt-advise-portfolio"></a>
+### `WF-AGT-ADVISE_PORTFOLIO` — Portfolio and Risk Advisory
+
+**Lead owner:** [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio). **Release gate:** U7. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio), [`FEAT-POR-COMPOSE_PORTFOLIOS`](../portfolio/README.md#feat-por-compose-portfolios), [`FEAT-POR-ANALYZE_PORTFOLIO_RISK`](../portfolio/README.md#feat-por-analyze-portfolio-risk), [`FEAT-RSK-ASSESS_RESEARCH_RISK`](../risk/README.md#feat-rsk-assess-research-risk), [`FEAT-AGT-DELIBERATE_RESEARCH`](#feat-agt-deliberate-research), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls).
+
+**This domain contributes:** [`FEAT-AGT-ADVISE_PORTFOLIO`](#feat-agt-advise-portfolio), [`FEAT-AGT-DELIBERATE_RESEARCH`](#feat-agt-deliberate-research), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-ADVISE_PORTFOLIO` — Fresh account/portfolio evidence and independent risk challenge; strictly expiring non-binding output cannot encode executable quantities or Risk approval.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-advise-portfolio).
+
+<a id="wf-agt-compose-strategy-proposal"></a>
+### `WF-AGT-COMPOSE_STRATEGY_PROPOSAL` — Strategy Proposal Handoff
+
+**Lead owner:** [`FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`](#feat-agt-compose-strategy-proposals). **Release gate:** U3. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`](#feat-agt-compose-strategy-proposals), [`FEAT-STRAT-ACCEPT_PROPOSALS`](../strategy/README.md#feat-strat-accept-proposals), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls).
+
+**This domain contributes:** [`FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`](#feat-agt-compose-strategy-proposals), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-COMPOSE_STRATEGY_PROPOSAL` — One exact authorized proposal intake/rejection/expiry receipt; accepted intake is not accepted strategy, TradeIntent, order or fill.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-compose-strategy-proposal).
+
+<a id="wf-agt-author-sandbox-artifact"></a>
+### `WF-AGT-AUTHOR_SANDBOX_ARTIFACT` — Sandbox Code Fallback
+
+**Lead owner:** [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts). **Release gate:** U9. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts), [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls), [`FEAT-PLUG-SANDBOX_PERMISSIONS`](../plugins/README.md#feat-plug-sandbox-permissions), [`FEAT-PLUG-ISOLATE_ANALYSIS`](../plugins/README.md#feat-plug-isolate-analysis), [`FEAT-WS-MANAGE_ARTIFACTS`](../workspace/README.md#feat-ws-manage-artifacts).
+
+**This domain contributes:** [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](#feat-agt-author-sandbox-artifacts), [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-AUTHOR_SANDBOX_ARTIFACT` — Receiver-validated DSL gap plus exact specification/authorization precedes bounded model/write/build; staging manifest and cleanup receipt; no host import/deployment.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-author-sandbox-artifact).
+
+<a id="wf-agt-evaluate-profile"></a>
+### `WF-AGT-EVALUATE_PROFILE` — Profile and Topology Evaluation
+
+**Lead owner:** [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles). **Release gate:** U2. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles), [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls), [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows).
+
+**This domain contributes:** [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles), [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls), [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-EVALUATE_PROFILE` — Separate evaluation-only bootstrap; deterministic/human-calibrated graders and baselines/ablations; subject cannot self-promote; eligibility pins every version.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-evaluate-profile).
+
+<a id="wf-agt-calibrate-outcome"></a>
+### `WF-AGT-CALIBRATE_OUTCOME` — Post-Horizon Calibration
+
+**Lead owner:** [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes). **Release gate:** U8. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes), [`FEAT-TRD-OBSERVE_OUTCOMES`](../trading/README.md#feat-trd-observe-outcomes), [`FEAT-ANA-COMPUTE_METRICS`](../analytics/README.md#feat-ana-compute-metrics), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls).
+
+**This domain contributes:** [`FEAT-AGT-CALIBRATE_OUTCOMES`](#feat-agt-calibrate-outcomes), [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims), [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-CALIBRATE_OUTCOME` — Only matured immutable observation rules/outcomes are matched; deterministic scores and baselines, sample uncertainty; change candidate never self-applies.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-calibrate-outcome).
+
+<a id="wf-agt-respond-incident"></a>
+### `WF-AGT-RESPOND_INCIDENT` — Incident and Safe Recovery
+
+**Lead owner:** [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs). **Release gate:** U1. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls), [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models), [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles).
+
+**This domain contributes:** [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs), [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls), [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models), [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows), [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-RESPOND_INCIDENT` — Use the incident containment, revocation and recovery oracle in the canonical workflow card; recovery cannot replay consequential receiver actions without renewed authorization.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-respond-incident).
+
+## 4. Composable Feature Specifications
+
+Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. All acceptance states are PENDING / NOT_REVALIDATED. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
+
+<a id="feat-agt-enforce-mandate"></a>
+### 4.1 `enforce_mandate/` — `FEAT-AGT-ENFORCE_MANDATE`
+
+> **Feature ID:** `FEAT-AGT-ENFORCE_MANDATE`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/enforce_mandate/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Mandate Enforcement. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.mandate@1`.
+
+**Required capabilities:**
+
+`workspace.manage-accounts@1` — [`FEAT-WS-MANAGE_ACCOUNTS`](../workspace/README.md#feat-ws-manage-accounts)<br>`workspace.administer-settings@1` — [`FEAT-WS-ADMINISTER_SETTINGS`](../workspace/README.md#feat-ws-administer-settings).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-enforce-mandate) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/mandate.py`](../../contracts/agentic/mandate.py). **Specified primary method:** `enforce_mandate(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-VALIDATE_MANDATE`, `NFR-TRC-AGT-ENFORCE_MANDATE-001`, `NFR-TRC-AGT-ENFORCE_MANDATE-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.mandate@1` | FEAT-AGT-ENFORCE_MANDATE | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-ENFORCE_MANDATE | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| enforce_mandate.py | Focused production domain-logic module | enforce_mandate. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-VALIDATE_MANDATE` | Validate immutable mandate identity/integrity, effective interval, objectives, enabled roles/features, environment/account/asset scope and finite budgets. | `AT-AGT-ENFORCE_MANDATE-001` | Tampered, absent, future or expired mandate fails; the narrowest applicable owner/system rule wins. |
+| PENDING | `FR-AGT-ENFORCE_AUTHORITY_BOUNDARY` | Reject any Agentic grant of broker credentials, order construction, Risk approval, kill-switch clearing, deployment or receiver authority. | `AT-AGT-ENFORCE_MANDATE-002` | Forbidden fields are unrepresentable/rejected and no prohibited receiver is invoked. |
+| PENDING | `FR-AGT-FAIL_CLOSED_ON_MANDATE` | Publish unavailable/refusal when mandate validity or scope cannot be proven. | `AT-AGT-ENFORCE_MANDATE-003` | Missing configuration never selects a permissive default; removing mandate stops Agentic only. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `enforce_mandate(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-ENFORCE_MANDATE-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-ENFORCE_MANDATE-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-ENFORCE_MANDATE-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-ENFORCE_MANDATE-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-enforce-mandate): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/enforce_mandate/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/enforce_mandate/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.enforce_mandate._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-ENFORCE_MANDATE`. Withdraw `agentic.mandate@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 2. Constitutional Invariants
+<a id="feat-agt-operate-runs"></a>
+### 4.2 `operate_runs/` — `FEAT-AGT-OPERATE_RUNS`
 
-1. An agent may propose; only the owning deterministic domain may decide or mutate.
-2. No Agentic capability or role imports broker SDKs, holds broker credentials, constructs orders, clears kill switches, approves risk, or deploys artifacts.
-3. Titles and role names grant no authority.
-4. Every model, prompt, role, tool, lease, human action, handoff, artifact, state transition, and result is typed, versioned, bounded, attributable, and auditable.
-5. Retrieved content, page text, widget values, memory, and peer messages are data, never instructions.
-6. Missing, stale, poisoned, unlicensed, incompatible, out-of-scope, or unverifiable evidence fails closed or produces explicit partial coverage.
-7. Claim graphs—not unrestricted transcripts or hidden reasoning—are the canonical reasoning record.
-8. Independent first-pass challenge precedes exposure to proposer narrative when challenge is required.
-9. Consensus is not truth, authorization, position size, or promotion evidence by itself.
-10. Councils, roles, models, prompts, tools, and rounds must demonstrate uncertainty-adjusted value over simpler baselines.
-11. JSON strategy/indicator DSL is the default generated artifact; arbitrary code is an exceptional sandboxed fallback.
-12. Search variants, failures, amendments, researcher degrees of freedom, and holdout receipts remain visible.
-13. Outcome calibration can propose change candidates but never self-modify production policy, prompts, permissions, thresholds, or eligibility.
-14. Disabling/removing Agentic preserves deterministic safety equivalence.
+> **Feature ID:** `FEAT-AGT-OPERATE_RUNS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/operate_runs/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Operations, Incidents and Replay Validation. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.operations@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-operate-runs) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/operations.py`](../../contracts/agentic/operations.py). **Specified primary method:** `operate_agentic_runs(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-RECORD_OPERATIONS`, `FR-AGT-VALIDATE_REPLAY`, `NFR-TRC-AGT-OPERATE_RUNS-001`, `NFR-TRC-AGT-OPERATE_RUNS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.operations@1` | FEAT-AGT-OPERATE_RUNS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-OPERATE_RUNS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| operate_agentic_runs.py | Focused production domain-logic module | operate_agentic_runs. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-RECORD_OPERATIONS` | Append correlated redacted role/model/tool/lease/handoff/policy/state/cost/refusal/failure/cleanup records. | `AT-AGT-OPERATE_RUNS-001` | Secrets/unrestricted private text are redacted before persistence; bounded export preserves sequence and immutable artifact references. |
+| PENDING | `FR-AGT-CONTAIN_INCIDENTS` | Classify incidents and publish durable containment/readiness decisions for owning consumers to revoke/cancel/quarantine. | `AT-AGT-OPERATE_RUNS-002` | Kill the event consumer between decision and acknowledgement: restart cannot lose containment or reauthorize revoked work. |
+| PENDING | `FR-AGT-VALIDATE_REPLAY` | Validate exact references, versions, generations and side-effect prohibition for historical replay eligibility. | `AT-AGT-OPERATE_RUNS-003` | Tampered/missing/drifted references fail; replay validation invokes no external side effect. |
+| PENDING | `FR-AGT-PUBLISH_AGENTIC_READINESS` | Expose feature-level readiness/degradation and containment reasons without private provider internals. | `AT-AGT-OPERATE_RUNS-004` | A missed event cannot bypass the mandatory current readiness check before invocation. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `operate_agentic_runs(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-OPERATE_RUNS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-OPERATE_RUNS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-OPERATE_RUNS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-OPERATE_RUNS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-operate-runs): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/operate_runs/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/operate_runs/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-OPERATE_RUNS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.operate_runs._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-OPERATE_RUNS`. Withdraw `agentic.operations@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 3. Focused Feature Registry
-| Order | Status | Wave | Feature | Folder | Provides | State | Primary responsibility | Removal result |
-|---:|---|---:|---|---|---|---|---|---|
-| 1 | Missing | 1 | `FEAT-AGT-ENFORCE_MANDATE` — Mandate Enforcement | `enforce_mandate/` | `agentic.mandate@1` | None | Validate the immutable Agentic operating envelope and answer exact scope, budget, environment, role, feature, and prohibited-authority questions. The stricter system, Risk, venue, or runtime rule always wins. | Reject all new Agentic work. Retained evidence stays readable through its owning capabilities; deterministic safety remains unchanged. |
-| 2 | Missing | 1 | `FEAT-AGT-OPERATE_RUNS` — Operations, Incidents, and Replay Validation | `operate_runs/` | `agentic.operations@1` | `agentic.operations` / RETAIN | Record correlated redacted operational evidence, inspect traces, classify incidents, contain affected work, expose readiness/cost diagnostics, and validate side-effect-free replay references. This feature is deterministic and invokes no model. | Stop Agentic work that requires mandatory audit. Preserve retained traces/incidents. Cancel subscriptions and exact callbacks; do not affect deterministic-domain audit or safety. |
-| 3 | Missing | 1 | `FEAT-AGT-REGISTER_ROLES` — Role Contribution Registry | `register_roles/` | `agentic.roles@1` | None | Register, verify, resolve, list, enable, disable, and exactly dispose versioned role contributions and prompt artifacts. Registration does not grant eligibility or authority. | Remove the role registry capability and exactly dispose all contributions registered through it. Model-dependent workflows become unready; retained operations/workflow evidence remains. |
-| 4 | Missing | 1 | `FEAT-AGT-GOVERN_TOOL_CALLS` — Tool Governance and Human Actions | `govern_tool_calls/` | `agentic.tool-governance@1` | `agentic.tool_governance` / RETAIN | Register eligible Agentic tools, issue invocation-bound capability leases, authorize every call/retry, filter returned content before model access, revoke leases, and manage typed human actions. This feature is deterministic and invokes no model. | Revoke all outstanding leases, dispose tool contributions, refuse new tool calls and pending actions, and preserve retained approval/audit evidence. Model-only workflows may continue only when their profiles permit zero tools. |
-| 5 | Missing | 1 | `FEAT-AGT-INVOKE_MODELS` — Provider-Neutral Model Invocation | `invoke_models/` | `agentic.model-inference@1` | None | Validate an evaluated model profile and execute one schema-bound model invocation without silent provider/model substitution. Provider adapters are replaceable; provider objects never cross the contract. | Cancel/drain managed invocations, close provider clients, and make model-dependent capabilities unready unless composition has an independently evaluated compatible provider replacement. |
-| 6 | Missing | 2 | `FEAT-AGT-RUN_WORKFLOWS` — Durable Workflow Orchestration | `run_workflows/` | `agentic.workflows@1` | `agentic.workflows` / RETAIN | Submit, route, checkpoint, resume, cancel, expire, drain, and inspect bounded idempotent workflows. Routing and bounds are deterministic. This feature owns the Research Planner and Artifact Planner role contributions but gives them no authority. | Stop new workflows, revoke child leases, cancel or drain active tasks according to policy, and preserve checkpoints/results. Consumers lose Agentic workflow execution, not deterministic domain operations. |
-| 7 | Missing | 2 | `FEAT-AGT-ASSEMBLE_CONTEXT` — Point-in-Time Context Assembly | `assemble_context/` | `agentic.context@1` | None | Assemble bounded task context from public evidence and UI context using provenance, availability, freshness, licensing, trust, injection, scope, and deduplication filters. Browser context or memory never substitutes for authoritative evidence. | New model work requiring governed context becomes unready. Pure deterministic Agentic reads that do not require context may continue. No retained state is deleted. |
-| 8 | Missing | 2 | `FEAT-AGT-MANAGE_MEMORY` — Governed Memory | `manage_memory/` | `agentic.memory@1` | `agentic.memory` / RETAIN | Accept memory candidates; validate, redact, classify, promote, retrieve, supersede, expire, purge, and export workflow, working, episodic, validated-semantic, and audit memory. Memory remains context, not market truth or policy. | New memory reads/writes stop. Workflows may continue statelessly only when memory is optional. Retained records remain subject to policy and audit access; TTL-bound working state is cleaned by declared policy. |
-| 9 | Missing | 2 | `FEAT-AGT-EVALUATE_PROFILES` — Profile and Topology Evaluation | `evaluate_profiles/` | `agentic.profile-evaluation@1` | `agentic.profile_evaluation` / RETAIN | Aggregate feature-local evaluation evidence and deterministically decide eligibility for role, prompt, model, tool, workflow, and council-topology profiles. Compare deterministic, single-agent, and council baselines with uncertainty and cost. | Freeze current evidence as retained history but prevent new or changed profiles/topologies from becoming eligible. Existing eligible profiles may run only while mandate and policy permit. |
-| 10 | Missing | 2 | `FEAT-AGT-ASSIST_OPERATOR` — Website Chat Bot and Specialist Delegation | `assist_operator/` | `agentic.operator-assistance@1` | `agentic.operator_conversations` / DELETE | Run the website agent named exactly Chat Bot. Validate current page/widget context, answer safe contextual questions, deterministically verify specialist routes, wait for specialist results, and present one coherent response in the same conversation. Initial actions are read context, answer, explain, delegate, summarize, and suggest navigation only. | Chat Bot becomes unavailable. Existing session/task conversation state is deleted or expires by policy; specialists and internal workflows may remain available through other authorized interfaces. UI shell and widgets remain usable without LLM assistance. |
-| 11 | Missing | 3 | `FEAT-AGT-MANAGE_CLAIMS` — Claim-and-Evidence Graph | `manage_claims/` | `agentic.claims@1` | `agentic.claims` / RETAIN | Normalize, validate, relate, version, expire, and inspect observed facts, deterministic derivations, model inferences, forecasts, recommendations, assumptions, contradictions, falsifiers, and uncertainty. Own the five evidence-analysis role contributions. | Stop new claim graph mutation and claim-based reasoning. Preserve retained graphs and facts for audit/export. Capabilities requiring a canonical reasoning record become unready. |
-| 12 | Missing | 3 | `FEAT-AGT-DELIBERATE_RESEARCH` — Independent Challenge and Deliberation | `deliberate_research/` | `agentic.deliberation@1` | `agentic.deliberation` / RETAIN | Run bounded independent challenge and rebuttal against claim graphs. Challengers assess objective/evidence before proposer narrative, preserve dissent, record independence correlation, and cannot authorize outcomes. Own the six challenge profiles. | Councils and challenge-required workflows become unavailable. Low-risk single-specialist paths may continue when their workflow policy allows. Preserve retained dissent and records. |
-| 13 | Missing | 3 | `FEAT-AGT-SYNTHESIZE_RESEARCH` — Research Synthesis | `synthesize_research/` | `agentic.synthesis@1` | None | Produce a typed decision-support synthesis from the current claim graph and deliberation record, preserving unsupported, contested, refuted, unknown, expired, and dissenting material. Own the Research Synthesizer role. | New multi-source research synthesis becomes unavailable. Specialist results and retained claim/deliberation evidence remain separately accessible. |
-| 14 | Missing | 4 | `FEAT-AGT-GOVERN_RESEARCH_SEARCH` — Research Campaign and Search Governance | `govern_research_search/` | `agentic.research-search@1` | `agentic.research_search` / RETAIN | Track research campaigns, hypothesis families, dataset families, variants, prompts/models, amendments, all attempts/failures, search budgets, holdout reservations, and degrees of freedom; classify near-duplicates deterministically. | Refuse new governed research design, optimization, or holdout use. Preserve campaign/search history and outstanding reservations for audit; do not permit a different feature to reset budgets. |
-| 15 | Missing | 4 | `FEAT-AGT-DESIGN_RESEARCH` — Falsifiable Research Design | `design_research/` | `agentic.research-design@1` | None | Convert supported claim graphs into falsifiable hypothesis, experiment-request, and bounded-search candidates using receiver-owned schemas and registered campaign/search identity. Own Hypothesis Designer, Experiment Designer, and Bounded Search Designer roles. | Stop new model-assisted research design. Existing receiver-owned runs and Agentic search ledgers remain valid and accessible. |
-| 16 | Missing | 5 | `FEAT-AGT-COMPOSE_STRATEGY_SPECS` — JSON Strategy and Indicator DSL Composition | `compose_strategy_specs/` | `agentic.strategy-specs@1` | None | Compose candidate JSON strategy/indicator DSL artifacts from approved hypotheses and exact Strategy/Indicators schema capabilities. Own the Strategy DSL Author role. Agentic stages a candidate; the receiver validates, compiles, registers, and owns lifecycle. | Stop new Agentic DSL composition. Existing Strategy/Indicators artifacts and registered versions are unaffected. |
-| 17 | Missing | 5 | `FEAT-AGT-ADVISE_PORTFOLIO` — Portfolio and Risk Advisory | `advise_portfolio/` | `agentic.portfolio-advisory@1` | None | Produce expiring non-binding portfolio/risk advice from current receiver-owned evidence and independent challenges. Own the Portfolio Advisory Synthesizer. Output contains no approval, executable quantity, lot size, order, or kill-switch action. | Stop new Agentic advisory. Portfolio and Risk continue normally; existing advice expires and remains only in retained workflow/audit evidence. |
-| 18 | Missing | 5 | `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS` — Strategy Proposal Composition and Handoff | `compose_strategy_proposals/` | `agentic.strategy-proposals@1` | None | Compose an untrusted Strategy-owned proposal request with thesis, evidence, horizon, invalidation, uncertainty, scope, and expiry; submit it through Strategy's public intake. Own the Strategy Proposal Synthesizer. A receipt is never an order or fill. | Stop new Agentic proposals and handoffs. Strategy/Risk/Trading/Brokers remain unaffected; accepted receiver-owned records retain their own lifecycle. |
-| 19 | Missing | 6 | `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS` — Sandboxed Source Artifact Fallback | `author_sandbox_artifacts/` | `agentic.sandbox-artifacts@1` | `agentic.sandbox_artifacts` / DELETE | As an exceptional fallback, generate source artifacts only from an authenticated specification and a real attested sandbox lease; validate raw/resolved paths, stage outputs, hashes, tests, dependencies/SBOM, search history, and provenance. Own the Sandbox Code Author role. | Revoke sandbox leases, cancel tasks, clean ephemeral/staged artifacts according to policy, and refuse new code generation. No production code or receiver-owned artifact is removed. |
-| 20 | Missing | 6 | `FEAT-AGT-CALIBRATE_OUTCOMES` — Post-Horizon Outcome Calibration | `calibrate_outcomes/` | `agentic.outcome-calibration@1` | `agentic.outcome_calibration` / RETAIN | Bind matured outcomes to forecasts, recommendations, role/workflow topology, receiver decisions, costs, regimes, and simpler baselines; compute calibration and incremental utility; produce governed change candidates without self-modification. | Stop new calibration and profile-change candidates. Preserve historical calibration evidence. Eligibility falls back to existing evidence without inventing neutral performance. |
+<a id="feat-agt-register-roles"></a>
+### 4.3 `register_roles/` — `FEAT-AGT-REGISTER_ROLES`
 
-### Dependency waves
+> **Feature ID:** `FEAT-AGT-REGISTER_ROLES`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/register_roles/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-| Wave | Features | Purpose |
-|---:|---|---|
-| 1 | `ENFORCE_MANDATE`, `OPERATE_RUNS`, `REGISTER_ROLES`, `GOVERN_TOOL_CALLS`, `INVOKE_MODELS` | Establish authority, audit, role contribution, invocation permissions, and provider-neutral model seams. |
-| 2 | `RUN_WORKFLOWS`, `ASSEMBLE_CONTEXT`, `MANAGE_MEMORY`, `EVALUATE_PROFILES`, `ASSIST_OPERATOR` | Establish durable execution, bounded context, governed memory, evaluated eligibility, and website assistance. |
-| 3 | `MANAGE_CLAIMS`, `DELIBERATE_RESEARCH`, `SYNTHESIZE_RESEARCH` | Establish canonical reasoning records, independent challenge, dissent, and synthesis. |
-| 4 | `GOVERN_RESEARCH_SEARCH`, `DESIGN_RESEARCH` | Establish campaign accounting and falsifiable experiment/search design. |
-| 5 | `COMPOSE_STRATEGY_SPECS`, `ADVISE_PORTFOLIO`, `COMPOSE_STRATEGY_PROPOSALS` | Produce receiver-owned candidate requests without receiver authority. |
-| 6 | `AUTHOR_SANDBOX_ARTIFACTS`, `CALIBRATE_OUTCOMES` | Add exceptional code fallback and outcome-grounded evolution. |
+#### Purpose
+
+Role Contribution Registry. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.roles@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-register-roles) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/roles.py`](../../contracts/agentic/roles.py). **Specified primary method:** `manage_role_contributions(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-REGISTER_ROLE_CONTRIBUTIONS`, `NFR-TRC-AGT-REGISTER_ROLES-001`, `NFR-TRC-AGT-REGISTER_ROLES-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.roles@1` | FEAT-AGT-REGISTER_ROLES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-REGISTER_ROLES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_role_contributions.py | Focused production domain-logic module | manage_role_contributions. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-REGISTER_ROLE_CONTRIBUTIONS` | Register immutable role/version, prompt, schemas, tools, model policy, limits, conflicts, refusals and evaluation references. | `AT-AGT-REGISTER_ROLES-001` | Duplicate identity/version or unknown fields fail; registration returns one exact disposer handle. |
+| PENDING | `FR-AGT-VERIFY_ROLE_ARTIFACTS` | Normalize prompt encoding/line endings and recompute manifest/prompt/composite hashes; reject floating model identity and undeclared tools. | `AT-AGT-REGISTER_ROLES-002` | Tamper fails before model construction; role title grants no authority. |
+| PENDING | `FR-AGT-RESOLVE_ELIGIBLE_ROLES` | Resolve only enabled, permitted, in-scope, nonconflicted roles with current independent eligibility. | `AT-AGT-REGISTER_ROLES-003` | Expired/revoked/missing eligibility or wrong-account scope denies invocation; evaluation-only is not user research. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `manage_role_contributions(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-REGISTER_ROLES-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-REGISTER_ROLES-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-REGISTER_ROLES-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-REGISTER_ROLES-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-register-roles): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/register_roles/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/register_roles/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-REGISTER_ROLES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.register_roles._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-REGISTER_ROLES`. Withdraw `agentic.roles@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 4. Actual Agent Roster
+<a id="feat-agt-govern-tool-calls"></a>
+### 4.4 `govern_tool_calls/` — `FEAT-AGT-GOVERN_TOOL_CALLS`
 
-The built-in workforce contains 22 immutable LLM role profiles. Profiles are not 22 service features, standing processes, or authority-bearing persons. A workflow invokes only eligible roles required by the task.
+> **Feature ID:** `FEAT-AGT-GOVERN_TOOL_CALLS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/govern_tool_calls/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-| # | Role family | Display name | Canonical role ID | Owning feature |
-|---:|---|---|---|---|
-| 1 | Operator Chat | Chat Bot | `chat_bot` | `FEAT-AGT-ASSIST_OPERATOR` |
-| 2 | Coordinator/Planner | Research Planner | `research_planner` | `FEAT-AGT-RUN_WORKFLOWS` |
-| 3 | Coordinator/Planner | Artifact Planner | `artifact_planner` | `FEAT-AGT-RUN_WORKFLOWS` |
-| 4 | Evidence Analyst | Analytics Evidence Reviewer | `analytics_evidence_reviewer` | `FEAT-AGT-MANAGE_CLAIMS` |
-| 5 | Evidence Analyst | Fundamental Analyst | `fundamental_analyst` | `FEAT-AGT-MANAGE_CLAIMS` |
-| 6 | Evidence Analyst | Sentiment Analyst | `sentiment_analyst` | `FEAT-AGT-MANAGE_CLAIMS` |
-| 7 | Evidence Analyst | Technical and Market-Structure Analyst | `technical_structure_analyst` | `FEAT-AGT-MANAGE_CLAIMS` |
-| 8 | Evidence Analyst | Quantitative Analyst | `quantitative_analyst` | `FEAT-AGT-MANAGE_CLAIMS` |
-| 9 | Research Designer | Hypothesis Designer | `hypothesis_designer` | `FEAT-AGT-DESIGN_RESEARCH` |
-| 10 | Research Designer | Experiment Designer | `experiment_designer` | `FEAT-AGT-DESIGN_RESEARCH` |
-| 11 | Research Designer | Bounded Search Designer | `bounded_search_designer` | `FEAT-AGT-DESIGN_RESEARCH` |
-| 12 | Independent Challenger | Causality Challenger | `causality_challenger` | `FEAT-AGT-DELIBERATE_RESEARCH` |
-| 13 | Independent Challenger | Leakage Challenger | `leakage_challenger` | `FEAT-AGT-DELIBERATE_RESEARCH` |
-| 14 | Independent Challenger | Robustness Challenger | `robustness_challenger` | `FEAT-AGT-DELIBERATE_RESEARCH` |
-| 15 | Independent Challenger | Risk Challenger | `risk_challenger` | `FEAT-AGT-DELIBERATE_RESEARCH` |
-| 16 | Independent Challenger | Compliance Challenger | `compliance_challenger` | `FEAT-AGT-DELIBERATE_RESEARCH` |
-| 17 | Independent Challenger | Operations and Security Challenger | `operations_security_challenger` | `FEAT-AGT-DELIBERATE_RESEARCH` |
-| 18 | Synthesizer | Research Synthesizer | `research_synthesizer` | `FEAT-AGT-SYNTHESIZE_RESEARCH` |
-| 19 | Synthesizer | Portfolio Advisory Synthesizer | `portfolio_advisory_synthesizer` | `FEAT-AGT-ADVISE_PORTFOLIO` |
-| 20 | Synthesizer | Strategy Proposal Synthesizer | `strategy_proposal_synthesizer` | `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS` |
-| 21 | Artifact Engineer | Strategy DSL Author | `strategy_dsl_author` | `FEAT-AGT-COMPOSE_STRATEGY_SPECS` |
-| 22 | Artifact Engineer | Sandbox Code Author | `sandbox_code_author` | `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS` |
+#### Purpose
 
-### Role artifact contract
+Tool Governance and Human Actions. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-Each role-bearing feature owns immutable package-local data:
+#### Capability Declarations
 
-```text
-roles/<role_id>/
-├── role.json
-└── prompt.md
+**Provides:** `agentic.tool-governance@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`workspace.manage-accounts@1` — [`FEAT-WS-MANAGE_ACCOUNTS`](../workspace/README.md#feat-ws-manage-accounts)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence)<br>`orchestration.resource-admission@1` — [`FEAT-ORCH-RESERVE_RESOURCES`](../orchestration/README.md#feat-orch-reserve-resources).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-govern-tool-calls) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/tool_governance.py`](../../contracts/agentic/tool_governance.py). **Specified primary method:** `govern_tool_calls(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-REGISTER_AGENTIC_TOOLS`, `FR-AGT-ISSUE_CAPABILITY_LEASES`, `FR-AGT-FILTER_TOOL_RESULTS`, `NFR-TRC-AGT-GOVERN_TOOL_CALLS-001`, `NFR-TRC-AGT-GOVERN_TOOL_CALLS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.tool-governance@1` | FEAT-AGT-GOVERN_TOOL_CALLS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-GOVERN_TOOL_CALLS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| govern_tool_calls.py | Focused production domain-logic module | govern_tool_calls. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-REGISTER_AGENTIC_TOOLS` | Register declared receiver capability/schema/permission/side-effect/environment/idempotency/cost/timeout/result-trust descriptors. | `AT-AGT-GOVERN_TOOL_CALLS-001` | Broker/order/approval/unrestricted shell/deployment tools are structurally unregistrable. |
+| PENDING | `FR-AGT-ISSUE_CAPABILITY_LEASES` | Issue immutable invocation-bound leases with principal/role/run/request hash/receiver generation/scope/egress/ceiling/expiry/nonce/policy/action identity. | `AT-AGT-GOVERN_TOOL_CALLS-002` | Forgery, replay, mutation, wrong scope and budget exhaustion deny authorization. |
+| PENDING | `FR-AGT-ENFORCE_TOOL_INVOCATIONS` | Reauthorize immediately before every invocation, retry and resume and reconcile uncertain owner effects by the original idempotency key. | `AT-AGT-GOVERN_TOOL_CALLS-003` | A denied call never reaches the receiver; a crash after receiver commit does not duplicate the logical effect. |
+| PENDING | `FR-AGT-FILTER_TOOL_RESULTS` | Validate and bound schema, scope, provenance, redaction, injection classification and observed cost before model exposure. | `AT-AGT-GOVERN_TOOL_CALLS-004` | Wrong-account, secret-bearing, oversized or malformed results never enter trusted context. |
+| PENDING | `FR-AGT-BIND_TYPED_HUMAN_ACTIONS` | Bind clarification, scope, tool/compute/holdout/staging/handoff approval, rejection and cancellation to exact expiring objects. | `AT-AGT-GOVERN_TOOL_CALLS-005` | Changing the candidate or action invalidates approval; a used nonce cannot approve another request. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `govern_tool_calls(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-GOVERN_TOOL_CALLS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-GOVERN_TOOL_CALLS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-GOVERN_TOOL_CALLS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-GOVERN_TOOL_CALLS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-govern-tool-calls): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/govern_tool_calls/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/govern_tool_calls/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-GOVERN_TOOL_CALLS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.govern_tool_calls._usage
 ```
 
-`role.json` conforms to `RoleManifest`. `prompt.md` contains base role instructions, evidence/citation boundaries, uncertainty, falsifiers, refusals, output protocol, and prohibited authority. The feature resolves `agentic.roles@1` during mount, registers the contribution, and registers the exact returned disposer with its scope. It does not import the role-registry implementation.
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-Built-in role ownership:
+#### Removal Behaviour
 
-- `RUN_WORKFLOWS`: Research Planner, Artifact Planner.
-- `ASSIST_OPERATOR`: Chat Bot.
-- `MANAGE_CLAIMS`: Analytics Evidence Reviewer, Fundamental Analyst, Sentiment Analyst, Technical and Market-Structure Analyst, Quantitative Analyst.
-- `DESIGN_RESEARCH`: Hypothesis Designer, Experiment Designer, Bounded Search Designer.
-- `DELIBERATE_RESEARCH`: six independent challenge profiles.
-- `SYNTHESIZE_RESEARCH`: Research Synthesizer.
-- `ADVISE_PORTFOLIO`: Portfolio Advisory Synthesizer.
-- `COMPOSE_STRATEGY_PROPOSALS`: Strategy Proposal Synthesizer.
-- `COMPOSE_STRATEGY_SPECS`: Strategy DSL Author.
-- `AUTHOR_SANDBOX_ARTIFACTS`: Sandbox Code Author.
-
-Mandate enforcement, authorization, state transitions, incident containment, memory promotion, search accounting, eligibility arithmetic, receiver registration, risk approval, execution, and broker connectivity are deterministic services—not agents.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-GOVERN_TOOL_CALLS`. Withdraw `agentic.tool-governance@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 5. Shared Contract Ownership
+<a id="feat-agt-invoke-models"></a>
+### 4.5 `invoke_models/` — `FEAT-AGT-INVOKE_MODELS`
 
-### 5.1 Agentic-owned physical contract modules
+> **Feature ID:** `FEAT-AGT-INVOKE_MODELS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/invoke_models/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-All public definitions live under `app/contracts/agentic/`. `app/services/agentic/` implements them and does not re-export substitute models.
+#### Purpose
 
-| Module | Capability key | Protocol | Primary async method | Request union / operation | Success or domain outcome | Streaming |
-|---|---|---|---|---|---|---|
-| `mandate.py` | `agentic.mandate@1` | `MandateEnforcement` | `enforce_mandate(request)` | `VALIDATE`, `CHECK_SCOPE`, `INSPECT` | `MandateAccepted`, `MandateScopeDecision`, `MandateView` plus shared refusal/failure | — |
-| `operations.py` | `agentic.operations@1` | `AgenticOperations` | `operate_agentic_runs(request)` | `RECORD`, `INSPECT_TRACE`, `REPORT_INCIDENT`, `VALIDATE_REPLAY`, `INSPECT_READINESS`, `EXPORT` | `OperationReceipt`, `AgenticRunTrace`, `IncidentRecord`, `ReplayValidation`, `AgenticReadinessView`, `OperationsExport` plus shared refusal/failure | `AgenticIncidentRaised`, `AgenticReadinessChanged` |
-| `roles.py` | `agentic.roles@1` | `RoleContributionRegistry` | `manage_role_contributions(request)` | `REGISTER`, `UNREGISTER`, `RESOLVE`, `LIST`, `SET_ELIGIBILITY_REFERENCE` | `RoleRegistrationReceipt`, `RoleRemovalReceipt`, `RoleResolution`, `RoleList`, `RoleEligibilityReferenceReceipt` plus shared refusal/failure | `RoleContributionRegistered`, `RoleContributionRemoved`, `RoleEligibilityReferenceChanged` |
-| `tool_governance.py` | `agentic.tool-governance@1` | `ToolCallGovernance` | `govern_tool_calls(request)` | `REGISTER_TOOL`, `REQUEST_LEASE`, `AUTHORIZE_INVOCATION`, `FILTER_RESULT`, `REVOKE_LEASE`, `REQUEST_HUMAN_ACTION`, `DECIDE_HUMAN_ACTION` | `ToolRegistrationReceipt`, `CapabilityLease`, `ToolAuthorizationDecision`, `FilteredToolResult`, `LeaseRevocationReceipt`, `HumanActionRequest`, `HumanActionDecision` plus shared refusal/failure | `CapabilityLeaseIssued`, `CapabilityLeaseRevoked`, `HumanActionRequested`, `HumanActionDecided` |
-| `model_inference.py` | `agentic.model-inference@1` | `ModelInference` | `invoke_model(request)` | `INVOKE` | `ModelInvocationSuccess`, `ModelInvocationRefusal` plus shared refusal/failure | `ModelInvocationStarted`, `ModelInvocationCompleted`, `ModelInvocationRefused` |
-| `workflows.py` | `agentic.workflows@1` | `AgenticWorkflowRunner` | `run_agentic_workflows(request)` | `SUBMIT`, `RESUME`, `CANCEL`, `EXPIRE`, `INSPECT`, `DRAIN` | `WorkflowAccepted`, `WorkflowRun`, `WorkflowCancellationReceipt`, `WorkflowExpiryReceipt`, `WorkflowDrainReceipt` plus shared refusal/failure | `WorkflowStateChanged`, `WorkflowProgressed`, `WorkflowWaitingForHuman`, `WorkflowTerminated` |
-| `context.py` | `agentic.context@1` | `AgenticContextAssembly` | `assemble_agentic_context(request)` | `ASSEMBLE`, `INSPECT_EXCLUSIONS` | `AgenticContextBundle`, `ContextExclusionReport` plus shared refusal/failure | — |
-| `memory.py` | `agentic.memory@1` | `AgenticMemory` | `manage_agentic_memory(request)` | `SUBMIT_CANDIDATE`, `PROMOTE`, `RETRIEVE`, `SUPERSEDE`, `PURGE`, `EXPORT` | `MemoryCandidateReceipt`, `MemoryPromotionDecision`, `MemoryQueryResult`, `MemorySupersessionReceipt`, `MemoryPurgeReceipt`, `MemoryExport` plus shared refusal/failure | `MemoryPromoted`, `MemorySuperseded`, `MemoryExpired` |
-| `profile_evaluation.py` | `agentic.profile-evaluation@1` | `AgenticProfileEvaluation` | `evaluate_agentic_profiles(request)` | `EVALUATE`, `INSPECT_ELIGIBILITY`, `REVOKE_ELIGIBILITY`, `COMPARE_BASELINE` | `ProfileEvaluationReport`, `EligibilityDecision`, `EligibilityRevocationReceipt`, `BaselineComparison` plus shared refusal/failure | `ProfileEligibilityChanged` |
-| `operator_assistance.py` | `agentic.operator-assistance@1` | `OperatorAssistance` | `assist_operator(request)` | `RESPOND`, `SUMMARIZE_SPECIALIST_RESULT` | `OperatorAnswer`, `OperatorSpecialistAnswer`, `OperatorConversationSummary` plus shared refusal/failure | `OperatorTurnAccepted`, `WorkspaceContextValidated`, `SpecialistRouteProposed`, `SpecialistRouteAuthorized`, `SpecialistStarted`, `SpecialistCompleted`, `OperatorResponseDelta`, `OperatorTurnCompleted`, `OperatorTurnRefused`, `OperatorTurnFailed` |
-| `claims.py` | `agentic.claims@1` | `AgenticClaimGraph` | `manage_claim_graphs(request)` | `CREATE_GRAPH`, `APPEND_CLAIM`, `RELATE_CLAIMS`, `TRANSITION_CLAIM`, `ASSESS_RELIABILITY`, `INSPECT_GRAPH` | `ClaimGraph`, `ClaimReceipt`, `ClaimRelationReceipt`, `ClaimStatusReceipt`, `ClaimReliabilityAssessment`, `ClaimGraphView` plus shared refusal/failure | `ClaimCreated`, `ClaimRelated`, `ClaimStatusChanged`, `ClaimExpired` |
-| `deliberation.py` | `agentic.deliberation@1` | `AgenticDeliberation` | `deliberate_research(request)` | `START`, `CONTINUE`, `CANCEL`, `INSPECT` | `DeliberationRecord`, `DeliberationCancellationReceipt`, `DeliberationView` plus shared refusal/failure | `DeliberationRoundStarted`, `ChallengeRecorded`, `DissentRecorded`, `DeliberationStopped` |
-| `synthesis.py` | `agentic.synthesis@1` | `AgenticResearchSynthesis` | `synthesize_research(request)` | `SYNTHESIZE` | `ResearchSynthesis`, `ResearchInsufficientEvidence` plus shared refusal/failure | `ResearchSynthesisCompleted` |
-| `research_search.py` | `agentic.research-search@1` | `AgenticResearchSearchGovernance` | `govern_research_search(request)` | `REGISTER_CAMPAIGN`, `REGISTER_FAMILY`, `REGISTER_VARIANT`, `RECORD_ATTEMPT`, `RESERVE_HOLDOUT`, `CLOSE_CAMPAIGN`, `INSPECT` | `ResearchCampaign`, `HypothesisFamilyReceipt`, `ResearchVariantReceipt`, `ResearchAttemptReceipt`, `HoldoutReservationReceipt`, `CampaignClosureReceipt`, `ResearchSearchView` plus shared refusal/failure | `ResearchCampaignOpened`, `ResearchAttemptRecorded`, `HoldoutReserved`, `ResearchCampaignClosed` |
-| `research_design.py` | `agentic.research-design@1` | `AgenticResearchDesign` | `design_research(request)` | `DESIGN_HYPOTHESIS`, `DESIGN_EXPERIMENT`, `DESIGN_SEARCH` | `HypothesisCandidate`, `ExperimentRequestCandidate`, `SearchRequestCandidate` plus shared refusal/failure | `ResearchDesignCompleted` |
-| `strategy_specs.py` | `agentic.strategy-specs@1` | `AgenticStrategySpecComposition` | `compose_strategy_specs(request)` | `COMPOSE`, `VALIDATE_HANDOFF` | `StrategySpecCandidate`, `StrategySpecHandoffReceipt`, `UnsupportedExpressionReport` plus shared refusal/failure | `StrategySpecComposed` |
-| `portfolio_advisory.py` | `agentic.portfolio-advisory@1` | `AgenticPortfolioAdvisory` | `advise_portfolio(request)` | `ADVISE` | `PortfolioAdvisory`, `PortfolioAdvisoryInsufficientEvidence` plus shared refusal/failure | `PortfolioAdvisoryCompleted` |
-| `strategy_proposals.py` | `agentic.strategy-proposals@1` | `AgenticStrategyProposalComposition` | `compose_strategy_proposals(request)` | `COMPOSE`, `SUBMIT` | `StrategyProposalCandidate`, `StrategyProposalReceipt` plus shared refusal/failure | `StrategyProposalComposed`, `StrategyProposalSubmitted` |
-| `sandbox_artifacts.py` | `agentic.sandbox-artifacts@1` | `AgenticSandboxArtifactAuthoring` | `author_sandbox_artifacts(request)` | `AUTHOR`, `INSPECT`, `CLEANUP` | `SandboxArtifactReceipt`, `SandboxArtifactView`, `SandboxCleanupReceipt` plus shared refusal/failure | `SandboxArtifactStaged`, `SandboxArtifactCleaned` |
-| `outcome_calibration.py` | `agentic.outcome-calibration@1` | `AgenticOutcomeCalibration` | `calibrate_agentic_outcomes(request)` | `CALIBRATE_FORECAST`, `CALIBRATE_RECOMMENDATION`, `INSPECT` | `ForecastCalibrationResult`, `RecommendationCalibrationResult`, `OutcomeCalibrationView` plus shared refusal/failure | `OutcomeCalibrationCompleted`, `AgenticChangeCandidateCreated` |
+Provider-Neutral Model Invocation. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-### 5.2 Shared Agentic records
+#### Capability Declarations
 
-Shared records are strict, frozen, JSON-safe public models under `app/contracts/agentic/common.py` or the smallest semantic owner module. They include:
+**Provides:** `agentic.model-inference@1`.
 
-- `AgenticTaskIdentity`, `AgenticRunIdentity`, `AgenticPrincipalRef`, `AgenticScope`;
-- `AgenticDeadline`, `AgenticBudget`, `AgenticBudgetUsage`;
-- `AgenticProvenance`, `AgenticContentReference`, `AgenticEvidenceReference`;
-- `AgenticRefusal`, `AgenticFailure`, `AgenticWarning`;
-- `RoleManifest`, `PromptArtifactReference`, `ModelProfileReference`;
-- `WorkflowCheckpoint`, `WorkflowTerminalReason`;
-- `UncertaintyBreakdown`, `ReliabilityAssessment`.
+**Required capabilities:**
 
-A public cross-boundary record always carries exact schema identity/version, stable IDs, aware UTC time, correlation lineage, bounded fields, and canonical digest where integrity matters. Model output never supplies deterministic execution fields.
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`orchestration.resource-admission@1` — [`FEAT-ORCH-RESERVE_RESOURCES`](../orchestration/README.md#feat-orch-reserve-resources).
 
-### 5.3 Capability-specific record inventory
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-invoke-models) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-#### `agentic.mandate@1` — Mandate Enforcement
+**Public contract target:** [`app/contracts/agentic/model_inference.py`](../../contracts/agentic/model_inference.py). **Specified primary method:** `invoke_model(request)`.
 
-- `FirmMandate`, `MandateVersion`, `MandateSignature`, `MandateValidityWindow`;
-- `ValidateMandateRequest`, `CheckMandateScopeRequest`, `InspectMandateRequest`;
-- `MandateAccepted`, `MandateScopeDecision`, `MandateView`.
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
-#### `agentic.operations@1` — Operations, Incidents, and Replay Validation
+#### Feature Configuration & Limits Manifest
 
-- `OperationRecordRequest`, `InspectAgenticTraceRequest`, `ReportAgenticIncidentRequest`, `ValidateAgenticReplayRequest`, `InspectAgenticReadinessRequest`, `ExportAgenticOperationsRequest`;
-- `AgenticOperationSpan`, `AgenticRunTrace`, `IncidentRecord`, `ReplayValidation`, `AgenticReadinessView`, `OperationsExport`;
-- `AgenticIncidentKind`, `AgenticContainmentAction`, `AgenticReadinessState`.
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-#### `agentic.roles@1` — Role Contribution Registry
+**Feature-specific parameter/limit obligations:** `FR-AGT-PIN_MODEL_INVOCATIONS`, `FR-AGT-ENFORCE_MODEL_BUDGETS`, `NFR-TRC-AGT-INVOKE_MODELS-001`, `NFR-TRC-AGT-INVOKE_MODELS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
-- `RegisterRoleContributionRequest`, `UnregisterRoleContributionRequest`, `ResolveRoleRequest`, `ListRolesRequest`, `SetRoleEligibilityReferenceRequest`;
-- `RoleRegistrationReceipt`, `RoleRemovalReceipt`, `RoleResolution`, `RoleList`, `RoleEligibilityReferenceReceipt`;
-- `RoleContribution`, `RoleCapability`, `RoleConflictClass`, `RoleEvaluationReference`.
+#### Runtime Effects & Scope Disposal
 
-#### `agentic.tool-governance@1` — Tool Governance and Human Actions
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.model-inference@1` | FEAT-AGT-INVOKE_MODELS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-INVOKE_MODELS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
 
-- `RegisterAgenticToolRequest`, `RequestCapabilityLease`, `AuthorizeToolInvocationRequest`, `FilterToolResultRequest`, `RevokeCapabilityLeaseRequest`;
-- `RequestHumanAction`, `DecideHumanAction`;
-- `ToolDescriptor`, `CapabilityLease`, `ToolAuthorizationDecision`, `FilteredToolResult`, `LeaseRevocationReceipt`;
-- `HumanActionRequest`, `HumanActionDecision`, `HumanActionKind`, `HumanDecisionKind`.
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
-`HumanActionKind` contains at least `CLARIFY_OBJECTIVE`, `AMEND_RESEARCH_SCOPE`, `APPROVE_TOOL_CALL`, `APPROVE_COMPUTE_BUDGET`, `APPROVE_HOLDOUT_USE`, `APPROVE_STAGED_ARTIFACT`, `APPROVE_RECEIVER_HANDOFF`, `REJECT`, and `CANCEL`.
+#### Persistent State Ownership
 
-#### `agentic.model-inference@1` — Provider-Neutral Model Invocation
+**Ownership class:** Feature-owned semantic state.
 
-- `ModelProfile`, `ModelInvocationRequest`, `ModelInvocationInput`, `ModelInvocationConstraints`;
-- `ModelInvocationSuccess`, `ModelInvocationRefusal`, `ModelUsage`, `ModelObservedCost`, `ModelSubstitutionEvidence`.
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
 
-#### `agentic.workflows@1` — Durable Workflow Orchestration
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
 
-- `SubmitAgenticWorkflowRequest`, `ResumeAgenticWorkflowRequest`, `CancelAgenticWorkflowRequest`, `ExpireAgenticWorkflowRequest`, `InspectAgenticWorkflowRequest`, `DrainAgenticWorkflowsRequest`;
-- `WorkflowDefinition`, `WorkflowNode`, `WorkflowTransition`, `WorkflowRun`, `WorkflowAccepted`, `WorkflowCancellationReceipt`, `WorkflowExpiryReceipt`, `WorkflowDrainReceipt`.
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
 
-#### `agentic.context@1` — Point-in-Time Context Assembly
+#### Feature Package Structure & Files
 
-- `AssembleAgenticContextRequest`, `InspectContextExclusionsRequest`;
-- `AgenticContextSource`, `AgenticContextItem`, `AgenticContextBundle`, `ContextExclusion`, `ContextExclusionReport`;
-- `ContextTrustClass`, `InjectionAssessment`, `LicensingAssessment`, `FreshnessAssessment`.
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| invoke_model.py | Focused production domain-logic module | invoke_model. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
 
-#### `agentic.memory@1` — Governed Memory
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
 
-- `SubmitMemoryCandidateRequest`, `PromoteMemoryRequest`, `RetrieveMemoryRequest`, `SupersedeMemoryRequest`, `PurgeMemoryRequest`, `ExportMemoryRequest`;
-- `MemoryCandidate`, `MemoryRecord`, `MemoryPromotionDecision`, `MemoryQueryResult`, `MemorySupersessionReceipt`, `MemoryPurgeReceipt`, `MemoryExport`;
-- `MemoryClass` values: `WORKFLOW`, `WORKING`, `EPISODIC`, `VALIDATED_SEMANTIC`, `OPERATIONAL_AUDIT`.
+#### Functional Requirements (FR)
 
-#### `agentic.profile-evaluation@1` — Profile and Topology Evaluation
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-PIN_MODEL_INVOCATIONS` | Pin provider/model/profile/role/prompt/composite/schema/context/tools/privacy/region/retention before a structured call. | `AT-AGT-INVOKE_MODELS-001` | The returned provider/model identity must match the selected eligible profile; private SDK objects never cross the boundary. |
+| PENDING | `FR-AGT-ENFORCE_MODEL_BUDGETS` | Enforce input/output tokens, time, retries and finite cost before and after each call and reconcile missing usage conservatively. | `AT-AGT-INVOKE_MODELS-002` | Overrun/nonfinite/missing usage cannot be reported as zero cost or enlarge the caller’s ceiling. |
+| PENDING | `FR-AGT-REFUSE_SILENT_MODEL_SUBSTITUTION` | Allow fallback only to explicitly declared independently eligible profiles for the same task/risk scope. | `AT-AGT-INVOKE_MODELS-003` | A floating alias, changed provider or unevaluated fallback fails closed. |
+| PENDING | `FR-AGT-CONTAIN_MODEL_OUTPUT` | Parse only the strict declared output union and map malformed/truncated/unsafe content to typed refusal/failure. | `AT-AGT-INVOKE_MODELS-004` | Extraneous fields, provider objects and hidden reasoning are excluded from canonical output. |
 
-- `EvaluateProfileRequest`, `InspectProfileEligibilityRequest`, `RevokeProfileEligibilityRequest`, `CompareProfileBaselineRequest`;
-- `EvaluationSetReference`, `ProfileEvaluationReport`, `EligibilityDecision`, `EligibilityRevocationReceipt`, `BaselineComparison`, `CouncilAblationResult`;
-- evaluated subjects: role, prompt, model, tool, workflow, and topology profiles.
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `invoke_model(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
-#### `agentic.operator-assistance@1` — Website Chat Bot and Specialist Delegation
+#### Non-Functional Requirements (Local)
 
-- `AssistOperatorRequest`, `SummarizeSpecialistResultRequest`;
-- `OperatorConversationRef`, `OperatorTurn`, `WorkspaceContextSnapshot`, `AssistantContextContribution`;
-- `SpecialistRouteProposal`, `SpecialistRouteDecision`, `SpecialistInvocationRef`, `SpecialistResultReference`;
-- `OperatorAnswer`, `OperatorSpecialistAnswer`, `OperatorConversationSummary`.
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-INVOKE_MODELS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-INVOKE_MODELS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-INVOKE_MODELS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-INVOKE_MODELS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
 
-`WorkspaceContextSnapshot` includes bounded page/route identity, focused widget, selected public entity references, filters, date/session/timeframe selections, allowed visible error/status codes, contribution versions, user permissions, redaction metadata, and observed time. It carries no raw DOM, credential, private provider object, unrestricted screenshot, or arbitrary executable content.
+#### Applicable Shared NFRs, Catalogue and Source Bindings
 
-#### `agentic.claims@1` — Claim-and-Evidence Graph
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-invoke-models): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
-- `CreateClaimGraphRequest`, `AppendClaimRequest`, `RelateClaimsRequest`, `TransitionClaimStatusRequest`, `AssessClaimReliabilityRequest`, `InspectClaimGraphRequest`;
-- `ClaimGraph`, `Claim`, `ClaimRelation`, `ClaimReceipt`, `ClaimRelationReceipt`, `ClaimStatusReceipt`, `ClaimReliabilityAssessment`, `ClaimGraphView`;
-- claim types: `OBSERVED_FACT`, `DETERMINISTIC_DERIVATION`, `MODEL_INFERENCE`, `FORECAST`, `RECOMMENDATION`;
-- claim statuses: `SUPPORTED`, `CONTESTED`, `REFUTED`, `UNKNOWN`, `EXPIRED`;
-- uncertainty: evidence, statistical, epistemic, operational, and calibrated-profile reliability.
+#### Acceptance Tests and Evidence
 
-#### `agentic.deliberation@1` — Independent Challenge and Deliberation
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/invoke_models/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/invoke_models/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-INVOKE_MODELS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
-- `StartDeliberationRequest`, `ContinueDeliberationRequest`, `CancelDeliberationRequest`, `InspectDeliberationRequest`;
-- `DeliberationPlan`, `IndependentAssessment`, `Challenge`, `Rebuttal`, `DissentRecord`, `IndependenceCorrelation`, `DeliberationRecord`, `DeliberationView`.
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
-#### `agentic.synthesis@1` — Research Synthesis
+#### Feature Usage Examples
 
-- `SynthesizeResearchRequest`;
-- `ResearchSynthesis`, `ResearchInsufficientEvidence`, `SynthesisClaimDisposition`, `SynthesisDissentReference`.
+**Required `_usage.py` command - planned, not executed:**
 
-#### `agentic.research-search@1` — Research Campaign and Search Governance
-
-- `RegisterResearchCampaignRequest`, `RegisterHypothesisFamilyRequest`, `RegisterResearchVariantRequest`, `RecordResearchAttemptRequest`, `ReserveHoldoutRequest`, `CloseResearchCampaignRequest`, `InspectResearchSearchRequest`;
-- `ResearchCampaign`, `HypothesisFamily`, `DatasetFamily`, `ResearchVariant`, `ResearchAttempt`, `HoldoutReservation`, `SearchBudget`, `ResearchSearchView`;
-- stable identities: `research_campaign_id`, `hypothesis_family_id`, `dataset_family_id`, `holdout_id`, `search_budget_id`.
-
-#### `agentic.research-design@1` — Falsifiable Research Design
-
-- `DesignHypothesisRequest`, `DesignExperimentRequest`, `DesignSearchRequest`;
-- `HypothesisCandidate`, `ExperimentRequestCandidate`, `SearchRequestCandidate`;
-- each candidate carries the receiver contract/version it targets and the registered campaign/family/search identities.
-
-#### `agentic.strategy-specs@1` — JSON Strategy and Indicator DSL Composition
-
-- `ComposeStrategySpecRequest`, `ValidateStrategySpecHandoffRequest`;
-- `StrategySpecCandidate`, `StrategySpecHandoffReceipt`, `UnsupportedExpressionReport`;
-- candidate records carry the target Strategy/Indicators schema capability and contain no compiled runtime object.
-
-#### `agentic.portfolio-advisory@1` — Portfolio and Risk Advisory
-
-- `AdvisePortfolioRequest`;
-- `PortfolioAdvisory`, `PortfolioAdvisoryInsufficientEvidence`, `AdvisoryRisk`, `AdvisoryQuestion`, `AdvisoryExpiry`.
-
-#### `agentic.strategy-proposals@1` — Strategy Proposal Composition and Handoff
-
-- `ComposeStrategyProposalRequest`, `SubmitStrategyProposalRequest`;
-- `StrategyProposalCandidate`, `StrategyProposalReceipt`;
-- proposal candidates carry no broker-native field, order type, quantity, lot size, notional, price, or risk approval.
-
-#### `agentic.sandbox-artifacts@1` — Sandboxed Source Artifact Fallback
-
-- `AuthorSandboxArtifactRequest`, `InspectSandboxArtifactRequest`, `CleanupSandboxArtifactRequest`;
-- `SandboxLeaseAttestation`, `SandboxArtifactManifest`, `SandboxArtifactReceipt`, `SandboxArtifactView`, `SandboxCleanupReceipt`.
-
-#### `agentic.outcome-calibration@1` — Post-Horizon Outcome Calibration
-
-- `CalibrateForecastRequest`, `CalibrateRecommendationRequest`, `InspectOutcomeCalibrationRequest`;
-- `ScoreableForecast`, `MaturedOutcomeReference`, `ForecastCalibrationResult`, `RecommendationCalibrationResult`, `OutcomeCalibrationView`, `AgenticChangeCandidate`.
-
-### 5.4 Consumed interface context contracts
-
-D-IFACE owns the transport request and UI owns contribution capture, but Agentic owns the semantic records above. The interface companion feature shall provide authenticated operations equivalent to:
-
-```text
-SubmitChatTurn
-CancelChatTurn
-InspectChatConversation
-AcknowledgeSpecialistRoute
-StreamChatEvents
+```powershell
+uv run --frozen python -m app.services.agentic.invoke_models._usage
 ```
 
-The UI companion feature shall expose one removable Chat Bot widget and a typed contribution registry. A widget contributes only its declared public context schema and exact disposer. Removing a widget removes its contribution from subsequent context snapshots.
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-### 5.5 Receiver-owned contracts
+#### Removal Behaviour
 
-Agentic does not define substitutes for these semantics. Exact names are finalized in the receiver's authoritative registry before implementation.
-
-| Receiver owner | Agentic use |
-|---|---|
-| Workspace/System | Opaque principal, secret, policy, clock, and runtime-profile references; Agentic does not resolve credentials in contracts. |
-| UI/D-IFACE | Authenticated chat transport, conversation streaming, typed widget context contribution capture, navigation suggestion presentation. |
-| Catalogue | Instrument/venue/session identity and applicability. |
-| Data | Canonical point-in-time market, account, document, availability, quality, lineage, persistence-execution, and retention operations. |
-| Indicators | Exact indicator schema/version, deterministic outputs, validation, and DSL schema ownership. |
-| Analytics | Versioned metrics, performance/adherence evidence, formulas, uncertainty inputs, and realized outcomes. |
-| Research | Canonical source-evidence, hypothesis/protocol validation where applicable, regime evidence, and research outcome truth. |
-| Simulation | Simulation request/result/run/journal/artifact-manifest truth. |
-| Optimization | Search request/result/trial/robustness/overfit truth. |
-| Strategy | JSON strategy DSL schema, validation, compilation, proposal intake, registration, lifecycle, and decision truth. |
-| Portfolio | Allocation/state/review request and portfolio decision truth. |
-| Risk | Risk evidence, allocation/trade risk decisions, mandate barriers, and kill-switch truth. |
-| Trading | Governed trade-intent/action/session/order/fill truth. Agentic has no mutation capability. |
-| Brokers | No direct Agentic dependency. |
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-INVOKE_MODELS`. Withdraw `agentic.model-inference@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 6. Workflow Registry
+<a id="feat-agt-run-workflows"></a>
+### 4.6 `run_workflows/` — `FEAT-AGT-RUN_WORKFLOWS`
 
-| Status | Workflow ID | Workflow | Input | Required path | Output |
-|---|---|---|---|---|---|
-| Missing | `WF-AGT-CHAT_CONTEXT` | Contextual Chat Bot Answer | Authenticated chat turn plus fresh `WorkspaceContextSnapshot`. | mandate → operator assistance → context → eligible model → streamed/final answer | `OperatorAnswer` or typed refusal/failure. |
-| Missing | `WF-AGT-CHAT_SPECIALIST` | Chat Bot Specialist Delegation | Contextual or explicit specialist question. | Chat Bot proposes → deterministic route verification → workflow/specialist → result returns → Chat Bot presents | `OperatorSpecialistAnswer` in the same conversation. |
-| Missing | `WF-AGT-REVIEW_EVIDENCE` | Deterministic Evidence Review | Completed versioned evidence from an owning domain. | mandate → workflow → context → one evidence analyst → claims → synthesis | Cited interpretation or refusal. |
-| Missing | `WF-AGT-RESEARCH` | Adaptive Research and Challenge | Authenticated bounded research objective. | deterministic baseline → specialist(s) → claim graph → challenger when required → synthesis | `ResearchSynthesis`, preserving dissent or insufficient evidence. |
-| Missing | `WF-AGT-DESIGN_EXPERIMENT` | Hypothesis to Experiment Candidate | Supported claim graph and campaign identity. | search governance → research design → receiver validation | Receiver-owned experiment request candidate or refusal. |
-| Missing | `WF-AGT-DESIGN_SEARCH` | Bounded Search Candidate | Validated experiment identity and search budget. | research-search governance → bounded search designer → Optimization-owned validation | Search request candidate or refusal. |
-| Missing | `WF-AGT-COMPOSE_DSL` | Strategy DSL Candidate | Approved hypothesis and exact DSL schema capability. | artifact planner → Strategy DSL Author → receiver validation | `StrategySpecCandidate` and receiver receipt. |
-| Missing | `WF-AGT-SANDBOX_FALLBACK` | Sandboxed Code Artifact | Authenticated code specification plus sandbox lease. | artifact planner → sandbox code author → sandbox/testing/static checks → staging | Staged artifact receipt; never runtime import. |
-| Missing | `WF-AGT-PORTFOLIO_ADVISORY` | Portfolio and Risk Advisory | Current receiver-owned evidence and allowed scope. | context → relevant analysis → risk/compliance challenge as required → advisory synthesis | Expiring non-binding advisory or insufficient evidence. |
-| Missing | `WF-AGT-STRATEGY_PROPOSAL` | Strategy Proposal Handoff | Supported thesis and Strategy intake capability. | proposal synthesis → exact receiver request → Strategy validation | Receiver receipt, rejection, or expiry; never order/fill. |
-| Missing | `WF-AGT-CALIBRATE` | Outcome Calibration | Matured forecast/recommendation and realized outcome reference. | validate horizon/outcome → compute deterministic calibration/value → compare baselines → candidate change | Calibration record and optional governed change candidate. |
-| Missing | `WF-AGT-INCIDENT` | Incident, Containment, and Replay Validation | Policy, injection, schema, budget, provider, workflow, tool, or sandbox incident. | operations classify → revoke/cancel/quarantine → preserve evidence → validate replay references | Contained incident and safe recovery/terminal result. |
+> **Feature ID:** `FEAT-AGT-RUN_WORKFLOWS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/run_workflows/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-### 6.1 Chat Bot routing examples
+#### Purpose
 
-| Current context and question | Route |
-|---|---|
-| “What does this widget show?” | Chat Bot direct answer from safe contribution metadata. |
-| “Why did this backtest lose?” | Analytics Evidence Reviewer through an evidence-review workflow. |
-| “Is the sample statistically meaningful?” | Quantitative Analyst. |
-| “What does this divergence mean?” | Technical and Market-Structure Analyst. |
-| “Which recent events may explain this move?” | Sentiment Analyst using point-in-time evidence. |
-| “Could this contain look-ahead bias?” | Leakage Challenger. |
-| “Is the result robust across regimes?” | Robustness Challenger. |
-| “Turn this into a falsifiable hypothesis.” | Hypothesis Designer. |
-| “Create a bounded backtest protocol.” | Experiment Designer. |
-| “Build this as the JSON strategy DSL.” | Strategy DSL Author. |
-| “Assess this portfolio concentration.” | Portfolio Advisory Synthesizer with Risk Challenger when required. |
-| “Investigate this from several perspectives.” | Research Planner creates an adaptive bounded workflow. |
+Durable Agentic Workflow Runtime. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-### 6.2 Common workflow guarantees
+#### Capability Declarations
 
-Every workflow:
+**Provides:** `agentic.workflows@1`.
 
-1. verifies the mandate, principal, runtime profile, feature readiness, capability graph, budget, deadline, and idempotency before side effects;
-2. persists its initial checkpoint before executing asynchronous work;
-3. uses deterministic routing and model-non-overridable limits;
-4. authorizes tools at every invocation/retry and filters results before model access;
-5. records prompt/model/tool/data/policy/configuration lineage;
-6. supports cancellation, expiration, bounded retry, backpressure, and crash-safe resume;
-7. returns explicit `ok`, `refused`, `failed`, `cancelled`, or `expired` terminal semantics;
-8. never resumes a terminal run under the same run identity;
-9. preserves failures, dissent, null results, and partial coverage;
-10. applies exact teardown, lease revocation, and retained-state policy when a capability is removed.
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence)<br>`orchestration.manage-jobs@1` — [`FEAT-ORCH-MANAGE_JOBS`](../orchestration/README.md#feat-orch-manage-jobs).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-run-workflows) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/workflows.py`](../../contracts/agentic/workflows.py). **Specified primary method:** `run_agentic_workflows(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-SUBMIT_WORKFLOWS`, `FR-AGT-CHECKPOINT_WORKFLOWS`, `FR-AGT-APPLY_BACKPRESSURE`, `NFR-TRC-AGT-RUN_WORKFLOWS-001`, `NFR-TRC-AGT-RUN_WORKFLOWS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.workflows@1` | FEAT-AGT-RUN_WORKFLOWS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-RUN_WORKFLOWS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| run_agentic_workflows.py | Focused production domain-logic module | run_agentic_workflows. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-SUBMIT_WORKFLOWS` | Validate identity/mandate/idempotency/definition/input/readiness/budget and persist the initial run/checkpoint before shared-job execution. | `AT-AGT-RUN_WORKFLOWS-001` | Duplicate submit returns one run; a missing required operation capability yields a typed refusal. |
+| PENDING | `FR-AGT-CHECKPOINT_WORKFLOWS` | Persist expected-version checkpoints, pause/waits and immutable outputs; resume only compatible workflow/node/provider/input versions with reconciled reservations. | `AT-AGT-RUN_WORKFLOWS-002` | Stale CAS, terminal resume and incompatible checkpoint fail; a human wait holds no worker slot and retains its deadline. |
+| PENDING | `FR-AGT-BOUND_ADAPTIVE_ESCALATION` | Use deterministic evidence first, one specialist when needed, independent challenge for material uncertainty and councils only when policy/value justify them. | `AT-AGT-RUN_WORKFLOWS-003` | Model suggestions cannot select an undeclared topology or enlarge fanout/budget; simpler eligible routes remain usable. |
+| PENDING | `FR-AGT-TERMINATE_WORKFLOWS` | Record one SUCCEEDED/REFUSED/FAILED/CANCELLED/EXPIRED semantic outcome with separate shared-job projection. | `AT-AGT-RUN_WORKFLOWS-004` | Terminal identities never resume; successful refusal is not displayed as successful research. |
+| PENDING | `FR-AGT-APPLY_BACKPRESSURE` | Bound queues, active runs, node steps, loops, fanout, retries, waits and child budgets using shared admission. | `AT-AGT-RUN_WORKFLOWS-005` | Overload is visible and no child can mint an additional parent budget; cancellation propagates and reconciles accepted child receipts. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `run_agentic_workflows(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-RUN_WORKFLOWS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-RUN_WORKFLOWS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-RUN_WORKFLOWS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-RUN_WORKFLOWS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-run-workflows): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/run_workflows/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/run_workflows/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-RUN_WORKFLOWS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.run_workflows._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-RUN_WORKFLOWS`. Withdraw `agentic.workflows@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 7. Persisted State Ownership
+<a id="feat-agt-assemble-context"></a>
+### 4.7 `assemble_context/` — `FEAT-AGT-ASSEMBLE_CONTEXT`
 
-| Feature | Namespace | Core records | Retention | Correction/deletion rule |
-|---|---|---|---|---|
-| `OPERATE_RUNS` | `agentic.operations` | spans, traces, model/tool/handoff/policy/state evidence, incidents, replay validations, readiness and cost observations | RETAIN | Append immutable operational facts; redact before persistence; correction appends. |
-| `GOVERN_TOOL_CALLS` | `agentic.tool_governance` | tool registrations, lease issuance/revocation/use, human action requests/decisions, nonces | RETAIN | Lease/use/action facts append; expiry/revocation append; secrets never persist. |
-| `RUN_WORKFLOWS` | `agentic.workflows` | task/run identity, workflow/version, state, checkpoints, revisions, waits, terminal reason, budgets | RETAIN | Expected-version guarded transitions; checkpoints append; terminal runs never reopen. |
-| `MANAGE_MEMORY` | `agentic.memory` | workflow/working/episodic/validated-semantic/operational-audit memory records and promotion evidence | RETAIN | Working records TTL/purge; other corrections append via supersession; no silent overwrite. |
-| `EVALUATE_PROFILES` | `agentic.profile_evaluation` | evaluation definitions/results, grader/rubric lineage, baseline/ablation results, eligibility and revocation decisions | RETAIN | Evaluation and eligibility decisions append. No self-promotion. |
-| `ASSIST_OPERATOR` | `agentic.operator_conversations` | session/task conversation state, turn references, current specialist handoff state, summary references | DELETE | Session/task scoped; TTL or explicit deletion; long-term material requires governed memory promotion. |
-| `MANAGE_CLAIMS` | `agentic.claims` | graphs, claims, evidence refs, relations, statuses, uncertainty, falsifiers, versions | RETAIN | Facts/relations append; status transitions append; correction supersedes; expiry is explicit. |
-| `DELIBERATE_RESEARCH` | `agentic.deliberation` | plans, independent assessments, challenges, rebuttals, dissent, correlation, stop reason | RETAIN | Records append; dissent cannot be deleted from a final record. |
-| `GOVERN_RESEARCH_SEARCH` | `agentic.research_search` | campaigns, families, datasets, variants, attempts/failures, budgets, holdout reservations/receipts, amendments | RETAIN | All attempts/failures append; reservations cannot be reset by renaming/re-hashing. |
-| `AUTHOR_SANDBOX_ARTIFACTS` | `agentic.sandbox_artifacts` | staging manifests, file hashes, tests, SBOM/dependencies, provenance, search history, cleanup receipts | DELETE | Ephemeral/staging only; content-addressed; cleanup according to lease/policy; production artifacts never owned. |
-| `CALIBRATE_OUTCOMES` | `agentic.outcome_calibration` | forecasts, matured outcomes, scores, baseline comparisons, costs, regimes, change candidates | RETAIN | Calibration appends per fixed horizon/outcome; corrections reference prior record. |
+> **Feature ID:** `FEAT-AGT-ASSEMBLE_CONTEXT`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/assemble_context/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-All namespaces are declared with positive schema versions and explicit retention. Each stateful feature owns its migrations and adapter within its package and reaches database execution through the approved Data persistence capability. No `app/services/agentic/persistence/` package exists. In-memory stores are controlled tests only.
+#### Purpose
 
-### State rules
+Point-in-Time Context Assembly. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-- External receiver facts remain referenced by immutable owner IDs/digests rather than copied as alternate truth.
-- Operational and memory data is redacted before persistence.
-- Decimal cost/financial values never use binary floating storage.
-- Requests, correlations, causation, workflow identity, schema identity, and aware UTC times are retained where applicable.
-- Every irreversible or durable operation defines idempotency, reconciliation, audit, recovery, and deletion behavior.
-- Removing a feature does not automatically delete retained state; deletion follows its declared state/retention contract.
+#### Capability Declarations
+
+**Provides:** `agentic.context@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-assemble-context) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/context.py`](../../contracts/agentic/context.py). **Specified primary method:** `assemble_agentic_context(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-ASSEMBLE_POINT_IN_TIME_CONTEXT`, `FR-AGT-REPORT_CONTEXT_EXCLUSIONS`, `FR-AGT-BOUND_CONTEXT_SIZE`, `NFR-TRC-AGT-ASSEMBLE_CONTEXT-001`, `NFR-TRC-AGT-ASSEMBLE_CONTEXT-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.context@1` | FEAT-AGT-ASSEMBLE_CONTEXT | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-ASSEMBLE_CONTEXT | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| assemble_agentic_context.py | Focused production domain-logic module | assemble_agentic_context. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-ASSEMBLE_POINT_IN_TIME_CONTEXT` | Select owner evidence by scope, schema, availability cutoff, licensing, trust, freshness, revision and integrity. | `AT-AGT-ASSEMBLE_CONTEXT-001` | Future/revised/unlicensed/wrong-scope evidence is excluded with a reason; required missing evidence refuses. |
+| PENDING | `FR-AGT-SEPARATE_EVIDENCE_FROM_INSTRUCTIONS` | Keep system/role instructions, trusted task input, retrieved evidence, peers and memory in distinct fields. | `AT-AGT-ASSEMBLE_CONTEXT-002` | Page/tool/memory/peer injection cannot occupy an instruction slot. |
+| PENDING | `FR-AGT-REPORT_CONTEXT_EXCLUSIONS` | Report ordered deterministic exclusions for stale, incompatible, duplicate, irrelevant, poisoned and over-budget items with explicit optional partial coverage. | `AT-AGT-ASSEMBLE_CONTEXT-003` | Same inputs yield same ordering/reasons; a partial result does not claim complete support. |
+| PENDING | `FR-AGT-BOUND_CONTEXT_SIZE` | Enforce stable item/byte/token/per-source/priority budgets and refresh material UI-projected facts from their owners. | `AT-AGT-ASSEMBLE_CONTEXT-004` | A large or high-priority injected item cannot widen limits; stale browser values never override actual result evidence. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `assemble_agentic_context(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-ASSEMBLE_CONTEXT-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-ASSEMBLE_CONTEXT-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-ASSEMBLE_CONTEXT-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-ASSEMBLE_CONTEXT-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-assemble-context): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/assemble_context/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/assemble_context/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-ASSEMBLE_CONTEXT/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.assemble_context._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-ASSEMBLE_CONTEXT`. Withdraw `agentic.context@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 8. Feature Specifications
+<a id="feat-agt-manage-memory"></a>
+### 4.8 `manage_memory/` — `FEAT-AGT-MANAGE_MEMORY`
 
-### 8.1 `FEAT-AGT-ENFORCE_MANDATE` — Mandate Enforcement
+> **Feature ID:** `FEAT-AGT-MANAGE_MEMORY`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/manage_memory/`
+> **First release milestone:** `U8`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Folder:** `app/services/agentic/enforce_mandate/`
-**Provides:** `agentic.mandate@1`
-**Requires:** approved System/Workspace clock, principal, runtime-profile, and signed-mandate-source capabilities (exact keys finalized against owner registries)
-**Optional:** `agentic.operations@1` for audit publication
-**Conflicts:** none
-**State:** none
-**Primary module:** `mandate_enforcement.py`
+#### Purpose
 
-**Files**
+Governed Memory. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-mandate_enforcement.py
+#### Capability Declarations
+
+**Provides:** `agentic.memory@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-manage-memory) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/memory.py`](../../contracts/agentic/memory.py). **Specified primary method:** `manage_agentic_memory(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-CLASSIFY_MEMORY`, `FR-AGT-PROMOTE_MEMORY`, `FR-AGT-RETRIEVE_MEMORY`, `FR-AGT-RETAIN_AND_PURGE_MEMORY`, `NFR-TRC-AGT-MANAGE_MEMORY-001`, `NFR-TRC-AGT-MANAGE_MEMORY-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.memory@1` | FEAT-AGT-MANAGE_MEMORY | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-MANAGE_MEMORY | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_agentic_memory.py | Focused production domain-logic module | manage_agentic_memory. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-CLASSIFY_MEMORY` | Separate task working context, episodic outcomes, validated semantic memory and audit classes with explicit scope/retention. | `AT-AGT-MANAGE_MEMORY-001` | Unknown/cross-class operations fail and workflow progress remains the workflow owner’s truth. |
+| PENDING | `FR-AGT-PROMOTE_MEMORY` | Validate provenance, evidence, trust, redaction, sensitivity, freshness, poisoning, dedup/supersession, retention and required approval before promotion. | `AT-AGT-MANAGE_MEMORY-002` | Secret, stale, forged, duplicate or poisoned content cannot become reusable semantic memory. |
+| PENDING | `FR-AGT-RETRIEVE_MEMORY` | Retrieve only bounded authorized task/user/account records and revalidate freshness at use time. | `AT-AGT-MANAGE_MEMORY-003` | Memory cannot substitute for a material current owner fact or grant permission/approval. |
+| PENDING | `FR-AGT-RETAIN_AND_PURGE_MEMORY` | Apply class TTL/export/legal hold and append-only correction/supersession within a supported RETAIN namespace. | `AT-AGT-MANAGE_MEMORY-004` | TTL cleanup respects holds; corrections preserve historical records; removal deletes only eligible ephemeral content. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `manage_agentic_memory(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-MANAGE_MEMORY-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-MANAGE_MEMORY-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-MANAGE_MEMORY-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-MANAGE_MEMORY-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-manage-memory): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/manage_memory/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/manage_memory/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-MANAGE_MEMORY/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.manage_memory._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-accepted_mandate_schema_versions
-maximum_clock_skew_seconds
-require_signature_verification
-fail_on_unknown_feature_or_role
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-MANDATE-001`: validate schema, signature, integrity digest, issuance, validity window, principal/deployment identity, runtime profile, and environment before accepting the mandate.
-- `FR-AGT-MANDATE-002`: answer exact feature, role, asset, venue, account, environment, operation, budget, approval, and prohibited-authority scope queries.
-- `FR-AGT-MANDATE-003`: treat absence, expiry, unverifiable signature, digest mismatch, unsupported version, unknown authority, or widened caller input as deterministic refusal.
-- `FR-AGT-MANDATE-004`: a title or enabled feature never grants an undeclared tool, approval, risk, lifecycle, deployment, or execution capability.
-
-**Effects and teardown**
-
-Read-only mandate acquisition is scope-managed. Removing the feature refuses new Agentic work, disposes subscriptions/caches exactly, and preserves no private mutable state.
-
-**Acceptance evidence**
-
-Contract/config unit tests, signature/integrity/expiry/scope negative tests, mount/config/replacement/removal tests, startup-without-mandate fail-closed test, executable usage.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-MANAGE_MEMORY`. Withdraw `agentic.memory@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.2 `FEAT-AGT-OPERATE_RUNS` — Operations, Incidents, and Replay Validation
+<a id="feat-agt-evaluate-profiles"></a>
+### 4.9 `evaluate_profiles/` — `FEAT-AGT-EVALUATE_PROFILES`
 
-**Folder:** `app/services/agentic/operate_runs/`
-**Provides:** `agentic.operations@1`
-**Requires:** Data persistence/audit execution, approved clock/ID/redaction capabilities
-**Optional:** event publication
-**Conflicts:** none
-**State:** `agentic.operations`, schema v1, RETAIN
-**Primary module:** `run_operations.py`
+> **Feature ID:** `FEAT-AGT-EVALUATE_PROFILES`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/evaluate_profiles/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-run_operations.py
-incident_policy.py
-replay_validation.py
-migration.py
-storage.py
+Profile and Topology Evaluation. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.profile-evaluation@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`agentic.workflows@1` — [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-evaluate-profiles) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/profile_evaluation.py`](../../contracts/agentic/profile_evaluation.py). **Specified primary method:** `evaluate_agentic_profiles(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-EVALUATE_PROFILES`, `FR-AGT-ABLATE_TOPOLOGIES`, `FR-AGT-CALIBRATE_GRADERS`, `NFR-TRC-AGT-EVALUATE_PROFILES-001`, `NFR-TRC-AGT-EVALUATE_PROFILES-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.profile-evaluation@1` | FEAT-AGT-EVALUATE_PROFILES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-EVALUATE_PROFILES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| evaluate_agentic_profiles.py | Focused production domain-logic module | evaluate_agentic_profiles. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-EVALUATE_PROFILES` | Evaluate version-pinned roles/prompts/models/tools/workflows on strict output, grounding, safety, tool, reproducibility, economic and operational evidence. | `AT-AGT-EVALUATE_PROFILES-001` | Golden/ambiguous/refusal/leakage/injection/null/stress/OOD corpus is retained; zero forbidden calls/leaks/promotion is a hard corpus gate. |
+| PENDING | `FR-AGT-ABLATE_TOPOLOGIES` | Compare deterministic-only, best-single-agent, full council, each-role-removed and no-peer-visibility under the same inputs/budgets. | `AT-AGT-EVALUATE_PROFILES-002` | Council remains disabled unless uncertainty-adjusted utility exceeds cost/latency/failure surface; distinct titles alone are not independence. |
+| PENDING | `FR-AGT-DETERMINE_PROFILE_ELIGIBILITY` | Compute enable/continue/restrict/disable/retire decisions deterministically from explicit thresholds, evidence, expiry and safety vetoes. | `AT-AGT-EVALUATE_PROFILES-003` | Missing evidence or material subject change invalidates eligibility; a model cannot approve itself or edit thresholds. |
+| PENDING | `FR-AGT-CALIBRATE_GRADERS` | Bind deterministic/human graders and calibrated model graders to independent versions/rubrics. | `AT-AGT-EVALUATE_PROFILES-004` | Self-grading alone cannot promote the subject; deterministic evaluation-only bootstrap cannot serve user research. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `evaluate_agentic_profiles(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-EVALUATE_PROFILES-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-EVALUATE_PROFILES-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-EVALUATE_PROFILES-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-EVALUATE_PROFILES-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-evaluate-profiles): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/evaluate_profiles/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/evaluate_profiles/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-EVALUATE_PROFILES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.evaluate_profiles._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-trace_retention_days
-incident_retention_days
-maximum_trace_spans
-maximum_export_records
-mandatory_audit
-replay_allowed_profiles
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-OPS-001`: record correlated redacted model, tool, workflow, handoff, policy, human-action, state, cost, failure, and teardown evidence using bounded schemas.
-- `FR-AGT-OPS-002`: assemble deterministic traces and readiness/cost diagnostics without exposing secrets, unrestricted prompts, hidden reasoning, or provider internals.
-- `FR-AGT-OPS-003`: classify injection, poisoning, permission, schema, drift, cost, runaway, provider, workflow, sandbox, and receiver incidents using a deterministic containment table.
-- `FR-AGT-OPS-004`: revoke leases, stop/cancel/quarantine affected work, preserve checkpoints/evidence, and emit a typed incident record; a model cannot reduce containment.
-- `FR-AGT-OPS-005`: replay validation verifies immutable inputs and an isolated zero-side-effect profile; it does not repeat external side effects.
-
-**Effects and teardown**
-
-All tasks use `context.spawn`; persistence and event subscriptions are scope-managed. Teardown stops intake, drains writes, cancels tasks, unsubscribes, closes adapters, and retains committed operational evidence. Mandatory-audit dependents become unready if removal prevents safe recording.
-
-**Acceptance evidence**
-
-Redaction, trace completeness, cost, incident containment, replay-side-effect, persistence/restart, callback/task cleanup, mandatory-audit degradation, physical removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-EVALUATE_PROFILES`. Withdraw `agentic.profile-evaluation@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.3 `FEAT-AGT-REGISTER_ROLES` — Role Contribution Registry
+<a id="feat-agt-assist-operator"></a>
+### 4.10 `assist_operator/` — `FEAT-AGT-ASSIST_OPERATOR`
 
-**Folder:** `app/services/agentic/register_roles/`
-**Provides:** `agentic.roles@1`
-**Requires:** `agentic.mandate@1`, approved digest/schema capabilities
-**Optional:** `agentic.operations@1`, event publication
-**Conflicts:** none
-**State:** none
-**Primary module:** `role_registry.py`
+> **Feature ID:** `FEAT-AGT-ASSIST_OPERATOR`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/assist_operator/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-role_registry.py
-prompt_integrity.py
+Chat Bot and Specialist Delegation. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.operator-assistance@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.workflows@1` — [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`workspace.manage-accounts@1` — [`FEAT-WS-MANAGE_ACCOUNTS`](../workspace/README.md#feat-ws-manage-accounts)<br>`workspace.conversations@1` — [`FEAT-WS-MANAGE_CONVERSATIONS`](../workspace/README.md#feat-ws-manage-conversations).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-assist-operator) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/operator_assistance.py`](../../contracts/agentic/operator_assistance.py). **Specified primary method:** `assist_operator(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-READ_WORKSPACE_CONTEXT`, `FR-AGT-ROUTE_SPECIALIST_QUESTIONS`, `FR-AGT-PRESERVE_CHAT_HANDOFF_LINEAGE`, `FR-AGT-RESTRICT_CHAT_ACTIONS`, `NFR-TRC-AGT-ASSIST_OPERATOR-001`, `NFR-TRC-AGT-ASSIST_OPERATOR-002`, `NFR-TRC-AGT-ASSIST_OPERATOR-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.operator-assistance@1` | FEAT-AGT-ASSIST_OPERATOR | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-ASSIST_OPERATOR | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| assist_operator.py | Focused production domain-logic module | assist_operator. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-READ_WORKSPACE_CONTEXT` | Accept a fresh bounded Interfaces-validated workspace snapshot and verify principal/account/widget/generation/time/hash/redaction. | `AT-AGT-ASSIST_OPERATOR-001` | Cross-user/account, expired, unknown/removed widget, oversized or secret-bearing context fails; every message gets a new snapshot. |
+| PENDING | `FR-AGT-ANSWER_CONTEXTUAL_QUESTIONS` | Answer safe UI meaning, definitions, navigation and already grounded summaries without domain mutation. | `AT-AGT-ASSIST_OPERATOR-002` | A material price/metric/run claim requires owner refresh and a suitable specialist, not browser text or model invention. |
+| PENDING | `FR-AGT-ROUTE_SPECIALIST_QUESTIONS` | Let the model propose routing but deterministically verify registration/eligibility/scope/conflict/readiness/permission/budget. | `AT-AGT-ASSIST_OPERATOR-003` | A denied/unavailable specialist is named; no silent substitution or generic mutation tool is invoked. |
+| PENDING | `FR-AGT-PRESERVE_CHAT_HANDOFF_LINEAGE` | Return specialist output in the same conversation with role/version, claims/evidence, uncertainty/refusal/dissent and causation. | `AT-AGT-ASSIST_OPERATOR-004` | Cancellation, stream reconnect and specialist failure preserve one turn identity and actual outcome attribution. |
+| PENDING | `FR-AGT-RESTRICT_CHAT_ACTIONS` | Limit direct verbs to read, answer, explain, delegate, summarize and suggest navigation; reviewed DSL changes are specialist/owner operations. | `AT-AGT-ASSIST_OPERATOR-005` | Prose cannot mutate widgets, settings, strategies, runs, holdouts, portfolios, Risk, Trading, Brokers or deployment. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `assist_operator(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-ASSIST_OPERATOR-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-ASSIST_OPERATOR-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-ASSIST_OPERATOR-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-ASSIST_OPERATOR-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+| PENDING | `NFR-TRC-AGT-ASSIST_OPERATOR-003` | Initial local profile bounds: 16,000 message characters, 32 contributions, 128 KiB snapshot, 30 s TTL, four delegations and two DSL repair attempts; stricter provider/mandate limits win. | `ATN-AGT-ASSIST_OPERATOR-003` | Boundary +1 input/byte/contribution/delegation/repair cases refuse; expired or changed context never authorizes stale actions. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-assist-operator): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/assist_operator/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/assist_operator/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-ASSIST_OPERATOR/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.assist_operator._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-accepted_role_schema_versions
-maximum_roles
-maximum_roles_per_feature
-allow_runtime_contributions
-require_evaluation_reference
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-ROLE-001`: validate stable role/version, owning feature, capability set, task/asset support, prompt and manifest digests, model policy, tool IDs, schemas, conflicts, evaluation reference, and refusal conditions.
-- `FR-AGT-ROLE-002`: reject duplicate identity/version, unknown feature, wildcard scope, forbidden authority class, unpinned prompt, missing eligibility evidence, or hash mismatch.
-- `FR-AGT-ROLE-003`: registration and removal return exact receipts/disposers; broad name scanning is prohibited.
-- `FR-AGT-ROLE-004`: role registration creates availability only; the mandate, evaluator, workflow router, tool governance, and receiver domains still authorize use.
-
-**Effects and teardown**
-
-Role contributions are registered at mount and exact disposers are scope-owned. Removal unregisters exact contributions, emits readiness change, and leaves workflow/operational evidence intact.
-
-**Acceptance evidence**
-
-Manifest/prompt integrity, duplicate/forbidden/wildcard cases, contribution replacement/removal, exact-disposer, degraded readiness, no implementation-import, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-ASSIST_OPERATOR`. Withdraw `agentic.operator-assistance@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.4 `FEAT-AGT-GOVERN_TOOL_CALLS` — Tool Governance and Human Actions
+<a id="feat-agt-manage-claims"></a>
+### 4.11 `manage_claims/` — `FEAT-AGT-MANAGE_CLAIMS`
 
-**Folder:** `app/services/agentic/govern_tool_calls/`
-**Provides:** `agentic.tool-governance@1`
-**Requires:** `agentic.mandate@1`, `agentic.roles@1`, approved clock/principal/digest capabilities
-**Optional:** `agentic.operations@1`, Data persistence, event publication
-**Conflicts:** none
-**State:** `agentic.tool_governance`, schema v1, RETAIN
-**Primary module:** `tool_governance.py`
+> **Feature ID:** `FEAT-AGT-MANAGE_CLAIMS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/manage_claims/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-tool_governance.py
-capability_leases.py
-human_actions.py
-result_filtering.py
-migration.py
-storage.py
+Claim-and-Evidence Graph. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.claims@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.context@1` — [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context)<br>`agentic.workflows@1` — [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-manage-claims) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/claims.py`](../../contracts/agentic/claims.py). **Specified primary method:** `manage_claim_graphs(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-AGT-MANAGE_CLAIMS-001`, `NFR-TRC-AGT-MANAGE_CLAIMS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.claims@1` | FEAT-AGT-MANAGE_CLAIMS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-MANAGE_CLAIMS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_claim_graphs.py | Focused production domain-logic module | manage_claim_graphs. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-CREATE_TYPED_CLAIMS` | Create separately typed observed fact, deterministic derivation, model inference, forecast and recommendation with scope/horizon/assumptions/falsifier/uncertainty/provenance. | `AT-AGT-MANAGE_CLAIMS-001` | A model cannot promote its narrative into an observed fact by choosing a label; unsupported empirical claims remain UNKNOWN. |
+| PENDING | `FR-AGT-LINK_CLAIM_EVIDENCE` | Bind material claims and relations to exact owner records/revisions/digests and immutable graph revisions. | `AT-AGT-MANAGE_CLAIMS-002` | Wrong-owner, missing/tampered/future evidence fails or remains explicitly unsupported; no invented citation is accepted. |
+| PENDING | `FR-AGT-PROPAGATE_CLAIM_STATUS` | Append SUPPORTED/CONTESTED/REFUTED/UNKNOWN/EXPIRED status transitions and propagate evidence expiry/revision/invalidation through dependencies. | `AT-AGT-MANAGE_CLAIMS-003` | History is not overwritten; content hashes exclude mutable status; cycles violating dependency semantics fail. |
+| PENDING | `FR-AGT-ASSESS_CLAIM_RELIABILITY` | Compute evidence/statistical/epistemic/operational/calibrated dimensions from deterministic evidence rules. | `AT-AGT-MANAGE_CLAIMS-004` | Model self-confidence is not authority; missing/conflicting dimensions remain explicit and repeated calculation is deterministic. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `manage_claim_graphs(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-MANAGE_CLAIMS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-MANAGE_CLAIMS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-MANAGE_CLAIMS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-MANAGE_CLAIMS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-manage-claims): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/manage_claims/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/manage_claims/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-MANAGE_CLAIMS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.manage_claims._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_registered_tools
-maximum_active_leases_per_run
-maximum_lease_seconds
-maximum_tool_result_bytes
-human_action_timeout_seconds
-allowed_read_side_effect_classes
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-TOOL-001`: tool descriptors bind stable name/version, owner/capability, exact request/result schemas, side-effect class, scope model, egress class, cost model, and approval policy.
-- `FR-AGT-TOOL-002`: capability leases bind principal, role, workflow/run, tool/capability version, exact request hash, scope, environment, side-effect class, egress, call/cost ceilings, issue/expiry, nonce, policy version, and required approval.
-- `FR-AGT-TOOL-003`: authorization is rechecked immediately before every invocation/retry/resume; denial never invokes the receiver.
-- `FR-AGT-TOOL-004`: post-call filtering validates schema, response size, redaction, provenance, resource scope, injection status, and observed cost before model context.
-- `FR-AGT-TOOL-005`: human actions are typed, exact-object-bound, expiring, signed/authenticated, single-use, and invalid after material object change.
-- `FR-AGT-TOOL-006`: broker mutation, order, risk approval, kill-switch clear, mandate override, production deployment, credential, or unrestricted shell/network tools are structurally unregistrable.
-
-**Effects and teardown**
-
-Registrations, leases, human waits, persistence, and events are scope-owned. Teardown stops issuance, revokes leases, resolves pending waits as unavailable/cancelled, unregisters exact tools, drains durable records, and preserves retained evidence.
-
-**Acceptance evidence**
-
-Authorization matrix, forged/replayed/expired/mutated approval, call-without-lease, retry/resume reauthorization, denied-call-never-invoked, result-injection, egress, cost, forbidden-tool, persistence/restart, removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-MANAGE_CLAIMS`. Withdraw `agentic.claims@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.5 `FEAT-AGT-INVOKE_MODELS` — Provider-Neutral Model Invocation
+<a id="feat-agt-deliberate-research"></a>
+### 4.12 `deliberate_research/` — `FEAT-AGT-DELIBERATE_RESEARCH`
 
-**Folder:** `app/services/agentic/invoke_models/`
-**Provides:** `agentic.model-inference@1`
-**Requires:** `agentic.mandate@1`, `agentic.roles@1`, approved Workspace secret-reference resolution and clock capabilities
-**Optional:** `agentic.operations@1`, `agentic.tool-governance@1`, event publication
-**Conflicts:** explicit provider-feature conflicts only when two providers claim the same exclusive configured profile
-**State:** none
-**Primary module:** `model_invocation.py`
+> **Feature ID:** `FEAT-AGT-DELIBERATE_RESEARCH`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/deliberate_research/`
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-model_invocation.py
-profile_validation.py
-provider_adapter.py
+Independent Challenge and Deliberation. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.deliberation@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`agentic.workflows@1` — [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows)<br>`agentic.claims@1` — [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-deliberate-research) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/deliberation.py`](../../contracts/agentic/deliberation.py). **Specified primary method:** `deliberate_research(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-BOUND_DELIBERATION`, `FR-AGT-STOP_LOW_VALUE_DELIBERATION`, `NFR-TRC-AGT-DELIBERATE_RESEARCH-001`, `NFR-TRC-AGT-DELIBERATE_RESEARCH-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.deliberation@1` | FEAT-AGT-DELIBERATE_RESEARCH | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-DELIBERATE_RESEARCH | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| deliberate_research.py | Focused production domain-logic module | deliberate_research. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-COLLECT_INDEPENDENT_CHALLENGES` | Commit challenger first-pass assessments before proposer narrative and record provider/model/prompt/evidence/context correlation. | `AT-AGT-DELIBERATE_RESEARCH-001` | Blind-first-pass ordering is provable; weak independence is disclosed or refused under policy. |
+| PENDING | `FR-AGT-PRESERVE_DELIBERATION_DISSENT` | Retain counterclaims, insufficient evidence, minority dissent and unresolved material disagreement. | `AT-AGT-DELIBERATE_RESEARCH-002` | Majority agreement cannot erase dissent, authorize risk or select executable size. |
+| PENDING | `FR-AGT-BOUND_DELIBERATION` | Enforce participant/role/round/fanout/time/token/tool/cost limits from deterministic profiles. | `AT-AGT-DELIBERATE_RESEARCH-003` | A caller/model cannot enlarge limits; no unbounded debate/retry survives budget exhaustion. |
+| PENDING | `FR-AGT-STOP_LOW_VALUE_DELIBERATION` | Stop on completion, inadequate evidence, material conflict, low incremental value, limits, incident, removal or cancellation. | `AT-AGT-DELIBERATE_RESEARCH-004` | Each stop produces a typed reason and preserves committed evidence; more discussion is not automatic escalation. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `deliberate_research(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-DELIBERATE_RESEARCH-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-DELIBERATE_RESEARCH-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-DELIBERATE_RESEARCH-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-DELIBERATE_RESEARCH-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-deliberate-research): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/deliberate_research/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/deliberate_research/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-DELIBERATE_RESEARCH/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.deliberate_research._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-accepted_profile_schema_versions
-maximum_input_bytes
-maximum_output_bytes
-maximum_tokens_per_call
-maximum_call_cost
-invocation_timeout_seconds
-allow_evaluated_fallback
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-MODEL-001`: profiles pin provider, model identifier/version, schema mode, tools, privacy, region, retention, latency, token/cost ceilings, fallback list, and eligibility reference; floating aliases are refused.
-- `FR-AGT-MODEL-002`: invoke one schema-bound provider-neutral request; provider credentials reach only the provider adapter and never a contract, log, event, prompt, or persisted record.
-- `FR-AGT-MODEL-003`: observed provider/model identity, tokens, cost, latency, finish status, and schema outcome are measured and compared with the requested profile; silent substitution is refused.
-- `FR-AGT-MODEL-004`: fallback is explicit and only to an independently eligible profile for the same schema, tools, privacy, regional, safety, cost, and workflow-risk class.
-- `FR-AGT-MODEL-005`: provider/framework objects—including ADK objects—never cross capability or persistence boundaries.
-
-**Effects and teardown**
-
-Provider clients are acquired with scope-managed contexts; invocations use managed tasks. Removal stops intake, cancels/drains calls, closes clients, unregisters provider contributions, and publishes unready/replacement status. No fallback is invented.
-
-**Acceptance evidence**
-
-Floating/silent-substitution, profile/credential/redaction, schema/timeout/cost, explicit fallback, provider replacement, no-provider-import-on-public-load, task/client cleanup, hot replacement, physical removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-DELIBERATE_RESEARCH`. Withdraw `agentic.deliberation@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.6 `FEAT-AGT-RUN_WORKFLOWS` — Durable Workflow Orchestration
+<a id="feat-agt-synthesize-research"></a>
+### 4.13 `synthesize_research/` — `FEAT-AGT-SYNTHESIZE_RESEARCH`
 
-**Folder:** `app/services/agentic/run_workflows/`
-**Provides:** `agentic.workflows@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, Data persistence, approved clock/ID capabilities
-**Optional:** `agentic.model-inference@1`, `agentic.tool-governance@1`, `agentic.context@1`, event publication
-**Conflicts:** none
-**State:** `agentic.workflows`, schema v1, RETAIN
-**Primary module:** `workflow_runtime.py`
+> **Feature ID:** `FEAT-AGT-SYNTHESIZE_RESEARCH`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/synthesize_research/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-workflow_runtime.py
-workflow_graph.py
-workflow_state.py
-routing.py
-migration.py
-storage.py
-roles/research_planner/role.json
-roles/research_planner/prompt.md
-roles/artifact_planner/role.json
-roles/artifact_planner/prompt.md
+Evidence-Preserving Research Synthesis. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.synthesis@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.claims@1` — [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-synthesize-research) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/synthesis.py`](../../contracts/agentic/synthesis.py). **Specified primary method:** `synthesize_research(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-SYNTHESIZE_CLAIM_GRAPHS`, `FR-AGT-PRESERVE_SYNTHESIS_UNCERTAINTY`, `NFR-TRC-AGT-SYNTHESIZE_RESEARCH-001`, `NFR-TRC-AGT-SYNTHESIZE_RESEARCH-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.synthesis@1` | FEAT-AGT-SYNTHESIZE_RESEARCH | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-SYNTHESIZE_RESEARCH | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| synthesize_research.py | Focused production domain-logic module | synthesize_research. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-SYNTHESIZE_CLAIM_GRAPHS` | Produce a typed summary only from supplied version-pinned claims/evidence and optional deliberation records. | `AT-AGT-SYNTHESIZE_RESEARCH-001` | Invented/omitted material evidence and recomputed receiver results fail validation. |
+| PENDING | `FR-AGT-PRESERVE_SYNTHESIS_UNCERTAINTY` | Preserve supported/contested/refuted/unknown/expired distinctions, dissent, limitations, questions and uncertainty dimensions. | `AT-AGT-SYNTHESIZE_RESEARCH-002` | A material unresolved dissent forces contested/insufficient disposition and cannot disappear from the final summary. |
+| PENDING | `FR-AGT-REFUSE_UNSUPPORTED_SYNTHESIS` | Refuse or return insufficient evidence when minimum support/freshness/trust or required challenge is missing. | `AT-AGT-SYNTHESIZE_RESEARCH-003` | No deliberation is needed for a policy that does not require it; absence never satisfies a challenge-required policy. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `synthesize_research(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-SYNTHESIZE_RESEARCH-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-SYNTHESIZE_RESEARCH-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-SYNTHESIZE_RESEARCH-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-SYNTHESIZE_RESEARCH-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-synthesize-research): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/synthesize_research/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/synthesize_research/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-SYNTHESIZE_RESEARCH/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.synthesize_research._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_active_runs
-maximum_nodes_per_workflow
-maximum_fanout
-maximum_rounds
-maximum_retries
-maximum_queue_depth
-default_deadline_seconds
-drain_timeout_seconds
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-WF-001`: task submission is idempotent and persists workflow/version, principal, immutable inputs, budgets, deadline, idempotency key, and initial checkpoint before execution.
-- `FR-AGT-WF-002`: graphs use bounded deterministic routing, fan-out, loops, retries, backpressure, human waits, cancellation, expiration, and drain; model output cannot widen them.
-- `FR-AGT-WF-003`: state transitions use expected-version guards and terminal states `SUCCEEDED`, `REFUSED`, `FAILED`, `CANCELLED`, or `EXPIRED`; terminal identity never resumes.
-- `FR-AGT-WF-004`: routing selects only mandate-enabled, registry-resolved, eligible, conflict-safe roles and capabilities with available evidence/budget; absence degrades or refuses according to workflow policy.
-- `FR-AGT-WF-005`: use risk/value-adaptive escalation: deterministic baseline, then one specialist, challenger when material, and council only for unresolved high-value work.
-- `FR-AGT-WF-006`: Research Planner and Artifact Planner are bounded role contributions; they propose graphs inside deterministic templates and have no approval or receiver authority.
-
-**Effects and teardown**
-
-All child work uses managed tasks and scope-owned subscriptions/resources. Teardown stops intake, marks/drains/cancels active work by policy, revokes leases, preserves committed checkpoints/results, removes role contributions exactly, and closes storage.
-
-**Acceptance evidence**
-
-Idempotency/CAS, restart/resume, queue/backpressure, bounded loop/fanout/retry, cancellation/expiry/human-wait, adaptive escalation, role absence/conflict, planner authority-negative, drain/removal/replacement, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-SYNTHESIZE_RESEARCH`. Withdraw `agentic.synthesis@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.7 `FEAT-AGT-ASSEMBLE_CONTEXT` — Point-in-Time Context Assembly
+<a id="feat-agt-govern-research-search"></a>
+### 4.14 `govern_research_search/` — `FEAT-AGT-GOVERN_RESEARCH_SEARCH`
 
-**Folder:** `app/services/agentic/assemble_context/`
-**Provides:** `agentic.context@1`
-**Requires:** `agentic.mandate@1`, approved clock/redaction/digest capabilities, receiver evidence capability keys selected by configured workflow
-**Optional:** `agentic.memory@1`, `agentic.operations@1`
-**Conflicts:** none
-**State:** none
-**Primary module:** `context_assembly.py`
+> **Feature ID:** `FEAT-AGT-GOVERN_RESEARCH_SEARCH`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/govern_research_search/`
+> **First release milestone:** `U3`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-context_assembly.py
-eligibility.py
-injection_filter.py
+Agentic Research Request Accounting. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.research-search@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.workflows@1` — [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`research.campaigns@1` — [`FEAT-RES-GOVERN_CAMPAIGNS`](../research/README.md#feat-res-govern-campaigns)<br>`research.holdout@1` — [`FEAT-RES-GOVERN_HOLDOUTS`](../research/README.md#feat-res-govern-holdouts)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-govern-research-search) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/research_search.py`](../../contracts/agentic/research_search.py). **Specified primary method:** `govern_research_search(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-ACCOUNT_RESEARCH_VARIANTS`, `NFR-TRC-AGT-GOVERN_RESEARCH_SEARCH-001`, `NFR-TRC-AGT-GOVERN_RESEARCH_SEARCH-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.research-search@1` | FEAT-AGT-GOVERN_RESEARCH_SEARCH | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-GOVERN_RESEARCH_SEARCH | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| govern_research_search.py | Focused production domain-logic module | govern_research_search. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-REGISTER_RESEARCH_CAMPAIGNS` | Obtain canonical Research campaign/family/dataset/search identities before generated research and retain mandatory owner references/receipts. | `AT-AGT-GOVERN_RESEARCH_SEARCH-001` | Local authored strings cannot create an independent Research campaign or holdout allocation. |
+| PENDING | `FR-AGT-ACCOUNT_RESEARCH_VARIANTS` | Record parameter/feature/prompt/model variants, amendments and degrees of freedom against owner-classified families and actual budgets. | `AT-AGT-GOVERN_RESEARCH_SEARCH-002` | Trivial renaming/rehashing cannot reset consumed scarcity; similarity advice never overrides Research classification. |
+| PENDING | `FR-AGT-PRESERVE_FAILED_ATTEMPTS` | Retain every accepted active and terminal attempt plus pre-admission denials and linked retries/repairs. | `AT-AGT-GOVERN_RESEARCH_SEARCH-003` | Accepted = active+completed+failed+cancelled+invalid+refused, with active zero at closure; null/negative results stay completed. |
+| PENDING | `FR-AGT-GOVERN_HOLDOUT_REQUESTS` | Request owner-authoritative reservations/consumption through governed leases and reconcile unknown receiver effects. | `AT-AGT-GOVERN_RESEARCH_SEARCH-004` | Concurrency/expiry/cancellation cannot refund exposed information or allocate a second look via a new local hash. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `govern_research_search(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-GOVERN_RESEARCH_SEARCH-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-GOVERN_RESEARCH_SEARCH-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-GOVERN_RESEARCH_SEARCH-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-GOVERN_RESEARCH_SEARCH-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-govern-research-search): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/govern_research_search/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/govern_research_search/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-GOVERN_RESEARCH_SEARCH/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.govern_research_search._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_context_items
-maximum_context_bytes
-maximum_item_bytes
-maximum_source_age_seconds
-accepted_trust_classes
-accepted_licence_classes
-fail_on_required_source_exclusion
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-CTX-001`: each context request pins task, objective, asset/account/session scope, observation time, evidence cutoff, required/optional source classes, and output bound.
-- `FR-AGT-CTX-002`: include items only after ordered availability, scope, licensing, trust, freshness, revision, deduplication, injection, redaction, and size checks.
-- `FR-AGT-CTX-003`: trusted instructions and untrusted evidence occupy separate structural fields; retrieved text, page content, memory, and peer content never enter an instruction slot.
-- `FR-AGT-CTX-004`: UI context provides orientation only; any material visible value must be refreshed through the owning capability before becoming an evidence claim.
-- `FR-AGT-CTX-005`: excluded items and reasons are returned; missing required evidence refuses, while optional missing evidence produces explicit partial coverage.
-
-**Effects and teardown**
-
-Receiver reads and subscriptions are scope-managed; no durable state. Teardown cancels reads/subscriptions, clears bounded process-local caches, and publishes readiness change. No source truth is copied as a new authority.
-
-**Acceptance evidence**
-
-Point-in-time/lookahead, stale/revised/unlicensed/untrusted/duplicate/oversize, injection separation, UI-orientation refresh, required-vs-optional coverage, receiver absence, cancellation/removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-GOVERN_RESEARCH_SEARCH`. Withdraw `agentic.research-search@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.8 `FEAT-AGT-MANAGE_MEMORY` — Governed Memory
+<a id="feat-agt-design-research"></a>
+### 4.15 `design_research/` — `FEAT-AGT-DESIGN_RESEARCH`
 
-**Folder:** `app/services/agentic/manage_memory/`
-**Provides:** `agentic.memory@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/redaction/digest capabilities
-**Optional:** event publication
-**Conflicts:** none
-**State:** `agentic.memory`, schema v1, RETAIN
-**Primary module:** `memory_management.py`
+> **Feature ID:** `FEAT-AGT-DESIGN_RESEARCH`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/design_research/`
+> **First release milestone:** `U3`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-memory_management.py
-promotion_policy.py
-retrieval.py
-migration.py
-storage.py
+Falsifiable Research Design. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.research-design@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`agentic.claims@1` — [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims)<br>`agentic.synthesis@1` — [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research)<br>`agentic.research-search@1` — [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search)<br>`agentic.workflows@1` — [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`research.protocols@1` — [`FEAT-RES-DEFINE_PROTOCOLS`](../research/README.md#feat-res-define-protocols).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-design-research) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/research_design.py`](../../contracts/agentic/research_design.py). **Specified primary method:** `design_research(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-COMPOSE_EXPERIMENT_REQUESTS`, `FR-AGT-COMPOSE_SEARCH_REQUESTS`, `FR-AGT-BIND_RESEARCH_PROTOCOLS`, `NFR-TRC-AGT-DESIGN_RESEARCH-001`, `NFR-TRC-AGT-DESIGN_RESEARCH-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.research-design@1` | FEAT-AGT-DESIGN_RESEARCH | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-DESIGN_RESEARCH | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| design_research.py | Focused production domain-logic module | design_research. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-DESIGN_FALSIFIABLE_HYPOTHESES` | Compose scope/horizon/mechanism/evidence/prerequisites/confounders/falsifier/rejection criterion under explicit research-draft or supported classification. | `AT-AGT-DESIGN_RESEARCH-001` | A draft may encode unvalidated assumptions but cannot claim empirical support or qualification. |
+| PENDING | `FR-AGT-COMPOSE_EXPERIMENT_REQUESTS` | Map reviewed hypotheses into the exact owner protocol with immutable inputs/splits/embargo/cost/seed/baseline/metrics/stop/evidence fields. | `AT-AGT-DESIGN_RESEARCH-002` | Missing or invented receiver fields fail schema validation; composing a candidate does not start computation. |
+| PENDING | `FR-AGT-COMPOSE_SEARCH_REQUESTS` | Compose finite Optimization method/space/objective/trial/early-stop/robustness/holdout candidates only when that operation is ready. | `AT-AGT-DESIGN_RESEARCH-003` | U3 hypothesis/experiment works without Optimization; DESIGN_SEARCH refuses until U6 receiver readiness. |
+| PENDING | `FR-AGT-BIND_RESEARCH_PROTOCOLS` | Retain claim/synthesis/campaign/family/data/policy/config/role/model/prompt and receiver-schema lineage. | `AT-AGT-DESIGN_RESEARCH-004` | Changing inputs requires a new candidate/review identity; unchanged owner rejection/result remains authoritative. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `design_research(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-DESIGN_RESEARCH-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-DESIGN_RESEARCH-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-DESIGN_RESEARCH-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-DESIGN_RESEARCH-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-design-research): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/design_research/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/design_research/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-DESIGN_RESEARCH/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.design_research._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_record_bytes
-maximum_retrieval_records
-working_memory_ttl_seconds
-conversation_summary_ttl_seconds
-validated_memory_requires_approval
-retention_days_by_class
-allowed_sensitivity_classes
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-MEM-001`: memory records are separated into `WORKFLOW`, `WORKING`, `EPISODIC`, `VALIDATED_SEMANTIC`, and `OPERATIONAL_AUDIT` classes with scope and retention.
-- `FR-AGT-MEM-002`: candidate promotion validates scope, evidence/provenance, sensitivity/redaction, freshness, injection, retention, deduplication, supersession, and required human action.
-- `FR-AGT-MEM-003`: retrieval is bounded by task/principal/asset/account/time scope and revalidates expiry/freshness; memory alone never supports a material market or decision claim.
-- `FR-AGT-MEM-004`: corrections append with `supersedes`; silent overwrite is forbidden. Working state expires/purges deterministically.
-- `FR-AGT-MEM-005`: model reflection cannot change mandate, permissions, evaluation policy, thresholds, prompts, profile eligibility, or receiver state.
-
-**Effects and teardown**
-
-Storage/tasks/events are scope-managed. Removal stops new operations, cancels retrievals, drains writes, closes adapters, retains governed state by class, and deletes expired working state only through declared policy. Optional consumers can operate statelessly.
-
-**Acceptance evidence**
-
-Class separation, promotion, approval, redaction-before-persist, scoped retrieval, memory-not-evidence, injection, supersession, TTL/purge, restart, stateless degradation, removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-DESIGN_RESEARCH`. Withdraw `agentic.research-design@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.9 `FEAT-AGT-EVALUATE_PROFILES` — Profile and Topology Evaluation
+<a id="feat-agt-compose-strategy-specs"></a>
+### 4.16 `compose_strategy_specs/` — `FEAT-AGT-COMPOSE_STRATEGY_SPECS`
 
-**Folder:** `app/services/agentic/evaluate_profiles/`
-**Provides:** `agentic.profile-evaluation@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities
-**Optional:** `agentic.roles@1`, `agentic.model-inference@1`, `agentic.tool-governance@1`, event publication
-**Conflicts:** none
-**State:** `agentic.profile_evaluation`, schema v1, RETAIN
-**Primary module:** `profile_evaluation.py`
+> **Feature ID:** `FEAT-AGT-COMPOSE_STRATEGY_SPECS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/compose_strategy_specs/`
+> **First release milestone:** `U3`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-profile_evaluation.py
-eligibility.py
-ablation.py
-migration.py
-storage.py
+HSL Strategy and Indicator Composition. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.strategy-specs@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.claims@1` — [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims)<br>`agentic.synthesis@1` — [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research)<br>`agentic.research-search@1` — [`FEAT-AGT-GOVERN_RESEARCH_SEARCH`](#feat-agt-govern-research-search)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`strategy.version-strategies@1` — [`FEAT-STRAT-VERSION_STRATEGIES`](../strategy/README.md#feat-strat-version-strategies)<br>`strategy.define-indicators@1` — [`FEAT-STRAT-DEFINE_INDICATORS`](../strategy/README.md#feat-strat-define-indicators).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-compose-strategy-specs) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/strategy_specs.py`](../../contracts/agentic/strategy_specs.py). **Specified primary method:** `compose_strategy_specs(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-COMPOSE_STRATEGY_DSL`, `FR-AGT-PRESERVE_DSL_PROVENANCE`, `NFR-TRC-AGT-COMPOSE_STRATEGY_SPECS-001`, `NFR-TRC-AGT-COMPOSE_STRATEGY_SPECS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.strategy-specs@1` | FEAT-AGT-COMPOSE_STRATEGY_SPECS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-COMPOSE_STRATEGY_SPECS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| compose_strategy_specs.py | Focused production domain-logic module | compose_strategy_specs. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-COMPOSE_STRATEGY_DSL` | Generate canonical HSL drafts or base-revision-bound typed patches using registered blocks, units, parameters, clocks, tests and displayed assumptions. | `AT-AGT-COMPOSE_STRATEGY_SPECS-001` | Unknown blocks/arbitrary source fail; new drafts need not claim prior profitability; repairs stop after the permitted limit. |
+| PENDING | `FR-AGT-VALIDATE_DSL_HANDOFF` | Preview dependency-safe granular edits and invoke Strategy/Indicators intake only for the exact user-reviewed candidate. | `AT-AGT-COMPOSE_STRATEGY_SPECS-002` | A changed base/selection/hash conflicts or requires new review; saving never starts a backtest or grants live authority. |
+| PENDING | `FR-AGT-REPORT_UNSUPPORTED_EXPRESSIONS` | Return a receiver-validated structured gap when current DSL cannot express the approved behavior. | `AT-AGT-COMPOSE_STRATEGY_SPECS-003` | No silent custom semantics or switch to source generation occurs. |
+| PENDING | `FR-AGT-PRESERVE_DSL_PROVENANCE` | Bind candidate to hypothesis/claims/campaign/search/role/model/prompt/schema/compiler/config/test vectors and receiver receipts. | `AT-AGT-COMPOSE_STRATEGY_SPECS-004` | A new revision reports the real owner outcome; supplied canonical hashes are not trusted without recomputation. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `compose_strategy_specs(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-COMPOSE_STRATEGY_SPECS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-COMPOSE_STRATEGY_SPECS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-COMPOSE_STRATEGY_SPECS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-COMPOSE_STRATEGY_SPECS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-compose-strategy-specs): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/compose_strategy_specs/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/compose_strategy_specs/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.compose_strategy_specs._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-required_evaluation_set_versions
-required_grader_versions
-maximum_evaluation_cases
-minimum_human_labels_for_model_grader
-maximum_regression_rate
-eligibility_expiry_seconds
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-EVAL-001`: every role, prompt, model, tool, workflow, and topology profile is evaluated against versioned contract, grounding, tool, safety, reasoning-utility, reproducibility, economic-value, and operational dimensions.
-- `FR-AGT-EVAL-002`: sets include golden, ambiguous, refusal, point-in-time, injection/poisoning, authorization-forgery, provider regression, null/random-label, historical regime, stress, and out-of-distribution cases as applicable.
-- `FR-AGT-EVAL-003`: deterministic graders govern schemas/calculations/permissions; human rubrics record agreement; model graders require calibration and never grade their own promotion alone.
-- `FR-AGT-EVAL-004`: council ablation compares deterministic-only, best single-agent, full council, each-role-removed, and no-peer-visibility configurations.
-- `FR-AGT-EVAL-005`: eligibility requires uncertainty-adjusted benefit exceeding latency, cost, and added failure surface; safety/reliability failure revokes eligibility. The evaluator records decisions but does not self-edit role manifests.
-
-**Effects and teardown**
-
-Evaluation runs use managed tasks/tools; storage/events are scope-managed. Removal cancels evaluations, freezes retained evidence, closes adapters, and blocks new/changed eligibility. It never invents passing evidence.
-
-**Acceptance evidence**
-
-Set completeness, grader calibration, self-grading negative, baseline/ablation arithmetic, eligibility/revocation/expiry, missing-evidence fail-closed, persistence/restart, role-registry integration, removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-COMPOSE_STRATEGY_SPECS`. Withdraw `agentic.strategy-specs@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.10 `FEAT-AGT-ASSIST_OPERATOR` — Website Chat Bot and Specialist Delegation
+<a id="feat-agt-advise-portfolio"></a>
+### 4.17 `advise_portfolio/` — `FEAT-AGT-ADVISE_PORTFOLIO`
 
-**Folder:** `app/services/agentic/assist_operator/`
-**Provides:** `agentic.operator-assistance@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.workflows@1`, approved clock/principal capabilities
-**Optional:** `agentic.memory@1`, `agentic.tool-governance@1`, D-IFACE event publication
-**Conflicts:** none
-**State:** `agentic.operator_conversations`, schema v1, DELETE
-**Primary module:** `operator_assistance.py`
+> **Feature ID:** `FEAT-AGT-ADVISE_PORTFOLIO`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/advise_portfolio/`
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-operator_assistance.py
-context_validation.py
-specialist_routing.py
-conversation_state.py
-migration.py
-storage.py
-roles/chat_bot/role.json
-roles/chat_bot/prompt.md
+Expiring Portfolio and Risk Advisory. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.portfolio-advisory@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`agentic.context@1` — [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context)<br>`agentic.claims@1` — [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims)<br>`agentic.deliberation@1` — [`FEAT-AGT-DELIBERATE_RESEARCH`](#feat-agt-deliberate-research)<br>`agentic.synthesis@1` — [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`portfolio.compose-portfolios@1` — [`FEAT-POR-COMPOSE_PORTFOLIOS`](../portfolio/README.md#feat-por-compose-portfolios)<br>`portfolio.analyze-portfolio-risk@1` — [`FEAT-POR-ANALYZE_PORTFOLIO_RISK`](../portfolio/README.md#feat-por-analyze-portfolio-risk)<br>`risk.research-evidence@1` — [`FEAT-RSK-ASSESS_RESEARCH_RISK`](../risk/README.md#feat-rsk-assess-research-risk).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-advise-portfolio) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/portfolio_advisory.py`](../../contracts/agentic/portfolio_advisory.py). **Specified primary method:** `advise_portfolio(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-AGT-ADVISE_PORTFOLIO-001`, `NFR-TRC-AGT-ADVISE_PORTFOLIO-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.portfolio-advisory@1` | FEAT-AGT-ADVISE_PORTFOLIO | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-ADVISE_PORTFOLIO | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| advise_portfolio.py | Focused production domain-logic module | advise_portfolio. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-ADVISE_PORTFOLIO_ALLOCATION` | Use current account/allocation/analytics/mandate/risk evidence for nonbinding weights/ranges/questions/uncertainty and strict expiry. | `AT-AGT-ADVISE_PORTFOLIO-001` | No lot/quantity/notional/order/approval field is accepted; wrong or stale account evidence refuses. |
+| PENDING | `FR-AGT-CHALLENGE_PORTFOLIO_RISK` | Require independent review of mandate/barrier/tail/concentration/liquidity/correlation/leverage/operations/model/compliance/data concerns. | `AT-AGT-ADVISE_PORTFOLIO-002` | Required risk-kind set and dissent remain visible; absence of objection is not consent. |
+| PENDING | `FR-AGT-EXPIRE_PORTFOLIO_ADVICE` | Prevent reuse/submission when advisory expiry or source freshness has elapsed. | `AT-AGT-ADVISE_PORTFOLIO-003` | At the exact expiry boundary the advice is unavailable for handoff; an already-expired input is rejected. |
+| PENDING | `FR-AGT-PRESERVE_PORTFOLIO_AUTHORITY` | Use normal Portfolio/Risk review contracts and respect their independent denial/decision. | `AT-AGT-ADVISE_PORTFOLIO-004` | No direct Portfolio mutation, live allocation or Risk approval can originate from the advisory. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `advise_portfolio(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-ADVISE_PORTFOLIO-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-ADVISE_PORTFOLIO-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-ADVISE_PORTFOLIO-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-ADVISE_PORTFOLIO-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-advise-portfolio): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/advise_portfolio/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/advise_portfolio/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-ADVISE_PORTFOLIO/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.advise_portfolio._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_message_bytes
-maximum_context_contributions
-maximum_context_bytes
-maximum_conversation_turns
-conversation_ttl_seconds
-maximum_specialist_handoffs_per_turn
-allow_navigation_suggestions
-enable_response_streaming
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-CHAT-001`: the public and actual agent name is exactly **Chat Bot**. Canonical role ID: `chat_bot`. CEO/Firm Coordinator/Copilot aliases are not canonical.
-- `FR-AGT-CHAT-002`: validate authenticated user, conversation/task scope, current page/route, active/focused widget, contribution versions, selected entity references, filters, timeframe/session/date selections, permissions, redactions, and observed time.
-- `FR-AGT-CHAT-003`: reject raw DOM, credentials, private provider objects, unrestricted screenshots, arbitrary executable content, unknown contributions, oversized context, and stale or cross-user snapshots.
-- `FR-AGT-CHAT-004`: answer directly only for safe UI explanation, navigation suggestion, definitions from public metadata, and summaries of already validated results; material domain questions require authoritative refresh or specialist delegation.
-- `FR-AGT-CHAT-005`: Chat Bot proposes a specialist route; deterministic routing verifies enabled/eligible role, capability support, conflicts, required evidence, user permission, budget, limits, and readiness before invocation.
-- `FR-AGT-CHAT-006`: specialist results return into the same conversation; Chat Bot preserves citations, provenance, uncertainty, refusal, failure, partial coverage, and dissent and names the specialist contribution.
-- `FR-AGT-CHAT-007`: initial actions are exactly read context, answer, explain, delegate, summarize, and suggest navigation. Chat Bot cannot directly mutate widgets/settings, start runs, edit strategies, alter portfolios, approve risk, submit orders, or trade.
-- `FR-AGT-CHAT-008`: page context refreshes every turn; conversation state is session/task-scoped, and long-term reuse requires governed memory promotion.
-
-**Effects and teardown**
-
-Chat turns, streaming, specialist tasks, context subscriptions, role contribution, and conversation store are scope-managed. Removal stops intake, cancels active turns/handoffs, unregisters Chat Bot exactly, unsubscribes, closes storage, and expires/deletes conversation state by policy. UI remains functional without Chat Bot.
-
-**Acceptance evidence**
-
-Context validation/staleness/cross-user/redaction/size, direct-vs-specialist routing, unsupported/disabled/conflicted specialist, same-conversation return, streaming cancellation/backpressure, action-authority negative tests, memory boundary, widget removal/stale-contribution test, feature removal and UI fallback, usage test.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-ADVISE_PORTFOLIO`. Withdraw `agentic.portfolio-advisory@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.11 `FEAT-AGT-MANAGE_CLAIMS` — Claim-and-Evidence Graph
+<a id="feat-agt-compose-strategy-proposals"></a>
+### 4.18 `compose_strategy_proposals/` — `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`
 
-**Folder:** `app/services/agentic/manage_claims/`
-**Provides:** `agentic.claims@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, Data persistence, approved clock/digest capabilities
-**Optional:** `agentic.tool-governance@1`, event publication
-**Conflicts:** none
-**State:** `agentic.claims`, schema v1, RETAIN
-**Primary module:** `claim_graph.py`
+> **Feature ID:** `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/compose_strategy_proposals/`
+> **First release milestone:** `U3`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-claim_graph.py
-claim_validation.py
-reliability.py
-migration.py
-storage.py
-roles/analytics_evidence_reviewer/role.json
-roles/analytics_evidence_reviewer/prompt.md
-roles/fundamental_analyst/role.json
-roles/fundamental_analyst/prompt.md
-roles/sentiment_analyst/role.json
-roles/sentiment_analyst/prompt.md
-roles/technical_structure_analyst/role.json
-roles/technical_structure_analyst/prompt.md
-roles/quantitative_analyst/role.json
-roles/quantitative_analyst/prompt.md
+Strategy Proposal Composition and Handoff. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.strategy-proposals@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`agentic.context@1` — [`FEAT-AGT-ASSEMBLE_CONTEXT`](#feat-agt-assemble-context)<br>`agentic.claims@1` — [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims)<br>`agentic.synthesis@1` — [`FEAT-AGT-SYNTHESIZE_RESEARCH`](#feat-agt-synthesize-research)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`strategy.proposal-intake@1` — [`FEAT-STRAT-ACCEPT_PROPOSALS`](../strategy/README.md#feat-strat-accept-proposals).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-compose-strategy-proposals) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/strategy_proposals.py`](../../contracts/agentic/strategy_proposals.py). **Specified primary method:** `compose_strategy_proposals(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-AGT-COMPOSE_STRATEGY_PROPOSALS-001`, `NFR-TRC-AGT-COMPOSE_STRATEGY_PROPOSALS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.strategy-proposals@1` | FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| compose_strategy_proposals.py | Focused production domain-logic module | compose_strategy_proposals. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-COMPOSE_STRATEGY_PROPOSALS` | Compose expiring thesis/scope/direction-or-behavior/horizon/invalidation/evidence/uncertainty/evaluation candidates. | `AT-AGT-COMPOSE_STRATEGY_PROPOSALS-001` | Broker/order/fill/approval/price/quantity/lot/notional/size fields are rejected. |
+| PENDING | `FR-AGT-SUBMIT_STRATEGY_PROPOSALS` | Submit unchanged through Strategy proposal intake with current identity/scope/freshness/idempotency and exact capability lease. | `AT-AGT-COMPOSE_STRATEGY_PROPOSALS-002` | A denied lease reaches no receiver; retry after uncertain commit reconciles the original key. |
+| PENDING | `FR-AGT-RECORD_STRATEGY_RECEIPTS` | Retain exact accepted/rejected/expired/pending intake receipts and resulting lifecycle state. | `AT-AGT-COMPOSE_STRATEGY_PROPOSALS-003` | Accepted intake cannot be displayed as accepted strategy, TradeIntent, order or fill. |
+| PENDING | `FR-AGT-PRESERVE_STRATEGY_AUTHORITY` | Keep evaluation into intents, registration, Risk approval and Trading/Brokers commands outside Agentic. | `AT-AGT-COMPOSE_STRATEGY_PROPOSALS-004` | Import/capability/schema negative tests prove no privileged route. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `compose_strategy_proposals(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-COMPOSE_STRATEGY_PROPOSALS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-COMPOSE_STRATEGY_PROPOSALS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-COMPOSE_STRATEGY_PROPOSALS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-COMPOSE_STRATEGY_PROPOSALS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-compose-strategy-proposals): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/compose_strategy_proposals/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/compose_strategy_proposals/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.compose_strategy_proposals._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_claims_per_graph
-maximum_relations_per_graph
-maximum_statement_bytes
-maximum_evidence_refs_per_claim
-claim_expiry_check_seconds
-accepted_claim_schema_versions
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-CLAIM-001`: every material claim declares type, statement, scope, horizon/validity, evidence refs, availability, derivation/assumptions, confounders, falsifier, dependencies, contradictions, uncertainty, author profile, provenance, and status as applicable.
-- `FR-AGT-CLAIM-002`: facts, deterministic derivations, model inferences, forecasts, and recommendations are structurally distinct; a model cannot promote its output to a measured fact.
-- `FR-AGT-CLAIM-003`: relations are typed and acyclic where dependency semantics require it; contradiction, support, derivation, supersession, and invalidation remain queryable.
-- `FR-AGT-CLAIM-004`: reliability separates evidence, statistical, epistemic, operational uncertainty, and calibrated profile reliability; displayed reliability is deterministic, not model self-confidence.
-- `FR-AGT-CLAIM-005`: stale/revised/refuted evidence transitions affected claims and downstream dependencies explicitly; no final memo hides contested, unknown, refuted, or expired state.
-- `FR-AGT-CLAIM-006`: evidence-analysis profiles interpret receiver evidence but never silently recalculate or replace owner outputs; missing/incompatible evidence refuses.
-
-**Effects and teardown**
-
-Model/tool/tasks, persistence, events, role contributions, and expiry task are scope-managed. Removal stops mutation/analysis, cancels work, unregisters roles, closes storage, retains graphs, and marks dependent capabilities unready.
-
-**Acceptance evidence**
-
-Claim type/status/prohibited promotion, graph relation/cycle, source expiry propagation, reliability computation, no-recomputation, analyst evidence applicability, persistence/restart, role removal/degradation, physical removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS`. Withdraw `agentic.strategy-proposals@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.12 `FEAT-AGT-DELIBERATE_RESEARCH` — Independent Challenge and Deliberation
+<a id="feat-agt-author-sandbox-artifacts"></a>
+### 4.19 `author_sandbox_artifacts/` — `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`
 
-**Folder:** `app/services/agentic/deliberate_research/`
-**Provides:** `agentic.deliberation@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.workflows@1`, `agentic.context@1`, `agentic.claims@1`, Data persistence
-**Optional:** `agentic.tool-governance@1`, `agentic.profile-evaluation@1`, event publication
-**Conflicts:** none
-**State:** `agentic.deliberation`, schema v1, RETAIN
-**Primary module:** `research_deliberation.py`
+> **Feature ID:** `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/author_sandbox_artifacts/`
+> **First release milestone:** `U9`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-research_deliberation.py
-independence.py
-challenge_policy.py
-migration.py
-storage.py
-roles/causality_challenger/role.json
-roles/causality_challenger/prompt.md
-roles/leakage_challenger/role.json
-roles/leakage_challenger/prompt.md
-roles/robustness_challenger/role.json
-roles/robustness_challenger/prompt.md
-roles/risk_challenger/role.json
-roles/risk_challenger/prompt.md
-roles/compliance_challenger/role.json
-roles/compliance_challenger/prompt.md
-roles/operations_security_challenger/role.json
-roles/operations_security_challenger/prompt.md
+Sandboxed Source Artifact Fallback. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.sandbox-artifacts@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.roles@1` — [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles)<br>`agentic.model-inference@1` — [`FEAT-AGT-INVOKE_MODELS`](#feat-agt-invoke-models)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`agentic.workflows@1` — [`FEAT-AGT-RUN_WORKFLOWS`](#feat-agt-run-workflows)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`agentic.strategy-specs@1` — [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](#feat-agt-compose-strategy-specs)<br>`plugins.sandbox-permissions@1` — [`FEAT-PLUG-SANDBOX_PERMISSIONS`](../plugins/README.md#feat-plug-sandbox-permissions)<br>`plugins.isolate-analysis@1` — [`FEAT-PLUG-ISOLATE_ANALYSIS`](../plugins/README.md#feat-plug-isolate-analysis)<br>`workspace.artifacts@1` — [`FEAT-WS-MANAGE_ARTIFACTS`](../workspace/README.md#feat-ws-manage-artifacts)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-author-sandbox-artifacts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/sandbox_artifacts.py`](../../contracts/agentic/sandbox_artifacts.py). **Specified primary method:** `author_sandbox_artifacts(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-AUTHOR_SANDBOX_ARTIFACTS`, `NFR-TRC-AGT-AUTHOR_SANDBOX_ARTIFACTS-001`, `NFR-TRC-AGT-AUTHOR_SANDBOX_ARTIFACTS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.sandbox-artifacts@1` | FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| author_sandbox_artifacts.py | Focused production domain-logic module | author_sandbox_artifacts. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-PROVE_DSL_GAP` | Require the exact approved requirement and receiver-validated unsupported-expression report before source generation. | `AT-AGT-AUTHOR_SANDBOX_ARTIFACTS-001` | Missing/changed/forged/expired/overbroad gap refuses before model call or file write. |
+| PENDING | `FR-AGT-AUTHOR_SANDBOX_ARTIFACTS` | Require authenticated specification and attested isolated credential-free staging lease with finite resource and egress policy. | `AT-AGT-AUTHOR_SANDBOX_ARTIFACTS-002` | No valid lease means no generation/write; traversal/symlink/device paths and inherited credentials are denied. |
+| PENDING | `FR-AGT-RECORD_ARTIFACT_MANIFEST` | Capture every path/hash/size, dependency/source/SBOM, test/static-analysis result, provenance and full search history. | `AT-AGT-AUTHOR_SANDBOX_ARTIFACTS-003` | Unlisted files/dependencies or mutated hashes fail aggregate validation. |
+| PENDING | `FR-AGT-ENFORCE_STAGING_ONLY` | Never import generated code in the application, hot-load/register/deploy it or mutate the production repository directly. | `AT-AGT-AUTHOR_SANDBOX_ARTIFACTS-004` | Only sandbox execution and staged receiver intake are possible; own tests do not grant acceptance. |
+| PENDING | `FR-AGT-CLEANUP_SANDBOX_ARTIFACTS` | Revoke leases and clean eligible staged/ephemeral bytes while retaining required metadata and cleanup receipts. | `AT-AGT-AUTHOR_SANDBOX_ARTIFACTS-005` | Failure/cancel/removal/replacement produce idempotent cleanup and no surviving unauthorized resources. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `author_sandbox_artifacts(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-AUTHOR_SANDBOX_ARTIFACTS-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-AUTHOR_SANDBOX_ARTIFACTS-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-AUTHOR_SANDBOX_ARTIFACTS-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-AUTHOR_SANDBOX_ARTIFACTS-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-author-sandbox-artifacts): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/author_sandbox_artifacts/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/author_sandbox_artifacts/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.author_sandbox_artifacts._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_participants
-maximum_rounds
-maximum_parallel_briefs
-maximum_challenges_per_claim
-minimum_independent_assessments
-warn_same_model_family
-require_distinct_model_family_for_high_risk
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-DELIB-001`: challengers first receive objective, evidence snapshot, and normalized claim IDs without proposer narrative; their independent assessment is committed before rebuttal context.
-- `FR-AGT-DELIB-002`: record same provider/model/prompt/context/evidence/decoding correlations and warn or refuse when required independence is not achieved.
-- `FR-AGT-DELIB-003`: challenge modes cover causality, leakage, robustness, risk, compliance, and operations/security, selected by deterministic task/risk policy rather than by role persuasion.
-- `FR-AGT-DELIB-004`: preserve challenges, rebuttals, unresolved dissent, material conflict, budgets, rounds, participants, tool evidence, and terminal reason. Voting and agreement cannot authorize or size a position.
-- `FR-AGT-DELIB-005`: stop on completion, insufficient evidence, material unresolved conflict, limits, deadline, budget, policy denial, incident, dependency removal, or cancellation; more discussion is not an automatic uncertainty remedy.
-
-**Effects and teardown**
-
-Tasks/model/tool calls, persistence, events, and role contributions are scope-managed. Removal stops new rounds, cancels/drains active deliberations, revokes leases, unregisters challenge profiles, persists terminal/degraded outcomes, closes storage, and retains dissent.
-
-**Acceptance evidence**
-
-Blind-first challenge, correlation warnings/distinct-family rule, challenge coverage, dissent/authority negative, bounds/stop conditions, cancellation/removal mid-round, persistence/restart, role removal/degraded low-risk path, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`. Withdraw `agentic.sandbox-artifacts@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.13 `FEAT-AGT-SYNTHESIZE_RESEARCH` — Research Synthesis
+<a id="feat-agt-calibrate-outcomes"></a>
+### 4.20 `calibrate_outcomes/` — `FEAT-AGT-CALIBRATE_OUTCOMES`
 
-**Folder:** `app/services/agentic/synthesize_research/`
-**Provides:** `agentic.synthesis@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.claims@1`
-**Optional:** `agentic.deliberation@1`, `agentic.profile-evaluation@1`, event publication
-**Conflicts:** none
-**State:** none
-**Primary module:** `research_synthesis.py`
+> **Feature ID:** `FEAT-AGT-CALIBRATE_OUTCOMES`
+> **Domain:** `agentic`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/agentic/calibrate_outcomes/`
+> **First release milestone:** `U8`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Files**
+#### Purpose
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-research_synthesis.py
-synthesis_validation.py
-roles/research_synthesizer/role.json
-roles/research_synthesizer/prompt.md
+Post-Horizon Outcome Calibration. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `agentic.outcome-calibration@1`.
+
+**Required capabilities:**
+
+`agentic.mandate@1` — [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate)<br>`agentic.claims@1` — [`FEAT-AGT-MANAGE_CLAIMS`](#feat-agt-manage-claims)<br>`agentic.operations@1` — [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs)<br>`agentic.profile-evaluation@1` — [`FEAT-AGT-EVALUATE_PROFILES`](#feat-agt-evaluate-profiles)<br>`agentic.tool-governance@1` — [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](../workspace/README.md#feat-ws-execute-persistence)<br>`analytics.compute-metrics@1` — [`FEAT-ANA-COMPUTE_METRICS`](../analytics/README.md#feat-ana-compute-metrics).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-calibrate-outcomes) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/agentic/outcome_calibration.py`](../../contracts/agentic/outcome_calibration.py). **Specified primary method:** `calibrate_agentic_outcomes(request)`.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-AGT-SCORE_CALIBRATION`, `FR-AGT-ATTRIBUTE_INCREMENTAL_VALUE`, `NFR-TRC-AGT-CALIBRATE_OUTCOMES-001`, `NFR-TRC-AGT-CALIBRATE_OUTCOMES-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `agentic.outcome-calibration@1` | FEAT-AGT-CALIBRATE_OUTCOMES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-AGT-CALIBRATE_OUTCOMES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| calibrate_agentic_outcomes.py | Focused production domain-logic module | calibrate_agentic_outcomes. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-AGT-MATCH_OUTCOMES` | Match immutable forecast/recommendation target/horizon/observation rules to later authoritative outcomes without rewriting the original. | `AT-AGT-CALIBRATE_OUTCOMES-001` | Open/ambiguous/revised/unmatched horizons remain unavailable or explicitly amended; no hindsight mutation occurs. |
+| PENDING | `FR-AGT-SCORE_CALIBRATION` | Compute declared probability/direction/magnitude/invalidation/rejection/latency/cost scores with finite deterministic arithmetic. | `AT-AGT-CALIBRATE_OUTCOMES-002` | Brier/log-loss/other selected scoring fixtures handle missing/nonfinite outcomes explicitly and repeat deterministically. |
+| PENDING | `FR-AGT-ATTRIBUTE_INCREMENTAL_VALUE` | Compare deterministic/single-agent baselines and role/round/prompt/model/tool/topology value after cost and uncertainty. | `AT-AGT-CALIBRATE_OUTCOMES-003` | Raw P&L alone cannot establish value; ablation and luck/cost counterexamples prevent unsupported attribution. |
+| PENDING | `FR-AGT-PROPOSE_PROFILE_CHANGES` | Emit an immutable candidate change with evidence and required independent review/evaluation. | `AT-AGT-CALIBRATE_OUTCOMES-004` | No prompt/mandate/permission/threshold/model/eligibility can change directly from calibration output. |
+
+**Implementing-symbol and side-effect binding:** the public contract operation is implemented within the focused primary module and any necessary single-responsibility siblings; use `calibrate_agentic_outcomes(request)` as the specified entry point. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-AGT-CALIBRATE_OUTCOMES-001` | All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets. | `ATN-AGT-CALIBRATE_OUTCOMES-001` | Denied/expired/over-budget/resumed/removed-provider fixtures prove fail-closed behavior with no unauthorized receiver invocation. |
+| PENDING | `NFR-TRC-AGT-CALIBRATE_OUTCOMES-002` | Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials. | `ATN-AGT-CALIBRATE_OUTCOMES-002` | 100 enable/disable cycles plus physical removal leave no leaked task/listener/lease/role/client/staging resource; implemented code meets the source coverage/quality gate. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-agt-calibrate-outcomes): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/agentic/calibrate_outcomes/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/agentic/calibrate_outcomes/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-AGT-CALIBRATE_OUTCOMES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.agentic.calibrate_outcomes._usage
 ```
 
-**Configuration keys**
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-```text
-maximum_output_bytes
-maximum_cited_claims
-require_dissent_preservation
-require_reliability_breakdown
-allow_partial_coverage
-```
+#### Removal Behaviour
 
-**Functional requirements**
-
-- `FR-AGT-SYN-001`: synthesis consumes canonical claim graphs and optional deliberation records; evidence references and statuses derive from supplied records rather than model invention.
-- `FR-AGT-SYN-002`: output separates supported conclusion, contested/refuted/unknown/expired claims, uncertainty components, assumptions, invalidation, unanswered questions, partial coverage, and preserved dissent.
-- `FR-AGT-SYN-003`: unresolved material dissent forces a contested or insufficient-evidence disposition; consensus cannot promote or authorize a proposal.
-- `FR-AGT-SYN-004`: reject code, orders, fills, broker fields, risk approvals, authoritative size, kill-switch language, or uncited material claims.
-
-**Effects and teardown**
-
-Model/tasks/events and role contribution are scope-managed. Removal cancels synthesis, unregisters the role, and leaves source graphs/deliberation records accessible. There is no private durable state.
-
-**Acceptance evidence**
-
-Claim-binding/no invented refs, disposition/uncertainty/dissent, material-dissent outcome, authority/prohibited fields, partial coverage, missing role/model/context, cancellation/removal, and usage tests.
+Disable and physically remove the actual reconciled owner of `FEAT-AGT-CALIBRATE_OUTCOMES`. Withdraw `agentic.outcome-calibration@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 8.14 `FEAT-AGT-GOVERN_RESEARCH_SEARCH` — Research Campaign and Search Governance
+## 5. Package-Wide Requirements, Configuration, and Architecture Invariants
 
-**Folder:** `app/services/agentic/govern_research_search/`
-**Provides:** `agentic.research-search@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities
-**Optional:** event publication, receiver dataset/holdout identity validation
-**Conflicts:** none
-**State:** `agentic.research_search`, schema v1, RETAIN
-**Primary module:** `research_search_governance.py`
+| ID | Category | Rule / architectural constraint | Verification |
+| --- | --- | --- | --- |
+| ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
+| ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
+| ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
 
-**Files**
+| Policy | Binding requirement | Verification |
+| --- | --- | --- |
+| Focused responsibility | Each file has one focused responsibility; feature identity is not split by algorithm variant, workflow, role or test. | Review and module/ownership checks. |
+| Type safety | Follow the template’s Python 3.14 strict-typing target and reconcile the actual repository/lockfile runtime in Phase 0; no type-ignore bypasses. UI follows the existing strict TypeScript build. | mypy / TypeScript checks against the ratified environment. |
+| Coverage | At least 80% line and branch coverage, retaining any stronger applicable repository or owner floor. | Actual coverage reports at the approved quality boundary. |
+| Configuration parity | Exact accepted keys agree between strict config, manifest and feature-local README; request/profile controls do not become implicit feature settings. | Positive/negative parsing and parity fixtures. |
+| Numerical / resource truth | Use the domain-specific §9 rules, exact source algorithms, finite admission and explicit measurement fixtures. Targets are not measurements. | Golden, causal, overflow, bounded-memory and native/reference evidence where applicable. |
+| Scope and authority | Identity, environment, account, dataset, approval and receiver boundaries are rechecked by their actual owners. | Wrong-scope, stale, refusal, idempotency and removal tests. |
+| Shared NFR applicability | Apply only the exact shared-NFR bindings of each source feature card; all applicable requirements remain mandatory. | Expanded per-feature acceptance mapping, not a blanket global pass. |
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-research_search_governance.py
-near_duplicate_policy.py
-holdout_policy.py
-migration.py
-storage.py
+## 6. Open Decisions
+
+The following are explicit documentary/implementation-entry gaps, not deferred permission to invent a design. Resolve the affected binding before production use. This documentation delivery does not close Preparation 0.03 or certify Phase 1 entry.
+
+| State | Decision / evidence label | Required resolution | Constraints | Impact |
+| --- | --- | --- | --- | --- |
+| OPEN | SOURCE-RECONCILIATION | Reconcile clause-level differences among the register’s source specification, the plan’s inspected specification and the current fetched specification. | Retain the supplied 205-feature identity set unless explicitly changed; differing hashes are not a semantic diff. | All source-dependent behavior. |
+| OPEN | EVD-CONTRACT-01 | Bind exact current protocol/DTO symbols, callable signatures, error branches, accepted config keys/defaults and literal state namespace/schema/driver. | Reuse compatible existing public contracts; no duplicate owner or invented field. Source-selected capability keys and target modules are retained here. | Each affected feature before its production consumer. |
+| OPEN | CURRENT-OWNER-BINDING | Reconcile selected target paths, compatible existing aliases, unrelated domain scope and actual implementation progress. | No automatic rename, overwrite of unrelated README entries or assumption that a missing target folder means missing behavior. | All target owners; especially legacy semantic folders and permanent UI IDs. |
+| OPEN | FIXTURE-AND-USAGE-BINDING | Pin concrete deterministic request/response fixtures, intended test symbols and runnable `_usage.py` or UI examples. | Use every existing acceptance oracle; a planned command or path is not a passing example. | Every feature acceptance bundle. |
+| OPEN | OPERATION-QUALIFICATION | Expand applicable shared-NFR/catalogue/source/operation tables into the actual per-feature evidence manifest and qualify real providers. | Complete registered adapter behavior once; an absent later provider gates only affected operations. Contract stubs are not real-provider evidence. | Applicable later-operation and release claims. |
+| CLOSED — documentary scope | IDENTITY-AND-BOUNDARY | Use the register feature/FR/local-NFR identities and exact primary-capability / required-provider bindings. | No additional feature for roles, algorithms, workflows, tests, performance or later UI integration. | The selected features in §2. |
+
+## 7. Tests and Definition of Done
+
+### Test Suite Structure
+
+Focused feature tests live at the intended owners named in §4. Add config, manifest, lifecycle, failure, boundary, numerical and replay coverage where applicable. Cross-feature contract, composition, Interfaces, browser, accessibility, physical-removal and leak evidence remains independent of feature unit tests. Do not mislabel an offline fixture as production integration.
+
+### Commands
+
+The following are target verification recipes. Bind actual paths and runner scripts before use; none is reported as executed by this documentation delivery.
+
+```powershell
+uv run --frozen pytest --no-cov tests/services/agentic/enforce_mandate
+uv run --frozen ruff format --check .
+uv run --frozen ruff check .
+uv run --frozen mypy
+uv run --frozen lint-imports
+uv run --frozen python scripts/architecture_check.py
+uv run --frozen python scripts/validate_feature_docs.py
+uv run --frozen python scripts/verify_feature_removal.py --feature FEAT-AGT-ENFORCE_MANDATE --report removal-report.json
 ```
 
-**Configuration keys**
-
-```text
-maximum_open_campaigns
-maximum_variants_per_family
-maximum_attempts_per_campaign
-near_duplicate_threshold
-maximum_holdout_reservations
-require_failure_reason
-require_multiple_testing_policy
-```
-
-**Functional requirements**
-
-- `FR-AGT-SEARCH-001`: register immutable campaign, hypothesis-family, dataset-family, search-budget, and holdout identities before governed trials.
-- `FR-AGT-SEARCH-002`: record every attempted variant, prompt/model/tool/profile lineage, parameters/features, amendment, completion/failure reason, and consumed budget; attempted equals completed plus failed.
-- `FR-AGT-SEARCH-003`: classify near-duplicate hypotheses/specifications deterministically and charge them to the same family/campaign/holdout budget unless material independence is proven by policy.
-- `FR-AGT-SEARCH-004`: holdout reservation/consumption binds campaign, hypothesis family, dataset family, holdout, protocol/request digest, principal, purpose, and expiry; renaming or rehashing cannot reset access.
-- `FR-AGT-SEARCH-005`: multiple-testing, sequential-testing/alpha-spending, embargo/purge, economic-cost, null-result, and predeclared termination policies are recorded where applicable.
-- `FR-AGT-SEARCH-006`: missing history, exhausted budget, conflicting reservation, undeclared amendment, or unverifiable family identity refuses before receiver execution.
-
-**Effects and teardown**
-
-Persistence/events and reservation-expiry task are scope-managed. Removal refuses new attempts/holdouts, cancels active reservations according to policy without freeing consumed budget, closes storage, and retains all history.
-
-**Acceptance evidence**
-
-Campaign/family/dataset identity, all-trial conservation, near-duplicate evasion, cross-spec holdout reuse, amendment/multiple-testing rules, concurrency/reservation/restart, exhausted budget, removal and retained scarcity, and usage tests.
-
----
-
-### 8.15 `FEAT-AGT-DESIGN_RESEARCH` — Falsifiable Research Design
-
-**Folder:** `app/services/agentic/design_research/`
-**Provides:** `agentic.research-design@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, `agentic.claims@1`, `agentic.research-search@1`
-**Optional:** `agentic.deliberation@1`, `agentic.synthesis@1`, `agentic.tool-governance@1`, Research/Simulation/Optimization validation capability keys
-**Conflicts:** none
-**State:** none
-**Primary module:** `research_design.py`
+The first test/removal command illustrates this domain’s first feature; use the affected feature’s exact owner path and ID for other cards. The full `scripts/ci_check.py` and coverage gate run at the approved pre-commit/CI/release boundary, not as a substitute for focused iterative checks.
 
-**Files**
+### Acceptance evidence model
 
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-research_design.py
-candidate_binding.py
-roles/hypothesis_designer/role.json
-roles/hypothesis_designer/prompt.md
-roles/experiment_designer/role.json
-roles/experiment_designer/prompt.md
-roles/bounded_search_designer/role.json
-roles/bounded_search_designer/prompt.md
-```
-
-**Configuration keys**
-
-```text
-maximum_hypotheses_per_request
-maximum_candidate_bytes
-require_receiver_schema_resolution
-require_registered_campaign
-allow_search_design
-```
-
-**Functional requirements**
-
-- `FR-AGT-DESIGN-001`: hypothesis candidates bind supported claims, asset scope, horizon, mechanism, prerequisites, confounders, assumptions, rejection criterion, required data, leakage constraints, and campaign/family identity.
-- `FR-AGT-DESIGN-002`: experiment candidates bind exact receiver contract/version, immutable inputs, splits, embargo, costs, seeds, baselines, metrics, stop rules, evidence classes, and falsification outcomes.
-- `FR-AGT-DESIGN-003`: search candidates bind exact Optimization contract/version, declared parameter/feature space, objective, method, trial/search budget, early stop, robustness/stability/overfit requirements, and holdout policy.
-- `FR-AGT-DESIGN-004`: candidates are proposals only; receiver owners validate and execute unchanged or return typed rejection. Agentic neither reconstructs receiver contracts nor alters results.
-- `FR-AGT-DESIGN-005`: no candidate is created from unsupported/contested material without explicit contested status, absent rejection criterion, unregistered campaign/family, exhausted search budget, or unresolved required dissent.
-
-**Effects and teardown**
-
-Models/tools/tasks/events and role contributions are scope-managed. Removal cancels design work, unregisters the three roles, revokes leases, and leaves search history/receiver runs intact.
-
-**Acceptance evidence**
-
-Hypothesis completeness/falsifiability, exact receiver schema/binding, experiment/search completeness, unsupported/dissent/budget refusals, unchanged receiver request/results, role removal, dependency degradation, and usage tests.
-
----
-
-### 8.16 `FEAT-AGT-COMPOSE_STRATEGY_SPECS` — JSON Strategy and Indicator DSL Composition
-
-**Folder:** `app/services/agentic/compose_strategy_specs/`
-**Provides:** `agentic.strategy-specs@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, approved Strategy/Indicators DSL schema/validation capability keys
-**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.research-design@1`, event publication
-**Conflicts:** none
-**State:** none
-**Primary module:** `strategy_spec_composition.py`
+For each feature, retain `docs/dev/SQX/evidence/features/<FEAT-ID>/acceptance.json` with source/README hashes, actual tested tree/commit, paths and symbols, FR/local/shared-NFR/catalogue/source/acceptance mappings, fixture hashes, environment, exact commands and exit codes, reports, usage transcript or browser trace, operation-qualification state, lifecycle/removal results and independent review. No credentials or private raw data enter this evidence. The final accepted commit is recorded after creation to avoid a self-referential hash.
 
-**Files**
-
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-strategy_spec_composition.py
-schema_binding.py
-roles/strategy_dsl_author/role.json
-roles/strategy_dsl_author/prompt.md
-```
-
-**Configuration keys**
-
-```text
-maximum_spec_bytes
-accepted_dsl_major_versions
-maximum_validation_attempts
-require_hypothesis_reference
-allow_indicator_spec_candidates
-```
-
-**Functional requirements**
-
-- `FR-AGT-DSL-001`: compose only against an exact receiver-owned Strategy/Indicators DSL schema/version and approved hypothesis/claim references.
-- `FR-AGT-DSL-002`: candidate contains declarative building blocks, parameters, inputs, signals, state, entries/exits, management, constraints, and metadata allowed by that schema; no compiled object, arbitrary source, broker command, or approval.
-- `FR-AGT-DSL-003`: deterministic schema validation runs after model output; correction attempts are bounded and all failed candidates remain observable.
-- `FR-AGT-DSL-004`: return unsupported-expression report when the DSL cannot represent the requirement; code fallback is not automatic and requires a new authenticated sandbox request.
-- `FR-AGT-DSL-005`: Strategy/Indicators owns semantic validation, compilation, registration, versioning, lifecycle, and production use. Agentic receipt is never receiver acceptance unless the receiver says so.
-
-**Effects and teardown**
-
-Models/tools/tasks/events and role contribution are scope-managed. Removal cancels work, unregisters the role, and leaves receiver-owned artifacts intact. No private durable state.
-
-**Acceptance evidence**
-
-Exact schema/version, deterministic validation/correction bounds, unsupported-expression path, source/broker/approval prohibited fields, receiver rejection/acceptance truth, role removal, physical removal, and usage tests.
-
----
-
-### 8.17 `FEAT-AGT-ADVISE_PORTFOLIO` — Portfolio and Risk Advisory
-
-**Folder:** `app/services/agentic/advise_portfolio/`
-**Provides:** `agentic.portfolio-advisory@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, current Portfolio/Risk/Analytics/account evidence capability keys
-**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.deliberation@1`, event publication
-**Conflicts:** none
-**State:** none
-**Primary module:** `portfolio_advisory.py`
+| Stage | Current README evidence state | What closes it |
+| --- | --- | --- |
+| Contract | NOT_REVALIDATED | Exact compatible schema, operation, config and error bindings plus contract tests. |
+| Provider | NOT_REVALIDATED | Actual implementation satisfies every owned FR/local NFR and applicable numerical/resource rule. |
+| Composition | NOT_REVALIDATED | Real registration, dependency closure, mount rollback and physical removal. |
+| Interfaces | NOT_REVALIDATED | Typed authenticated owner routing and parity; justify genuine nonapplicability. |
+| UI | NOT_REVALIDATED | Reachable truthful interaction, accessibility, cleanup and owner outcome. |
+| End-to-end | NOT_REVALIDATED | Real-provider workflow with canonical receipts and complete acceptance oracles. |
 
-**Files**
-
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-portfolio_advisory.py
-advisory_validation.py
-roles/portfolio_advisory_synthesizer/role.json
-roles/portfolio_advisory_synthesizer/prompt.md
-```
-
-**Configuration keys**
-
-```text
-maximum_advisory_bytes
-maximum_evidence_age_seconds
-maximum_advisory_lifetime_seconds
-require_risk_challenge
-require_compliance_challenge
-```
-
-**Functional requirements**
-
-- `FR-AGT-ADV-001`: require current portfolio allocation, account, analytics, mandate, and authoritative Risk evidence for the requested scope; unreadable observation time is stale.
-- `FR-AGT-ADV-002`: advice contains concerns, trade-offs, bounded allocation ranges/relative preferences where allowed, uncertainty, evidence, unanswered questions, challenge/dissent, and strict expiry.
-- `FR-AGT-ADV-003`: advice contains no lot size, quantity, notional, order, price, execution instruction, risk approval, verdict-by-absence, or kill-switch action.
-- `FR-AGT-ADV-004`: Risk/compliance challenge covers all configured kinds by set equality; missing required challenge refuses rather than implying consent.
-- `FR-AGT-ADV-005`: Portfolio and Risk own any receiver request, validation, decision, or mutation. Stale, expired, incomplete, out-of-scope, or rejected advice never becomes authority.
-
-**Effects and teardown**
-
-Models/tools/tasks/events and role contribution are scope-managed. Removal cancels work, unregisters the role, and leaves Portfolio/Risk unchanged. Advice persists only through workflow/operations evidence and expires strictly.
-
-**Acceptance evidence**
-
-Freshness/scope/evidence, non-binding/prohibited fields, challenge set equality/dissent, strict expiry, receiver rejection/authority, role/dependency removal, and usage tests.
-
----
-
-### 8.18 `FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS` — Strategy Proposal Composition and Handoff
-
-**Folder:** `app/services/agentic/compose_strategy_proposals/`
-**Provides:** `agentic.strategy-proposals@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.context@1`, Strategy proposal-intake capability
-**Optional:** `agentic.tool-governance@1`, `agentic.claims@1`, `agentic.synthesis@1`, `agentic.research-design@1`, event publication
-**Conflicts:** none
-**State:** none
-**Primary module:** `strategy_proposal_composition.py`
-
-**Files**
-
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-strategy_proposal_composition.py
-receiver_handoff.py
-roles/strategy_proposal_synthesizer/role.json
-roles/strategy_proposal_synthesizer/prompt.md
-```
-
-**Configuration keys**
-
-```text
-maximum_proposal_bytes
-maximum_proposal_lifetime_seconds
-require_research_synthesis
-require_receiver_schema_resolution
-maximum_handoff_attempts
-```
-
-**Functional requirements**
-
-- `FR-AGT-PROP-001`: compose a proposal from supported thesis/synthesis carrying instrument/scope, intended direction/behavior, horizon, invalidation, evidence, uncertainty, assumptions, requested evaluation, and strict expiry.
-- `FR-AGT-PROP-002`: the proposal type structurally lacks broker-native fields, order type, price, lot size, quantity, notional, risk approval, execution status, fill, or kill-switch action.
-- `FR-AGT-PROP-003`: map to the exact Strategy-owned intake contract and submit unchanged through its capability; Agentic imports no Strategy implementation and receives no privileged validation path.
-- `FR-AGT-PROP-004`: receipt reports receiver/status/request reference/rejection/expiry only; it is never interpreted as strategy acceptance, risk approval, order, or fill beyond receiver-declared semantics.
-- `FR-AGT-PROP-005`: expired, stale, unsupported, out-of-scope, unresolved-required-dissent, or receiver-unavailable proposals refuse without alternate route.
-
-**Effects and teardown**
-
-Models/tasks/events and role contribution are scope-managed. Receiver calls are bounded/idempotent. Removal cancels handoffs, unregisters the role, and leaves receiver-owned requests/records unchanged.
-
-**Acceptance evidence**
-
-Proposal completeness/prohibited fields, exact receiver mapping and no implementation import, idempotency/retry, receipt truth, expiry/stale/dissent/unavailable refusal, mid-handoff removal, and usage tests.
-
----
-
-### 8.19 `FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS` — Sandboxed Source Artifact Fallback
-
-**Folder:** `app/services/agentic/author_sandbox_artifacts/`
-**Provides:** `agentic.sandbox-artifacts@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, `agentic.roles@1`, `agentic.model-inference@1`, `agentic.tool-governance@1`, approved sandbox-leasing and Workspace secret-isolation capabilities
-**Optional:** `agentic.workflows@1`, event publication
-**Conflicts:** none
-**State:** `agentic.sandbox_artifacts`, schema v1, DELETE
-**Primary module:** `sandbox_artifact_authoring.py`
-
-**Files**
-
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-sandbox_artifact_authoring.py
-path_security.py
-artifact_manifest.py
-migration.py
-storage.py
-roles/sandbox_code_author/role.json
-roles/sandbox_code_author/prompt.md
-```
-
-**Configuration keys**
-
-```text
-maximum_files
-maximum_file_bytes
-maximum_total_bytes
-maximum_cpu_seconds
-maximum_memory_bytes
-maximum_storage_bytes
-sandbox_timeout_seconds
-allowed_dependency_sources
-require_network_denial
-```
-
-**Functional requirements**
-
-- `FR-AGT-SBOX-001`: require authenticated exact code specification, reason the DSL is insufficient, human action where policy requires, and an attested lease binding ephemeral, credential-free, network-denied/allowlisted, resource-bounded, staging-only execution.
-- `FR-AGT-SBOX-002`: validate every declared raw path before parsing and every resolved path after resolution; reject traversal, absolute/drive/UNC/device paths, reserved names, symlink escape, and writes outside staging.
-- `FR-AGT-SBOX-003`: generated artifact records all files/digests, dependencies and sources, SBOM, tests/results, static analysis, provenance, prompt/model/tool lineage, complete search history, and specification digest.
-- `FR-AGT-SBOX-004`: generated code is never imported, hot-loaded, registered, deployed, or executed in the production application directly; output is only staged for receiver/human review.
-- `FR-AGT-SBOX-005`: sandbox absence, under-attested lease, unknown dependency source, failed checks, path risk, budget exhaustion, or cleanup failure refuses/contains the task and preserves audit evidence.
-
-**Effects and teardown**
-
-Sandbox/client/tasks/files/persistence/events and role contribution are scope-owned. Removal stops intake, revokes leases, cancels sandboxes, unregisters role, cleans ephemeral and eligible staging artifacts, closes storage, and preserves operational receipts. It cannot remove receiver-owned artifacts.
-
-**Acceptance evidence**
-
-Lease attestation, credential/network/resource isolation, raw/resolved/symlink path attacks, dependency/SBOM/search history, no import/hot-load/deploy, timeout/cancel/cleanup/partial failure, persistence, mid-generation removal, and usage tests.
-
----
-
-### 8.20 `FEAT-AGT-CALIBRATE_OUTCOMES` — Post-Horizon Outcome Calibration
-
-**Folder:** `app/services/agentic/calibrate_outcomes/`
-**Provides:** `agentic.outcome-calibration@1`
-**Requires:** `agentic.mandate@1`, `agentic.operations@1`, Data persistence, approved clock/digest capabilities, receiver outcome/evaluation capabilities
-**Optional:** `agentic.profile-evaluation@1`, event publication
-**Conflicts:** none
-**State:** `agentic.outcome_calibration`, schema v1, RETAIN
-**Primary module:** `outcome_calibration.py`
-
-**Files**
-
-```text
-README.md
-__init__.py
-manifest.py
-config.py
-feature.py
-outcome_calibration.py
-scoring.py
-baseline_value.py
-migration.py
-storage.py
-```
-
-**Configuration keys**
-
-```text
-accepted_forecast_schema_versions
-minimum_matured_outcomes
-maximum_outcome_age_seconds
-calibration_windows
-required_baselines
-change_candidate_thresholds
-```
-
-**Functional requirements**
-
-- `FR-AGT-CAL-001`: a scoreable forecast declares target, probability/bounded distribution, horizon, observation rule, invalidation, expected regime, expected economic effect, and immutable provenance before the outcome.
-- `FR-AGT-CAL-002`: after maturity, bind authoritative outcome, direction/magnitude error, invalidation timing, realized costs/slippage where applicable, regime, receiver rejection/amendment, and deterministic/single-agent baseline outcomes.
-- `FR-AGT-CAL-003`: compute appropriate calibration/error, unsupported-claim, reversal, receiver-rejection, cost-adjusted value-of-information, latency, reliability, and incremental-utility measures deterministically.
-- `FR-AGT-CAL-004`: raw P&L is not sufficient and cannot replace calibration, baseline, uncertainty, regime, and cost analysis.
-- `FR-AGT-CAL-005`: learning emits a candidate role/prompt/model/workflow/topology change with evidence; it cannot modify production profiles, prompts, permissions, mandate, thresholds, or eligibility directly.
-
-**Effects and teardown**
-
-Receiver reads, scheduled calibration tasks, storage, and events are scope-managed. Removal stops scheduling/calculation, cancels tasks, closes adapters/storage, preserves committed calibration evidence, and prevents incomplete outcomes from being scored as neutral.
-
-**Acceptance evidence**
-
-Pre-outcome immutability, horizon maturity, receiver truth, probability/distribution scoring, P&L-only negative, baseline/value/cost, regime/invalidated/rejected cases, change-candidate no-self-modification, restart/removal, and usage tests.
-
----
-
-## 9. Domain-Wide Configuration and Runtime Profiles
-
-There is no root `_settings.py` or `_limits.py`. Each feature accepts only the keys listed in its section and manifest. Composition supplies validated configuration. Secrets remain opaque Workspace references and are resolved only inside the provider/sandbox adapter that requires them.
-
-| Runtime profile | Agentic policy |
-|---|---|
-| `research` | Read-only evidence, research, simulation/optimization candidate requests, DSL/staging workflows according to mandate; no market mutation. |
-| `simulation` | Same reasoning path using simulation-owned clock/evidence and receiver-owned simulated operations; no live mutation. |
-| `demo` | Current evidence and advisory/proposal workflows may run, but deterministic receiver validation and demo authority remain mandatory. |
-| `live` | Agentic remains proposal-only. No direct trading/broker mutation becomes available; receiver domains apply all live authorization and safety gates. |
-
-A convenience domain enable flag may exist in composition, but each feature remains independently enabled/configured/discoverable. Removing one feature does not grant another feature permission to absorb its responsibility.
-
----
-
-## 10. Non-Functional Requirements
-
-| Status | Requirement | Responsibility | Verification |
-|---|---|---|---|
-| Missing | `NFR-AGT-SECURITY` | Least privilege, secret isolation, prompt/memory/tool injection resistance, signed/typed human actions, egress controls, sandboxing, and fail-closed behavior are release gates. | Adversarial security suite. |
-| Missing | `NFR-AGT-RELIABILITY` | Durable state, idempotency, expected-version transitions, deadlines, bounded retry, backpressure, cancellation, recovery, and deterministic terminal states. | Failure/restart/concurrency suite. |
-| Missing | `NFR-AGT-REPRODUCIBILITY` | Exact model, prompt, role, tool, data, policy, dependency, configuration, seed, workflow, and receiver lineage for every material result. | Lineage/replay validation. |
-| Missing | `NFR-AGT-OBSERVABILITY` | Correlated traces, events, audit, metrics, cost, readiness, failure, and incident evidence without secrets or unrestricted hidden reasoning. | Trace/redaction/completeness tests. |
-| Missing | `NFR-AGT-PERFORMANCE` | Each feature/workflow declares concurrency, latency, queue, context, output, model, tool, token, cost, compute, and storage bounds; overload applies backpressure. | Load/budget tests. |
-| Missing | `NFR-AGT-DATA_GOVERNANCE` | Point-in-time availability, trust, licensing, revision, poisoning, retention, deletion, and source scope are enforced. | Governance/lookahead tests. |
-| Missing | `NFR-AGT-MODEL_GOVERNANCE` | Provider/model/framework/profile changes are explicit, pinned, evaluated, reversible, and never silently substituted. | Provider replacement/upgrade tests. |
-| Missing | `NFR-AGT-EVALUATION` | Safety, contracts, tools, grounding, reasoning utility, regression, ablation, null-data, outcome calibration, and economic value use versioned evidence. | Evaluation suite. |
-| Missing | `NFR-AGT-COMPATIBILITY` | Public contracts are provider/framework-neutral and follow versioned major compatibility and explicit migration rules. | Contract compatibility/replacement tests. |
-| Missing | `NFR-AGT-REMOVABILITY` | Every feature passes teardown, replacement, degraded-readiness, physical-removal, retained-state, no-stale-role/context/lease, and safety-equivalence tests. | Composition/removal suite. |
-| Missing | `NFR-AGT-TEST_QUALITY` | Controlled clocks, providers, tools, persistence, network, randomness, and receiver doubles; no live provider dependency in normal tests. | Warning/duration/determinism audit. |
-| Missing | `NFR-AGT-COVERAGE` | At least 80% implemented-code coverage; every feature has contract, configuration, lifecycle, failure, composition, removal, documentation, and executable usage evidence. | Coverage and pipeline checks. |
-
----
-
-## 11. Cross-Domain and Interface Boundaries
-
-### Chat Bot boundary
-
-```text
-UI widget contributions
-    → D-IFACE authenticated chat operation/event stream
-        → agentic.operator-assistance@1
-            → deterministic route verification
-                → agentic.workflows@1 / specialist capabilities
-                    → receiver-owned evidence operations
-```
-
-- UI owns presentation and contribution capture; it imports no Agentic implementation.
-- D-IFACE owns authentication, request envelopes, transport cancellation, streaming, rate limiting, and mapping.
-- `ASSIST_OPERATOR` owns conversational semantics and same-conversation delegation.
-- `ASSEMBLE_CONTEXT` validates the snapshot and refreshes material values through owner capabilities.
-- Chat Bot suggests navigation only; UI decides whether/how to execute a future typed UI command.
-
-### No direct Brokers edge
-
-No Agentic manifest requires or optionally resolves a Brokers mutation or provider channel capability. Market/account evidence reaches Agentic only through the semantic owner chosen by the current architecture. Static and runtime checks reject broker SDK names, order/fill DTOs, credential fields, and forbidden capabilities in Agentic contracts/features.
-
-### Framework/provider boundary
-
-Google ADK or any later orchestration/model framework may be implemented as a replaceable provider adapter or plugin. HaruQuantAI contracts, workflow state, provenance, role manifests, tool leases, memory, claim graphs, and results remain canonical and framework-neutral.
-
----
-
-## 12. Implementation Order
-
-Documentation completion precedes production implementation. Production code follows the repository feature implementation pipeline separately for each focused feature.
-
-| Phase | Features | Required exit |
-|---:|---|---|
-| 0 | Domain contract and companion-boundary reconciliation | All capability keys, receiver ownership, D-IFACE/UI companion features, Workspace/System references, and any new receiver specifications are ratified. |
-| 1 | `ENFORCE_MANDATE` | Contract/config/lifecycle/removal and fail-closed startup evidence. |
-| 2 | `OPERATE_RUNS` | Redacted retained operations/incident/replay capability and persistence evidence. |
-| 3 | `REGISTER_ROLES` | Contribution registry, prompt/manifest integrity, exact disposal, removal evidence. |
-| 4 | `GOVERN_TOOL_CALLS` | Invocation lease/human action/result-filtering and forbidden-tool evidence. |
-| 5 | `INVOKE_MODELS` | Provider-neutral evaluated invocation with explicit replacement/fallback. |
-| 6 | `RUN_WORKFLOWS` | Durable idempotent bounded workflow runtime and planner contributions. |
-| 7 | `ASSEMBLE_CONTEXT` | Point-in-time/injection/licensing/UI-orientation context evidence. |
-| 8 | `MANAGE_MEMORY` | Governed class separation, promotion, retrieval, retention, stateless degradation. |
-| 9 | `EVALUATE_PROFILES` | Eligibility, regression, baseline/ablation, revocation evidence. |
-| 10 | `ASSIST_OPERATOR` | Chat Bot context/direct-answer/specialist delegation, D-IFACE/UI integration, removal fallback. |
-| 11 | `MANAGE_CLAIMS` | Claim graph, five analyst contributions, expiry/reliability and no-recomputation evidence. |
-| 12 | `DELIBERATE_RESEARCH` | Six challengers, blind-first challenge, correlation/dissent/bounds evidence. |
-| 13 | `SYNTHESIZE_RESEARCH` | Claim-bound research synthesis and insufficient-evidence behavior. |
-| 14 | `GOVERN_RESEARCH_SEARCH` | Campaign/family/all-trial/holdout scarcity and evasion evidence. |
-| 15 | `DESIGN_RESEARCH` | Three designer roles and exact receiver candidate bindings. |
-| 16 | `COMPOSE_STRATEGY_SPECS` | JSON DSL-first composition and Strategy/Indicators receiver validation. |
-| 17 | `ADVISE_PORTFOLIO` | Non-binding fresh portfolio/risk advisory and challenge evidence. |
-| 18 | `COMPOSE_STRATEGY_PROPOSALS` | Strategy intake handoff and receipt-truth evidence. |
-| 19 | `AUTHOR_SANDBOX_ARTIFACTS` | Only after a real sandbox provider and all isolation gates exist. |
-| 20 | `CALIBRATE_OUTCOMES` | Matured outcome/baseline/value calibration and no-self-modification evidence. |
-| 21 | Domain completion | All workflows/NFRs/removal scenarios, docs/registry/changelog/system architecture, coverage, usage and full quality gates pass. |
-
-No feature may silently implement a missing receiver domain capability. Missing required receiver authority/specification is a blocker or an explicit specification-gap task, not permission to invent a local substitute.
-
----
-
-## 13. Tests and Definition of Done
-
-### Test locations
-
-```text
-tests/services/agentic/<feature>/
-├── test_contract.py
-├── test_config.py
-├── test_feature.py
-├── test_behavior.py
-├── test_failures.py
-└── optional focused tests
-
-tests/contracts/agentic/
-tests/composition/
-tests/architecture/
-tests/removal/
-```
-
-### Quality commands
-
-```bash
-uv run ruff check app/contracts/agentic app/services/agentic tests/services/agentic tests/contracts/agentic
-uv run ruff format --check app/contracts/agentic app/services/agentic tests/services/agentic tests/contracts/agentic
-uv run mypy app/contracts/agentic app/services/agentic tests/services/agentic tests/contracts/agentic
-uv run pytest tests/contracts/agentic tests/services/agentic
-uv run pytest tests/composition tests/architecture tests/removal
-uv run pytest --cov=app/services/agentic --cov-fail-under=80
-uv run python scripts/architecture_check.py
-uv run python scripts/feature_conformance.py
-uv run python scripts/documentation_drift.py
-uv run python scripts/physical_removal.py
-```
-
-Exact existing script names/arguments are verified at implementation time; no README command is considered passing evidence until it runs in the current repository.
-
-### Package completion checklist
-
-- [ ] `app/contracts/agentic/` contains exactly the ratified public contracts and no receiver-owned duplicates.
-- [ ] `app/services/agentic/README.md` remains the authoritative registry and every manifest/config/feature/feature-README/test agrees.
-- [ ] All 20 semantic feature IDs are registered and independently discoverable/removable.
-- [ ] All 22 built-in role profiles and seven role families have manifest/prompt/evaluation integrity and exact contribution disposal.
-- [ ] The website-facing and actual agent is exactly **Chat Bot** with role ID `chat_bot`.
-- [ ] Chat Bot uses bounded typed widget/page context, deterministic specialist routing, same-conversation results, and zero direct mutation authority.
-- [ ] Every stateful feature declares namespace/schema/retention and owns migrations/adapters locally.
-- [ ] No shared Agentic settings, limits, persistence, facade, agent hierarchy, or provider-framework object crosses boundaries.
-- [ ] Claim graphs, not transcripts/hidden reasoning, are the canonical reasoning record.
-- [ ] Research campaign/family/dataset/search/holdout accounting defeats trivial rehash/rename reuse and retains all failures/nulls.
-- [ ] JSON strategy DSL is the primary authoring path; source code is sandbox fallback only.
-- [ ] Every tool call has invocation-bound authorization and post-call filtering; forbidden consequential tools are unregistrable.
-- [ ] Every consequential receiver decision remains with its deterministic owner.
-- [ ] Provider/model fallback is explicit and independently eligible.
-- [ ] Every effect uses feature scope; teardown cancels tasks, revokes leases, unregisters exact contributions, closes resources, and handles state by declared policy.
-- [ ] Removing any feature produces its documented degraded state without fallback fabrication.
-- [ ] Removing the entire Agentic domain preserves deterministic startup and safety equivalence.
-- [ ] Every feature has executable primary-module usage plus contract/config/lifecycle/failure/replacement/removal tests.
-- [ ] All feature workflows, NFRs, documentation drift, architecture, quality, and coverage gates pass.
-
----
-
-## 14. Legacy Disposition and Authority Migration
-
-The deleted `app/agentic/README.md` is a behavioral donor only. Its strong controls—proposal-only authority, no broker credentials, fail-closed evidence, typed provenance, bounded workflows, independent challenge, dissent, sandbox staging, evaluation, operations, and safety-equivalent disablement—are preserved or strengthened here.
-
-Its old package path, `FEAT-AGT-01`–`22` numbering, agent-per-feature structure, global settings/limits, shared persistence, Agentic-owned receiver contracts, mandatory ADK identity, public API package, role titles, `Trader` name, exact-spec-only holdout rule, mixed implementation statuses, and completion claims do not carry forward.
-
-`docs/dev/agentic_firm/` remains supporting policy/evidence only. Any file that declares the deleted README authoritative must be updated during documentation reconciliation. Current V3 architecture, public contracts, feature manifests, runtime evidence, and this README win over donor mechanism or status.
-
-Legacy behavior is reconciled through the approved `KEEP / ADAPT / MERGE / REPLACE / DROP / ADD_TO_V3` matrix. Donor source/tests have not been pinned and inspected in this documentation stage, so this README makes no source-code parity claim.
-
----
-
-## 15. Change Process
-
-For every Agentic change:
-
-1. Update this authoritative domain README first.
-2. Confirm the semantic owner and exact public capability/contract version.
-3. Update the feature row, dependencies, state, removal result, workflow, FR/NFR, and role roster as applicable.
-4. Resolve receiver/UI/D-IFACE/System specification gaps before production invention.
-5. Follow `docs/dev/feature_implementation_pipeline.md` for one focused feature task.
-6. Add contract, configuration, lifecycle, behavior, failure, composition, replacement, removal, documentation, and executable usage evidence.
-7. Run the complete current repository quality and architecture gates.
-8. Change `Missing` status only after runtime truth and all documentation agree.
-9. Record release-visible changes in `docs/CHANGELOG.md` and reconcile `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, `app/services/README.md`, and interface registries when their scope changes.
+### Feature Definition of Done Checklist
+
+- [ ] 1. Stable feature ID: retain the registered identity, including permanent numeric UI IDs.
+- [ ] 2. Single domain ownership: each feature has exactly one semantic owner and one implementation task.
+- [ ] 3. Cohesive capability: implement the complete registered behavior, not merely an adapter-shaped stub.
+- [ ] 4. External contracts: reuse compatible public contracts outside removable implementation packages; UI contribution contracts consume the generated wire boundary.
+- [ ] 5. Declared dependencies: manifest provides/requires/optional keys agree with the resolved public contracts and operation gates.
+- [ ] 6. Zero private feature imports: use public contracts and context-resolved capabilities only.
+- [ ] 7. Zero import-time I/O or registration: initialization remains pure.
+- [ ] 8. Scoped runtime effects: bindings, tasks, listeners, requests, workers and buffers have exact owners and disposers.
+- [ ] 9. Mount rollback: injected mount failure releases every partial contribution.
+- [ ] 10. Idempotent teardown: repeated scope closure is safe and leaves no orphan runtime effect.
+- [ ] 11. Required-dependency loss: absent/removed required providers block only dependent behavior and yield the declared failure state.
+- [ ] 12. Optional-dependency loss: affected operations fail explicitly; no substitute provider, fabricated data or silently reduced semantics.
+- [ ] 13. Persistent state: literal namespace/schema/driver/retention/purge and migrations are bound where state is owned; otherwise explicitly none.
+- [ ] 14. Irreversible-action safety: exact scope, idempotency, receiver reconciliation and retained audit are tested.
+- [ ] 15. Starts feature-absent: deleting the feature physically does not break unrelated startup and capabilities.
+- [ ] 16. Interfaces/UI degradation: typed unavailable/denied/partial states remain usable and truthful.
+- [ ] 17. README parity: feature-local documentation, this domain entry, manifests, configuration and contracts agree.
+- [ ] 18. Module usage: focused capability modules document public Python/API or interactive UI use and failure cases.
+- [ ] 19. Usage evidence: every backend feature has one required `_usage.py` with the bounded offline `__main__` scenarios; UI has real interaction evidence instead.
+- [ ] 20. Quality and acceptance: mapped FR/local/shared NFR, catalogue, source, workflow, removal and actual-provider evidence passes all applicable gates; no target is reported as a measurement.
+
+The ordinary ≥80% coverage floor is not proof of semantic completeness. Repeated enable/disable, failed mount, dependency loss/replacement and physical removal must demonstrate exact cleanup; use 100-cycle tests where specified. Stronger owner-specific limits and evaluation thresholds take precedence. Missing mandatory evidence prevents acceptance; a future optional provider must remain explicitly OPERATION_NOT_QUALIFIED.
+
+## 8. Change Process
+
+Update this domain card first, then reconcile the contract and source scope. A breaking public change bumps the capability major rather than shadowing an existing contract. Keep manifest declarations, strict configuration, feature-local README and state migrations aligned. Implement only the selected feature’s cohesive behavior, update its required `_usage.py` scenarios or UI workflow, and add the exact acceptance and failure assertions. Verify dependency/removal behavior and actual provider integration, then run the approved quality gates and independent review.
+
+Maintain one feature task and its accepted implementation commit in the existing Planner → Executor → Reviewer workflow. A verified existing feature keeps its slot and evidence; do not force a rewrite or empty commit. The phase’s last feature owns its cross-feature checkpoint, not a new feature. Later providers add real integration evidence to the already complete consumer adapter; they do not authorize unnoticed extra implementation scope. Record progress in the tracker and receipts, never by declaring all targets Implemented in this README. Preserve unrelated current domain entries when merging this selected scope.
+
+## 9. Normative Domain Specification
+
+The following domain-specific rules explain the source requirements and ownership boundaries. Stable labels here are navigation labels, **not newly counted FR/NFR or feature IDs**. The feature FR/local-NFR tables and exact linked source semantics remain binding; these explanations never replace an algorithm definition, contract schema, catalogue entry or release qualification gate.
+
+<a id="agt-authority"></a>
+### 9.1 AGT-AUTHORITY
+
+Enforce the narrowest applicable system/owner/mandate rule. Missing, tampered, future or expired mandates fail closed. LLM text, confidence, a workflow label or a human’s broad objective cannot grant a forbidden receiver capability.
+
+<a id="agt-pinning"></a>
+### 9.2 AGT-PINNING
+
+Pin provider/model/profile/role/prompt/composite/schema/context/tool/privacy/region/retention identities before invocation. Use strict structured outputs and finite parent budgets. Never silently substitute another model/provider or erase a failed/refused attempt.
+
+<a id="agt-leases"></a>
+### 9.3 AGT-LEASES
+
+Consequential tools require the exact authorized descriptor, arguments/hash, principal/scope, generation, nonce, expiry, cost and receiver idempotency rules. Revalidate on invocation, retry and resume. Persist containment and human-action state before proceeding; uncertain receiver outcomes reconcile receipts rather than repeat effects.
+
+<a id="agt-evidence"></a>
+### 9.4 AGT-EVIDENCE
+
+Refresh material facts from authorized owners. Separate observed facts, deterministic derivations, model inferences, forecasts and recommendations. Preserve immutable content and append status transitions. Missing evidence yields a limitation or refusal, never an invented citation, recalculated metric or fabricated owner receipt.
+
+<a id="agt-workflows"></a>
+### 9.5 AGT-WORKFLOWS
+
+Persist the initial run/checkpoint before shared-job execution. Keep semantic outcome distinct from infrastructure status. Waiting for a human does not hold a fabricated worker slot; accepted owner work survives observer closure. Stale or changed approval payloads require renewed exact review.
+
+<a id="agt-council"></a>
+### 9.6 AGT-COUNCIL
+
+Use the evaluated direct/specialist/challenge/council policy, not an always-on committee. Blind first-pass challenge precedes proposer narrative; disclose correlated models/prompts/evidence, preserve dissent and bound cost. No role or topology self-promotes without independent eligibility evidence and measured utility.
+
+<a id="agt-context-memory"></a>
+### 9.7 AGT-CONTEXT-MEMORY
+
+Capture fresh typed context for every Chat Bot turn. Retain the specified 16,000-character message, 32-contribution, 128 KiB snapshot, 30 s freshness, four-delegation and two-DSL-repair bounds in the operations to which they apply. Memory classes have explicit scope/TTL; retrieved memory is not automatically canonical truth.
+
+<a id="agt-drafts"></a>
+### 9.8 AGT-DRAFTS
+
+Return HSL drafts or base-bound patches using registered deterministic semantics. Distinguish Draft ready, Draft saved, Backtest queued and Backtest completed using actual owner receipts. Saving and running are separate actions; neither grants holdout or live authority.
+
+<a id="agt-sandbox"></a>
+### 9.9 AGT-SANDBOX
+
+Source generation is a separately authorized fallback only after an approved requirement and receiver-validated unsupported-expression/DSL-gap report. Govern model, write, build and cleanup steps; publish staging and cleanup receipts. Do not import generated code into the host or deploy it.
+
+<a id="agt-privacy-calibration"></a>
+### 9.10 AGT-PRIVACY-CALIBRATION
+
+Retain auditable public rationale and evidence, not hidden chain-of-thought or secrets. Calibrate only after the declared horizon closes using authoritative outcomes and pinned observation rules. Report sample uncertainty; a calibration candidate cannot update its own policy or eligibility.
+
+### Normative source and acceptance binding
+
+Each §4 source-card link incorporates only that feature’s shared NFR applicability, operation-gated dependencies, detailed catalogue entries, original source-ID relationships and source clauses. Open the linked entry, not a similarly named legacy feature. The register-wide inventories contain 66 shared NFRs, 646 catalogue entries, 389 original requirement-ID mappings and 233 operation-time dependency edges. Those inventories are **retained by scoped reference**, not reproduced or independently expanded in this delivery. The actual acceptance manifest must enumerate their applicable members before scope can be signed off.
+
+### Source fingerprint record
+
+| Source | Git blob identity | Role |
+| --- | --- | --- |
+| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/templates/README.md`](../../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
+
+The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
+
+### Delivery evidence boundary
+
+This is a documentation projection and proposed domain-registry update. Generated-document checks may establish identity/count/graph/anchor consistency; they do not establish current code parity, external-provider licensing/support, native throughput, model eligibility, browser behavior, successful live connectivity or Phase 0 completion. No application suite or live operation was executed as part of authoring this README.

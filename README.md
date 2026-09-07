@@ -144,15 +144,17 @@ Pytest is the canonical unit and usage-test runner. Coverage must remain above *
   ```
   *Coverage HTML reports are generated at `htmlcov/index.html`.*
 
-### 5. Running Usage Examples
-To run usage examples (such as integration flows or sample domain workflows) under the `tests/usage/` directory:
+### 5. Running Feature Usage Examples
+
+Each backend service feature owns its executable examples in a required `_usage.py` module. Run the
+scenarios documented by the feature's owning README:
+
 ```bash
-uv run pytest tests/usage
+uv run python -m app.services.<domain>.<feature>._usage
 ```
-Or run individual example scripts directly:
-```bash
-uv run python tests/usage/<example_script>.py
-```
+
+The `_usage.py` module may contain multiple bounded scenarios. Production domain-logic modules do not
+contain `__main__` demonstrations, and `tests/` remains dedicated to automated verification.
 
 ---
 

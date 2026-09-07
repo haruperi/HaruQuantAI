@@ -39,7 +39,7 @@ Validate plugin identity, package integrity, compatibility, capabilities, permis
 Run the executable usage demonstration:
 
 ```bash
-uv run python -m app.services.plugins.manifests.plugin_manifests
+uv run python -m app.services.plugins.manifests._usage
 ```
 
 ## Runtime Effects

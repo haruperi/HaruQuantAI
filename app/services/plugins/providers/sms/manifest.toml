@@ -1,7 +1,7 @@
 [provider]
 id = "notification.delivery.sms"
 version = "1.0.0"
-entry_point = "app.utils.notifications.providers.sms.plugin:create_provider"
+entry_point = "app.services.plugins.providers.sms.plugin:create_provider"
 
 [[provides]]
 capability_id = "notification.delivery.v1"

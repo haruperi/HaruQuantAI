@@ -54,4 +54,4 @@ Removing this feature withdraws its scoped `catalogue.map-providers@1` provider.
 
 ## Evidence
 
-Run `uv run python -m app.services.catalogue.provider_mapping.provider_mapping` for the executable scenario harness. Automated tests live in `tests/services/catalogue/provider_mapping/`.
+Run `uv run python -m app.services.catalogue.provider_mapping._usage` for the executable scenario harness. Automated tests live in `tests/services/catalogue/provider_mapping/`.

@@ -39,7 +39,7 @@ Validate settings, resource guards, launcher settings, and support profiles.
 Run the executable usage demonstration:
 
 ```bash
-uv run python -m app.services.workspace.runtime_configuration.runtime_configuration
+uv run python -m app.services.workspace.runtime_configuration._usage
 ```
 
 ## Runtime Effects

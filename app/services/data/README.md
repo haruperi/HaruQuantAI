@@ -1,1291 +1,2248 @@
 # Data
 
 > **Package:** `app/services/data/`
-> **Status:** `Missing`
-> **Last updated:** `2026-08-23`
+> **Status:** `Partial` — documentary target; runtime acceptance is **NOT_REVALIDATED**.
+> **Last updated:** `2026-09-06`
 > **Domain ID:** `D-DATA`
 
-> This README is the domain package's **single source of truth** for domain boundaries, composable feature capabilities, architecture invariants, implementation sequence, progress, usage examples, and tests.
-> Update this document before modifying or adding code.
+> This README is the domain target registry for boundaries, composable feature capabilities, requirements, ownership, workflows, acceptance, and removal. Update it before changing the affected implementation. It does not certify that a target package, contract, test, usage demonstration or provider is already implemented.
+
+**Selected scope:** 16 features · 36 owned functional requirements · 16 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
+
+**Sources:** [Unified Specification](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
 
 ## Code-Aligned Implementation Convention
 
-This README is the sole current target registry for this domain's feature IDs and statuses, functional requirements, domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence, and deletion behavior. `PROJECT.md` owns system scope, cross-domain behavior, system NFRs, and release gates; `ARCHITECTURE.md` owns universal package and runtime constraints. Feature-local READMEs, manifests, contract definitions, migrations, and tests provide current implementation evidence without silently changing this target registry.
+This domain README defines target behavior; `PROJECT.md` retains system scope, cross-domain policy, system NFRs and release gates, and `ARCHITECTURE.md` retains universal package/runtime constraints. Feature-local READMEs, manifests, contracts, migrations and evidence mirror rather than silently redefine this target. For focused work, load §1, the affected §4 card, applicable §5 and §9 rules, and §7. Follow the [Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md).
 
-Implementation uses the repository's existing feature substrate: each feature lives directly at `app/services/<domain>/<feature>/`, is discovered through the `haruquantai.features` Python entry-point group, and declares one immutable `FeatureSpec` in `manifest.py`. There are no domain or feature YAML manifests.
+Implement one feature directly in its selected owner folder and discover it through the `haruquantai.features` Python entry-point group. Declare one immutable `SPEC = FeatureSpec(...)` in `manifest.py`; do not introduce a domain registry or YAML manifest. The feature contains pure `__init__.py`, a runtime-validated `README.md`, strict `config.py` with `.from_dict()`, lifecycle `feature.py`, focused logic modules and required `_usage.py`. Add `_persistence.py` only when the feature performs database operations. Effects and dependencies flow through `FeatureContext` and `FeatureScope`; durable state is declared by `FeatureSpec.state`. Existing compatible public contracts and owners are reused, not copied into a parallel implementation.
 
-Every implemented feature also contains a mandatory runtime-validated `README.md`, pure `__init__.py`, strict `config.py`, lifecycle `feature.py`, and focused implementation modules. Dependencies and effects flow through `FeatureContext`/`FeatureScope`; cross-feature implementation imports are forbidden. Persistent state is declared by `FeatureSpec.state`; any migrations and storage adapters remain with the owning feature. Capability keys use `<domain>.<name>@<major>`. FR IDs remain product, acceptance, and test-trace identities rather than one runtime registration per FR. A requirement `Depends` cell expresses product sequencing, traceability, or acceptance evidence only; runtime dependencies are declared separately with exact keys in `FeatureSpec.requires` or `FeatureSpec.optional`.
+Each core logic module documents its public API. Every service feature has one required `_usage.py` containing its bounded offline `if __name__ == "__main__":` scenarios; production logic modules do not contain demonstrations. Optional `_persistence.py` owns all feature-local database operations when durable state is required. The paths below are documentary targets pending current-code reconciliation, not claims of executable files. Tests verify the scenarios independently.
 
-Feature-level automated tests live at `tests/services/data/<feature>/`. Usage examples never live under `tests/`; they belong to each feature's designated primary domain-logic module. Broader automated verification retains its documented architecture, composition, API, integration, or system test location. The code-backed procedure is the [Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md).
+FR and acceptance IDs are trace identities, not runtime registrations. Required-provider keys below reproduce the register’s required graph. Optional providers are operation-gated: they must be declared and tested without making an absent future extension a universal startup dependency. The plan’s P1–P16 execution phases are distinct from specification U0–U13 release milestones; a U label is not proof of readiness or a new feature task.
 
 ## 1. Purpose and Boundary
 
 ### Purpose
 
-The Data domain delivers historical data ingestion, immutable series versions, quality, normalization, aggregation, alignment, connectors, derived inputs, synthetic/scenario series, point-in-time economic/news evidence, normalized real-time market events, and governed QuantDataManager ingestion. Its public feature capabilities are registered and remain independent of package-import order. Removing the domain produces the degradation defined below rather than preventing the shared substrate or unrelated domains from starting.
+Create reproducible, causal and inspectable market-data inputs for the whole research workbench. Retain raw provenance while allowing large histories to grow through immutable appended parts and bounded reads.
 
 ### Owns
 
-- `FEAT-DATA-INGEST_HISTORY` — Historical Data Ingestion.
-- `FEAT-DATA-RESOLVE_QUALITY` — Data Quality and Resolution.
-- `FEAT-DATA-AGGREGATE_BARS` — Bar Aggregation and Timeframes.
-- `FEAT-DATA-MANAGE_RETENTION` — Inspection, Export, and Retention.
-- `FEAT-DATA-BIND_RUN_DATA` — Run Data Binding.
-- `FEAT-DATA-ALIGN_SERIES` — External Series Alignment.
-- `FEAT-DATA-SYNC_CONNECTORS` — Connector Synchronization.
-- `FEAT-DATA-NORMALIZE_TICKS` — Tick Normalization.
-- `FEAT-DATA-PREPARE_PROFILES` — Volume Profile Source Preparation.
-- `FEAT-DATA-IMPORT_INDICATORS` — External Indicator Series.
-- `FEAT-DATA-GENERATE_SCENARIOS` — Synthetic and Scenario Series.
-- `FEAT-DATA-TRACK_MARKET_NEWS` — Economic Calendar and News Evidence.
-- `FEAT-DATA-STREAM_MARKET_EVENTS` — Real-Time Market Events.
-- `FEAT-DATA-IMPORT_QUANTDATA` — QuantDataManager Source.
-- `FEAT-DATA-BROWSE_REFERENCE` — Market Reference Browser.
-- `FEAT-DATA-MARKET_DATA_STORE` — Partitioned Parquet Market Data Store.
+Historical ingestion and receipts; partitioned market-data storage; quality inspection and versioned repairs; bar aggregation; inspection/retention; exact run-data bindings; external-series alignment; connector synchronization; tick normalization; profile-source preparation; external indicator imports; scenarios; governed news evidence; real-time streams; QDM imports; coherent browse projections.
 
 ### Does not own
 
-- Instrument semantics, strategy definitions, runtime indicator state, or result analysis; it owns immutable market and external-series data.
-- Volume Profile/TPO indicator definitions and calculations; Data owns only the validated, versioned source rows, sessions, bins, and coverage diagnostics consumed by Strategy/Simulator capabilities.
-- Composition lifecycle, dependency resolution, effect reversal, and transactional replacement; those belong to the non-domain shared substrate (`app/contracts/`, `app/kernel/`, and `app/composition/`).
-- **Deletion boundary:** deleting `app/services/data/` means data management and retrieval disappear; immutable artifacts remain retained and other domains expose capability-unavailable states rather than failing startup. The kernel and unrelated domains shall remain healthy.
+Instrument and session definitions; broker transport internals; indicator mathematics; synthetic tick execution methods owned by Simulator; trading policy; research qualification; browser presentation. Data browsing is not a second storage authority.
 
 ### Shared Contracts
 
-This domain semantically owns the contracts listed below, but their sole physical definitions live in `app/contracts/data/` and wire schemas in `app/contracts/data/wire/`. `app/services/data/` contains implementations only and shall not define or re-export substitute public contract types. Contract versions and semantic owners must agree with `PROJECT.md` and this README. Feature IDs and FR IDs are documentation, lifecycle, acceptance, and traceability identities; runtime bindings use exact versioned `CapabilityKey` declarations in contracts and `FeatureSpec`. The exact public records and capability bundles are listed in the [Shared Contracts README](../../contracts/README.md#43-appcontractsdata).
+**Owned by this domain.** Status is an evidence state. Contract modules are selected public boundaries; an unbound symbol/DTO must be reconciled before implementing its production consumer. Do not infer a callable signature from the English title.
 
-Rows labelled `FEAT-* capability surface` describe planned semantic contract bundles, not literal runtime capability keys. A listed counterparty may produce, consume, or observe the bundle and does not establish package-import or runtime dependency direction.
+| Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
+| --- | --- | --- | --- | --- |
+| NOT_REVALIDATED | `data.ingest-history@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import historical observations with a conserved receipt |
+| NOT_REVALIDATED | `data.market-data-store@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/market_data_store.py`](../../contracts/data/market_data_store.py) | 1 | Append and query immutable partitioned market data |
+| NOT_REVALIDATED | `data.resolve-quality@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Inspect and repair data through new versions |
+| NOT_REVALIDATED | `data.aggregate-bars@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Aggregate causal bars on declared clocks |
+| NOT_REVALIDATED | `data.manage-retention@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Inspect, export and retire market data safely |
+| NOT_REVALIDATED | `data.bind-run-data@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Bind exact eligible inputs to a run |
+| NOT_REVALIDATED | `data.align-series@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Align external series without look-ahead |
+| NOT_REVALIDATED | `data.sync-connectors@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Resume bounded source synchronization |
+| NOT_REVALIDATED | `data.normalize-ticks@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Normalize recorded ticks while retaining source evidence |
+| NOT_REVALIDATED | `data.prepare-profiles@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Prepare eligible inputs for market profiles |
+| NOT_REVALIDATED | `data.import-indicators@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import non-executable external indicator series |
+| NOT_REVALIDATED | `data.generate-scenarios@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Publish synthetic market-data scenarios |
+| NOT_REVALIDATED | `data.track-market-news@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Supply governed point-in-time document evidence |
+| NOT_REVALIDATED | `data.stream-market-events@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Expose bounded normalized real-time observations |
+| NOT_REVALIDATED | `data.import-quantdata@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py) | 1 | Import QuantDataManager source artifacts |
+| NOT_REVALIDATED | `data.browse-reference@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/data/browse_reference.py`](../../contracts/data/browse_reference.py) | 1 | Browse one coherent data/reference projection |
 
-**Owned by this domain**
+**Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
 
-| Status | Contract | Version | Counterparty | Purpose |
-|---|---|---|---|---|
-| Complete | `FEAT-DATA-INGEST_HISTORY` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Historical Data Ingestion. |
-| Missing | `FEAT-DATA-RESOLVE_QUALITY` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Data Quality and Resolution. |
-| Missing | `FEAT-DATA-AGGREGATE_BARS` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Bar Aggregation and Timeframes. |
-| Complete | `FEAT-DATA-MANAGE_RETENTION` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Inspection, Export, and Retention. |
-| Complete | `FEAT-DATA-BIND_RUN_DATA` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Run Data Binding. |
-| Complete | `FEAT-DATA-ALIGN_SERIES` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | External Series Alignment. |
-| Missing | `FEAT-DATA-SYNC_CONNECTORS` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Connector Synchronization. |
-| Complete | `FEAT-DATA-NORMALIZE_TICKS` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Tick Normalization. |
-| Complete | `FEAT-DATA-PREPARE_PROFILES` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | Volume Profile Source Preparation. |
-| Complete | `FEAT-DATA-IMPORT_INDICATORS` capability surface | `v1` | Catalogue, Plugins, Simulator, Strategy, Workspace | External Indicator Series. |
-| Complete | `FEAT-DATA-GENERATE_SCENARIOS` capability surface | `v1` | Simulator, Research, Workspace | Synthetic and Scenario Series. |
-| Complete | `FEAT-DATA-TRACK_MARKET_NEWS` capability surface | `v1` | Research, Risk, Trading, Interfaces | Economic Calendar and News Evidence. |
-| Complete | `FEAT-DATA-STREAM_MARKET_EVENTS` capability surface | `v1` | Strategy, Risk, Trading, Interfaces | Real-Time Market Events. |
-| Implemented | `FEAT-DATA-IMPORT_QUANTDATA` capability surface | `v1` | Catalogue, Workspace | QuantDataManager Source. |
-| Implemented | `FEAT-DATA-BROWSE_REFERENCE` capability surface | `v1` | Interfaces, Workspace | Market Reference Browser. |
-| Implemented | `FEAT-DATA-MARKET_DATA_STORE` capability surface | `v1` | Data, Interfaces, Workspace | Partitioned Parquet Market Data Store. |
+| Capability | Owner | Binding | Consuming feature | Used for |
+| --- | --- | --- | --- | --- |
+| `workspace.artifacts@1` | Workspace | Required | [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store) | Publish and retain immutable artifact bytes |
+| `orchestration.resource-admission@1` | Orchestration | Required | [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store) | Admit finite work under one resource ledger |
+| `catalogue.define-sessions@1` | Catalogue | Required | [`FEAT-DATA-RESOLVE_QUALITY`](#feat-data-resolve-quality) | Define market sessions and calendar availability |
+| `catalogue.define-sessions@1` | Catalogue | Required | [`FEAT-DATA-AGGREGATE_BARS`](#feat-data-aggregate-bars) | Define market sessions and calendar availability |
+| `catalogue.catalog-instruments@1` | Catalogue | Required | [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) | Version instrument identities and tradable units |
+| `catalogue.map-providers@1` | Catalogue | Required | [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) | Resolve provider symbols and broker profiles |
+| `catalogue.define-sessions@1` | Catalogue | Required | [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) | Define market sessions and calendar availability |
+| `catalogue.define-sessions@1` | Catalogue | Required | [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series) | Define market sessions and calendar availability |
+| `orchestration.manage-jobs@1` | Orchestration | Required | [`FEAT-DATA-SYNC_CONNECTORS`](#feat-data-sync-connectors) | Persist and control shared jobs and attempts |
+| `broker.resolver@1` | Brokers | Required | [`FEAT-DATA-SYNC_CONNECTORS`](#feat-data-sync-connectors) | Resolve an explicitly selected broker/data provider |
+| `catalogue.catalog-instruments@1` | Catalogue | Required | [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks) | Version instrument identities and tradable units |
+| `catalogue.define-sessions@1` | Catalogue | Required | [`FEAT-DATA-PREPARE_PROFILES`](#feat-data-prepare-profiles) | Define market sessions and calendar availability |
+| `broker.resolver@1` | Brokers | Required | [`FEAT-DATA-STREAM_MARKET_EVENTS`](#feat-data-stream-market-events) | Resolve an explicitly selected broker/data provider |
+| `catalogue.catalog-instruments@1` | Catalogue | Required | [`FEAT-DATA-BROWSE_REFERENCE`](#feat-data-browse-reference) | Version instrument identities and tradable units |
+| `catalogue.map-providers@1` | Catalogue | Required | [`FEAT-DATA-BROWSE_REFERENCE`](#feat-data-browse-reference) | Resolve provider symbols and broker profiles |
+| `catalogue.define-sessions@1` | Catalogue | Required | [`FEAT-DATA-BROWSE_REFERENCE`](#feat-data-browse-reference) | Define market sessions and calendar availability |
 
-**Cross-domain requirement references (not runtime dependencies)**
-
-The rows below summarize foreign owner tokens found in FR `Depends` cells. They express product sequencing, traceability, or acceptance-evidence relationships only. Actual runtime consumption must name an exact versioned capability key in the consuming feature's `FeatureSpec.requires` or `FeatureSpec.optional` and must follow the dependency direction in `PROJECT.md` and `ARCHITECTURE.md`.
-
-| Referenced domain set | Documentation version | Owner | Meaning |
-|---|---|---|---|
-| `D-CAT` public capability set | `v1` | Catalogue | Requirements whose `Depends` cell names `CAT-*`. |
-| `D-PLUG` public capability set | `v1` | Plugins | Requirements whose `Depends` cell names `PLUG-*`. |
-| `D-SIM` public capability set | `v1` | Simulator | Requirements whose `Depends` cell names `SIM-*`. |
-| `D-STRAT` public capability set | `v1` | Strategy | Requirements whose `Depends` cell names `STRAT-*`. |
-| `D-WS` public capability set | `v1` | Workspace | Requirements whose `Depends` cell names `WS-*`. |
-| `D-BRK` public capability set | `v1` | Broker Connectivity | Provider-native real-time events and authority generation used by `FEAT-DATA-STREAM_MARKET_EVENTS`. |
-
-#### Ratified v1 public records (27)
-
-All 27 records (24 absent + 3 incomplete) and 14 capabilities resolved; nothing removed. All records are wire-native strict frozen Pydantic v1; `*Version` records are immutable with `content_hash`; series identity uniqueness is `(instrument_id,broker_id,timeframe,tick_type)` (`data_series`).
-
-| # | Record | Exact wire fields | Producer → consumers | FRs |
-|---|---|---|---|---|
-| R1 | `DataSeriesRef` | `series_id: Uuid7`; `schema_version: Literal[1] = 1`. | Data → Simulator, Analytics, Research, Strategy | FR-DATA-PUBLISH_DATA_VERSIONS. |
-| R2 | `DataSeriesVersion` (incomplete → complete) | `series_version_id: Uuid7`; `series_id: Uuid7`; `version: int >= 1`; `instrument: InstrumentRef`; `instrument_version_id: Uuid7`; `session_version_id: Uuid7 | None`; `calendar_version_id: Uuid7 | None`; `broker: BrokerRef | None`; `timeframe: Timeframe | None`; `tick_type: Literal[BID_ASK,LAST] | None`; `timezone: IANA name`; `precision: Literal[SELECTED_TIMEFRAME,M1_SIMULATION,REAL_TICK_CUSTOM_SPREAD,REAL_TICK_RECORDED_SPREAD]`; `coverage: SeriesCoverage`; `row_count: int >= 0`; `source_artifact_id: Uuid7`; `canonical_artifact_id: Uuid7`; `import_policy: DataImportPlan ref (Uuid7) | None`; `aggregation_lineage: AggregationSpec ref (Uuid7) | None`; `findings_summary: tuple[ValidationIssue, ...] = ()`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Exactly one of `timeframe`/`tick_type` is set. Pinned provenance per FR-DATA-PIN_DATA_PROVENANCE; publication is atomic (staged → findings/checksum → commit). | Data → Simulator, Analytics, Research, Strategy, Interfaces | FR-DATA-PUBLISH_DATA_VERSIONS, PIN_DATA_PROVENANCE, LOCK_DATA_PUBLICATION. |
-| R3 | `DataConnectionRef` | `connection_id: Uuid7`; `connection_type: Literal[CSV,PARQUET,CONNECTOR,QUANTDATA]`; `declared_capabilities: tuple[CapabilityIdentifier, ...] = ()`; `schema_version: Literal[1] = 1`. | Data → UI, Interfaces | FR-DATA-REGISTER_DATA_CONNECTIONS; UI/API shows only supported operations. |
-| R4 | `DataImportPlan` | `plan_id: Uuid7`; `connection: DataConnectionRef`; `source_artifact_id: Uuid7`; `delimiter: str = ","`; `has_header: bool = True`; `encoding: nonempty str = "utf-8"`; `timestamp_format: str | None = None`; `timezone: IANA name`; `column_mapping: dict[nonempty str, nonempty str]`; `decimal_separator: str = "."`; `malformed_row_policy: Literal[REJECT_ROW,ABORT_IMPORT]`; `deduplication_policy: Literal[KEEP_FIRST,KEEP_LAST,REJECT] = "KEEP_FIRST"`; `schema_version: Literal[1] = 1`. | Data → import executor | FR-DATA-IMPORT_CSV_DATA; identical UI/CLI fixture behavior. |
-| R5 | `DataImportReceipt` | `receipt_id: Uuid7`; `series_version_id: Uuid7`; `input_rows: int >= 0`; `accepted_rows: int >= 0`; `rejected_rows: int >= 0`; `duplicate_rows: int >= 0`; `transformed_rows: int >= 0`; `published_rows: int >= 0`; `findings: tuple[ValidationIssue, ...] = ()`; `schema_version: Literal[1] = 1`. Constraint: the six counters reconcile exactly to input rows in every malformed-row mode. | Data → UI, Interfaces | FR-DATA-REPORT_IMPORT_COUNTS. |
-| R6 | `Bar` (incomplete → complete) | `timestamp: UtcTimestamp` (bar open, `[open_time,close_time)` §15.4); `open/high/low/close: DecimalValue`; `volume: DecimalValue >= 0`; `spread_ticks: DecimalValue >= 0 | None = None`; `source_sequence: int >= 0`; `flags: int >= 0` (u32 §22.3 bits 0–5); `schema_version: Literal[1] = 1`. Constraints: `low <= min(open,close)`; `high >= max(open,close)`; `low <= high`; nonfinite values rejected (FR-DATA-VALIDATE_OHLC_BARS). | Data → Simulator, Analytics, Interfaces | FR-DATA-VALIDATE_OHLC_BARS, ORDER_MARKET_ROWS, AGGREGATE_TIMEFRAMES. |
-| R7 | `Tick` (incomplete → complete) | `timestamp: UtcTimestamp`; `bid: DecimalValue`; `ask: DecimalValue`; `last: DecimalValue | None = None`; `volume: DecimalValue >= 0 | None = None`; `source_sequence: int >= 0` (duplicate timestamps preserved deterministically); `flags: int >= 0`; `schema_version: Literal[1] = 1`. Constraint: reimporting the same fixture yields the same canonical order and hash. | Data → Simulator, Analytics, Interfaces | FR-DATA-PRESERVE_TICK_FIELDS, ORDER_MARKET_ROWS. |
-| R8 | `SeriesCoverage` | `from_at: UtcTimestamp`; `to_at: UtcTimestamp` (`>` `from_at`, half-open); `gap_intervals: tuple[SeriesInterval, ...] = ()` where `SeriesInterval(from_at: UtcTimestamp, to_at: UtcTimestamp)`; `schema_version: Literal[1] = 1`. | Data → Simulator, Analytics, UI | FR-DATA-PREVIEW_DATA_COVERAGE. |
-| R9 | `DataQualityFinding` | `finding_id: Uuid7`; `data_version_id: Uuid7`; `rule_code: nonempty uppercase str`; `severity: Literal[INFO,WARNING,ERROR]`; `point: SeriesPointKey | None = None`; `range_from: UtcTimestamp | None = None`; `range_to: UtcTimestamp | None = None`; `observed: JsonValue = None`; `expected: JsonValue = None`; `resolution_state: Literal[OPEN,ACCEPTED,REJECTED,TRANSFORMED] = "OPEN"`; `derived_version_id: Uuid7 | None = None`; `schema_version: Literal[1] = 1`. | Data → UI, Simulator | FR-DATA-DETECT_DATA_QUALITY (rule list fixed: invalid OHLC, unsorted time, duplicates, gaps, out-of-session, nonfinite, negative volume, timestamp parse/offset). |
-| R10 | `DataQualityDecision` | `decision_id: Uuid7`; `finding_ids: nonempty tuple[Uuid7, ...]`; `action: Literal[ACCEPT,REJECT,TRANSFORM]`; `policy_version: int >= 1`; `derived_version_id: Uuid7 | None = None`; `decided_at: UtcTimestamp`; `schema_version: Literal[1] = 1`. Never mutates the source version; records source→derived lineage. | Data → UI | FR-DATA-RESOLVE_QUALITY_FINDINGS. |
-| R11 | `AggregationSpec` | `spec_id: Uuid7`; `source_version_id: Uuid7`; `target_timeframe: Timeframe`; `session_version_id: Uuid7 | None`; `calendar_version_id: Uuid7 | None`; `timezone: IANA name`; `alignment_origin: Literal[SESSION_BOUNDARY,UTC_MIDNIGHT]`; `gap_policy: Literal[ABSENT_EMPTY,SYNTHETIC_GAP] = "ABSENT_EMPTY"`; `algorithm_version: nonempty str`; `schema_version: Literal[1] = 1`. Custom intervals are positive multiples (M10/H2 valid; zero/mixed/overflow rejected); OHLCV aggregation is `open=first, high=max, low=min, close=last, volume=sum` without crossing session boundaries; any policy change changes the derived-version hash. | Data → Simulator, Analytics | FR-DATA-AGGREGATE_TIMEFRAMES, RECORD_AGGREGATION_LINEAGE, DEFINE_CUSTOM_TIMEFRAMES. |
-| R12 | `RetentionPolicy` | `policy_id: Uuid7`; `retention_days: int >= 1 | None = None`; `quarantine_days: int >= 1 = 30`; `schema_version: Literal[1] = 1`. Reachability from committed manifests; referenced data never collected; interrupted collection recoverable. | Data → Workspace GC | FR-DATA-COLLECT_REACHABLE_ARTIFACTS. |
-| R13 | `RunDataBinding` | `binding_id: Uuid7`; `run_manifest_id: Uuid7`; `series_version_ids: nonempty tuple[Uuid7, ...]`; `precision: Literal[SELECTED_TIMEFRAME,M1_SIMULATION,REAL_TICK_CUSTOM_SPREAD,REAL_TICK_RECORDED_SPREAD]`; `validated_at: UtcTimestamp`; `schema_version: Literal[1] = 1`. Only committed versions bind; later imports never change a bound manifest; missing prerequisites fail `DATA_PRECISION_UNAVAILABLE` before queueing. | Data → Simulator, Orchestration | FR-DATA-BIND_COMMITTED_DATA, VALIDATE_PRECISION_INPUTS. |
-| R14 | `AlignedSeries` | `alignment_id: Uuid7`; `source_version_id: Uuid7`; `policy: AlignmentPolicy`; `aligned_version_id: Uuid7`; `schema_version: Literal[1] = 1`, where `AlignmentPolicy(direction: Literal[EXACT,LAST_KNOWN,AGGREGATE], max_age_seconds: int >= 1, missing_policy: Literal[NULL,CARRY_FORWARD,FAIL], timezone: IANA name, look_ahead_prohibited: Literal[True] = True)`. No value timestamped after a decision event can affect that event. | Data → Simulator, Strategy | FR-DATA-ALIGN_EXTERNAL_SERIES, DEFINE_ALIGNMENT_POLICY. |
-| R15 | `ConnectorProfile` | `profile_id: Uuid7`; `connector_kind: nonempty str`; `declared_capabilities: tuple[CapabilityIdentifier, ...]`; `credential_refs: tuple[Uuid7, ...] = ()` (Workspace `SecretRef` IDs, opaque); `rate_limit: int >= 1 | None = None`; `rate_window_seconds: int >= 1 | None = None`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Credentials unavailable to strategy/result-panel/research processes. | Data → Broker-adjacent connectors, Interfaces | FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE, PROTECT_CONNECTOR_SECRETS, CONNECT_DATA_PROVIDERS. |
-| R16 | `ConnectorSyncPlan` | `plan_id: Uuid7`; `profile_id: Uuid7`; `connector_version: nonempty str`; `requested_from: UtcTimestamp`; `requested_to: UtcTimestamp`; `overlap_window_seconds: int >= 0 = 0`; `deduplication: Literal[KEEP_FIRST,KEEP_LAST,REJECT] = "KEEP_FIRST"`; `revision_policy: Literal[COMPARE_OVERLAP,FULL_RESCAN] = "COMPARE_OVERLAP"`; `cursor: str | None = None`; `checkpoint: str | None = None`; `max_records: int >= 1`; `schema_version: Literal[1] = 1`. Repeating the same synchronization is idempotent with the same committed hash. | Data → connector executors | FR-DATA-PLAN_INCREMENTAL_SYNC, §21.6. |
-| R17 | `ConnectorSyncReceipt` | `receipt_id: Uuid7`; `records: int >= 0`; `provider_revision_ids: tuple[Uuid7, ...] = ()`; `next_cursor: str | None = None`; `is_complete: bool`; `content_hash: ContentHash`; `committed_version_id: Uuid7 | None = None`; `schema_version: Literal[1] = 1`. Interruption resumes without duplicate publication. | Data → UI, Interfaces | §21.6 page contract; FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE. |
-| R18 | `VolumeProfileSource` | `source_id: Uuid7`; `data_version_id: Uuid7`; `source_kind: Literal[TICK,LOWER_GRANULARITY]`; `session_version_id: Uuid7`; `price_step: DecimalValue > 0`; `bin_count: int >= 1 | None = None`; `coverage_diagnostics: tuple[ValidationIssue, ...] = ()`; `is_sufficient: bool`; `schema_version: Literal[1] = 1`. Insufficient precision or incomplete sessions fail or are explicitly flagged. | Data → Simulator | FR-DATA-VALIDATE_PROFILE_SOURCE. |
-| R19 | `ExternalIndicatorSeriesVersion` | `series_id: Uuid7`; `version: int >= 1`; `definition_id: Uuid7`; `definition_version: int >= 1` (Strategy-owned definition ref); `instrument: InstrumentRef`; `timeframe: Timeframe | None`; `timezone: IANA name`; `source_artifact_id: Uuid7`; `source_hash: ContentHash`; `canonical_artifact_id: Uuid7`; `coverage: SeriesCoverage`; `alignment_policy: AlignmentPolicy`; `synchronization_findings: tuple[ValidationIssue, ...] = ()`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Immutable. | Data → Simulator, Strategy | FR-DATA-IMPORT_INDICATOR_VALUES. |
-| R20 | `SyntheticModelSpec` | `spec_id: Uuid7`; `model_type: nonempty str`; `model_version: nonempty str`; `parameters: JsonObject` (bounded by the declared model invariants); `timeframe: Timeframe`; `from_at: UtcTimestamp`; `to_at: UtcTimestamp`; `instrument: InstrumentRef`; `seed_streams: tuple[nonempty str, ...] = ()` (§15.5 stream names); `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Same manifest produces byte-identical canonical output. | Data → Simulator, Research | FR-DATA-CONFIGURE_SYNTHETIC_MODEL, GENERATE_SYNTHETIC_SERIES. |
-| R21 | `ScenarioSeriesVersion` | `series_id: Uuid7`; `version: int >= 1`; `source_version_id: Uuid7`; `source_hash: ContentHash`; `transforms: tuple[ScenarioTransform, ...] = ()` where `ScenarioTransform(kind: Literal[SHOCK,GAP,VOLATILITY,LIQUIDITY,OUTAGE,MISSINGNESS], parameters: JsonObject)`; `classification: Literal[SYNTHETIC,SCENARIO]`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Source version never mutated; transform order pinned; synthetic data cannot masquerade as observed provider evidence unless the consumer explicitly permits. | Data → Simulator, Research | FR-DATA-TRANSFORM_SCENARIO_DATA, CLASSIFY_SYNTHETIC_DATA. |
-| R22 | `MarketNewsObservation` | `observation_id: Uuid7`; `source_id: nonempty str`; `provider_item_id: nonempty str`; `first_seen_at: UtcTimestamp`; `retrieved_at: UtcTimestamp`; `scheduled_at: UtcTimestamp | None = None`; `published_at: UtcTimestamp | None = None`; `scope_currencies: tuple[CurrencyCode, ...] = ()`; `scope_instruments: tuple[InstrumentRef, ...] = ()`; `category: nonempty str`; `impact: Literal[NONE,LOW,MEDIUM,HIGH]`; `language: nonempty str`; `payload_hash: ContentHash`; `schema_version: Literal[1] = 1`. Uniqueness `(source_id,provider_item_id,observed_at,revision)` (`economic_news_observation_versions`). | Data → Research, Risk, Trading, Strategy | FR-DATA-RECORD_NEWS_OBSERVATIONS. |
-| R23 | `MarketNewsRevision` | `revision_id: Uuid7`; `observation_id: Uuid7`; `revision: int >= 1`; `kind: Literal[REVISION,CANCELLATION,RESCHEDULE,VALUES]`; `actual: DecimalValue | None = None`; `forecast: DecimalValue | None = None`; `previous: DecimalValue | None = None`; `visible_from: UtcTimestamp`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Point-in-time queries never expose information before it was observed. | Data → Research, Risk | FR-DATA-VERSION_NEWS_REVISIONS, QUERY_MARKET_NEWS. |
-| R24 | `MarketEvent` | `event_id: Uuid7`; `provider: ProviderRef`; `event_kind: Literal[QUOTE,TICK,DEPTH_UPDATE,MARKET_STATUS,HEARTBEAT]`; `event_time: UtcTimestamp`; `receipt_time: UtcTimestamp`; `provider_sequence: int >= 0 | None = None`; `ordering_mode: Literal[PROVIDER_SEQUENCE,RECEIPT_ORDER]`; `instrument: InstrumentRef | None = None`; `values: JsonObject` (kind-declared bounded fields with exact values/units); `raw_hash: ContentHash`; `schema_version: Literal[1] = 1`. Duplicates, late events, and gaps remain observable; repeated ingestion yields the same accepted order. | Data → Simulator, Interfaces, Trading | FR-DATA-NORMALIZE_LIVE_EVENTS, ORDER_LIVE_EVENTS. |
-| R25 | `MarketFeedState` | `feed_id: Uuid7`; `provider: ProviderRef`; `generation: int >= 1`; `state: Literal[CONNECTING,LIVE,DELAYED,STALE,GAP,RECONNECTING,FAILED,STOPPED]`; `last_event_at: UtcTimestamp | None = None`; `observed_at: UtcTimestamp`; `uncovered_intervals: tuple[SeriesInterval, ...] = ()`; `schema_version: Literal[1] = 1`. A boolean connected flag cannot satisfy readiness. | Data → Interfaces, UI, Trading | FR-DATA-TRACK_FEED_STATE, RECONNECT_MARKET_FEEDS, BOUND_EVENT_BUFFERS. |
-| R26 | `MarketReplayRef` | `replay_id: Uuid7`; `feed_id: Uuid7`; `generation: int >= 1`; `partition_artifact_ids: tuple[Uuid7, ...] = ()`; `from_at: UtcTimestamp`; `to_at: UtcTimestamp`; `event_count: int >= 0`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Replay reproduces normalized events and never claims current live evidence. | Data → Simulator, Interfaces | FR-DATA-RECORD_MARKET_REPLAYS. |
-| R27 | `QuantDataImportSpec` | `spec_id: Uuid7`; `allowed_root: nonempty str`; `series_selection: tuple[nonempty str, ...] = ()`; `decoder_version: nonempty str`; `mapping_version_ids: tuple[Uuid7, ...] = ()`; `schema_version: Literal[1] = 1`. Paths outside the allowed root are rejected; every imported version retains source root identity, relative paths, file size/mtime/hash, decoder version, mapping versions, and import manifest; changed input or decoder produces a distinct version. | Data → Interfaces (QuantDataManager source) | FR-DATA-DISCOVER_QUANTDATA_SERIES, DECODE_QUANTDATA_FILES, SYNC_QUANTDATA_CATALOGUE, RECORD_QUANTDATA_LINEAGE. |
-
-#### Ratified v1 capabilities and operation envelopes
-
-All new (universal new-port rule; shared `DataFailure` with `code: Literal[DATA_VALIDATION_FAILED,DATA_NOT_FOUND,DATA_VERSION_CONFLICT,DATA_CONNECTION_UNSUPPORTED,DATA_TIMEFRAME_UNSUPPORTED,DATA_PRECISION_UNAVAILABLE,DATA_COVERAGE_INCOMPLETE,DATA_ALIGNMENT_INCOMPATIBLE,DATA_FEED_UNAVAILABLE,DATA_QUANTDATA_INVALID,CAPABILITY_UNAVAILABLE]`, `problem: ProblemDetails`; common request/success envelope fields as ratified):
-
-1. `data.ingest-history@1` / `IngestHistoryCapability` / `ingest_history` — operations `REGISTER_CONNECTION, IMPORT, EXPORT`. EXPORT writes CSV/Parquet with explicit timezone/schema metadata (reimport yields an equivalent canonical hash). Success: `connection: DataConnectionRef | None`; `receipt: DataImportReceipt | None`; `version: DataSeriesVersion | None`. Event `data.series-version-published` observational. FRs: REGISTER_DATA_CONNECTIONS, IMPORT_CSV_DATA, PUBLISH_DATA_VERSIONS, PIN_DATA_PROVENANCE, REPORT_IMPORT_COUNTS, EXPORT_DATA_SERIES.
-2. `data.sync-connectors@1` / `SyncConnectorsCapability` / `sync_connectors` — operations `PLAN, FETCH, COMMIT`. Success: `plan: ConnectorSyncPlan | None`; `receipt: ConnectorSyncReceipt | None`. FRs: IMPLEMENT_CONNECTOR_LIFECYCLE, PLAN_INCREMENTAL_SYNC, CONNECT_DATA_PROVIDERS, PROTECT_CONNECTOR_SECRETS.
-3. `data.import-quantdata@1` / `ImportQuantdataCapability` / `import_quantdata` — operations `DISCOVER, DECODE, SYNC`. Success: `spec: QuantDataImportSpec | None`; `committed_version_ids: tuple[Uuid7, ...] = ()`. FRs: the four QUANTDATA rows.
-4. `data.normalize-ticks@1` / `NormalizeTicksCapability` / `normalize_ticks` — operations `NORMALIZE`. Success: `version_id: Uuid7 | None`; `findings: tuple[ValidationIssue, ...] = ()`. FR: PRESERVE_TICK_FIELDS.
-5. `data.resolve-quality@1` / `ResolveQualityCapability` / `resolve_quality` — operations `DETECT, RESOLVE`. Success: `findings: tuple[DataQualityFinding, ...] = ()`; `decision: DataQualityDecision | None`. FRs: DETECT_DATA_QUALITY, RESOLVE_QUALITY_FINDINGS, VALIDATE_OHLC_BARS, ORDER_MARKET_ROWS.
-6. `data.aggregate-bars@1` / `AggregateBarsCapability` / `aggregate_bars` — operations `AGGREGATE, VALIDATE_TIMEFRAME`. Success: `spec: AggregationSpec | None`; `derived_version_id: Uuid7 | None`. FRs: AGGREGATE_TIMEFRAMES, RECORD_AGGREGATION_LINEAGE, DEFINE_CUSTOM_TIMEFRAMES, VERSION_DATA_TRANSFORMS.
-7. `data.manage-retention@1` / `ManageRetentionCapability` / `manage_retention` — operations `DEFINE_POLICY, COLLECT`. Success: `policy: RetentionPolicy | None`; `collected_count: int >= 0 = 0`. FR: COLLECT_REACHABLE_ARTIFACTS.
-8. `data.align-series@1` / `AlignSeriesCapability` / `align_series` — operations `ALIGN, DEFINE_POLICY`. Success: `aligned: AlignedSeries | None`. FRs: ALIGN_EXTERNAL_SERIES, DEFINE_ALIGNMENT_POLICY.
-9. `data.prepare-profiles@1` / `PrepareProfilesCapability` / `prepare_profiles` — operations `VALIDATE_SOURCE`. Success: `source: VolumeProfileSource | None`. FR: VALIDATE_PROFILE_SOURCE.
-10. `data.import-indicators@1` / `ImportIndicatorsCapability` / `import_indicators` — operations `IMPORT`. Success: `version_id: Uuid7 | None`; `findings: tuple[ValidationIssue, ...] = ()`. FR: IMPORT_INDICATOR_VALUES.
-11. `data.bind-run-data@1` / `BindRunDataCapability` / `bind_run_data` — operations `BIND, VALIDATE_PRECISION`. Success: `binding: RunDataBinding | None`. FRs: BIND_COMMITTED_DATA, VALIDATE_PRECISION_INPUTS.
-12. `data.generate-scenarios@1` / `GenerateScenariosCapability` / `generate_scenarios` — operations `CONFIGURE_MODEL, GENERATE, TRANSFORM`. Success: `spec: SyntheticModelSpec | None`; `scenario_version_id: Uuid7 | None`. FRs: CONFIGURE_SYNTHETIC_MODEL, GENERATE_SYNTHETIC_SERIES, TRANSFORM_SCENARIO_DATA, CLASSIFY_SYNTHETIC_DATA.
-13. `data.track-market-news@1` / `TrackMarketNewsCapability` / `track_market_news` — operations `RECORD, REVISE, QUERY` (QUERY carries `as_of`, interval, source/category/language/impact filters, coverage/freshness policy; incomplete coverage is explicit and may fail closed). Success: `observation: MarketNewsObservation | None`; `revision: MarketNewsRevision | None`; `observations: tuple[MarketNewsObservation, ...] = ()`. Also produces the non-authorizing `data.trade-restriction` projection evidence for Strategy/Research/Risk/Trading (FR-DATA-PROJECT_TRADE_RESTRICTIONS). FRs: RECORD_NEWS_OBSERVATIONS, VERSION_NEWS_REVISIONS, QUERY_MARKET_NEWS, PROJECT_TRADE_RESTRICTIONS, GOVERN_NETWORK_IMPORTS.
-14. `data.stream-market-events@1` / `StreamMarketEventsCapability` / `stream_market_events` — operations `BIND_FEED, FEED_STATE, REPLAY`. Success: `feed_state: MarketFeedState | None`; `replay: MarketReplayRef | None`. **Subscription (owner-required by FR-DATA-NORMALIZE_LIVE_EVENTS/RECONNECT_MARKET_FEEDS live delivery):** `subscribe_stream_market_events_events(request)` with `provider_id: Uuid7 | None`, `feed_id: Uuid7 | None`, `instruments: tuple[InstrumentRef, ...] = ()`, `resume_event_id: Uuid7 | None`, `replay_limit: int 0..10000 = 0`, `schema_version`; yields `DomainEvent`. FRs: NORMALIZE_LIVE_EVENTS, TRACK_FEED_STATE, ORDER_LIVE_EVENTS, BOUND_EVENT_BUFFERS, RECONNECT_MARKET_FEEDS, RECORD_MARKET_REPLAYS.
-
-Cross-owner references: `InstrumentRef`, `ProviderRef`, `BrokerRef` (Catalogue); `SecretRef` IDs (Workspace); `ExternalIndicatorDefinitionVersion` ref (Strategy). One owner-required subscription (`stream-market-events`).
+**Operation-gated providers.** For each §4 feature, its linked source card’s complete “Operation-gated providers” table defines applicability, exact provider identity and absence behavior. This is scoped incorporation, not permission to treat all 233 register-wide operation edges as optional for every feature. Resolve those provider IDs to their primary capability keys in the corresponding domain README; bind actual operations in the acceptance record. An omitted local duplicate table does not waive a source dependency.
 
 ### Persisted State Ownership
 
-| Status | State / Store | Read access (via contract) | Migration definitions |
-|---|---|---|---|
-| Missing | data_series, data_series_versions, quality_findings, external_indicator_series_versions, economic_news_observation_versions, recorded_market_event_versions | Other domains through `D-DATA` public capabilities only | The owning feature's `StateDeclaration` and migration/storage adapter |
+Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+| Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-RESOLVE_QUALITY`](#feat-data-resolve-quality) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-AGGREGATE_BARS`](#feat-data-aggregate-bars) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-MANAGE_RETENTION`](#feat-data-manage-retention) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-SYNC_CONNECTORS`](#feat-data-sync-connectors) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-PREPARE_PROFILES`](#feat-data-prepare-profiles) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-IMPORT_INDICATORS`](#feat-data-import-indicators) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-GENERATE_SCENARIOS`](#feat-data-generate-scenarios) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-TRACK_MARKET_NEWS`](#feat-data-track-market-news) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-STREAM_MARKET_EVENTS`](#feat-data-stream-market-events) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-IMPORT_QUANTDATA`](#feat-data-import-quantdata) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-DATA-BROWSE_REFERENCE`](#feat-data-browse-reference) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+
+A feature’s exact durable namespace, schema version and migrations are taken from its reconciled manifest and contract, not guessed from its folder name. External consumers access semantic state only through the owner capability. Workspace persistence/artifact custody never acquires that semantic ownership.
 
 ### Four-Level Structural Hierarchy
 
-| Code level | Represents | This package |
-|---|---|---|
-| **Package** | Domain | `app/services/data/` / `D-DATA` |
-| **Module folder** | Feature / capability | One folder for each of: Historical Data Ingestion, Data Quality and Resolution, Bar Aggregation and Timeframes, Inspection, Export, and Retention, Run Data Binding, External Series Alignment, Connector Synchronization, Tick Normalization, Volume Profile Source Preparation, External Indicator Series, Synthetic and Scenario Series, Economic Calendar and News Evidence, Real-Time Market Events, QuantDataManager Source |
-| **File** | Use case or focused responsibility | Exactly the responsibility file named in each module specification |
-| **Class / function / method** | Functional requirement behavior | Exactly one registered `fr_*` behavior per `FR-*` row |
-
-```text
-Package (Domain)
-└── Module folder (Feature)
-    └── File (Responsibility)
-        └── Registered function (Functional requirement behavior)
-```
+| Code level | Represents | Domain example |
+| --- | --- | --- |
+| Package | Domain boundary | `app/services/data/` |
+| Module folder | Composable feature owner | `app/services/data/historical_data_ingestion/` — [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history) |
+| File | Manifest, strict configuration, lifecycle or focused use case | `manifest.py`, `config.py`, `feature.py`, focused logic module |
+| Class / function / method | One or more traced requirement behaviors | `FR-TRC-DATA-INGEST_HISTORY-001` and its acceptance oracle |
 
 ### Domain Capability Map
 
-```mermaid
-flowchart TD
-    DOMAIN[[D-DATA: Data]]
-    DOMAIN --> FEAT_DATA_INGEST_HISTORY[[FEAT-DATA-INGEST_HISTORY: Historical Data Ingestion]]
-    FEAT_DATA_INGEST_HISTORY --> FEAT_DATA_INGEST_HISTORY_FILE[historical_data_ingestion.py: RESP-DATA-01-01]
-    DOMAIN --> FEAT_DATA_RESOLVE_QUALITY[[FEAT-DATA-RESOLVE_QUALITY: Data Quality and Resolution]]
-    FEAT_DATA_RESOLVE_QUALITY --> FEAT_DATA_RESOLVE_QUALITY_FILE[data_quality_resolution.py: RESP-DATA-02-01]
-    DOMAIN --> FEAT_DATA_AGGREGATE_BARS[[FEAT-DATA-AGGREGATE_BARS: Bar Aggregation and Timeframes]]
-    FEAT_DATA_AGGREGATE_BARS --> FEAT_DATA_AGGREGATE_BARS_FILE[bar_aggregation.py: RESP-DATA-03-01]
-    DOMAIN --> FEAT_DATA_MANAGE_RETENTION[[FEAT-DATA-MANAGE_RETENTION: Inspection, Export, and Retention]]
-    FEAT_DATA_MANAGE_RETENTION --> FEAT_DATA_MANAGE_RETENTION_FILE[data_inspection_retention.py: RESP-DATA-04-01]
-    DOMAIN --> FEAT_DATA_BIND_RUN_DATA[[FEAT-DATA-BIND_RUN_DATA: Run Data Binding]]
-    FEAT_DATA_BIND_RUN_DATA --> FEAT_DATA_BIND_RUN_DATA_FILE[run_data_binding.py: RESP-DATA-05-01]
-    DOMAIN --> FEAT_DATA_ALIGN_SERIES[[FEAT-DATA-ALIGN_SERIES: External Series Alignment]]
-    FEAT_DATA_ALIGN_SERIES --> FEAT_DATA_ALIGN_SERIES_FILE[external_series_alignment.py: RESP-DATA-06-01]
-    DOMAIN --> FEAT_DATA_SYNC_CONNECTORS[[FEAT-DATA-SYNC_CONNECTORS: Connector Synchronization]]
-    FEAT_DATA_SYNC_CONNECTORS --> FEAT_DATA_SYNC_CONNECTORS_FILE[connector_synchronization.py: RESP-DATA-07-01]
-    DOMAIN --> FEAT_DATA_NORMALIZE_TICKS[[FEAT-DATA-NORMALIZE_TICKS: Tick Normalization]]
-    FEAT_DATA_NORMALIZE_TICKS --> FEAT_DATA_NORMALIZE_TICKS_FILE[tick_normalization.py: RESP-DATA-08-01]
-    DOMAIN --> FEAT_DATA_PREPARE_PROFILES[[FEAT-DATA-PREPARE_PROFILES: Volume Profile Source Preparation]]
-    FEAT_DATA_PREPARE_PROFILES --> FEAT_DATA_PREPARE_PROFILES_FILE[profile_source_preparation.py: RESP-DATA-09-01]
-    DOMAIN --> FEAT_DATA_IMPORT_INDICATORS[[FEAT-DATA-IMPORT_INDICATORS: External Indicator Series]]
-    FEAT_DATA_IMPORT_INDICATORS --> FEAT_DATA_IMPORT_INDICATORS_FILE[external_indicator_series.py: RESP-DATA-10-01]
-    DOMAIN --> FEAT_DATA_GENERATE_SCENARIOS[[FEAT-DATA-GENERATE_SCENARIOS: Synthetic and Scenario Series]]
-    FEAT_DATA_GENERATE_SCENARIOS --> FEAT_DATA_GENERATE_SCENARIOS_FILE[synthetic_scenario_series.py: RESP-DATA-11-01]
-    DOMAIN --> FEAT_DATA_TRACK_MARKET_NEWS[[FEAT-DATA-TRACK_MARKET_NEWS: Economic Calendar and News Evidence]]
-    FEAT_DATA_TRACK_MARKET_NEWS --> FEAT_DATA_TRACK_MARKET_NEWS_FILE[economic_news_evidence.py: RESP-DATA-12-01]
-    DOMAIN --> FEAT_DATA_STREAM_MARKET_EVENTS[[FEAT-DATA-STREAM_MARKET_EVENTS: Real-Time Market Events]]
-    FEAT_DATA_STREAM_MARKET_EVENTS --> FEAT_DATA_STREAM_MARKET_EVENTS_FILE[realtime_market_events.py: RESP-DATA-13-01]
-    DOMAIN --> FEAT_DATA_IMPORT_QUANTDATA[[FEAT-DATA-IMPORT_QUANTDATA: QuantDataManager Source]]
-    FEAT_DATA_IMPORT_QUANTDATA --> FEAT_DATA_IMPORT_QUANTDATA_FILE[quantdata_manager_source.py: RESP-DATA-14-01]
-```
+The table in §2 is the complete domain capability map. Edges below illustrate dependency direction, not a new orchestrator or private import relationship.
 
----
+```mermaid
+flowchart LR
+    Caller["Caller / consuming feature"] --> Contract["Versioned public contract"]
+    Provider["Removable domain feature"] -->|provides| Contract
+    Provider --> Scope["Scoped effects and disposal"]
+    Provider --> State["Own records only, when declared"]
+```
 
 ## 2. Final Package Structure and Feature Independence
 
+Feature owners are independent and physically removable. The selected package is a target binding: reconcile known current aliases and preserve compatible existing identities before creating a folder. Folder absence does not prove behavior absence. Removing a feature withdraws its contributions; it does not delete another feature’s source or retained evidence.
+
+| Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history) | Import historical observations with a conserved receipt | `app/services/data/historical_data_ingestion/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store) | Append and query immutable partitioned market data | `app/services/data/market_data_store/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-RESOLVE_QUALITY`](#feat-data-resolve-quality) | Inspect and repair data through new versions | `app/services/data/data_quality_resolution/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-AGGREGATE_BARS`](#feat-data-aggregate-bars) | Aggregate causal bars on declared clocks | `app/services/data/bar_aggregation/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-MANAGE_RETENTION`](#feat-data-manage-retention) | Inspect, export and retire market data safely | `app/services/data/data_inspection_retention/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) | Bind exact eligible inputs to a run | `app/services/data/run_data_binding/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series) | Align external series without look-ahead | `app/services/data/external_series_alignment/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-SYNC_CONNECTORS`](#feat-data-sync-connectors) | Resume bounded source synchronization | `app/services/data/connector_synchronization/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks) | Normalize recorded ticks while retaining source evidence | `app/services/data/tick_normalization/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-PREPARE_PROFILES`](#feat-data-prepare-profiles) | Prepare eligible inputs for market profiles | `app/services/data/profile_source_preparation/` | U10 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-IMPORT_INDICATORS`](#feat-data-import-indicators) | Import non-executable external indicator series | `app/services/data/external_indicator_series/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-GENERATE_SCENARIOS`](#feat-data-generate-scenarios) | Publish synthetic market-data scenarios | `app/services/data/synthetic_scenario_series/` | U4 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-TRACK_MARKET_NEWS`](#feat-data-track-market-news) | Supply governed point-in-time document evidence | `app/services/data/economic_news_evidence/` | U4 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-STREAM_MARKET_EVENTS`](#feat-data-stream-market-events) | Expose bounded normalized real-time observations | `app/services/data/realtime_market_events/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-IMPORT_QUANTDATA`](#feat-data-import-quantdata) | Import QuantDataManager source artifacts | `app/services/data/quantdata_manager_source/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-DATA-BROWSE_REFERENCE`](#feat-data-browse-reference) | Browse one coherent data/reference projection | `app/services/data/browse_reference/` | U1 | 2 | 1 | NOT_REVALIDATED |
+
 ```text
-data/
-├── README.md
-├── __init__.py
-├── historical_data_ingestion/                    # FEAT-DATA-INGEST_HISTORY: Historical Data Ingestion
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── historical_data_ingestion.py              # RESP-DATA-01-01
-├── data_quality_resolution/                    # FEAT-DATA-RESOLVE_QUALITY: Data Quality and Resolution
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── data_quality_resolution.py              # RESP-DATA-02-01
-├── bar_aggregation/                    # FEAT-DATA-AGGREGATE_BARS: Bar Aggregation and Timeframes
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── bar_aggregation.py              # RESP-DATA-03-01
-├── data_inspection_retention/                    # FEAT-DATA-MANAGE_RETENTION: Inspection, Export, and Retention
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── data_inspection_retention.py              # RESP-DATA-04-01
-├── run_data_binding/                    # FEAT-DATA-BIND_RUN_DATA: Run Data Binding
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── run_data_binding.py              # RESP-DATA-05-01
-├── external_series_alignment/                    # FEAT-DATA-ALIGN_SERIES: External Series Alignment
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── external_series_alignment.py              # RESP-DATA-06-01
-├── connector_synchronization/                    # FEAT-DATA-SYNC_CONNECTORS: Connector Synchronization
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── connector_synchronization.py              # RESP-DATA-07-01
-├── tick_normalization/                    # FEAT-DATA-NORMALIZE_TICKS: Tick Normalization
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── tick_normalization.py              # RESP-DATA-08-01
-├── profile_source_preparation/                    # FEAT-DATA-PREPARE_PROFILES: Volume Profile Source Preparation
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── profile_source_preparation.py              # RESP-DATA-09-01
-├── external_indicator_series/                    # FEAT-DATA-IMPORT_INDICATORS: External Indicator Series
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── external_indicator_series.py              # RESP-DATA-10-01
-├── synthetic_scenario_series/                    # FEAT-DATA-GENERATE_SCENARIOS
-├── economic_news_evidence/                       # FEAT-DATA-TRACK_MARKET_NEWS
-├── realtime_market_events/                       # FEAT-DATA-STREAM_MARKET_EVENTS
-└── quantdata_manager_source/                     # FEAT-DATA-IMPORT_QUANTDATA
+app/services/data/
+├── README.md  # this domain target registry
+├── __init__.py  # docstring only
+├── historical_data_ingestion/  # FEAT-DATA-INGEST_HISTORY
+├── market_data_store/  # FEAT-DATA-MARKET_DATA_STORE
+├── data_quality_resolution/  # FEAT-DATA-RESOLVE_QUALITY
+├── bar_aggregation/  # FEAT-DATA-AGGREGATE_BARS
+├── data_inspection_retention/  # FEAT-DATA-MANAGE_RETENTION
+├── run_data_binding/  # FEAT-DATA-BIND_RUN_DATA
+├── external_series_alignment/  # FEAT-DATA-ALIGN_SERIES
+├── connector_synchronization/  # FEAT-DATA-SYNC_CONNECTORS
+├── tick_normalization/  # FEAT-DATA-NORMALIZE_TICKS
+├── profile_source_preparation/  # FEAT-DATA-PREPARE_PROFILES
+├── external_indicator_series/  # FEAT-DATA-IMPORT_INDICATORS
+├── synthetic_scenario_series/  # FEAT-DATA-GENERATE_SCENARIOS
+├── economic_news_evidence/  # FEAT-DATA-TRACK_MARKET_NEWS
+├── realtime_market_events/  # FEAT-DATA-STREAM_MARKET_EVENTS
+├── quantdata_manager_source/  # FEAT-DATA-IMPORT_QUANTDATA
+└── browse_reference/  # FEAT-DATA-BROWSE_REFERENCE
 ```
 
-### Module dependency diagram
+Every feature folder contains `README.md`, docstring-only `__init__.py`, `manifest.py`, `config.py`, `feature.py` and its focused logic modules. Shared contract definitions live outside those removable packages. The primary logic-module designation in §4 is a target for usage ownership; adapt a compatible existing module rather than duplicate its service.
 
-Feature modules do not import one another's private files. Runtime dependencies resolve through kernel capabilities obtained from `FeatureContext`; composition selects providers and reconciles changes, so reciprocal workflow participation cannot create a package-import cycle.
+### Feature Capability Dependency Direction
 
-```mermaid
-flowchart LR
-    K[[Kernel capability registry]]
-    K --> FEAT_DATA_INGEST_HISTORY[[FEAT-DATA-INGEST_HISTORY: Historical Data Ingestion]]
-    K --> FEAT_DATA_RESOLVE_QUALITY[[FEAT-DATA-RESOLVE_QUALITY: Data Quality and Resolution]]
-    K --> FEAT_DATA_AGGREGATE_BARS[[FEAT-DATA-AGGREGATE_BARS: Bar Aggregation and Timeframes]]
-    K --> FEAT_DATA_MANAGE_RETENTION[[FEAT-DATA-MANAGE_RETENTION: Inspection, Export, and Retention]]
-    K --> FEAT_DATA_BIND_RUN_DATA[[FEAT-DATA-BIND_RUN_DATA: Run Data Binding]]
-    K --> FEAT_DATA_ALIGN_SERIES[[FEAT-DATA-ALIGN_SERIES: External Series Alignment]]
-    K --> FEAT_DATA_SYNC_CONNECTORS[[FEAT-DATA-SYNC_CONNECTORS: Connector Synchronization]]
-    K --> FEAT_DATA_NORMALIZE_TICKS[[FEAT-DATA-NORMALIZE_TICKS: Tick Normalization]]
-    K --> FEAT_DATA_PREPARE_PROFILES[[FEAT-DATA-PREPARE_PROFILES: Volume Profile Source Preparation]]
-    K --> FEAT_DATA_IMPORT_INDICATORS[[FEAT-DATA-IMPORT_INDICATORS: External Indicator Series]]
-    K --> FEAT_DATA_GENERATE_SCENARIOS[[FEAT-DATA-GENERATE_SCENARIOS: Synthetic and Scenario Series]]
-    K --> FEAT_DATA_TRACK_MARKET_NEWS[[FEAT-DATA-TRACK_MARKET_NEWS: Economic Calendar and News Evidence]]
-    K --> FEAT_DATA_STREAM_MARKET_EVENTS[[FEAT-DATA-STREAM_MARKET_EVENTS: Real-Time Market Events]]
-    K --> FEAT_DATA_IMPORT_QUANTDATA[[FEAT-DATA-IMPORT_QUANTDATA: QuantDataManager Source]]
-```
-
-### Structure rules
-
-- The package root contains `README.md`, import-pure `__init__.py`, and one direct folder per feature; discovery uses the `haruquantai.features` entry-point group.
-- Each feature folder contains mandatory `README.md`, pure `__init__.py`, `manifest.py`, `config.py`, `feature.py`, and focused responsibility modules.
-- `FR-*`/`fr_*` names provide product, implementation, and test traceability inside the feature; they are not separate runtime registrations or capability keys.
-- Cross-feature and cross-domain behavior is injected by capability key. Direct private-file imports are prohibited.
-- Every core capability module documents Python and CLI usage; exactly one designated primary domain-logic module owns the feature's executable `__main__` demonstration. Usage examples never live under `tests/`.
-
----
+A required edge means “consumer requires the provider’s public capability.” It never means “import the provider package.” Optional operation closure is resolved by the composition/runtime boundary and rechecked at invocation. Physical removal must cause the declared unavailable or blocked state while unrelated capabilities remain usable.
 
 ## 3. Workflows
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Missing | `WF-DATA-001` | Cross-domain | Historical Data Ingestion | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-REGISTER_DATA_CONNECTIONS` → `FR-DATA-IMPORT_CSV_DATA` → `FR-DATA-PUBLISH_DATA_VERSIONS` → `FR-DATA-PIN_DATA_PROVENANCE` → `FR-DATA-REPORT_IMPORT_COUNTS` |
-| Missing | `WF-DATA-002` | Cross-domain | Data Quality and Resolution | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-DETECT_DATA_QUALITY` → `FR-DATA-RESOLVE_QUALITY_FINDINGS` → `FR-DATA-VALIDATE_OHLC_BARS` → `FR-DATA-ORDER_MARKET_ROWS` → `FR-DATA-LOCK_DATA_PUBLICATION` |
-| Missing | `WF-DATA-003` | Cross-domain | Bar Aggregation and Timeframes | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-AGGREGATE_TIMEFRAMES` → `FR-DATA-RECORD_AGGREGATION_LINEAGE` → `FR-DATA-DEFINE_CUSTOM_TIMEFRAMES` |
-| Missing | `WF-DATA-004` | Cross-domain | Inspection, Export, and Retention | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-PREVIEW_DATA_COVERAGE` → `FR-DATA-EXPORT_DATA_SERIES` → `FR-DATA-COLLECT_REACHABLE_ARTIFACTS` |
-| Missing | `WF-DATA-005` | Cross-domain | Run Data Binding | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-BIND_COMMITTED_DATA` → `FR-DATA-VALIDATE_PRECISION_INPUTS` |
-| Missing | `WF-DATA-006` | Cross-domain | External Series Alignment | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-ALIGN_EXTERNAL_SERIES` → `FR-DATA-DEFINE_ALIGNMENT_POLICY` |
-| Missing | `WF-DATA-007` | Cross-domain | Connector Synchronization | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE` → `FR-DATA-PLAN_INCREMENTAL_SYNC` → `FR-DATA-VERSION_DATA_TRANSFORMS` → `FR-DATA-CONNECT_DATA_PROVIDERS` → `FR-DATA-PROTECT_CONNECTOR_SECRETS` |
-| Missing | `WF-DATA-008` | Internal | Tick Normalization | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-PRESERVE_TICK_FIELDS` |
-| Missing | `WF-DATA-009` | Cross-domain | Volume Profile Source Preparation | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-VALIDATE_PROFILE_SOURCE` |
-| Missing | `WF-DATA-010` | Cross-domain | External Indicator Series | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-DATA-IMPORT_INDICATOR_VALUES` |
-| Missing | `WF-DATA-011` | Internal | Synthetic and Scenario Series | Versioned model or immutable source plus explicit seed/transform | Classified immutable scenario version | `FR-DATA-CONFIGURE_SYNTHETIC_MODEL` → `FR-DATA-GENERATE_SYNTHETIC_SERIES` → `FR-DATA-TRANSFORM_SCENARIO_DATA` → `FR-DATA-CLASSIFY_SYNTHETIC_DATA` |
-| Missing | `WF-DATA-012` | Cross-domain | Economic Calendar and News Evidence | Governed source observation or point-in-time query | Versioned observation/revision/restriction evidence | `FR-DATA-RECORD_NEWS_OBSERVATIONS` → `FR-DATA-VERSION_NEWS_REVISIONS` → `FR-DATA-QUERY_MARKET_NEWS` → `FR-DATA-PROJECT_TRADE_RESTRICTIONS` → `FR-DATA-GOVERN_NETWORK_IMPORTS` |
-| Implemented | `WF-DATA-013` | Cross-domain | Real-Time Market Events | Explicit provider feed/session binding | Ordered bounded events plus feed-state/replay evidence | `FR-DATA-NORMALIZE_LIVE_EVENTS` → `FR-DATA-TRACK_FEED_STATE` → `FR-DATA-ORDER_LIVE_EVENTS` → `FR-DATA-BOUND_EVENT_BUFFERS` → `FR-DATA-RECONNECT_MARKET_FEEDS` → `FR-DATA-RECORD_MARKET_REPLAYS` |
-| Missing | `WF-DATA-014` | Cross-domain | QuantDataManager Source | Allowed source root plus Catalogue mapping capabilities | Validated immutable Data versions with complete lineage | `FR-DATA-DISCOVER_QUANTDATA_SERIES` → `FR-DATA-DECODE_QUANTDATA_FILES` → `FR-DATA-SYNC_QUANTDATA_CATALOGUE` → `FR-DATA-RECORD_QUANTDATA_LINEAGE` |
+Workflows connect existing features; they do not create additional feature owners. “Internal” means all participating behavior is domain-local. “Cross-Domain” means collaboration through public contracts. Participant lists below are **not** a substitute for the plan’s execution schedule or the workflow’s validated operation graph.
 
-### `WF-DATA-001` — Historical Data Ingestion
+### Domain-local reading sequence — Import, inspect and bind data
 
-**Scope:** `Cross-domain` when the request requires another domain capability; otherwise `Internal`.
+**Input boundary:** Authorized file/source and explicit instrument, profile, clock and range.
 
-**System workflow:** `SYS-WF-002`
+**Output boundary:** A conserved publication receipt and exact eligible immutable inputs, or a typed diagnostic/refusal.
 
-**Input boundary:** A validated request/query plus an immutable capability snapshot and provider bindings.
+**Capabilities to inspect:** [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history) → [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store) → [`FEAT-DATA-RESOLVE_QUALITY`](#feat-data-resolve-quality) → [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data) → [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series).
 
-**Output boundary:** The result/artifact/event defined by the participating `FR-*` rows, or their exact structured failure/degradation outcome.
+This is a domain-oriented explanation, not an additional canonical `WF-*` identity. Apply every FR of the participating operation, not only its first validation step. Validate scope and immutable references, resolve admitted providers, perform owner work, verify the owner receipt, and then expose the result. Invalid input, provider absence, stale revision and cancellation retain separate typed outcomes.
 
-1. `Feature.mount()` resolves its declared required capabilities through `FeatureContext`.
-2. `historical_data_ingestion.py` executes `data_register_data_connections`, `data_import_csv_data`, `data_publish_data_versions`, `data_pin_data_provenance`, `data_report_import_counts` in the requirement-defined order.
-3. Scoped effects are committed or reversed under `FR-KERN-DEFINE_REQUIREMENT_BEHAVIOR, FR-KERN-DEFINE_LIFECYCLE_CONTEXT, FR-KERN-DECLARE_BEHAVIOR_DEPENDENCIES, FR-KERN-REGISTER_FEATURE_MODULES, FR-KERN-DEFINE_RESPONSIBILITY_FILES, FR-KERN-IMPLEMENT_REQUIREMENT_FUNCTIONS, FR-KERN-DEPEND_PUBLIC_PORTS, FR-KERN-NAMESPACE_CAPABILITY_KEYS, FR-KERN-DECLARE_DEPENDENCY_RULES, FR-KERN-REEVALUATE_DEPENDENCIES, FR-KERN-DEFINE_SCOPE_HIERARCHY, FR-KERN-PASS_EFFECT_SCOPES, FR-KERN-REGISTER_EFFECT_REVERSALS, FR-KERN-REVERSE_EFFECTS_LIFO, FR-KERN-ROLLBACK_FAILED_ACTIVATION, FR-KERN-MANAGE_COMPONENT_LIFECYCLE, FR-KERN-COMMIT_CAPABILITY_SWAP, FR-KERN-QUIESCE_DEPENDENT_WORK, FR-KERN-REMOVE_DEPENDENT_COMPONENTS, FR-KERN-ISOLATE_DISPOSAL_FAILURES, FR-KERN-RECONCILE_DESIRED_STATE, FR-KERN-REPLACE_COMPONENTS_TRANSACTIONALLY, FR-KERN-PROVIDE_SCOPED_REGISTRARS, FR-KERN-DRAIN_REMOVED_BEHAVIORS, FR-KERN-CLASSIFY_COMPONENT_EFFECTS, FR-KERN-NAMESPACE_COMPONENT_STATE, FR-KERN-REGISTER_EXTENSION_POINTS, FR-KERN-EMIT_CAUSAL_EVENTS, FR-KERN-REJECT_DEPENDENCY_CYCLES, FR-KERN-PIN_CAPABILITY_SNAPSHOTS, FR-KERN-TEST_COMPONENT_REMOVAL, FR-KERN-VERIFY_EXACT_REMOVAL, FR-KERN-ROUTE_MULTIPLE_PROVIDERS`.
-4. The feature returns or publishes only the documented output boundary.
+| Evidence | Workflow | Scope | Lead | First U gate | Acceptance |
+| --- | --- | --- | --- | --- | --- |
+| PENDING | [`WF-WB-GENERATE_QUALIFY`](#wf-wb-generate-qualify) | Cross-Domain | [`FEAT-RES-RUN_RESEARCH`](../research/README.md#feat-res-run-research) | U5 | `ATW-WB-GENERATE_QUALIFY` |
 
-**Failure behaviour:**
+<a id="wf-wb-generate-qualify"></a>
+### `WF-WB-GENERATE_QUALIFY` — Generate and qualify strategies
 
-- Feature unavailable → new imports are unavailable; committed series remain opaque artifacts. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- Missing/incompatible required capability → `CAPABILITY_UNAVAILABLE` or `CAPABILITY_INCOMPATIBLE`; no partial mutation.
+**Lead owner:** [`FEAT-RES-RUN_RESEARCH`](../research/README.md#feat-res-run-research). **Release gate:** U5. **State:** PENDING.
 
-**Integration test:**
-`tests/services/data/integration/test_historical_data_ingestion.py::test_historical_data_ingestion_workflow()`
+**Participants:** [`FEAT-RES-RUN_RESEARCH`](../research/README.md#feat-res-run-research), [`FEAT-UI-01`](../../ui/README.md#feat-ui-01), [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data), [`FEAT-STRAT-DEFINE_SEARCH_SPACES`](../strategy/README.md#feat-strat-define-search-spaces), [`FEAT-RES-GENERATE_STRATEGIES`](../research/README.md#feat-res-generate-strategies), [`FEAT-RES-EVOLVE_STRATEGIES`](../research/README.md#feat-res-evolve-strategies), [`FEAT-SIM-EXECUTE_TICKS`](../simulator/README.md#feat-sim-execute-ticks), [`FEAT-ANA-COMPUTE_METRICS`](../analytics/README.md#feat-ana-compute-metrics), [`FEAT-RES-TEST_ROBUSTNESS`](../research/README.md#feat-res-test-robustness), [`FEAT-RES-QUALIFY_RESEARCH`](../research/README.md#feat-res-qualify-research), [`FEAT-ANA-DATABANK_MEMBERSHIP`](../analytics/README.md#feat-ana-databank-membership), [`FEAT-UI-32`](../../ui/README.md#feat-ui-32).
 
-```mermaid
-flowchart LR
-    INPUT[Validated input + capability snapshot]
-    FEATURE[[FEAT-DATA-INGEST_HISTORY: Historical Data Ingestion]]
-    FILE[historical_data_ingestion.py: RESP-DATA-01-01]
-    OUTPUT[Committed result or structured failure]
-    INPUT --> FEATURE --> FILE --> OUTPUT
-```
+**This domain contributes:** [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data). Every participating feature’s scoped FR/local-NFR obligations remain binding.
 
----
+**Input/output and acceptance contract:** `ATW-WB-GENERATE_QUALIFY` — Pinned source/space/seed; one accepted research run; each candidate has actual simulation, filters and stage history; only qualified committed result references enter the destination databank.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-generate-qualify).
 
 ## 4. Composable Feature Specifications
 
-Implement module sections from top to bottom. Requirement `Depends` cells define product and implementation ordering; runtime capability dependencies must be declared separately in the owning `FeatureSpec`.
+Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. All acceptance states are PENDING / NOT_REVALIDATED. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
 
----
+<a id="feat-data-ingest-history"></a>
+### 4.1 `historical_data_ingestion/` — `FEAT-DATA-INGEST_HISTORY`
 
-### 4.1 `historical_data_ingestion/` — Historical Data Ingestion
+> **Feature ID:** `FEAT-DATA-INGEST_HISTORY`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/historical_data_ingestion/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Feature ID:** `FEAT-DATA-INGEST_HISTORY`
+#### Purpose
 
-**Purpose:** Register sources, import files, stage, publish, describe, and account for data.
+Import historical observations with a conserved receipt. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Deletion contract:** new imports are unavailable; committed series remain opaque artifacts. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+#### Capability Declarations
 
-**Module flow:**
+**Provides:** `data.ingest-history@1`.
 
-```text
-validated input and capability bindings
-  → historical_data_ingestion.py
-  → data_register_data_connections, data_import_csv_data, data_publish_data_versions, data_pin_data_provenance, data_report_import_counts
-  → requirement-defined output or structured failure
+**Required capabilities:**
+
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-ingest-history) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-INGEST_HISTORY-001`, `FR-TRC-DATA-INGEST_HISTORY-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.ingest-history@1` | FEAT-DATA-INGEST_HISTORY | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-INGEST_HISTORY | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| ingest_history.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-INGEST_HISTORY-001` | Import bounded delimited/CSV, Arrow/Parquet and registered tick/bar formats using an explicit column, encoding, timezone and malformed-row policy. | `AT-DATA-INGEST_HISTORY-001` | Wrong type/version or timestamp mapping fails with row/path reasons; no format is inferred solely from its extension. |
+| PENDING | `FR-TRC-DATA-INGEST_HISTORY-002` | Conserve input, accepted, rejected, duplicate, transformed and published observation accounting with immutable source and output hashes. | `AT-DATA-INGEST_HISTORY-002` | Reimport an identical fixture: the receipt is idempotent and the selected dedup policy produces the same ordering/count/hash. |
+| PENDING | `FR-TRC-DATA-INGEST_HISTORY-003` | Publish a new dataset version only after validation and verified storage publication; expose cancel/partial inspection separately from committed data. | `AT-DATA-INGEST_HISTORY-003` | A crash before commit leaves no available partial series; cancellation retains a truthful incomplete receipt. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-INGEST_HISTORY-001` | Removing FEAT-DATA-INGEST_HISTORY withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-INGEST_HISTORY-001` | Disable and physically remove historical_data_ingestion; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-ingest-history): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/historical_data_ingestion/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/historical_data_ingestion/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-INGEST_HISTORY/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.historical_data_ingestion._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Complete | `historical_data_ingestion.py` | Register sources, import files, stage, publish, describe, and account for data | `data_register_data_connections`, `data_import_csv_data`, `data_publish_data_versions`, `data_pin_data_provenance`, `data_report_import_counts` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Complete | `feature.py` | Mount `FEAT-DATA-INGEST_HISTORY` through `FeatureContext` and stage its declared providers/effects | `FEAT-DATA-INGEST_HISTORY` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Complete | `manifest.py` | Define the immutable `FEAT-DATA-INGEST_HISTORY` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-DATA-INGEST_HISTORY` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Complete | `FEAT-DATA-INGEST_HISTORY.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `historical_data_ingestion.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `historical_data_ingestion.py` — Register sources, import files, stage, publish, describe, and account for data
-
-**File responsibility:** Register sources, import files, stage, publish, describe, and account for data.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Complete | `FR-DATA-REGISTER_DATA_CONNECTIONS` | Target | P0 | The system shall register data connections by type and declared capabilities; Phase 1 shall provide local CSV and Parquet connections. | `data_register_data_connections` implementation trace | Read-only | The UI/API shows only operations supported by the selected connection. | FR-WS-INITIALIZE_WORKSPACE | Baseline `DATA`; Target | **Usage:** `app/services/data/historical_data_ingestion/historical_data_ingestion.py::__main__` scenario `FR-DATA-REGISTER_DATA_CONNECTIONS`<br>**Unit:** `tests/services/data/historical_data_ingestion/test_historical_data_ingestion.py::test_data_register_data_connections()` |
-| Complete | `FR-DATA-IMPORT_CSV_DATA` | Adapter | P0 | The CSV importer shall support user-defined delimiter, header, encoding, timestamp format, timezone, OHLCV/tick mappings, decimal separator, and malformed-row policy. | `data_import_csv_data` implementation trace | Persistence write | A fixture imports identically through UI and CLI; `stop` publishes nothing and `skip` publishes valid rows plus a reject report. | FR-DATA-REGISTER_DATA_CONNECTIONS, FR-CAT-DEFINE_INSTRUMENTS | Reference import; Verified concept | **Usage:** `app/services/data/historical_data_ingestion/historical_data_ingestion.py::__main__` scenario `FR-DATA-IMPORT_CSV_DATA`<br>**Unit:** `tests/services/data/historical_data_ingestion/test_historical_data_ingestion.py::test_data_import_csv_data()` |
-| Complete | `FR-DATA-PUBLISH_DATA_VERSIONS` | Target | P0 | Import shall write a staged artifact, compute quality findings and checksum, then atomically publish a new `DataSeriesVersion`. | `data_publish_data_versions` implementation trace | Event publication; Persistence write | Termination before commit leaves no selectable version; termination after acknowledgement leaves exactly one. | FR-WS-RECOVER_WORKSPACE_STATE, FR-DATA-IMPORT_CSV_DATA | `BD-06`, `BD-09`; Target | **Usage:** `app/services/data/historical_data_ingestion/historical_data_ingestion.py::__main__` scenario `FR-DATA-PUBLISH_DATA_VERSIONS`<br>**Unit:** `tests/services/data/historical_data_ingestion/test_historical_data_ingestion.py::test_data_publish_data_versions()` |
-| Complete | `FR-DATA-PIN_DATA_PROVENANCE` | Target | P0 | Each series version shall pin instrument version, timeframe or tick type, timezone, precision, coverage, row count, source metadata, import policy, and content hash. | `data_pin_data_provenance` implementation trace | Persistence write | Manifest comparison identifies any differing field. | FR-CAT-VERSION_INSTRUMENTS, FR-DATA-PUBLISH_DATA_VERSIONS | `BD-08`; Target | **Usage:** `app/services/data/historical_data_ingestion/historical_data_ingestion.py::__main__` scenario `FR-DATA-PIN_DATA_PROVENANCE`<br>**Unit:** `tests/services/data/historical_data_ingestion/test_historical_data_ingestion.py::test_data_pin_data_provenance()` |
-| Complete | `FR-DATA-REPORT_IMPORT_COUNTS` | Target | P1 | The importer shall report deterministic counters for input, accepted, rejected, duplicate, transformed, and published rows. | `data_report_import_counts` implementation trace | Event publication; Persistence write | Counters reconcile exactly to input rows in every malformed-row mode. | FR-DATA-IMPORT_CSV_DATA | Target | **Usage:** `app/services/data/historical_data_ingestion/historical_data_ingestion.py::__main__` scenario `FR-DATA-REPORT_IMPORT_COUNTS`<br>**Unit:** `tests/services/data/historical_data_ingestion/test_historical_data_ingestion.py::test_data_report_import_counts()` |
-
-**Rules:**
-
-- new imports are unavailable; committed series remain opaque artifacts. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/historical_data_ingestion/historical_data_ingestion.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-INGEST_HISTORY`. Withdraw `data.ingest-history@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.2 `data_quality_resolution/` — Data Quality and Resolution
+<a id="feat-data-market-data-store"></a>
+### 4.2 `market_data_store/` — `FEAT-DATA-MARKET_DATA_STORE`
 
-**Feature ID:** `FEAT-DATA-RESOLVE_QUALITY`
+> **Feature ID:** `FEAT-DATA-MARKET_DATA_STORE`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/market_data_store/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Detect, resolve, normalize, and serialize conflicting quality operations.
+#### Purpose
 
-**Deletion contract:** quality-dependent publication is disabled; no unvalidated data is silently admitted. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Append and query immutable partitioned market data. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → data_quality_resolution.py
-  → data_detect_data_quality, data_resolve_quality_findings, data_validate_ohlc_bars, data_order_market_rows, data_lock_data_publication
-  → requirement-defined output or structured failure
+**Provides:** `data.market-data-store@1`.
+
+**Required capabilities:**
+
+`workspace.artifacts@1` — [`FEAT-WS-MANAGE_ARTIFACTS`](../workspace/README.md#feat-ws-manage-artifacts)<br>`orchestration.resource-admission@1` — [`FEAT-ORCH-RESERVE_RESOURCES`](../orchestration/README.md#feat-orch-reserve-resources).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-market-data-store) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/market_data_store.py`](../../contracts/data/market_data_store.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-MARKET_DATA_STORE-001`, `FR-TRC-DATA-MARKET_DATA_STORE-002`, `FR-TRC-DATA-MARKET_DATA_STORE-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.market-data-store@1` | FEAT-DATA-MARKET_DATA_STORE | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-MARKET_DATA_STORE | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| market_data_store.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-MARKET_DATA_STORE-001` | Write closed Parquet parts using the initial Zstandard level 3 and approximately 128 MiB uncompressed row-group profile, bounded by admission. | `AT-DATA-MARKET_DATA_STORE-001` | Appending a new period leaves all prior part hashes unchanged; no file-per-row/tick write path exists. |
+| PENDING | `FR-TRC-DATA-MARKET_DATA_STORE-002` | Project columns and prune by symbol/time/row-group statistics into bounded decode buffers. | `AT-DATA-MARKET_DATA_STORE-002` | A one-symbol interval query does not materialize all symbols/years; data larger than RAM completes within its reservation. |
+| PENDING | `FR-TRC-DATA-MARKET_DATA_STORE-003` | Compact or correct through new manifests and atomic publication, preserving active readers of old versions. | `AT-DATA-MARKET_DATA_STORE-003` | Interrupt compaction: old readers remain valid; successful publication has complete count/hash reconciliation. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-MARKET_DATA_STORE-001` | Removing FEAT-DATA-MARKET_DATA_STORE withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-MARKET_DATA_STORE-001` | Disable and physically remove market_data_store; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-market-data-store): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/market_data_store/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/market_data_store/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-MARKET_DATA_STORE/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.market_data_store._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Complete | `data_quality_resolution.py` | Detect, resolve, normalize, and serialize conflicting quality operations | `data_detect_data_quality`, `data_resolve_quality_findings`, `data_validate_ohlc_bars`, `data_order_market_rows`, `data_lock_data_publication` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Complete | `feature.py` | Mount `FEAT-DATA-RESOLVE_QUALITY` through `FeatureContext` and stage its declared providers/effects | `FEAT-DATA-RESOLVE_QUALITY` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Complete | `manifest.py` | Define the immutable `FEAT-DATA-RESOLVE_QUALITY` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-DATA-RESOLVE_QUALITY` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Complete | `FEAT-DATA-RESOLVE_QUALITY.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `data_quality_resolution.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `data_quality_resolution.py` — Detect, resolve, normalize, and serialize conflicting quality operations
-
-**File responsibility:** Detect, resolve, normalize, and serialize conflicting quality operations.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Complete | `FR-DATA-DETECT_DATA_QUALITY` | Target | P0 | The quality engine shall detect invalid OHLC, unsorted time, duplicates, gaps, out-of-session rows, nonfinite/invalid numbers, negative volume, and timestamp parse/offset failures. | `data_detect_data_quality` implementation trace | None | Each fixture produces a finding with rule, severity, row/range, observed value, and resolution state. | FR-DATA-PUBLISH_DATA_VERSIONS, FR-CAT-DEFINE_TRADING_SESSIONS | Specified §16.4 | **Usage:** `app/services/data/data_quality_resolution/data_quality_resolution.py::__main__` scenario `FR-DATA-DETECT_DATA_QUALITY`<br>**Unit:** `tests/services/data/data_quality_resolution/test_data_quality_resolution.py::test_data_detect_data_quality()` |
-| Complete | `FR-DATA-RESOLVE_QUALITY_FINDINGS` | Target | P1 | The user shall be able to accept, reject, or transform findings through an explicit version-producing resolution policy. | `data_resolve_quality_findings` implementation trace | None | Resolving a finding never mutates the source version and records source→derived lineage. | FR-DATA-DETECT_DATA_QUALITY | Data versioning; Target | **Usage:** `app/services/data/data_quality_resolution/data_quality_resolution.py::__main__` scenario `FR-DATA-RESOLVE_QUALITY_FINDINGS`<br>**Unit:** `tests/services/data/data_quality_resolution/test_data_quality_resolution.py::test_data_resolve_quality_findings()` |
-| Complete | `FR-DATA-VALIDATE_OHLC_BARS` | Target | P0 | The system shall reject a published bar where `low > min(open, close)`, `high < max(open, close)`, `low > high`, or a required field is nonfinite. | `data_validate_ohlc_bars` implementation trace | Event publication | Property tests across generated bars cannot commit an invalid record. | FR-DATA-DETECT_DATA_QUALITY | Verified invariant | **Usage:** `app/services/data/data_quality_resolution/data_quality_resolution.py::__main__` scenario `FR-DATA-VALIDATE_OHLC_BARS`<br>**Unit:** `tests/services/data/data_quality_resolution/test_data_quality_resolution.py::test_data_validate_ohlc_bars()` |
-| Complete | `FR-DATA-ORDER_MARKET_ROWS` | Target | P0 | The system shall sort by UTC timestamp and source sequence and shall preserve duplicate tick timestamps using a deterministic sequence. | `data_order_market_rows` implementation trace | None | Reimporting the same tick fixture produces the same canonical order and hash. | FR-DATA-IMPORT_CSV_DATA | Time baseline; Target | **Usage:** `app/services/data/data_quality_resolution/data_quality_resolution.py::__main__` scenario `FR-DATA-ORDER_MARKET_ROWS`<br>**Unit:** `tests/services/data/data_quality_resolution/test_data_quality_resolution.py::test_data_order_market_rows()` |
-| Complete | `FR-DATA-LOCK_DATA_PUBLICATION` | Target | P1 | Conflicting import, aggregation, delete, and resolution operations on the same logical series shall use optimistic version checks and exclusive publication locks. | `data_lock_data_publication` implementation trace | Persistence write | Two concurrent publishes produce ordered versions or one version conflict, never mixed payload. | FR-DATA-PUBLISH_DATA_VERSIONS | Baseline invariant; Target | **Usage:** `app/services/data/data_quality_resolution/data_quality_resolution.py::__main__` scenario `FR-DATA-LOCK_DATA_PUBLICATION`<br>**Unit:** `tests/services/data/data_quality_resolution/test_data_quality_resolution.py::test_data_lock_data_publication()` |
-
-**Rules:**
-
-- quality-dependent publication is disabled; no unvalidated data is silently admitted. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/data_quality_resolution/data_quality_resolution.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-MARKET_DATA_STORE`. Withdraw `data.market-data-store@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.3 `bar_aggregation/` — Bar Aggregation and Timeframes
+<a id="feat-data-resolve-quality"></a>
+### 4.3 `data_quality_resolution/` — `FEAT-DATA-RESOLVE_QUALITY`
 
-**Feature ID:** `FEAT-DATA-AGGREGATE_BARS`
+> **Feature ID:** `FEAT-DATA-RESOLVE_QUALITY`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/data_quality_resolution/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Aggregate series and define timeframe semantics.
+#### Purpose
 
-**Deletion contract:** derived timeframe creation is unavailable; existing versions remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Inspect and repair data through new versions. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → bar_aggregation.py
-  → data_aggregate_timeframes, data_record_aggregation_lineage, data_define_custom_timeframes
-  → requirement-defined output or structured failure
+**Provides:** `data.resolve-quality@1`.
+
+**Required capabilities:**
+
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-resolve-quality) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-RESOLVE_QUALITY-001`, `FR-TRC-DATA-RESOLVE_QUALITY-002`, `FR-TRC-DATA-RESOLVE_QUALITY-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.resolve-quality@1` | FEAT-DATA-RESOLVE_QUALITY | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-RESOLVE_QUALITY | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| resolve_quality.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-RESOLVE_QUALITY-001` | Detect gaps, duplicates, ordering faults, spikes, nonfinite/negative/zero-volume concerns, invalid OHLC and out-of-session observations under versioned thresholds. | `AT-DATA-RESOLVE_QUALITY-001` | Boundary fixtures produce stable rule IDs, observation IDs and severity; zero volume is flagged by its feed policy, not universally fabricated or dropped. |
+| PENDING | `FR-TRC-DATA-RESOLVE_QUALITY-002` | Preview and accept/reject findings or create a derived repaired version with exact source-to-output lineage. | `AT-DATA-RESOLVE_QUALITY-002` | Repair preserves the original hash and records each transformed observation; concurrent stale decisions conflict. |
+| PENDING | `FR-TRC-DATA-RESOLVE_QUALITY-003` | Page findings and timeline summaries with bounded diagnostics and explicit partial analysis. | `AT-DATA-RESOLVE_QUALITY-003` | A million findings never become one browser payload; incomplete scans cannot claim a clean dataset. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-RESOLVE_QUALITY-001` | Removing FEAT-DATA-RESOLVE_QUALITY withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-RESOLVE_QUALITY-001` | Disable and physically remove data_quality_resolution; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-resolve-quality): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/data_quality_resolution/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/data_quality_resolution/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-RESOLVE_QUALITY/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.data_quality_resolution._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `bar_aggregation.py` | Aggregate series and define timeframe semantics | `data_aggregate_timeframes`, `data_record_aggregation_lineage`, `data_define_custom_timeframes` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-DATA-AGGREGATE_BARS` through `FeatureContext` and stage its declared providers/effects | `FEAT-DATA-AGGREGATE_BARS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-AGGREGATE_BARS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-DATA-AGGREGATE_BARS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-AGGREGATE_BARS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `bar_aggregation.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `bar_aggregation.py` — Aggregate series and define timeframe semantics
-
-**File responsibility:** Aggregate series and define timeframe semantics.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-AGGREGATE_TIMEFRAMES` | Parity | P0 | The system shall aggregate lower-resolution source data into requested minute/day/week/month bars without crossing effective session boundaries. | `data_aggregate_timeframes` implementation trace | None | M1→M5 and M1→H1 fixtures reconcile OHLCV and produce no cross-session bar. | FR-CAT-DEFINE_TRADING_SESSIONS, FR-CAT-DEFINE_MARKET_CALENDARS, FR-CAT-PREVIEW_TRADING_INTERVALS, FR-DATA-PIN_DATA_PROVENANCE | Specified §§15.4, 16.5 | **Usage:** `app/services/data/bar_aggregation/bar_aggregation.py::__main__` scenario `FR-DATA-AGGREGATE_TIMEFRAMES`<br>**Unit:** `tests/services/data/bar_aggregation/test_bar_aggregation.py::test_data_aggregate_timeframes()` |
-| Implemented | `FR-DATA-RECORD_AGGREGATION_LINEAGE` | Target | P0 | Aggregation shall record source version, session/calendar versions, timezone, alignment origin, gap policy, and algorithm version. | `data_record_aggregation_lineage` implementation trace | Persistence write | Changing any policy produces a different derived-version hash. | FR-DATA-AGGREGATE_TIMEFRAMES | `BD-08`; Target | **Usage:** `app/services/data/bar_aggregation/bar_aggregation.py::__main__` scenario `FR-DATA-RECORD_AGGREGATION_LINEAGE`<br>**Unit:** `tests/services/data/bar_aggregation/test_bar_aggregation.py::test_data_record_aggregation_lineage()` |
-| Implemented | `FR-DATA-DEFINE_CUSTOM_TIMEFRAMES` | Target | P1 | The target timeframe model shall support positive custom intervals while retaining reference presets M1, M5, M15, M30, H1, H4, D1, W1, and MN. | `data_define_custom_timeframes` implementation trace | Read-only | Valid M10 and H2 intervals aggregate; zero, mixed invalid, or overflow values fail. | FR-DATA-AGGREGATE_TIMEFRAMES | Baseline §10.2; Target | **Usage:** `app/services/data/bar_aggregation/bar_aggregation.py::__main__` scenario `FR-DATA-DEFINE_CUSTOM_TIMEFRAMES`<br>**Unit:** `tests/services/data/bar_aggregation/test_bar_aggregation.py::test_data_define_custom_timeframes()` |
-
-**Rules:**
-
-- derived timeframe creation is unavailable; existing versions remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/bar_aggregation/bar_aggregation.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-RESOLVE_QUALITY`. Withdraw `data.resolve-quality@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.4 `data_inspection_retention/` — Inspection, Export, and Retention
+<a id="feat-data-aggregate-bars"></a>
+### 4.4 `bar_aggregation/` — `FEAT-DATA-AGGREGATE_BARS`
 
-**Feature ID:** `FEAT-DATA-MANAGE_RETENTION`
+> **Feature ID:** `FEAT-DATA-AGGREGATE_BARS`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/bar_aggregation/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Preview, export, and garbage-collect data versions safely.
+#### Purpose
 
-**Deletion contract:** preview/export/collection is unavailable without deleting committed versions. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Aggregate causal bars on declared clocks. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → data_inspection_retention.py
-  → data_preview_data_coverage, data_export_data_series, data_collect_reachable_artifacts
-  → requirement-defined output or structured failure
+**Provides:** `data.aggregate-bars@1`.
+
+**Required capabilities:**
+
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-aggregate-bars) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.aggregate-bars@1` | FEAT-DATA-AGGREGATE_BARS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-AGGREGATE_BARS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| aggregate_bars.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-AGGREGATE_BARS-001` | Aggregate observations into half-open intervals with pinned origin, timezone/session/calendar and gap policy. | `AT-DATA-AGGREGATE_BARS-001` | An event exactly on the boundary enters the next interval; DST fixtures preserve the declared interval semantics. |
+| PENDING | `FR-TRC-DATA-AGGREGATE_BARS-002` | Publish only complete/available bars and carry partial aggregation state across source partitions. | `AT-DATA-AGGREGATE_BARS-002` | Changing chunk size yields identical completed bars; future high/low values are not exposed before bar closure. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-AGGREGATE_BARS-001` | Removing FEAT-DATA-AGGREGATE_BARS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-AGGREGATE_BARS-001` | Disable and physically remove bar_aggregation; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-aggregate-bars): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/bar_aggregation/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/bar_aggregation/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-AGGREGATE_BARS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.bar_aggregation._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `data_inspection_retention.py` | Preview, export, and garbage-collect data versions safely | `data_preview_data_coverage`, `data_export_data_series`, `data_collect_reachable_artifacts` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-DATA-MANAGE_RETENTION` through `FeatureContext` and stage its declared providers/effects | `FEAT-DATA-MANAGE_RETENTION` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-MANAGE_RETENTION` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-DATA-MANAGE_RETENTION` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-MANAGE_RETENTION.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `data_inspection_retention.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `data_inspection_retention.py` — Preview, export, and garbage-collect data versions safely
-
-**File responsibility:** Preview, export, and garbage-collect data versions safely.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-PREVIEW_DATA_COVERAGE` | Target | P0 | The system shall expose coverage, row count, precision, findings, gaps, and a bounded preview without decoding the complete dataset into API memory. | `data_preview_data_coverage` implementation trace | Read-only | Previewing the large fixture keeps API memory within the performance budget. | FR-DATA-PIN_DATA_PROVENANCE, FR-DATA-DETECT_DATA_QUALITY | Specified §§16.4, 22.3–22.5 | **Usage:** `app/services/data/data_inspection_retention/data_inspection_retention.py::__main__` scenario `FR-DATA-PREVIEW_DATA_COVERAGE`<br>**Unit:** `tests/services/data/data_inspection_retention/test_data_inspection_retention.py::test_data_preview_data_coverage()` |
-| Implemented | `FR-DATA-EXPORT_DATA_SERIES` | Target | P1 | The system shall export a selected series version to CSV or Parquet with explicit timezone and schema metadata. | `data_export_data_series` implementation trace | Persistence write | Export→reimport produces an equivalent canonical content hash after normalization. | FR-DATA-PIN_DATA_PROVENANCE | Specified §§16.3, 22.3 | **Usage:** `app/services/data/data_inspection_retention/data_inspection_retention.py::__main__` scenario `FR-DATA-EXPORT_DATA_SERIES`<br>**Unit:** `tests/services/data/data_inspection_retention/test_data_inspection_retention.py::test_data_export_data_series()` |
-| Implemented | `FR-DATA-COLLECT_REACHABLE_ARTIFACTS` | Target | P1 | Retention and garbage collection shall operate on reachability from committed manifests and maintain a quarantine interval. | `data_collect_reachable_artifacts` implementation trace | Persistence write | Referenced data is never collected; interrupted collection is recoverable. | FR-WS-REPORT_SYSTEM_READINESS, FR-DATA-EXPORT_DATA_SERIES | Storage baseline | **Usage:** `app/services/data/data_inspection_retention/data_inspection_retention.py::__main__` scenario `FR-DATA-COLLECT_REACHABLE_ARTIFACTS`<br>**Unit:** `tests/services/data/data_inspection_retention/test_data_inspection_retention.py::test_data_collect_reachable_artifacts()` |
-
-**Rules:**
-
-- preview/export/collection is unavailable without deleting committed versions. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/data_inspection_retention/data_inspection_retention.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-AGGREGATE_BARS`. Withdraw `data.aggregate-bars@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.5 `run_data_binding/` — Run Data Binding
+<a id="feat-data-manage-retention"></a>
+### 4.5 `data_inspection_retention/` — `FEAT-DATA-MANAGE_RETENTION`
 
-**Feature ID:** `FEAT-DATA-BIND_RUN_DATA`
+> **Feature ID:** `FEAT-DATA-MANAGE_RETENTION`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/data_inspection_retention/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Pin committed input data and validate precision prerequisites.
+#### Purpose
 
-**Deletion contract:** new runs needing data cannot be admitted; existing manifests remain readable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Inspect, export and retire market data safely. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → run_data_binding.py
-  → data_bind_committed_data, data_validate_precision_inputs
-  → requirement-defined output or structured failure
+**Provides:** `data.manage-retention@1`.
+
+**Required capabilities:**
+
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-manage-retention) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-MANAGE_RETENTION-001`, `FR-TRC-DATA-MANAGE_RETENTION-002`, `FR-TRC-DATA-MANAGE_RETENTION-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.manage-retention@1` | FEAT-DATA-MANAGE_RETENTION | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-MANAGE_RETENTION | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_retention.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-MANAGE_RETENTION-001` | Return paged observation previews, statistics, coverage and explicit chart LOD with version and sample. | `AT-DATA-MANAGE_RETENTION-001` | Preview respects requested projection and limits; missing series is unavailable rather than substituted. |
+| PENDING | `FR-TRC-DATA-MANAGE_RETENTION-002` | Export selected data to supported CSV/Arrow/Parquet formats with schema, timezone, filter, counts, checksum and warnings. | `AT-DATA-MANAGE_RETENTION-002` | Export includes the server-resolved population beyond visible rows and matches its manifest counts. |
+| PENDING | `FR-TRC-DATA-MANAGE_RETENTION-003` | Preview dependencies before clone-timezone, lineage-aware merge, guarded deletion or retirement; create new versions for transformations. | `AT-DATA-MANAGE_RETENTION-003` | A referenced series cannot be destructively removed; timezone cloning preserves source bytes and pins the transformation. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-MANAGE_RETENTION-001` | Removing FEAT-DATA-MANAGE_RETENTION withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-MANAGE_RETENTION-001` | Disable and physically remove data_inspection_retention; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-manage-retention): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/data_inspection_retention/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/data_inspection_retention/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-MANAGE_RETENTION/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.data_inspection_retention._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `run_data_binding.py` | Pin committed input data and validate precision prerequisites | `data_bind_committed_data`, `data_validate_precision_inputs`, `BindRunDataService` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-DATA-BIND_RUN_DATA` through `FeatureContext` and stage its declared providers/effects | `RunDataBindingFeature`, `feature` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-BIND_RUN_DATA` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `SPEC` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-BIND_RUN_DATA.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `run_data_binding.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `run_data_binding.py` — Pin committed input data and validate precision prerequisites
-
-**File responsibility:** Pin committed input data and validate precision prerequisites.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-BIND_COMMITTED_DATA` | Target | P0 | A run shall bind only committed data versions and shall retain those bindings after later imports or updates. | `data_bind_committed_data` | Persistence write | Updating a series does not change an already queued run manifest. | FR-DATA-PUBLISH_DATA_VERSIONS, FR-SIM-BUILD_RUN_MANIFEST | `BD-08`; Target | **Usage:** `app/services/data/run_data_binding/run_data_binding.py::__main__` scenario `FR-DATA-BIND_COMMITTED_DATA`<br>**Unit:** `tests/services/data/run_data_binding/test_run_data_binding.py::test_data_bind_committed_data()` |
-| Implemented | `FR-DATA-VALIDATE_PRECISION_INPUTS` | Target | P0 | Selecting a precision whose source prerequisites are absent shall fail before a backtest job is queued. | `data_validate_precision_inputs` | Persistence write | Real-tick mode with only H1 data returns `DATA_PRECISION_UNAVAILABLE`; no fallback occurs. | FR-DATA-PIN_DATA_PROVENANCE | Baseline §10.2; Target | **Usage:** `app/services/data/run_data_binding/run_data_binding.py::__main__` scenario `FR-DATA-VALIDATE_PRECISION_INPUTS`<br>**Unit:** `tests/services/data/run_data_binding/test_run_data_binding.py::test_data_validate_precision_inputs()` |
-
-**Rules:**
-
-- new runs needing data cannot be admitted; existing manifests remain readable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/run_data_binding/run_data_binding.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-MANAGE_RETENTION`. Withdraw `data.manage-retention@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.6 `external_series_alignment/` — External Series Alignment
+<a id="feat-data-bind-run-data"></a>
+### 4.6 `run_data_binding/` — `FEAT-DATA-BIND_RUN_DATA`
 
-**Feature ID:** `FEAT-DATA-ALIGN_SERIES`
+> **Feature ID:** `FEAT-DATA-BIND_RUN_DATA`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/run_data_binding/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Align external numeric series without future visibility.
+#### Purpose
 
-**Deletion contract:** strategies requiring external series are inactive; native price series remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Bind exact eligible inputs to a run. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → external_series_alignment.py
-  → data_align_external_series, data_define_alignment_policy
-  → requirement-defined output or structured failure
+**Provides:** `data.bind-run-data@1`.
+
+**Required capabilities:**
+
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](../catalogue/README.md#feat-cat-catalog-instruments)<br>`catalogue.map-providers@1` — [`FEAT-CAT-MAP_PROVIDERS`](../catalogue/README.md#feat-cat-map-providers)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-bind-run-data) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-BIND_RUN_DATA-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.bind-run-data@1` | FEAT-DATA-BIND_RUN_DATA | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-BIND_RUN_DATA | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| bind_run_data.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-BIND_RUN_DATA-001` | Resolve all primary/additional chart requirements into immutable observation/profile/calendar hashes and explicit coverage. | `AT-DATA-BIND_RUN_DATA-001` | Removing a required partition blocks admission; a current profile cannot silently replace the pinned historical version. |
+| PENDING | `FR-TRC-DATA-BIND_RUN_DATA-002` | Enforce observation/availability cutoff, warm-up and sample boundaries and report eligible recorded/generated source inputs. | `AT-DATA-BIND_RUN_DATA-002` | A later source correction or future observation is excluded; lack of warm-up/coverage is a typed failure. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-BIND_RUN_DATA-001` | Removing FEAT-DATA-BIND_RUN_DATA withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-BIND_RUN_DATA-001` | Disable and physically remove run_data_binding; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-bind-run-data): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/run_data_binding/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/run_data_binding/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-BIND_RUN_DATA/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.run_data_binding._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `external_series_alignment.py` | Align external numeric series without future visibility | `data_align_external_series`, `data_define_alignment_policy` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-DATA-ALIGN_SERIES` through `FeatureContext` and stage its declared providers/effects | `FEAT-DATA-ALIGN_SERIES` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-ALIGN_SERIES` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-DATA-ALIGN_SERIES` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-ALIGN_SERIES.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `external_series_alignment.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `external_series_alignment.py` — Align external numeric series without future visibility
-
-**File responsibility:** Align external numeric series without future visibility.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-ALIGN_EXTERNAL_SERIES` | Target | P1 | The system shall support external numeric series aligned by `exact`, `last_known`, or declared aggregation policy without future visibility. | `data_align_external_series` implementation trace | Read-only | A value timestamped after a decision event cannot affect that event under any policy. | FR-DATA-PIN_DATA_PROVENANCE, FR-STRAT-DEFINE_SERIES_SHIFTS | Specified §§16.5–16.6 | **Usage:** `app/services/data/external_series_alignment/external_series_alignment.py::__main__` scenario `FR-DATA-ALIGN_EXTERNAL_SERIES`<br>**Unit:** `tests/services/data/external_series_alignment/test_external_series_alignment.py::test_data_align_external_series()` |
-| Implemented | `FR-DATA-DEFINE_ALIGNMENT_POLICY` | Target | P0 | External aligned series shall declare alignment direction, maximum age, missing-value policy, timezone, and look-ahead prohibition. | `data_define_alignment_policy` implementation trace | Read-only | A fixture proves no value later than the decision timestamp becomes visible. | FR-DATA-RECORD_AGGREGATION_LINEAGE, FR-SIM-APPLY_SPREAD | Phase 2 baseline | **Usage:** `app/services/data/external_series_alignment/external_series_alignment.py::__main__` scenario `FR-DATA-DEFINE_ALIGNMENT_POLICY`<br>**Unit:** `tests/services/data/external_series_alignment/test_external_series_alignment.py::test_data_define_alignment_policy()` |
-
-**Rules:**
-
-- strategies requiring external series are inactive; native price series remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/external_series_alignment/external_series_alignment.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-BIND_RUN_DATA`. Withdraw `data.bind-run-data@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.7 `connector_synchronization/` — Connector Synchronization
+<a id="feat-data-align-series"></a>
+### 4.7 `external_series_alignment/` — `FEAT-DATA-ALIGN_SERIES`
 
-**Feature ID:** `FEAT-DATA-SYNC_CONNECTORS`
+> **Feature ID:** `FEAT-DATA-ALIGN_SERIES`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/external_series_alignment/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Plan, fetch, checkpoint, normalize, revise, and secure provider synchronization.
+#### Purpose
 
-**Deletion contract:** automatic synchronization is unavailable; file import remains if installed. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Align external series without look-ahead. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → connector_synchronization.py
-  → data_implement_connector_lifecycle, data_plan_incremental_sync, data_version_data_transforms, data_connect_data_providers, data_protect_connector_secrets
-  → requirement-defined output or structured failure
+**Provides:** `data.align-series@1`.
+
+**Required capabilities:**
+
+`data.bind-run-data@1` — [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-align-series) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-ALIGN_SERIES-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.align-series@1` | FEAT-DATA-ALIGN_SERIES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-ALIGN_SERIES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| align_series.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-ALIGN_SERIES-001` | Align by declared observation/availability timestamps, calendar, units and as-of join policy. | `AT-DATA-ALIGN_SERIES-001` | A higher-timeframe bar that has not closed cannot be joined into a lower-timeframe decision. |
+| PENDING | `FR-TRC-DATA-ALIGN_SERIES-002` | Preserve missing/stale/unsupported values and version every resampling or fill convention. | `AT-DATA-ALIGN_SERIES-002` | Gap fixtures never become valid zeroes; different alignment policies produce distinct artifact identities. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-ALIGN_SERIES-001` | Removing FEAT-DATA-ALIGN_SERIES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-ALIGN_SERIES-001` | Disable and physically remove external_series_alignment; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-align-series): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/external_series_alignment/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/external_series_alignment/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-ALIGN_SERIES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.external_series_alignment._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `connector_synchronization.py` | Plan, fetch, checkpoint, normalize, revise, and secure provider synchronization | `data_implement_connector_lifecycle`, `data_plan_incremental_sync`, `data_version_data_transforms`, `data_connect_data_providers`, `data_protect_connector_secrets` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-DATA-SYNC_CONNECTORS` through `FeatureContext` and stage its declared providers/effects | `FEAT-DATA-SYNC_CONNECTORS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-SYNC_CONNECTORS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-DATA-SYNC_CONNECTORS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-SYNC_CONNECTORS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `connector_synchronization.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `connector_synchronization.py` — Plan, fetch, checkpoint, normalize, revise, and secure provider synchronization
-
-**File responsibility:** Plan, fetch, checkpoint, normalize, revise, and secure provider synchronization.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE` | Target | P0 | Data connectors shall implement discover, describe, plan, fetch, checkpoint, normalize, and commit operations without bypassing the data-version lifecycle. | `data_implement_connector_lifecycle` implementation trace | Persistence write | A connector interruption resumes without duplicate rows or partial publication. | FR-DATA-PUBLISH_DATA_VERSIONS, FR-DATA-EXPORT_DATA_SERIES | Phase 2/4 baseline | **Usage:** `app/services/data/connector_synchronization/connector_synchronization.py::__main__` scenario `FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE`<br>**Unit:** `tests/services/data/connector_synchronization/test_connector_synchronization.py::test_data_implement_connector_lifecycle()` |
-| Implemented | `FR-DATA-PLAN_INCREMENTAL_SYNC` | Target | P0 | Incremental synchronization shall calculate an explicit requested range, overlap window, deduplication key, and revision policy. | `data_plan_incremental_sync` implementation trace | Read-only | Repeating the same synchronization is idempotent and yields the same committed hash when the source is unchanged. | FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE | Phase 4 connectors | **Usage:** `app/services/data/connector_synchronization/connector_synchronization.py::__main__` scenario `FR-DATA-PLAN_INCREMENTAL_SYNC`<br>**Unit:** `tests/services/data/connector_synchronization/test_connector_synchronization.py::test_data_plan_incremental_sync()` |
-| Implemented | `FR-DATA-VERSION_DATA_TRANSFORMS` | Target | P1 | Corporate actions and continuous-contract transformations shall be separate versioned transformations, never silent mutations of source data. | `data_version_data_transforms` implementation trace | None | Raw and transformed series remain independently reproducible and traceable. | FR-DATA-EXPORT_DATA_SERIES, FR-CAT-MAP_PROVIDER_IDENTITIES | Phase 4 specialized data | **Usage:** `app/services/data/connector_synchronization/connector_synchronization.py::__main__` scenario `FR-DATA-VERSION_DATA_TRANSFORMS`<br>**Unit:** `tests/services/data/connector_synchronization/test_connector_synchronization.py::test_data_version_data_transforms()` |
-| Implemented | `FR-DATA-CONNECT_DATA_PROVIDERS` | Adapter | P1 | Direct MT5 and additional provider connectors shall implement the connector contract, provider throttling, resumable cursors, revision detection, and canonical mapping. | `data_connect_data_providers` implementation trace | External API call | Provider outages or partial pages cannot publish incomplete data versions. | FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE, FR-CAT-MAP_PROVIDER_IDENTITIES | Phase 4 connectors | **Usage:** `app/services/data/connector_synchronization/connector_synchronization.py::__main__` scenario `FR-DATA-CONNECT_DATA_PROVIDERS`<br>**Unit:** `tests/services/data/connector_synchronization/test_connector_synchronization.py::test_data_connect_data_providers()` |
-| Implemented | `FR-DATA-PROTECT_CONNECTOR_SECRETS` | Target | P1 | Connector credentials shall be workspace secrets referenced by opaque IDs and unavailable to strategy, result-panel, and research-method processes. | `data_protect_connector_secrets` implementation trace | Event publication | Permission and log-leak tests pass. | FR-WS-CONFIGURE_WORKSPACE, FR-PLUG-RESTRICT_PLUGIN_SECRETS | Connector safety | **Usage:** `app/services/data/connector_synchronization/connector_synchronization.py::__main__` scenario `FR-DATA-PROTECT_CONNECTOR_SECRETS`<br>**Unit:** `tests/services/data/connector_synchronization/test_connector_synchronization.py::test_data_protect_connector_secrets()` |
-
-**Rules:**
-
-- automatic synchronization is unavailable; file import remains if installed. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/connector_synchronization/connector_synchronization.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-ALIGN_SERIES`. Withdraw `data.align-series@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.8 `tick_normalization/` — Tick Normalization
+<a id="feat-data-sync-connectors"></a>
+### 4.8 `connector_synchronization/` — `FEAT-DATA-SYNC_CONNECTORS`
 
-**Feature ID:** `FEAT-DATA-NORMALIZE_TICKS`
+> **Feature ID:** `FEAT-DATA-SYNC_CONNECTORS`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/connector_synchronization/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Preserve and normalize complete tick semantics.
+#### Purpose
 
-**Deletion contract:** tick precision modes are unavailable; bar modes remain if installed. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Resume bounded source synchronization. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → tick_normalization.py
-  → data_preserve_tick_fields
-  → requirement-defined output or structured failure
+**Provides:** `data.sync-connectors@1`.
+
+**Required capabilities:**
+
+`data.ingest-history@1` — [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history)<br>`orchestration.manage-jobs@1` — [`FEAT-ORCH-MANAGE_JOBS`](../orchestration/README.md#feat-orch-manage-jobs)<br>`broker.resolver@1` — [`FEAT-BRK-RESOLVE`](../brokers/README.md#feat-brk-resolve).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-sync-connectors) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-SYNC_CONNECTORS-001`, `FR-TRC-DATA-SYNC_CONNECTORS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.sync-connectors@1` | FEAT-DATA-SYNC_CONNECTORS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-SYNC_CONNECTORS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| sync_connectors.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-SYNC_CONNECTORS-001` | Plan source-specific date/instrument updates using exact provider support and finite resource/rate budgets. | `AT-DATA-SYNC_CONNECTORS-001` | An unsupported pause or range returns a per-item outcome; bulk commands resolve the authorized job set. |
+| PENDING | `FR-TRC-DATA-SYNC_CONNECTORS-002` | Checkpoint at declared provider boundaries and reconcile already published partitions before retry. | `AT-DATA-SYNC_CONNECTORS-002` | Disconnect after publication then resume: no partition or accepted observation is published twice. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-SYNC_CONNECTORS-001` | Removing FEAT-DATA-SYNC_CONNECTORS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-SYNC_CONNECTORS-001` | Disable and physically remove connector_synchronization; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-sync-connectors): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/connector_synchronization/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/connector_synchronization/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-SYNC_CONNECTORS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.connector_synchronization._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Complete | `tick_normalization.py` | Preserve and normalize complete tick semantics | `data_preserve_tick_fields` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Complete | `feature.py` | Mount `FEAT-DATA-NORMALIZE_TICKS` through `FeatureContext` and stage its declared providers/effects | `FEAT-DATA-NORMALIZE_TICKS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Complete | `manifest.py` | Define the immutable `FEAT-DATA-NORMALIZE_TICKS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-DATA-NORMALIZE_TICKS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Complete | `FEAT-DATA-NORMALIZE_TICKS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `tick_normalization.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `tick_normalization.py` — Preserve and normalize complete tick semantics
-
-**File responsibility:** Preserve and normalize complete tick semantics.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Complete | `FR-DATA-PRESERVE_TICK_FIELDS` | Parity | P0 | Tick normalization shall preserve bid, ask, last, volume, flags, source sequence, and duplicate timestamps where supplied. | `data_preserve_tick_fields` implementation trace | None | Tick fixtures round-trip without reordering equal timestamps. | FR-DATA-RESOLVE_QUALITY_FINDINGS | Priority-0 parity backlog | **Usage:** `app/services/data/tick_normalization/tick_normalization.py::__main__` scenario `FR-DATA-PRESERVE_TICK_FIELDS`<br>**Unit:** `tests/services/data/tick_normalization/test_tick_normalization.py::test_data_preserve_tick_fields()` |
-
-**Rules:**
-
-- tick precision modes are unavailable; bar modes remain if installed. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/tick_normalization/tick_normalization.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-SYNC_CONNECTORS`. Withdraw `data.sync-connectors@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.9 `profile_source_preparation/` — Volume Profile Source Preparation
+<a id="feat-data-normalize-ticks"></a>
+### 4.9 `tick_normalization/` — `FEAT-DATA-NORMALIZE_TICKS`
 
-**Feature ID:** `FEAT-DATA-PREPARE_PROFILES`
+> **Feature ID:** `FEAT-DATA-NORMALIZE_TICKS`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/tick_normalization/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Prepare validated session/bin inputs for volume profile and tpo.
+#### Purpose
 
-**Deletion contract:** profile indicators are unavailable; unrelated indicators remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Normalize recorded ticks while retaining source evidence. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → profile_source_preparation.py
-  → data_validate_profile_source
-  → requirement-defined output or structured failure
+**Provides:** `data.normalize-ticks@1`.
+
+**Required capabilities:**
+
+`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](../catalogue/README.md#feat-cat-catalog-instruments).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-normalize-ticks) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.normalize-ticks@1` | FEAT-DATA-NORMALIZE_TICKS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-NORMALIZE_TICKS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| normalize_ticks.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-NORMALIZE_TICKS-001` | Normalize timestamp resolution, source sequence, bid/ask/last atoms, volume meaning and masks without deduplicating equal-time updates. | `AT-DATA-NORMALIZE_TICKS-001` | Equal-time quote changes remain in source order; last-only data never gains fabricated bid/ask quotes. |
+| PENDING | `FR-TRC-DATA-NORMALIZE_TICKS-002` | Reject nonfinite/invalid prices and report source gaps and normalization policy in the immutable manifest. | `AT-DATA-NORMALIZE_TICKS-002` | Two runs over the same fixture and policy yield equal count/hash/order, including across chunk boundaries. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-NORMALIZE_TICKS-001` | Removing FEAT-DATA-NORMALIZE_TICKS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-NORMALIZE_TICKS-001` | Disable and physically remove tick_normalization; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-normalize-ticks): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/tick_normalization/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/tick_normalization/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-NORMALIZE_TICKS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.tick_normalization._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `profile_source_preparation.py` | Prepare validated session/bin inputs for volume profile and tpo | `data_validate_profile_source`, `PrepareProfilesService` | **Standard library:** `decimal`, `logging`, `uuid`, `typing`<br>**Required third-party:** None<br>**Local:** `app.contracts.data.*`, `app.contracts.common.models` |
-| Implemented | `feature.py` | Mount `FEAT-DATA-PREPARE_PROFILES` through `FeatureContext` and stage its declared providers/effects | `ProfileSourcePreparationFeature`, `feature` | **Standard library:** `decimal`, `typing`<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, `profile_source_preparation.py` |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-PREPARE_PROFILES` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `SPEC` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec`, `app.contracts.data.capabilities` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-PREPARE_PROFILES.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `profile_source_preparation.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `profile_source_preparation.py` — Prepare validated session/bin inputs for volume profile and tpo
-
-**File responsibility:** Prepare validated session/bin inputs for volume profile and tpo.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-VALIDATE_PROFILE_SOURCE` | Target | P0 | Volume Profile/TPO source preparation shall require tick or declared lower-granularity data, session boundaries, price-step/bin policy, and coverage diagnostics. | `data_validate_profile_source` implementation trace | Read-only | Insufficient precision or incomplete sessions fail or are explicitly marked according to policy. | FR-DATA-ORDER_MARKET_ROWS, FR-CAT-DEFINE_TRADING_SESSIONS | Phase 4 specialized data | **Usage:** `app/services/data/profile_source_preparation/profile_source_preparation.py::__main__` scenario `FR-DATA-VALIDATE_PROFILE_SOURCE`<br>**Unit:** `tests/services/data/profile_source_preparation/test_profile_source_preparation.py::test_data_validate_profile_source()` |
-
-**Rules:**
-
-- profile indicators are unavailable; unrelated indicators remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/profile_source_preparation/profile_source_preparation.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-NORMALIZE_TICKS`. Withdraw `data.normalize-ticks@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.10 `external_indicator_series/` — External Indicator Series
+<a id="feat-data-prepare-profiles"></a>
+### 4.10 `profile_source_preparation/` — `FEAT-DATA-PREPARE_PROFILES`
 
-**Feature ID:** `FEAT-DATA-IMPORT_INDICATORS`
+> **Feature ID:** `FEAT-DATA-PREPARE_PROFILES`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/profile_source_preparation/`
+> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Import and align immutable external-indicator values.
+#### Purpose
 
-**Deletion contract:** imported/precomputed external-indicator values and their alignment are unavailable; indicator definitions and built-in indicators remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Prepare eligible inputs for market profiles. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → external_indicator_series.py
-  → data_import_indicator_values
-  → requirement-defined output or structured failure
+**Provides:** `data.prepare-profiles@1`.
+
+**Required capabilities:**
+
+`data.bind-run-data@1` — [`FEAT-DATA-BIND_RUN_DATA`](#feat-data-bind-run-data)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-prepare-profiles) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-PREPARE_PROFILES-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.prepare-profiles@1` | FEAT-DATA-PREPARE_PROFILES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-PREPARE_PROFILES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| prepare_profiles.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-PREPARE_PROFILES-001` | Bind source type, quantity/volume meaning, sessions, price scale and bin-input coverage. | `AT-DATA-PREPARE_PROFILES-001` | Tick-volume and exchange-volume fixtures remain differently labelled and cannot be compared as identical evidence. |
+| PENDING | `FR-TRC-DATA-PREPARE_PROFILES-002` | Prepare bounded eligible session slices and identify gaps or incomplete support. | `AT-DATA-PREPARE_PROFILES-002` | Empty or partial sessions are reported explicitly; no invented volume enters the downstream calculation. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-PREPARE_PROFILES-001` | Removing FEAT-DATA-PREPARE_PROFILES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-PREPARE_PROFILES-001` | Disable and physically remove profile_source_preparation; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-prepare-profiles): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/profile_source_preparation/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/profile_source_preparation/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-PREPARE_PROFILES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.profile_source_preparation._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `external_indicator_series.py` | Import and align immutable external-indicator values | `ImportIndicatorsService`, `data_import_indicator_values` | **Standard library:** `asyncio`, `hashlib`, `logging`, `re`, `uuid`, `zoneinfo`<br>**Required third-party:** None<br>**Local:** `app.contracts.data.ports`, `app.contracts.data.models`, `app.contracts.data.errors`, `config.py` |
-| Implemented | `feature.py` | Mount `FEAT-DATA-IMPORT_INDICATORS` through `FeatureContext` and stage its declared providers/effects | `ExternalIndicatorSeriesFeature`, `feature` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, `external_indicator_series.py` |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-IMPORT_INDICATORS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `SPEC` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec`, `app.contracts.data.capabilities` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-IMPORT_INDICATORS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `external_indicator_series.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `external_indicator_series.py` — Import and align immutable external-indicator values
-
-**File responsibility:** Import and align immutable external-indicator values.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-IMPORT_INDICATOR_VALUES` | Adapter | P0 | Imported external-indicator values shall become immutable aligned data versions that record source artifact/hash, definition version, chart binding, coverage, alignment/missing-value policies, and synchronization diagnostics. | `data_import_indicator_values` implementation trace | Persistence write | Reimport is deterministic; gaps and timestamp mismatches are reported; no value calculated after a decision event is visible to that event. | FR-DATA-ALIGN_EXTERNAL_SERIES, FR-DATA-DEFINE_ALIGNMENT_POLICY, FR-STRAT-DEFINE_EXTERNAL_INDICATORS | [External indicators](https://strategyquant.com/doc/strategyquant/external-indicators/); Verified documentation | **Usage:** `app/services/data/external_indicator_series/external_indicator_series.py::__main__` scenario `FR-DATA-IMPORT_INDICATOR_VALUES`<br>**Unit:** `tests/services/data/external_indicator_series/test_external_indicator_series.py::test_data_import_indicator_values()` |
-
-**Rules:**
-
-- imported/precomputed external-indicator values and their alignment are unavailable; indicator definitions and built-in indicators remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/data/external_indicator_series/external_indicator_series.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-PREPARE_PROFILES`. Withdraw `data.prepare-profiles@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
----
+<a id="feat-data-import-indicators"></a>
+### 4.11 `external_indicator_series/` — `FEAT-DATA-IMPORT_INDICATORS`
 
-### 4.11 `synthetic_scenario_series/` — Synthetic and Scenario Series
+> **Feature ID:** `FEAT-DATA-IMPORT_INDICATORS`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/external_indicator_series/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Feature ID:** `FEAT-DATA-GENERATE_SCENARIOS`
+#### Purpose
 
-**Purpose:** Create seeded synthetic bars, ticks, and bounded scenario series with complete provenance.
+Import non-executable external indicator series. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Deletion contract:** Synthetic and scenario generation becomes unavailable while real historical and streaming market data remains unaffected. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+#### Capability Declarations
 
-**Module flow:**
+**Provides:** `data.import-indicators@1`.
 
-```text
-validated input and capability bindings
-  → synthetic_scenario_series.py
-  → GenerateScenariosService
-  → requirement-defined output or structured failure
+**Required capabilities:**
+
+`data.ingest-history@1` — [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history)<br>`data.align-series@1` — [`FEAT-DATA-ALIGN_SERIES`](#feat-data-align-series).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-indicators) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-IMPORT_INDICATORS-001`, `FR-TRC-DATA-IMPORT_INDICATORS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.import-indicators@1` | FEAT-DATA-IMPORT_INDICATORS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-IMPORT_INDICATORS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| import_indicators.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-IMPORT_INDICATORS-001` | Define/recognize a bounded external-series format and preview timestamp/value/unit/schema mappings. | `AT-DATA-IMPORT_INDICATORS-001` | Malformed or incompatible formats return diagnostic rows before publication; recognition does not execute embedded content. |
+| PENDING | `FR-TRC-DATA-IMPORT_INDICATORS-002` | Import/edit-by-new-version/view/delete through Data policy and retain the original artifact and conversion report. | `AT-DATA-IMPORT_INDICATORS-002` | An imported script payload stays opaque/rejected; source/version references and missing values survive round trip. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-IMPORT_INDICATORS-001` | Removing FEAT-DATA-IMPORT_INDICATORS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-IMPORT_INDICATORS-001` | Disable and physically remove external_indicator_series; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-indicators): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/external_indicator_series/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/external_indicator_series/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-IMPORT_INDICATORS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.external_indicator_series._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `synthetic_scenario_series.py` | Configure models, generate synthetic series, and transform scenarios | `GenerateScenariosService` | **Standard library:** `asyncio`, `datetime`, `decimal`, `hashlib`, `json`, `logging`, `random`, `re`, `typing`, `uuid`<br>**Required third-party:** None<br>**Local:** `app.contracts.data.ports`, `app.contracts.data.models`, `app.contracts.data.errors`, `config.py` |
-| Implemented | `feature.py` | Mount `FEAT-DATA-GENERATE_SCENARIOS` through `FeatureContext` and stage its declared providers/effects | `SyntheticScenarioSeriesFeature`, `feature` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, `synthetic_scenario_series.py` |
-| Implemented | `manifest.py` | Define the immutable `FEAT-DATA-GENERATE_SCENARIOS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `SPEC` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec`, `app.contracts.data.capabilities` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-IMPORT_INDICATORS`. Withdraw `data.import-indicators@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-DATA-GENERATE_SCENARIOS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `synthetic_scenario_series.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
+---
 
-#### `synthetic_scenario_series.py` — Create seeded synthetic bars, ticks, and bounded scenario series with complete provenance
+<a id="feat-data-generate-scenarios"></a>
+### 4.12 `synthetic_scenario_series/` — `FEAT-DATA-GENERATE_SCENARIOS`
 
-**File responsibility:** Configure models, generate synthetic series, and transform scenarios.
+> **Feature ID:** `FEAT-DATA-GENERATE_SCENARIOS`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/synthetic_scenario_series/`
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-CONFIGURE_SYNTHETIC_MODEL` | Target | P1 | Synthetic generation shall accept an explicit versioned model, exact parameters, time grid, instrument/unit metadata, and named seed/RNG streams. | `GenerateScenariosService._configure_model` | None | Same manifest produces byte-identical canonical output and lineage. | WS, CAT | Data synthetic feature | **Usage:** `app/services/data/synthetic_scenario_series/synthetic_scenario_series.py::__main__` scenario `FR-DATA-CONFIGURE_SYNTHETIC_MODEL`<br>**Unit:** `tests/services/data/synthetic_scenario_series/test_synthetic_scenario_series.py::test_configure_model_success()` |
-| Implemented | `FR-DATA-GENERATE_SYNTHETIC_SERIES` | Target | P1 | The feature shall generate internally consistent OHLCV bars and/or ordered ticks only for model types whose invariants and limits are declared. | `GenerateScenariosService._generate_series` | None | Price/volume/time invariants and independent statistical fixtures pass; invalid parameters reject. | FR-DATA-CONFIGURE_SYNTHETIC_MODEL | Data synthetic feature | **Usage:** `app/services/data/synthetic_scenario_series/synthetic_scenario_series.py::__main__` scenario `FR-DATA-GENERATE_SYNTHETIC_SERIES`<br>**Unit:** `tests/services/data/synthetic_scenario_series/test_synthetic_scenario_series.py::test_generate_synthetic_series_reproducibility()` |
-| Implemented | `FR-DATA-TRANSFORM_SCENARIO_DATA` | Target | P1 | Scenario transforms shall apply bounded declared shocks, gaps, volatility/liquidity changes, outages, or missingness to an immutable source version without mutating it. | `GenerateScenariosService._transform_scenario` | Persistence write | The output pins source hash, transform order, parameters, seed, and algorithm version. | FR-DATA-IMPORT_CSV_DATA, FR-DATA-CONFIGURE_SYNTHETIC_MODEL | Scenario/replay evidence | **Usage:** `app/services/data/synthetic_scenario_series/synthetic_scenario_series.py::__main__` scenario `FR-DATA-TRANSFORM_SCENARIO_DATA`<br>**Unit:** `tests/services/data/synthetic_scenario_series/test_synthetic_scenario_series.py::test_transform_scenario_data()` |
-| Implemented | `FR-DATA-CLASSIFY_SYNTHETIC_DATA` | Target | P1 | Synthetic/scenario versions shall be visibly classified and cannot satisfy a requirement for observed provider evidence unless that consumer explicitly permits them. | `GenerateScenariosService.generate_scenarios` | None | Admission tests prevent synthetic data from masquerading as live/historical authority. | FR-DATA-PUBLISH_DATA_VERSIONS, FR-DATA-DETECT_DATA_QUALITY | Provenance rule | **Usage:** `app/services/data/synthetic_scenario_series/synthetic_scenario_series.py::__main__` scenario `FR-DATA-CLASSIFY_SYNTHETIC_DATA`<br>**Unit:** `tests/services/data/synthetic_scenario_series/test_synthetic_scenario_series.py::test_classify_synthetic_data()` |
+#### Purpose
 
-**Rules:**
+Publish synthetic market-data scenarios. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-- Synthetic and scenario generation becomes unavailable while real historical and streaming market data remains unaffected. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- No business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`.
+#### Capability Declarations
 
-#### Feature usage examples
+**Provides:** `data.generate-scenarios@1`.
 
-The primary domain-logic module `app/services/data/synthetic_scenario_series/synthetic_scenario_series.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+**Required capabilities:**
 
-### 4.12 `economic_news_evidence/` — Economic Calendar and News Evidence
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
 
-**Feature ID:** `FEAT-DATA-TRACK_MARKET_NEWS`
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-generate-scenarios) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Purpose:** Preserve point-in-time economic/news observations, revisions, coverage, freshness, and restriction evidence.
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
 
-**Deletion contract:** Research, Trading, or Risk features requiring this evidence fail closed; other data remains available.
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
-| Status | Requirement ID | Class | Pri | Responsibility | Side Effects | Failure / acceptance | Depends | Source / confidence |
-|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-RECORD_NEWS_OBSERVATIONS` | Target | P1 | Economic/news observations shall preserve source, provider event/article ID, first-seen and retrieved UTC times, scheduled/published time, currency/instrument scope, category, impact, language, and exact source payload hash. | Persistence write | Missing or unsupported fields remain explicit; duplicates preserve source identity. | WS, CAT | Economic calendar/news |
-| Implemented | `FR-DATA-VERSION_NEWS_REVISIONS` | Target | P1 | Revisions, cancellations, reschedules, actual/forecast/previous values, and visibility times shall be versioned so point-in-time queries never expose information before it was observed. | Persistence write | Lookahead fixtures across revisions return only then-visible fields. | FR-DATA-RECORD_NEWS_OBSERVATIONS | Calendar revision semantics |
-| Implemented | `FR-DATA-QUERY_MARKET_NEWS` | Target | P1 | Queries shall declare `as_of`, event interval, source/category/language/impact filters, timezone projection, coverage, and freshness policy. | Read-only | Incomplete coverage or stale evidence is returned explicitly and can fail closed by policy. | FR-DATA-RECORD_NEWS_OBSERVATIONS, FR-DATA-VERSION_NEWS_REVISIONS | Point-in-time evidence |
-| Implemented | `FR-DATA-PROJECT_TRADE_RESTRICTIONS` | Target | P1 | Data shall produce a versioned non-authorizing restriction-evidence projection for Strategy/Research/Risk/Trading, including applicable windows, cause, evidence refs, and uncertainty. | None | The projection never places, cancels, or approves an order. | FR-DATA-QUERY_MARKET_NEWS, FR-CAT-DEFINE_TRADING_SESSIONS, FR-CAT-DEFINE_MARKET_CALENDARS, FR-CAT-PREVIEW_TRADING_INTERVALS | News-restriction evidence |
-| Implemented | `FR-DATA-GOVERN_NETWORK_IMPORTS` | Adapter | P1 | Network acquisition shall be bounded, licensed, rate-limited, checkpointed, redacted, and publish no committed revision until schema, timestamp, and provenance validation pass. | External API call; Persistence write | Partial pages or source failure preserve prior versions and emit findings. | FR-DATA-REPORT_IMPORT_COUNTS, FR-DATA-IMPLEMENT_CONNECTOR_LIFECYCLE, FR-DATA-PLAN_INCREMENTAL_SYNC, PLUG | Source governance |
+#### Feature Configuration & Limits Manifest
 
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-#### Feature usage examples
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-GENERATE_SCENARIOS-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
-The primary domain-logic module `app/services/data/economic_news_evidence/economic_news_evidence.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+#### Runtime Effects & Scope Disposal
 
-### 4.13 `realtime_market_events/` — Real-Time Market Events
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.generate-scenarios@1` | FEAT-DATA-GENERATE_SCENARIOS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-GENERATE_SCENARIOS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
 
-**Feature ID:** `FEAT-DATA-STREAM_MARKET_EVENTS`
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
-**Purpose:** Normalize genuine live quotes, ticks, depth, status events, feed lifecycle, bounded buffering, gaps, and reconnect evidence.
+#### Persistent State Ownership
 
-**Deletion contract:** Live monitoring and operational consumers degrade; historical data remains available.
+**Ownership class:** Feature-owned semantic state.
 
-| Status | Requirement ID | Class | Pri | Responsibility | Side Effects | Failure / acceptance | Depends | Source / confidence |
-|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-NORMALIZE_LIVE_EVENTS` | Target | P0 | Real-time events shall normalize genuine provider quotes, ticks, depth updates, market status, and heartbeats while preserving provider identity, sequence where supplied, event time, receipt time, exact values/units, and raw hash. | Event publication | No bid/ask/last/depth/sequence is invented; missingness remains explicit. | CAT, BRK | Market events |
-| Implemented | `FR-DATA-TRACK_FEED_STATE` | Target | P0 | Feed state shall distinguish connecting, live, delayed, stale, gap, reconnecting, failed, and stopped with generation and freshness evidence. | Event publication; Local state mutation | A boolean connected flag cannot satisfy readiness. | FR-DATA-NORMALIZE_LIVE_EVENTS | Feed lifecycle |
-| Implemented | `FR-DATA-ORDER_LIVE_EVENTS` | Target | P0 | Event ordering shall use provider sequence when trustworthy and otherwise a declared deterministic receipt ordering; duplicates, late events, and gaps remain observable. | None | Repeated ingestion yields the same accepted order and finding set for the same input trace. | FR-DATA-NORMALIZE_LIVE_EVENTS | Event normalization |
-| Implemented | `FR-DATA-BOUND_EVENT_BUFFERS` | Target | P0 | Buffers, subscriptions, symbols, depth, throughput, and retention shall be explicitly bounded with backpressure policy. | Local state mutation | Overflow emits a gap/resync finding and never silently drops critical state. | WS limits | Bounded streaming |
-| Implemented | `FR-DATA-RECONNECT_MARKET_FEEDS` | Target | P0 | Reconnect shall create a new generation, restore declared subscriptions, reconcile snapshot/cursor state, and expose any uncovered interval. | External API call; Event publication | Consumers cannot treat the feed as live until resynchronization succeeds. | FR-DATA-TRACK_FEED_STATE, FR-BRK-RECONNECT_SESSIONS | Reconnection |
-| Implemented | `FR-DATA-RECORD_MARKET_REPLAYS` | Target | P1 | Optional event recording/replay shall write immutable bounded partitions with sequence/time/hash metadata and replay them without claiming they are current live evidence. | Persistence write | Replay reproduces normalized events and findings; identity remains `RECORDED_REPLAY`. | FR-DATA-NORMALIZE_LIVE_EVENTS, FR-DATA-TRACK_FEED_STATE, FR-DATA-ORDER_LIVE_EVENTS, FR-DATA-BOUND_EVENT_BUFFERS, FR-DATA-RECONNECT_MARKET_FEEDS | Replay |
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
 
-#### Feature usage examples
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
 
-The primary domain-logic module `app/services/data/realtime_market_events/realtime_market_events.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
 
-### 4.14 `quantdata_manager_source/` — QuantDataManager Source
+#### Feature Package Structure & Files
 
-**Feature ID:** `FEAT-DATA-IMPORT_QUANTDATA`
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| generate_scenarios.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
 
-**Purpose:** Discover and decode governed StrategyQuant QuantDataManager M1/tick files and synchronize reference metadata.
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
 
-**Deletion contract:** This source disappears independently; all other connectors continue.
+#### Functional Requirements (FR)
 
-| Status | Requirement ID | Class | Pri | Responsibility | Side Effects | Failure / acceptance | Depends | Source / confidence |
-|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-DATA-DISCOVER_QUANTDATA_SERIES` | Adapter | P1 | The source shall discover QuantDataManager instruments/series from an explicit allowed root and preserve source-relative identity, broker, symbol, timeframe, date coverage, and file metadata. | Filesystem read | Paths outside the allowed root, ambiguous layouts, and unsupported versions reject. | WS paths, CAT | Feature evidence |
-| Implemented | `FR-DATA-DECODE_QUANTDATA_FILES` | Adapter | P1 | Versioned decoders shall read supported QuantDataManager M1 and tick `.dat` records into exact normalized candidate records without using undocumented-field guesses. | Filesystem read | Malformed/truncated/unsupported records produce bounded offset diagnostics and no committed version. | FR-DATA-REGISTER_DATA_CONNECTIONS, FR-DATA-IMPORT_CSV_DATA, FR-DATA-PUBLISH_DATA_VERSIONS, FR-DATA-PIN_DATA_PROVENANCE | QuantDataManager decoder |
-| Implemented | `FR-DATA-SYNC_QUANTDATA_CATALOGUE` | Adapter | P1 | Synchronization shall map discovered series and broker metadata through Catalogue public capabilities and commit Data versions only after quality, unit, timezone, ordering, coverage, and checksum gates pass. | Persistence write | Catalogue/Data commits are staged and reconciled; partial cross-domain state is not visible. | FR-CAT-DEFINE_INSTRUMENTS, FR-CAT-VERSION_INSTRUMENTS, FR-CAT-MAP_BROKER_SYMBOLS, FR-DATA-REGISTER_DATA_CONNECTIONS, FR-DATA-IMPORT_CSV_DATA, FR-DATA-PUBLISH_DATA_VERSIONS, FR-DATA-PIN_DATA_PROVENANCE, FR-DATA-DETECT_DATA_QUALITY, FR-DATA-RESOLVE_QUALITY_FINDINGS, FR-DATA-VALIDATE_OHLC_BARS, FR-DATA-ORDER_MARKET_ROWS | Reference synchronization |
-| Implemented | `FR-DATA-RECORD_QUANTDATA_LINEAGE` | Adapter | P1 | Every imported version shall retain source root identity, relative paths, file size/mtime/content hash, decoder version, mapping versions, and import manifest. | Persistence write | Any changed input or decoder produces a distinct version hash and reproducible diagnostic. | FR-DATA-DISCOVER_QUANTDATA_SERIES, FR-DATA-DECODE_QUANTDATA_FILES, FR-DATA-SYNC_QUANTDATA_CATALOGUE | Provenance |
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-GENERATE_SCENARIOS-001` | Generate bounded scenario series from explicit method/version/seed/units/gap parameters. | `AT-DATA-GENERATE_SCENARIOS-001` | The same seed/configuration yields the same series hash; changing a parameter creates a new version. |
+| PENDING | `FR-TRC-DATA-GENERATE_SCENARIOS-002` | Mark source/evidence class as synthetic and preserve full construction metadata through Data binding and exports. | `AT-DATA-GENERATE_SCENARIOS-002` | A synthetic fixture cannot be displayed or qualified as recorded market history. |
 
-#### Feature usage examples
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
-The primary domain-logic module `app/services/data/quantdata_manager_source/quantdata_manager_source.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+#### Non-Functional Requirements (Local)
 
-### Specialized capability verification
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-GENERATE_SCENARIOS-001` | Removing FEAT-DATA-GENERATE_SCENARIOS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-GENERATE_SCENARIOS-001` | Disable and physically remove synthetic_scenario_series; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
-- Focused automated tests and named executable-usage scenarios cover `FR-DATA-CONFIGURE_SYNTHETIC_MODEL, FR-DATA-GENERATE_SYNTHETIC_SERIES, FR-DATA-TRANSFORM_SCENARIO_DATA, FR-DATA-CLASSIFY_SYNTHETIC_DATA, FR-DATA-RECORD_NEWS_OBSERVATIONS, FR-DATA-VERSION_NEWS_REVISIONS, FR-DATA-QUERY_MARKET_NEWS, FR-DATA-PROJECT_TRADE_RESTRICTIONS, FR-DATA-GOVERN_NETWORK_IMPORTS, FR-DATA-NORMALIZE_LIVE_EVENTS, FR-DATA-TRACK_FEED_STATE, FR-DATA-ORDER_LIVE_EVENTS, FR-DATA-BOUND_EVENT_BUFFERS, FR-DATA-RECONNECT_MARKET_FEEDS, FR-DATA-RECORD_MARKET_REPLAYS, FR-DATA-DISCOVER_QUANTDATA_SERIES, FR-DATA-DECODE_QUANTDATA_FILES, FR-DATA-SYNC_QUANTDATA_CATALOGUE, FR-DATA-RECORD_QUANTDATA_LINEAGE`.
-- Synthetic and replay fixtures prove determinism and classification.
-- Economic/news fixtures prove revision-time visibility and coverage behavior.
-- Streaming fixtures cover duplicates, late events, gaps, overflow, reconnect, and stale feed state.
-- QuantDataManager fixtures cover supported versions plus malformed, truncated, path-escape, timezone, ordering, and checksum cases.
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-generate-scenarios): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/synthetic_scenario_series/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/synthetic_scenario_series/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-GENERATE_SCENARIOS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.synthetic_scenario_series._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-GENERATE_SCENARIOS`. Withdraw `data.generate-scenarios@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-data-track-market-news"></a>
+### 4.13 `economic_news_evidence/` — `FEAT-DATA-TRACK_MARKET_NEWS`
+
+> **Feature ID:** `FEAT-DATA-TRACK_MARKET_NEWS`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/economic_news_evidence/`
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Supply governed point-in-time document evidence. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `data.track-market-news@1`.
+
+**Required capabilities:**
+
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-track-market-news) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-TRACK_MARKET_NEWS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.track-market-news@1` | FEAT-DATA-TRACK_MARKET_NEWS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-TRACK_MARKET_NEWS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| track_market_news.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-TRACK_MARKET_NEWS-001` | Register allowed source classes and retain observation, publication/availability, revision, licensing, trust, asset applicability and content hashes. | `AT-DATA-TRACK_MARKET_NEWS-001` | A revised document unavailable at the requested cutoff is excluded; absent/inapplicable evidence returns typed coverage reasons. |
+| PENDING | `FR-TRC-DATA-TRACK_MARKET_NEWS-002` | Return bounded authorized evidence projections without secrets, executable instructions or cross-account material. | `AT-DATA-TRACK_MARKET_NEWS-002` | Injected source text stays untrusted evidence; unauthorized sources cannot be fetched by a role naming a URL. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-TRACK_MARKET_NEWS-001` | Removing FEAT-DATA-TRACK_MARKET_NEWS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-TRACK_MARKET_NEWS-001` | Disable and physically remove economic_news_evidence; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-track-market-news): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/economic_news_evidence/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/economic_news_evidence/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-TRACK_MARKET_NEWS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.economic_news_evidence._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-TRACK_MARKET_NEWS`. Withdraw `data.track-market-news@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-data-stream-market-events"></a>
+### 4.14 `realtime_market_events/` — `FEAT-DATA-STREAM_MARKET_EVENTS`
+
+> **Feature ID:** `FEAT-DATA-STREAM_MARKET_EVENTS`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/realtime_market_events/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Expose bounded normalized real-time observations. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `data.stream-market-events@1`.
+
+**Required capabilities:**
+
+`broker.resolver@1` — [`FEAT-BRK-RESOLVE`](../brokers/README.md#feat-brk-resolve)<br>`data.normalize-ticks@1` — [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-stream-market-events) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-STREAM_MARKET_EVENTS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.stream-market-events@1` | FEAT-DATA-STREAM_MARKET_EVENTS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-STREAM_MARKET_EVENTS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| stream_market_events.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-STREAM_MARKET_EVENTS-001` | Stream normalized source events with stable identity/sequence, observed time, source and freshness status. | `AT-DATA-STREAM_MARKET_EVENTS-001` | Out-of-order/gap/reconnect fixtures preserve ordering diagnostics; a disconnected source becomes stale/unavailable, not frozen-live. |
+| PENDING | `FR-TRC-DATA-STREAM_MARKET_EVENTS-002` | Bound subscribers and coalesce presentation updates without thinning the authoritative execution stream. | `AT-DATA-STREAM_MARKET_EVENTS-002` | A slow widget receives bounded updates; removing it disposes its subscription without stopping other consumers. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-STREAM_MARKET_EVENTS-001` | Removing FEAT-DATA-STREAM_MARKET_EVENTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-STREAM_MARKET_EVENTS-001` | Disable and physically remove realtime_market_events; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-stream-market-events): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/realtime_market_events/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/realtime_market_events/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-STREAM_MARKET_EVENTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.realtime_market_events._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-STREAM_MARKET_EVENTS`. Withdraw `data.stream-market-events@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-data-import-quantdata"></a>
+### 4.15 `quantdata_manager_source/` — `FEAT-DATA-IMPORT_QUANTDATA`
+
+> **Feature ID:** `FEAT-DATA-IMPORT_QUANTDATA`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/quantdata_manager_source/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Import QuantDataManager source artifacts. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `data.import-quantdata@1`.
+
+**Required capabilities:**
+
+`data.ingest-history@1` — [`FEAT-DATA-INGEST_HISTORY`](#feat-data-ingest-history)<br>`data.normalize-ticks@1` — [`FEAT-DATA-NORMALIZE_TICKS`](#feat-data-normalize-ticks).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-quantdata) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/capabilities.py`](../../contracts/data/capabilities.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-IMPORT_QUANTDATA-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.import-quantdata@1` | FEAT-DATA-IMPORT_QUANTDATA | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-IMPORT_QUANTDATA | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| import_quantdata.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-IMPORT_QUANTDATA-001` | Inspect supported QDM tick/bar artifacts with explicit version, symbol, timezone, precision and coverage mapping. | `AT-DATA-IMPORT_QUANTDATA-001` | Unknown layouts are unavailable/opaque; a supported fixture preserves count, timestamp and price/volume semantics. |
+| PENDING | `FR-TRC-DATA-IMPORT_QUANTDATA-002` | Delegate normalized publication to Data ingestion/store and retain a complete conversion receipt. | `AT-DATA-IMPORT_QUANTDATA-002` | Reimport is idempotent; cancellation/corruption produces no partially available dataset. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-IMPORT_QUANTDATA-001` | Removing FEAT-DATA-IMPORT_QUANTDATA withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-IMPORT_QUANTDATA-001` | Disable and physically remove quantdata_manager_source; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-import-quantdata): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/quantdata_manager_source/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/quantdata_manager_source/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-IMPORT_QUANTDATA/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.quantdata_manager_source._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-IMPORT_QUANTDATA`. Withdraw `data.import-quantdata@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-data-browse-reference"></a>
+### 4.16 `browse_reference/` — `FEAT-DATA-BROWSE_REFERENCE`
+
+> **Feature ID:** `FEAT-DATA-BROWSE_REFERENCE`
+> **Domain:** `data`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/data/browse_reference/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Browse one coherent data/reference projection. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `data.browse-reference@1`.
+
+**Required capabilities:**
+
+`data.market-data-store@1` — [`FEAT-DATA-MARKET_DATA_STORE`](#feat-data-market-data-store)<br>`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](../catalogue/README.md#feat-cat-catalog-instruments)<br>`catalogue.map-providers@1` — [`FEAT-CAT-MAP_PROVIDERS`](../catalogue/README.md#feat-cat-map-providers)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](../catalogue/README.md#feat-cat-define-sessions).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-browse-reference) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/data/browse_reference.py`](../../contracts/data/browse_reference.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-DATA-BROWSE_REFERENCE-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `data.browse-reference@1` | FEAT-DATA-BROWSE_REFERENCE | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-DATA-BROWSE_REFERENCE | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable raw and derived dataset versions and manifests; conserved ingestion/quality/synchronization receipts; exact run bindings; synthetic/evidence provenance; retention and reference metadata. Workspace provides byte custody without interpreting market semantics.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| browse_reference.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-DATA-BROWSE_REFERENCE-001` | Return cursor-paged series metadata and Catalogue references with all §12.2 grid fields and explicit unavailable/partial states. | `AT-DATA-BROWSE_REFERENCE-001` | Changing page/sort preserves row identity and snapshot; missing downstream providers are named. |
+| PENDING | `FR-TRC-DATA-BROWSE_REFERENCE-002` | Expose only supported import/download/quality/clone/export/batch operations and their owner schemas. | `AT-DATA-BROWSE_REFERENCE-002` | No offered action bypasses owner validation or manufactures a successful receipt when the provider is absent. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-DATA-BROWSE_REFERENCE-001` | Removing FEAT-DATA-BROWSE_REFERENCE withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-DATA-BROWSE_REFERENCE-001` | Disable and physically remove browse_reference; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-data-browse-reference): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/data/browse_reference/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/data/browse_reference/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-DATA-BROWSE_REFERENCE/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.data.browse_reference._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-DATA-BROWSE_REFERENCE`. Withdraw `data.browse-reference@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
 ## 5. Package-Wide Requirements, Configuration, and Architecture Invariants
 
-### Timeframe representation
+| ID | Category | Rule / architectural constraint | Verification |
+| --- | --- | --- | --- |
+| ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
+| ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
+| ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
 
-Data owns `ENUM_TIMEFRAMES` and the exact `PERIOD_*` values for standard
-periods. Internal standard-period selection and comparison use those contracts.
-The richer `Timeframe` model remains authoritative for validated custom
-positive multiples. HTTP/configuration input, persisted partition metadata,
-file names, and provider payloads retain stable string encodings only at their
-explicit parse/serialization boundaries.
-
-### Persistence - Database
-
-The domain-owned table namespace is `data_`. The authoritative logical entities are: data_series, data_series_versions, quality_findings, external_indicator_series_versions. Universal representation and persistence rules are owned by `app/contracts/README.md` §§15 and 23.12; Data-specific storage semantics remain here.
-
-Migration definitions shall live in The owning feature's `StateDeclaration` and migration/storage adapter. Only this domain may write its tables; other domains use the public capability contracts in Section 1.
-
-### Shared Configuration
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `[features.FEAT-*].config` | Strict TOML feature configuration | Feature-owned defaults only | Per feature | The owning feature | Accepted keys match `FeatureSpec.config_keys` and `config.py`; provider choice belongs in `[providers]`. |
-
-### Non-Functional Requirements
-
-No domain-private NFR IDs are introduced. The following project-owned requirements apply without duplication:
-
-| Status | Requirement ID | Type | Responsibility | Verification |
-|---|---|---|---|---|
-| Missing | `FR-KERN-DEFINE_REQUIREMENT_BEHAVIOR, FR-KERN-DEFINE_LIFECYCLE_CONTEXT, FR-KERN-DECLARE_BEHAVIOR_DEPENDENCIES, FR-KERN-REGISTER_FEATURE_MODULES, FR-KERN-DEFINE_RESPONSIBILITY_FILES, FR-KERN-IMPLEMENT_REQUIREMENT_FUNCTIONS, FR-KERN-DEPEND_PUBLIC_PORTS, FR-KERN-NAMESPACE_CAPABILITY_KEYS, FR-KERN-DECLARE_DEPENDENCY_RULES, FR-KERN-REEVALUATE_DEPENDENCIES, FR-KERN-DEFINE_SCOPE_HIERARCHY, FR-KERN-PASS_EFFECT_SCOPES, FR-KERN-REGISTER_EFFECT_REVERSALS, FR-KERN-REVERSE_EFFECTS_LIFO, FR-KERN-ROLLBACK_FAILED_ACTIVATION, FR-KERN-MANAGE_COMPONENT_LIFECYCLE, FR-KERN-COMMIT_CAPABILITY_SWAP, FR-KERN-QUIESCE_DEPENDENT_WORK, FR-KERN-REMOVE_DEPENDENT_COMPONENTS, FR-KERN-ISOLATE_DISPOSAL_FAILURES, FR-KERN-RECONCILE_DESIRED_STATE, FR-KERN-REPLACE_COMPONENTS_TRANSACTIONALLY, FR-KERN-PROVIDE_SCOPED_REGISTRARS, FR-KERN-DRAIN_REMOVED_BEHAVIORS, FR-KERN-CLASSIFY_COMPONENT_EFFECTS, FR-KERN-NAMESPACE_COMPONENT_STATE, FR-KERN-REGISTER_EXTENSION_POINTS, FR-KERN-EMIT_CAUSAL_EVENTS, FR-KERN-REJECT_DEPENDENCY_CYCLES, FR-KERN-PIN_CAPABILITY_SNAPSHOTS, FR-KERN-TEST_COMPONENT_REMOVAL, FR-KERN-VERIFY_EXACT_REMOVAL, FR-KERN-ROUTE_MULTIPLE_PROVIDERS` | Architecture | Spatiotemporal composition, deletion, lifecycle, dependency, HMR, effect, and fixture guarantees. | Composition/deletion matrix |
-| Missing | `NFR-DET-*` | Determinism | Applicable deterministic behavior reproduces under pinned inputs and versions. | Determinism corpus |
-| Missing | `NFR-DUR-*` | Durability | Committed state, recovery, leases, checkpoints, and retained metadata follow system rules. | Fault/recovery corpus |
-| Missing | `NFR-PERF-*` | Performance | Applicable latency, throughput, memory, and benchmark gates pass. | Named performance corpus |
-| Missing | `NFR-ISO-*` | Isolation | Processes, permissions, paths, secrets, and workspace boundaries remain isolated. | Security/isolation corpus |
-| Missing | `NFR-OBS-*` | Observability | Operations emit causal, redacted logs/events/metrics/traces. | Lineage reconstruction |
-| Missing | `NFR-COMP-*` | Compatibility | Public contracts, schemas, packages, and providers evolve through declared compatibility rules. | Compatibility corpus |
-
----
+| Policy | Binding requirement | Verification |
+| --- | --- | --- |
+| Focused responsibility | Each file has one focused responsibility; feature identity is not split by algorithm variant, workflow, role or test. | Review and module/ownership checks. |
+| Type safety | Follow the template’s Python 3.14 strict-typing target and reconcile the actual repository/lockfile runtime in Phase 0; no type-ignore bypasses. UI follows the existing strict TypeScript build. | mypy / TypeScript checks against the ratified environment. |
+| Coverage | At least 80% line and branch coverage, retaining any stronger applicable repository or owner floor. | Actual coverage reports at the approved quality boundary. |
+| Configuration parity | Exact accepted keys agree between strict config, manifest and feature-local README; request/profile controls do not become implicit feature settings. | Positive/negative parsing and parity fixtures. |
+| Numerical / resource truth | Use the domain-specific §9 rules, exact source algorithms, finite admission and explicit measurement fixtures. Targets are not measurements. | Golden, causal, overflow, bounded-memory and native/reference evidence where applicable. |
+| Scope and authority | Identity, environment, account, dataset, approval and receiver boundaries are rechecked by their actual owners. | Wrong-scope, stale, refusal, idempotency and removal tests. |
+| Shared NFR applicability | Apply only the exact shared-NFR bindings of each source feature card; all applicable requirements remain mandatory. | Expanded per-feature acceptance mapping, not a blanket global pass. |
 
 ## 6. Open Decisions
 
-None. Any behavior not specified by this README and the normative project appendices is unsupported and must fail capability validation rather than be guessed.
+The following are explicit documentary/implementation-entry gaps, not deferred permission to invent a design. Resolve the affected binding before production use. This documentation delivery does not close Preparation 0.03 or certify Phase 1 entry.
 
----
+| State | Decision / evidence label | Required resolution | Constraints | Impact |
+| --- | --- | --- | --- | --- |
+| OPEN | SOURCE-RECONCILIATION | Reconcile clause-level differences among the register’s source specification, the plan’s inspected specification and the current fetched specification. | Retain the supplied 205-feature identity set unless explicitly changed; differing hashes are not a semantic diff. | All source-dependent behavior. |
+| OPEN | EVD-CONTRACT-01 | Bind exact current protocol/DTO symbols, callable signatures, error branches, accepted config keys/defaults and literal state namespace/schema/driver. | Reuse compatible existing public contracts; no duplicate owner or invented field. Source-selected capability keys and target modules are retained here. | Each affected feature before its production consumer. |
+| OPEN | CURRENT-OWNER-BINDING | Reconcile selected target paths, compatible existing aliases, unrelated domain scope and actual implementation progress. | No automatic rename, overwrite of unrelated README entries or assumption that a missing target folder means missing behavior. | All target owners; especially legacy semantic folders and permanent UI IDs. |
+| OPEN | FIXTURE-AND-USAGE-BINDING | Pin concrete deterministic request/response fixtures, intended test symbols and runnable `_usage.py` or UI examples. | Use every existing acceptance oracle; a planned command or path is not a passing example. | Every feature acceptance bundle. |
+| OPEN | NUMERICAL-AND-EXTERNAL-EVIDENCE | Ratify exact algorithm/version, golden fixture, supported format/provider/target and runtime/toolchain evidence for the affected operation. | Do not invent production generated-tick paths, donor binary formats, licenses, toolchain results or numerical pass measurements. | Only the affected numerical/external operation; retain release gates. |
+| OPEN | OPERATION-QUALIFICATION | Expand applicable shared-NFR/catalogue/source/operation tables into the actual per-feature evidence manifest and qualify real providers. | Complete registered adapter behavior once; an absent later provider gates only affected operations. Contract stubs are not real-provider evidence. | Applicable later-operation and release claims. |
+| CLOSED — documentary scope | IDENTITY-AND-BOUNDARY | Use the register feature/FR/local-NFR identities and exact primary-capability / required-provider bindings. | No additional feature for roles, algorithms, workflows, tests, performance or later UI integration. | The selected features in §2. |
 
 ## 7. Tests and Definition of Done
 
-### Test and usage locations
+### Test Suite Structure
 
-```text
-tests/services/data/
-└── <feature>/                 # feature automated verification
-```
+Focused feature tests live at the intended owners named in §4. Add config, manifest, lifecycle, failure, boundary, numerical and replay coverage where applicable. Cross-feature contract, composition, Interfaces, browser, accessibility, physical-removal and leak evidence remains independent of feature unit tests. Do not mislabel an offline fixture as production integration.
 
 ### Commands
 
-```bash
-uv run ruff check app/services/data
-uv run ruff format --check app/services/data
-uv run mypy app/services/data
-uv run pytest tests/services/data/<feature>/
-uv run pytest tests/data --cov=app/services/data --cov-fail-under=80
+The following are target verification recipes. Bind actual paths and runner scripts before use; none is reported as executed by this documentation delivery.
+
+```powershell
+uv run --frozen pytest --no-cov tests/services/data/historical_data_ingestion
+uv run --frozen ruff format --check .
+uv run --frozen ruff check .
+uv run --frozen mypy
+uv run --frozen lint-imports
+uv run --frozen python scripts/architecture_check.py
+uv run --frozen python scripts/validate_feature_docs.py
+uv run --frozen python scripts/verify_feature_removal.py --feature FEAT-DATA-INGEST_HISTORY --report removal-report.json
 ```
 
-### Required test levels
+The first test/removal command illustrates this domain’s first feature; use the affected feature’s exact owner path and ID for other cards. The full `scripts/ci_check.py` and coverage gate run at the approved pre-commit/CI/release boundary, not as a substitute for focused iterative checks.
 
-- **Unit:** Verify every `FR-*` behavior and every failure path.
-- **Integration:** Verify internal feature workflows, capability binding, disable/re-enable, physical removal, replacement where applicable, and leak freedom.
-- **Usage:** Execute each feature's designated primary domain-logic module and verify every named FR scenario.
+### Acceptance evidence model
 
-### Package completion checklist
+For each feature, retain `docs/dev/SQX/evidence/features/<FEAT-ID>/acceptance.json` with source/README hashes, actual tested tree/commit, paths and symbols, FR/local/shared-NFR/catalogue/source/acceptance mappings, fixture hashes, environment, exact commands and exit codes, reports, usage transcript or browser trace, operation-qualification state, lifecycle/removal results and independent review. No credentials or private raw data enter this evidence. The final accepted commit is recorded after creation to avoid a self-referential hash.
 
-- [ ] The actual package tree matches Section 2.
-- [ ] Modules and files remain arranged in documented implementation order.
-- [ ] Every module represents one feature and every file one focused responsibility.
-- [ ] Every requirement, workflow, manifest, configuration, and test row is `Implemented`.
-- [ ] Every public export, dependency, effect, error, owned state, and contract is documented.
-- [ ] Every requirement maps to a named scenario in the primary module's executable usage harness and has focused automated verification; collaborating behaviors have integration tests where applicable.
-- [ ] Feature disable/re-enable, physical removal, failed activation/cleanup, transactional replacement where applicable, and leak tests pass.
-- [ ] No private cross-feature/domain import or duplicated business logic exists.
-- [ ] No unresolved decision affects implementation.
-- [ ] All quality, security, determinism, durability, performance, observability, and compatibility gates pass.
+| Stage | Current README evidence state | What closes it |
+| --- | --- | --- |
+| Contract | NOT_REVALIDATED | Exact compatible schema, operation, config and error bindings plus contract tests. |
+| Provider | NOT_REVALIDATED | Actual implementation satisfies every owned FR/local NFR and applicable numerical/resource rule. |
+| Composition | NOT_REVALIDATED | Real registration, dependency closure, mount rollback and physical removal. |
+| Interfaces | NOT_REVALIDATED | Typed authenticated owner routing and parity; justify genuine nonapplicability. |
+| UI | NOT_REVALIDATED | Reachable truthful interaction, accessibility, cleanup and owner outcome. |
+| End-to-end | NOT_REVALIDATED | Real-provider workflow with canonical receipts and complete acceptance oracles. |
 
----
+### Feature Definition of Done Checklist
+
+- [ ] 1. Stable feature ID: retain the registered identity, including permanent numeric UI IDs.
+- [ ] 2. Single domain ownership: each feature has exactly one semantic owner and one implementation task.
+- [ ] 3. Cohesive capability: implement the complete registered behavior, not merely an adapter-shaped stub.
+- [ ] 4. External contracts: reuse compatible public contracts outside removable implementation packages; UI contribution contracts consume the generated wire boundary.
+- [ ] 5. Declared dependencies: manifest provides/requires/optional keys agree with the resolved public contracts and operation gates.
+- [ ] 6. Zero private feature imports: use public contracts and context-resolved capabilities only.
+- [ ] 7. Zero import-time I/O or registration: initialization remains pure.
+- [ ] 8. Scoped runtime effects: bindings, tasks, listeners, requests, workers and buffers have exact owners and disposers.
+- [ ] 9. Mount rollback: injected mount failure releases every partial contribution.
+- [ ] 10. Idempotent teardown: repeated scope closure is safe and leaves no orphan runtime effect.
+- [ ] 11. Required-dependency loss: absent/removed required providers block only dependent behavior and yield the declared failure state.
+- [ ] 12. Optional-dependency loss: affected operations fail explicitly; no substitute provider, fabricated data or silently reduced semantics.
+- [ ] 13. Persistent state: literal namespace/schema/driver/retention/purge and migrations are bound where state is owned; otherwise explicitly none.
+- [ ] 14. Irreversible-action safety: exact scope, idempotency, receiver reconciliation and retained audit are tested.
+- [ ] 15. Starts feature-absent: deleting the feature physically does not break unrelated startup and capabilities.
+- [ ] 16. Interfaces/UI degradation: typed unavailable/denied/partial states remain usable and truthful.
+- [ ] 17. README parity: feature-local documentation, this domain entry, manifests, configuration and contracts agree.
+- [ ] 18. Module usage: focused capability modules document public Python/API or interactive UI use and failure cases.
+- [ ] 19. Usage evidence: every backend feature has one required `_usage.py` with the bounded offline `__main__` scenarios; UI has real interaction evidence instead.
+- [ ] 20. Quality and acceptance: mapped FR/local/shared NFR, catalogue, source, workflow, removal and actual-provider evidence passes all applicable gates; no target is reported as a measurement.
+
+The ordinary ≥80% coverage floor is not proof of semantic completeness. Repeated enable/disable, failed mount, dependency loss/replacement and physical removal must demonstrate exact cleanup; use 100-cycle tests where specified. Stronger owner-specific limits and evaluation thresholds take precedence. Missing mandatory evidence prevents acceptance; a future optional provider must remain explicitly OPERATION_NOT_QUALIFIED.
 
 ## 8. Change Process
 
-```text
-1. Update this README first.
-2. Update owned/consumed contracts and affected project workflows.
-3. Resolve or record any decision that would otherwise require guessing.
-4. Add or change the functional requirement row, effect, failure behavior, and dependency.
-5. Update files, exports, manifests, configuration, and implementation order.
-6. Implement the smallest code change through public capability boundaries.
-7. Update and execute the primary-module usage harness; add or update unit, integration, deletion, and fault tests.
-8. Change status to `Implemented` only after every relevant gate passes.
-```
+Update this domain card first, then reconcile the contract and source scope. A breaking public change bumps the capability major rather than shadowing an existing contract. Keep manifest declarations, strict configuration, feature-local README and state migrations aligned. Implement only the selected feature’s cohesive behavior, update its required `_usage.py` scenarios or UI workflow, and add the exact acceptance and failure assertions. Verify dependency/removal behavior and actual provider integration, then run the approved quality gates and independent review.
 
-This keeps documentation, composition boundaries, implementation, usage examples, and verification aligned.
-
----
-
----
+Maintain one feature task and its accepted implementation commit in the existing Planner → Executor → Reviewer workflow. A verified existing feature keeps its slot and evidence; do not force a rewrite or empty commit. The phase’s last feature owns its cross-feature checkpoint, not a new feature. Later providers add real integration evidence to the already complete consumer adapter; they do not authorize unnoticed extra implementation scope. Record progress in the tracker and receipts, never by declaring all targets Implemented in this README. Preserve unrelated current domain entries when merging this selected scope.
 
 ## 9. Normative Domain Specification
 
-The stable `§x.y` labels below are preserved for cross-document references. They are authoritative here and no longer identify sections in `docs/PROJECT.md`.
+The following domain-specific rules explain the source requirements and ownership boundaries. Stable labels here are navigation labels, **not newly counted FR/NFR or feature IDs**. The feature FR/local-NFR tables and exact linked source semantics remain binding; these explanations never replace an algorithm definition, contract schema, catalogue entry or release qualification gate.
 
-### §16.3 — CSV import grammar
+<a id="data-append"></a>
+### 9.1 DATA-APPEND
 
-- Encoding defaults UTF-8; UTF-8 BOM is accepted. Configurable encodings are UTF-8, UTF-16LE/BE, Windows-1252, and ISO-8859-1.
-- Delimiter is one Unicode scalar other than quote, CR, LF, or a decimal separator. Quote is `"`; a quote inside a quoted field is doubled. CRLF and LF record endings are accepted.
-- Required bar fields are timestamp, open, high, low, close. Optional fields are volume, bid_volume, ask_volume, trade_count, spread. Required tick fields are timestamp and at least bid, ask, or last; recorded-spread mode requires both bid and ask.
-- Decimal syntax is optional sign, digits, optional separator and fractional digits. Thousands separators are forbidden. Empty required fields fail the row.
-- Timestamp parsing uses the configured exact pattern and timezone. An explicit numeric offset in the input overrides configured timezone for that row. Leap seconds normalize to the final microsecond of the preceding minute and emit warning `LEAP_SECOND_NORMALIZED`.
-- `STOP` policy aborts and publishes nothing on the first invalid row. `SKIP` publishes valid rows and an immutable reject file. `QUARANTINE` publishes nothing until every rejected row is accepted, corrected, or excluded through a versioned resolution.
-- Canonical row order is timestamp ascending then source sequence ascending. Bars with duplicate timestamps are rejected unless deduplication is explicitly `KEEP_FIRST`, `KEEP_LAST`, or `AGGREGATE`; ticks preserve duplicates by sequence.
+Append immutable partitions and manifests rather than rewrite the full history. Reads select only the required time ranges and columns under admitted memory/I/O budgets. Repair and compaction publish new versions; accepted historical references remain resolvable.
 
-### §16.4 — Data-quality rules
+<a id="data-conservation"></a>
+### 9.2 DATA-CONSERVATION
 
-Severity `ERROR` blocks publication under all policies except explicit row exclusion; `WARNING` permits publication; `INFO` records transformation. Rules are:
+Retain source identity, format/version, hashes, import choices and reconciled row counts. Invalid, rejected, duplicate and accepted observations must be explainable. A partial ingestion is not a complete dataset and cannot silently enter a run.
 
-| Code | Severity | Condition |
+<a id="data-causality"></a>
+### 9.3 DATA-CAUSALITY
+
+Align by the value’s actual availability time, not merely its nominal event timestamp. A higher-timeframe bar becomes eligible only when closed under the pinned clock/session. As-of selection observes explicit maximum staleness and missingness; backfilling with future data is forbidden.
+
+<a id="data-ticks"></a>
+### 9.4 DATA-TICKS
+
+Retain recorded tick ordering, bid/ask or other executable sides, timestamps, flags and gaps. Source tick counts are not exchange volume. Real-time reconnects preserve order/deduplication semantics and expose stale/unavailable states.
+
+<a id="data-evidence"></a>
+### 9.5 DATA-EVIDENCE
+
+External indicator imports are typed non-executable series. News/document evidence preserves revisions, licensing and point-in-time availability. Synthetic scenarios are explicitly labelled with their generator and seed; they never masquerade as recorded-market evidence.
+
+<a id="data-boundaries"></a>
+### 9.6 DATA-BOUNDARIES
+
+Catalogue owns instrument/profile/session revisions; Brokers owns authorized source access; Data owns normalization, eligibility and publication. browse_reference queries those public owners and the canonical store rather than maintain a conflicting catalogue. QDM reuse requires verified format/version adapters and the same conserved publication path.
+
+<a id="data-retirement"></a>
+### 9.7 DATA-RETIREMENT
+
+Export or retirement reports dependencies on accepted research and shared artifacts. Removing a source connector or UI observer does not delete stored datasets. Reference-aware purge requires separate authority and may not invalidate retained experiment evidence.
+
+### Normative source and acceptance binding
+
+Each §4 source-card link incorporates only that feature’s shared NFR applicability, operation-gated dependencies, detailed catalogue entries, original source-ID relationships and source clauses. Open the linked entry, not a similarly named legacy feature. The register-wide inventories contain 66 shared NFRs, 646 catalogue entries, 389 original requirement-ID mappings and 233 operation-time dependency edges. Those inventories are **retained by scoped reference**, not reproduced or independently expanded in this delivery. The actual acceptance manifest must enumerate their applicable members before scope can be signed off.
+
+### Source fingerprint record
+
+| Source | Git blob identity | Role |
 | --- | --- | --- |
-| `OHLC_NONFINITE` | ERROR | Any required numeric field is nonfinite or unparsable. |
-| `OHLC_LOW_ABOVE_BODY` | ERROR | `low > min(open,close)`. |
-| `OHLC_HIGH_BELOW_BODY` | ERROR | `high < max(open,close)`. |
-| `OHLC_LOW_ABOVE_HIGH` | ERROR | `low > high`. |
-| `NEGATIVE_VOLUME` | ERROR | Any volume/count field is negative. |
-| `UNSORTED_TIME` | WARNING | Source timestamp is earlier than previous source row. Canonical sort is recorded. |
-| `DUPLICATE_BAR` | ERROR | Duplicate bar timestamp without deduplication policy. |
-| `DUPLICATE_TICK` | INFO | Equal tick timestamps; preserved with sequence. |
-| `OUT_OF_SESSION` | WARNING | Timestamp is outside effective session. |
-| `EXPECTED_BAR_GAP` | INFO | Gap is wholly explained by session/calendar closure. |
-| `UNEXPLAINED_BAR_GAP` | WARNING | One or more expected source intervals are absent. |
-| `BID_ABOVE_ASK` | ERROR | Recorded bid is greater than ask. |
-| `NEGATIVE_SPREAD` | ERROR | Spread is negative. |
-| `TIME_PARSE` | ERROR | Timestamp cannot be mapped to one UTC instant. |
-| `DST_NORMALIZED` | INFO | §15.4 nonexistent/ambiguous-time rule was applied. |
+| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/templates/README.md`](../../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
 
-### §16.5 — Aggregation and alignment
+The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
 
-- Fixed intervals are positive whole microseconds. A bucket index is `floor((event_time-origin)/interval)` after restricting events to one effective session. Origin is session open unless explicitly `UTC_EPOCH`.
-- Weekly buckets start Monday at the first effective session boundary; monthly buckets start on the first effective trading session of the calendar month.
-- A derived bar is emitted only if it contains at least one source record. Coverage contains expected count, observed count, first/last time, gaps, and completeness ratio.
-- `EXACT` external alignment requires equal timestamps. `LAST_KNOWN` selects the greatest source timestamp `<= decision_time` whose age does not exceed `max_age`. `AGGREGATE` applies the declared `FIRST`, `LAST`, `MIN`, `MAX`, `SUM`, or `MEAN` reducer over source values inside the target half-open bucket.
-- Missing-value policy is `FAIL`, `NULL`, `FORWARD_FILL(max_age)`, or `SKIP_DECISION`. Backfill from a later value is forbidden.
+### Delivery evidence boundary
 
-### §16.6 — External-indicator schema
-
-An external indicator contains one definition and one or more immutable value versions. Each output line has `line_id`, display name, value kind (`NUMBER`, `PRICE`, `PRICE_RANGE`, `SIGNAL`), decimal scale, and nullable policy. `PRICE_RANGE` is a pair `{lower,upper}` with `lower<=upper`; `SIGNAL` is `-1`, `0`, `1`, or null. Each value row contains timestamp plus every required line. Definition parameters are typed using §17.2. Target fragments are keyed by exact target/profile version and declare buffer/line mapping and a `${SHIFT}` placeholder. Missing placeholders, lines, or target versions are validation errors.
-
-
-### §21.7 — Volume Profile and TPO Profile
-
-A profile declares session/range, price `bin_size` as an integer tick multiple, value-area percent default 70, source `TICK|LOWER_BAR`, and lower-bar allocation `CLOSE|TYPICAL|UNIFORM_RANGE`. Tick volume is assigned to the tick-price bin. `CLOSE` and `TYPICAL` assign the whole bar volume to one bin; `UNIFORM_RANGE` divides volume equally over every touched bin and assigns the decimal residual to the lowest bin. Bin index is `floor((price-origin)/bin_size)`, where origin is the session minimum rounded down to bin size.
-
-POC is the bin with maximum volume/TPO; ties choose the bin closest to the volume-weighted mean price, then the lower price. Value area starts at POC and repeatedly adds the adjacent upper or lower bin with greater value; ties add lower first, until accumulated value is at least the requested percentage of total. VAH/VAL are the outer included bin boundaries. TPO counts one occurrence per `(time_bracket,bin)` touched; bracket duration is mandatory and divides the session from its open. Incomplete source precision yields a diagnostic and fails when `precision_policy=REQUIRE_EXACT`.
-
-
-### §23.2 — CSV, quality, session, and aggregation
-
-Use instrument tick size `0.01`, UTC 24-hour session, and the exact file:
-
-```csv
-timestamp,open,high,low,close,volume
-2024-01-02T00:00:00Z,100.00,101.00,99.00,100.50,10
-2024-01-02T00:01:00Z,100.50,102.00,100.25,101.75,20
-2024-01-02T00:02:00Z,101.75,101.70,101.00,101.25,30
-2024-01-02T00:02:00Z,101.75,102.00,101.00,101.25,30
-2024-01-02T00:04:00Z,101.25,101.50,100.50,101.00,-1
-```
-
-Strict import rejects publication with ordered findings: row 4 `HIGH_BELOW_BODY`; rows 3–4 `DUPLICATE_TIMESTAMP`; missing 00:03 `GAP`; row 5 `NEGATIVE_VOLUME`. With explicit policies `duplicate=KEEP_LAST`, `negative_volume=SET_NULL`, `gaps=ALLOW_AND_FLAG`, output has four rows, the 00:02 high is 102.00, last volume is null, no synthetic 00:03 row exists, and flags identify corrections/gap adjacency.
-
-Given the first three corrected one-minute rows only, aggregating to a three-minute `[00:00,00:03)` bar yields `O=100.00,H=102.00,L=99.00,C=101.25,V=60`. Aggregating the first two rows to two minutes yields `O=100.00,H=102.00,L=99.00,C=101.75,V=30`. A decision at 00:02 bar open may read that bar's open 101.75 at shift 0 but gets `NULL_NOT_CLOSED` for its high/low/close/volume; shift 1 returns the completed 00:01 row.
-
-
-### §23.11 — Volume/TPO profile
-
-With origin 100, bin size 1, per-bin volumes `{100:10,101:30,102:20,103:5}`, POC is 101. For value area 70%, target is 45.5 of total 65: begin 30 at 101, add upper 20 at 102, stop at 50, so VAL=101 lower boundary and VAH=103 upper boundary. If bins 100 and 102 both have 20 around POC 101, a tie expansion adds lower 100 first. TPO records count a bin only once within each time bracket regardless of ticks.
-
-### Reconciled Specification Gaps
-
-- `SPEC-GAP-DATA-DATA-02-PROVIDER-SPEC-HISTORY` (`V2:DATA-02#provider-specification-history`): Reconciled to exact V3 architecture. Provider specification history, dataset lifecycle, and complete-coverage provenance are ratified in `FEAT-DATA-INGEST_HISTORY` through immutable `DataSeriesVersion` records, atomic publication, and checksummed series provenance (`FR-DATA-PUBLISH_DATA_VERSIONS`, `FR-DATA-PIN_DATA_PROVENANCE`, `FR-DATA-LOCK_DATA_PUBLICATION`).
+This is a documentation projection and proposed domain-registry update. Generated-document checks may establish identity/count/graph/anchor consistency; they do not establish current code parity, external-provider licensing/support, native throughput, model eligibility, browser behavior, successful live connectivity or Phase 0 completion. No application suite or live operation was executed as part of authoring this README.

@@ -6,12 +6,14 @@ from __future__ import annotations
 import collections
 import contextlib
 import contextvars
+import copy
 import hashlib
 import itertools
 import json
 import logging
 import logging.handlers
 import math
+import queue
 import re
 import sys
 import time
@@ -27,6 +29,7 @@ _OWNED_HANDLER_ATTR: Final[str] = "_haruquantai_owned"
 _HANDLER_GENERATION_ATTR: Final[str] = "_haruquantai_generation"
 _BASELINE_LEVEL_ATTR: Final[str] = "_haruquantai_baseline_level"
 _CORRELATION_RECORD_ATTR: Final[str] = "_haruquantai_correlation_snapshot"
+_SAFE_ERROR_RECORD_ATTR: Final[str] = "_haruquantai_safe_error"
 _LOG_SCHEMA_VERSION: Final[int] = 1
 
 _MAX_TEXT_CHARS: Final[int] = 4096
@@ -91,7 +94,8 @@ _STANDARD_LOG_RECORD_ATTRS: Final[frozenset[str]] = frozenset(
     }
 )
 _RESERVED_LOG_ATTRS: Final[frozenset[str]] = frozenset(
-    _STANDARD_LOG_RECORD_ATTRS | {"event", "fields", _CORRELATION_RECORD_ATTR}
+    _STANDARD_LOG_RECORD_ATTRS
+    | {"event", "fields", _CORRELATION_RECORD_ATTR, _SAFE_ERROR_RECORD_ATTR}
 )
 
 
@@ -439,7 +443,13 @@ def _build_payload(
     if fields:
         payload["fields"] = fields
 
-    if record.exc_info and record.exc_info[1] is not None:
+    safe_error = getattr(record, _SAFE_ERROR_RECORD_ATTR, None)
+    if isinstance(safe_error, Mapping):
+        payload["error"] = {
+            str(key): value
+            for key, value in cast("Mapping[object, object]", safe_error).items()
+        }
+    elif record.exc_info and record.exc_info[1] is not None:
         error = record.exc_info[1]
         payload["error"] = {
             "type": redact_text(type(error).__name__),
@@ -631,6 +641,95 @@ class DiagnosticCaptureHandler(logging.Handler):
             self._mark_expired(record.diagnostic_id)
         self._records.clear()
         self._active_ids.clear()
+
+
+class _OwnedQueueListener(logging.handlers.QueueListener):
+    """Queue listener whose shutdown sentinel cannot be dropped when full."""
+
+    @override
+    def enqueue_sentinel(self) -> None:
+        """Enqueue the stop marker after all already accepted records."""
+        cast("queue.Queue[Any]", self.queue).put(None)
+
+
+class NonBlockingQueueHandler(logging.handlers.QueueHandler):
+    """Bounded producer handler that never waits for external logging I/O."""
+
+    def __init__(
+        self,
+        record_queue: queue.Queue[logging.LogRecord],
+        targets: Sequence[logging.Handler],
+    ) -> None:
+        """Create a producer and its lifecycle-owned consumer targets."""
+        super().__init__(record_queue)
+        self._targets = tuple(targets)
+        self._listener = _OwnedQueueListener(
+            record_queue,
+            *self._targets,
+            respect_handler_level=True,
+        )
+        self._dropped_records = 0
+        self._listener_started = False
+
+    @property
+    def dropped_records(self) -> int:
+        """Return the number of newest records dropped because the queue was full."""
+        return self._dropped_records
+
+    def start(self) -> None:
+        """Start the consumer exactly once after handler attachment succeeds."""
+        if not self._listener_started:
+            self._listener.start()
+            self._listener_started = True
+
+    @override
+    def prepare(self, record: logging.LogRecord) -> logging.LogRecord:
+        """Copy, context-snapshot, and redact a record before queueing it."""
+        prepared = copy.copy(record)
+        correlation = redact_data(_record_correlation(prepared))
+        setattr(prepared, _CORRELATION_RECORD_ATTR, correlation)
+        prepared.msg = redact_text(record.getMessage())
+        prepared.args = ()
+        prepared.event = redact_text(str(getattr(prepared, "event", "LOG_RECORD")))
+        explicit_fields = getattr(prepared, "fields", None)
+        if isinstance(explicit_fields, Mapping):
+            prepared.fields = redact_data(explicit_fields)
+        for key, value in tuple(prepared.__dict__.items()):
+            if key not in _RESERVED_LOG_ATTRS:
+                prepared.__dict__[key] = redact_data(value)
+        if prepared.exc_info and prepared.exc_info[1] is not None:
+            error = prepared.exc_info[1]
+            traceback_text = logging.Formatter().formatException(prepared.exc_info)
+            safe_error = {
+                "type": redact_text(type(error).__name__),
+                "message": redact_text(str(error)),
+                "traceback": redact_text(traceback_text),
+            }
+            setattr(prepared, _SAFE_ERROR_RECORD_ATTR, safe_error)
+            prepared.exc_info = None
+            prepared.exc_text = safe_error["traceback"]
+        return prepared
+
+    @override
+    def enqueue(self, record: logging.LogRecord) -> None:
+        """Enqueue immediately or account for a dropped newest record."""
+        try:
+            self.queue.put_nowait(record)
+        except queue.Full:
+            self._dropped_records += 1
+
+    @override
+    def close(self) -> None:
+        """Drain accepted records, stop the listener, and close its targets."""
+        if self._listener_started:
+            self._listener.stop()
+            self._listener_started = False
+        for target in self._targets:
+            with contextlib.suppress(Exception):
+                target.flush()
+            with contextlib.suppress(Exception):
+                target.close()
+        super().close()
 
 
 _VALID_FORMATS: Final[frozenset[str]] = frozenset({"text", "json"})
@@ -877,6 +976,7 @@ class LoggingConfig:
     max_bytes: int = 10 * 1024 * 1024
     backup_count: int = 5
     capture_capacity: int = 1000
+    queue_capacity: int = 1000
     format: str = "text"
     colorize: bool = True
     retention_days: int = 30
@@ -927,6 +1027,9 @@ class LoggingConfig:
                 f"got {self.capture_capacity}"
             )
             raise ValueError(msg)
+        if self.queue_capacity <= 0:
+            msg = f"queue_capacity must be strictly positive, got {self.queue_capacity}"
+            raise ValueError(msg)
         if self.retention_days <= 0:
             msg = f"retention_days must be strictly positive, got {self.retention_days}"
             raise ValueError(msg)
@@ -973,6 +1076,15 @@ class LoggingHandle:
     def is_closed(self) -> bool:
         """Return whether close has already run."""
         return self._closed
+
+    @property
+    def dropped_records(self) -> int:
+        """Return records dropped by this generation's bounded I/O queue."""
+        return sum(
+            handler.dropped_records
+            for handler in self._handlers
+            if isinstance(handler, NonBlockingQueueHandler)
+        )
 
     def _record_cleanup_error(
         self,
@@ -1132,13 +1244,13 @@ def _create_handlers(
     else:
         console_formatter = StandardTextFormatter(colorize=cfg.colorize)
         file_formatter = StandardTextFormatter(colorize=False)
-    handlers: list[logging.Handler] = []
+    output_handlers: list[logging.Handler] = []
 
     if cfg.console:
         console_handler = logging.StreamHandler(sys.stderr)
         console_handler.setLevel(numeric_level)
         console_handler.setFormatter(console_formatter)
-        handlers.append(console_handler)
+        output_handlers.append(console_handler)
 
     if cfg.file_path is not None:
         file_path = Path(cfg.file_path)
@@ -1152,7 +1264,7 @@ def _create_handlers(
         )
         custom_handler.setLevel(numeric_level)
         custom_handler.setFormatter(file_formatter)
-        handlers.append(custom_handler)
+        output_handlers.append(custom_handler)
 
     if cfg.log_directory is not None:
         directory = Path(cfg.log_directory)
@@ -1167,7 +1279,7 @@ def _create_handlers(
         )
         app_handler.setLevel(numeric_level)
         app_handler.setFormatter(file_formatter)
-        handlers.append(app_handler)
+        output_handlers.append(app_handler)
 
         access_handler = CompressingRotatingFileHandler(
             filename=directory / "access.log",
@@ -1179,7 +1291,7 @@ def _create_handlers(
         access_handler.setLevel(numeric_level)
         access_handler.setFormatter(file_formatter)
         access_handler.addFilter(_RouteFilter("access"))
-        handlers.append(access_handler)
+        output_handlers.append(access_handler)
 
         debug_handler = CompressingRotatingFileHandler(
             filename=directory / "debug.log",
@@ -1191,7 +1303,7 @@ def _create_handlers(
         debug_handler.setLevel(logging.DEBUG)
         debug_handler.setFormatter(file_formatter)
         debug_handler.addFilter(_RouteFilter("debug"))
-        handlers.append(debug_handler)
+        output_handlers.append(debug_handler)
 
         error_handler = CompressingRotatingFileHandler(
             filename=directory / "error.log",
@@ -1203,11 +1315,19 @@ def _create_handlers(
         error_handler.setLevel(logging.ERROR)
         error_handler.setFormatter(file_formatter)
         error_handler.addFilter(_RouteFilter("error"))
-        handlers.append(error_handler)
+        output_handlers.append(error_handler)
 
     capture_handler = DiagnosticCaptureHandler(capacity=cfg.capture_capacity)
     capture_handler.setLevel(numeric_level)
     capture_handler.setFormatter(StructuredJsonFormatter())
+    handlers: list[logging.Handler] = []
+    if output_handlers:
+        record_queue: queue.Queue[logging.LogRecord] = queue.Queue(
+            maxsize=cfg.queue_capacity
+        )
+        queue_handler = NonBlockingQueueHandler(record_queue, output_handlers)
+        queue_handler.setLevel(numeric_level)
+        handlers.append(queue_handler)
     handlers.append(capture_handler)
     return handlers, capture_handler
 
@@ -1280,6 +1400,9 @@ def configure_logging(
         for handler in new_handlers:
             logger_target.addHandler(handler)
         logger_target.setLevel(numeric_level)
+        for handler in new_handlers:
+            if isinstance(handler, NonBlockingQueueHandler):
+                handler.start()
     except Exception:
         for handler in tuple(logger_target.handlers):
             if handler in new_handlers:

@@ -62,4 +62,4 @@ Removing this feature withdraws its scoped `data.sync-connectors@1` provider. Au
 
 ## Evidence
 
-Run `uv run python -m app.services.data.connector_synchronization.connector_synchronization` for the executable scenario harness. Automated tests live in `tests/services/data/connector_synchronization/`.
+Run `uv run python -m app.services.data.connector_synchronization._usage` for the executable scenario harness. Automated tests live in `tests/services/data/connector_synchronization/`.

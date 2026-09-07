@@ -54,4 +54,4 @@ Removing this feature withdraws its scoped `catalogue.define-sessions@1` provide
 
 ## Evidence
 
-Run `uv run python -m app.services.catalogue.session_calendar.session_calendar` for the executable scenario harness. Automated tests live in `tests/services/catalogue/session_calendar/`.
+Run `uv run python -m app.services.catalogue.session_calendar._usage` for the executable scenario harness. Automated tests live in `tests/services/catalogue/session_calendar/`.

@@ -96,6 +96,23 @@ def test_standard_response_constructors() -> None:
     assert get_standard_response_type() == StandardResponse
 
 
+def test_legacy_standard_response_import_normalizes_to_canonical_model() -> None:
+    """The retired response module re-exports and normalizes to one class."""
+    from app.contracts.common.response import StandardResponse as LegacyImport
+
+    assert LegacyImport is StandardResponse
+    response = LegacyImport(
+        status="success",
+        data={"ok": True},
+        operation="connect",
+        execution_time_ms=1.25,
+        metadata={"provider": "fixture"},
+    )
+    assert response.operation == "connect"
+    assert response.execution_time_ms == 1.25
+    assert response.metadata.extensions == {"provider": "fixture"}
+
+
 def test_auth_context_and_audit_event_builders() -> None:
     """Verify create_auth_context and create_audit_event builders."""
     auth = create_auth_context(

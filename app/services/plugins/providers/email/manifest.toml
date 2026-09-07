@@ -1,7 +1,7 @@
 [provider]
 id = "notification.delivery.email"
 version = "1.0.0"
-entry_point = "app.utils.notifications.providers.email.plugin:create_provider"
+entry_point = "app.services.plugins.providers.email.plugin:create_provider"
 
 [[provides]]
 capability_id = "notification.delivery.v1"

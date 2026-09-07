@@ -1,6 +1,8 @@
 """Strict common scalar aliases and reusable wire records."""
 
 import re
+import uuid
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from enum import StrEnum
 from typing import Annotated, Any, Literal
@@ -284,6 +286,105 @@ class StandardResponse[T](WireModel):
     metadata: ResponseMetadata
     data: T | None = None
     error: ProblemDetails | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def normalize_legacy_response(cls, value: object) -> object:
+        """Normalize the retired seven-field response shape into this envelope.
+
+        Returns:
+            Canonicalized response input.
+        """
+        if not isinstance(value, Mapping):
+            return value
+        normalized = dict(value)
+        operation = normalized.pop("operation", None)
+        execution_time_ms = normalized.pop("execution_time_ms", None)
+        if normalized.get("status", "success") == "connected":
+            normalized["status"] = "success"
+
+        raw_metadata = normalized.get("metadata")
+        if isinstance(raw_metadata, ResponseMetadata):
+            metadata = raw_metadata
+        else:
+            metadata_values = (
+                dict(raw_metadata) if isinstance(raw_metadata, Mapping) else {}
+            )
+            request_id = metadata_values.pop(
+                "request_id", f"req-{uuid.uuid4().hex[:12]}"
+            )
+            timestamp = metadata_values.pop(
+                "timestamp", datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%S.%fZ")
+            )
+            metadata = ResponseMetadata(
+                request_id=str(request_id),
+                timestamp=str(timestamp),
+                execution_ms=float(execution_time_ms or 0.0),
+                name=str(operation) if operation is not None else None,
+                domain="brokers" if operation is not None else None,
+                extensions={str(key): item for key, item in metadata_values.items()},
+            )
+        normalized["metadata"] = metadata
+
+        raw_error = normalized.get("error")
+        if raw_error is not None and not isinstance(raw_error, ProblemDetails):
+            details = (
+                dict(raw_error)
+                if isinstance(raw_error, Mapping)
+                else {"cause": str(raw_error)}
+            )
+            raw_code = (
+                details.get("message")
+                or details.get("code")
+                or "BROKER_OPERATION_FAILED"
+            )
+            code = str(raw_code)
+            if re.fullmatch(r"^[A-Z][A-Z0-9_]*$", code) is None:
+                code = "BROKER_OPERATION_FAILED"
+            message = str(normalized.get("message") or "Broker operation failed")
+            normalized["error"] = ProblemDetails(
+                type=f"urn:haruquantai:error:{code}",
+                title=code,
+                status=502,
+                code=code,
+                detail=message,
+                request_id=metadata.request_id,
+                details={str(key): item for key, item in details.items()},
+            )
+        normalized.setdefault("message", str(normalized.get("status", "success")))
+        return normalized
+
+    @property
+    def operation(self) -> str:
+        """Return the legacy operation name stored in canonical metadata."""
+        return self.metadata.name or ""
+
+    @property
+    def execution_time_ms(self) -> float:
+        """Return the legacy timing view backed by canonical metadata."""
+        return self.metadata.execution_ms
+
+    def to_dict(self) -> dict[str, object]:
+        """Return a plain dictionary for compatibility consumers."""
+        return self.model_dump(mode="python")
+
+    def __getitem__(self, item: str) -> object:
+        """Return one response attribute using legacy mapping syntax.
+
+        Raises:
+            KeyError: If no response attribute has the requested name.
+        """
+        if hasattr(self, item):
+            return getattr(self, item)
+        raise KeyError(item)
+
+    def __contains__(self, item: object) -> bool:
+        """Return whether a string names a response attribute."""
+        return isinstance(item, str) and hasattr(self, item)
+
+    def get(self, item: str, default: object = None) -> object:
+        """Return one response attribute or a supplied default."""
+        return getattr(self, item, default)
 
 
 type ValidationVerdict = Literal["PASS", "WARN", "BLOCK", "FAIL", "UNKNOWN"]

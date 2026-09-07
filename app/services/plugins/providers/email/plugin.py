@@ -9,9 +9,10 @@ from app.contracts.notification.delivery.v1 import (
     NotificationDeliveryCapabilityV1,
     NotificationDeliveryResultV1,
 )
-from app.utils.notifications.email import (  # type: ignore[import-untyped]
-    EmailConfig,
-    EmailNotifier,
+from app.services.plugins.providers._notification import (
+    NotificationBackend,
+    recipient_count,
+    validate_backend,
 )
 
 if TYPE_CHECKING:
@@ -22,7 +23,7 @@ if TYPE_CHECKING:
 class _EmailDeliveryAdapter:
     """Adapts internal EmailNotifier to NotificationDeliveryCapabilityV1 protocol."""
 
-    def __init__(self, notifier: EmailNotifier) -> None:
+    def __init__(self, notifier: NotificationBackend) -> None:
         self._notifier = notifier
         self._active = True
 
@@ -44,12 +45,10 @@ class _EmailDeliveryAdapter:
             msg = "Email delivery transport is closed"
             raise RuntimeError(msg)
         result = self._notifier.send(title, text, html_body)
-        raw_count = result.get("recipients")
-        recipient_count = int(raw_count) if isinstance(raw_count, (int, str)) else 1
         return NotificationDeliveryResultV1(
             channel="email",
             status="accepted",
-            recipient_count=recipient_count,
+            recipient_count=recipient_count(result),
         )
 
     def close(self) -> None:
@@ -66,7 +65,7 @@ def create_provider(
 
     Args:
         dependencies: Must be empty.
-        config: Must contain only 'configuration' with EmailConfig.
+        config: Must contain only 'configuration' with a notification backend.
         scope: EffectScope managing provider lifecycle.
 
     Returns:
@@ -79,12 +78,7 @@ def create_provider(
         msg = "email notification provider requires only 'configuration'"
         raise ValueError(msg)
 
-    configuration = config["configuration"]
-    if not isinstance(configuration, EmailConfig):
-        msg = "email notification provider requires only 'configuration'"
-        raise ValueError(msg)  # noqa: TRY004
-
-    notifier = EmailNotifier(configuration)
+    notifier = validate_backend(config["configuration"], "email")
     adapter = _EmailDeliveryAdapter(notifier)
     scope.callback(adapter.close)
     return adapter

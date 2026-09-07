@@ -1,839 +1,1411 @@
 # Workspace
 
 > **Package:** `app/services/workspace/`
-> **Status:** `Implemented`
-> **Last updated:** `2026-08-27`
+> **Status:** `Partial` — documentary target; runtime acceptance is **NOT_REVALIDATED**.
+> **Last updated:** `2026-09-06`
 > **Domain ID:** `D-WS`
 
-> This README is the domain package's **single source of truth** for domain boundaries, composable feature capabilities, architecture invariants, implementation sequence, progress, usage examples, and tests.
-> Update this document before modifying or adding code.
+> This README is the domain target registry for boundaries, composable feature capabilities, requirements, ownership, workflows, acceptance, and removal. Update it before changing the affected implementation. It does not certify that a target package, contract, test, usage demonstration or provider is already implemented.
+
+**Selected scope:** 9 features · 27 owned functional requirements · 9 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
+
+**Sources:** [Unified Specification](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
 
 ## Code-Aligned Implementation Convention
 
-This README is the sole current target registry for this domain's feature IDs and statuses, functional requirements, domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence, and deletion behavior. `PROJECT.md` owns system scope, cross-domain behavior, system NFRs, and release gates; `ARCHITECTURE.md` owns universal package and runtime constraints. Feature-local READMEs, manifests, contract definitions, migrations, and tests provide current implementation evidence without silently changing this target registry.
+This domain README defines target behavior; `PROJECT.md` retains system scope, cross-domain policy, system NFRs and release gates, and `ARCHITECTURE.md` retains universal package/runtime constraints. Feature-local READMEs, manifests, contracts, migrations and evidence mirror rather than silently redefine this target. For focused work, load §1, the affected §4 card, applicable §5 and §9 rules, and §7. Follow the [Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md).
 
-Implementation uses the repository's existing feature substrate: each feature lives directly at `app/services/<domain>/<feature>/`, is discovered through the `haruquantai.features` Python entry-point group, and declares one immutable `FeatureSpec` in `manifest.py`. There are no domain or feature YAML manifests.
+Implement one feature directly in its selected owner folder and discover it through the `haruquantai.features` Python entry-point group. Declare one immutable `SPEC = FeatureSpec(...)` in `manifest.py`; do not introduce a domain registry or YAML manifest. The feature contains pure `__init__.py`, a runtime-validated `README.md`, strict `config.py` with `.from_dict()`, lifecycle `feature.py`, focused logic modules and required `_usage.py`. Add `_persistence.py` only when the feature performs database operations. Effects and dependencies flow through `FeatureContext` and `FeatureScope`; durable state is declared by `FeatureSpec.state`. Existing compatible public contracts and owners are reused, not copied into a parallel implementation.
 
-Every implemented feature also contains a mandatory runtime-validated `README.md`, pure `__init__.py`, strict `config.py`, lifecycle `feature.py`, and focused implementation modules. Dependencies and effects flow through `FeatureContext`/`FeatureScope`; cross-feature implementation imports are forbidden. Persistent state is declared by `FeatureSpec.state`; any migrations and storage adapters remain with the owning feature. Capability keys use `<domain>.<name>@<major>`. FR IDs remain product, acceptance, and test-trace identities rather than one runtime registration per FR. A requirement `Depends` cell expresses product sequencing, traceability, or acceptance evidence only; runtime dependencies are declared separately with exact keys in `FeatureSpec.requires` or `FeatureSpec.optional`.
+Each core logic module documents its public API. Every service feature has one required `_usage.py` containing its bounded offline `if __name__ == "__main__":` scenarios; production logic modules do not contain demonstrations. Optional `_persistence.py` owns all feature-local database operations when durable state is required. The paths below are documentary targets pending current-code reconciliation, not claims of executable files. Tests verify the scenarios independently.
 
-Feature-level automated tests live at `tests/services/workspace/<feature>/`. Usage examples never live under `tests/`; they belong to each feature's designated primary domain-logic module. Broader automated verification retains its documented architecture, composition, API, integration, or system test location. The code-backed procedure is the [Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md).
+FR and acceptance IDs are trace identities, not runtime registrations. Required-provider keys below reproduce the register’s required graph. Optional providers are operation-gated: they must be declared and tested without making an absent future extension a universal startup dependency. The plan’s P1–P16 execution phases are distinct from specification U0–U13 release milestones; a U label is not proof of readiness or a new feature task.
 
 ## 1. Purpose and Boundary
 
 ### Purpose
 
-The Workspace domain delivers workspace lifecycle, runtime configuration, local/hosted access, worker pools, backup, and diagnostics. Its public feature capabilities are registered and remain independent of package-import order. Removing the domain produces the degradation defined below rather than preventing the shared substrate or unrelated domains from starting.
+Provide the durable, scoped working environment in which all research features operate. Preserve workspace identity, committed metadata and immutable artifact custody across crashes, upgrades and recovery without becoming the owner of another domain’s business records.
 
 ### Owns
 
-- `FEAT-WS-MANAGE_WORKSPACES` — Workspace Lifecycle.
-- `FEAT-WS-CONFIGURE_RUNTIME` — Runtime Configuration and Admission.
-- `FEAT-WS-SECURE_LOCAL_ACCESS` — Local Access and Health.
-- `FEAT-WS-BUILD_DIAGNOSTICS` — Diagnostics.
-- `FEAT-WS-DISTRIBUTE_WORKERS` — Distributed Worker Pool.
-- `FEAT-WS-HOST_WORKSPACES` — Hosted Workspace Boundary.
-- `FEAT-WS-MANAGE_ACCOUNTS` — Account and Session Store.
-- `FEAT-WS-MANAGE_WATCHLISTS` — Account Watchlist Store.
-- `FEAT-WS-ADMINISTER_SETTINGS` — System Settings Administration.
+Workspace lifecycle and writer fencing; bounded feature-owned persistence execution; immutable artifact custody; authenticated accounts and sessions; secret-reference and local-host access policy; versioned settings; transcript retention; diagnostic exports; application distribution.
 
 ### Does not own
 
-- Trading, strategy, simulation, analytics, and research policy; it supplies runtime, persistence, worker, recovery, and security capabilities only.
-- Generic application TOML parsing, feature discovery, provider selection, deployment-profile readiness, and lifecycle reconciliation; `app/composition/` owns that substrate. Workspace owns product workspace settings, admission records, secrets, jobs, workers, artifacts, and hosted/local operational boundaries exposed through capabilities.
-- Composition lifecycle, dependency resolution, effect reversal, and transactional replacement; those belong to the non-domain shared substrate (`app/contracts/`, `app/kernel/`, and `app/composition/`).
-- **Deletion boundary:** deleting `app/services/workspace/` means the shell starts in diagnostic/no-workspace mode; trading domains remain discoverable but workflows needing persistence or workers are unavailable. The kernel and unrelated domains shall remain healthy.
+Research qualification and holdout policy; job scheduling and resource admission; market-data interpretation; strategy or result semantics; live deployment decisions. Artifact custody does not make Workspace the semantic owner of artifacts.
 
 ### Shared Contracts
 
-This domain semantically owns the contracts listed below, but their sole physical definitions live in `app/contracts/workspace/` and wire schemas in `app/contracts/workspace/wire/`. `app/services/workspace/` contains implementations only and shall not define or re-export substitute public contract types. Contract versions and semantic owners must agree with `PROJECT.md` and this README. Feature IDs and FR IDs are documentation, lifecycle, acceptance, and traceability identities; runtime bindings use exact versioned `CapabilityKey` declarations in contracts and `FeatureSpec`. The exact public records and capability bundles are listed in the [Shared Contracts README](../../contracts/README.md#41-appcontractsworkspace).
+**Owned by this domain.** Status is an evidence state. Contract modules are selected public boundaries; an unbound symbol/DTO must be reconciled before implementing its production consumer. Do not infer a callable signature from the English title.
 
-Rows labelled `FEAT-* capability surface` describe planned semantic contract bundles, not literal runtime capability keys. A listed counterparty may produce, consume, or observe the bundle and does not establish package-import or runtime dependency direction.
+| Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
+| --- | --- | --- | --- | --- |
+| NOT_REVALIDATED | `workspace.manage-workspaces@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/manage_workspaces.py`](../../contracts/workspace/manage_workspaces.py) | 1 | Open, recover and back up a workspace |
+| NOT_REVALIDATED | `workspace.persistence@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/persistence.py`](../../contracts/workspace/persistence.py) | 1 | Execute bounded feature-owned transactions |
+| NOT_REVALIDATED | `workspace.artifacts@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/artifacts.py`](../../contracts/workspace/artifacts.py) | 1 | Publish and retain immutable artifact bytes |
+| NOT_REVALIDATED | `workspace.manage-accounts@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/manage_accounts.py`](../../contracts/workspace/manage_accounts.py) | 1 | Verify accounts, principals and sessions |
+| NOT_REVALIDATED | `workspace.secure-local-access@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/secure_local_access.py`](../../contracts/workspace/secure_local_access.py) | 1 | Resolve secrets and protect host access |
+| NOT_REVALIDATED | `workspace.administer-settings@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/administer_settings.py`](../../contracts/workspace/administer_settings.py) | 1 | Version user-visible system settings |
+| NOT_REVALIDATED | `workspace.conversations@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/conversations.py`](../../contracts/workspace/conversations.py) | 1 | Retain scoped conversations without losing canonical evidence |
+| NOT_REVALIDATED | `workspace.build-diagnostics@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/build_diagnostics.py`](../../contracts/workspace/build_diagnostics.py) | 1 | Explain runtime health and export safe diagnostics |
+| NOT_REVALIDATED | `workspace.distribute-application@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/workspace/distribute_application.py`](../../contracts/workspace/distribute_application.py) | 1 | Build installable desktop and headless application distributions |
 
-**Owned by this domain**
+**Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
 
-| Status | Contract | Version | Counterparty | Purpose |
-|---|---|---|---|---|
-| Implemented | `FEAT-WS-MANAGE_WORKSPACES` capability surface | `v1` | Interfaces, Orchestration, Simulator | Workspace Lifecycle. |
-| Implemented | `FEAT-WS-CONFIGURE_RUNTIME` capability surface | `v1` | Interfaces, Orchestration, Simulator | Runtime Configuration and Admission. |
-| Implemented | `FEAT-WS-SECURE_LOCAL_ACCESS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Local Access and Health. |
-| Implemented | `FEAT-WS-BUILD_DIAGNOSTICS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Diagnostics. |
-| Implemented | `FEAT-WS-DISTRIBUTE_WORKERS` capability surface | `v1` | Interfaces, Orchestration, Simulator | Distributed Worker Pool. |
-| Implemented | `FEAT-WS-HOST_WORKSPACES` capability surface | `v1` | Interfaces, Orchestration, Simulator | Hosted Workspace Boundary. |
-| Implemented | `FEAT-WS-MANAGE_ACCOUNTS` capability surface | `v1` | Interfaces | Account and Session Store. |
-| Implemented | `FEAT-WS-MANAGE_WATCHLISTS` capability surface | `v1` | Interfaces | Account Watchlist Store. |
-| Implemented | `FEAT-WS-ADMINISTER_SETTINGS` capability surface | `v1` | Interfaces | System Settings Administration. |
+There are no cross-domain required-provider edges in this selected register slice.
 
-**Cross-domain requirement references (not runtime dependencies)**
-
-The rows below summarize foreign owner tokens found in FR `Depends` cells. They express product sequencing, traceability, or acceptance-evidence relationships only. Actual runtime consumption must name an exact versioned capability key in the consuming feature's `FeatureSpec.requires` or `FeatureSpec.optional` and must follow the dependency direction in `PROJECT.md` and `ARCHITECTURE.md`.
-
-| Referenced domain set | Documentation version | Owner | Meaning |
-|---|---|---|---|
-| `D-IFACE` public capability set | `v1` | Interfaces | Requirements whose `Depends` cell names `IFACE-*`. |
-| `D-ORCH` public capability set | `v1` | Orchestration | Requirements whose `Depends` cell names `ORCH-*`. |
-| `D-SIM` public capability set | `v1` | Simulator | Requirements whose `Depends` cell names `SIM-*`. |
-
-#### Ratified v1 public records (23)
-
-Physical-layer reconciliation rules (apply to every record below):
-
-1. Frozen v1 Python classes stay unchanged as process contracts with their exact constructors, defaults, and sync methods; frozen ports keep raising the existing `WorkspaceError` family with stable `error_code` strings.
-2. Each mapped record gains an additive strict frozen Pydantic v2 wire projection named `<Record>Wire` in `app/contracts/workspace/models.py` (new classes; no v1 renames). Generated JSON Schema and TypeScript emit the inventory name `<Record>`. Wire-native new records (R6, R10, R11, R17–R23) are Pydantic models named exactly as inventoried; they carry no `Wire` suffix.
-3. Wire projections keep v1 field names and normalize types only: IDs → `Uuid7`, timestamps → `UtcTimestamp`, SHA-256 strings → `ContentHash`. V1 empty-string defaults (`WorkspaceRef.created_at`, `WorkspaceBackupManifest.manifest_checksum`) are process-local construction conveniences; the wire form requires the canonical value.
-4. Process-local exclusions: `Path` fields (`WorkspaceRef.root_path`, `WorkspaceRestorePlan.backup_manifest_path/target_path`, `DiagnosticBundleRef.archive_path`) and secret token fields (`WorkspaceWriterFence.lock_token`, `LocalSession.token`, scoped job credentials) never enter wire schemas or generated UI types.
-5. Domain-`schema_version` collision exception: `WorkspaceVersion`, `WorkspaceBackupManifest`, `SystemReadiness`, and `DiagnosticBundleManifest` keep `schema_version` as the workspace database schema number (`int >= 0`, nullable where v1 is nullable) because the frozen constructor owns that name. These four records carry no record-level `Literal[1]` field; their wire-schema identity is the workspace namespace v1. Every other Workspace record carries `schema_version: Literal[1] = 1`.
-
-| # | Record | Exact wire fields (defaults in `=`) | Producer → consumers | FRs / lifecycle |
-|---|---|---|---|---|
-| R1 | `WorkspaceRef` (`WorkspaceRefWire`) | `workspace_id: Uuid7`; `name: str 1..160`; `status: Literal[UNINITIALIZED,READY,MIGRATING,LOCKED,RECOVERING,CORRUPTED] = "READY"`; `created_at: UtcTimestamp`; `schema_version: Literal[1] = 1`. `status` mirrors the v1 `WorkspaceStatus` states. | Manage Workspaces → Interfaces, Orchestration, Simulator, UI | FR-WS-INITIALIZE_WORKSPACE, FR-WS-BACKUP_WORKSPACE (restore result). Immutable identity description; `root_path` process-local only. |
-| R2 | `WorkspaceVersion` (`WorkspaceVersionWire`) | `schema_version: int >= 0` (workspace DB schema number); `app_version: nonempty str`; `applied_at: UtcTimestamp`; `database_engine: nonempty str = "sqlite3"`. Collision exception applies. | Manage Workspaces → Interfaces, Orchestration, Simulator | FR-WS-MIGRATE_WORKSPACE_SCHEMA. Result of ordered transactional migrations; reopening up-to-date performs no mutation. |
-| R3 | `WorkspaceConfiguration` (`WorkspaceConfigurationWire`) | `workspace_id: Uuid7`; `version: int >= 1`; `settings: WorkspaceSettingsWire`; `created_at: UtcTimestamp`; `schema_version: Literal[1] = 1`. Nested `WorkspaceSettingsWire` = v1 `WorkspaceSettings` fields exactly: `timezone: IANA name`, `locale: BCP 47 tag`, `worker_count: int >= 1`, `worker_memory_mb: int >= 1`, `max_artifact_size_mb: int >= 1`, `max_total_artifact_gb: int >= 1`, `artifacts_dir = "artifacts"`, `logs_dir = "logs"`, `cache_dir = "cache"`, `exports_dir = "exports"`, `log_level: Literal[DEBUG,INFO,WARNING,ERROR,CRITICAL] = "INFO"`, `log_retention_days: int >= 1 = 30`, `retention_days: int >= 1 = 365`; directories are workspace-relative, no `..`, no absolute paths, mutually distinct. | Configure Runtime → Interfaces, Orchestration, Simulator, UI | FR-WS-CONFIGURE_WORKSPACE. Immutable versioned settings (`workspace_setting_versions(workspace_id,version UNIQUE)`); invalid values never increment the version. |
-| R4 | `RuntimeConfiguration` (`RuntimeConfigurationWire`) | `settings: ServerRuntimeSettingsWire`; `validation: ServerRuntimeValidationWire`; `schema_version: Literal[1] = 1`. Nested settings = v1 fields: `port: int 1..65535`, `bind_address: IP literal = "127.0.0.1"`, `headless: bool = False`, `authentication_mode: Literal[LOCAL_SESSION,NONLOCAL_TOKEN] = "LOCAL_SESSION"`, `allow_non_loopback: bool = False`, `worker_cpu_percent: int 1..100 = 100`, `global_cpu_percent: int 1..100 = 100`, `worker_memory_mb: int >= 1 = 1024`, `global_memory_mb: int >= 1 = 4096`; cross-field: `allow_non_loopback=True` requires `authentication_mode="NONLOCAL_TOKEN"`. Nested validation = v1 fields: `valid: bool`, `errors: tuple[nonempty str, ...] = ()`, `port_available: bool = True`; cross-field: `valid=False` iff `errors` nonempty or `port_available=False`. | Configure Runtime → Interfaces, UI (launcher) | FR-WS-CONFIGURE_SERVER_RUNTIME. Pre-launch validation outcome; invalid/unavailable port fails before UI launch. |
-| R5 | `StorageGuardPolicy` (`StorageGuardPolicyWire`) | `min_free_space_mb: int >= 1 = 512`; `max_artifact_size_mb: int >= 1 = 4096`; `schema_version: Literal[1] = 1`. | Configure Runtime → Simulator, Orchestration (job admission) | FR-WS-ENFORCE_STORAGE_GUARDS. Policy carries limits only; the admission `StorageGuardDecision` remains the distinct frozen v1 port result. |
-| R6 | `WorkspaceWriterLease` (wire-native) | `lease_id: Uuid7`; `workspace_id: Uuid7`; `holder_pid: int >= 1`; `acquired_at: UtcTimestamp`; `expires_at: UtcTimestamp`; `is_read_only: bool = False`; `schema_version: Literal[1] = 1`. Constraint: `expires_at > acquired_at`. | Manage Workspaces → Manage Workspaces (recovery), Interfaces | FR-WS-FENCE_WORKSPACE_WRITERS, FR-WS-RECOVER_WORKSPACE_STATE. At most one active writer lease per workspace; expired leases are reclaimed at startup. The secret `lock_token` of the paired fence is process-local and excluded. |
-| R7 | `WorkspaceWriterFence` (`WorkspaceWriterFenceWire`) | `workspace_id: Uuid7`; `holder_pid: int >= 1`; `acquired_at: UtcTimestamp`; `is_write_locked: bool = True`; `is_read_only: bool = False`; `schema_version: Literal[1] = 1`. Cross-field: exactly one of `is_write_locked`/`is_read_only` is `True`. | Manage Workspaces → Interfaces, UI | FR-WS-FENCE_WORKSPACE_WRITERS. Result of fence acquisition; second writer fails `WORKSPACE_ALREADY_OPEN`. |
-| R8 | `WorkspaceBackupManifest` (`WorkspaceBackupManifestWire`) | `backup_id: Uuid7`; `workspace_id: Uuid7`; `schema_version: int >= 0` (workspace DB schema at backup; collision exception); `created_at: UtcTimestamp`; `file_count: int >= 0`; `total_bytes: int >= 0`; `files: tuple[BackupFileRecordWire, ...] = ()` where each record is `relative_path: workspace-relative POSIX path`, `sha256_hash: ContentHash`, `size_bytes: int >= 0`; `manifest_checksum: ContentHash`. Constraints: `file_count == len(files)`; `total_bytes == sum(size_bytes)`. | Manage Workspaces → Interfaces, Diagnostics | FR-WS-BACKUP_WORKSPACE, FR-WS-RECOVER_WORKSPACE_STATE. Consistent snapshot per §22.7; retention 30 daily / 12 monthly unless compliance holds. |
-| R9 | `WorkspaceRestorePlan` (`WorkspaceRestorePlanWire`) | `backup_id: Uuid7`; `verify_checksums: bool = True`; `schema_version: Literal[1] = 1`. | Interfaces/UI (future transport) → Manage Workspaces | FR-WS-BACKUP_WORKSPACE acceptance (restore path). Wire plan references the backup by identity; v1 `Path`-based plan remains the process contract. Restore always targets empty staging per §22.7. |
-| R10 | `SecretRef` (wire-native) | `secret_id: Uuid7`; `workspace_id: Uuid7`; `name: str 1..160 matching ^[A-Za-z0-9][A-Za-z0-9._-]*$`; `created_at: UtcTimestamp`; `updated_at: UtcTimestamp`; `row_version: int >= 1 = 1`; `schema_version: Literal[1] = 1`. Uniqueness `(workspace_id, name)`. | Secure Local Access / Host Workspaces store → Broker, Trading, Data (opaque credential IDs) | FR-WS-SECURE_REMOTE_WORKERS (short-lived job credentials), FR-WS-ISOLATE_HOSTED_WORKSPACES (per-workspace credentials), FR-WS-BUILD_DIAGNOSTIC_BUNDLE (values never disclosed). Secret values are never wire fields, never in manifests/logs (`secret_refs(workspace_id,name UNIQUE)`). |
-| R11 | `PrincipalRef` (wire-native) | `principal_id: Uuid7`; `auth_provider: nonempty str`; `schema_version: Literal[1] = 1`. | Host Workspaces → Interfaces (authorization boundary), audit records | FR-WS-AUTHORIZE_HOSTED_WORKSPACES. Pluggable authenticated principal replacing the local-session token in hosted mode; the authority discriminator is the provider identity. |
-| R12 | `LocalSession` (`LocalSessionWire`) | `session_id: Uuid7`; `client_id: nonempty str`; `client_host: IP literal`; `issued_at: UtcTimestamp`; `expires_at: UtcTimestamp`; `is_loopback: bool = True`; `is_launcher_connected: bool = True`; `schema_version: Literal[1] = 1`. Constraint: `expires_at > issued_at`. | Secure Local Access → Interfaces, UI | FR-WS-ISSUE_LOCAL_SESSION. Ephemeral per-launch session; the secret `token` is process-local and must never appear in wire schemas or generated UI types. |
-| R13 | `SystemHealth` (`SystemHealthWire`) | `status: Literal[HEALTHY,DEGRADED,UNHEALTHY] = "HEALTHY"`; `healthy: bool = True`; `checked_at: UtcTimestamp`; `components: dict[nonempty str, Literal[HEALTHY,DEGRADED,UNHEALTHY]] = {}`; `schema_version: Literal[1] = 1`. Cross-field: `healthy == (status == "HEALTHY")`. | Secure Local Access → Interfaces, UI | FR-WS-REPORT_SYSTEM_READINESS. Functional before full readiness. |
-| R14 | `SystemReadiness` (`SystemReadinessWire`) | `ready: bool`; `healthy: bool`; `build_version: nonempty str`; `build_commit: nonempty str`; `schema_version: int >= 0 | None` (workspace DB schema if open; collision exception); `migrations_current: bool`; `state_recovered: bool`; `worker_capacity: int >= 0`; `active_workers: int >= 0`; `checked_at: UtcTimestamp`; `reasons: tuple[nonempty str, ...] = ()`. Constraint: `active_workers <= worker_capacity`; `ready=True` only when `migrations_current` and `state_recovered`. | Secure Local Access → Interfaces, UI, Composition readiness | FR-WS-REPORT_SYSTEM_READINESS. Never discloses secrets or absolute user paths. |
-| R15 | `DiagnosticBundleRef` (`DiagnosticBundleRefWire`) | `bundle_id: Uuid7`; `checksum_sha256: ContentHash`; `file_size_bytes: int >= 0`; `manifest: DiagnosticBundleManifestWire`; `schema_version: Literal[1] = 1`. | Build Diagnostics → Interfaces, UI | FR-WS-BUILD_DIAGNOSTIC_BUNDLE. `archive_path` is process-local and excluded. |
-| R16 | `DiagnosticBundleManifest` (`DiagnosticBundleManifestWire`) | `bundle_id: Uuid7`; `created_at: UtcTimestamp`; `build_version: nonempty str`; `build_commit: nonempty str`; `schema_version: int >= 0 | None` (collision exception); `workspace_id: Uuid7 | None`; `log_entries_count: int >= 0`; `job_records_count: int >= 0`; `integrity_findings: tuple[nonempty str, ...] = ()`; `redaction_summary: dict[nonempty str, int >= 0] = {}`; record-level `schema_version` omitted per collision exception. | Build Diagnostics → Interfaces, UI | FR-WS-BUILD_DIAGNOSTIC_BUNDLE. Redacted bundle: no session tokens, connection secrets, or unredacted secret values (acceptance scan). |
-| R17 | `WorkerCapabilityDescriptor` (wire-native) | `capabilities: nonempty tuple[CapabilityIdentifier, ...]` (supported task/profile/plugin capability versions); `build_hash: ContentHash`; `os_family: nonempty uppercase token`; `architecture: nonempty uppercase token`; `cpu_cores: int >= 1`; `memory_mb: int >= 1`; `artifact_locality: tuple[ContentHash, ...] = ()` (artifact content hashes present locally); `heartbeat_interval_seconds: int >= 1`; `schema_version: Literal[1] = 1`. | FEAT-WS-DISTRIBUTE_WORKERS → Orchestration (scheduler), Simulator | FR-WS-REGISTER_WORKER_CAPABILITIES, §21.6 registration facts. Registration alone confers no trust. |
-| R18 | `WorkerRegistration` (wire-native) | `worker_id: Uuid7`; `descriptor: WorkerCapabilityDescriptor`; `endpoint: nonempty URI str` (authenticated channel); `registered_at: UtcTimestamp`; `last_heartbeat_at: UtcTimestamp`; `heartbeat_expires_at: UtcTimestamp`; `trusted: bool = False`; `schema_version: Literal[1] = 1`. Constraints: `last_heartbeat_at >= registered_at`; `heartbeat_expires_at > last_heartbeat_at`; stale (`heartbeat_expires_at` passed) workers expire and receive no assignments; `trusted=False` workers receive no assignments. | FEAT-WS-DISTRIBUTE_WORKERS → Orchestration, Simulator | FR-WS-REGISTER_WORKER_CAPABILITIES, FR-WS-SECURE_REMOTE_WORKERS. Trust requires channel authentication, not registration. |
-| R19 | `WorkerLease` (wire-native) | `job_id: Uuid7`; `attempt_no: int >= 1`; `worker_id: Uuid7`; `worker_build_hash: ContentHash`; `fencing_token: int >= 1` (monotonically increasing per job); `acquired_at: UtcTimestamp`; `last_heartbeat_at: UtcTimestamp`; `expires_at: UtcTimestamp`; `heartbeat_interval_seconds: int >= 1`; `state: Literal[ACTIVE,RELEASED,EXPIRED,SUPERSEDED]`; `schema_version: Literal[1] = 1`. Constraints: `expires_at > acquired_at`; `last_heartbeat_at >= acquired_at`; uniqueness `(job_id,attempt_no,fencing_token)`; a commit is accepted only for the current token before expiry (`worker_leases(job_id,attempt_no,fencing_token UNIQUE)`). Scoped short-lived job credentials are `SecretRef` identities, never values. | FEAT-WS-DISTRIBUTE_WORKERS → Simulator, Orchestration | FR-WS-SECURE_REMOTE_WORKERS, FR-ORCH-FENCE_TASK_LEASES (cross-reference). |
-| R20 | `WorkerTaskEnvelope` (wire-native) | `envelope_id: Uuid7`; `task_run_id: Uuid7`; `job_id: Uuid7`; `attempt_no: int >= 1`; `fencing_token: int >= 1`; `assigned_worker_id: Uuid7`; `assigned_at: UtcTimestamp`; `input_hashes: tuple[ContentHash, ...] = ()` (ordered content-addressed inputs incl. seed-bearing manifests); `locality_hints: tuple[ContentHash, ...] = ()`; `schema_version: Literal[1] = 1`. Constraint: reassignment to another compatible worker changes only `envelope_id`/`assigned_worker_id`/`assigned_at`; input hashes are invariant so seeds and canonical output are unchanged. | FEAT-WS-DISTRIBUTE_WORKERS → Simulator, Orchestration | FR-WS-SCHEDULE_DATA_LOCALITY; §21.6 scheduler order: capability → locality score → available resources → current load → worker ID. |
-| R21 | `ArtifactManifest` (wire-native) | `artifact_id: Uuid7`; `kind: nonempty str`; `content_hash: ContentHash`; `size_bytes: int >= 0`; `media_type: nonempty str`; `artifact_schema_version: int >= 1` (artifact payload schema per §22.3); `state: Literal[STAGED,VALIDATING,COMMITTED,REJECTED,CORRUPT]`; `chunks: tuple[ArtifactChunk, ...] = ()` where `ArtifactChunk(index: int >= 0, offset_bytes: int >= 0, size_bytes: int >= 1, chunk_hash: ContentHash)`; `created_at: UtcTimestamp`; `committed_at: UtcTimestamp | None = None`; `schema_version: Literal[1] = 1`. Constraints: chunks sorted by `index` starting at 0 and contiguous from `offset_bytes 0`; commit requires concatenating chunk bytes to reproduce `content_hash` and `size_bytes`; corruption/interruption never yields `COMMITTED` (§23.12); `committed_at` present iff `state="COMMITTED"`. | FEAT-WS-DISTRIBUTE_WORKERS → remote workers, artifact store, Simulator | FR-WS-VERIFY_ARTIFACT_TRANSFER, §5.2 artifact states. |
-| R22 | `HostedWorkspaceContext` (wire-native) | `workspace_id: Uuid7`; `deployment_mode: Literal[DESKTOP,HOSTED]`; `metadata_scope: nonempty str`; `artifact_scope: nonempty str`; `queue_scope: nonempty str`; `credential_scope: nonempty str`; `quota_scope: nonempty str`; `plugin_permission_scope: nonempty str`; `schema_version: Literal[1] = 1`. Constraint: no two hosted contexts share a value of the same scope kind; the six scopes map one-to-one to the isolated concerns of the FR. | FEAT-WS-HOST_WORKSPACES → Interfaces, all hosted consumers | FR-WS-ISOLATE_HOSTED_WORKSPACES, NFR-ISO-006. Hosted substitutes PostgreSQL 16+ / object store per §22.1 while preserving repository/API behavior. |
-| R23 | `WorkspaceAuthorizationDecision` (wire-native) | `decision_id: Uuid7`; `principal: PrincipalRef`; `workspace_id: Uuid7`; `action: nonempty str`; `outcome: Literal[ALLOW,DENY]`; `reason: str = ""` (empty iff `outcome="ALLOW"`); `decided_at: UtcTimestamp`; `expires_at: UtcTimestamp | None = None`; `schema_version: Literal[1] = 1`. Constraint: missing evidence or policy uncertainty yields `DENY` (fail-closed). | FEAT-WS-HOST_WORKSPACES → Interfaces gateways, audit | FR-WS-AUTHORIZE_HOSTED_WORKSPACES. Local and hosted contract suites differ only at this adapter; domain services are unchanged. |
-
-Cross-owner references used by these records (never copied): `CapabilityIdentifier`, `ProblemDetails`, `DomainEvent`, and common aliases from `app/contracts/common/`; job/task identities as `Uuid7` with Orchestration/Simulator ownership noted.
-
-#### Ratified v1 capabilities and operation envelopes
-
-Frozen v1 bundles (compatibility rule: exact current method sets and sync/async behavior; no new-port reshaping; Python failures remain the `WorkspaceError` family with stable `error_code` strings; no subscription methods):
-
-| Key / port | Frozen method set | Provider → consumers | FRs |
-|---|---|---|---|
-| `workspace.manage-workspaces@1` / `ManageWorkspacesCapability` | `initialize_workspace`, `migrate_workspace_schema`, `fence_workspace_writers`, `release_writer_fence`, `recover_workspace_state`, `backup_workspace`, `restore_workspace` (all synchronous) | FEAT-WS-MANAGE_WORKSPACES → Interfaces, Orchestration, Simulator, UI | FR-WS-INITIALIZE_WORKSPACE, FR-WS-MIGRATE_WORKSPACE_SCHEMA, FR-WS-FENCE_WORKSPACE_WRITERS, FR-WS-RECOVER_WORKSPACE_STATE, FR-WS-BACKUP_WORKSPACE |
-| `workspace.configure-runtime@1` / `ConfigureRuntimeCapability` | `configure_workspace`, `get_workspace_settings`, `enforce_storage_guards`, `configure_server_runtime`, `publish_runtime_support` (all synchronous) | FEAT-WS-CONFIGURE_RUNTIME → Interfaces, Orchestration, Simulator, UI | FR-WS-CONFIGURE_WORKSPACE, FR-WS-ENFORCE_STORAGE_GUARDS, FR-WS-CONFIGURE_SERVER_RUNTIME, FR-WS-PUBLISH_RUNTIME_SUPPORT (observational runtime-support Kernel event, PUBLISH mode; no subscription) |
-| `workspace.secure-local-access@1` / `SecureLocalAccessCapability` | `issue_local_session`, `verify_local_session`, `revoke_local_session`, `check_system_health`, `report_system_readiness` (all synchronous) | FEAT-WS-SECURE_LOCAL_ACCESS → Interfaces, UI | FR-WS-ISSUE_LOCAL_SESSION, FR-WS-REPORT_SYSTEM_READINESS |
-| `workspace.build-diagnostics@1` / `BuildDiagnosticsCapability` | `build_diagnostic_bundle` (synchronous) | FEAT-WS-BUILD_DIAGNOSTICS → Interfaces, UI | FR-WS-BUILD_DIAGNOSTIC_BUNDLE |
-
-New bundles (universal new-port rule: `@runtime_checkable` async protocol, exactly one capability-named request method over a closed operation-discriminated union; no subscription — no owner FR requires live/stream/replay):
-
-**`workspace.distribute-workers@1` / `DistributeWorkersCapability`** — `async def distribute_workers(request: DistributeWorkersRequest) -> DistributeWorkersSuccess | WorkspaceFailure`. Provider: FEAT-WS-DISTRIBUTE_WORKERS. Consumers: Orchestration, Simulator, Interfaces. FRs: FR-WS-REGISTER_WORKER_CAPABILITIES, FR-WS-SECURE_REMOTE_WORKERS, FR-WS-SCHEDULE_DATA_LOCALITY, FR-WS-VERIFY_ARTIFACT_TRANSFER.
-
-- `DistributeWorkersRequest`: `request_id: Uuid7`; `capability_snapshot_id: Uuid7`; `operation: Literal[REGISTER,AUTHENTICATE,HEARTBEAT,ACQUIRE_LEASE,RELEASE_LEASE,ASSIGN_TASK,PREPARE_TRANSFER,COMMIT_TRANSFER]`; `descriptor: WorkerCapabilityDescriptor | None = None`; `endpoint: URI str | None = None`; `worker_id: Uuid7 | None = None`; `job_id: Uuid7 | None = None`; `attempt_no: int >= 1 | None = None`; `fencing_token: int >= 1 | None = None`; `task_run_id: Uuid7 | None = None`; `required_capabilities: tuple[CapabilityIdentifier, ...] = ()`; `locality_hints: tuple[ContentHash, ...] = ()`; `artifact: ArtifactManifest | None = None`; `artifact_id: Uuid7 | None = None`; `schema_version: Literal[1] = 1`.
-- Operation presence matrix: `REGISTER` requires `descriptor`,`endpoint`, forbids the rest. `AUTHENTICATE` and `HEARTBEAT` require `worker_id` only. `ACQUIRE_LEASE` requires `worker_id`,`job_id`,`attempt_no`. `RELEASE_LEASE` requires `worker_id`,`job_id`,`attempt_no`,`fencing_token`. `ASSIGN_TASK` requires `job_id`,`attempt_no`,`task_run_id` (`required_capabilities`/`locality_hints` optional; scheduler selects the worker). `PREPARE_TRANSFER` requires `artifact` (STAGED manifest with chunk plan). `COMMIT_TRANSFER` requires `artifact_id`,`job_id`,`attempt_no`,`fencing_token` (commit accepted only for the current token before expiry).
-- `DistributeWorkersSuccess`: `outcome: Literal["SUCCESS"] = "SUCCESS"`; `request_id: Uuid7`; `result_version: Literal[1] = 1`; `registration: WorkerRegistration | None = None` (REGISTER/AUTHENTICATE/HEARTBEAT); `lease: WorkerLease | None = None` (ACQUIRE_LEASE); `envelope: WorkerTaskEnvelope | None = None` (ASSIGN_TASK); `artifact: ArtifactManifest | None = None` (PREPARE_TRANSFER returns the STAGED chunk plan; COMMIT_TRANSFER returns the COMMITTED manifest); `schema_version: Literal[1] = 1`.
-- `WorkspaceFailure` (shared by both new Workspace capabilities): `outcome: Literal["FAILURE"] = "FAILURE"`; `request_id: Uuid7`; `code: Literal[WORKSPACE_VALIDATION_FAILED,WORKSPACE_NOT_FOUND,WORKSPACE_ALREADY_OPEN,WORKER_UNKNOWN,WORKER_UNTRUSTED,WORKER_EXPIRED,LEASE_UNAVAILABLE,LEASE_TOKEN_STALE,TRANSFER_INVALID,TRANSFER_INCOMPLETE,ISOLATION_CONFLICT,CAPABILITY_UNAVAILABLE]`; `problem: ProblemDetails`; `schema_version: Literal[1] = 1`. Mapping: `WORKER_UNTRUSTED` for assignments/leases by untrusted workers; `LEASE_TOKEN_STALE` for commits under a superseded token; `TRANSFER_INVALID` for hash/size/schema mismatch; `TRANSFER_INCOMPLETE` for missing chunks; `CAPABILITY_UNAVAILABLE` performs no mutation.
-- Event union: empty in v1. Worker/lease/transfer facts are observational Kernel `PUBLISH` events at implementation time (FR-WS-SECURE_REMOTE_WORKERS effect column) and are not port stream contracts.
-
-**`workspace.host-workspaces@1` / `HostWorkspacesCapability`** — `async def host_workspaces(request: HostWorkspacesRequest) -> HostWorkspacesSuccess | WorkspaceFailure`. Provider: FEAT-WS-HOST_WORKSPACES. Consumers: Interfaces, hosted principals. FRs: FR-WS-ISOLATE_HOSTED_WORKSPACES, FR-WS-AUTHORIZE_HOSTED_WORKSPACES.
-
-- `HostWorkspacesRequest`: `request_id: Uuid7`; `capability_snapshot_id: Uuid7`; `operation: Literal[PROVISION,DESCRIBE,AUTHORIZE]`; `context: HostedWorkspaceContext | None = None` (PROVISION); `workspace_id: Uuid7 | None = None` (DESCRIBE, AUTHORIZE); `principal: PrincipalRef | None = None` (AUTHORIZE); `action: nonempty str | None = None` (AUTHORIZE); `schema_version: Literal[1] = 1`.
-- `HostWorkspacesSuccess`: `outcome: Literal["SUCCESS"] = "SUCCESS"`; `request_id: Uuid7`; `result_version: Literal[1] = 1`; `context: HostedWorkspaceContext | None = None` (PROVISION/DESCRIBE); `decision: WorkspaceAuthorizationDecision | None = None` (AUTHORIZE; `DENY` is a typed success outcome, never a failure); `schema_version: Literal[1] = 1`.
-- Event union: empty; no subscription. `ISOLATION_CONFLICT` covers scope collisions at PROVISION.
+**Operation-gated providers.** For each §4 feature, its linked source card’s complete “Operation-gated providers” table defines applicability, exact provider identity and absence behavior. This is scoped incorporation, not permission to treat all 233 register-wide operation edges as optional for every feature. Resolve those provider IDs to their primary capability keys in the corresponding domain README; bind actual operations in the acceptance record. An omitted local duplicate table does not waive a source dependency.
 
 ### Persisted State Ownership
 
-| Status | State / Store | Read access (via contract) | Migration definitions |
-|---|---|---|---|
-| Missing | workspace, workspace_setting_versions, secret_refs, audit_events, jobs, job_commands, worker_leases, artifacts, artifact_refs, events, tombstones | Other domains through `D-WS` public capabilities only | The owning feature's `StateDeclaration` and migration/storage adapter |
+Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+| Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-SECURE_LOCAL_ACCESS`](#feat-ws-secure-local-access) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-ADMINISTER_SETTINGS`](#feat-ws-administer-settings) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-BUILD_DIAGNOSTICS`](#feat-ws-build-diagnostics) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-WS-DISTRIBUTE_APPLICATION`](#feat-ws-distribute-application) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+
+A feature’s exact durable namespace, schema version and migrations are taken from its reconciled manifest and contract, not guessed from its folder name. External consumers access semantic state only through the owner capability. Workspace persistence/artifact custody never acquires that semantic ownership.
 
 ### Four-Level Structural Hierarchy
 
-| Code level | Represents | This package |
-|---|---|---|
-| **Package** | Domain | `app/services/workspace/` / `D-WS` |
-| **Module folder** | Feature / capability | One folder for each of: Workspace Lifecycle, Runtime Configuration and Admission, Local Access and Health, Diagnostics, Distributed Worker Pool, Hosted Workspace Boundary |
-| **File** | Use case or focused responsibility | Exactly the responsibility file named in each module specification |
-| **Class / function / method** | Functional requirement behavior | Exactly one registered `fr_*` behavior per `FR-*` row |
-
-```text
-Package (Domain)
-└── Module folder (Feature)
-    └── File (Responsibility)
-        └── Registered function (Functional requirement behavior)
-```
+| Code level | Represents | Domain example |
+| --- | --- | --- |
+| Package | Domain boundary | `app/services/workspace/` |
+| Module folder | Composable feature owner | `app/services/workspace/manage_workspaces/` — [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) |
+| File | Manifest, strict configuration, lifecycle or focused use case | `manifest.py`, `config.py`, `feature.py`, focused logic module |
+| Class / function / method | One or more traced requirement behaviors | `FR-TRC-WS-MANAGE_WORKSPACES-001` and its acceptance oracle |
 
 ### Domain Capability Map
 
-```mermaid
-flowchart TD
-    DOMAIN[[D-WS: Workspace]]
-    DOMAIN --> FEAT_WS_MANAGE_WORKSPACES[[FEAT-WS-MANAGE_WORKSPACES: Workspace Lifecycle]]
-    FEAT_WS_MANAGE_WORKSPACES --> FEAT_WS_MANAGE_WORKSPACES_FILE[workspace_lifecycle.py: RESP-WS-01-01]
-    DOMAIN --> FEAT_WS_CONFIGURE_RUNTIME[[FEAT-WS-CONFIGURE_RUNTIME: Runtime Configuration and Admission]]
-    FEAT_WS_CONFIGURE_RUNTIME --> FEAT_WS_CONFIGURE_RUNTIME_FILE[runtime_configuration.py: RESP-WS-02-01]
-    DOMAIN --> FEAT_WS_SECURE_LOCAL_ACCESS[[FEAT-WS-SECURE_LOCAL_ACCESS: Local Access and Health]]
-    FEAT_WS_SECURE_LOCAL_ACCESS --> FEAT_WS_SECURE_LOCAL_ACCESS_FILE[local_access_health.py: RESP-WS-03-01]
-    DOMAIN --> FEAT_WS_BUILD_DIAGNOSTICS[[FEAT-WS-BUILD_DIAGNOSTICS: Diagnostics]]
-    FEAT_WS_BUILD_DIAGNOSTICS --> FEAT_WS_BUILD_DIAGNOSTICS_FILE[diagnostic_bundle.py: RESP-WS-04-01]
-    DOMAIN --> FEAT_WS_DISTRIBUTE_WORKERS[[FEAT-WS-DISTRIBUTE_WORKERS: Distributed Worker Pool]]
-    FEAT_WS_DISTRIBUTE_WORKERS --> FEAT_WS_DISTRIBUTE_WORKERS_FILE[distributed_worker_pool.py: RESP-WS-05-01]
-    DOMAIN --> FEAT_WS_HOST_WORKSPACES[[FEAT-WS-HOST_WORKSPACES: Hosted Workspace Boundary]]
-    FEAT_WS_HOST_WORKSPACES --> FEAT_WS_HOST_WORKSPACES_FILE[hosted_workspace.py: RESP-WS-06-01]
-```
+The table in §2 is the complete domain capability map. Edges below illustrate dependency direction, not a new orchestrator or private import relationship.
 
----
+```mermaid
+flowchart LR
+    Caller["Caller / consuming feature"] --> Contract["Versioned public contract"]
+    Provider["Removable domain feature"] -->|provides| Contract
+    Provider --> Scope["Scoped effects and disposal"]
+    Provider --> State["Own records only, when declared"]
+```
 
 ## 2. Final Package Structure and Feature Independence
 
+Feature owners are independent and physically removable. The selected package is a target binding: reconcile known current aliases and preserve compatible existing identities before creating a folder. Folder absence does not prove behavior absence. Removing a feature withdraws its contributions; it does not delete another feature’s source or retained evidence.
+
+| Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) | Open, recover and back up a workspace | `app/services/workspace/manage_workspaces/` | U0 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) | Execute bounded feature-owned transactions | `app/services/workspace/execute_persistence/` | U0 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Publish and retain immutable artifact bytes | `app/services/workspace/manage_artifacts/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Verify accounts, principals and sessions | `app/services/workspace/manage_accounts/` | U0 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-SECURE_LOCAL_ACCESS`](#feat-ws-secure-local-access) | Resolve secrets and protect host access | `app/services/workspace/secure_local_access/` | U0 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-ADMINISTER_SETTINGS`](#feat-ws-administer-settings) | Version user-visible system settings | `app/services/workspace/administer_settings/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations) | Retain scoped conversations without losing canonical evidence | `app/services/workspace/manage_conversations/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-BUILD_DIAGNOSTICS`](#feat-ws-build-diagnostics) | Explain runtime health and export safe diagnostics | `app/services/workspace/build_diagnostics/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-DISTRIBUTE_APPLICATION`](#feat-ws-distribute-application) | Build installable desktop and headless application distributions | `app/services/workspace/distribute_application/` | U13 | 3 | 1 | NOT_REVALIDATED |
+
 ```text
-workspace/
-├── README.md
-├── __init__.py
-├── workspace_lifecycle/                    # FEAT-WS-MANAGE_WORKSPACES: Workspace Lifecycle
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── workspace_lifecycle.py              # RESP-WS-01-01
-├── runtime_configuration/                    # FEAT-WS-CONFIGURE_RUNTIME: Runtime Configuration and Admission
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── runtime_configuration.py              # RESP-WS-02-01
-├── local_access_health/                    # FEAT-WS-SECURE_LOCAL_ACCESS: Local Access and Health
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── local_access_health.py              # RESP-WS-03-01
-├── diagnostic_bundle/                    # FEAT-WS-BUILD_DIAGNOSTICS: Diagnostics
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── diagnostic_bundle.py              # RESP-WS-04-01
-├── distributed_worker_pool/                    # FEAT-WS-DISTRIBUTE_WORKERS: Distributed Worker Pool
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── distributed_worker_pool.py              # RESP-WS-05-01
-└── hosted_workspace/                    # FEAT-WS-HOST_WORKSPACES: Hosted Workspace Boundary
-    ├── README.md
-    ├── __init__.py
-    ├── manifest.py
-    ├── config.py
-    ├── feature.py
-    └── hosted_workspace.py              # RESP-WS-06-01
+app/services/workspace/
+├── README.md  # this domain target registry
+├── __init__.py  # docstring only
+├── manage_workspaces/  # FEAT-WS-MANAGE_WORKSPACES
+├── execute_persistence/  # FEAT-WS-EXECUTE_PERSISTENCE
+├── manage_artifacts/  # FEAT-WS-MANAGE_ARTIFACTS
+├── manage_accounts/  # FEAT-WS-MANAGE_ACCOUNTS
+├── secure_local_access/  # FEAT-WS-SECURE_LOCAL_ACCESS
+├── administer_settings/  # FEAT-WS-ADMINISTER_SETTINGS
+├── manage_conversations/  # FEAT-WS-MANAGE_CONVERSATIONS
+├── build_diagnostics/  # FEAT-WS-BUILD_DIAGNOSTICS
+└── distribute_application/  # FEAT-WS-DISTRIBUTE_APPLICATION
 ```
 
-### Module dependency diagram
+Every feature folder contains `README.md`, docstring-only `__init__.py`, `manifest.py`, `config.py`, `feature.py` and its focused logic modules. Shared contract definitions live outside those removable packages. The primary logic-module designation in §4 is a target for usage ownership; adapt a compatible existing module rather than duplicate its service.
 
-Feature modules do not import one another's private files. Runtime dependencies resolve through kernel capabilities obtained from `FeatureContext`; composition selects providers and reconciles changes, so reciprocal workflow participation cannot create a package-import cycle.
+### Feature Capability Dependency Direction
 
-```mermaid
-flowchart LR
-    K[[Kernel capability registry]]
-    K --> FEAT_WS_MANAGE_WORKSPACES[[FEAT-WS-MANAGE_WORKSPACES: Workspace Lifecycle]]
-    K --> FEAT_WS_CONFIGURE_RUNTIME[[FEAT-WS-CONFIGURE_RUNTIME: Runtime Configuration and Admission]]
-    K --> FEAT_WS_SECURE_LOCAL_ACCESS[[FEAT-WS-SECURE_LOCAL_ACCESS: Local Access and Health]]
-    K --> FEAT_WS_BUILD_DIAGNOSTICS[[FEAT-WS-BUILD_DIAGNOSTICS: Diagnostics]]
-    K --> FEAT_WS_DISTRIBUTE_WORKERS[[FEAT-WS-DISTRIBUTE_WORKERS: Distributed Worker Pool]]
-    K --> FEAT_WS_HOST_WORKSPACES[[FEAT-WS-HOST_WORKSPACES: Hosted Workspace Boundary]]
-```
-
-### Structure rules
-
-- The package root contains `README.md`, import-pure `__init__.py`, and one direct folder per feature; discovery uses the `haruquantai.features` entry-point group.
-- Each feature folder contains mandatory `README.md`, pure `__init__.py`, `manifest.py`, `config.py`, `feature.py`, and focused responsibility modules.
-- `FR-*`/`fr_*` names provide product, implementation, and test traceability inside the feature; they are not separate runtime registrations or capability keys.
-- Cross-feature and cross-domain behavior is injected by capability key. Direct private-file imports are prohibited.
-- Every core capability module documents Python and CLI usage; exactly one designated primary domain-logic module owns the feature's executable `__main__` demonstration. Usage examples never live under `tests/`.
-
----
+A required edge means “consumer requires the provider’s public capability.” It never means “import the provider package.” Optional operation closure is resolved by the composition/runtime boundary and rechecked at invocation. Physical removal must cause the declared unavailable or blocked state while unrelated capabilities remain usable.
 
 ## 3. Workflows
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Implemented | `WF-WS-001` | Cross-domain | Workspace Lifecycle | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-INITIALIZE_WORKSPACE` → `FR-WS-MIGRATE_WORKSPACE_SCHEMA` → `FR-WS-FENCE_WORKSPACE_WRITERS` → `FR-WS-RECOVER_WORKSPACE_STATE` → `FR-WS-BACKUP_WORKSPACE` |
-| Implemented | `WF-WS-002` | Internal | Runtime Configuration and Admission | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-CONFIGURE_WORKSPACE` → `FR-WS-ENFORCE_STORAGE_GUARDS` → `FR-WS-CONFIGURE_SERVER_RUNTIME` → `FR-WS-PUBLISH_RUNTIME_SUPPORT` |
-| Implemented | `WF-WS-003` | Internal | Local Access and Health | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-ISSUE_LOCAL_SESSION` → `FR-WS-REPORT_SYSTEM_READINESS` |
-| Implemented | `WF-WS-004` | Internal | Diagnostics | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-BUILD_DIAGNOSTIC_BUNDLE` |
-| Missing | `WF-WS-005` | Cross-domain | Distributed Worker Pool | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-REGISTER_WORKER_CAPABILITIES` → `FR-WS-SECURE_REMOTE_WORKERS` → `FR-WS-SCHEDULE_DATA_LOCALITY` → `FR-WS-VERIFY_ARTIFACT_TRANSFER` |
-| Missing | `WF-WS-006` | Cross-domain | Hosted Workspace Boundary | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-WS-ISOLATE_HOSTED_WORKSPACES` → `FR-WS-AUTHORIZE_HOSTED_WORKSPACES` |
+Workflows connect existing features; they do not create additional feature owners. “Internal” means all participating behavior is domain-local. “Cross-Domain” means collaboration through public contracts. Participant lists below are **not** a substitute for the plan’s execution schedule or the workflow’s validated operation graph.
 
-### `WF-WS-001` — Workspace Lifecycle
+### Domain-local reading sequence — Recover a workspace
 
-**Scope:** `Cross-domain` when the request requires another domain capability; otherwise `Internal`.
+**Input boundary:** Open an existing workspace or a verified restore manifest.
 
-**System workflow:** `SYS-WF-001`
+**Output boundary:** One fenced writer or an explicit read-only/recovery session; committed references still resolve.
 
-**Input boundary:** A validated request/query plus an immutable capability snapshot and provider bindings.
+**Capabilities to inspect:** [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) → [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) → [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts).
 
-**Output boundary:** The result/artifact/event defined by the participating `FR-*` rows, or their exact structured failure/degradation outcome.
+This is a domain-oriented explanation, not an additional canonical `WF-*` identity. Apply every FR of the participating operation, not only its first validation step. Validate scope and immutable references, resolve admitted providers, perform owner work, verify the owner receipt, and then expose the result. Invalid input, provider absence, stale revision and cancellation retain separate typed outcomes.
 
-1. `Feature.mount()` resolves its declared required capabilities through `FeatureContext`.
-2. `workspace_lifecycle.py` executes `fr_ws_initialize_workspace`, `fr_ws_migrate_workspace_schema`, `fr_ws_fence_workspace_writers`, `fr_ws_recover_workspace_state`, `fr_ws_backup_workspace` in the requirement-defined order.
-3. Scoped effects are committed or reversed under `FR-KERN-DEFINE_REQUIREMENT_BEHAVIOR, FR-KERN-DEFINE_LIFECYCLE_CONTEXT, FR-KERN-DECLARE_BEHAVIOR_DEPENDENCIES, FR-KERN-REGISTER_FEATURE_MODULES, FR-KERN-DEFINE_RESPONSIBILITY_FILES, FR-KERN-IMPLEMENT_REQUIREMENT_FUNCTIONS, FR-KERN-DEPEND_PUBLIC_PORTS, FR-KERN-NAMESPACE_CAPABILITY_KEYS, FR-KERN-DECLARE_DEPENDENCY_RULES, FR-KERN-REEVALUATE_DEPENDENCIES, FR-KERN-DEFINE_SCOPE_HIERARCHY, FR-KERN-PASS_EFFECT_SCOPES, FR-KERN-REGISTER_EFFECT_REVERSALS, FR-KERN-REVERSE_EFFECTS_LIFO, FR-KERN-ROLLBACK_FAILED_ACTIVATION, FR-KERN-MANAGE_COMPONENT_LIFECYCLE, FR-KERN-COMMIT_CAPABILITY_SWAP, FR-KERN-QUIESCE_DEPENDENT_WORK, FR-KERN-REMOVE_DEPENDENT_COMPONENTS, FR-KERN-ISOLATE_DISPOSAL_FAILURES, FR-KERN-RECONCILE_DESIRED_STATE, FR-KERN-REPLACE_COMPONENTS_TRANSACTIONALLY, FR-KERN-PROVIDE_SCOPED_REGISTRARS, FR-KERN-DRAIN_REMOVED_BEHAVIORS, FR-KERN-CLASSIFY_COMPONENT_EFFECTS, FR-KERN-NAMESPACE_COMPONENT_STATE, FR-KERN-REGISTER_EXTENSION_POINTS, FR-KERN-EMIT_CAUSAL_EVENTS, FR-KERN-REJECT_DEPENDENCY_CYCLES, FR-KERN-PIN_CAPABILITY_SNAPSHOTS, FR-KERN-TEST_COMPONENT_REMOVAL, FR-KERN-VERIFY_EXACT_REMOVAL, FR-KERN-ROUTE_MULTIPLE_PROVIDERS`.
-4. The feature returns or publishes only the documented output boundary.
+| Evidence | Workflow | Scope | Lead | First U gate | Acceptance |
+| --- | --- | --- | --- | --- | --- |
+| PENDING | [`WF-WB-CHAT_REVIEW`](#wf-wb-chat-review) | Cross-Domain | [`FEAT-AGT-ASSIST_OPERATOR`](../agentic/README.md#feat-agt-assist-operator) | U2 | `ATW-WB-CHAT_REVIEW` |
+| PENDING | [`WF-AGT-ASSIST_OPERATOR`](#wf-agt-assist-operator) | Cross-Domain | [`FEAT-AGT-ASSIST_OPERATOR`](../agentic/README.md#feat-agt-assist-operator) | U2 | `ATW-AGT-ASSIST_OPERATOR` |
+| PENDING | [`WF-AGT-AUTHOR_SANDBOX_ARTIFACT`](#wf-agt-author-sandbox-artifact) | Cross-Domain | [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](../agentic/README.md#feat-agt-author-sandbox-artifacts) | U9 | `ATW-AGT-AUTHOR_SANDBOX_ARTIFACT` |
 
-**Failure behaviour:**
+<a id="wf-wb-chat-review"></a>
+### `WF-WB-CHAT_REVIEW` — Review a real result through Chat Bot
 
-- Feature unavailable → workspace creation/open/recovery/backup is unavailable; an existing workspace is not mutated. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- Missing/incompatible required capability → `CAPABILITY_UNAVAILABLE` or `CAPABILITY_INCOMPATIBLE`; no partial mutation.
+**Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](../agentic/README.md#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
 
-**Integration test:**
-`tests/services/workspace/integration/test_workspace_lifecycle.py::test_workspace_lifecycle_workflow()`
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../agentic/README.md#feat-agt-assist-operator), [`FEAT-UI-32`](../../ui/README.md#feat-ui-32), [`FEAT-UI-15`](../../ui/README.md#feat-ui-15), [`FEAT-UI-CHAT_BOT`](../../ui/README.md#feat-ui-chat-bot), [`FEAT-IFACE-AGENTIC_GATEWAY`](../interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](../agentic/README.md#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](../agentic/README.md#feat-agt-synthesize-research), [`FEAT-ANA-QUERY_RESULTS`](../analytics/README.md#feat-ana-query-results), [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations).
 
-```mermaid
-flowchart LR
-    INPUT[Validated input + capability snapshot]
-    FEATURE[[FEAT-WS-MANAGE_WORKSPACES: Workspace Lifecycle]]
-    FILE[workspace_lifecycle.py: RESP-WS-01-01]
-    OUTPUT[Committed result or structured failure]
-    INPUT --> FEATURE --> FILE --> OUTPUT
-```
+**This domain contributes:** [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations). Every participating feature’s scoped FR/local-NFR obligations remain binding.
 
----
+**Input/output and acceptance contract:** `ATW-WB-CHAT_REVIEW` — Change the browser-displayed metric to an incorrect value: answer refreshes owner truth and cites exact evidence, same-conversation specialist attribution; stale or denied evidence cannot produce a claimed fact.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-chat-review).
+
+<a id="wf-agt-assist-operator"></a>
+### `WF-AGT-ASSIST_OPERATOR` — Context-Aware Chat Bot
+
+**Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](../agentic/README.md#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../agentic/README.md#feat-agt-assist-operator), [`FEAT-AGT-ENFORCE_MANDATE`](../agentic/README.md#feat-agt-enforce-mandate), [`FEAT-AGT-RUN_WORKFLOWS`](../agentic/README.md#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-REGISTER_ROLES`](../agentic/README.md#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](../agentic/README.md#feat-agt-invoke-models), [`FEAT-UI-15`](../../ui/README.md#feat-ui-15), [`FEAT-IFACE-AGENTIC_GATEWAY`](../interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations).
+
+**This domain contributes:** [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-ASSIST_OPERATOR` — Fresh verified scope and deterministic direct/specialist route; reply preserves attribution, refusals and evidence; no prose-triggered mutation.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-assist-operator).
+
+<a id="wf-agt-author-sandbox-artifact"></a>
+### `WF-AGT-AUTHOR_SANDBOX_ARTIFACT` — Sandbox Code Fallback
+
+**Lead owner:** [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](../agentic/README.md#feat-agt-author-sandbox-artifacts). **Release gate:** U9. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS`](../agentic/README.md#feat-agt-author-sandbox-artifacts), [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](../agentic/README.md#feat-agt-compose-strategy-specs), [`FEAT-AGT-GOVERN_TOOL_CALLS`](../agentic/README.md#feat-agt-govern-tool-calls), [`FEAT-PLUG-SANDBOX_PERMISSIONS`](../plugins/README.md#feat-plug-sandbox-permissions), [`FEAT-PLUG-ISOLATE_ANALYSIS`](../plugins/README.md#feat-plug-isolate-analysis), [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts).
+
+**This domain contributes:** [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-AUTHOR_SANDBOX_ARTIFACT` — Receiver-validated DSL gap plus exact specification/authorization precedes bounded model/write/build; staging manifest and cleanup receipt; no host import/deployment.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-author-sandbox-artifact).
 
 ## 4. Composable Feature Specifications
 
-Implement module sections from top to bottom. Requirement `Depends` cells define product and implementation ordering; runtime capability dependencies must be declared separately in the owning `FeatureSpec`.
+Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. All acceptance states are PENDING / NOT_REVALIDATED. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
+
+<a id="feat-ws-manage-workspaces"></a>
+### 4.1 `manage_workspaces/` — `FEAT-WS-MANAGE_WORKSPACES`
+
+> **Feature ID:** `FEAT-WS-MANAGE_WORKSPACES`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/manage_workspaces/`
+> **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Open, recover and back up a workspace. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `workspace.manage-workspaces@1`.
+
+**Required capabilities:**
+
+None (root with respect to the register’s required-provider graph)..
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-workspaces) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/manage_workspaces.py`](../../contracts/workspace/manage_workspaces.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.manage-workspaces@1` | FEAT-WS-MANAGE_WORKSPACES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-MANAGE_WORKSPACES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_workspaces.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-MANAGE_WORKSPACES-001` | Initialize/open a workspace with one active writer fence and explicit read-only recovery mode. | `AT-WS-MANAGE_WORKSPACES-001` | Two concurrent writers yield one owner and one denied/read-only session; reopening preserves the same workspace ID. |
+| PENDING | `FR-TRC-WS-MANAGE_WORKSPACES-002` | Back up metadata and referenced immutable artifacts as one verified manifest and restore into empty staging before switching the active workspace. | `AT-WS-MANAGE_WORKSPACES-002` | Corrupt one member: restore is rejected before switch; a valid restore reconciles all counts, hashes and references. |
+| PENDING | `FR-TRC-WS-MANAGE_WORKSPACES-003` | Reconcile incomplete migration/publication records after a crash without deleting committed domain evidence. | `AT-WS-MANAGE_WORKSPACES-003` | Inject crashes before promotion and after promotion/before catalogue commit; no committed row points at partial bytes and orphan custody is reported. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-MANAGE_WORKSPACES-001` | Removing FEAT-WS-MANAGE_WORKSPACES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_WORKSPACES-001` | Disable and physically remove manage_workspaces; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-workspaces): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/manage_workspaces/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/manage_workspaces/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.manage_workspaces._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-WS-MANAGE_WORKSPACES`. Withdraw `workspace.manage-workspaces@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.1 `workspace_lifecycle/` — Workspace Lifecycle
+<a id="feat-ws-execute-persistence"></a>
+### 4.2 `execute_persistence/` — `FEAT-WS-EXECUTE_PERSISTENCE`
 
-**Feature ID:** `FEAT-WS-MANAGE_WORKSPACES`
+> **Feature ID:** `FEAT-WS-EXECUTE_PERSISTENCE`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/execute_persistence/`
+> **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Initialize, migrate, lock, recover, and back up a workspace.
+#### Purpose
 
-**Deletion contract:** workspace creation/open/recovery/backup is unavailable; an existing workspace is not mutated. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Execute bounded feature-owned transactions. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → workspace_lifecycle.py
-  → fr_ws_initialize_workspace, fr_ws_migrate_workspace_schema, fr_ws_fence_workspace_writers, fr_ws_recover_workspace_state, fr_ws_backup_workspace
-  → requirement-defined output or structured failure
+**Provides:** `workspace.persistence@1`.
+
+**Required capabilities:**
+
+`workspace.manage-workspaces@1` — [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-execute-persistence) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/persistence.py`](../../contracts/workspace/persistence.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-WS-EXECUTE_PERSISTENCE-001`, `FR-TRC-WS-EXECUTE_PERSISTENCE-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.persistence@1` | FEAT-WS-EXECUTE_PERSISTENCE | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-EXECUTE_PERSISTENCE | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| execute_persistence.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-EXECUTE_PERSISTENCE-001` | Execute registered namespace-bound transactions with idempotency and expected revision; reject undeclared table/namespace access. | `AT-WS-EXECUTE_PERSISTENCE-001` | A workflow writer cannot update claim tables; two competing expected-revision writes accept exactly one. |
+| PENDING | `FR-TRC-WS-EXECUTE_PERSISTENCE-002` | Apply ordered additive feature migration manifests with checksum verification and transactional rollback. | `AT-WS-EXECUTE_PERSISTENCE-002` | Reapplying the same manifest changes nothing; changed checksum fails; a failed migration does not partially advance the schema version. |
+| PENDING | `FR-TRC-WS-EXECUTE_PERSISTENCE-003` | Keep append-only evidence immutable and provide bounded owner-scoped reads/export operations. | `AT-WS-EXECUTE_PERSISTENCE-003` | An attempted overwrite/delete of retained evidence is denied; paged export has stable order and cannot cross workspace scope. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-EXECUTE_PERSISTENCE-001` | Removing FEAT-WS-EXECUTE_PERSISTENCE withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-EXECUTE_PERSISTENCE-001` | Disable and physically remove execute_persistence; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-execute-persistence): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/execute_persistence/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/execute_persistence/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-EXECUTE_PERSISTENCE/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.execute_persistence._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `workspace_lifecycle.py` | Initialize, migrate, lock, recover, and back up a workspace | `fr_ws_initialize_workspace`, `fr_ws_migrate_workspace_schema`, `fr_ws_fence_workspace_writers`, `fr_ws_recover_workspace_state`, `fr_ws_backup_workspace` | **Standard library:** `pathlib`, `sqlite3`, `hashlib`, `json`, `uuid`, `shutil`, `os`, `sys`, `time`, `dataclasses`, `enum`, `typing`, `contextlib`<br>**Required third-party:** None<br>**Local:** `app.contracts.workspace`, `app.kernel.capability`, `app.kernel.feature`<br>no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-WS-MANAGE_WORKSPACES` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-MANAGE_WORKSPACES` `Feature.mount`, `feature` | **Standard library:** `typing`<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and `workspace_lifecycle.py` |
-| Implemented | `manifest.py` | Define the immutable `FEAT-WS-MANAGE_WORKSPACES` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-MANAGE_WORKSPACES` `FeatureSpec`, `SPEC` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec`, `app.contracts.workspace.capabilities` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `FEAT-WS-MANAGE_WORKSPACES.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `workspace_lifecycle.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `workspace_lifecycle.py` — Initialize, migrate, lock, recover, and back up a workspace
-
-**File responsibility:** Initialize, migrate, lock, recover, and back up a workspace.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-WS-INITIALIZE_WORKSPACE` | Target | P0 | The system shall initialize a workspace atomically at an explicit writable path with metadata, artifacts, logs, cache, exports, and temporary subdirectories. | `fr_ws_initialize_workspace` implementation trace | Persistence write | Killing initialization at any filesystem operation leaves either no workspace or a workspace that can resume initialization without loss. | — | `BD-01`, `BD-09`; Verified concept | **Usage:** `app/services/workspace/workspace_lifecycle/workspace_lifecycle.py::__main__` scenario `FR-WS-INITIALIZE_WORKSPACE`<br>**Unit:** `tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py::test_ws_initialize_workspace()` |
-| Implemented | `FR-WS-MIGRATE_WORKSPACE_SCHEMA` | Target | P0 | The system shall record workspace and database schema versions and apply ordered, transactional migrations. | `fr_ws_migrate_workspace_schema` implementation trace | Persistence write | Opening an older supported fixture migrates once; reopening performs no further mutation. Failed migration restores the previous usable schema. | FR-WS-INITIALIZE_WORKSPACE | Baseline §8; Target | **Usage:** `app/services/workspace/workspace_lifecycle/workspace_lifecycle.py::__main__` scenario `FR-WS-MIGRATE_WORKSPACE_SCHEMA`<br>**Unit:** `tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py::test_ws_migrate_workspace_schema()` |
-| Implemented | `FR-WS-FENCE_WORKSPACE_WRITERS` | Target | P0 | The system shall prevent concurrent writers from opening the same local workspace while permitting a read-only diagnostic open. | `fr_ws_fence_workspace_writers` implementation trace | Persistence write | A second writer receives `WORKSPACE_ALREADY_OPEN`; no second job supervisor starts. | FR-WS-INITIALIZE_WORKSPACE | Specified §22.1 | **Usage:** `app/services/workspace/workspace_lifecycle/workspace_lifecycle.py::__main__` scenario `FR-WS-FENCE_WORKSPACE_WRITERS`<br>**Unit:** `tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py::test_ws_fence_workspace_writers()` |
-| Implemented | `FR-WS-RECOVER_WORKSPACE_STATE` | Target | P0 | The system shall recover staged artifacts, expired leases, and nonterminal jobs during startup. | `fr_ws_recover_workspace_state` implementation trace | None | Fault-injection fixtures produce no duplicate committed result and classify every orphan. | FR-WS-MIGRATE_WORKSPACE_SCHEMA, DUR-001 | `BD-09`; Target | **Usage:** `app/services/workspace/workspace_lifecycle/workspace_lifecycle.py::__main__` scenario `FR-WS-RECOVER_WORKSPACE_STATE`<br>**Unit:** `tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py::test_ws_recover_workspace_state()` |
-| Implemented | `FR-WS-BACKUP_WORKSPACE` | Target | P1 | The system shall create a consistent backup snapshot of metadata plus referenced committed artifacts. | `fr_ws_backup_workspace` implementation trace | Persistence write | Restore into an empty path passes all checksums and referential-integrity checks. | FR-WS-MIGRATE_WORKSPACE_SCHEMA, FR-WS-RECOVER_WORKSPACE_STATE | Baseline §16.2; Target | **Usage:** `app/services/workspace/workspace_lifecycle/workspace_lifecycle.py::__main__` scenario `FR-WS-BACKUP_WORKSPACE`<br>**Unit:** `tests/services/workspace/workspace_lifecycle/test_workspace_lifecycle.py::test_ws_backup_workspace()` |
-
-**Rules:**
-
-- workspace creation/open/recovery/backup is unavailable; an existing workspace is not mutated. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/workspace/workspace_lifecycle/workspace_lifecycle.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-WS-EXECUTE_PERSISTENCE`. Withdraw `workspace.persistence@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.2 `runtime_configuration/` — Runtime Configuration and Admission
+<a id="feat-ws-manage-artifacts"></a>
+### 4.3 `manage_artifacts/` — `FEAT-WS-MANAGE_ARTIFACTS`
 
-**Feature ID:** `FEAT-WS-CONFIGURE_RUNTIME`
+> **Feature ID:** `FEAT-WS-MANAGE_ARTIFACTS`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/manage_artifacts/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Validate settings, resource guards, launcher settings, and support profiles.
+#### Purpose
 
-**Deletion contract:** defaults remain readable but configuration changes and guarded job admission are unavailable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Publish and retain immutable artifact bytes. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → runtime_configuration.py
-  → fr_ws_configure_workspace, fr_ws_enforce_storage_guards, fr_ws_configure_server_runtime, fr_ws_publish_runtime_support
-  → requirement-defined output or structured failure
+**Provides:** `workspace.artifacts@1`.
+
+**Required capabilities:**
+
+`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-artifacts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/artifacts.py`](../../contracts/workspace/artifacts.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-WS-MANAGE_ARTIFACTS-001`, `FR-TRC-WS-MANAGE_ARTIFACTS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.artifacts@1` | FEAT-WS-MANAGE_ARTIFACTS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-MANAGE_ARTIFACTS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_artifacts.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-MANAGE_ARTIFACTS-001` | Stage, flush and validate byte count/schema declaration/content hash before atomic publication; issue a custody receipt. | `AT-WS-MANAGE_ARTIFACTS-001` | A bad hash or truncated write yields no published artifact reference; retry of the same publication is idempotent. |
+| PENDING | `FR-TRC-WS-MANAGE_ARTIFACTS-002` | Resolve authorized artifact IDs and bounded download grants; reject host paths, cross-account access and expired grants. | `AT-WS-MANAGE_ARTIFACTS-002` | Traversal/UNC/drive paths and a grant for another principal fail; valid downloads match the immutable checksum. |
+| PENDING | `FR-TRC-WS-MANAGE_ARTIFACTS-003` | Retain referenced artifacts and legal holds; clean eligible staging/orphans through admitted maintenance with an audit receipt. | `AT-WS-MANAGE_ARTIFACTS-003` | Deleting a databank membership leaves its referenced strategy/result bytes intact; expired unreferenced staging is removed and recorded. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-MANAGE_ARTIFACTS-001` | Removing FEAT-WS-MANAGE_ARTIFACTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_ARTIFACTS-001` | Disable and physically remove manage_artifacts; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-artifacts): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/manage_artifacts/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/manage_artifacts/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.manage_artifacts._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `runtime_configuration.py` | Validate settings, resource guards, launcher settings, and support profiles | `fr_ws_configure_workspace`, `fr_ws_enforce_storage_guards`, `fr_ws_configure_server_runtime`, `fr_ws_publish_runtime_support` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-WS-CONFIGURE_RUNTIME` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-CONFIGURE_RUNTIME` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-WS-CONFIGURE_RUNTIME` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-CONFIGURE_RUNTIME` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-WS-CONFIGURE_RUNTIME.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `runtime_configuration.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `runtime_configuration.py` — Validate settings, resource guards, launcher settings, and support profiles
-
-**File responsibility:** Validate settings, resource guards, launcher settings, and support profiles.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-WS-CONFIGURE_WORKSPACE` | Target | P1 | The system shall persist validated settings for timezone, locale, worker count, worker memory, artifact limits, paths, logging, and retention. | `fr_ws_configure_workspace` implementation trace | Persistence write | Invalid memory/count/path values return field errors and do not increment configuration version. | FR-WS-INITIALIZE_WORKSPACE | Baseline `WS`; Target | **Usage:** `app/services/workspace/runtime_configuration/runtime_configuration.py::__main__` scenario `FR-WS-CONFIGURE_WORKSPACE`<br>**Unit:** `tests/services/workspace/runtime_configuration/test_runtime_configuration.py::test_ws_configure_workspace()` |
-| Implemented | `FR-WS-ENFORCE_STORAGE_GUARDS` | Target | P1 | The system shall enforce configurable workspace free-space and artifact-size guards before admitting data import, backtest, and code-generation jobs. | `fr_ws_enforce_storage_guards` implementation trace | Persistence write | A projected over-limit job remains unqueued and reports required versus available storage. | FR-WS-CONFIGURE_WORKSPACE | Specified §§19.2, 22.1 | **Usage:** `app/services/workspace/runtime_configuration/runtime_configuration.py::__main__` scenario `FR-WS-ENFORCE_STORAGE_GUARDS`<br>**Unit:** `tests/services/workspace/runtime_configuration/test_runtime_configuration.py::test_ws_enforce_storage_guards()` |
-| Implemented | `FR-WS-CONFIGURE_SERVER_RUNTIME` | Target | P1 | The launcher/server shall expose validated bind address, TCP port, headless mode, authentication mode, and per-worker/global CPU and memory limits; loopback shall remain the default and non-loopback binding shall require explicit opt-in plus nonlocal authentication. | `fr_ws_configure_server_runtime` implementation trace | Read-only | An invalid or unavailable port fails before UI launch; headless readiness is observable without a browser; a non-loopback unauthenticated configuration is rejected. | FR-WS-CONFIGURE_WORKSPACE, FR-WS-ISSUE_LOCAL_SESSION, FR-WS-REPORT_SYSTEM_READINESS | [Internal web-server port](https://strategyquant.com/doc/strategyquant/manually-configure-internal-web-server-port/); Target security adaptation | **Usage:** `app/services/workspace/runtime_configuration/runtime_configuration.py::__main__` scenario `FR-WS-CONFIGURE_SERVER_RUNTIME`<br>**Unit:** `tests/services/workspace/runtime_configuration/test_runtime_configuration.py::test_ws_configure_server_runtime()` |
-| Implemented | `FR-WS-PUBLISH_RUNTIME_SUPPORT` | Target | P1 | Each release shall publish a versioned runtime support profile naming supported OS/architecture, minimum and recommended CPU, memory, free storage, filesystem, browser, and required external compiler versions. | `fr_ws_publish_runtime_support` implementation trace | External API call; Event publication | Startup rejects unsupported architecture/filesystem semantics and reports below-recommended resources without inventing a capability; admitted jobs still obey resource guards. | FR-WS-REPORT_SYSTEM_READINESS, FR-WS-ENFORCE_STORAGE_GUARDS, NFR-COMP-005 | [System requirements](https://strategyquant.com/doc/strategyquant/system-requirements/); Target adaptation | **Usage:** `app/services/workspace/runtime_configuration/runtime_configuration.py::__main__` scenario `FR-WS-PUBLISH_RUNTIME_SUPPORT`<br>**Unit:** `tests/services/workspace/runtime_configuration/test_runtime_configuration.py::test_ws_publish_runtime_support()` |
-
-**Rules:**
-
-- defaults remain readable but configuration changes and guarded job admission are unavailable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/workspace/runtime_configuration/runtime_configuration.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-WS-MANAGE_ARTIFACTS`. Withdraw `workspace.artifacts@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.3 `local_access_health/` — Local Access and Health
+<a id="feat-ws-manage-accounts"></a>
+### 4.4 `manage_accounts/` — `FEAT-WS-MANAGE_ACCOUNTS`
 
-**Feature ID:** `FEAT-WS-SECURE_LOCAL_ACCESS`
+> **Feature ID:** `FEAT-WS-MANAGE_ACCOUNTS`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/manage_accounts/`
+> **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Issue local credentials and report health/readiness.
+#### Purpose
 
-**Deletion contract:** the local interactive endpoint is not advertised; offline domain libraries remain usable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Verify accounts, principals and sessions. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → local_access_health.py
-  → fr_ws_issue_local_session, fr_ws_report_system_readiness
-  → requirement-defined output or structured failure
+**Provides:** `workspace.manage-accounts@1`.
+
+**Required capabilities:**
+
+None (root with respect to the register’s required-provider graph)..
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-accounts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/manage_accounts.py`](../../contracts/workspace/manage_accounts.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-WS-MANAGE_ACCOUNTS-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.manage-accounts@1` | FEAT-WS-MANAGE_ACCOUNTS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-MANAGE_ACCOUNTS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_accounts.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-MANAGE_ACCOUNTS-001` | Verify session expiry, revocation, principal and authorized account/workspace before returning a bounded identity projection. | `AT-WS-MANAGE_ACCOUNTS-001` | Expired, revoked and wrong-account sessions produce denial before any receiver mutation. |
+| PENDING | `FR-TRC-WS-MANAGE_ACCOUNTS-002` | Revalidate identity on resumed work and evidence access rather than trusting a previously captured UI context. | `AT-WS-MANAGE_ACCOUNTS-002` | Revoke access between capture and use: the next read/handoff fails despite an otherwise valid snapshot. |
+| PENDING | `FR-TRC-WS-MANAGE_ACCOUNTS-003` | Retain redacted authentication/audit references and keep credential material out of public session records. | `AT-WS-MANAGE_ACCOUNTS-003` | Wire/log/export fixtures contain no password, raw token or broker credential. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-MANAGE_ACCOUNTS-001` | Removing FEAT-WS-MANAGE_ACCOUNTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_ACCOUNTS-001` | Disable and physically remove manage_accounts; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-accounts): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/manage_accounts/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/manage_accounts/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.manage_accounts._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `local_access_health.py` | Issue local credentials and report health/readiness | `fr_ws_issue_local_session`, `fr_ws_report_system_readiness` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-WS-SECURE_LOCAL_ACCESS` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-SECURE_LOCAL_ACCESS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-WS-SECURE_LOCAL_ACCESS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-SECURE_LOCAL_ACCESS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-WS-SECURE_LOCAL_ACCESS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `local_access_health.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `local_access_health.py` — Issue local credentials and report health/readiness
-
-**File responsibility:** Issue local credentials and report health/readiness.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-WS-ISSUE_LOCAL_SESSION` | Target | P0 | The system shall issue an ephemeral local-session token only to a launcher-connected client and shall bind the API to loopback by default. | `fr_ws_issue_local_session` implementation trace | Local state mutation | A request without the token or from a non-loopback source is denied before application service execution. | FR-WS-INITIALIZE_WORKSPACE | `BD-01`; Target | **Usage:** `app/services/workspace/local_access_health/local_access_health.py::__main__` scenario `FR-WS-ISSUE_LOCAL_SESSION`<br>**Unit:** `tests/services/workspace/local_access_health/test_local_access_health.py::test_ws_issue_local_session()` |
-| Implemented | `FR-WS-REPORT_SYSTEM_READINESS` | Target | P1 | The system shall expose health, readiness, build, schema, and worker-capacity status without disclosing secrets or absolute user paths. | `fr_ws_report_system_readiness` implementation trace | Read-only | Health works before full readiness; readiness becomes true only after migrations and job recovery. | FR-WS-MIGRATE_WORKSPACE_SCHEMA | Baseline §15; Target | **Usage:** `app/services/workspace/local_access_health/local_access_health.py::__main__` scenario `FR-WS-REPORT_SYSTEM_READINESS`<br>**Unit:** `tests/services/workspace/local_access_health/test_local_access_health.py::test_ws_report_system_readiness()` |
-
-**Rules:**
-
-- the local interactive endpoint is not advertised; offline domain libraries remain usable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/workspace/local_access_health/local_access_health.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-WS-MANAGE_ACCOUNTS`. Withdraw `workspace.manage-accounts@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.4 `diagnostic_bundle/` — Diagnostics
+<a id="feat-ws-secure-local-access"></a>
+### 4.5 `secure_local_access/` — `FEAT-WS-SECURE_LOCAL_ACCESS`
 
-**Feature ID:** `FEAT-WS-BUILD_DIAGNOSTICS`
+> **Feature ID:** `FEAT-WS-SECURE_LOCAL_ACCESS`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/secure_local_access/`
+> **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Produce a redacted diagnostic bundle.
+#### Purpose
 
-**Deletion contract:** diagnostic export is unavailable; normal execution continues. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Resolve secrets and protect host access. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → diagnostic_bundle.py
-  → fr_ws_build_diagnostic_bundle
-  → requirement-defined output or structured failure
+**Provides:** `workspace.secure-local-access@1`.
+
+**Required capabilities:**
+
+`workspace.manage-accounts@1` — [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-secure-local-access) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/secure_local_access.py`](../../contracts/workspace/secure_local_access.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-WS-SECURE_LOCAL_ACCESS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.secure-local-access@1` | FEAT-WS-SECURE_LOCAL_ACCESS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-SECURE_LOCAL_ACCESS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| secure_local_access.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-SECURE_LOCAL_ACCESS-001` | Create and resolve opaque secret references only for an authorized selected adapter generation and purpose. | `AT-WS-SECURE_LOCAL_ACCESS-001` | A UI, Agentic role or unrelated provider cannot resolve a secret; the approved adapter receives it only inside its isolated boundary. |
+| PENDING | `FR-TRC-WS-SECURE_LOCAL_ACCESS-002` | Validate loopback/nonlocal host access configuration and require authenticated policy before exposing remote access. | `AT-WS-SECURE_LOCAL_ACCESS-002` | An unauthenticated nonloopback configuration is rejected before listener startup; status reports no secret values. |
+| PENDING | `FR-TRC-WS-SECURE_LOCAL_ACCESS-003` | Rotate/revoke a secret reference without rewriting historic provenance or enabling silent provider fallback. | `AT-WS-SECURE_LOCAL_ACCESS-003` | An old generation loses future resolution, while historical records retain only the old opaque reference. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-SECURE_LOCAL_ACCESS-001` | Removing FEAT-WS-SECURE_LOCAL_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-SECURE_LOCAL_ACCESS-001` | Disable and physically remove secure_local_access; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-secure-local-access): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/secure_local_access/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/secure_local_access/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.secure_local_access._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `diagnostic_bundle.py` | Produce a redacted diagnostic bundle | `fr_ws_build_diagnostic_bundle` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-WS-BUILD_DIAGNOSTICS` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-BUILD_DIAGNOSTICS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-WS-BUILD_DIAGNOSTICS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-BUILD_DIAGNOSTICS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-WS-BUILD_DIAGNOSTICS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `diagnostic_bundle.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `diagnostic_bundle.py` — Produce a redacted diagnostic bundle
-
-**File responsibility:** Produce a redacted diagnostic bundle.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-WS-BUILD_DIAGNOSTIC_BUNDLE` | Target | P1 | The system shall produce a redacted diagnostic bundle containing versions, configuration shape, recent structured logs, job states, and integrity findings. | `fr_ws_build_diagnostic_bundle` implementation trace | None | Bundle scanning finds no session token, connection secret, or unredacted configured secret value. | FR-WS-CONFIGURE_WORKSPACE | Baseline §16.5; Target | **Usage:** `app/services/workspace/diagnostic_bundle/diagnostic_bundle.py::__main__` scenario `FR-WS-BUILD_DIAGNOSTIC_BUNDLE`<br>**Unit:** `tests/services/workspace/diagnostic_bundle/test_diagnostic_bundle.py::test_ws_build_diagnostic_bundle()` |
-
-**Rules:**
-
-- diagnostic export is unavailable; normal execution continues. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/workspace/diagnostic_bundle/diagnostic_bundle.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-WS-SECURE_LOCAL_ACCESS`. Withdraw `workspace.secure-local-access@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.5 `distributed_worker_pool/` — Distributed Worker Pool
+<a id="feat-ws-administer-settings"></a>
+### 4.6 `administer_settings/` — `FEAT-WS-ADMINISTER_SETTINGS`
 
-**Feature ID:** `FEAT-WS-DISTRIBUTE_WORKERS`
+> **Feature ID:** `FEAT-WS-ADMINISTER_SETTINGS`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/administer_settings/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Register, authenticate, schedule, and transfer artifacts to remote workers.
+#### Purpose
 
-**Deletion contract:** only compatible local workers remain eligible. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Version user-visible system settings. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → distributed_worker_pool.py
-  → fr_ws_register_worker_capabilities, fr_ws_secure_remote_workers, fr_ws_schedule_data_locality, fr_ws_verify_artifact_transfer
-  → requirement-defined output or structured failure
+**Provides:** `workspace.administer-settings@1`.
+
+**Required capabilities:**
+
+`workspace.manage-accounts@1` — [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-administer-settings) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/administer_settings.py`](../../contracts/workspace/administer_settings.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-WS-ADMINISTER_SETTINGS-001`, `FR-TRC-WS-ADMINISTER_SETTINGS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.administer-settings@1` | FEAT-WS-ADMINISTER_SETTINGS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-ADMINISTER_SETTINGS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| administer_settings.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-ADMINISTER_SETTINGS-001` | Read and update schema-validated setting revisions using expected revision; reject unknown keys and incompatible combinations. | `AT-WS-ADMINISTER_SETTINGS-001` | A stale update conflicts; invalid values do not increment the version or partially apply. |
+| PENDING | `FR-TRC-WS-ADMINISTER_SETTINGS-002` | Expose owner, effective default, narrower policy, remount/restart effect and secret-reference slots for each setting. | `AT-WS-ADMINISTER_SETTINGS-002` | Selecting a larger UI CPU value cannot override the effective Orchestration envelope; the UI shows the stricter value and reason. |
+| PENDING | `FR-TRC-WS-ADMINISTER_SETTINGS-003` | Preserve user-visible units, locale, theme, sound, picker/view defaults and report header/footer without placing business data in layout state. | `AT-WS-ADMINISTER_SETTINGS-003` | Changing locale changes display only; stored capability IDs, numerical values and source hashes stay unchanged. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-ADMINISTER_SETTINGS-001` | Removing FEAT-WS-ADMINISTER_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-ADMINISTER_SETTINGS-001` | Disable and physically remove administer_settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-administer-settings): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/administer_settings/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/administer_settings/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.administer_settings._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `distributed_worker_pool.py` | Register, authenticate, schedule, and transfer artifacts to remote workers | `fr_ws_register_worker_capabilities`, `fr_ws_secure_remote_workers`, `fr_ws_schedule_data_locality`, `fr_ws_verify_artifact_transfer` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-WS-DISTRIBUTE_WORKERS` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-DISTRIBUTE_WORKERS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-WS-DISTRIBUTE_WORKERS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-DISTRIBUTE_WORKERS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-WS-DISTRIBUTE_WORKERS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `distributed_worker_pool.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `distributed_worker_pool.py` — Register, authenticate, schedule, and transfer artifacts to remote workers
-
-**File responsibility:** Register, authenticate, schedule, and transfer artifacts to remote workers.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-WS-REGISTER_WORKER_CAPABILITIES` | Target | P0 | Phase 4 worker pools shall register capability, implementation/build identity, platform, resources, and heartbeat without becoming trusted merely by registration. | `fr_ws_register_worker_capabilities` implementation trace | None | Scheduler assigns only compatible work and expires stale workers. | FR-ORCH-FENCE_TASK_LEASES | Distributed baseline | **Usage:** `app/services/workspace/distributed_worker_pool/distributed_worker_pool.py::__main__` scenario `FR-WS-REGISTER_WORKER_CAPABILITIES`<br>**Unit:** `tests/services/workspace/distributed_worker_pool/test_distributed_worker_pool.py::test_ws_register_worker_capabilities()` |
-| Implemented | `FR-WS-SECURE_REMOTE_WORKERS` | Target | P0 | Remote workers shall use authenticated, encrypted channels, short-lived job credentials, fenced leases, and content-addressed artifact transfer. | `fr_ws_secure_remote_workers` implementation trace | External API call; Event publication | A worker cannot access artifacts or commit outputs outside its active lease. | FR-WS-REGISTER_WORKER_CAPABILITIES, FR-ORCH-FENCE_TASK_LEASES | Distributed baseline | **Usage:** `app/services/workspace/distributed_worker_pool/distributed_worker_pool.py::__main__` scenario `FR-WS-SECURE_REMOTE_WORKERS`<br>**Unit:** `tests/services/workspace/distributed_worker_pool/test_distributed_worker_pool.py::test_ws_secure_remote_workers()` |
-| Implemented | `FR-WS-SCHEDULE_DATA_LOCALITY` | Target | P0 | Distributed scheduling shall support data/artifact locality hints without changing deterministic task semantics. | `fr_ws_schedule_data_locality` implementation trace | Read-only | Moving a task between compatible workers leaves canonical output unchanged. | FR-WS-SECURE_REMOTE_WORKERS, FR-SIM-DISTRIBUTE_SIMULATION | Distributed baseline | **Usage:** `app/services/workspace/distributed_worker_pool/distributed_worker_pool.py::__main__` scenario `FR-WS-SCHEDULE_DATA_LOCALITY`<br>**Unit:** `tests/services/workspace/distributed_worker_pool/test_distributed_worker_pool.py::test_ws_schedule_data_locality()` |
-| Implemented | `FR-WS-VERIFY_ARTIFACT_TRANSFER` | Target | P1 | Remote artifact transfer shall verify hash, size, schema, resumable chunks, and final commit state. | `fr_ws_verify_artifact_transfer` implementation trace | External API call; Persistence write | Corruption/interruption never creates a committed invalid artifact. | FR-WS-SECURE_REMOTE_WORKERS, FR-WS-REPORT_SYSTEM_READINESS | Distributed durability | **Usage:** `app/services/workspace/distributed_worker_pool/distributed_worker_pool.py::__main__` scenario `FR-WS-VERIFY_ARTIFACT_TRANSFER`<br>**Unit:** `tests/services/workspace/distributed_worker_pool/test_distributed_worker_pool.py::test_ws_verify_artifact_transfer()` |
-
-**Rules:**
-
-- only compatible local workers remain eligible. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/workspace/distributed_worker_pool/distributed_worker_pool.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-WS-ADMINISTER_SETTINGS`. Withdraw `workspace.administer-settings@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.6 `hosted_workspace/` — Hosted Workspace Boundary
+<a id="feat-ws-manage-conversations"></a>
+### 4.7 `manage_conversations/` — `FEAT-WS-MANAGE_CONVERSATIONS`
 
-**Feature ID:** `FEAT-WS-HOST_WORKSPACES`
+> **Feature ID:** `FEAT-WS-MANAGE_CONVERSATIONS`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/manage_conversations/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Isolate hosted workspaces and authorize principals.
+#### Purpose
 
-**Deletion contract:** hosted mode is unavailable; local workspace mode remains. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Retain scoped conversations without losing canonical evidence. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → hosted_workspace.py
-  → fr_ws_isolate_hosted_workspaces, fr_ws_authorize_hosted_workspaces
-  → requirement-defined output or structured failure
+**Provides:** `workspace.conversations@1`.
+
+**Required capabilities:**
+
+`workspace.manage-accounts@1` — [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts)<br>`workspace.persistence@1` — [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-conversations) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/conversations.py`](../../contracts/workspace/conversations.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-WS-MANAGE_CONVERSATIONS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.conversations@1` | FEAT-WS-MANAGE_CONVERSATIONS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-MANAGE_CONVERSATIONS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_conversations.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-MANAGE_CONVERSATIONS-001` | Accept one idempotent turn identity and monotonic sequence under verified conversation/workspace/account scope. | `AT-WS-MANAGE_CONVERSATIONS-001` | Replaying a submitted turn returns the same accepted turn; a concurrent stale writer is rejected. |
+| PENDING | `FR-TRC-WS-MANAGE_CONVERSATIONS-002` | Expire unpinned redacted conversation content after 30 days or a stricter configured period, subject to authorized holds. | `AT-WS-MANAGE_CONVERSATIONS-002` | At the exact expiry boundary content becomes unavailable; a shorter policy wins and a valid hold is respected. |
+| PENDING | `FR-TRC-WS-MANAGE_CONVERSATIONS-003` | Export/delete conversation text separately from workflow outputs and receiver-owned records. | `AT-WS-MANAGE_CONVERSATIONS-003` | Transcript deletion leaves claim graphs, holdout receipts, strategy revisions and operational audit resolvable through their own authorized owners. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-MANAGE_CONVERSATIONS-001` | Removing FEAT-WS-MANAGE_CONVERSATIONS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_CONVERSATIONS-001` | Disable and physically remove manage_conversations; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-manage-conversations): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/manage_conversations/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/manage_conversations/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_CONVERSATIONS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.manage_conversations._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Implemented | `hosted_workspace.py` | Isolate hosted workspaces and authorize principals | `fr_ws_isolate_hosted_workspaces`, `fr_ws_authorize_hosted_workspaces` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Implemented | `feature.py` | Mount `FEAT-WS-HOST_WORKSPACES` through `FeatureContext` and stage its declared providers/effects | `FEAT-WS-HOST_WORKSPACES` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Implemented | `manifest.py` | Define the immutable `FEAT-WS-HOST_WORKSPACES` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-WS-HOST_WORKSPACES` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
+Disable and physically remove the actual reconciled owner of `FEAT-WS-MANAGE_CONVERSATIONS`. Withdraw `workspace.conversations@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Implemented | `FEAT-WS-HOST_WORKSPACES.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `hosted_workspace.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
+---
 
-#### `hosted_workspace.py` — Isolate hosted workspaces and authorize principals
+<a id="feat-ws-build-diagnostics"></a>
+### 4.8 `build_diagnostics/` — `FEAT-WS-BUILD_DIAGNOSTICS`
 
-**File responsibility:** Isolate hosted workspaces and authorize principals.
+> **Feature ID:** `FEAT-WS-BUILD_DIAGNOSTICS`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/build_diagnostics/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Implemented | `FR-WS-ISOLATE_HOSTED_WORKSPACES` | Target | P1 | Optional hosted multi-workspace deployment shall isolate metadata, artifacts, queues, credentials, quotas, and plugin permissions by workspace. | `fr_ws_isolate_hosted_workspaces` implementation trace | Persistence write | Cross-workspace identifier/path/queue tests cannot disclose or mutate another workspace. | NFR-ISO-006, FR-WS-SECURE_REMOTE_WORKERS | Phase 4 optional deployment | **Usage:** `app/services/workspace/hosted_workspace/hosted_workspace.py::__main__` scenario `FR-WS-ISOLATE_HOSTED_WORKSPACES`<br>**Unit:** `tests/services/workspace/hosted_workspace/test_hosted_workspace.py::test_ws_isolate_hosted_workspaces()` |
-| Implemented | `FR-WS-AUTHORIZE_HOSTED_WORKSPACES` | Target | P1 | Hosted deployment shall replace the local-session token with a pluggable authenticated principal and workspace authorization boundary without changing domain services. | `fr_ws_authorize_hosted_workspaces` implementation trace | None | Local and hosted contract suites differ only at the authentication/authorization adapter. | FR-IFACE-SERVE_VERSIONED_API, FR-WS-ISOLATE_HOSTED_WORKSPACES | Phase 4 optional deployment | **Usage:** `app/services/workspace/hosted_workspace/hosted_workspace.py::__main__` scenario `FR-WS-AUTHORIZE_HOSTED_WORKSPACES`<br>**Unit:** `tests/services/workspace/hosted_workspace/test_hosted_workspace.py::test_ws_authorize_hosted_workspaces()` |
+#### Purpose
 
-**Rules:**
+Explain runtime health and export safe diagnostics. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-- hosted mode is unavailable; local workspace mode remains. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
+#### Capability Declarations
 
-**Implementation notes:**
+**Provides:** `workspace.build-diagnostics@1`.
 
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
+**Required capabilities:**
 
-#### Feature usage examples
+`workspace.manage-accounts@1` — [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts).
 
-The primary domain-logic module `app/services/workspace/hosted_workspace/hosted_workspace.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-build-diagnostics) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/build_diagnostics.py`](../../contracts/workspace/build_diagnostics.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-WS-BUILD_DIAGNOSTICS-002`, `FR-TRC-WS-BUILD_DIAGNOSTICS-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.build-diagnostics@1` | FEAT-WS-BUILD_DIAGNOSTICS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-BUILD_DIAGNOSTICS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| build_diagnostics.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-BUILD_DIAGNOSTICS-001` | Assemble scoped capability, build, runtime, trace and failure metadata with explicit unknown/unavailable states. | `AT-WS-BUILD_DIAGNOSTICS-001` | A removed provider yields its owner’s readiness reason, not an invented healthy status. |
+| PENDING | `FR-TRC-WS-BUILD_DIAGNOSTICS-002` | Export bounded redacted diagnostics with stage timing, queue delay and native/process-group memory references. | `AT-WS-BUILD_DIAGNOSTICS-002` | Secret-bearing provider messages are redacted before persistence/export; byte and record limits hold under a flood. |
+| PENDING | `FR-TRC-WS-BUILD_DIAGNOSTICS-003` | Index versioned benchmark reports and compare only matched fixture/runtime/resource identities; expose targets separately from measurements. | `AT-WS-BUILD_DIAGNOSTICS-003` | An unmeasured target remains PENDING; a mismatched hardware or tick-method report cannot produce a parity/pass badge. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-BUILD_DIAGNOSTICS-001` | Removing FEAT-WS-BUILD_DIAGNOSTICS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-BUILD_DIAGNOSTICS-001` | Disable and physically remove build_diagnostics; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-build-diagnostics): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/build_diagnostics/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/build_diagnostics/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-BUILD_DIAGNOSTICS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.build_diagnostics._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-WS-BUILD_DIAGNOSTICS`. Withdraw `workspace.build-diagnostics@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ws-distribute-application"></a>
+### 4.9 `distribute_application/` — `FEAT-WS-DISTRIBUTE_APPLICATION`
+
+> **Feature ID:** `FEAT-WS-DISTRIBUTE_APPLICATION`
+> **Domain:** `workspace`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/workspace/distribute_application/`
+> **First release milestone:** `U13`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Build installable desktop and headless application distributions. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `workspace.distribute-application@1`.
+
+**Required capabilities:**
+
+`workspace.manage-workspaces@1` — [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-distribute-application) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/workspace/distribute_application.py`](../../contracts/workspace/distribute_application.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `workspace.distribute-application@1` | FEAT-WS-DISTRIBUTE_APPLICATION | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-DISTRIBUTE_APPLICATION | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| distribute_application.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-WS-DISTRIBUTE_APPLICATION-001` | Produce a thin desktop wrapper around the existing application and a headless Docker image from pinned source and lockfiles. | `AT-WS-DISTRIBUTE_APPLICATION-001` | Clean CI builds both outputs; their embedded application/contract versions and source commit match the distribution manifest. |
+| PENDING | `FR-TRC-WS-DISTRIBUTE_APPLICATION-002` | Verify installation, first launch, native runtime support, shutdown, upgrade and rollback on the supported Windows/server profiles. | `AT-WS-DISTRIBUTE_APPLICATION-002` | A missing native runtime produces an explicit pre-admission error; uninstall leaves retained user evidence untouched. |
+| PENDING | `FR-TRC-WS-DISTRIBUTE_APPLICATION-003` | Record target, toolchain, dependency/integrity metadata and exactly which release gates passed; never infer trading approval from installation. | `AT-WS-DISTRIBUTE_APPLICATION-003` | The installer report links test artifacts and hashes; no distribution action activates a live strategy or embeds credentials. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-WS-DISTRIBUTE_APPLICATION-001` | Removing FEAT-WS-DISTRIBUTE_APPLICATION withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-DISTRIBUTE_APPLICATION-001` | Disable and physically remove distribute_application; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ws-distribute-application): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/workspace/distribute_application/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/workspace/distribute_application/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-DISTRIBUTE_APPLICATION/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.workspace.distribute_application._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-WS-DISTRIBUTE_APPLICATION`. Withdraw `workspace.distribute-application@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
 ## 5. Package-Wide Requirements, Configuration, and Architecture Invariants
 
-### Persistence - Database
+| ID | Category | Rule / architectural constraint | Verification |
+| --- | --- | --- | --- |
+| ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
+| ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
+| ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
 
-The domain-owned table namespace is `workspace_`. The authoritative logical entities are: workspace, workspace_setting_versions, secret_refs, audit_events, jobs, job_commands, worker_leases, artifacts, artifact_refs, events, tombstones. Universal representation and persistence rules are owned by `app/contracts/README.md` §§15 and 23.12; this README's §22 labels define Workspace-specific storage semantics.
-
-Migration definitions shall live in The owning feature's `StateDeclaration` and migration/storage adapter. Only this domain may write its tables; other domains use the public capability contracts in Section 1.
-
-### Shared Configuration
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `[features.FEAT-*].config` | Strict TOML feature configuration | Feature-owned defaults only | Per feature | The owning feature | Accepted keys match `FeatureSpec.config_keys` and `config.py`; provider choice belongs in `[providers]`. |
-
-### Non-Functional Requirements
-
-No domain-private NFR IDs are introduced. The following project-owned requirements apply without duplication:
-
-| Status | Requirement ID | Type | Responsibility | Verification |
-|---|---|---|---|---|
-| Missing | `FR-KERN-DEFINE_REQUIREMENT_BEHAVIOR, FR-KERN-DEFINE_LIFECYCLE_CONTEXT, FR-KERN-DECLARE_BEHAVIOR_DEPENDENCIES, FR-KERN-REGISTER_FEATURE_MODULES, FR-KERN-DEFINE_RESPONSIBILITY_FILES, FR-KERN-IMPLEMENT_REQUIREMENT_FUNCTIONS, FR-KERN-DEPEND_PUBLIC_PORTS, FR-KERN-NAMESPACE_CAPABILITY_KEYS, FR-KERN-DECLARE_DEPENDENCY_RULES, FR-KERN-REEVALUATE_DEPENDENCIES, FR-KERN-DEFINE_SCOPE_HIERARCHY, FR-KERN-PASS_EFFECT_SCOPES, FR-KERN-REGISTER_EFFECT_REVERSALS, FR-KERN-REVERSE_EFFECTS_LIFO, FR-KERN-ROLLBACK_FAILED_ACTIVATION, FR-KERN-MANAGE_COMPONENT_LIFECYCLE, FR-KERN-COMMIT_CAPABILITY_SWAP, FR-KERN-QUIESCE_DEPENDENT_WORK, FR-KERN-REMOVE_DEPENDENT_COMPONENTS, FR-KERN-ISOLATE_DISPOSAL_FAILURES, FR-KERN-RECONCILE_DESIRED_STATE, FR-KERN-REPLACE_COMPONENTS_TRANSACTIONALLY, FR-KERN-PROVIDE_SCOPED_REGISTRARS, FR-KERN-DRAIN_REMOVED_BEHAVIORS, FR-KERN-CLASSIFY_COMPONENT_EFFECTS, FR-KERN-NAMESPACE_COMPONENT_STATE, FR-KERN-REGISTER_EXTENSION_POINTS, FR-KERN-EMIT_CAUSAL_EVENTS, FR-KERN-REJECT_DEPENDENCY_CYCLES, FR-KERN-PIN_CAPABILITY_SNAPSHOTS, FR-KERN-TEST_COMPONENT_REMOVAL, FR-KERN-VERIFY_EXACT_REMOVAL, FR-KERN-ROUTE_MULTIPLE_PROVIDERS` | Architecture | Spatiotemporal composition, deletion, lifecycle, dependency, HMR, effect, and fixture guarantees. | Composition/deletion matrix |
-| Missing | `NFR-DET-*` | Determinism | Applicable deterministic behavior reproduces under pinned inputs and versions. | Determinism corpus |
-| Missing | `NFR-DUR-*` | Durability | Committed state, recovery, leases, checkpoints, and retained metadata follow system rules. | Fault/recovery corpus |
-| Missing | `NFR-PERF-*` | Performance | Applicable latency, throughput, memory, and benchmark gates pass. | Named performance corpus |
-| Missing | `NFR-ISO-*` | Isolation | Processes, permissions, paths, secrets, and workspace boundaries remain isolated. | Security/isolation corpus |
-| Missing | `NFR-OBS-*` | Observability | Operations emit causal, redacted logs/events/metrics/traces. | Lineage reconstruction |
-| Missing | `NFR-COMP-*` | Compatibility | Public contracts, schemas, packages, and providers evolve through declared compatibility rules. | Compatibility corpus |
-
----
+| Policy | Binding requirement | Verification |
+| --- | --- | --- |
+| Focused responsibility | Each file has one focused responsibility; feature identity is not split by algorithm variant, workflow, role or test. | Review and module/ownership checks. |
+| Type safety | Follow the template’s Python 3.14 strict-typing target and reconcile the actual repository/lockfile runtime in Phase 0; no type-ignore bypasses. UI follows the existing strict TypeScript build. | mypy / TypeScript checks against the ratified environment. |
+| Coverage | At least 80% line and branch coverage, retaining any stronger applicable repository or owner floor. | Actual coverage reports at the approved quality boundary. |
+| Configuration parity | Exact accepted keys agree between strict config, manifest and feature-local README; request/profile controls do not become implicit feature settings. | Positive/negative parsing and parity fixtures. |
+| Numerical / resource truth | Use the domain-specific §9 rules, exact source algorithms, finite admission and explicit measurement fixtures. Targets are not measurements. | Golden, causal, overflow, bounded-memory and native/reference evidence where applicable. |
+| Scope and authority | Identity, environment, account, dataset, approval and receiver boundaries are rechecked by their actual owners. | Wrong-scope, stale, refusal, idempotency and removal tests. |
+| Shared NFR applicability | Apply only the exact shared-NFR bindings of each source feature card; all applicable requirements remain mandatory. | Expanded per-feature acceptance mapping, not a blanket global pass. |
 
 ## 6. Open Decisions
 
-None. Any behavior not specified by this README and the normative project appendices is unsupported and must fail capability validation rather than be guessed.
+The following are explicit documentary/implementation-entry gaps, not deferred permission to invent a design. Resolve the affected binding before production use. This documentation delivery does not close Preparation 0.03 or certify Phase 1 entry.
 
----
+| State | Decision / evidence label | Required resolution | Constraints | Impact |
+| --- | --- | --- | --- | --- |
+| OPEN | SOURCE-RECONCILIATION | Reconcile clause-level differences among the register’s source specification, the plan’s inspected specification and the current fetched specification. | Retain the supplied 205-feature identity set unless explicitly changed; differing hashes are not a semantic diff. | All source-dependent behavior. |
+| OPEN | EVD-CONTRACT-01 | Bind exact current protocol/DTO symbols, callable signatures, error branches, accepted config keys/defaults and literal state namespace/schema/driver. | Reuse compatible existing public contracts; no duplicate owner or invented field. Source-selected capability keys and target modules are retained here. | Each affected feature before its production consumer. |
+| OPEN | CURRENT-OWNER-BINDING | Reconcile selected target paths, compatible existing aliases, unrelated domain scope and actual implementation progress. | No automatic rename, overwrite of unrelated README entries or assumption that a missing target folder means missing behavior. | All target owners; especially legacy semantic folders and permanent UI IDs. |
+| OPEN | FIXTURE-AND-USAGE-BINDING | Pin concrete deterministic request/response fixtures, intended test symbols and runnable `_usage.py` or UI examples. | Use every existing acceptance oracle; a planned command or path is not a passing example. | Every feature acceptance bundle. |
+| OPEN | OPERATION-QUALIFICATION | Expand applicable shared-NFR/catalogue/source/operation tables into the actual per-feature evidence manifest and qualify real providers. | Complete registered adapter behavior once; an absent later provider gates only affected operations. Contract stubs are not real-provider evidence. | Applicable later-operation and release claims. |
+| CLOSED — documentary scope | IDENTITY-AND-BOUNDARY | Use the register feature/FR/local-NFR identities and exact primary-capability / required-provider bindings. | No additional feature for roles, algorithms, workflows, tests, performance or later UI integration. | The selected features in §2. |
 
 ## 7. Tests and Definition of Done
 
-### Test and usage locations
+### Test Suite Structure
 
-```text
-tests/services/workspace/
-└── <feature>/                 # feature automated verification
-```
+Focused feature tests live at the intended owners named in §4. Add config, manifest, lifecycle, failure, boundary, numerical and replay coverage where applicable. Cross-feature contract, composition, Interfaces, browser, accessibility, physical-removal and leak evidence remains independent of feature unit tests. Do not mislabel an offline fixture as production integration.
 
 ### Commands
 
-```bash
-uv run ruff check app/services/workspace
-uv run ruff format --check app/services/workspace
-uv run mypy app/services/workspace
-uv run pytest tests/services/workspace/<feature>/
-uv run pytest tests/workspace --cov=app/services/workspace --cov-fail-under=80
+The following are target verification recipes. Bind actual paths and runner scripts before use; none is reported as executed by this documentation delivery.
+
+```powershell
+uv run --frozen pytest --no-cov tests/services/workspace/manage_workspaces
+uv run --frozen ruff format --check .
+uv run --frozen ruff check .
+uv run --frozen mypy
+uv run --frozen lint-imports
+uv run --frozen python scripts/architecture_check.py
+uv run --frozen python scripts/validate_feature_docs.py
+uv run --frozen python scripts/verify_feature_removal.py --feature FEAT-WS-MANAGE_WORKSPACES --report removal-report.json
 ```
 
-### Required test levels
+The first test/removal command illustrates this domain’s first feature; use the affected feature’s exact owner path and ID for other cards. The full `scripts/ci_check.py` and coverage gate run at the approved pre-commit/CI/release boundary, not as a substitute for focused iterative checks.
 
-- **Unit:** Verify every `FR-*` behavior and every failure path.
-- **Integration:** Verify internal feature workflows, capability binding, disable/re-enable, physical removal, replacement where applicable, and leak freedom.
-- **Usage:** Execute each feature's designated primary domain-logic module and verify every named FR scenario.
+### Acceptance evidence model
 
-### Package completion checklist
+For each feature, retain `docs/dev/SQX/evidence/features/<FEAT-ID>/acceptance.json` with source/README hashes, actual tested tree/commit, paths and symbols, FR/local/shared-NFR/catalogue/source/acceptance mappings, fixture hashes, environment, exact commands and exit codes, reports, usage transcript or browser trace, operation-qualification state, lifecycle/removal results and independent review. No credentials or private raw data enter this evidence. The final accepted commit is recorded after creation to avoid a self-referential hash.
 
-- [ ] The actual package tree matches Section 2.
-- [ ] Modules and files remain arranged in documented implementation order.
-- [ ] Every module represents one feature and every file one focused responsibility.
-- [ ] Every requirement, workflow, manifest, configuration, and test row is `Implemented`.
-- [ ] Every public export, dependency, effect, error, owned state, and contract is documented.
-- [ ] Every requirement maps to a named scenario in the primary module's executable usage harness and has focused automated verification; collaborating behaviors have integration tests where applicable.
-- [ ] Feature disable/re-enable, physical removal, failed activation/cleanup, transactional replacement where applicable, and leak tests pass.
-- [ ] No private cross-feature/domain import or duplicated business logic exists.
-- [ ] No unresolved decision affects implementation.
-- [ ] All quality, security, determinism, durability, performance, observability, and compatibility gates pass.
+| Stage | Current README evidence state | What closes it |
+| --- | --- | --- |
+| Contract | NOT_REVALIDATED | Exact compatible schema, operation, config and error bindings plus contract tests. |
+| Provider | NOT_REVALIDATED | Actual implementation satisfies every owned FR/local NFR and applicable numerical/resource rule. |
+| Composition | NOT_REVALIDATED | Real registration, dependency closure, mount rollback and physical removal. |
+| Interfaces | NOT_REVALIDATED | Typed authenticated owner routing and parity; justify genuine nonapplicability. |
+| UI | NOT_REVALIDATED | Reachable truthful interaction, accessibility, cleanup and owner outcome. |
+| End-to-end | NOT_REVALIDATED | Real-provider workflow with canonical receipts and complete acceptance oracles. |
 
----
+### Feature Definition of Done Checklist
+
+- [ ] 1. Stable feature ID: retain the registered identity, including permanent numeric UI IDs.
+- [ ] 2. Single domain ownership: each feature has exactly one semantic owner and one implementation task.
+- [ ] 3. Cohesive capability: implement the complete registered behavior, not merely an adapter-shaped stub.
+- [ ] 4. External contracts: reuse compatible public contracts outside removable implementation packages; UI contribution contracts consume the generated wire boundary.
+- [ ] 5. Declared dependencies: manifest provides/requires/optional keys agree with the resolved public contracts and operation gates.
+- [ ] 6. Zero private feature imports: use public contracts and context-resolved capabilities only.
+- [ ] 7. Zero import-time I/O or registration: initialization remains pure.
+- [ ] 8. Scoped runtime effects: bindings, tasks, listeners, requests, workers and buffers have exact owners and disposers.
+- [ ] 9. Mount rollback: injected mount failure releases every partial contribution.
+- [ ] 10. Idempotent teardown: repeated scope closure is safe and leaves no orphan runtime effect.
+- [ ] 11. Required-dependency loss: absent/removed required providers block only dependent behavior and yield the declared failure state.
+- [ ] 12. Optional-dependency loss: affected operations fail explicitly; no substitute provider, fabricated data or silently reduced semantics.
+- [ ] 13. Persistent state: literal namespace/schema/driver/retention/purge and migrations are bound where state is owned; otherwise explicitly none.
+- [ ] 14. Irreversible-action safety: exact scope, idempotency, receiver reconciliation and retained audit are tested.
+- [ ] 15. Starts feature-absent: deleting the feature physically does not break unrelated startup and capabilities.
+- [ ] 16. Interfaces/UI degradation: typed unavailable/denied/partial states remain usable and truthful.
+- [ ] 17. README parity: feature-local documentation, this domain entry, manifests, configuration and contracts agree.
+- [ ] 18. Module usage: focused capability modules document public Python/API or interactive UI use and failure cases.
+- [ ] 19. Usage evidence: every backend feature has one required `_usage.py` with the bounded offline `__main__` scenarios; UI has real interaction evidence instead.
+- [ ] 20. Quality and acceptance: mapped FR/local/shared NFR, catalogue, source, workflow, removal and actual-provider evidence passes all applicable gates; no target is reported as a measurement.
+
+The ordinary ≥80% coverage floor is not proof of semantic completeness. Repeated enable/disable, failed mount, dependency loss/replacement and physical removal must demonstrate exact cleanup; use 100-cycle tests where specified. Stronger owner-specific limits and evaluation thresholds take precedence. Missing mandatory evidence prevents acceptance; a future optional provider must remain explicitly OPERATION_NOT_QUALIFIED.
 
 ## 8. Change Process
 
-```text
-1. Update this README first.
-2. Update owned/consumed contracts and affected project workflows.
-3. Resolve or record any decision that would otherwise require guessing.
-4. Add or change the functional requirement row, effect, failure behavior, and dependency.
-5. Update files, exports, manifests, configuration, and implementation order.
-6. Implement the smallest code change through public capability boundaries.
-7. Update and execute the primary-module usage harness; add or update unit, integration, deletion, and fault tests.
-8. Change status to `Implemented` only after every relevant gate passes.
-```
+Update this domain card first, then reconcile the contract and source scope. A breaking public change bumps the capability major rather than shadowing an existing contract. Keep manifest declarations, strict configuration, feature-local README and state migrations aligned. Implement only the selected feature’s cohesive behavior, update its required `_usage.py` scenarios or UI workflow, and add the exact acceptance and failure assertions. Verify dependency/removal behavior and actual provider integration, then run the approved quality gates and independent review.
 
-This keeps documentation, composition boundaries, implementation, usage examples, and verification aligned.
-
----
+Maintain one feature task and its accepted implementation commit in the existing Planner → Executor → Reviewer workflow. A verified existing feature keeps its slot and evidence; do not force a rewrite or empty commit. The phase’s last feature owns its cross-feature checkpoint, not a new feature. Later providers add real integration evidence to the already complete consumer adapter; they do not authorize unnoticed extra implementation scope. Record progress in the tracker and receipts, never by declaring all targets Implemented in this README. Preserve unrelated current domain entries when merging this selected scope.
 
 ## 9. Normative Domain Specification
 
-The stable `§x.y` labels below are preserved for cross-document references. They are authoritative here and no longer identify sections in `docs/PROJECT.md`.
+The following domain-specific rules explain the source requirements and ownership boundaries. Stable labels here are navigation labels, **not newly counted FR/NFR or feature IDs**. The feature FR/local-NFR tables and exact linked source semantics remain binding; these explanations never replace an algorithm definition, contract schema, catalogue entry or release qualification gate.
 
-### §22.3 — Canonical artifact schemas
+<a id="ws-recovery"></a>
+### 9.1 WS-RECOVERY
 
-Columnar datasets use Parquet with Zstandard, UTC microsecond timestamps, stable column order below, no dictionary encoding for decimals, and file metadata containing schema ID/version/content inputs. Journals use UTF-8 JSON Lines, one canonical JSON object per LF-terminated line. Multi-file artifacts have a canonical `index.json` listing ordered relative file paths, hashes, row counts, min/max timestamp, and schema version.
+Acquire one writer fence before mutable work. Restore into empty staging, verify every member and reference, then switch the active workspace. A corrupt member prevents the switch; a crash must not leave a committed row pointing at partial bytes. Recovery reports orphan custody rather than deleting evidence speculatively.
 
-| Schema ID | Ordered columns/records |
-| --- | --- |
-| `sqx.bar.v1` | `timestamp_utc:int64_us`, `open:decimal_string`, `high`, `low`, `close`, `volume`, `spread_ticks nullable`, `source_sequence:int64`, `flags:uint32` |
-| `sqx.tick.v1` | `timestamp_utc`, `bid`, `ask`, `last nullable`, `volume nullable`, `source_sequence`, `flags` |
-| `sqx.external-line.v1` | `timestamp_utc`, then output lines in definition ordinal as nullable binary64, `source_sequence`, `flags` |
-| `sqx.order.v1` | order fields from §8 plus `sequence`, `created_event_id`, `terminal_event_id nullable`; enum strings, decimal strings |
-| `sqx.fill.v1` | `fill_id,order_id,sequence,timestamp_utc,side,quantity,base_price,spread_price,slippage_price,final_price,commission,conversion_rate,source_event_id` |
-| `sqx.trade.v1` | fields in §8 plus `initial_risk,mfe,mae,entry_fill_ids[],exit_fill_ids[]` |
-| `sqx.equity.v1` | `timestamp_utc,sequence,balance,equity,margin,free_margin,unrealized_pl,external_cash_flow` |
-| `sqx.trace.v1` | JSONL record `eventId,timestamp,phase,instrument,strategy,nodeId,eventType,payload`; payload schema depends on eventType and is always versioned |
-| `sqx.metric.v1` | `result_id,segment,direction,metric_id,metric_version,value_decimal nullable,unit,null_reason nullable` |
-| `sqx.rng-state.v1` | canonical JSON object of sorted stream name to algorithm/state/inc/draw_count |
+<a id="ws-persistence"></a>
+### 9.2 WS-PERSISTENCE
 
-Parquet decimal-string fields are stored as BYTE_ARRAY UTF-8 canonical decimal text to prevent reader-specific scale changes. `flags` bits are: 0 synthetic, 1 corrected, 2 duplicate-resolved, 3 gap-adjacent, 4 incomplete-source, 5 session-boundary; other bits must be zero in v1. Import/export round trips preserve values, timestamps, ordering, nulls, and flags exactly.
+Accept bounded operations within the requesting feature’s declared namespace and schema. Execute its migrations and transactions without returning an unrestricted database connection. Preserve the existing SQLite authority; do not introduce a parallel generic business CRUD store.
 
-The native strategy container has media type `application/vnd.sqx-strategy+zip` and file extension `.sqxs`. It is a deterministic ZIP64 archive with UTF-8 normalized relative paths, no encryption, no extra fields/comments, DOS timestamp `1980-01-01 00:00:00`, and entries sorted by path. Required entries are `manifest.json` and `strategy.json`; optional entries are `settings/simulation.json`, `results/index.json` plus referenced result files, and `dependencies/<sha256>`. `manifest.json` contains container/schema version, strategy/version IDs, AST hash, created timestamp, ordered dependency records `(role,path,mediaType,size,sha256)`, and optional result/settings hashes. The manifest itself is excluded from its dependency list. On import, every size/hash/path/schema is validated before any object is committed; unknown optional entries are preserved as namespaced attachments, while an unknown required role rejects import. Export→import must reproduce the StrategyVersion AST/content hash. The proprietary vendor `.sqx` file extension is deliberately distinct and has no built-in binary grammar.
+<a id="ws-custody"></a>
+### 9.3 WS-CUSTODY
 
-The same deterministic ZIP rules define `.sqxp` (`application/vnd.sqx-project+zip`) with required `manifest.json`, `project.json`, and every pinned referenced version under `dependencies/`; `.sqxr` result containers with required manifest, strategy reference/content, settings, orders, fills, trades, equity, metrics, and journal indexes; and `.sqxpf` portfolio containers with portfolio definition, constituents, policies, and optional result artifacts. Import never resolves a same-named local object in place of packaged hash content. Identity collision with different content creates a new local ID plus an import mapping; identical hash is reused.
+Separate staging, verified publication, immutable content identity, authorization and reference-aware retention. Data, Strategy, Analytics, Research and Portfolio continue to define artifact meaning. Grant downloads only after current authorization and content-integrity checks.
 
-CSV export is UTF-8 without BOM, RFC 4180 quoting, comma delimiter, CRLF rows, one header row of stable field IDs, empty field for null, canonical decimals, and UTC timestamps unless an explicit export timezone adds a separate offset-bearing display column. XLSX has no macros/external links/formulas; sheet names are stable (`Summary`, `Metrics`, `Trades`, `Orders`, `Fills`, `Equity`, `Manifest`), truncated with hash suffix only if needed; machine decimals are numeric cells when exactly representable at declared scale and otherwise text with an adjacent unit/format descriptor. A hidden `_schema` sheet records schema/version, query/selector, units, full field IDs, hashes, and export timestamp. Visible filtering never changes exported membership unless the pinned query is supplied.
+<a id="ws-identity"></a>
+### 9.4 WS-IDENTITY
 
+Verify principal, workspace and account scope through the existing account/session owner. Interfaces owns transport mechanisms such as cookies and CSRF. Roles and browser widgets cannot manufacture authorization. Secret values remain in the approved secret facility and are resolved only for authorized adapters.
 
-### §22.7 — Backup, restore, retention, and audit
+<a id="ws-retention"></a>
+### 9.5 WS-RETENTION
 
-A backup captures a consistent metadata snapshot, every reachable artifact hash, schema/build version, and `backup.json` index with per-file hashes. It is written to staging, verified by reopening metadata and hashing all files, then atomically published. Restore always targets an empty staging workspace, verifies every hash/schema/migration path, then atomically switches the workspace pointer; it never overlays a live workspace. Default retention is 30 daily and 12 monthly backups, but referenced compliance holds override deletion.
+Conversation expiry or deletion affects transcripts, not accepted claims, workflow outcomes, research artifacts or receiver receipts. Removing a feature withdraws its runtime contributions but does not purge committed state. Purge is a separately authorized, reference-aware operation.
 
-Audit events are append-only and include sequence, UTC time, principal, action, object type/ID/version, request/idempotency/trace IDs, before/after hashes where applicable, outcome, and redacted details. Secret values, raw credentials, and unredacted AI payloads are forbidden. Log rotation cannot remove audit records before retention. Integrity verification recomputes the per-record hash chain `H_i=SHA256(H_(i-1)||canonical_event_i)` from an all-zero genesis hash.
+<a id="ws-distribution"></a>
+### 9.6 WS-DISTRIBUTION
 
-The following universal storage labels are authoritative here; Architecture retains only their boundary summary.
+The register selects Electron as a thin desktop-wrapper target while retaining the Next/React/Dockview application; this is a selected target, not a claim of installed dependencies. Desktop and headless distributions use the same business providers. Installer, upgrade, rollback, manifest and build evidence must qualify the advertised release scope.
 
-### §22.1 — Deployment and storage architecture
+### Normative source and acceptance binding
 
-The reference desktop implementation is one control-plane service, one or more isolated workers, SQLite 3 in WAL mode for metadata, and a filesystem content-addressed artifact store. The hosted implementation substitutes PostgreSQL 16+ and an object store but preserves repository/API behavior. Strategy evaluation never executes inside the HTTP/control-plane process. On desktop, only loopback TCP is bound by default and every mutating request requires the per-launch 256-bit session token held in memory and a protected runtime file.
+Each §4 source-card link incorporates only that feature’s shared NFR applicability, operation-gated dependencies, detailed catalogue entries, original source-ID relationships and source clauses. Open the linked entry, not a similarly named legacy feature. The register-wide inventories contain 66 shared NFRs, 646 catalogue entries, 389 original requirement-ID mappings and 233 operation-time dependency edges. Those inventories are **retained by scoped reference**, not reproduced or independently expanded in this delivery. The actual acceptance manifest must enumerate their applicable members before scope can be signed off.
 
-SQLite requirements are `foreign_keys=ON`, `journal_mode=WAL`, `synchronous=FULL`, busy timeout 5 seconds, and one application writer transaction at a time. PostgreSQL uses `READ COMMITTED` plus row-version compare-and-swap; admission/commit operations use `SERIALIZABLE`. All schema changes are numbered forward-only migrations executed transactionally where the engine permits. Startup refuses a database newer than the binary. A failed migration restores the pre-migration backup and leaves readiness false.
+### Source fingerprint record
 
-Artifacts are addressed by lowercase SHA-256 of bytes and stored under `objects/aa/bb/<remaining-hash>`. A staging file has a random name under a dedicated `staging` directory, is written and flushed, hash/size/schema validated, atomically renamed into CAS, then referenced and marked committed in one database transaction. Existing identical blobs are reused. Relative paths are constructed from validated hashes only. Garbage collection marks every committed/transitive reference from live metadata and retained backups, then moves unmarked blobs older than the grace period to quarantine before deletion. Default quarantine is 30 days.
+| Source | Git blob identity | Role |
+| --- | --- | --- |
+| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/templates/README.md`](../../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
 
-### §22.2 — Relational conventions and tables
+The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
 
-Every mutable metadata table has `id TEXT PRIMARY KEY`, `created_at TEXT NOT NULL`, `updated_at TEXT NOT NULL`, and `row_version INTEGER NOT NULL DEFAULT 1`; timestamps obey §15.2. Immutable version tables omit update operations and contain `content_hash TEXT NOT NULL UNIQUE` plus `schema_version INTEGER NOT NULL`. Foreign keys are restrictive unless the relation explicitly uses a tombstone. Enum columns have CHECK constraints matching §4.3 and §§15–21. Decimal values are canonical decimal TEXT plus optional generated/index numeric projections; hashes never use projections. JSON columns contain canonical JSON and are schema-validated before commit.
+### Delivery evidence boundary
 
-The required tables and uniqueness constraints are:
-
-| Table group | Tables and mandatory keys |
-| --- | --- |
-| Composition | `component_definitions(component_id,version UNIQUE)`, `component_instances(instance_id UNIQUE)`, `capability_registrations(capability_key,realm,registration_generation UNIQUE)`, `dependency_bindings(consumer_instance_id,behavior_id,capability_key UNIQUE)`, `effect_ledger(scope_id,acquisition_ordinal UNIQUE)`, `capability_snapshots(content_hash UNIQUE)`, `reconciliation_transactions(id UNIQUE)` |
-| Workspace/security | `workspace(singleton_key UNIQUE)`, `workspace_setting_versions(workspace_id,version UNIQUE)`, `secret_refs(workspace_id,name UNIQUE)`, `audit_events(sequence UNIQUE)` |
-| Catalogue | `instruments(canonical_symbol UNIQUE)`, `instrument_versions(instrument_id,version UNIQUE)`, `brokers(name UNIQUE)`, `broker_versions(broker_id,version UNIQUE)`, `sessions(name UNIQUE)`, `session_versions(session_id,version UNIQUE)`, `calendars(name UNIQUE)`, `calendar_versions(calendar_id,version UNIQUE)` |
-| Data | `data_series(instrument_id,broker_id,timeframe,tick_type UNIQUE)`, `data_series_versions(series_id,version UNIQUE)`, `quality_findings(data_version_id,rule_code,start_ts,end_ts)`, `external_indicator_series_versions(definition_version_id,series_id,version UNIQUE)`, `economic_news_observation_versions(source_id,provider_item_id,observed_at,revision UNIQUE)`, `recorded_market_event_versions(manifest_hash UNIQUE)` |
-| Strategy | `strategies(name_normalized UNIQUE)`, `strategy_versions(strategy_id,version UNIQUE)`, `strategy_charts(strategy_version_id,ordinal UNIQUE)`, `block_definitions(stable_id,version UNIQUE)`, `external_indicator_definitions(stable_id UNIQUE)`, `external_indicator_definition_versions(definition_id,version UNIQUE)`, `random_group_versions(group_id,version UNIQUE)`, `opposite_map_versions(map_id,version UNIQUE)`, `engine_profile_versions(profile_id,version UNIQUE)`, `codegen_runs(manifest_id UNIQUE)`, `deployment_packages(codegen_run_id,package_hash UNIQUE)` |
-| Simulator | `jobs(idempotency_scope,idempotency_key UNIQUE)`, `job_commands(job_id,command_id UNIQUE)`, `worker_leases(job_id,attempt_no,fencing_token UNIQUE)`, `run_manifests(content_hash UNIQUE)`, `results(manifest_id UNIQUE)`, `result_segments(result_id,name UNIQUE)`, `orders(result_id,order_sequence UNIQUE)`, `fills(order_id,fill_sequence UNIQUE)`, `positions(result_id,position_id UNIQUE)`, `trades(result_id,trade_id UNIQUE)`, `metric_definitions(stable_id,version UNIQUE)`, `metric_values(result_id,segment,direction,definition_id UNIQUE)` |
-| Research | `research_runs(manifest_id UNIQUE)`, `simulations(research_run_id,ordinal UNIQUE)`, `optimization_variants(research_run_id,combination_index UNIQUE)`, `wf_windows(research_run_id,ordinal UNIQUE)`, `checkpoints(research_run_id,sequence UNIQUE)` |
-| Analytics | `databanks(project_id,name_normalized UNIQUE)`, `databank_items(databank_id,strategy_version_id,result_id UNIQUE)`, `databank_decisions(databank_id,sequence UNIQUE)`, `analysis_artifacts(result_id,type,settings_hash UNIQUE)`, `benchmark_comparisons(result_id,settings_hash UNIQUE)`, `operational_journal_artifacts(source_set_hash,policy_hash UNIQUE)`, `qualification_profile_versions(profile_id,version UNIQUE)` |
-| Portfolio | `portfolios(name_normalized UNIQUE)`, `portfolio_versions(portfolio_id,version UNIQUE)`, `portfolio_results(manifest_id UNIQUE)`, `correlation_matrices(candidate_set_hash,settings_hash UNIQUE)`, `portfolio_search_artifacts(research_run_id UNIQUE)` |
-| Orchestration | `projects(name_normalized UNIQUE)`, `project_versions(project_id,version UNIQUE)`, `project_runs(project_version_id,run_number UNIQUE)`, `task_runs(project_run_id,task_key,logical_iteration UNIQUE)`, `task_attempts(task_run_id,attempt_no UNIQUE)`, `variable_assignments(project_run_id,name,sequence UNIQUE)` |
-| Plugins/specialized | `plugins(stable_id UNIQUE)`, `plugin_versions(plugin_id,version UNIQUE)`, `plugin_activations(plugin_id,workspace_id UNIQUE)`, `ai_proposals(input_hash,provider_request_id UNIQUE)` |
-| Broker Connectivity | `broker_adapter_profiles(stable_id UNIQUE)`, `broker_adapter_profile_versions(profile_id,version UNIQUE)`, `broker_sessions(session_ref,generation UNIQUE)`, `broker_session_transitions(session_id,sequence UNIQUE)`, `broker_operation_receipts(operation_id,attempt_no UNIQUE)`, `broker_capability_certifications(profile_version_id,capability_id,certification_version UNIQUE)` |
-| Runtime Risk | `risk_profiles(stable_id UNIQUE)`, `risk_profile_versions(profile_id,version UNIQUE)`, `firm_mandate_versions(stable_id,version UNIQUE)`, `risk_decisions(decision_id UNIQUE)`, `risk_limit_results(decision_id,precedence UNIQUE)`, `risk_approval_tokens(token_id UNIQUE)`, `risk_token_events(token_id,sequence UNIQUE)`, `risk_capacity_reservations(reservation_id UNIQUE)`, `risk_capacity_events(reservation_id,sequence UNIQUE)`, `risk_kill_switch_state(scope_hash UNIQUE)`, `risk_kill_switch_events(scope_hash,version UNIQUE)`, `risk_audit_records(sequence UNIQUE,record_hash UNIQUE)` |
-| Trading | `trading_sessions(session_id UNIQUE)`, `trading_session_events(session_id,sequence UNIQUE)`, `trading_operations(operation_id UNIQUE,idempotency_scope,idempotency_key UNIQUE)`, `trading_operation_events(operation_id,sequence UNIQUE)`, `trading_orders(session_id,authority_order_id UNIQUE)`, `trading_deals(session_id,authority_deal_id UNIQUE)`, `trading_position_projections(session_id,position_identity UNIQUE)`, `trading_protection_sets(owner_identity,version UNIQUE)`, `trading_journal_records(session_id,sequence UNIQUE,record_hash UNIQUE)`, `operational_accounts(session_id,account_ref UNIQUE)`, `operational_ledger_entries(account_id,sequence UNIQUE,record_hash UNIQUE)`, `operational_valuations(account_id,as_of,valuation_version UNIQUE)`, `trading_reconciliation_runs(session_id,run_sequence UNIQUE)`, `trading_reconciliation_findings(run_id,finding_key UNIQUE)` |
-| Artifact/event | `artifacts(content_hash UNIQUE)`, `artifact_refs(owner_type,owner_id,role,artifact_id UNIQUE)`, `events(sequence INTEGER UNIQUE,event_id UNIQUE)`, `tombstones(entity_type,entity_id UNIQUE)` |
-
-Every foreign-key target needed to reproduce a result is immutable or version-pinned. Deleting a logical entity creates a tombstone and removes it from ordinary queries but does not cascade into versions/results/artifacts. A transaction that updates mutable metadata uses `WHERE id=? AND row_version=?`, increments row version, and returns conflict if zero rows changed.
-
-### Reconciled Specification Gaps
-
-- `SPEC-GAP-WS-API-02-IDENTITY` (`V2:API-02#identity-session-rbac`): Reconciled to exact V3 architecture. Identity and session management are partitioned across Workspace domain features (`FEAT-WS-SECURE_LOCAL_ACCESS` for local session tokens and health, `FEAT-WS-HOST_WORKSPACES` for hosted principal refs and scoped secret refs, `FEAT-WS-CONFIGURE_RUNTIME` for versioned settings) and Interfaces transport middleware.
+This is a documentation projection and proposed domain-registry update. Generated-document checks may establish identity/count/graph/anchor consistency; they do not establish current code parity, external-provider licensing/support, native throughput, model eligibility, browser behavior, successful live connectivity or Phase 0 completion. No application suite or live operation was executed as part of authoring this README.

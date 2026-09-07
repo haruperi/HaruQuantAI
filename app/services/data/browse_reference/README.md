@@ -83,5 +83,5 @@ database; re-mounting resumes on existing rows.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.data.browse_reference.browse_reference
+uv run python -m app.services.data.browse_reference._usage
 ```

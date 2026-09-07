@@ -62,4 +62,4 @@ Removing this feature withdraws its scoped `data.aggregate-bars@1` provider. Der
 
 ## Evidence
 
-Run `uv run python -m app.services.data.bar_aggregation.bar_aggregation` for the executable scenario harness. Automated tests live in `tests/services/data/bar_aggregation/`.
+Run `uv run python -m app.services.data.bar_aggregation._usage` for the executable scenario harness. Automated tests live in `tests/services/data/bar_aggregation/`.

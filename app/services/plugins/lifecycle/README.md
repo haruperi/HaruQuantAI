@@ -70,6 +70,6 @@ and no state is purged by this feature.
 
 ## Evidence
 
-Run `uv run python -m app.services.plugins.lifecycle.plugin_lifecycle` for the
+Run `uv run python -m app.services.plugins.lifecycle._usage` for the
 bounded install/enable/upgrade/rollback/disable/remove scenario. Focused SQLite,
 configuration, and mount evidence lives in `tests/services/plugins/lifecycle/`.

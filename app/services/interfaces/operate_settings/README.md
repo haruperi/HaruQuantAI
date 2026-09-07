@@ -74,5 +74,5 @@ Interfaces features stay active.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.interfaces.operate_settings.gateway
+uv run python -m app.services.interfaces.operate_settings._usage
 ```

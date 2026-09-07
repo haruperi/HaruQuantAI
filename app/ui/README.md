@@ -1,1332 +1,4744 @@
-# UI
+# Ui
 
 > **Package:** `app/ui/`
-> **Status:** `In Progress` — 31 registered UI features (`FEAT-UI-07` withdrawn);
-> 27 `Completed` and 4 `Pending` requirement coverage or focused-folder ownership.
-> **Last updated:** `2026-09-04`
+> **Status:** `Partial` — documentary target; runtime acceptance is **NOT_REVALIDATED**.
+> **Last updated:** `2026-09-06`
+> **Domain ID:** `D-UI`
 
-> This README is the package's **single source of truth** for requirements, final
-> structure, implementation sequence, progress, verification evidence, and tests.
-> Update this file before changing UI code.
+> This README is the domain target registry for boundaries, composable feature capabilities, requirements, ownership, workflows, acceptance, and removal. Update it before changing the affected implementation. It does not certify that a target package, contract, test, usage demonstration or provider is already implemented.
+
+**Selected scope:** 38 features · 89 owned functional requirements · 64 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
+
+**Sources:** [Unified Specification](../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
+
+## Code-Aligned Implementation Convention
+
+This domain README defines target behavior; `PROJECT.md` retains system scope, cross-domain policy, system NFRs and release gates, and `ARCHITECTURE.md` retains universal package/runtime constraints. Feature-local READMEs, manifests, contracts, migrations and evidence mirror rather than silently redefine this target. For focused work, load §1, the affected §4 card, applicable §5 and §9 rules, and §7. Follow the [Feature Implementation Pipeline](../../docs/dev/feature_implementation_pipeline.md).
+
+Keep the existing single-page workstation and typed client. A `FEAT-UI-*` is the capability, acceptance and removal owner, not a new Python service. Visual contributions use a typed `manifest.ts`, strict configuration, lifecycle/render adapter, public `index.ts`, focused components and an owning workflow README. Register each contribution once; one feature may contribute multiple widgets. Retain the exact selected paths in §2, including existing nonvisual owners. No Python entry point or Python `__main__` harness is introduced for UI features. Backend wire contracts remain under `app/contracts/ui/` and other public owner contract namespaces; generated TypeScript wire DTOs are not hand-edited. A local `contracts.ts` listed below is a contribution/view boundary, not a competing server schema.
+
+FR and acceptance IDs are trace identities, not runtime registrations. Required-provider keys below reproduce the register’s required graph. Optional providers are operation-gated: they must be declared and tested without making an absent future extension a universal startup dependency. The plan’s P1–P16 execution phases are distinct from specification U0–U13 release milestones; a U label is not proof of readiness or a new feature task.
 
 ## 1. Purpose and Boundary
 
 ### Purpose
 
-UI is HaruQuantAI's independently governed Next.js presentation domain. It presents
-typed API evidence, manages bounded interaction state, and submits explicit user
-actions without becoming a business, policy, persistence, or broker authority.
+Deliver a single composable research workstation in which independently removable tools expose real backend capabilities. Present accurate owner state and evidence while keeping interaction, layout and rendering separate from business authority.
 
 ### Owns
 
-- Accessible pages, widgets, workflow presentation, navigation, and interaction state.
-- Typed API clients and frontend validation kept in route-contract parity with API.
-- Truthful loading, stale, empty, unavailable, unknown, and error presentation.
-- Browser-session recovery and non-authoritative governed-action preflight.
+Workspace/docking and lazy contributions; typed clients; per-turn context capture; navigation/access presentation; settings/data workflows; reusable grids and draft review; charts; strategy/research/simulation/result/optimization/portfolio/project tools; code/indicator tools; run monitoring; Chat Bot and Agentic inspection; advanced/neural/packaging/performance views.
 
 ### Does not own
 
-- Trading, Risk, Strategy, Data, Indicators, Simulation, Analytics, Optimization,
-  Research, Portfolio, or Agentic calculations and decisions.
-- Authentication or authorization authority, durable state, credential resolution,
-  provider readiness, broker sessions, or direct MT5 access.
-- Invented quotes, fills, performance, readiness, recovery, or successful mutations.
+Market parsing, authoritative storage, indicator/metric calculations, training or inference truth, research orchestration, permissions, Risk approval and trading execution. A widget’s visibility or display data cannot become business authority.
 
-### Shared contracts
+### Shared Contracts
 
-Contract names, versions, and owners match `docs/PROJECT.md` and the Interfaces
-(D-IFACE) contract family in `app/contracts/interfaces/`. The former monolithic
-API registry was deleted with `app/services/api` and is not restored; the
-boundary reconciliation is recorded in
-`docs/dev/iface-ui-migration/phase-0-baseline-reconciliation.md`.
+**Owned by this domain.** Status is an evidence state. Contract modules are selected public boundaries; an unbound symbol/DTO must be reconciled before implementing its production consumer. Do not infer a callable signature from the English title.
 
-**Owned by this domain** — UI-only view and interaction contracts:
+| Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
+| --- | --- | --- | --- | --- |
+| NOT_REVALIDATED | `ui.workspace-layout@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/workspaces/contracts.ts`](src/widgets/workspaces/contracts.ts) | 1 | Compose and restore the research workspace |
+| NOT_REVALIDATED | `ui.typed-backend@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/clients/contracts.ts`](src/clients/contracts.ts) | 1 | Call the typed backend and resume observation |
+| NOT_REVALIDATED | `ui.chat-context@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/context/contracts.ts`](src/context/contracts.ts) | 1 | Capture current authorized widget context |
+| NOT_REVALIDATED | `ui.shell-navigation@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/components/layout/contracts.ts`](src/components/layout/contracts.ts) | 1 | Navigate capabilities and explain workspace controls |
+| NOT_REVALIDATED | `ui.access-gate@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/app/contracts.ts`](src/app/contracts.ts) | 1 | Present session access and scope changes |
+| NOT_REVALIDATED | `ui.system-settings@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/system-settings/contracts.ts`](src/widgets/system-settings/contracts.ts) | 1 | Review effective settings and safe configuration changes |
+| NOT_REVALIDATED | `ui.data-workflow@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/components/workflow/contracts.ts`](src/components/workflow/contracts.ts) | 1 | Operate the Data Manager workspace |
+| NOT_REVALIDATED | `ui.collection-grid@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/collection-grid/contracts.ts`](src/widgets/collection-grid/contracts.ts) | 1 | Navigate large typed collections accessibly |
+| NOT_REVALIDATED | `ui.draft-review@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/draft-review/contracts.ts`](src/widgets/draft-review/contracts.ts) | 1 | Review typed edits and consequential action scope |
+| NOT_REVALIDATED | `ui.market-chart@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/chart/contracts.ts`](src/widgets/chart/contracts.ts) | 1 | Inspect market charts and typed overlays |
+| NOT_REVALIDATED | `ui.canonical-backtest@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/simulator/contracts.ts`](src/widgets/simulator/contracts.ts) | 1 | Configure and observe a canonical backtest |
+| NOT_REVALIDATED | `ui.research-workbench@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/research/contracts.ts`](src/widgets/research/contracts.ts) | 1 | Inspect research campaigns, protocols and evidence |
+| NOT_REVALIDATED | `ui.results-workbench@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/analytics/contracts.ts`](src/widgets/analytics/contracts.ts) | 1 | Compose the result inspection workspace |
+| NOT_REVALIDATED | `ui.strategy-editor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/strategy-editor/contracts.ts`](src/widgets/strategy-editor/contracts.ts) | 1 | Edit and review a strategy |
+| NOT_REVALIDATED | `ui.strategy-search-space@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/strategy-search-space/contracts.ts`](src/widgets/strategy-search-space/contracts.ts) | 1 | Configure and run strategy generation |
+| NOT_REVALIDATED | `ui.research-settings@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/research-settings/contracts.ts`](src/widgets/research-settings/contracts.ts) | 1 | Retest a fixed strategy population |
+| NOT_REVALIDATED | `ui.optimization-settings@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/optimization-settings/contracts.ts`](src/widgets/optimization-settings/contracts.ts) | 1 | Plan and inspect parameter optimization |
+| NOT_REVALIDATED | `ui.databank-grid@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/databank-grid/contracts.ts`](src/widgets/databank-grid/contracts.ts) | 1 | Organize and act on a databank |
+| NOT_REVALIDATED | `ui.result-overview@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/result-overview/contracts.ts`](src/widgets/result-overview/contracts.ts) | 1 | Read a provenance-rich result summary |
+| NOT_REVALIDATED | `ui.trade-list@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/trade-list/contracts.ts`](src/widgets/trade-list/contracts.ts) | 1 | Inspect and select individual trades |
+| NOT_REVALIDATED | `ui.equity-chart@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/equity-chart/contracts.ts`](src/widgets/equity-chart/contracts.ts) | 1 | Inspect equity, drawdown and benchmark paths |
+| NOT_REVALIDATED | `ui.trade-analysis@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/trade-analysis/contracts.ts`](src/widgets/trade-analysis/contracts.ts) | 1 | Compare trade behavior across dimensions |
+| NOT_REVALIDATED | `ui.trades-on-chart@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/trades-on-chart/contracts.ts`](src/widgets/trades-on-chart/contracts.ts) | 1 | Inspect fills against their actual market context |
+| NOT_REVALIDATED | `ui.robustness-results@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/robustness-results/contracts.ts`](src/widgets/robustness-results/contracts.ts) | 1 | Inspect robustness and scenario evidence |
+| NOT_REVALIDATED | `ui.optimization-results@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/optimization-results/contracts.ts`](src/widgets/optimization-results/contracts.ts) | 1 | Inspect parameter surfaces and walk-forward evidence |
+| NOT_REVALIDATED | `ui.portfolio-composer@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/portfolio-composer/contracts.ts`](src/widgets/portfolio-composer/contracts.ts) | 1 | Compose and compare a portfolio |
+| NOT_REVALIDATED | `ui.portfolio-builder@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/portfolio-builder/contracts.ts`](src/widgets/portfolio-builder/contracts.ts) | 1 | Search a bounded portfolio universe |
+| NOT_REVALIDATED | `ui.project-editor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/project-editor/contracts.ts`](src/widgets/project-editor/contracts.ts) | 1 | Compose and control a research project |
+| NOT_REVALIDATED | `ui.code-editor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/code-editor/contracts.ts`](src/widgets/code-editor/contracts.ts) | 1 | Edit scoped code and inspect build evidence |
+| NOT_REVALIDATED | `ui.indicator-tester@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/indicator-tester/contracts.ts`](src/widgets/indicator-tester/contracts.ts) | 1 | Compare indicator providers and previews |
+| NOT_REVALIDATED | `ui.run-monitor@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/run-monitor/contracts.ts`](src/widgets/run-monitor/contracts.ts) | 1 | Inspect and control jobs and workers |
+| NOT_REVALIDATED | `ui.debug-console@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/debug-console/contracts.ts`](src/widgets/debug-console/contracts.ts) | 1 | Inspect bounded redacted diagnostic logs |
+| NOT_REVALIDATED | `ui.chat-bot@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/chat-bot/contracts.ts`](src/widgets/chat-bot/contracts.ts) | 1 | Ask context-aware questions and review specialist output |
+| NOT_REVALIDATED | `ui.agentic-run-inspector@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/agentic-run-inspector/contracts.ts`](src/widgets/agentic-run-inspector/contracts.ts) | 1 | Inspect Agentic evidence and governed work |
+| NOT_REVALIDATED | `ui.neural-research@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/neural-research/contracts.ts`](src/widgets/neural-research/contracts.ts) | 1 | Design, train and validate neural research |
+| NOT_REVALIDATED | `ui.strategy-packager@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/strategy-packager/contracts.ts`](src/widgets/strategy-packager/contracts.ts) | 1 | Review and build strategy distribution packages |
+| NOT_REVALIDATED | `ui.advanced-analysis@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/advanced-analysis/contracts.ts`](src/widgets/advanced-analysis/contracts.ts) | 1 | Explore advanced statistical and profile visualizations |
+| NOT_REVALIDATED | `ui.performance-lab@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/ui/src/widgets/performance-lab/contracts.ts`](src/widgets/performance-lab/contracts.ts) | 1 | Inspect reproducible performance and lifecycle evidence |
 
-| Status    | Contract              | Version | Counterparty | Purpose                                     |
-| --------- | --------------------- | ------- | ------------ | ------------------------------------------- |
-| Completed | `InstrumentValue`   | `v1`  | UI features  | Labelled value with explicit freshness.     |
-| Completed | `WarningItem`       | `v1`  | UI features  | Bounded warning presentation state.         |
-| Completed | `WorkflowStage`     | `v1`  | UI routes    | State-gated workstation stage.              |
-| Completed | `EmergencyStep`     | `v1`  | UI routes    | Emergency checklist presentation.           |
-| Completed | `Alarm`             | `v1`  | UI routes    | Priority, root, and lifecycle presentation. |
-| Completed | `QualificationView` | `v1`  | UI routes    | Qualification and remediation presentation. |
+**Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
 
-**Consumed from other domains** — referenced and validated, never redefined as owner
-truth:
+There are no cross-domain required-provider edges in this selected register slice.
 
-| Contract                                                                           | Version             | Owner                              | Used for                                   |
-| ---------------------------------------------------------------------------------- | ------------------- | ---------------------------------- | ------------------------------------------ |
-| `ApiResponse`, `ApiError`, `ApiMetadata`, `StreamEvent`, `RouteContract` | `v1`              | Interfaces (D-IFACE), planned      | Typed HTTP and stream transport.           |
-| `GovernedRequestContext`, `PageContext`                                        | `v1`              | Interfaces (D-IFACE), planned      | Bounded route and governed-action context. |
-| Registered domain response DTOs                                                    | Registered versions | Owning service domains through D-IFACE gateways | Truthful workflow and widget presentation. |
+**Operation-gated providers.** For each §4 feature, its linked source card’s complete “Operation-gated providers” table defines applicability, exact provider identity and absence behavior. This is scoped incorporation, not permission to treat all 233 register-wide operation edges as optional for every feature. Resolve those provider IDs to their primary capability keys in the corresponding domain README; bind actual operations in the acceptance record. An omitted local duplicate table does not waive a source dependency.
 
-The `v1` envelope family above is the frozen contract the typed clients observe
-today; the schemas in `src/clients/contracts.ts` remain its drift-checked mirror.
-Record ownership formally moves from the deleted API domain to the Interfaces
-domain when the `FEAT-IFACE-SERVE_API_EVENTS` transport feature lands,
-preserving the observed semantics.
+### Persisted State Ownership
 
-### Persisted state
+Versioned non-authoritative display/layout preferences and bounded transient drafts, selections, viewport/context and subscription state. Store stable resource IDs, never secret values, strategy truth, raw populations or provider instances in layouts.
 
-UI owns no durable state and no migration manifest. Browser `sessionStorage` and
-component/store state are non-authoritative display state; the backend boundary
-remains the source of session and domain truth.
+| Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
+| --- | --- | --- | --- | --- |
+| PRESENTATION_ONLY | [`FEAT-UI-01`](#feat-ui-01) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-14`](#feat-ui-14) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-15`](#feat-ui-15) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-16`](#feat-ui-16) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-17`](#feat-ui-17) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-13`](#feat-ui-13) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-18`](#feat-ui-18) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-04`](#feat-ui-04) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-27`](#feat-ui-27) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-28`](#feat-ui-28) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-32`](#feat-ui-32) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-STRATEGY_STUDIO`](#feat-ui-strategy-studio) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-STRATEGY_BUILDER`](#feat-ui-strategy-builder) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-STRATEGY_RETESTER`](#feat-ui-strategy-retester) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-PARAMETER_OPTIMIZER`](#feat-ui-parameter-optimizer) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-DATABANK_GRID`](#feat-ui-databank-grid) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-RESULT_OVERVIEW`](#feat-ui-result-overview) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-TRADE_LIST`](#feat-ui-trade-list) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-EQUITY_CHART`](#feat-ui-equity-chart) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-TRADE_ANALYSIS`](#feat-ui-trade-analysis) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-TRADES_ON_CHART`](#feat-ui-trades-on-chart) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-ROBUSTNESS_RESULTS`](#feat-ui-robustness-results) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-OPTIMIZATION_RESULTS`](#feat-ui-optimization-results) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-PORTFOLIO_COMPOSER`](#feat-ui-portfolio-composer) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-PORTFOLIO_BUILDER`](#feat-ui-portfolio-builder) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-PROJECT_EDITOR`](#feat-ui-project-editor) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-CODE_EDITOR`](#feat-ui-code-editor) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-INDICATOR_TESTER`](#feat-ui-indicator-tester) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-RUN_MONITOR`](#feat-ui-run-monitor) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-DEBUG_CONSOLE`](#feat-ui-debug-console) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-AGENTIC_RUN_INSPECTOR`](#feat-ui-agentic-run-inspector) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-NEURAL_RESEARCH`](#feat-ui-neural-research) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-STRATEGY_PACKAGER`](#feat-ui-strategy-packager) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-ADVANCED_ANALYSIS`](#feat-ui-advanced-analysis) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-PERFORMANCE_LAB`](#feat-ui-performance-lab) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
 
-### Architectural Paradigm: Spatiotemporal Composability ("Everything is a Plugin")
+A feature’s exact durable namespace, schema version and migrations are taken from its reconciled manifest and contract, not guessed from its folder name. External consumers access semantic state only through the owner capability. Workspace persistence/artifact custody never acquires that semantic ownership.
 
-HaruQuantAI UI is engineered around the principle of **Spatiotemporal Composability**, replacing traditional static, multi-page web application silos with a single unified composable canvas:
+### Four-Level Structural Hierarchy
 
-1. **Single-Page Composable Canvas**:
-   - The application does not route between isolated, fragmented full-page views for separate tools.
-   - The entire application interface is a single unified workstation viewport hosting dynamically composable **Workspaces**.
+| Code level | Represents | Domain example |
+| --- | --- | --- |
+| Package | Domain boundary | `app/ui/` |
+| Module folder | Composable feature owner | `app/ui/src/widgets/workspaces/` — [`FEAT-UI-01`](#feat-ui-01) |
+| File | Manifest, strict configuration, lifecycle or focused use case | `manifest.ts`, `index.ts`, focused component |
+| Class / function / method | One or more traced requirement behaviors | `FR-TRC-UI-01-001` and its acceptance oracle |
 
-2. **"Everything is a Plugin / Widget"**:
-   - Every functional capability (Markets, Watchlists, Charting, Price Ladder, Order Ticket, Simulator, Analytics Workbench, Research Workbench, Market Ticks, News, FX Market Hours, Sessions, Settings) is encapsulated as a standalone, pluggable **Widget** residing in `src/widgets/<widget>/`.
-   - Widgets are self-contained presentation modules that register clear contracts, manage their own streaming subscriptions, and expose isolated visual boundaries.
+### Domain Capability Map
 
-3. **Spatial Composability**:
-   - Workspaces provide a flexible 2D docking and tiling canvas powered by `Dockview`.
-   - Users and automated presets can dynamically add, remove, dock, tab, split (horizontally/vertically), resize, minimize, or expand any widget within any workspace at runtime.
-   - Blank workspaces can be populated with arbitrary combinations of widgets, and curated templates (e.g., *Default Trading*, *Market Analysis*, *Strategy Development*, *Simulation & Analytics*) serve as pre-composed spatial arrangements rather than fixed pages.
-
-4. **Temporal Composability**:
-   - Widgets asynchronously synchronize with independent time domains—such as real-time market quote streams, historical bar playback, backtest event schedules, or live simulation clocks.
-   - State updates, quote ticks, and trade lifecycle events propagate across widgets without requiring page refreshes or coupling widget lifecycles.
-
-### Four-level structure
-
-| Code level                            | Represents                                                |
-| ------------------------------------- | --------------------------------------------------------- |
-| **Package**                     | UI domain                                                 |
-| **Module folder**               | UI widget or documented support capability                |
-| **File**                        | Page, component, client, contract, or focused interaction |
-| **Component / function / type** | Functional requirement behaviour or UI contract           |
-
-```text
-app/ui
-└── src/widgets/<widget>
-    └── <focused-file>.tsx
-        └── Component / Function / Type
-```
-
-### Leading document
-
-`docs/dev/documentation.pdf` is the leading source for UI features. The trading
-workspace and its widgets are the primary UI and are registered first
-(`FEAT-UI-01`–`FEAT-UI-13`). Foundation modules (`FEAT-UI-14`–`FEAT-UI-17`) exist to
-enable that primary UI. Every other surface, including the trading-cockpit features
-traced in `docs/dev/trading-cockpit/`, is registered as an additive layer on top
-(`FEAT-UI-18`–`FEAT-UI-24`) and never as the owner of a primary widget. The
-focused `FEAT-UI-25` diagnostic widget isolates the MT5 snapshot presentation
-path without replacing any primary widget.
-
-### Package capability map
+The table in §2 is the complete domain capability map. Edges below illustrate dependency direction, not a new orchestrator or private import relationship.
 
 ```mermaid
-flowchart TD
-    UI[[UI Package]]
-    UI --> CLIENTS[[Typed Transport]]
-    CLIENTS --> CONTEXT[[Session and Page Context]]
-    CONTEXT --> SHELL[[Application Shell and Navigation]]
-    SHELL --> WORKSPACE[[Workspace Layout and Session Mode]]
-    WORKSPACE --> WIDGETS[[Primary Trading Widgets]]
-    WIDGETS --> MARKETS[[Markets / Watchlist]]
-    WIDGETS --> CHARTS[[Chart / Price Ladder]]
-    WIDGETS --> ORDERS[[Trading / Positions / Trade Log]]
-    WIDGETS --> PLAN[[Trade Plan / Education / Challenges]]
-    SHELL --> ADDON[[Layered cockpit and workflow add-ons]]
+flowchart LR
+    Caller["Caller / consuming feature"] --> Contract["Versioned public contract"]
+    Provider["Removable domain feature"] -->|provides| Contract
+    Provider --> Scope["Scoped effects and disposal"]
+    Provider --> State["Own records only, when declared"]
 ```
 
----
+## 2. Final Package Structure and Feature Independence
 
-## 2. Final Package Structure
+Feature owners are independent and physically removable. The selected package is a target binding: reconcile known current aliases and preserve compatible existing identities before creating a folder. Folder absence does not prove behavior absence. Removing a feature withdraws its contributions; it does not delete another feature’s source or retained evidence.
 
-The tree records the target focused ownership of all registered UI features,
-following the D-UI shape in `docs/dev/feature_implementation_pipeline.md` §4.8.
-Entries marked *(target)* are registered destinations whose code has not yet moved.
+| Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| [`FEAT-UI-01`](#feat-ui-01) | Compose and restore the research workspace | `app/ui/src/widgets/workspaces/` | U1 | 4 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-14`](#feat-ui-14) | Call the typed backend and resume observation | `app/ui/src/clients/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-15`](#feat-ui-15) | Capture current authorized widget context | `app/ui/src/context/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-16`](#feat-ui-16) | Navigate capabilities and explain workspace controls | `app/ui/src/components/layout/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-17`](#feat-ui-17) | Present session access and scope changes | `app/ui/src/app/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-13`](#feat-ui-13) | Review effective settings and safe configuration changes | `app/ui/src/widgets/system-settings/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-18`](#feat-ui-18) | Operate the Data Manager workspace | `app/ui/src/components/workflow/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections) | Navigate large typed collections accessibly | `app/ui/src/widgets/collection-grid/` | U1 | 3 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts) | Review typed edits and consequential action scope | `app/ui/src/widgets/draft-review/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-04`](#feat-ui-04) | Inspect market charts and typed overlays | `app/ui/src/widgets/chart/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-27`](#feat-ui-27) | Configure and observe a canonical backtest | `app/ui/src/widgets/simulator/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-28`](#feat-ui-28) | Inspect research campaigns, protocols and evidence | `app/ui/src/widgets/research/` | U3 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-32`](#feat-ui-32) | Compose the result inspection workspace | `app/ui/src/widgets/analytics/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-STRATEGY_STUDIO`](#feat-ui-strategy-studio) | Edit and review a strategy | `app/ui/src/widgets/strategy-editor/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-STRATEGY_BUILDER`](#feat-ui-strategy-builder) | Configure and run strategy generation | `app/ui/src/widgets/strategy-search-space/` | U5 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-STRATEGY_RETESTER`](#feat-ui-strategy-retester) | Retest a fixed strategy population | `app/ui/src/widgets/research-settings/` | U4 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-PARAMETER_OPTIMIZER`](#feat-ui-parameter-optimizer) | Plan and inspect parameter optimization | `app/ui/src/widgets/optimization-settings/` | U6 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-DATABANK_GRID`](#feat-ui-databank-grid) | Organize and act on a databank | `app/ui/src/widgets/databank-grid/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-RESULT_OVERVIEW`](#feat-ui-result-overview) | Read a provenance-rich result summary | `app/ui/src/widgets/result-overview/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-TRADE_LIST`](#feat-ui-trade-list) | Inspect and select individual trades | `app/ui/src/widgets/trade-list/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-EQUITY_CHART`](#feat-ui-equity-chart) | Inspect equity, drawdown and benchmark paths | `app/ui/src/widgets/equity-chart/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-TRADE_ANALYSIS`](#feat-ui-trade-analysis) | Compare trade behavior across dimensions | `app/ui/src/widgets/trade-analysis/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-TRADES_ON_CHART`](#feat-ui-trades-on-chart) | Inspect fills against their actual market context | `app/ui/src/widgets/trades-on-chart/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-ROBUSTNESS_RESULTS`](#feat-ui-robustness-results) | Inspect robustness and scenario evidence | `app/ui/src/widgets/robustness-results/` | U4 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-OPTIMIZATION_RESULTS`](#feat-ui-optimization-results) | Inspect parameter surfaces and walk-forward evidence | `app/ui/src/widgets/optimization-results/` | U6 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-PORTFOLIO_COMPOSER`](#feat-ui-portfolio-composer) | Compose and compare a portfolio | `app/ui/src/widgets/portfolio-composer/` | U7 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-PORTFOLIO_BUILDER`](#feat-ui-portfolio-builder) | Search a bounded portfolio universe | `app/ui/src/widgets/portfolio-builder/` | U7 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-PROJECT_EDITOR`](#feat-ui-project-editor) | Compose and control a research project | `app/ui/src/widgets/project-editor/` | U8 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-CODE_EDITOR`](#feat-ui-code-editor) | Edit scoped code and inspect build evidence | `app/ui/src/widgets/code-editor/` | U9 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-INDICATOR_TESTER`](#feat-ui-indicator-tester) | Compare indicator providers and previews | `app/ui/src/widgets/indicator-tester/` | U9 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-RUN_MONITOR`](#feat-ui-run-monitor) | Inspect and control jobs and workers | `app/ui/src/widgets/run-monitor/` | U1 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-DEBUG_CONSOLE`](#feat-ui-debug-console) | Inspect bounded redacted diagnostic logs | `app/ui/src/widgets/debug-console/` | U1 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot) | Ask context-aware questions and review specialist output | `app/ui/src/widgets/chat-bot/` | U2 | 3 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-AGENTIC_RUN_INSPECTOR`](#feat-ui-agentic-run-inspector) | Inspect Agentic evidence and governed work | `app/ui/src/widgets/agentic-run-inspector/` | U2 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-NEURAL_RESEARCH`](#feat-ui-neural-research) | Design, train and validate neural research | `app/ui/src/widgets/neural-research/` | U11 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-STRATEGY_PACKAGER`](#feat-ui-strategy-packager) | Review and build strategy distribution packages | `app/ui/src/widgets/strategy-packager/` | U13 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-ADVANCED_ANALYSIS`](#feat-ui-advanced-analysis) | Explore advanced statistical and profile visualizations | `app/ui/src/widgets/advanced-analysis/` | U10 | 2 | 2 | NOT_REVALIDATED |
+| [`FEAT-UI-PERFORMANCE_LAB`](#feat-ui-performance-lab) | Inspect reproducible performance and lifecycle evidence | `app/ui/src/widgets/performance-lab/` | U10 | 2 | 2 | NOT_REVALIDATED |
 
 ```text
 app/ui/
-├── README.md
-├── package.json
-└── src/
-    ├── widgets/workspaces/              # FEAT-UI-01
-    ├── widgets/markets/                 # FEAT-UI-02
-    ├── widgets/watchlists/              # FEAT-UI-03
-    ├── widgets/chart/                   # FEAT-UI-04
-    ├── widgets/price-ladder/            # FEAT-UI-05
-    ├── widgets/trading/                 # FEAT-UI-06
-    ├── widgets/trade-log/               # FEAT-UI-08
-    ├── widgets/positions/               # FEAT-UI-09
-    ├── widgets/trade-plan/              # FEAT-UI-10
-    ├── widgets/education/               # FEAT-UI-11 (target)
-    ├── widgets/challenges/              # FEAT-UI-12 (target)
-    ├── widgets/system-settings/         # FEAT-UI-13
-    ├── widgets/instrument-panels/       # FEAT-UI-19
-    ├── widgets/planning/                # FEAT-UI-20
-    ├── widgets/workflow-pages/          # FEAT-UI-21
-    ├── widgets/emergency-ux/            # FEAT-UI-22
-    ├── widgets/human-factors/           # FEAT-UI-23
-    ├── widgets/training-ux/             # FEAT-UI-24
-    ├── widgets/market-ticks/            # FEAT-UI-25
-    ├── widgets/session-registry/        # FEAT-UI-26
-    ├── widgets/simulator/               # FEAT-UI-27 and FEAT-UI-31
-    ├── widgets/research/                # FEAT-UI-28
-    ├── widgets/news/                    # FEAT-UI-29
-    ├── widgets/market-hours/            # FEAT-UI-30
-    ├── widgets/analytics/               # FEAT-UI-32
-    ├── clients/                         # FEAT-UI-14 support: typed transport
-    ├── context/                         # FEAT-UI-15 support: session/page/stream context
-    ├── components/layout/               # FEAT-UI-16 nonvisual shell feature
-    ├── app/                             # FEAT-UI-17 framework routes
-    ├── components/workflow/             # FEAT-UI-18 nonvisual workflow feature
-    ├── contracts/generated/             # support: generated wire types only
-    ├── runtime/                         # support: UI composition boundary
-    ├── workspaces/                      # support: workspace composition
-    ├── types/                           # support: shared types
-    ├── utils/                           # support: shared helpers
-    └── mock/                            # support: test-only fixtures
+├── README.md  # this domain target registry
+├── src/widgets/workspaces/  # FEAT-UI-01
+├── src/clients/  # FEAT-UI-14
+├── src/context/  # FEAT-UI-15
+├── src/components/layout/  # FEAT-UI-16
+├── src/app/  # FEAT-UI-17
+├── src/widgets/system-settings/  # FEAT-UI-13
+├── src/components/workflow/  # FEAT-UI-18
+├── src/widgets/collection-grid/  # FEAT-UI-VIEW_COLLECTIONS
+├── src/widgets/draft-review/  # FEAT-UI-REVIEW_DRAFTS
+├── src/widgets/chart/  # FEAT-UI-04
+├── src/widgets/simulator/  # FEAT-UI-27
+├── src/widgets/research/  # FEAT-UI-28
+├── src/widgets/analytics/  # FEAT-UI-32
+├── src/widgets/strategy-editor/  # FEAT-UI-STRATEGY_STUDIO
+├── src/widgets/strategy-search-space/  # FEAT-UI-STRATEGY_BUILDER
+├── src/widgets/research-settings/  # FEAT-UI-STRATEGY_RETESTER
+├── src/widgets/optimization-settings/  # FEAT-UI-PARAMETER_OPTIMIZER
+├── src/widgets/databank-grid/  # FEAT-UI-DATABANK_GRID
+├── src/widgets/result-overview/  # FEAT-UI-RESULT_OVERVIEW
+├── src/widgets/trade-list/  # FEAT-UI-TRADE_LIST
+├── src/widgets/equity-chart/  # FEAT-UI-EQUITY_CHART
+├── src/widgets/trade-analysis/  # FEAT-UI-TRADE_ANALYSIS
+├── src/widgets/trades-on-chart/  # FEAT-UI-TRADES_ON_CHART
+├── src/widgets/robustness-results/  # FEAT-UI-ROBUSTNESS_RESULTS
+├── src/widgets/optimization-results/  # FEAT-UI-OPTIMIZATION_RESULTS
+├── src/widgets/portfolio-composer/  # FEAT-UI-PORTFOLIO_COMPOSER
+├── src/widgets/portfolio-builder/  # FEAT-UI-PORTFOLIO_BUILDER
+├── src/widgets/project-editor/  # FEAT-UI-PROJECT_EDITOR
+├── src/widgets/code-editor/  # FEAT-UI-CODE_EDITOR
+├── src/widgets/indicator-tester/  # FEAT-UI-INDICATOR_TESTER
+├── src/widgets/run-monitor/  # FEAT-UI-RUN_MONITOR
+├── src/widgets/debug-console/  # FEAT-UI-DEBUG_CONSOLE
+├── src/widgets/chat-bot/  # FEAT-UI-CHAT_BOT
+├── src/widgets/agentic-run-inspector/  # FEAT-UI-AGENTIC_RUN_INSPECTOR
+├── src/widgets/neural-research/  # FEAT-UI-NEURAL_RESEARCH
+├── src/widgets/strategy-packager/  # FEAT-UI-STRATEGY_PACKAGER
+├── src/widgets/advanced-analysis/  # FEAT-UI-ADVANCED_ANALYSIS
+└── src/widgets/performance-lab/  # FEAT-UI-PERFORMANCE_LAB
 ```
 
-### D-UI feature shape and identity
+The template’s generic UI support-folder convention and the register’s retained `src/components/layout`, `src/app`, `src/components/workflow`, `src/clients` and `src/context` bindings are explicitly reconciled as existing-owner exceptions for this scope. Preserve permanent numeric feature IDs. Product labels such as Strategy Studio, Builder or Retester do not authorize duplicate widgets or new owners. Any future relocation needs a reviewed path binding, unchanged ownership and removal/regression evidence.
 
-Widget-owning features migrate to the D-UI shape defined by
-`docs/dev/feature_implementation_pipeline.md` §4.8: each
-`src/widgets/<widget_slug>/` gains `README.md`, `manifest.ts`, `config.ts`,
-`feature.tsx`, focused presentation modules, and a deliberate `index.ts`. The
-existing `FEAT-UI-*` numeric identities are permanent runtime/configuration
-identities and are kept; no feature-ID migration is approved, and `FEAT-UI-07`
-stays withdrawn. Nonvisual features (`FEAT-UI-14`–`FEAT-UI-18`) adopt the same
-identity, lifecycle, and removal rules through their owning migration phase,
-with support code confined to the documented support folders above.
+### Feature Capability Dependency Direction
 
-### Feature Registry
-
-| Status    | Feature                                                 | Owning module                                                                                               | Public surface                                                                                                                                                                                                                                           | Requirements                                                                                            | Verification evidence                                                                                                                                                                                                                     |
-| --------- | ------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `FEAT-UI-01` Workspace Layout and Session Mode        | `src/widgets/workspaces/`                                                                                | Workspace and widget layout state, workspace templates, docking layout trees, confirmation mode, account mode, provider-mode compatibility gate                                                                                                          | `FR-UI-001`–`FR-UI-029`; `FR-UI-195`–`FR-UI-199`; `FR-UI-200`–`FR-UI-205`; `FR-UI-208` | `src/widgets/workspaces/store.test.ts`; `dockLayout.test.ts`; `TemplatePicker.test.tsx`; `WorkspaceEmptyState.test.tsx`; `src/components/layout/DockingWorkspace.test.tsx`; `Header.test.tsx`; focused Trading control tests |
-| Completed | `FEAT-UI-02` Markets Widget                           | `src/widgets/markets/`                                                                                   | `MarketsFeature` (D-UI lifecycle) wrapping `MarketsWidget`; `MARKETS_MANIFEST`; strict `config.ts`                                                                                                                                                     | `FR-UI-030`–`FR-UI-037`; `FR-UI-192`–`FR-UI-193`                                              | `src/widgets/markets/{MarketsWidget,feature}.test.tsx`; `manifest.test.ts`; `config.test.ts`                                                                                                                                           |
-| Completed | `FEAT-UI-03` Watchlist Widget                         | `src/widgets/watchlists/`                                                                                | `WatchlistsFeature` (D-UI lifecycle) wrapping `WatchlistWidget`; `WATCHLISTS_MANIFEST`; strict `config.ts`                                                                                                                                             | `FR-UI-038`–`FR-UI-045`; `FR-UI-192`                                                             | `src/widgets/watchlists/{WatchlistWidget,feature}.test.tsx`; `manifest.test.ts`; `config.test.ts`                                                                                                                                     |
-| Completed | `FEAT-UI-04` Charting Tools Widget                    | `src/widgets/chart/`                                                                                     | `ChartWidget`                                                                                                                                                                                                                                          | `FR-UI-046`–`FR-UI-054`; `FR-UI-194`                                                             | `src/widgets/chart/ChartWidget.test.tsx`                                                                                                                                                                                               |
-| Completed | `FEAT-UI-05` Price Ladder Widget                      | `src/widgets/price-ladder/`                                                                              | `PriceLadderFeature` (D-UI lifecycle) wrapping `PriceLadderWidget`; `PRICE_LADDER_MANIFEST`; strict `config.ts`                                                                                                                                          | `FR-UI-055`–`FR-UI-062`                                                                            | `src/widgets/price-ladder/{PriceLadderWidget,feature,useDepthStream}.test.tsx`; `manifest.test.ts`; `config.test.ts`                                                                                                                 |
-| Completed | `FEAT-UI-06` Trading Widget                           | `src/widgets/trading/`                                                                                   | `TradingFeature` (D-UI lifecycle) wrapping `TradingWidget` and `OrderTicket`; `TRADING_MANIFEST`; strict `config.ts`                                                                                                                                     | `FR-UI-063`–`FR-UI-072`; `FR-UI-147`; `FR-UI-225`–`FR-UI-233`                               | `src/widgets/trading/{OrderTicket,TradingWidget,feature}.test.tsx`; `manifest.test.ts`; `config.test.ts`; `src/widgets/price-ladder/PriceLadderWidget.test.tsx`                                                                   |
-| Completed | `FEAT-UI-08` Trade Log Widget                         | `src/widgets/trade-log/`                                                                                | `TradeLogFeature` (D-UI lifecycle) wrapping `TradeLogWidget`; `TRADE_LOG_MANIFEST`; strict `config.ts`                                                                                                                                                   | `FR-UI-085`–`FR-UI-089`                                                                            | `src/widgets/trade-log/{TradeLogWidget,feature}.test.tsx`; `manifest.test.ts`; `config.test.ts`                                                                                                                                       |
-| Completed | `FEAT-UI-09` Positions and Orders Widgets             | `src/widgets/positions/`                                                                                | `PositionsFeature` (D-UI lifecycle) wrapping `PositionsWidget`; `POSITIONS_MANIFEST`; strict `config.ts`                                                                                                                                                 | `FR-UI-090`–`FR-UI-098`                                                                            | `src/widgets/positions/{PositionsWidget,feature}.test.tsx`; `manifest.test.ts`; `config.test.ts`                                                                                                                                       |
-| Completed | `FEAT-UI-10` Trade Plan Widget                        | `src/widgets/trade-plan/`                                                                               | `TradePlanFeature` (D-UI lifecycle) wrapping `TradePlanWidget`; `TRADE_PLAN_MANIFEST`; strict `config.ts`                                                                                                                                                | `FR-UI-099`–`FR-UI-104`                                                                            | `src/widgets/trade-plan/{TradePlanWidget,feature}.test.tsx`; `manifest.test.ts`; `config.test.ts`                                                                                                                                      |
-| Pending   | `FEAT-UI-11` Education Resources Widget               | Target:`src/widgets/education/`; current: `src/widgets/training-ux/EducationWidget.tsx`               | `EducationWidget`                                                                                                                                                                                                                                      | `FR-UI-105`–`FR-UI-108`                                                                            | Pending evidence; blocked on an owning backend domain                                                                                                                                                                                     |
-| Pending   | `FEAT-UI-12` Challenges and Challenge Dashboard       | Target:`src/widgets/challenges/`; current: `src/widgets/training-ux/ChallengesWidget.tsx`             | `ChallengesWidget`                                                                                                                                                                                                                                     | `FR-UI-109`–`FR-UI-116`                                                                            | Pending evidence; blocked on an owning backend domain                                                                                                                                                                                     |
-| Completed | `FEAT-UI-13` System Settings                          | `src/widgets/system-settings/`                                                                           | `SystemSettingsFeature` (D-UI lifecycle), `SystemSettingsModal`; `SYSTEM_SETTINGS_MANIFEST`; strict `config.ts`                                                                                                                                          | `FR-UI-117`–`FR-UI-121`                                                                            | `src/widgets/system-settings/{system-settings-modal,feature}.test.tsx`; `manifest.test.ts`; `config.test.ts`                                                                                                                             |
-| Completed | `FEAT-UI-14` Typed Backend Transport                  | `src/clients/`                                                                                            | `request`, `unwrapData`, `ApiClientError`, `openStream`, `apiClients`                                                                                                                                                                          | `FR-UI-122`–`FR-UI-126`                                                                            | `src/clients/request.test.ts`; `clients.test.ts`; `clients.contract.test.ts`                                                                                                                                                        |
-| Pending   | `FEAT-UI-15` Session and Page Context                 | `src/context/`                                                                                            | Auth, page, governed-preflight, and stream context                                                                                                                                                                                                       | `FR-UI-127`–`FR-UI-131`                                                                            | `src/context/{auth,page,governed,streams}.test.ts(x)`; further evidence pending                                                                                                                                                         |
-| Pending   | `FEAT-UI-16` Application Shell and Navigation         | `src/components/layout/`                                                                                  | `Header`, `Sidebar`, `WorkspaceGrid`, session clock, account metrics settings                                                                                                                                                                      | `FR-UI-132`–`FR-UI-137`; `FR-UI-207`; `FR-UI-209`–`FR-UI-211`                               | `src/components/layout/clock.test.ts`; `TimeCorrectionDialog.test.tsx`; `AccountMetricsMenu.test.tsx`; `Header.test.tsx`; `src/widgets/system-settings/system-settings-modal.test.tsx`; further evidence pending                  |
-| Pending   | `FEAT-UI-17` Protected Routing and Access Gate        | `src/app/`                                                                                                | `AuthenticationPage`, `ProtectedLayout`, `WorkflowPage`                                                                                                                                                                                            | `FR-UI-138`–`FR-UI-141`                                                                            | `src/app/{authentication-page,protected-layout,pages.contract}.test.ts(x)`; further evidence pending                                                                                                                                    |
-| Completed | `FEAT-UI-18` Domain Workflow Views                    | `src/components/workflow/`                                                                                | `AppShell` and non-Trading focused domain workflow views, including QuantDataManager (QDM) Workspace (`data.tsx`), QDM Ribbon (`QdmRibbon`), Edit Symbol Dialog (`DataEditDialog`), Data Review & Quality Inspector (`DataReviewModal`), MT4/CSV Exporters, and Timezone Cloner (`src/components/workflow/qdm/`) | `FR-UI-142`–`FR-UI-146`; `FR-UI-148`–`FR-UI-150`                                              | Focused non-Trading `src/components/workflow/*.test.tsx`                                                                                                                                                                                 |
-| Completed | `FEAT-UI-19` Instrument Panels                        | `src/widgets/instrument-panels/`                                                                         | `InstrumentPanels`, `InstrumentValue`                                                                                                                                                                                                                | `FR-UI-151`–`FR-UI-156`                                                                            | `src/widgets/instrument-panels/components.test.tsx`                                                                                                                                                                                    |
-| Completed | `FEAT-UI-20` Navigation, Planning, and Warning Panels | `src/widgets/planning/`                                                                                  | `PlanningPanels`, `WarningItem`                                                                                                                                                                                                                      | `FR-UI-157`–`FR-UI-161`                                                                            | `src/widgets/planning/components.test.tsx`                                                                                                                                                                                             |
-| Completed | `FEAT-UI-21` Workflow Stage Pages                     | `src/widgets/workflow-pages/`                                                                            | `WorkflowStages`, `WorkflowStage`                                                                                                                                                                                                                     | `FR-UI-162`–`FR-UI-168`                                                                            | `src/widgets/workflow-pages/components.test.tsx`                                                                                                                                                                                       |
-| Completed | `FEAT-UI-22` Emergency and Recovery UX                | `src/widgets/emergency-ux/`                                                                              | `EmergencyPanel`, `EmergencyStep`                                                                                                                                                                                                                    | `FR-UI-169`–`FR-UI-173`                                                                            | `src/widgets/emergency-ux/components.test.tsx`                                                                                                                                                                                         |
-| Completed | `FEAT-UI-23` Human-Factors and Alarm Model            | `src/widgets/human-factors/`                                                                             | `AlarmModel`, `Alarm`                                                                                                                                                                                                                                | `FR-UI-174`–`FR-UI-179`                                                                            | `src/widgets/human-factors/components.test.tsx`                                                                                                                                                                                        |
-| Completed | `FEAT-UI-24` Training, Replay, and Qualification UX   | `src/widgets/training-ux/`                                                                               | `TrainingPanel`, `QualificationView`                                                                                                                                                                                                                 | `FR-UI-180`–`FR-UI-185`                                                                            | `src/widgets/training-ux/components.test.tsx`                                                                                                                                                                                          |
-| Completed | `FEAT-UI-25` MT5 Market Ticks Diagnostic Widget       | `src/widgets/market-ticks/`                                                                              | `MarketTicksFeature` (D-UI lifecycle) wrapping `MarketTicksTableWidget`; `MARKET_TICKS_MANIFEST`; strict `config.ts`                                                                                                                                    | `FR-UI-186`–`FR-UI-191`; `FR-UI-193`                                                             | `src/widgets/market-ticks/{MarketTicksTableWidget,useMarketSnapshots,feature}.test.ts(x)`; `manifest.test.ts`; `config.test.ts`                                                                                                                                            |
-| Completed | `FEAT-UI-26` Trading Session Registry Widget          | `src/widgets/session-registry/`                                                                          | `SessionRegistryWidget`; typed create/list/default/start/stop/archive controls, SIM opening-account and verified-dataset configuration, stopped-only legacy completion, metadata inspection, durable lifecycle history, and safe live activity console | `FR-UI-212`–`FR-UI-224`                                                                            | `src/widgets/session-registry/SessionRegistryWidget.test.tsx`; typed client and backend integration tests                                                                                                                              |
-| Completed | `FEAT-UI-27` Canonical Backtest Simulator Widget      | `src/widgets/simulator/`                                                                                 | `SimulatorWidget`; registered strategy picker with per-strategy parameters, market and execution configuration, background run control, ordered progress, and the Analytics-owned performance report                                                   | `FR-UI-234`–`FR-UI-240`                                                                            | `src/widgets/simulator/SimulatorWidget.test.tsx`; `src/clients/clients.contract.test.ts`                                                                                                                                             |
-| Completed | `FEAT-UI-28` Research Workbench | `src/widgets/research/` | `ResearchDashboard`, `ResearchRunBuilder`, `ResearchWorkbench`, `ResearchStageNav`, `ResearchRunHeader`, `ResearchComparison`, `ResearchAutomation`, `ResearchArtifactDrawer`, `ResearchExpectancy`, `ResearchDrift`, and thirteen stage panels; deep-linkable run stages, server-derived stage status, ordered progress streaming, run history and comparison, artifact provenance, permission-gated expectancy governance, and the V2-only Features/Validation/Intelligence/Stress evidence views | `FR-UI-241`–`FR-UI-252` | `src/widgets/research/ResearchWorkbench.test.tsx`; `src/widgets/research/ResearchExpectancy.test.tsx`; `src/widgets/research/research-client.test.ts`; `src/widgets/research/v1-coverage.test.ts` |
-| Completed | `FEAT-UI-29` News Online Feed Widget | `src/widgets/news/` | `NewsFeature` (D-UI lifecycle) wrapping `NewsWidget`; `NEWS_MANIFEST`; strict `config.ts`; `NewsCategory`, `NewsLanguage` through the feature barrel | `FR-UI-253`–`FR-UI-258` | `src/widgets/news/NewsWidget.test.tsx`; `feature.test.ts` |
-| Completed | `FEAT-UI-30` FX Market Hours Widget | `src/widgets/market-hours/` | `MarketHoursFeature` (D-UI lifecycle) wrapping `MarketHoursWidget`; `MARKET_HOURS_MANIFEST`; `DEFAULT_MARKET_HOURS_CONFIG`, `POPULAR_FX_INSTRUMENTS` through the feature barrel | `FR-UI-259`–`FR-UI-264` | `src/widgets/market-hours/MarketHoursWidget.test.tsx`; `feature.test.ts` |
-| Completed | `FEAT-UI-31` Simulation Workbench | `src/widgets/simulator/` | `SimulationWorkbench`, `SimulationHome`, `SimulationStatusBadge`, `SimulationRunBuilder` (eight ordered stages), `CanonicalRunMonitor`, `BatchRunMonitor`, `InteractiveSimulationWorkspace`, `SimulationSessionHeader`, `MarketViewport`, `ManualCommandPanel`, `SessionStatePanels`, `WhatIfPanel`, `SimulationRecoveryPanel`, `SimulationFinalizeDialog`, `SimulationPlaybackWorkspace`, `ScenarioPanel`, `ChecklistPanel`, `MissionPanel`, `PortfolioSimulationPanel`, `RunCataloguePanel`, `simulation-store`, `simulation-selectors` | `FR-UI-265`–`FR-UI-270`, `FR-UI-277` | `src/widgets/simulator/SimulationWorkbench.test.tsx`; `src/widgets/simulator/RunCataloguePanel.test.tsx`; `src/widgets/simulator/SimulationRunBuilder.test.tsx`; `src/widgets/simulator/CanonicalRunMonitor.test.tsx`; `src/widgets/simulator/BatchRunMonitor.test.tsx`; `src/widgets/simulator/SimulationHome.test.tsx`; `src/widgets/simulator/InteractiveSimulationWorkspace.test.tsx`; `src/widgets/simulator/ManualCommandPanel.test.tsx`; `src/widgets/simulator/SimulationRecoveryPanel.test.tsx`; `src/widgets/simulator/SimulationPlaybackWorkspace.test.tsx`; `src/widgets/simulator/ScenarioPanel.test.tsx`; `src/widgets/simulator/PortfolioSimulationPanel.test.tsx`; `src/clients/simulationWorkbench.test.ts` |
-| Completed | `FEAT-UI-32` Analytics Workbench | `src/widgets/analytics/` | `AnalyticsWorkspace`, `AnalyticsNav`, `AnalyticsLibrary`, `OverviewPanel`, `AnalyticsEvidenceState`, `TradesPanel`, `TradeDetailPanel`, `AnalyticsArtifactDrawer`, `TimeSeriesChart`, `CalendarHeatmap`, `DistributionChart`, `RealismPanel`, `ProvenancePanel`, `ReturnsPanel`, `RiskPanel`, `DistributionPanel`, `PeriodsPanel`, `BenchmarkPanel`, `ChartsPanel`, `AnalyticsComparison`, `analytics-store`, `analytics-selectors` | `FR-UI-271`–`FR-UI-276`, `FR-UI-278` | `src/widgets/analytics/AnalyticsWorkspace.test.tsx`; `src/widgets/analytics/AnalyticsLibrary.test.tsx`; `src/widgets/analytics/TradesPanel.test.tsx`; `src/widgets/analytics/charts.test.tsx`; `src/widgets/analytics/evidence-context.test.tsx`; `src/widgets/analytics/advanced-panels.test.tsx`; `src/widgets/analytics/PeriodsPanel.test.tsx`; `src/widgets/analytics/AnalyticsComparison.test.tsx`; `src/clients/analyticsWorkbench.test.ts` |
-
-
-**Primary UI.** `FEAT-UI-01`–`FEAT-UI-06` and `FEAT-UI-08`–`FEAT-UI-13` are the trading workspace and widgets
-specified by `docs/dev/documentation.pdf`. `FEAT-UI-14`–`FEAT-UI-17` are the foundation
-that enables them. `FEAT-UI-18`–`FEAT-UI-24` are additive layers and own no primary widget.
-
-`FEAT-UI-02` consumes Markets orchestration and `FEAT-UI-03` consumes Account
-Watchlists through focused Interfaces (D-IFACE) gateways; the former
-`FEAT-API-11/12` owners were deleted with `app/services/api`. UI feature
-identity remains independent from the backend feature registry.
-
-**Blocked features.** `FEAT-UI-11` and `FEAT-UI-12` have no owning backend domain;
-see Section 6. Listed-options and options-chain UI scope is withdrawn because the
-owner trades CFDs, primarily forex through MT5; the retired identifiers are not reused.
-
-**Non-feature support directories.** `src/types/` and `src/utils/` are documented
-shared type and helper directories owning no feature behaviour. `src/mock/` is
-test-only fixture data; production modules must not import it (see `NFR-UI-007`).
-These directories are excluded from feature-count reconciliation.
-
-### Module dependency diagram
-
-```mermaid
-flowchart LR
-    CLIENTS[[clients]] --> CONTEXT[[context]]
-    CONTEXT --> LAYOUT[[components/layout]]
-    LAYOUT --> WORKSPACES[[widgets/workspaces]]
-    WORKSPACES --> WIDGETS[[primary widget features]]
-    CLIENTS --> WIDGETS
-    LAYOUT --> APP[[app]]
-    CLIENTS --> WORKFLOW[[components/workflow]]
-    WORKFLOW --> APP
-    PANELS[[layered cockpit features]] --> APP
-```
-
-### Structure rules
-
-Shared data tables use the global `Be Vietnam Pro` font and the dense typography
-contract in `src/index.css`: 11px regular body text in a 30px row with a 29px
-calculated line height. Light mode uses `rgb(37, 50, 60)` for table-cell text;
-dark mode retains the theme foreground token so the same component remains
-legible on navy surfaces.
-
-- Each registered feature owns one focused production module folder; framework route
-  entries may remain in `src/app/` and delegate to their owning feature.
-- Each file owns one focused page, component, contract, transport, or interaction.
-- UI imports service capabilities only through typed API contracts.
-- Shared `src/components/widgets/` ownership is prohibited; widgets reside in their
-  registered feature folder.
-- `FEAT-UI-*` features use the UI verification-evidence exception: they do not require
-  separate numbered standalone usage programs. Production rendering is not evidence.
-
----
+A required edge means “consumer requires the provider’s public capability.” It never means “import the provider package.” Optional operation closure is resolved by the composition/runtime boundary and rechecked at invocation. Physical removal must cause the declared unavailable or blocked state while unrelated capabilities remain usable.
 
 ## 3. Workflows
 
-### Status values
+Workflows connect existing features; they do not create additional feature owners. “Internal” means all participating behavior is domain-local. “Cross-Domain” means collaboration through public contracts. Participant lists below are **not** a substitute for the plan’s execution schedule or the workflow’s validated operation graph.
 
-| Status              | Meaning                                                               |
-| ------------------- | --------------------------------------------------------------------- |
-| **Pending**   | Not implemented, not verified, or awaiting structural reconciliation. |
-| **Partial**   | Some behavior exists but required evidence is incomplete.             |
-| **Completed** | Implemented and verified by the required UI evidence.                 |
+### Domain-local reading sequence — Open and close a research tool safely
 
-### Workflow scope values
+**Input boundary:** Authorized capability discovery and selected stable resource IDs in the current workspace.
 
-| Scope                  | Meaning                                    |
-| ---------------------- | ------------------------------------------ |
-| **Internal**     | The workflow remains within UI.            |
-| **Cross-domain** | UI exchanges typed boundary data with API. |
+**Output boundary:** Accurate accessible views and receipt-backed actions; closing an observer releases effects without cancelling unrelated accepted work.
 
-| Status    | Workflow ID   | Scope        | Workflow                   | Trigger / Input boundary | Final outcome / Output boundary           | Requirement sequence                                 |
-| --------- | ------------- | ------------ | -------------------------- | ------------------------ | ----------------------------------------- | ---------------------------------------------------- |
-| Completed | `WF-UI-001` | Cross-domain | Governed user action       | Explicit user action     | API result, warning, or preflight block   | `FR-UI-006 → FR-UI-007 → FR-UI-008 → FR-UI-021` |
-| Completed | `WF-UI-002` | Cross-domain | Ordered stream consumption | Authenticated API stream | Validated events or authoritative refresh | `FR-UI-005 → FR-UI-009 → FR-UI-010`              |
+**Capabilities to inspect:** [`FEAT-UI-01`](#feat-ui-01) → [`FEAT-UI-14`](#feat-ui-14) → [`FEAT-UI-15`](#feat-ui-15) → [`FEAT-UI-27`](#feat-ui-27) → [`FEAT-UI-32`](#feat-ui-32) → [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot).
 
-### `WF-UI-001` — Governed User Action
+This is a domain-oriented explanation, not an additional canonical `WF-*` identity. Apply every FR of the participating operation, not only its first validation step. Validate scope and immutable references, resolve admitted providers, perform owner work, verify the owner receipt, and then expose the result. Invalid input, provider absence, stale revision and cancellation retain separate typed outcomes.
 
-**Scope:** `Cross-domain`
+| Evidence | Workflow | Scope | Lead | First U gate | Acceptance |
+| --- | --- | --- | --- | --- | --- |
+| PENDING | [`WF-WB-GENERATE_QUALIFY`](#wf-wb-generate-qualify) | Cross-Domain | [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research) | U5 | `ATW-WB-GENERATE_QUALIFY` |
+| PENDING | [`WF-WB-RETEST`](#wf-wb-retest) | Cross-Domain | [`FEAT-RES-TEST_ROBUSTNESS`](../services/research/README.md#feat-res-test-robustness) | U4 | `ATW-WB-RETEST` |
+| PENDING | [`WF-WB-OPTIMIZE_PROMOTE`](#wf-wb-optimize-promote) | Cross-Domain | [`FEAT-OPT-SEARCH_PARAMETERS`](../services/optimization/README.md#feat-opt-search-parameters) | U6 | `ATW-WB-OPTIMIZE_PROMOTE` |
+| PENDING | [`WF-WB-PORTFOLIO`](#wf-wb-portfolio) | Cross-Domain | [`FEAT-POR-COMPOSE_PORTFOLIOS`](../services/portfolio/README.md#feat-por-compose-portfolios) | U7 | `ATW-WB-PORTFOLIO` |
+| PENDING | [`WF-WB-PROJECT`](#wf-wb-project) | Cross-Domain | [`FEAT-ORCH-RUN_PROJECTS`](../services/orchestration/README.md#feat-orch-run-projects) | U8 | `ATW-WB-PROJECT` |
+| PENDING | [`WF-WB-EXTEND_ANALYSIS`](#wf-wb-extend-analysis) | Cross-Domain | [`FEAT-PLUG-MANAGE_LIFECYCLE`](../services/plugins/README.md#feat-plug-manage-lifecycle) | U9 | `ATW-WB-EXTEND_ANALYSIS` |
+| PENDING | [`WF-WB-CHAT_REVIEW`](#wf-wb-chat-review) | Cross-Domain | [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator) | U2 | `ATW-WB-CHAT_REVIEW` |
+| PENDING | [`WF-WB-IDEA_TO_STRATEGY`](#wf-wb-idea-to-strategy) | Cross-Domain | [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](../services/agentic/README.md#feat-agt-compose-strategy-specs) | U3 | `ATW-WB-IDEA_TO_STRATEGY` |
+| PENDING | [`WF-AGT-ASSIST_OPERATOR`](#wf-agt-assist-operator) | Cross-Domain | [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator) | U2 | `ATW-AGT-ASSIST_OPERATOR` |
 
-**System workflow:** Any registered `SYS-WF-*` requiring an operator action.
+<a id="wf-wb-generate-qualify"></a>
+### `WF-WB-GENERATE_QUALIFY` — Generate and qualify strategies
 
-**Input boundary:** An authenticated user explicitly initiates an action in UI.
+**Lead owner:** [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research). **Release gate:** U5. **State:** PENDING.
 
-**Output boundary:** API receives one typed request, or UI displays a bounded preflight
-block without claiming backend authorization.
+**Participants:** [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research), [`FEAT-UI-01`](#feat-ui-01), [`FEAT-DATA-BIND_RUN_DATA`](../services/data/README.md#feat-data-bind-run-data), [`FEAT-STRAT-DEFINE_SEARCH_SPACES`](../services/strategy/README.md#feat-strat-define-search-spaces), [`FEAT-RES-GENERATE_STRATEGIES`](../services/research/README.md#feat-res-generate-strategies), [`FEAT-RES-EVOLVE_STRATEGIES`](../services/research/README.md#feat-res-evolve-strategies), [`FEAT-SIM-EXECUTE_TICKS`](../services/simulator/README.md#feat-sim-execute-ticks), [`FEAT-ANA-COMPUTE_METRICS`](../services/analytics/README.md#feat-ana-compute-metrics), [`FEAT-RES-TEST_ROBUSTNESS`](../services/research/README.md#feat-res-test-robustness), [`FEAT-RES-QUALIFY_RESEARCH`](../services/research/README.md#feat-res-qualify-research), [`FEAT-ANA-DATABANK_MEMBERSHIP`](../services/analytics/README.md#feat-ana-databank-membership), [`FEAT-UI-32`](#feat-ui-32).
 
-1. `AuthProvider` recovers current session truth from API.
-2. `PageContextProvider` supplies bounded, redacted route/action context.
-3. `buildGovernedOptions` rejects incomplete or stale context.
-4. The focused typed client submits the action and the owning view presents its result.
+**This domain contributes:** [`FEAT-UI-01`](#feat-ui-01), [`FEAT-UI-32`](#feat-ui-32). Every participating feature’s scoped FR/local-NFR obligations remain binding.
 
-**Failure behaviour:** Expired session redirects to access; stale context blocks the
-request; API rejection remains visible and is never converted into success.
+**Input/output and acceptance contract:** `ATW-WB-GENERATE_QUALIFY` — Pinned source/space/seed; one accepted research run; each candidate has actual simulation, filters and stage history; only qualified committed result references enter the destination databank.
 
-**Integration test:** `src/context/auth.test.tsx`, `governed.test.ts`, and focused
-workflow component tests.
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-generate-qualify).
 
-```mermaid
-flowchart LR
-    USER[Explicit user action] --> AUTH[FR-UI-006: session]
-    AUTH --> PAGE[FR-UI-007: page context]
-    PAGE --> PREFLIGHT[FR-UI-008: preflight]
-    PREFLIGHT --> API[Typed API request]
-    API --> RESULT[Truthful result state]
-```
+<a id="wf-wb-retest"></a>
+### `WF-WB-RETEST` — Retest robustness
 
-### `WF-UI-002` — Ordered Stream Consumption
+**Lead owner:** [`FEAT-RES-TEST_ROBUSTNESS`](../services/research/README.md#feat-res-test-robustness). **Release gate:** U4. **State:** PENDING.
 
-**Scope:** `Cross-domain`
+**Participants:** [`FEAT-RES-TEST_ROBUSTNESS`](../services/research/README.md#feat-res-test-robustness), [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research), [`FEAT-SIM-PERTURB_INPUTS`](../services/simulator/README.md#feat-sim-perturb-inputs), [`FEAT-SIM-CONFIGURE_ENGINE`](../services/simulator/README.md#feat-sim-configure-engine), [`FEAT-SIM-EXECUTE_TICKS`](../services/simulator/README.md#feat-sim-execute-ticks), [`FEAT-ANA-COMPARE_RESULTS`](../services/analytics/README.md#feat-ana-compare-results), [`FEAT-ANA-DATABANK_MEMBERSHIP`](../services/analytics/README.md#feat-ana-databank-membership), [`FEAT-UI-STRATEGY_RETESTER`](#feat-ui-strategy-retester).
 
-**System workflow:** Any registered streaming workflow.
+**This domain contributes:** [`FEAT-UI-STRATEGY_RETESTER`](#feat-ui-strategy-retester). Every participating feature’s scoped FR/local-NFR obligations remain binding.
 
-**Input boundary:** Authenticated API stream events.
+**Input/output and acceptance contract:** `ATW-WB-RETEST` — Resolve immutable strategies and baseline; retain source hashes; ordered explicit scenarios, paired metric deltas and typed cancellation; atomic membership has complete passed/failed reasons.
 
-**Output boundary:** Ordered UI events or an explicit gap/error followed by
-authoritative state refresh.
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-retest).
 
-1. `openStream` opens the typed transport.
-2. `consumeStream` validates ordering and filters heartbeat frames.
-3. Gaps and terminal events surface explicitly and trigger the registered recovery.
-4. Disconnect aborts transport and releases UI resources.
+<a id="wf-wb-optimize-promote"></a>
+### `WF-WB-OPTIMIZE_PROMOTE` — Optimize and explicitly promote
 
-**Integration test:** `src/clients/stream.test.ts` and
-`src/context/streams.test.ts`.
+**Lead owner:** [`FEAT-OPT-SEARCH_PARAMETERS`](../services/optimization/README.md#feat-opt-search-parameters). **Release gate:** U6. **State:** PENDING.
+
+**Participants:** [`FEAT-OPT-SEARCH_PARAMETERS`](../services/optimization/README.md#feat-opt-search-parameters), [`FEAT-OPT-VALIDATE_WALK_FORWARD`](../services/optimization/README.md#feat-opt-validate-walk-forward), [`FEAT-OPT-PERMUTE_PARAMETERS`](../services/optimization/README.md#feat-opt-permute-parameters), [`FEAT-RES-GOVERN_HOLDOUTS`](../services/research/README.md#feat-res-govern-holdouts), [`FEAT-RES-QUALIFY_RESEARCH`](../services/research/README.md#feat-res-qualify-research), [`FEAT-SIM-EXECUTE_TICKS`](../services/simulator/README.md#feat-sim-execute-ticks), [`FEAT-ANA-QUERY_RESULTS`](../services/analytics/README.md#feat-ana-query-results), [`FEAT-STRAT-VERSION_STRATEGIES`](../services/strategy/README.md#feat-strat-version-strategies), [`FEAT-UI-PARAMETER_OPTIMIZER`](#feat-ui-parameter-optimizer).
+
+**This domain contributes:** [`FEAT-UI-PARAMETER_OPTIMIZER`](#feat-ui-parameter-optimizer). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-OPTIMIZE_PROMOTE` — Finite legal parameter lattice/folds and all trial outcomes; untouched holdout protected; promotion creates a new revision only after exact review; base remains unchanged.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-optimize-promote).
+
+<a id="wf-wb-portfolio"></a>
+### `WF-WB-PORTFOLIO` — Compose and evaluate a portfolio
+
+**Lead owner:** [`FEAT-POR-COMPOSE_PORTFOLIOS`](../services/portfolio/README.md#feat-por-compose-portfolios). **Release gate:** U7. **State:** PENDING.
+
+**Participants:** [`FEAT-POR-COMPOSE_PORTFOLIOS`](../services/portfolio/README.md#feat-por-compose-portfolios), [`FEAT-POR-ANALYZE_CORRELATION`](../services/portfolio/README.md#feat-por-analyze-correlation), [`FEAT-POR-OPTIMIZE_WEIGHTS`](../services/portfolio/README.md#feat-por-optimize-weights), [`FEAT-POR-SEARCH_PORTFOLIOS`](../services/portfolio/README.md#feat-por-search-portfolios), [`FEAT-POR-SIMULATE_PORTFOLIOS`](../services/portfolio/README.md#feat-por-simulate-portfolios), [`FEAT-POR-ANALYZE_PORTFOLIO_RISK`](../services/portfolio/README.md#feat-por-analyze-portfolio-risk), [`FEAT-UI-PORTFOLIO_COMPOSER`](#feat-ui-portfolio-composer), [`FEAT-UI-PORTFOLIO_BUILDER`](#feat-ui-portfolio-builder), [`FEAT-ANA-DATABANK_MEMBERSHIP`](../services/analytics/README.md#feat-ana-databank-membership).
+
+**This domain contributes:** [`FEAT-UI-PORTFOLIO_COMPOSER`](#feat-ui-portfolio-composer), [`FEAT-UI-PORTFOLIO_BUILDER`](#feat-ui-portfolio-builder). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-PORTFOLIO` — Resolve cash/calendar/currency/sample/size compatibility; manual/qualified weights; shared-capital interactions use ordered ticks; save exact constituents, weights, result and benchmark provenance.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-portfolio).
+
+<a id="wf-wb-project"></a>
+### `WF-WB-PROJECT` — Automate a research project
+
+**Lead owner:** [`FEAT-ORCH-RUN_PROJECTS`](../services/orchestration/README.md#feat-orch-run-projects). **Release gate:** U8. **State:** PENDING.
+
+**Participants:** [`FEAT-ORCH-RUN_PROJECTS`](../services/orchestration/README.md#feat-orch-run-projects), [`FEAT-ORCH-DEFINE_PROJECTS`](../services/orchestration/README.md#feat-orch-define-projects), [`FEAT-ORCH-MANAGE_JOBS`](../services/orchestration/README.md#feat-orch-manage-jobs), [`FEAT-ORCH-EXECUTE_UTILITIES`](../services/orchestration/README.md#feat-orch-execute-utilities), [`FEAT-ORCH-DELIVER_NOTIFICATIONS`](../services/orchestration/README.md#feat-orch-deliver-notifications), [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research), [`FEAT-OPT-SEARCH_PARAMETERS`](../services/optimization/README.md#feat-opt-search-parameters), [`FEAT-POR-SIMULATE_PORTFOLIOS`](../services/portfolio/README.md#feat-por-simulate-portfolios), [`FEAT-UI-PROJECT_EDITOR`](#feat-ui-project-editor).
+
+**This domain contributes:** [`FEAT-UI-PROJECT_EDITOR`](#feat-ui-project-editor). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-PROJECT` — Validate bounded typed graph; whole/from-here/only preview; crash after child commit reconciles one receipt; retries append attempts and lineage navigates both directions.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-project).
+
+<a id="wf-wb-extend-analysis"></a>
+### `WF-WB-EXTEND_ANALYSIS` — Develop and install analysis safely
+
+**Lead owner:** [`FEAT-PLUG-MANAGE_LIFECYCLE`](../services/plugins/README.md#feat-plug-manage-lifecycle). **Release gate:** U9. **State:** PENDING.
+
+**Participants:** [`FEAT-PLUG-MANAGE_LIFECYCLE`](../services/plugins/README.md#feat-plug-manage-lifecycle), [`FEAT-PLUG-AUTHOR_PACKAGES`](../services/plugins/README.md#feat-plug-author-packages), [`FEAT-PLUG-DECLARE_MANIFESTS`](../services/plugins/README.md#feat-plug-declare-manifests), [`FEAT-PLUG-SANDBOX_PERMISSIONS`](../services/plugins/README.md#feat-plug-sandbox-permissions), [`FEAT-PLUG-ISOLATE_ANALYSIS`](../services/plugins/README.md#feat-plug-isolate-analysis), [`FEAT-PLUG-RENDER_RESULT_PANELS`](../services/plugins/README.md#feat-plug-render-result-panels), [`FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS`](../services/analytics/README.md#feat-ana-provide-custom-analysis), [`FEAT-UI-CODE_EDITOR`](#feat-ui-code-editor).
+
+**This domain contributes:** [`FEAT-UI-CODE_EDITOR`](#feat-ui-code-editor). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-EXTEND_ANALYSIS` — Fork/edit/build/test in isolation; compile success does not install; separate reviewed activation; hostile panel/uninstall removes only its contribution and preserves canonical results.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-extend-analysis).
+
+<a id="wf-wb-chat-review"></a>
+### `WF-WB-CHAT_REVIEW` — Review a real result through Chat Bot
+
+**Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator), [`FEAT-UI-32`](#feat-ui-32), [`FEAT-UI-15`](#feat-ui-15), [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot), [`FEAT-IFACE-AGENTIC_GATEWAY`](../services/interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../services/agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](../services/agentic/README.md#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](../services/agentic/README.md#feat-agt-synthesize-research), [`FEAT-ANA-QUERY_RESULTS`](../services/analytics/README.md#feat-ana-query-results), [`FEAT-WS-MANAGE_CONVERSATIONS`](../services/workspace/README.md#feat-ws-manage-conversations).
+
+**This domain contributes:** [`FEAT-UI-32`](#feat-ui-32), [`FEAT-UI-15`](#feat-ui-15), [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-CHAT_REVIEW` — Change the browser-displayed metric to an incorrect value: answer refreshes owner truth and cites exact evidence, same-conversation specialist attribution; stale or denied evidence cannot produce a claimed fact.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-chat-review).
+
+<a id="wf-wb-idea-to-strategy"></a>
+### `WF-WB-IDEA_TO_STRATEGY` — Research idea to reviewed strategy
+
+**Lead owner:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](../services/agentic/README.md#feat-agt-compose-strategy-specs). **Release gate:** U3. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-COMPOSE_STRATEGY_SPECS`](../services/agentic/README.md#feat-agt-compose-strategy-specs), [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator), [`FEAT-AGT-DESIGN_RESEARCH`](../services/agentic/README.md#feat-agt-design-research), [`FEAT-RES-GOVERN_CAMPAIGNS`](../services/research/README.md#feat-res-govern-campaigns), [`FEAT-RES-DEFINE_PROTOCOLS`](../services/research/README.md#feat-res-define-protocols), [`FEAT-STRAT-DEFINE_AST`](../services/strategy/README.md#feat-strat-define-ast), [`FEAT-STRAT-CATALOG_BLOCKS`](../services/strategy/README.md#feat-strat-catalog-blocks), [`FEAT-STRAT-VERSION_STRATEGIES`](../services/strategy/README.md#feat-strat-version-strategies), [`FEAT-IFACE-AGENTIC_GATEWAY`](../services/interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot), [`FEAT-UI-STRATEGY_STUDIO`](#feat-ui-strategy-studio), [`FEAT-SIM-EXECUTE_TICKS`](../services/simulator/README.md#feat-sim-execute-ticks).
+
+**This domain contributes:** [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot), [`FEAT-UI-STRATEGY_STUDIO`](#feat-ui-strategy-studio). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-WB-IDEA_TO_STRATEGY` — Draft with explicit unvalidated assumptions; validate, bounded repair, exact patch closure review and CAS acceptance; separately authorize a bounded tick backtest; no save/holdout/live authority implied by prose.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-wb-idea-to-strategy).
+
+<a id="wf-agt-assist-operator"></a>
+### `WF-AGT-ASSIST_OPERATOR` — Context-Aware Chat Bot
+
+**Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
+
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator), [`FEAT-AGT-ENFORCE_MANDATE`](../services/agentic/README.md#feat-agt-enforce-mandate), [`FEAT-AGT-RUN_WORKFLOWS`](../services/agentic/README.md#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../services/agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-REGISTER_ROLES`](../services/agentic/README.md#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](../services/agentic/README.md#feat-agt-invoke-models), [`FEAT-UI-15`](#feat-ui-15), [`FEAT-IFACE-AGENTIC_GATEWAY`](../services/interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-WS-MANAGE_CONVERSATIONS`](../services/workspace/README.md#feat-ws-manage-conversations).
+
+**This domain contributes:** [`FEAT-UI-15`](#feat-ui-15). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+
+**Input/output and acceptance contract:** `ATW-AGT-ASSIST_OPERATOR` — Fresh verified scope and deterministic direct/specialist route; reply preserves attribution, refusals and evidence; no prose-triggered mutation.
+
+**Failure boundary:** required evidence or provider absence yields the declared refusal/unavailable/partial result; it never implies a pass, silently substitutes a provider or grants live authority. [Canonical workflow definition](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#wf-agt-assist-operator).
+
+## 4. Composable Feature Specifications
+
+Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. All acceptance states are PENDING / NOT_REVALIDATED. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
+
+<a id="feat-ui-01"></a>
+### 4.1 `workspaces/` — `FEAT-UI-01`
+
+> **Feature ID:** `FEAT-UI-01`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/workspaces/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Compose and restore the research workspace. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.workspace-layout@1`.
+
+**Required capabilities:**
+
+None (root with respect to the register’s required-provider graph)..
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-01) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/workspaces/contracts.ts`](src/widgets/workspaces/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-01-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-01 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-01 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-01 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-01-001` | Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry. | `AT-UI-01-001` | Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. |
+| PENDING | `FR-TRC-UI-01-002` | Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery. | `AT-UI-01-002` | One invalid/missing widget does not discard valid siblings; secrets, strategies, raw rows and provider objects never enter saved layout. |
+| PENDING | `FR-TRC-UI-01-003` | Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery. | `AT-UI-01-003` | Persist/restore round-trips panel topology and stable identity; unsupported cross-window behavior is explicitly disabled rather than falsely advertised. |
+| PENDING | `FR-TRC-UI-01-004` | Keep closing an observer distinct from cancelling its accepted owner job. | `AT-UI-01-004` | Unmount releases timers/listeners/workers/requests but a running backtest continues unless the explicit owner cancellation command is issued. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-01-001` | Each widget and registration proves exact cleanup and isolated layout failure. | `ATN-UI-01-001` | 100 enable/disable cycles, physical widget removal and partially corrupt persisted layouts leave no leaked effect or lost valid sibling. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-01): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/workspaces/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/workspaces/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-01/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-01`. Withdraw `ui.workspace-layout@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
----
-
-## 4. Module and Requirement Specifications
-
-Modules are ordered primary UI first, then foundation, then layered add-ons. The
-`Usage / Test` column records UI verification evidence; the approved UI exception
-replaces standalone usage programs with focused unit/component and appropriate
-integration, contract, or browser evidence.
-
-### 4.1 `src/widgets/workspaces/` — Workspace Layout and Session Mode
-
-**Purpose:** Own non-authoritative workspace layout preference, order-confirmation mode, and account-mode presentation.
-
-**Location:** `src/widgets/workspaces/`. Migrated from the former
-`src/store/useTradingStore.ts` (trimmed to only the unrelated trading-engine
-state - orders, positions, trade log, practice/challenge balances - which
-remains out of this feature's scope) and `src/types/widget.ts` (deleted; its
-contents moved into `contracts.ts`). `accountMode` is derived exclusively from
-the authenticated identity's `runtime_profile` (`src/context/auth.tsx`) rather
-than through `clients/settings`, which has no
-workspace-related field; see the feature's own `README.md` for that gap.
-
-### Files
-
-| Status    | File                        | Responsibility                                               | Key exports                                                                             | Dependencies                                                                                                                     |
-| --------- | --------------------------- | ------------------------------------------------------------ | --------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `contracts.ts`            | Workspace and widget layout contracts                        | `Workspace`, `Widget`, `WidgetType`, `AccountMode`                              | **Standard library:** None**Required third-party:** Zod**Local:** None                                         |
-| Completed | `templates.ts`            | Workspace template catalog (FR-UI-195–FR-UI-197)            | `WORKSPACE_TEMPLATES`, `WorkspaceTemplate`, `findWorkspaceTemplate`               | **Standard library:** None**Required third-party:** None**Local:** contracts                                   |
-| Completed | `dockLayout.ts`           | Docking layout tree factory and legacy migration (FR-UI-201) | `buildDockLayout`                                                                     | **Standard library:** None**Required third-party:** dockview-react (types only)**Local:** contracts            |
-| Completed | `store.ts`                | Bounded layout, confirmation-mode, and account-mode state    | `useWorkspaceStore`, `selectOrderEntryDisabled`, `mapRuntimeProfileToAccountMode` | **Standard library:** localStorage**Required third-party:** Zustand**Local:** contracts, templates, dockLayout |
-| Completed | `TemplatePicker.tsx`      | New-workspace template picker screen (FR-UI-195/196/198)     | `TemplatePicker` through the feature barrel                                           | **Standard library:** None**Required third-party:** None**Local:** store, templates                            |
-| Completed | `WorkspaceEmptyState.tsx` | Explicit empty-workspace prompt (FR-UI-026/197)              | `WorkspaceEmptyState` through the feature barrel                                      | **Standard library:** None**Required third-party:** None**Local:** None                                        |
-| Completed | `index.ts`                | Sole public surface for the feature                          | feature barrel                                                                          | **Standard library:** None**Required third-party:** None**Local:** store and contracts                         |
-
-| Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                | Component / Function / Type                           | Side Effects                 | Failure presentation                                                  | Usage / Test                                                                                 |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- | ---------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Completed | `FR-UI-001`  | Provide a default workspace on first authenticated load presenting the new-workspace template picker screen pending choice.                                                                                                                                                                                                                                                   | `Workspace`                                         | Local persistence            | Default restored                                                      | `store.test.ts`                                                                            |
-| Completed | `FR-UI-002`  | Allow creation of named workspaces up to a bounded maximum, rejecting creation beyond the limit explicitly.                                                                                                                                                                                                                                                                                                   | workspace actions                                     | Local persistence            | Limit message shown                                                   | `store.test.ts`                                                                            |
-| Completed | `FR-UI-003`  | Default an unnamed new workspace to a deterministic incrementing name.                                                                                                                                                                                                                                                                                                                                        | workspace actions                                     | Local persistence            | Deterministic naming                                                  | `store.test.ts`                                                                            |
-| Completed | `FR-UI-004`  | Allow renaming, duplicating, and deleting a workspace; deleting the last remaining workspace is rejected.                                                                                                                                                                                                                                                                                                     | workspace actions                                     | Local persistence            | Rejection explicit                                                    | `store.test.ts`                                                                            |
-| Completed | `FR-UI-005`  | Allow a workspace to be designated the default opened on next session start.                                                                                                                                                                                                                                                                                                                                  | workspace actions                                     | Local persistence            | Default visible                                                       | `store.test.ts`                                                                            |
-| Completed | `FR-UI-006`  | Support moving a widget by dragging its tab: dropping on a panel's centre docks it as a tab in that group, dropping on an edge splits the region in that direction, and the layout always fills the workspace with no gaps or overlaps.                                                                                                                                                                       | `DockingWorkspace`                                  | Local persistence            | Drop overlay visible                                                  | `DockingWorkspace.test.tsx`; live docking evidence                                         |
-| Completed | `FR-UI-007`  | Provide a keyboard-operable path for layout moves: focused tabs switch with arrow keys and Alt+Arrow moves the active panel left/right/above/below; splitter pixel-resizing remains pointer-only and tracked as a follow-up.                                                                                                                                                                                  | `DockingWorkspace`                                  | Local persistence            | Keyboard path preserved                                               | `DockingWorkspace.test.tsx`                                                                |
-| Completed | `FR-UI-008`  | Support expanding a widget's group to fill the workspace and restoring the prior layout through an explicit title-bar control or the equivalent double-click shortcut; the control visibly and accessibly switches between Expand and Restore.                                                                                                                                                                | `DockingWorkspace`                                  | Local persistence            | Prior layout retained                                                 | `DockingWorkspace.test.tsx`; `store.test.ts` (expand/contract state)                     |
-| Completed | `FR-UI-009`  | Persist layout to browser-local storage only; layout is a client preference and never system state.                                                                                                                                                                                                                                                                                                           | store                                                 | Local persistence            | Non-authoritative                                                     | `store.test.ts`                                                                            |
-| Completed | `FR-UI-010`  | Restore a corrupt or unreadable persisted layout to the default workspace rather than failing to render.                                                                                                                                                                                                                                                                                                      | store                                                 | Local persistence            | Default restored                                                      | `store.test.ts`                                                                            |
-| Completed | `FR-UI-011`  | Provide an order-confirmation toggle that, when disabled, submits without the client-side confirmation dialog.                                                                                                                                                                                                                                                                                                | mode actions                                          | Local state mutation         | Mode always visible                                                   | `store.test.ts`                                                                            |
-| Completed | `FR-UI-012`  | Default the toggle to confirmation-required on every new session; the setting is never inherited silently.                                                                                                                                                                                                                                                                                                    | mode actions                                          | Local state mutation         | Safe default                                                          | `store.test.ts`                                                                            |
-| Completed | `FR-UI-013`  | Present the active confirmation mode persistently in the shell.                                                                                                                                                                                                                                                                                                                                               | mode actions                                          | None                         | Mode always visible                                                   | `Header.tsx` confirmation-mode toggle; `Header.test.tsx`                                 |
-| Completed | `FR-UI-014`  | Treat the toggle as presentation only; it never suppresses or pre-satisfies API authorization, approval, idempotency, governance, or kill-switch enforcement.                                                                                                                                                                                                                                                 | mode actions                                          | None                         | API authority unchanged                                               | `store.test.ts`                                                                            |
-| Completed | `FR-UI-015`  | Apply the toggle identically in simulation and live; the difference between modes is the environment switch, not a different order path.                                                                                                                                                                                                                                                                      | mode actions                                          | None                         | One order path                                                        | `store.test.ts`                                                                            |
-| Completed | `FR-UI-016`  | Present the active account mode — sim, demo, or live — persistently, unambiguously, and colour-coded.                                                                                                                                                                                                                                                                                                       | mode actions                                          | None                         | Mode always visible                                                   | `Header.test.tsx` badge tests                                                              |
-| Completed | `FR-UI-017`  | Elect the mode from the profile dropdown and persist it as the`ACCOUNT_MODE` system setting; the backend setting is authoritative for every session. Supersedes the previous never-client-elected rule by owner decision (2026-08-17).                                                                                                                                                                      | mode actions                                          | External API call            | Selection persisted                                                   | `Header.test.tsx`; `store.test.ts`                                                       |
-| Completed | `FR-UI-018`  | Require an explicit operator action to change mode, apply it only once the backend has accepted it, and revert on refusal.                                                                                                                                                                                                                                                                                    | mode actions                                          | External API call            | Explicit action required                                              | `Header.test.tsx` (selection, persistence, and revert-on-refusal)                          |
-| Completed | `FR-UI-019`  | Present simulated and live balances distinctly and never combine them in one total.                                                                                                                                                                                                                                                                                                                           | mode actions                                          | None                         | No combined total                                                     | `Header.tsx` (single balance figure per active mode)                                       |
-| Completed | `FR-UI-203`  | Persist the elected account mode as the complete system-settings document under its observed version, so a mode change never erases another setting and a concurrent edit is refused.                                                                                                                                                                                                                         | mode actions                                          | External API call            | Full-document write                                                   | `Header.test.tsx` (full-document write assertion)                                          |
-| Completed | `FR-UI-204`  | Route every governed order, cancellation, and account-state read on the active mode's route, and refuse to act at all while the mode is unresolved.                                                                                                                                                                                                                                                           | mode actions                                          | External API call            | Route follows mode                                                    | `PriceLadderWidget.tsx` route resolution; `store.test.ts`                                |
-| Completed | `FR-UI-205`  | Colour-code the account mode identically in the profile dropdown and the header badge: sim green, demo amber, live red.                                                                                                                                                                                                                                                                                       | mode actions                                          | None                         | One palette, both places                                              | `Header.test.tsx`; `index.css` account-mode palette                                      |
-| Completed | `FR-UI-206`  | Display the active provider account name above its authoritative environment in the Header. DEMO/LIVE consume MT5-authored account-profile evidence—including MT5's actual environment when it differs from the elected execution mode—while SIM consumes the explicit Simulator identity. Loading and unavailable states are visible, and the app-login username is never substituted for broker identity. | `Header`                                            | External API call            | Loading/unavailable explicit                                          | `Header.test.tsx`; `clients/trading.test.ts`                                             |
-| Completed | `FR-UI-208`  | Disable every Trading mutation control and handler unless fresh provider-authored account mode exactly matches the selected system mode (`SIMULATION`/sim, `DEMO`/demo, `REAL`/live); unknown, unavailable, malformed, contest, or mismatched evidence fails closed while read-only presentation remains available.                                                                                     | mode compatibility state; Trading controls            | Local state mutation         | Persistent mismatch warning; actions disabled                         | `store.test.ts`; `Header.test.tsx`; `trading.test.tsx`; `PriceLadderWidget.test.tsx` |
-| Completed | `FR-UI-209`  | Display the active account's provider-authored Balance, Profit, Margin, Free Margin, Margin Level, Leverage, and Equity in that order; unavailable values render as an explicit dash and never fall back to mock trading-store figures.                                                                                                                                                                       | `Header`                                            | External API call            | Loading and unavailable metrics remain explicit                       | `Header.test.tsx`; `clients/trading.test.ts`                                             |
-| Completed | `FR-UI-210`  | Open an accessible account-metrics settings menu from the Header caret. Switch Profit between provider-currency Money and an internally calculated floating-return Percent (`profit / balance * 100`); zero, missing, or invalid balance renders unavailable. The preference is session-local.                                                                                                              | `AccountMetricsMenu`; `Header`                    | Local presentation state     | Escape/outside close; safe zero-balance handling                      | `AccountMetricsMenu.test.tsx`; `Header.test.tsx`                                         |
-| Completed | `FR-UI-211`  | Present MT5 leverage as provider-owned and read-only. SIM leverage remains unavailable without an active simulation-session contract, and the Header cannot mutate a global or invented leverage value.                                                                                                                                                                                                       | `AccountMetricsMenu`; `Header`                    | None                         | Mode-specific explanation; control disabled                           | `AccountMetricsMenu.test.tsx`; `Header.test.tsx`                                         |
-| Completed | `FR-UI-217`  | When creating a SIM session, require an initial account balance and leverage and accept a three-letter currency defaulting to USD. Hide and omit these controls for DEMO/LIVE because MT5 owns those values.                                                                                                                                                                                                  | `SessionRegistryWidget`; typed Trading client       | External API call            | Client validation and API rejection remain visible                    | `SessionRegistryWidget.test.tsx`; `clients/trading.test.ts`                              |
-| Completed | `FR-UI-218`  | Display persisted SIM opening balance and leverage in session details and use the scoped active/default SIM account profile for Header metrics across reloads. Legacy unconfigured sessions remain explicitly unavailable.                                                                                                                                                                                    | `SessionRegistryWidget`; `Header`                 | External API read            | Unconfigured values render unavailable                                | `SessionRegistryWidget.test.tsx`; `Header.test.tsx`                                      |
-| Completed | `FR-UI-219`  | Display the selected system mode and its active/default session name together as`MODE : SESSION`; when no scoped session exists, display `NO SESSION` without inventing an identity. Backend session-start admission remains authoritative and cannot be bypassed by the client.                                                                                                                          | `Header`                                            | External API read            | Loading, no-session, and mismatch states explicit                     | `Header.test.tsx`; `clients/trading.test.ts`                                             |
-| Completed | `FR-UI-220`  | Require selection of a Data-verified dataset when creating SIM sessions, persist its exact lineage, and visibly mark the bound dataset active. DEMO/LIVE omit dataset configuration.                                                                                                                                                                                                                          | `SessionRegistryWidget`; typed Data/Trading clients | External API read/write      | Empty catalogue blocks SIM creation visibly                           | `SessionRegistryWidget.test.tsx`; `clients.contract.test.ts`                             |
-| Completed | `FR-UI-221`  | Label the provider identity as Account Name and display the immutable SIM logical identity separately in`username_N` format; unavailable legacy values remain explicit.                                                                                                                                                                                                                                     | `SessionRegistryWidget`                             | External API read            | No invented fallback identity                                         | `SessionRegistryWidget.test.tsx`; Trading integration tests                                |
-| Completed | `FR-UI-222`  | Present durable lifecycle events separately from a bounded live activity console with connection state, pause/resume, clear, and accessible log semantics. Explain that streamed redacted file logs are not duplicated in the database.                                                                                                                                                                       | `SessionRegistryWidget`; typed SSE client           | External stream              | Stream failure is visible without hiding lifecycle history            | `SessionRegistryWidget.test.tsx`; `test_session_activity_stream.py`                      |
-| Completed | `FR-UI-223`  | Detect legacy SIM sessions missing Account Name, Simulation ID, or dataset lineage; direct the user to stop a running session, require explicit verified-dataset selection, and complete all three fields through one visible action.                                                                                                                                                                         | `SessionRegistryWidget`; typed Trading client       | External API read/write      | Running/incomplete/empty-catalogue states remain explicit and blocked | `SessionRegistryWidget.test.tsx`; Trading integration tests                                |
-| Completed | `FR-UI-224`  | Present the authenticated username as the SIM Account Name in the Header and session details, the immutable`username_N` value as Simulation ID, and the independently editable registry label only as Session Name.                                                                                                                                                                                         | `Header`; `SessionRegistryWidget`                 | External API read            | Missing identity remains explicit and trading stays blocked           | `Header.test.tsx`; `SessionRegistryWidget.test.tsx`; Trading integration tests           |
-| Completed | `FR-UI-225`  | Present the existing governed Trading controls as a responsive execution cockpit with a Sessions-style hero, account/position/order evidence cards, grouped execution/order/authority/target fields, explicit loading/error/disabled/result states, and a dedicated command bar without changing any mutation or validation behavior.                                                                         | `TradingWidget`                                     | Existing Trading client only | All safety gates and disabled conditions remain authoritative         | `src/widgets/trading/TradingWidget.test.tsx`; TypeScript typecheck                        |
-| Removed   | `FR-UI-020`  | Balance reset control removed by owner decision (2026-08-16): no reset action is offered in the shell; the requirement is retired.                                                                                                                                                                                                                                                                            | none                                                  | None                         | No reset offered                                                      | Owner decision;`docs/CHANGELOG.md` [Unreleased]                                            |
-| Completed | `FR-UI-021`  | Fail closed when mode is unknown: present as unknown, disable order entry, and name no route until resolved.                                                                                                                                                                                                                                                                                                  | mode actions                                          | None                         | Order entry disabled                                                  | `store.test.ts`; `Header.test.tsx`; `src/widgets/trading/OrderTicket.test.tsx`        |
-| Completed | `FR-UI-022`  | Present the market-data delay applicable to the active mode where the API declares one.                                                                                                                                                                                                                                                                                                                       | mode actions                                          | External API call            | Unknown remains explicit                                              | `marketDataDelaySeconds` field, undefined until the API supplies one                       |
-| Completed | `FR-UI-023`  | Present widget type and title from the registered widget-type set only.                                                                                                                                                                                                                                                                                                                                       | `WidgetType`                                        | None                         | Unknown type rejected                                                 | `store.test.ts`                                                                            |
-| Completed | `FR-UI-024`  | Keep every widget inside the workspace bounds inherently: the docking layout always fills the container and cannot express out-of-bounds or overlapping regions.                                                                                                                                                                                                                                              | `DockingWorkspace`                                  | Local persistence            | No out-of-bounds state                                                | `dockLayout.test.ts`                                                                       |
-| Completed | `FR-UI-025`  | Preserve widget identity across docking moves, duplication, and restore operations: panel ids equal widget ids and never change.                                                                                                                                                                                                                                                                              | `DockingWorkspace`                                  | Local persistence            | Stable identity                                                       | `dockLayout.test.ts`; `store.test.ts`                                                    |
-| Completed | `FR-UI-026`  | Present an empty workspace explicitly rather than as a failed render.                                                                                                                                                                                                                                                                                                                                         | `Workspace`                                         | None                         | Empty state truthful                                                  | `store.test.ts`                                                                            |
-| Completed | `FR-UI-027`  | Never persist account, credential, or order state to browser-local storage.                                                                                                                                                                                                                                                                                                                                   | store                                                 | Local persistence            | Layout keys only                                                      | `store.test.ts`                                                                            |
-| Completed | `FR-UI-028`  | Expose workspace and mode state only through the feature barrel.                                                                                                                                                                                                                                                                                                                                              | `index.ts`                                          | None                         | No deep import                                                        | Consumer files import only from`widgets/workspaces`                                       |
-| Completed | `FR-UI-029`  | Import no fixture data; every displayed value is API-sourced or a labelled client preference.                                                                                                                                                                                                                                                                                                                 | store                                                 | None                         | No fixture import                                                     | `store.test.ts`                                                                            |
-| Completed | `FR-UI-195`  | Create a new workspace as pending its template choice: deterministically named, widget-free, and rendered as the template picker instead of the widget grid; creation stays bounded by FR-UI-002.                                                                                                                                                                                                             | `addWorkspace`, `TemplatePicker`                  | Local persistence            | Bounded creation kept                                                 | `store.test.ts`; `TemplatePicker.test.tsx`                                               |
-| Completed | `FR-UI-196`  | Apply a content template to the active pending workspace by seeding the template's registered-widget preset, whose rectangle set reproduces the reference thumbnail's exact panel orientation (`public/templates/`, Dark/Light), and renaming the workspace to the template name.                                                                                                                           | `applyWorkspaceTemplate`                            | Local persistence            | Unknown template rejected                                             | `store.test.ts`; `TemplatePicker.test.tsx`; `dockLayout.test.ts`                       |
-| Completed | `FR-UI-197`  | Apply the Blank template by leaving the workspace empty under its deterministic name and presenting the explicit empty-workspace prompt.                                                                                                                                                                                                                                                                      | `applyWorkspaceTemplate`, `WorkspaceEmptyState`   | Local persistence            | Empty state truthful                                                  | `store.test.ts`; `WorkspaceEmptyState.test.tsx`                                          |
-| Completed | `FR-UI-198`  | Present every template as a labeled card control operable by pointer and keyboard.                                                                                                                                                                                                                                                                                                                            | `TemplatePicker`                                    | None                         | Full keyboard path                                                    | `TemplatePicker.test.tsx`                                                                  |
-| Completed | `FR-UI-199`  | Reject an unregistered template id without any state change.                                                                                                                                                                                                                                                                                                                                                  | `applyWorkspaceTemplate`                            | None                         | No state change                                                       | `store.test.ts`                                                                            |
-| Completed | `FR-UI-200`  | Support fluid pixel-level resizing of adjacent layout regions by dragging the splitter between them, with the drop landing at the exact pointer position.                                                                                                                                                                                                                                                     | `DockingWorkspace`                                  | Local persistence            | Continuous resize                                                     | Live docking evidence;`DockingWorkspace.test.tsx`                                          |
-| Completed | `FR-UI-201`  | Persist the serialized docking layout per workspace, restore it on reload, and deterministically convert grid-rectangle layouts (and template presets) into proportional docking trees by a column-cluster then row-band partition, so side-by-side columns keep independent vertical splits.                                                                                                                 | `dockLayout.ts`, `setWorkspaceDockLayout`         | Local persistence            | Legacy layouts convert or fall back                                   | `dockLayout.test.ts`; `store.test.ts`                                                    |
-| Completed | `FR-UI-202`  | Collapse layout regions vacated by a moved or closed widget and expand the remaining regions to refill the workspace automatically.                                                                                                                                                                                                                                                                           | `DockingWorkspace`                                  | Local persistence            | No gaps or dead regions                                               | Live docking evidence                                                                        |
-
-### Configuration and Limits Manifest
-
-| Status    | Setting / Limit           | Type       | Default | Required | Used by           | Description                     |
-| --------- | ------------------------- | ---------- | ------- | -------- | ----------------- | ------------------------------- |
-| Completed | `MAX_CUSTOM_WORKSPACES` | `number` | `10`  | Yes      | workspace actions | Bounded custom workspace count. |
-
-### 4.2 `src/widgets/markets/` — Markets Widget
-
-**Purpose:** Present the tradable instrument directory for the configured runtime source.
-
-### Files
-
-| Status    | File                  | Responsibility                                                                       | Key exports       | Dependencies                                                                                                                                                               |
-| --------- | --------------------- | ------------------------------------------------------------------------------------ | ----------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `MarketsWidget.tsx` | Bounded progressive market-directory presentation, with an optional watchlist filter | `MarketsWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/data, clients/watchlists, widgets/workspaces, store/useTradingStore |
-| Completed | `index.ts`          | Sole public surface for the feature                                                  | `MarketsWidget` | **Standard library:** None**Required third-party:** None**Local:** `MarketsWidget.tsx`                                                                 |
-
-| Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        | Component / Function / Type | Side Effects                                         | Failure presentation             | Usage / Test                                    |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- | ---------------------------------------------------- | -------------------------------- | ----------------------------------------------- |
-| Completed | `FR-UI-030`  | Present typed API market evidence without market calculation; format every populated symbol's annualized volatility as a percentage, ADR in pips, and range as a percentage of ADR, then present owner-supplied Bid as Last Price, convert raw spread into integer MT5 points using provider precision, show per-symbol whole-second Age from genuine TCP quote time, and preserve explicit live, stale, or not-live evidence from one authenticated snapshot stream. All sequential HTTP history/calculation batches must finish before a visible 10-second settling interval begins; streaming starts only after that interval and may update quote-only fields without replacing initialized technical evidence. Initial HTTP rows and invalid quote times retain unavailable Age. | `MarketsWidget`           | Sequential external API calls followed by one stream | Unavailable remains unavailable  | `src/widgets/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-031`  | Use bounded batch reads and progressive rendering.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | `MarketsWidget`           | External API call; local state mutation              | Completed batches remain visible | `src/widgets/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-032`  | Show explicit loading, error, formatting, and sort states.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | `MarketsWidget`           | Local state mutation                                 | Em dash for unavailable legs     | `src/widgets/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-033`  | Present the tradable instrument directory for the configured runtime source only.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | `MarketsWidget`           | External API call                                    | Non-tradable absent              | `src/widgets/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-034`  | Offer filtering of the directory by asset class.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      | `MarketsWidget`           | Local state mutation                                 | Empty filter truthful            | `src/widgets/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-035`  | Offer sorting by symbol, change, and volume with a stable tiebreak.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | `MarketsWidget`           | Local state mutation                                 | Deterministic ordering           | `src/widgets/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-036`  | Offer a direct trade action per row that opens the order ticket pre-filled with that instrument while its text and accessible label present green live, yellow stale, or red not-live quote status without changing trading authority.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | `MarketsWidget`           | Local state mutation                                 | Ticket authority unchanged       | `src/widgets/markets/MarketsWidget.test.tsx` |
-| Completed | `FR-UI-037`  | Offer per-row actions targeting the chart and price ladder surfaces at the selected instrument.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | `MarketsWidget`           | Navigation                                           | Unavailable target disabled      | `src/widgets/markets/MarketsWidget.test.tsx` |
-
-### Configuration and Limits Manifest
-
-| Status    | Setting / Limit       | Type       | Default | Required | Used by         | Description                                                                                                         |
-| --------- | --------------------- | ---------- | ------- | -------- | --------------- | ------------------------------------------------------------------------------------------------------------------- |
-| Completed | `MARKETS_PAGE_SIZE` | `number` | `50`  | Yes      | directory fetch | Rows requested per page; matches the API's own default page size.                                                   |
-| Completed | `MARKETS_MAX_PAGES` | `number` | `4`   | Yes      | directory fetch | Bounded page count (200 rows max) so the widget never walks the full broker catalogue regardless of`next_cursor`. |
+<a id="feat-ui-14"></a>
+### 4.2 `clients/` — `FEAT-UI-14`
 
-### 4.3 `src/widgets/watchlists/` — Watchlist Widget
+> **Feature ID:** `FEAT-UI-14`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/clients/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Present watchlist selection and explicit CRUD interaction.
+#### Purpose
 
-### Files
+Call the typed backend and resume observation. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
 
-| Status    | File                    | Responsibility                                                                                                                   | Key exports                                                                                 | Dependencies                                                                                                                                                                               |
-| --------- | ----------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Completed | `WatchlistWidget.tsx` | Account watchlist interaction with source-backed symbol selection                                                                | `WatchlistWidget`                                                                         | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/watchlists, clients/data, widgets/workspaces, store/useTradingStore, symbolUniverse |
-| Completed | `symbolUniverse.ts`   | Load the complete provider symbol directory once into memory, rank bounded suggestions, and resolve exact provider-native values | `loadSymbolUniverse`, `resetSymbolUniverse`, `filterSymbols`, `resolveSourceSymbol` | **Standard library:** browser runtime**Required third-party:** None**Local:** clients/data                                                                               |
-| Completed | `index.ts`            | Sole public surface for the feature                                                                                              | `WatchlistWidget`                                                                         | **Standard library:** None**Required third-party:** None**Local:** `WatchlistWidget.tsx`                                                                               |
-
-| Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                          | Component / Function / Type                                                             | Side Effects                             | Failure presentation                                                      | Usage / Test                                                                          |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
-| Completed | `FR-UI-038`  | Present lists and explicit default/current selection.                                                                                                                                                                                                                                                                                                   | `WatchlistWidget`                                                                     | External API call; local state mutation  | Empty/error state                                                         | `src/widgets/watchlists/WatchlistWidget.test.tsx`                                  |
-| Completed | `FR-UI-039`  | Submit CRUD/item actions only after explicit user intent.                                                                                                                                                                                                                                                                                               | `WatchlistWidget`                                                                     | External API call                        | API rejection visible                                                     | `src/widgets/watchlists/WatchlistWidget.test.tsx`                                  |
-| Completed | `FR-UI-040`  | Surface validation, authorization, conflict, and unavailable outcomes.                                                                                                                                                                                                                                                                                  | `WatchlistWidget`                                                                     | None                                     | Never invent success                                                      | `src/widgets/watchlists/WatchlistWidget.test.tsx`                                  |
-| Completed | `FR-UI-041`  | Remove manual asset-class controls and display the backend-persisted class automatically derived from the selected connected-source symbol metadata.                                                                                                                                                                                                    | `WatchlistWidget`                                                                     | External API response                    | Missing class remains explicit as unavailable                             | `src/widgets/watchlists/WatchlistWidget.test.tsx`; `src/clients/clients.test.ts` |
-| Completed | `FR-UI-042`  | Permit membership beyond the tradable set and mark an entry non-tradable only when its exact provider-native symbol is absent from the complete connected-source universe already held in memory.                                                                                                                                                       | `WatchlistWidget`                                                                     | In-memory source-universe read           | Loading or unavailable universe never produces a false non-tradable label | `src/widgets/watchlists/WatchlistWidget.test.tsx`                                  |
-| Completed | `FR-UI-043`  | Rename, reorder, and delete lists and add or remove symbols through registered operations only. Symbol addition shall preload the connected source's complete symbol directory, offer prefix-first and substring suggestions, preserve the exact provider-native value, and fail closed unless the candidate uniquely matches that in-memory directory. | `WatchlistWidget`, `loadSymbolUniverse`, `filterSymbols`, `resolveSourceSymbol` | External API call; local in-memory cache | API rejection or unavailable symbol evidence visible                      | `src/widgets/watchlists/WatchlistWidget.test.tsx`                                  |
-| Completed | `FR-UI-044`  | Sort rows by any displayed column with a stable tiebreak.                                                                                                                                                                                                                                                                                               | `WatchlistWidget`                                                                     | Local state mutation                     | Deterministic ordering                                                    | `src/widgets/watchlists/WatchlistWidget.test.tsx`                                  |
-| Completed | `FR-UI-045`  | Present quote columns with freshness and an explicit unknown state.                                                                                                                                                                                                                                                                                     | `WatchlistWidget`                                                                     | External API call                        | Unknown remains explicit                                                  | `src/widgets/watchlists/WatchlistWidget.test.tsx`                                  |
+#### Capability Declarations
 
-### Configuration and Limits Manifest
-
-| Status    | Setting / Limit                                   | Type       | Default           | Required | Used by                         | Description                                                                                                                                                       |
-| --------- | ------------------------------------------------- | ---------- | ----------------- | -------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `DIRECTORY_PAGE_SIZE` / `DIRECTORY_MAX_PAGES` | `number` | `50` / `4`    | Yes      | tradability + bulk-add-by-class | Same bounded/capped directory read as`MarketsWidget` (§4.2); never walks the full broker catalogue.                                                            |
-| Completed | `QUOTE_STALE_AFTER_SECONDS`                     | `number` | `30`            | Yes      | freshness display               | Age past which a fetched quote renders`stale` rather than `current`.                                                                                          |
-| Completed | `PAGE_SIZE` / `MAX_PAGES`                     | `number` | `200` / `100` | Yes      | source symbol preload           | Walk at most 20,000 source symbols through the existing bounded cursor route, sharing one in-flight load and retaining the completed directory in browser memory. |
-| Completed | `MAX_SUGGESTIONS`                               | `number` | `50`            | Yes      | symbol autocomplete             | Bound the rendered prefix-first and substring-match suggestion list.                                                                                              |
-
-Mutation and idempotency limits otherwise remain owned by the API contracts.
-
-### 4.4 `src/widgets/chart/` — Charting Tools Widget
-
-**Purpose:** Present price charts with Indicators-owned overlays and drawing tools.
-
-### Files
-
-| Status   | File                | Responsibility                                                          | Key exports     | Dependencies                                                                                                                      |
-| -------- | ------------------- | ----------------------------------------------------------------------- | --------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Complete | `ChartWidget.tsx` | Price chart, timeframe selection, indicator overlays, and drawing tools | `ChartWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/data and clients/indicators |
-| Complete | `index.ts`        | Sole public surface for the feature                                     | `ChartWidget` | **Standard library:** None**Required third-party:** None**Local:** `ChartWidget.tsx`                          |
-
-| Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Component / Function / Type                                                            | Side Effects                                   | Failure presentation                                                                         | Usage / Test                                |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| Completed | `FR-UI-046`  | Present a price chart for a selected instrument and timeframe from Data-owned bars read through`GET /api/v1/data/bars`; after authoritative initialization, one-symbol MT5 TCP Bid ticks may update only the current bar's High, Low, and Close. Open, volume, timestamp, prior bars, and new-bar creation remain Data-owned.                                                                                                                                                             | `ChartWidget`, `apiClients.data.bars`, `apiClients.data.snapshotStream`          | External API call and stream                   | Unavailable history explicit; live disconnect preserves history                              | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-047`  | Offer exactly Data's canonical timeframe manifest (`M1`–`MN1`) and preserve the selection per widget instance; a timeframe the broker cannot serve is never offered.                                                                                                                                                                                                                                                                                                                   | `ChartWidget`, `BAR_TIMEFRAMES`                                                    | Local state mutation                           | Unsupported timeframe absent                                                                 | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-048`  | Discover indicators from the authenticated Indicators catalogue and overlay only Indicators-owned values; the widget performs no indicator arithmetic. EMA and RSI are chart-enabled, RSI panel timestamps share the chart's pan/zoom viewport, and other registered indicators remain visibly unavailable until they gain a series contract.                                                                                                                                               | `ChartWidget`, `apiClients.indicators.catalogue`, `apiClients.indicators.series` | External API call                              | No derived or mock series                                                                    | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-049`  | Present each overlay with the parameters used to compute it.                                                                                                                                                                                                                                                                                                                                                                                                                                | `ChartWidget`                                                                        | None                                           | Parameters visible                                                                           | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-050`  | Present an indicator as unavailable when history is insufficient rather than rendering a partial series as complete.                                                                                                                                                                                                                                                                                                                                                                        | `ChartWidget`                                                                        | None                                           | Warm-up gap explicit                                                                         | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-051`  | Provide drawing tools whose annotations persist per instrument as a validated, versioned client-side preference.                                                                                                                                                                                                                                                                                                                                                                            | `ChartWidget`                                                                        | Local persistence                              | Malformed or unavailable browser storage fails open with empty non-authoritative annotations | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-052`  | Provide chart appearance controls that mutate rendering state without refetching or replacing underlying Data-owned bars.                                                                                                                                                                                                                                                                                                                                                                   | `ChartWidget`                                                                        | Local state mutation                           | Data unchanged                                                                               | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-053`  | Detect invalid slots and timeframe discontinuities, present the missing-bar count and visible gap region, and break continuous price and indicator paths rather than interpolating across it.                                                                                                                                                                                                                                                                                               | `ChartWidget`, `toChartBars`                                                       | None                                           | No interpolation                                                                             | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-054`  | Remain responsive at the registered 1,000,000-bar maximum by indexing owner series once and degrading every render loop to the clipped viewport without dropping the latest bar.                                                                                                                                                                                                                                                                                                            | `ChartWidget`, `visibleBarRange`                                                   | None                                           | Latest bar retained                                                                          | `src/widgets/chart/ChartWidget.test.tsx` |
-| Completed | `FR-UI-194`  | Complete every initial or configuration-driven bar read before a visible 10-second settling interval and live subscription. At a canonical timeframe boundary, after a hidden-page missed boundary, or upon a newer-bucket tick, abort live projection and resume only after the authoritative read contains the target bucket; while MT5 still returns the prior bucket, keep SSE closed and use bounded delayed bar retries without synthesizing a candle or repeating the initial delay. | `ChartWidget`, `barBucketStart`, `nextBarBoundary`, `applyTickToCurrentBar`    | Timers, external API calls, and one SSE stream | Historical bars remain visible; delayed or failed rollover is explicit                       | `src/widgets/chart/ChartWidget.test.tsx` |
-
-### Configuration and Limits Manifest
-
-| Status    | Key                                        | Type                     | Default | Operator Configurable | Used By             | Notes                                                                                                |
-| --------- | ------------------------------------------ | ------------------------ | ------- | --------------------- | ------------------- | ---------------------------------------------------------------------------------------------------- |
-| Completed | `haruquantai.chart.drawings.v1:{symbol}` | browser-local JSON array | `[]`  | Yes                   | drawing annotations | Versioned, instrument-scoped, validated client preference; never market-data or execution authority. |
-
-Chart bar-count limits follow the registered Data contract; the current maximum is 1,000,000 bars.
-
-### 4.5 `src/widgets/price-ladder/` — Price Ladder Widget
-
-**Purpose:** Present real Depth-of-Market and ladder-initiated order interaction.
-
-**Files:**
-
-| Status    | File                      | Responsibility                                                                            | Key exports                                           | Dependencies                                                                                                                                                                                          |
-| --------- | ------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Completed | `PriceLadderWidget.tsx` | Real depth presentation, real order submission/cancellation, and ladder order interaction | `PriceLadderWidget`                                 | **Standard library:** browser APIs**Required third-party:** React, lucide-react**Local:** `clients` (data/trading), `context` (governed), `workspaces`, `useDepthStream.ts` |
-| Completed | `useDepthStream.ts`     | Real authenticated SSE Depth-of-Market consumption for one symbol                         | `useDepthStream`, `DepthBookView`, `DepthLevel` | **Standard library:** browser APIs**Required third-party:** React**Local:** `clients`                                                                                             |
-| Completed | `index.ts`              | Sole public surface for the feature                                                       | `PriceLadderWidget`                                 | **Standard library:** None**Required third-party:** None**Local:** `PriceLadderWidget.tsx`                                                                                        |
-
-| Status    | Requirement ID | Responsibility                                                                                                                                                                                                            | Component / Function / Type               | Side Effects         | Failure presentation                                                                                                          | Usage / Test                                                |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- | -------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Completed | `FR-UI-055`  | Present bid and ask price levels with resting quantity for the selected instrument, sourced from the real`api.data.depth_stream` SSE feed.                                                                              | `PriceLadderWidget`; `useDepthStream` | External API call    | Unavailable depth explicit (connecting/disconnected/unavailable status; per-symbol book error surfaced, never a blank row)    | `PriceLadderWidget.test.tsx`; `useDepthStream.test.tsx` |
-| Completed | `FR-UI-056`  | Present depth from the market-data feed only; the ladder row set is the real union of the book's own bid/ask price levels — nothing the feed does not provide is synthesized.                                            | `PriceLadderWidget`                     | None                 | No synthesized levels                                                                                                         | `PriceLadderWidget.test.tsx`                              |
-| Completed | `FR-UI-057`  | Provide a configurable default order quantity and order type (MARKET/LIMIT) for ladder-initiated orders.                                                                                                                  | `PriceLadderWidget`                     | Local state mutation | Defaults visible                                                                                                              | `PriceLadderWidget.test.tsx`                              |
-| Completed | `FR-UI-058`  | Open an order ticket pre-filled with the price level activated by the operator, handed off to the host via`onOpenTicket`; the ladder owns no ticket UI itself.                                                          | `PriceLadderWidget`                     | Local state mutation | Ticket authority unchanged                                                                                                    | `PriceLadderWidget.test.tsx`                              |
-| Completed | `FR-UI-059`  | Present the operator's real working orders (from`TradingProjection.orders`) against their price levels.                                                                                                                 | `PriceLadderWidget`                     | External API call    | Unknown remains explicit (a refresh failure keeps the last known real orders rather than clearing to an invented empty state) | `PriceLadderWidget.test.tsx`                              |
-| Completed | `FR-UI-060`  | Offer cancellation of an individual working order (gated until the order carries a real`broker_order_id`) and a separate bounded cancel-all action, both authorized through Risk's real preflight gate before mutation. | `PriceLadderWidget`                     | External API call    | API rejection visible; a declined preflight blocks the mutation call entirely                                                 | `PriceLadderWidget.test.tsx`                              |
-| Completed | `FR-UI-061`  | Require explicit confirmation for cancel-all regardless of the active confirmation mode.                                                                                                                                  | `PriceLadderWidget`                     | External API call    | Confirmation always required                                                                                                  | `PriceLadderWidget.test.tsx`                              |
-| Completed | `FR-UI-062`  | Provide a re-center action reachable by both keyboard (Spacebar) and pointer (button).                                                                                                                                    | `PriceLadderWidget`                     | Local state mutation | Keyboard path preserved                                                                                                       | `PriceLadderWidget.test.tsx`                              |
-
-**Real backend dependencies added to support this feature:** `GET /api/v1/data/depth-stream` (FR-API-129); `POST /api/v1/trading/orders/preflight` (FR-API-130); `POST /api/v1/trading/orders/{order_id}/preflight` (FR-API-133); `POST /api/v1/trading/orders/cancel-all/preflight` (FR-API-131); `POST /api/v1/trading/orders/cancel-all` (FR-API-132); Risk's `review_manual_order`/`review_cancel_authorization` (FR-RISK-093/095).
-
-**Known gap:** the widget accepts an `accountId` prop (mirroring the existing per-widget `symbol` config); depth still renders without one, but every order/cancel action stays disabled until a real Trading account is configured for that widget instance. No app-wide "current account" concept exists yet.
-
-### Configuration and Limits Manifest
-
-None; order limits follow the registered Trading contracts.
-
-### 4.6 `src/widgets/trading/` — Trading Widget
-
-**Purpose:** Present the authoritative Trading session and capture explicit CFD
-orders, primarily forex orders routed through MT5, without becoming the source of
-market, Risk, account, order, position, or execution truth.
-
-The focused feature composes API-backed execution-session resolution, a private
-authoritative order ticket, and the public `FEAT-UI-05` Price Ladder in one
-responsive execution surface. The existing `trading` workspace type and sidebar
-item remain its entry point; no separate page route is introduced. Standalone
-Price Ladder widgets remain supported for saved-workspace compatibility.
-
-Detailed position/order filtering and lifecycle presentation remains owned by
-`FEAT-UI-09`. The Trading Widget may present a bounded session summary or compose
-that feature through its public surface, but it must not create a second detailed
-positions/orders implementation.
-
-### Files
-
-| Status    | File                  | Responsibility                                                         | Key exports       | Dependencies                                                                                                                                           |
-| --------- | --------------------- | ---------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Completed | `TradingWidget.tsx` | Trading session context plus order-ticket and Price Ladder composition | `TradingWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/trading, workspaces, price-ladder public surface |
-| Completed | `OrderTicket.tsx`   | CFD/forex order capture, confirmation, preflight, and submission       | Private component | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/trading, typed market evidence                   |
-| Completed | `index.ts`          | Sole public surface for the feature                                    | `TradingWidget` | **Standard library:** None**Required third-party:** None**Local:** `TradingWidget.tsx`                                             |
-
-| Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                                                               | Component / Function / Type                               | Side Effects                                        | Failure presentation                                                                                                                  | Usage / Test                                                                                                   |
-| --------- | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Completed | `FR-UI-063`  | Present the API-sourced current bid/ask market and freshness for the selected provider-native CFD/forex symbol when the ticket opens.                                                                                                                                                                                                                                                                                                        | `OrderTicket`                                           | External API call                                   | Stale, unavailable, and unknown explicit                                                                                              | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-064`  | Require an explicit BUY or SELL side; no side is preselected.                                                                                                                                                                                                                                                                                                                                                                                | `OrderTicket`                                           | None                                                | Submission blocked                                                                                                                    | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-065`  | Offer only the Trading contract's registered MARKET, LIMIT, STOP, and STOP_LIMIT order types that the active route and instrument support.                                                                                                                                                                                                                                                                                                   | `OrderTicket`                                           | None                                                | Unsupported type absent                                                                                                               | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-066`  | Enable and require exactly the execution-price fields the selected order type needs, while presenting optional stop-loss and take-profit fields only when the verified contract supports them.                                                                                                                                                                                                                                               | `OrderTicket`                                           | Local state mutation                                | Inapplicable fields disabled                                                                                                          | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-067`  | Validate positive decimal quantity against the API-supplied quantity unit, minimum, maximum, and step; do not impose a futures-style integer quantity.                                                                                                                                                                                                                                                                                       | `OrderTicket`                                           | None                                                | Contract limit or step error shown                                                                                                    | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-068`  | Offer only registered time-in-force values supported for the selected route, instrument, and order type; preserve an omitted value when the authority owns a documented default.                                                                                                                                                                                                                                                             | `OrderTicket`                                           | None                                                | Unsupported instruction absent                                                                                                        | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-069`  | Validate ticket completeness and typed input only; API, Risk, Trading, and the execution authority remain solely responsible for acceptance.                                                                                                                                                                                                                                                                                                 | `OrderTicket`                                           | None                                                | Authoritative rejection visible                                                                                                       | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-070`  | Obtain a real Risk preflight decision, then submit exactly once through the registered Trading operation with its idempotency key; never retry a mutation automatically.                                                                                                                                                                                                                                                                     | `OrderTicket`                                           | External API call                                   | No submit without approval; no silent retry                                                                                           | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-071`  | Present the authoritative submission outcome with reasons and retryability; ambiguous or timed-out authority outcomes remain unknown until reconciled.                                                                                                                                                                                                                                                                                       | `OrderTicket`                                           | None                                                | Never invent success                                                                                                                  | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-072`  | Present the fully resolved order through the active confirmation mode while leaving all backend authorization, approval, idempotency, and kill-switch checks unchanged.                                                                                                                                                                                                                                                                      | `OrderTicket`                                           | Local state mutation                                | Confirmation retained when required                                                                                                   | `OrderTicket.test.tsx`                                                                                       |
-| Completed | `FR-UI-147`  | Present API-authored Trading account/session context and governed submit, cancel, and close actions requiring explicit authoritative evidence.                                                                                                                                                                                                                                                                                               | `TradingWidget`                                         | External API call                                   | Loading, unavailable, preflight, and API rejection explicit                                                                           | `src/widgets/trading/TradingWidget.test.tsx`                                                                |
-| Completed | `FR-UI-226`  | Present a compact cTrader-inspired order ticket that derives route and account from the selected mode's active/default execution session, selects an exact registered strategy while binding its version internally, and resolves symbols through the shared provider autocomplete; governance identifiers are generated or obtained internally and are never manual inputs.                                                                 | `TradingWidget`; `OrderTicket`                        | External API reads; local state mutation            | Missing mode, session, account reference, strategy catalogue, or exact symbol fails closed                                            | `TradingWidget.test.tsx`; `OrderTicket.test.tsx`                                                           |
-| Completed | `FR-UI-227`  | Compose the public Price Ladder on the Trading widget's right-hand side using the same resolved route, account, and exact provider symbol as the order ticket; synchronize only exact provider-symbol selections and retain each feature's independent authority and failure behavior.                                                                                                                                                       | `TradingWidget`; `OrderTicket`; `PriceLadderWidget` | External API/stream reads; local state mutation     | Partial symbols never reach depth; unavailable depth remains explicit; mutation gates remain unchanged                                | `TradingWidget.test.tsx`; `OrderTicket.test.tsx`; `src/widgets/price-ladder/PriceLadderWidget.test.tsx` |
-| Completed | `FR-UI-228`  | In the Trading composition, use the order ticket as the single visible symbol and order-entry surface and render only synchronized depth, working-order, status, and navigation presentation on the right; the standalone Price Ladder retains its complete controls.                                                                                                                                                                        | `TradingWidget`; `PriceLadderWidget`                  | External stream read; local presentation state      | Embedded duplicate controls are absent; standalone behavior unchanged                                                                 | `TradingWidget.test.tsx`; `src/widgets/price-ladder/PriceLadderWidget.test.tsx`                           |
-| Completed | `FR-UI-229`  | Predict provider symbols in the Trading ticket with the same accessible combobox interaction used by Chart, including pointer and keyboard selection; only an exact provider-symbol selection may load trading evidence or synchronize the embedded Price Ladder.                                                                                                                                                                            | `OrderTicket`                                           | External API read; local presentation state         | Partial or unknown symbols remain local and fail closed                                                                               | `src/widgets/trading/OrderTicket.test.tsx`                                                                  |
-| Completed | `FR-UI-230`  | Present Market orders with a compact cTrader-inspired quantity and protection panel beneath quote freshness. Stop-loss and take-profit are explicit opt-ins and reach submission only when enabled and contract-supported; unsupported margin, market-range, trailing-stop, break-even, and comment capabilities remain visibly disabled and never create invented execution data.                                                           | `OrderTicket`                                           | Local state mutation                                | Unsupported capabilities remain disabled; omitted protection stays null                                                               | `src/widgets/trading/OrderTicket.test.tsx`                                                                  |
-| Completed | `FR-UI-231`  | Enable each complete Stop Loss or Take Profit column only after explicit selection and complete provider/account evidence. Treat Pips, Price, Balance, and Profit as one bidirectionally connected value set derived from side, current executable quote, quantity, account balance, provider pip/tick size, and direction-specific tick value; submit only its derived protection price and fail closed without verified calculator inputs. | `OrderTicket`; Trading typed client                     | External API reads; local deterministic calculation | Entire column disabled when unchecked or evidence incomplete; invalid direction/sign does not produce derived values                  | `src/widgets/trading/OrderTicket.test.tsx`; `src/clients/clients.contract.test.ts`                        |
-| Completed | `FR-UI-232`  | Give Limit, Stop, and Stop-Limit tickets the Market ticket's explicitly enabled, bidirectionally connected Pips, Price, Balance, and Profit protection controls. Calculate Limit and Stop-Limit protection from the limit fill target, calculate Stop protection from the stop entry, and fail closed while the required pending entry is absent or invalid.                                                                                 | `OrderTicket`                                           | Local deterministic calculation                     | Pending protection uses the correct intended execution price; unchecked columns remain disabled; only derived prices reach submission | `src/widgets/trading/OrderTicket.test.tsx`                                                                  |
-| Completed | `FR-UI-233`  | Populate the order ticket's Strategy dropdown from every exact registered Strategy version returned by the Strategy catalogue manifest, preserve explicit user selection, and bind the selected immutable strategy ID/version to governed submission.                                                                                                                                                                                        | `OrderTicket`                                           | External API read; local state mutation             | Empty or invalid catalogue entries never become options; no strategy is silently selected                                             | `src/widgets/trading/OrderTicket.test.tsx`                                                                  |
-
-### Withdrawn scope
-
-`FEAT-UI-07`, `FR-UI-073`–`FR-UI-079`, and `FR-UI-080`–`FR-UI-084` are retired
-without reuse. They described futures/options ticket tabs and an options-chain grid,
-which do not belong in the owner's CFD/forex MT5 workflow and have no authoritative
-backend contract. The legacy `OptionsGridWidget`, options fixture, sidebar entry,
-workspace type, template, and futures/options modal behavior remain implementation
-cleanup for a separately approved coding task; they are not registered target scope.
-
-### Configuration and Limits Manifest
-
-- Mutation routes follow the configured gateway contract. `sim` binds every order
-  to an explicit historical Simulation session and its replay cursor; `demo` uses
-  current broker bars with virtual broker funds; `live` uses current broker bars
-  and the real account selected by verified live MT5 credentials.
-- Quantity unit, minimum, maximum, step, price tick, supported order types, and
-  time-in-force values come from authoritative API/provider evidence.
-- Position close remains unavailable unless authoritative governance references are
-  supplied; the UI must not fabricate them because no dedicated close-position
-  preflight route currently exists.
-- Idempotency, approval lifetime, Risk policy, kill switch, and execution authority
-  limits remain owned by their registered backend contracts.
-
-### 4.8 `src/widgets/trade-log/` — Trade Log Widget
-
-**Purpose:** Present executed orders for the current session with operator notes.
-
-**Target location:** `src/widgets/trade-log/`; the widget currently resides in
-`src/components/workflow/`.
-
-### Files
-
-| Status  | File                   | Responsibility                      | Key exports        | Dependencies                                                                                                  |
-| ------- | ---------------------- | ----------------------------------- | ------------------ | ------------------------------------------------------------------------------------------------------------- |
-| Pending | `TradeLogWidget.tsx` | Executed-order log and note capture | `TradeLogWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/trading |
-| Pending | `index.ts`           | Sole public surface for the feature | `TradeLogWidget` | **Standard library:** None**Required third-party:** None**Local:** `TradeLogWidget.tsx`   |
-
-| Status  | Requirement ID | Responsibility                                                                                    | Component / Function / Type | Side Effects      | Failure presentation   | Usage / Test     |
-| ------- | -------------- | ------------------------------------------------------------------------------------------------- | --------------------------- | ----------------- | ---------------------- | ---------------- |
-| Pending | `FR-UI-085`  | Present executed orders for the current session in reverse chronological order.                   | `TradeLogWidget`          | External API call | Empty state truthful   | Pending evidence |
-| Pending | `FR-UI-086`  | Exclude cancelled orders from the executed log while keeping them visible in orders presentation. | `TradeLogWidget`          | None              | No double counting     | Pending evidence |
-| Pending | `FR-UI-087`  | Present each entry's instrument, side, quantity, price, and execution time.                       | `TradeLogWidget`          | None              | Missing field explicit | Pending evidence |
-| Pending | `FR-UI-088`  | Allow an operator note to be attached to a log entry.                                             | `TradeLogWidget`          | External API call | Rejection visible      | Pending evidence |
-| Pending | `FR-UI-089`  | State the log's retention boundary so an empty log is not read as no activity.                    | `TradeLogWidget`          | None              | Boundary stated        | Pending evidence |
-
-### Configuration and Limits Manifest
+**Provides:** `ui.typed-backend@1`.
 
-None; retention is owned by the registered Trading contracts.
-
-### 4.9 `src/widgets/positions/` — Positions and Orders Widgets
-
-**Purpose:** Present open positions and order lifecycle without computing profit and loss.
-
-**Target location:** `src/widgets/positions/`; the widget currently resides in
-`src/components/workflow/`.
-
-### Files
-
-| Status  | File                    | Responsibility                                                     | Key exports         | Dependencies                                                                                                                        |
-| ------- | ----------------------- | ------------------------------------------------------------------ | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
-| Pending | `PositionsWidget.tsx` | Position and order presentation, filtering, and amendment hand-off | `PositionsWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/trading and clients/portfolio |
-| Pending | `index.ts`            | Sole public surface for the feature                                | `PositionsWidget` | **Standard library:** None**Required third-party:** None**Local:** `PositionsWidget.tsx`                        |
+**Required capabilities:**
 
-| Status  | Requirement ID | Responsibility                                                                              | Component / Function / Type | Side Effects         | Failure presentation     | Usage / Test     |
-| ------- | -------------- | ------------------------------------------------------------------------------------------- | --------------------------- | -------------------- | ------------------------ | ---------------- |
-| Pending | `FR-UI-090`  | Present open positions with instrument, quantity, average price, and current price.         | `PositionsWidget`         | External API call    | Empty state truthful     | Pending evidence |
-| Pending | `FR-UI-091`  | Present API-supplied unrealized profit and loss per position and an account total.          | `PositionsWidget`         | External API call    | Unknown remains explicit | Pending evidence |
-| Pending | `FR-UI-092`  | Compute no profit-and-loss value in UI; an unsupplied value presents as unknown.            | `PositionsWidget`         | None                 | No derived arithmetic    | Pending evidence |
-| Pending | `FR-UI-093`  | Offer filtering and sorting over positions with a stable tiebreak.                          | `PositionsWidget`         | Local state mutation | Deterministic ordering   | Pending evidence |
-| Pending | `FR-UI-094`  | Present orders with their lifecycle status.                                                 | orders presentation         | External API call    | Unknown status explicit  | Pending evidence |
-| Pending | `FR-UI-095`  | Offer filtering of orders by working, filled, and cancelled, defaulting to all.             | orders presentation         | Local state mutation | Empty filter truthful    | Pending evidence |
-| Pending | `FR-UI-096`  | Offer amendment of a working order through the order ticket, pre-filled with current terms. | orders presentation         | External API call    | API rejection visible    | Pending evidence |
-| Pending | `FR-UI-097`  | Offer cancellation of a working order with an explicit confirmation.                        | orders presentation         | External API call    | Confirmation required    | Pending evidence |
-| Pending | `FR-UI-098`  | Present positions and orders with freshness and mark them stale past declared tolerance.    | positions/orders            | None                 | Stale marked stale       | Pending evidence |
+None (root with respect to the register’s required-provider graph)..
 
-### Configuration and Limits Manifest
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-14) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-None; profit and loss is supplied by the owning domains through API.
+**Public contract target:** [`app/ui/src/clients/contracts.ts`](src/clients/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
 
-### 4.10 `src/widgets/trade-plan/` — Trade Plan Widget
-
-**Purpose:** Capture operator risk limits and objectives and present adherence without enforcing.
-
-**Target location:** `src/widgets/trade-plan/`; the widget currently resides inside
-`src/widgets/planning/`.
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
-### Files
+#### Feature Configuration & Limits Manifest
 
-| Status  | File                    | Responsibility                                              | Key exports         | Dependencies                                                                                                 |
-| ------- | ----------------------- | ----------------------------------------------------------- | ------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Pending | `TradePlanWidget.tsx` | Risk limit and objective capture and adherence presentation | `TradePlanWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/risk   |
-| Pending | `index.ts`            | Sole public surface for the feature                         | `TradePlanWidget` | **Standard library:** None**Required third-party:** None**Local:** `TradePlanWidget.tsx` |
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-| Status  | Requirement ID | Responsibility                                                                               | Component / Function / Type | Side Effects      | Failure presentation     | Usage / Test     |
-| ------- | -------------- | -------------------------------------------------------------------------------------------- | --------------------------- | ----------------- | ------------------------ | ---------------- |
-| Pending | `FR-UI-099`  | Capture an operator-defined risk limit and trading objective for the session.                | `TradePlanWidget`         | External API call | Rejection visible        | Pending evidence |
-| Pending | `FR-UI-100`  | Present the active plan against observed session activity.                                   | `TradePlanWidget`         | External API call | Absent activity explicit | Pending evidence |
-| Pending | `FR-UI-101`  | Allow the plan to be revised, retaining the prior version for review.                        | `TradePlanWidget`         | External API call | No silent overwrite      | Pending evidence |
-| Pending | `FR-UI-102`  | Present plan adherence as comparison only; the widget enforces no limit and blocks no order. | `TradePlanWidget`         | None              | No enforcement claimed   | Pending evidence |
-| Pending | `FR-UI-103`  | Direct all enforcement to Risk and present Risk's verdict rather than deriving one.          | `TradePlanWidget`         | External API call | No derived verdict       | Pending evidence |
-| Pending | `FR-UI-104`  | Present an absent plan as absent rather than as an empty satisfied plan.                     | `TradePlanWidget`         | None              | Never infer compliance   | Pending evidence |
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-14-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
-### Configuration and Limits Manifest
+#### Runtime Effects & Scope Disposal
 
-None; enforcement is owned by Risk.
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-14 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-14 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-14 | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
-### 4.11 `src/widgets/education/` — Education Resources Widget
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
-**Purpose:** Present a catalogue of learning resources.
+#### Persistent State Ownership
 
-**Target location:** `src/widgets/education/`. Blocked: no service domain owns
-learning content, and the widget currently reads fixture data from `src/mock/`.
+**Ownership class:** Presentation-only state.
 
-### Files
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
 
-| Status  | File                    | Responsibility                           | Key exports         | Dependencies                                                                                                                              |
-| ------- | ----------------------- | ---------------------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Pending | `EducationWidget.tsx` | Learning-resource catalogue presentation | `EducationWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** fixture data pending an owning API contract |
-| Pending | `index.ts`            | Sole public surface for the feature      | `EducationWidget` | **Standard library:** None**Required third-party:** None**Local:** `EducationWidget.tsx`                              |
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
 
-| Status            | Requirement ID | Responsibility                                                                  | Component / Function / Type | Side Effects      | Failure presentation     | Usage / Test     |
-| ----------------- | -------------- | ------------------------------------------------------------------------------- | --------------------------- | ----------------- | ------------------------ | ---------------- |
-| Pending (blocked) | `FR-UI-105`  | Present a catalogue of learning resources grouped by topic.                     | `EducationWidget`         | External API call | No owning API contract   | Pending evidence |
-| Pending (blocked) | `FR-UI-106`  | Open a selected resource without leaving the authenticated session unprotected. | `EducationWidget`         | Navigation        | Session gate retained    | Pending evidence |
-| Pending (blocked) | `FR-UI-107`  | Present per-resource completion state where the owning source supplies it.      | `EducationWidget`         | None              | Unknown remains explicit | Pending evidence |
-| Pending (blocked) | `FR-UI-108`  | Present an unavailable catalogue explicitly rather than as an empty catalogue.  | `EducationWidget`         | None              | Never infer emptiness    | Pending evidence |
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
 
-### Configuration and Limits Manifest
+#### Feature Package Structure & Files
 
-None.
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
 
-### 4.12 `src/widgets/challenges/` — Challenges and Challenge Dashboard
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
 
-**Purpose:** Present challenge discovery, entry, and challenge-mode state.
+#### Functional Requirements (FR)
 
-**Target location:** `src/widgets/challenges/`. Blocked: no service domain owns
-multi-participant challenges.
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-14-001` | Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts. | `AT-UI-14-001` | Schema drift and wrong response shapes fail visibly; no unchecked any/object fallback supplies a business value. |
+| PENDING | `FR-TRC-UI-14-002` | Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions. | `AT-UI-14-002` | Mutations are retried only by their original idempotency identity and reconciliation policy; navigation aborts stale observations. |
 
-### Files
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
-| Status  | File                     | Responsibility                                    | Key exports          | Dependencies                                                                                                                      |
-| ------- | ------------------------ | ------------------------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| Pending | `ChallengesWidget.tsx` | Challenge discovery, entry, and mode presentation | `ChallengesWidget` | **Standard library:** browser APIs**Required third-party:** React**Local:** none pending an owning API contract |
-| Pending | `index.ts`             | Sole public surface for the feature               | `ChallengesWidget` | **Standard library:** None**Required third-party:** None**Local:** `ChallengesWidget.tsx`                     |
+#### Non-Functional Requirements (Local)
 
-| Status            | Requirement ID | Responsibility                                                                                      | Component / Function / Type | Side Effects         | Failure presentation           | Usage / Test     |
-| ----------------- | -------------- | --------------------------------------------------------------------------------------------------- | --------------------------- | -------------------- | ------------------------------ | ---------------- |
-| Pending (blocked) | `FR-UI-109`  | Present available public challenges with schedule and status.                                       | `ChallengesWidget`        | External API call    | No owning API contract         | Pending evidence |
-| Pending (blocked) | `FR-UI-110`  | Join a public challenge with an operator-supplied display name.                                     | `ChallengesWidget`        | External API call    | Rejection visible              | Pending evidence |
-| Pending (blocked) | `FR-UI-111`  | Join a private challenge with a supplied access code and explicit terms acceptance.                 | `ChallengesWidget`        | External API call    | Invalid code explicit          | Pending evidence |
-| Pending (blocked) | `FR-UI-112`  | Present a challenge dashboard with entry requirements and standing.                                 | `ChallengesWidget`        | External API call    | Unknown standing explicit      | Pending evidence |
-| Pending (blocked) | `FR-UI-113`  | Present challenge mode unambiguously and persistently in the shell.                                 | `ChallengesWidget`        | None                 | Mode always visible            | Pending evidence |
-| Pending (blocked) | `FR-UI-114`  | Present challenge funds distinctly from practice funds and never combine them in one total.         | `ChallengesWidget`        | None                 | No combined total              | Pending evidence |
-| Pending (blocked) | `FR-UI-115`  | Switch between challenge and practice modes only through an explicit confirmed action.              | `ChallengesWidget`        | Local state mutation | Confirmation required          | Pending evidence |
-| Pending (blocked) | `FR-UI-116`  | Restrict the tradable instrument set to the challenge's defined set while challenge mode is active. | `ChallengesWidget`        | None                 | Out-of-scope instrument absent | Pending evidence |
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-14-001` | Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-14-001` | Disable and physically remove clients; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
-### Configuration and Limits Manifest
+#### Applicable Shared NFRs, Catalogue and Source Bindings
 
-None.
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-14): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
-### 4.13 `src/widgets/system-settings/` — System Settings
+#### Acceptance Tests and Evidence
 
-**Purpose:** Present user and administrator-scoped settings derived from API authority.
-
-**Target location:** `src/widgets/system-settings/`.
-
-### Files
-
-| Status    | File                        | Responsibility                              | Key exports             | Dependencies                                                                                                     |
-| --------- | --------------------------- | ------------------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| Completed | `SystemSettingsModal.tsx` | Scoped settings presentation and submission | `SystemSettingsModal` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients/settings   |
-| Completed | `contracts.ts`            | Widget contracts and prop interfaces        | `SystemSettingsModalProps` | **Standard library:** None**Required third-party:** None**Local:** None |
-| Completed | `index.ts`                | Sole public surface for the feature         | `SystemSettingsModal` | **Standard library:** None**Required third-party:** None**Local:** `SystemSettingsModal.tsx`, `contracts.ts` |
-| Completed | `system-settings-modal.test.tsx` | Settings modal unit test suite         | Test suite              | **Standard library:** None**Required third-party:** Vitest, RTL**Local:** `SystemSettingsModal.tsx` |
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/clients/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/clients/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-14/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
-| Status  | Requirement ID | Responsibility                                                                                | Component / Function / Type | Side Effects      | Failure presentation        | Usage / Test     |
-| ------- | -------------- | --------------------------------------------------------------------------------------------- | --------------------------- | ----------------- | --------------------------- | ---------------- |
-| Pending | `FR-UI-117`  | Present user-scoped settings and, for authorized administrators only, system-scoped settings. | settings presentation       | External API call | Unauthorized section absent | Pending evidence |
-| Pending | `FR-UI-118`  | Derive the editable set from API authority, never from a client-side role guess.              | settings presentation       | External API call | Read-only fallback          | Pending evidence |
-| Pending | `FR-UI-119`  | Submit changes through the single registered settings operation.                              | settings presentation       | External API call | API rejection visible       | Pending evidence |
-| Pending | `FR-UI-120`  | Present a rejected change with its reason and leave the prior value displayed.                | settings presentation       | None              | Never invent success        | Pending evidence |
-| Pending | `FR-UI-121`  | Never render a credential, secret, or key value.                                              | settings presentation       | None              | Redacted placeholder        | Pending evidence |
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
-### Configuration and Limits Manifest
+#### Feature Usage Examples
 
-None; scope and authority are owned by the registered settings operation.
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
 
-### 4.14 `src/clients/` — Typed Backend Transport
+#### Removal Behaviour
 
-**Purpose:** Provide one typed API transport and operation catalogue.
-
-### Files
-
-| Status    | File                              | Responsibility                                 | Key exports                                                     | Dependencies                                                                                                      |
-| --------- | --------------------------------- | ---------------------------------------------- | --------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Completed | `contracts.ts`, `routes.ts`   | Validate envelopes and register API operations | schemas,`RouteContract` types                                 | **Standard library:** browser APIs**Required third-party:** Zod**Local:** None                  |
-| Completed | `request.ts`, `stream.ts`     | HTTP and SSE transport                         | `request`, `unwrapData`, `ApiClientError`, `openStream` | **Standard library:** fetch, crypto**Required third-party:** Zod**Local:** contracts and routes |
-| Completed | focused client files,`index.ts` | Map each API family and expose one catalogue   | `apiClients`                                                  | **Standard library:** None**Required third-party:** Zod**Local:** request and routes            |
-
-| Status    | Requirement ID | Responsibility                                                      | Component / Function / Type | Side Effects      | Failure presentation  | Usage / Test                 |
-| --------- | -------------- | ------------------------------------------------------------------- | --------------------------- | ----------------- | --------------------- | ---------------------------- |
-| Completed | `FR-UI-122`  | Send validated typed requests with traceable IDs and bounded retry. | `request`                 | External API call | `ApiClientError`    | `request.test.ts`          |
-| Completed | `FR-UI-123`  | Return data only from successful envelopes.                         | `unwrapData`              | None              | `ApiClientError`    | `request.test.ts`          |
-| Completed | `FR-UI-124`  | Preserve bounded transport/contract failure evidence.               | `ApiClientError`          | None              | None                  | `request.test.ts`          |
-| Completed | `FR-UI-125`  | Expose one typed catalogue for registered API operations.           | `apiClients`              | External API call | `ApiClientError`    | `clients.test.ts`          |
-| Completed | `FR-UI-126`  | Enforce API route and Data-capability contract parity.              | route catalogue             | None              | Contract test failure | `clients.contract.test.ts` |
-
-### Configuration and Limits Manifest
-
-| Status    | Setting / Limit         | Type       | Default                   | Required              | Used by           | Description                                |
-| --------- | ----------------------- | ---------- | ------------------------- | --------------------- | ----------------- | ------------------------------------------ |
-| Completed | `NEXT_PUBLIC_API_URL` | `string` | Same origin               | Production deployment | request transport | Canonical API origin.                      |
-| Completed | `BACKEND_URL`         | `string` | `http://127.0.0.1:8000` | Development only      | Next rewrite      | Local proxy target; not a broker endpoint. |
-
-### 4.15 `src/context/` — Session and Page Context
-
-**Purpose:** Coordinate non-authoritative browser session, page, preflight, and stream state.
-
-### Files
-
-| Status    | File                          | Responsibility                     | Key exports                         | Dependencies                                                                                                 |
-| --------- | ----------------------------- | ---------------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------------------------ |
-| Completed | `auth.tsx`                  | Recover and expose session state   | `AuthProvider`, `useAuth`       | **Standard library:** sessionStorage**Required third-party:** React**Local:** clients/auth |
-| Completed | `page.tsx`, `governed.ts` | Bound context and preflight writes | page hooks,`buildGovernedOptions` | **Standard library:** crypto**Required third-party:** React**Local:** API contracts        |
-| Completed | `streams.ts`, `errors.ts` | Ordered consumption and errors     | `consumeStream`, context errors   | **Standard library:** fetch streams**Required third-party:** Zod**Local:** clients/stream  |
-
-| Status    | Requirement ID | Responsibility                                                                          | Component / Function / Type | Side Effects                            | Failure presentation       | Usage / Test         |
-| --------- | -------------- | --------------------------------------------------------------------------------------- | --------------------------- | --------------------------------------- | -------------------------- | -------------------- |
-| Completed | `FR-UI-127`  | Recover session and clear/redirect expired identity.                                    | `AuthProvider`            | External API call; local state mutation | `ApiClientError`         | `auth.test.tsx`    |
-| Completed | `FR-UI-128`  | Register bounded redacted page/action context.                                          | `PageContextProvider`     | Local state mutation                    | `PageContextError`       | `page.test.ts`     |
-| Completed | `FR-UI-129`  | Block incomplete or stale governed submissions.                                         | `buildGovernedOptions`    | None                                    | `GovernedPreflightError` | `governed.test.ts` |
-| Completed | `FR-UI-130`  | Validate ordering, gaps, recovery, and cleanup.                                         | `consumeStream`           | External API call; local state mutation | `StreamGapError`         | `streams.test.ts`  |
-| Pending   | `FR-UI-131`  | Surface a typed context, preflight, or stream-gap error rather than degrading silently. | context errors              | None                                    | Typed error propagated     | Pending evidence     |
-
-### Configuration and Limits Manifest
-
-| Status    | Setting / Limit                   | Type       | Default | Required | Used by                  | Description                                      |
-| --------- | --------------------------------- | ---------- | ------- | -------- | ------------------------ | ------------------------------------------------ |
-| Completed | `PREFLIGHT_WARNING_TTL_SECONDS` | `number` | `30`  | Yes      | `buildGovernedOptions` | Expiry blocks governed submission until refresh. |
-
-### 4.16 `src/components/layout/` — Application Shell and Navigation
-
-**Purpose:** Present the persistent shell, navigation, session clock, and layout host.
-
-### Files
-
-| Status    | File                                                               | Responsibility                                                                                                                                                                                | Key exports                          | Dependencies                                                                                                                                                            |
-| --------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Pending   | `Header.tsx`, `TimeCorrectionDialog.tsx`                       | Shell header, mode and confirmation indicators, interactive digital clock with session-local correction dialog, 1-Click switch, profile section with dropdown chevron                         | `Header`, `TimeCorrectionDialog` | **Standard library:** browser APIs**Required third-party:** React**Local:** clients, context, `ProfileDropdown`, widgets/workspaces, store         |
-| Completed | `Sidebar.tsx`, `Sidebar.test.tsx`                               | Domain-grouped widget navigation, collapsible accordions, and collapsed flyout submenus                                                                                                       | `Sidebar`, `DOMAIN_GROUPS`           | **Standard library:** None**Required third-party:** React, Next**Local:** store, widgets/workspaces                                                    |
-| Pending   | `WorkspaceGrid.tsx`                                              | Workspace content router: template picker, empty state, or docking host                                                                                                                       | `WorkspaceGrid`                    | **Standard library:** browser APIs**Required third-party:** React**Local:** widgets/workspaces, `DockingWorkspace`                                 |
-| Completed | `DockingWorkspace.tsx`                                           | Dockview docking host: persistent workspace tabs above the canvas, fluid splitters, tab docking, edge splits, Expand/Restore grouping of all in-workspace widgets into a native tab bar, Alt+Arrow keyboard moves, layout persistence (FR-UI-006/007/008/024/200/202) | `DockingWorkspace`                 | **Standard library:** browser APIs**Required third-party:** React, dockview-react, dockview-core**Local:** widgets/workspaces, `WidgetContentHost` |
-| Completed | `WidgetContentHost.tsx`                                          | Widget-type to widget-component rendering switch shared by layout hosts                                                                                                                       | `WidgetContentHost`                | **Standard library:** None**Required third-party:** React**Local:** widget features                                                                   |
-| Completed | `ProfileDropdown.tsx`, `Header.test.tsx`                       | Header profile menu: account-mode selection (SIM/DEMO/LIVE), Settings/Logout actions, and open-menu stacking above expanded workspace widgets (FR-UI-011/013)                                  | `ProfileDropdown`                  | **Standard library:** browser APIs**Required third-party:** React**Local:** context, store                                                            |
-| Completed | `clock.ts`, `clock.test.ts`, `TimeCorrectionDialog.test.tsx` | Session clock and drift presentation, digital-clock segment decomposition, and manual correction conversion                                                                                   | clock helpers                        | **Standard library:** Date**Required third-party:** React**Local:** clients/settings                                                                  |
-
-| Status    | Requirement ID | Responsibility                                                                                                                                                                                                                                                                                                                                                                                   | Component / Function / Type                         | Side Effects                            | Failure presentation                                                            | Usage / Test                                                                                                                               |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------- | --------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| Pending   | `FR-UI-132`  | Present an accessible shell with skip-to-content, landmark regions, and a visible focus order.                                                                                                                                                                                                                                                                                                   | `Header`                                          | None                                    | Semantics preserved                                                             | Pending evidence                                                                                                                           |
-| Completed | `FR-UI-133`  | Present navigation listing domain-grouped widgets and permitted controls with collapsible accordions.                                                                                                                                                                                                                                                                                            | `Sidebar`                                         | Navigation; workspace widget dispatch   | Disallowed route absent                                                         | `src/components/layout/Sidebar.test.tsx`                                                                                                   |
-| Completed | `FR-UI-134`  | Present a session clock with active market timezone and an explicit drift indicator from the API readiness probe.                                                                                                                                                                                                                                                                                | clock helpers                                       | External API call                       | Unknown drift explicit                                                          | `clock.test.ts`                                                                                                                          |
-| Pending   | `FR-UI-135`  | Present offline, stale, and service-unavailable states without hiding governed controls.                                                                                                                                                                                                                                                                                                         | `Header`                                          | None                                    | Controls remain visible                                                         | Pending evidence                                                                                                                           |
-| Pending   | `FR-UI-136`  | Present the widget grid as a bounded responsive layout that reflows without loss of content.                                                                                                                                                                                                                                                                                                     | `WorkspaceGrid`                                   | None                                    | No content dropped                                                              | Pending evidence                                                                                                                           |
-| Pending   | `FR-UI-137`  | Provide one error boundary reporting a correlation identifier and offering recovery without full reload.                                                                                                                                                                                                                                                                                         | `Header`                                          | Local state mutation                    | Correlation ID shown                                                            | Pending evidence                                                                                                                           |
-| Completed | `FR-UI-207`  | Allow pointer or keyboard activation of the session clock to correct its displayed date/time and fixed UTC offset; persist the timezone through the registered settings operation while retaining manual time correction only for the active UI session. The correction dialog retains active-control focus across clock ticks, and System Settings refreshes persisted values on every opening. | `Header`, `TimeCorrectionDialog`, clock helpers | External API call; local state mutation | Rejected persistence retains the prior display; invalid input remains unapplied | `Header.test.tsx`; `TimeCorrectionDialog.test.tsx`; `clock.test.ts`; `src/widgets/system-settings/system-settings-modal.test.tsx` |
-
-### Configuration and Limits Manifest
-
-None.
-
-### 4.17 `src/app/` — Protected Routing and Access Gate
-
-**Purpose:** Compose access and protected workspace routes from UI public surfaces.
-
-### Files
-
-| Status    | File                                                                         | Responsibility                                  | Key exports           | Dependencies                                                                                                           |
-| --------- | ---------------------------------------------------------------------------- | ----------------------------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Completed | `authentication-page.tsx`, `protected-layout.tsx`, `workflow-page.tsx` | Access, session gate, and workspace composition | named page components | **Standard library:** None**Required third-party:** Next, React**Local:** clients, context, workflow |
-| Completed | `page.tsx`, `login/page.tsx`                                                 | Framework route entries                         | default route exports | **Standard library:** None**Required third-party:** Next**Local:** owning UI features                |
-
-| Status    | Requirement ID | Responsibility                                                                                       | Component / Function / Type | Side Effects                            | Failure presentation | Usage / Test                     |
-| --------- | -------------- | ---------------------------------------------------------------------------------------------------- | --------------------------- | --------------------------------------- | -------------------- | -------------------------------- |
-| Completed | `FR-UI-138`  | Render login/register and recover invalid sessions.                                                  | `AuthenticationPage`      | External API call; local state mutation | Visible auth error   | `authentication-page.test.tsx` |
-| Completed | `FR-UI-139`  | Redirect unauthenticated users from protected routes.                                                | `ProtectedLayout`         | Navigation                              | Access route         | `protected-layout.test.tsx`    |
-| Completed | `FR-UI-140`  | Compose routes only from UI public clients/context/features.                                         | `WorkflowPage`            | External API call                       | Typed boundary state | `pages.contract.test.ts`       |
-| Pending   | `FR-UI-141`  | Never render a protected surface before session recovery resolves; show a determinate loading state. | `ProtectedLayout`         | None                                    | No premature render  | Pending evidence                 |
-
-### Configuration and Limits Manifest
-
-None.
-
-### 4.18 `src/components/workflow/` — Domain Workflow Views
-
-**Purpose:** Present API-authored workflow evidence without creating business truth.
-
-### Files
-
-| Status    | File                                                                           | Responsibility                                          | Key exports               | Dependencies                                                                                                      |
-| --------- | ------------------------------------------------------------------------------ | ------------------------------------------------------- | ------------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| Completed | `shell.tsx`, non-Trading domain view files, `playback.tsx`, `whatIf.tsx` | Accessible shell and focused non-Trading workflow views | workflow component barrel | **Standard library:** browser APIs**Required third-party:** React**Local:** clients and context |
-
-| Status    | Requirement ID | Responsibility                                                | Component / Function / Type | Side Effects         | Failure presentation            | Usage / Test            |
-| --------- | -------------- | ------------------------------------------------------------- | --------------------------- | -------------------- | ------------------------------- | ----------------------- |
-| Completed | `FR-UI-142`  | Render accessible shell and explicit unavailable states.      | `AppShell`                | Local state mutation | Visible boundary state          | `shell.test.tsx`      |
-| Completed | `FR-UI-143`  | Present dashboard evidence with freshness.                    | `DashboardView`           | None                 | Visible stale/error state       | `dashboard.test.tsx`  |
-| Completed | `FR-UI-144`  | Present registered Strategy catalogue/version evidence.       | `StrategyWorkspace`       | External API call    | Typed error state               | `strategies.test.tsx` |
-| Completed | `FR-UI-145`  | Present Simulation requests/results without invented metrics. | `SimulationView`          | External API call    | Typed error state               | `simulation.test.tsx` |
-| Completed | `FR-UI-146`  | Present read-only canonical Risk state.                       | `RiskView`                | External API call    | Explicit unknown/error state    | `risk.test.tsx`       |
-| Completed | `FR-UI-148`  | Present registered Research evidence only through the superseding `FEAT-UI-28` workbench. | `ResearchDashboard` | External API call | Typed loading, empty, unavailable, and error states | `src/widgets/research/ResearchWorkbench.test.tsx`; `src/components/layout/WidgetContentHost.test.tsx` |
-| Completed | `FR-UI-149`  | Present every Data capability in explicit UI states.          | `DataWorkspace`           | External API call    | Loading/error/empty state       | `data.test.tsx`       |
-| Completed | `FR-UI-150`  | Never fabricate provider readiness or market evidence.        | workflow views              | None                 | Unavailable remains unavailable | workflow NFR tests      |
-
-### Configuration and Limits Manifest
-
-None; workflow views consume typed client/context policy.
-
-### 4.19 `src/widgets/instrument-panels/` — Instrument Panels
-
-**Purpose:** Present bounded instrument values with explicit freshness.
-
-### Files
-
-| Status    | File                                               | Responsibility                             | Key exports                               | Dependencies                                                                               |
-| --------- | -------------------------------------------------- | ------------------------------------------ | ----------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Completed | `contracts.ts`, `components.tsx`, `index.ts` | Value contract and accessible presentation | `InstrumentValue`, `InstrumentPanels` | **Standard library:** None**Required third-party:** React**Local:** None |
-
-| Status    | Requirement ID | Responsibility                                | Component / Function / Type | Side Effects | Failure presentation     | Usage / Test   |
-| --------- | -------------- | --------------------------------------------- | --------------------------- | ------------ | ------------------------ | -------------- |
-| Completed | `FR-UI-151`  | Present market instrument values.             | `InstrumentPanels`        | None         | Unknown remains explicit | component test |
-| Completed | `FR-UI-152`  | Present portfolio instrument values.          | `InstrumentPanels`        | None         | Unknown remains explicit | component test |
-| Completed | `FR-UI-153`  | Present trade instrument values.              | `InstrumentPanels`        | None         | Unknown remains explicit | component test |
-| Completed | `FR-UI-154`  | Display current, stale, or unknown freshness. | `InstrumentValue`         | None         | No inferred freshness    | component test |
-| Completed | `FR-UI-155`  | Never invent absent values.                   | `InstrumentPanels`        | None         | Placeholder state        | component test |
-| Completed | `FR-UI-156`  | Keep instruments accessible and responsive.   | `InstrumentPanels`        | None         | Semantic list preserved  | component test |
-
-### Configuration and Limits Manifest
-
-None.
-
-### 4.20 `src/widgets/planning/` — Navigation, Planning, and Warning Panels
-
-**Purpose:** Present operating mode, plans, warnings, and acknowledgement state.
-
-### Files
-
-| Status    | File                                               | Responsibility              | Key exports                         | Dependencies                                                                               |
-| --------- | -------------------------------------------------- | --------------------------- | ----------------------------------- | ------------------------------------------------------------------------------------------ |
-| Completed | `contracts.ts`, `components.tsx`, `index.ts` | Warning contract and panels | `WarningItem`, `PlanningPanels` | **Standard library:** None**Required third-party:** React**Local:** None |
-
-| Status    | Requirement ID | Responsibility                                               | Component / Function / Type | Side Effects | Failure presentation             | Usage / Test   |
-| --------- | -------------- | ------------------------------------------------------------ | --------------------------- | ------------ | -------------------------------- | -------------- |
-| Completed | `FR-UI-157`  | Present active operating mode.                               | `PlanningPanels`          | None         | Unknown text remains explicit    | component test |
-| Completed | `FR-UI-158`  | Present planning information.                                | `PlanningPanels`          | None         | Empty state                      | component test |
-| Completed | `FR-UI-159`  | Present severity-qualified warnings.                         | `WarningItem`             | None         | Invalid input rejected by typing | component test |
-| Completed | `FR-UI-160`  | Present acknowledgement state without granting authority.    | `PlanningPanels`          | None         | Active remains active            | component test |
-| Completed | `FR-UI-161`  | Expose critical warnings through accessible alert semantics. | `PlanningPanels`          | None         | Visible alert                    | component test |
-
-### Configuration and Limits Manifest
-
-None.
-
-### 4.21 `src/widgets/workflow-pages/` — Workflow Stage Pages
-
-**Purpose:** Gate and present the workstation's ordered trading stages.
-
-### Files
-
-| Status    | File                                                                                 | Responsibility                         | Key exports                           | Dependencies                                                                                                    |
-| --------- | ------------------------------------------------------------------------------------ | -------------------------------------- | ------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Completed | `contracts.ts`, `components.tsx`, `index.ts` | Stage contract and navigation | `WorkflowStage`, `WorkflowStages` | **Standard library:** None**Required third-party:** React**Local:** focused UI features |
-
-| Status    | Requirement ID | Responsibility                                            | Component / Function / Type | Side Effects | Failure presentation      | Usage / Test   |
-| --------- | -------------- | --------------------------------------------------------- | --------------------------- | ------------ | ------------------------- | -------------- |
-| Completed | `FR-UI-162`  | Present pre-market stage.                                 | `WorkflowStages`          | Navigation   | Disabled when disallowed  | component test |
-| Completed | `FR-UI-163`  | Present trade-planning stage.                             | `WorkflowStages`          | Navigation   | Disabled when disallowed  | component test |
-| Completed | `FR-UI-164`  | Present execution stage.                                  | `WorkflowStages`          | Navigation   | Disabled when disallowed  | component test |
-| Completed | `FR-UI-165`  | Present management stage.                                 | `WorkflowStages`          | Navigation   | Disabled when disallowed  | component test |
-| Completed | `FR-UI-166`  | Present post-market stage.                                | `WorkflowStages`          | Navigation   | Disabled when disallowed  | component test |
-| Completed | `FR-UI-167`  | Mark the current stage accessibly.                        | `WorkflowStages`          | None         | No false current stage    | component test |
-| Completed | `FR-UI-168`  | Gate navigation using supplied authoritative eligibility. | `WorkflowStages`          | None         | Disallowed stage disabled | component test |
-
-### Configuration and Limits Manifest
-
-None.
-
-### 4.22 `src/widgets/emergency-ux/` — Emergency and Recovery UX
-
-**Purpose:** Present emergency state, checklist progress, and guarded acknowledgement.
-
-### Files
-
-| Status    | File                                               | Responsibility            | Key exports                           | Dependencies                                                                               |
-| --------- | -------------------------------------------------- | ------------------------- | ------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Completed | `contracts.ts`, `components.tsx`, `index.ts` | Emergency steps and panel | `EmergencyStep`, `EmergencyPanel` | **Standard library:** None**Required third-party:** React**Local:** None |
-
-| Status    | Requirement ID | Responsibility                                            | Component / Function / Type | Side Effects         | Failure presentation        | Usage / Test   |
-| --------- | -------------- | --------------------------------------------------------- | --------------------------- | -------------------- | --------------------------- | -------------- |
-| Completed | `FR-UI-169`  | Present whether emergency mode is active.                 | `EmergencyPanel`          | None                 | Inactive remains explicit   | component test |
-| Completed | `FR-UI-170`  | Present ordered emergency checklist steps.                | `EmergencyStep`           | None                 | Incomplete remains explicit | component test |
-| Completed | `FR-UI-171`  | Enable acknowledgement only during active emergency.      | `EmergencyPanel`          | Local state mutation | Disabled control            | component test |
-| Completed | `FR-UI-172`  | Never claim recovery before supplied completion evidence. | `EmergencyPanel`          | None                 | Incomplete state retained   | component test |
-| Completed | `FR-UI-173`  | Keep emergency controls keyboard accessible.              | `EmergencyPanel`          | None                 | Native button semantics     | component test |
-
-### Configuration and Limits Manifest
-
-None.
-
-### 4.23 `src/widgets/human-factors/` — Human-Factors and Alarm Model
-
-**Purpose:** Reduce alarm noise while preserving priority and lifecycle truth.
-
-### Files
-
-| Status    | File                                               | Responsibility                       | Key exports               | Dependencies                                                                              |
-| --------- | -------------------------------------------------- | ------------------------------------ | ------------------------- | ----------------------------------------------------------------------------------------- |
-| Completed | `contracts.ts`, `components.tsx`, `index.ts` | Alarm contract and root-grouped view | `Alarm`, `AlarmModel` | **Standard library:** Map**Required third-party:** React**Local:** None |
-
-| Status    | Requirement ID | Responsibility                                               | Component / Function / Type | Side Effects | Failure presentation   | Usage / Test        |
-| --------- | -------------- | ------------------------------------------------------------ | --------------------------- | ------------ | ---------------------- | ------------------- |
-| Completed | `FR-UI-174`  | Order alarms by priority.                                    | `AlarmModel`              | None         | Deterministic ordering | component test      |
-| Completed | `FR-UI-175`  | Group alarms by root cause.                                  | `AlarmModel`              | None         | One root presentation  | component test      |
-| Completed | `FR-UI-176`  | Present active, acknowledged, and resolved lifecycle.        | `Alarm`                   | None         | State remains explicit | component test      |
-| Completed | `FR-UI-177`  | Use accessible alert/status semantics.                       | `AlarmModel`              | None         | Visible semantic state | component test      |
-| Completed | `FR-UI-178`  | Preserve freshness/unknown presentation at consuming views.  | `AlarmModel`              | None         | No inferred state      | component/NFR tests |
-| Completed | `FR-UI-179`  | Prevent presentation flooding and duplicate submission cues. | `AlarmModel`              | None         | Root grouping retained | component/NFR tests |
-
-### Configuration and Limits Manifest
-
-None.
-
-### 4.24 `src/widgets/training-ux/` — Training, Replay, and Qualification UX
-
-**Purpose:** Present curriculum, replay/debrief, remediation, and qualification state.
-
-### Files
-
-| Status    | File                                               | Responsibility                            | Key exports                              | Dependencies                                                                               |
-| --------- | -------------------------------------------------- | ----------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ |
-| Completed | `contracts.ts`, `components.tsx`, `index.ts` | Qualification contract and training panel | `QualificationView`, `TrainingPanel` | **Standard library:** None**Required third-party:** React**Local:** None |
-
-| Status    | Requirement ID | Responsibility                                                 | Component / Function / Type | Side Effects | Failure presentation     | Usage / Test          |
-| --------- | -------------- | -------------------------------------------------------------- | --------------------------- | ------------ | ------------------------ | --------------------- |
-| Completed | `FR-UI-180`  | Present curriculum version.                                    | `TrainingPanel`           | None         | Unknown explicit         | component test        |
-| Completed | `FR-UI-181`  | Present training mode.                                         | `TrainingPanel`           | None         | No inferred mode         | component test        |
-| Completed | `FR-UI-182`  | Present scenario/replay access through registered routes.      | workstation routes          | Navigation   | Protected route          | route/component tests |
-| Completed | `FR-UI-183`  | Present debrief evidence without recalculation.                | `TrainingPanel`           | None         | Missing remains explicit | component test        |
-| Completed | `FR-UI-184`  | Present required remediation actions.                          | `TrainingPanel`           | None         | Empty list truthful      | component test        |
-| Completed | `FR-UI-185`  | Fail closed for ineligible, expired, or unknown qualification. | `QualificationView`       | None         | Non-qualified state      | component test        |
-
-### Configuration and Limits Manifest
-
-None.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-14`. Withdraw `ui.typed-backend@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.25 `src/widgets/market-ticks/` — MT5 Market Ticks Diagnostic Widget
+<a id="feat-ui-15"></a>
+### 4.3 `context/` — `FEAT-UI-15`
 
-**Purpose:** Isolate the complete MT5 TCP-to-browser presentation path with a
-playground-equivalent table while retaining HaruQuantAI's authenticated typed SSE
-boundary.
+> **Feature ID:** `FEAT-UI-15`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/context/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-| Status    | Requirement ID | Responsibility                                                                                                                                                                          | Component / Function / Type                                    | Side Effects                                     | Failure presentation              | Usage / Test                          |
-| --------- | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ------------------------------------------------ | --------------------------------- | ------------------------------------- |
-| Completed | `FR-UI-186`  | Read broker-native symbols from`MT5_SNAPSHOT_SYMBOLS`.                                                                                                                                | `useMarketSnapshots`                                         | Authenticated settings read                      | Missing configuration explicit    | hook test                             |
-| Completed | `FR-UI-187`  | Consume only the typed authenticated snapshot stream and apply atomic events.                                                                                                           | `useMarketSnapshots`                                         | SSE read                                         | Transport failure explicit        | hook test                             |
-| Completed | `FR-UI-188`  | Present source, sequence, gaps, quote values, spread, broker time, age, and freshness.                                                                                                  | `MarketTicksTableWidget`                                     | None                                             | Missing values remain unavailable | component test                        |
-| Completed | `FR-UI-189`  | Present connecting, connected, disconnected, stale, clock-skew, empty, and unavailable states.                                                                                          | `MarketTicksTableWidget`                                     | None                                             | Explicit badges and alert         | component test                        |
-| Completed | `FR-UI-190`  | Reconnect with bounded exponential backoff and release streams and timers on unmount.                                                                                                   | `useMarketSnapshots`                                         | Timer and abort lifecycle                        | Disconnected state                | hook test                             |
-| Completed | `FR-UI-191`  | Register the diagnostic as an optional workspace widget without changing defaults.                                                                                                      | Workspace contracts, grid, sidebar                             | Workspace layout state                           | Registered-type validation        | workspace/component tests             |
-| Completed | `FR-UI-192`  | Notify independently mounted Markets widgets after successful watchlist mutations so they reload authoritative symbols and replace their snapshot demand without a page refresh.        | `watchlistEvents.ts`; `WatchlistWidget`; `MarketsWidget` | Browser-local invalidation event without payload | Failed mutations emit no event    | Markets and Watchlist component tests |
-| Completed | `FR-UI-193`  | Abort live MT5 snapshot streams when their widget unmounts or the browser document becomes hidden, and reconnect when visible without repeating Markets' initial historical-data phase. | `MarketsWidget`; `useMarketSnapshots`                      | SSE abort and visibility listener                | Paused state remains explicit     | Markets and Market Ticks hook tests   |
+#### Purpose
 
-### Configuration and Limits Manifest
+Capture current authorized widget context. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
 
-- Symbol authority: persisted non-secret `MT5_SNAPSHOT_SYMBOLS` system setting.
-- Initial retry: 1 second; maximum retry: 10 seconds.
-- Stale presentation threshold: 5 seconds, aligned with the Data snapshot owner.
+#### Capability Declarations
 
----
+**Provides:** `ui.chat-context@1`.
 
-### 4.26 `src/widgets/research/` — Research Workbench
+**Required capabilities:**
 
-**Purpose:** Present Research-owned experiment, run, comparison, automation,
-expectancy, drift, artifact, provenance, and stage evidence without computing a
-scientific conclusion in the browser. The URL owns experiment/run/stage
-navigation; the local store owns display state only.
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
 
-The executable V1 coverage authority is
-`src/widgets/research/v1-coverage.test.ts`. It verifies that V1 Data, Core
-Metric, Seasonality, Edge Profile, Scorecard, Automation, Discovery, Market
-Structure, Unsupervised Structure, progressive prerequisites, saved runs,
-comparison, and safe JSON/Markdown artifacts have a V2 destination. SQX import
-remains Strategy/Data-owned; Monte Carlo remains Optimization/Simulation-owned.
-Parquet export remains explicitly excluded because no safe Research artifact
-type is registered.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-15) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-The V2-only destinations are the Features, Validation, Intelligence, and Stress
-stage views plus the Expectancy and Drift routes. Intelligence renders evidence
-only when eligible point-in-time Data-owned sources exist. Stress evidence is
-selected by registered scenario identifier and never accepts browser-authored
-shock content.
+**Public contract target:** [`app/ui/src/context/contracts.ts`](src/context/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
 
-| Status | Requirement ID | Responsibility | Component | Side Effects | Failure / Empty State | Test Evidence |
-|---|---|---|---|---|---|---|
-| Completed | `FR-UI-241` | Present a Research dashboard and experiment ledger with explicit loading, empty, unavailable, stale, and error states. | `ResearchDashboard`; `ResearchExperiments` | External API call | Typed evidence state | `ResearchWorkbench.test.tsx` |
-| Completed | `FR-UI-242` | Submit browser-safe experiment and run requests without artifact roots, resource ceilings, canonical dataset objects, or other server-owned decisions. | `ResearchRunBuilder` | External API call | Validation and typed request failure | `research-client.test.ts`; `ResearchWorkbench.test.tsx` |
-| Completed | `FR-UI-243` | Keep experiment, run, and stage identity in deep-linkable URL state and use local state only for drafts, filters, comparison selection, and stream display. | Research routes; `research-store.ts` | Navigation; display-only local state | Refresh restores the route | `ResearchWorkbench.test.tsx`; `v1-coverage.test.ts` |
-| Completed | `FR-UI-244` | Present server-derived stage prerequisites, ordered progress, cancellation, and terminal run state without inferring completion. | `ResearchStageNav`; `ResearchRunHeader`; `ResearchRunStatus` | External API/SSE calls | Queued, running, partial, failed, cancelled, stale | `ResearchWorkbench.test.tsx`; `research-client.test.ts` |
-| Completed | `FR-UI-245` | Render every Research stage through typed, schema-validated evidence and preserve warnings, unavailable reasons, sample counts, provenance, and uncertainty. | Thirteen Research stage panels | None beyond API reads | Distinct non-success evidence states | `ResearchWorkbench.test.tsx`; `research-client.test.ts` |
-| Completed | `FR-UI-246` | Present bounded Research-authored market-structure geometry, seasonality, validation, scorecard, and snapshot evidence without frontend recomputation. | Stage panels | None | Legacy or absent evidence is explicitly not published | `ResearchWorkbench.test.tsx` |
-| Completed | `FR-UI-247` | Present immutable run history and server-derived comparison, including failed and inconclusive runs. | `ResearchExperiments`; `ResearchComparison` | External API call | Empty/incompatible comparison state | `ResearchWorkbench.test.tsx` |
-| Completed | `FR-UI-248` | Present automation batches with per-symbol state and retry while generating required idempotency keys for new expensive submissions. | `ResearchAutomation`; typed Research client | External API call | Partial, failed, cancelled, conflict | `research-client.test.ts`; `ResearchWorkbench.test.tsx` |
-| Completed | `FR-UI-249` | Present safe Research artifacts with hashes, audit identity, and provenance; do not claim unsupported Parquet export. | `ResearchArtifactDrawer`; `ProvenancePanel` | Artifact link navigation | Missing/unavailable artifact evidence | `ResearchWorkbench.test.tsx`; `v1-coverage.test.ts` |
-| Completed | `FR-UI-250` | Present point-in-time fundamental and sentiment evidence only when Research declares it applicable and eligible; preserve missingness and refusal reasons. | `IntelligencePanel` | External API call | Not applicable, unavailable, stale, or empty | `ResearchWorkbench.test.tsx` |
-| Completed | `FR-UI-251` | Create draft expectancy only from explicit completed-run measurements and expose lifecycle transitions only to callers with `research:govern`; never decide the transition in the UI. | `ResearchExpectancy` | Governed external API call | Permission, eligibility, conflict, unavailable | `ResearchExpectancy.test.tsx`; `research-client.test.ts` |
-| Completed | `FR-UI-252` | Present drift and registered stress evidence without enacting suspension or accepting browser-authored scenario magnitude, unit, rationale, or assumption reference. | `ResearchDrift`; `StressPanel` | External API call | No evidence, unavailable calibration, unknown scenario | `ResearchWorkbench.test.tsx`; `research-client.test.ts` |
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
----
+#### Feature Configuration & Limits Manifest
 
-### 4.27 `src/widgets/news/` — News Online Feed Widget
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Purpose:** Present real-time streaming financial and market news dynamically from
-Dukascopy's Online News Applet feed within an isolated, sandboxed iframe container without
-requiring backend ingestion.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-15-001`, `FR-TRC-UI-15-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
-### Files
+#### Runtime Effects & Scope Disposal
 
-| Status    | File                  | Responsibility                                                                                                   | Key exports                                                                                             | Dependencies                                                                                 |
-| --------- | --------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Completed | `contracts.ts`        | Category, language, filter, and widget configuration contracts                                                   | `NEWS_CATEGORIES`, `NEWS_LANGUAGES`, `CATEGORY_LABELS`, `LANGUAGE_LABELS`, `NewsWidgetProps`, etc.     | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None              |
-| Completed | `news.module.css`     | Dark CME/HaruQuantAI styling for toolbar, iframe embed, loader overlay, and footer                                | CSS module classes                                                                                      | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None              |
-| Completed | `NewsWidget.tsx`      | Focused widget component rendering isolated iframe with srcDoc and Dukascopy Online News applet                  | `NewsWidget`                                                                                            | **Standard library:** None<br>**Required third-party:** React, Lucide<br>**Local:** contracts |
-| Completed | `index.ts`            | Sole public barrel export for the feature                                                                        | `NewsWidget`, contracts                                                                                 | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, component|
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-15 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-15 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-15 | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
-| Status    | Requirement ID | Responsibility                                                                                                                       | Component / Function / Type | Side Effects            | Failure presentation                                               | Usage / Test Evidence     |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------- | ----------------------- | ------------------------------------------------------------------ | ------------------------- |
-| Completed | `FR-UI-253`    | Render Dukascopy Online News feed in an isolated, sandboxed `iframe` with dark theme injection, avoiding SPA virtual DOM disruption. | `NewsWidget`                | Iframe script execution | Explicit loading spinner and fallback message                      | `NewsWidget.test.tsx`     |
-| Completed | `FR-UI-254`    | Pass configured categories (`finance`, `forex`, `stocks`, `company_news`, `commodities`) to the Dukascopy applet parameters.        | `NewsWidget`                | Iframe configuration    | Non-empty category fallback                                        | `NewsWidget.test.tsx`     |
-| Completed | `FR-UI-255`    | Support language selection across 22 supported languages defaulting to English (`en`).                                               | `NewsWidget`                | Iframe configuration    | Fallback to `en` on invalid choice                                 | `NewsWidget.test.tsx`     |
-| Completed | `FR-UI-256`    | Provide an explicit live status badge and loading overlay during iframe initialization.                                              | `NewsWidget`                | Iframe reload           | Visual loading spinner during refresh                              | `NewsWidget.test.tsx`     |
-| Completed | `FR-UI-257`    | Register the `news` widget type in workspace contracts, allowing docking, splitting, and persistence within workspace layouts.       | Workspace contracts, host   | Layout persistence      | Registered-type validation                                         | `NewsWidget.test.tsx`     |
-| Completed | `FR-UI-258`    | Provide a standalone workstation page route (`/workstation/news`) with full-screen layout.                                           | `/workstation/news`         | Client routing          | Protected layout                                                   | `NewsWidget.test.tsx`     |
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
-### Configuration and Limits Manifest
+#### Persistent State Ownership
 
-- External source: `https://freeserv-static.dukascopy.com/2.0/core.js`.
-- Supported categories: `finance`, `forex`, `stocks`, `company_news`, `commodities`.
-- Supported languages: 22 ISO language codes.
+**Ownership class:** Presentation-only state.
 
----
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
 
-### 4.28 `src/widgets/market-hours/` — FX Market Hours Widget
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
 
-**Purpose:** Present real-time trading session clocks and market data for the Asian, European,
-and North American FX trading sessions, alongside hourly spreads, volatility, and volume indicators
-dynamically from Dukascopy's FX Market Hours Applet within an isolated, sandboxed iframe container without
-requiring backend ingestion.
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
 
-### Files
+#### Feature Package Structure & Files
 
-| Status    | File                      | Responsibility                                                                                       | Key exports                                                                                       | Dependencies                                                                              |
-| --------- | ------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------- |
-| Completed | `contracts.ts`            | Widget configuration schemas, default CME dark themes, and popular FX instruments                   | `MarketHoursWidgetConfig`, `DEFAULT_MARKET_HOURS_CONFIG`, `POPULAR_FX_INSTRUMENTS`, etc.          | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None           |
-| Completed | `market-hours.module.css` | Dark CME/HaruQuantAI styling for toolbar, title, live sessions indicator, and iframe embed          | CSS module classes                                                                                | **Standard library:** None<br>**Required third-party:** None<br>**Local:** None           |
-| Completed | `MarketHoursWidget.tsx`   | Focused widget component rendering isolated iframe with srcDoc and Dukascopy FX Market Hours applet | `MarketHoursWidget`                                                                               | **Standard library:** None<br>**Required third-party:** React, Lucide<br>**Local:** contracts|
-| Completed | `index.ts`                | Sole public barrel export for the feature                                                            | `MarketHoursWidget`, contracts                                                                    | **Standard library:** None<br>**Required third-party:** None<br>**Local:** contracts, component|
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
 
-| Status    | Requirement ID | Responsibility                                                                                                                       | Component / Function / Type | Side Effects            | Failure presentation                          | Usage / Test Evidence        |
-| --------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------- | ----------------------- | --------------------------------------------- | ---------------------------- |
-| Completed | `FR-UI-259`    | Render Dukascopy FX Market Hours feed in an isolated, sandboxed `iframe` with dark theme parameter injection and CSS reset.         | `MarketHoursWidget`         | Iframe script execution | Explicit loading spinner and fallback message | `MarketHoursWidget.test.tsx` |
-| Completed | `FR-UI-260`    | Support configurable instrument default (`EUR/USD`, etc.) and indicator display modes (`0` for spreads/volatility/volume).          | `MarketHoursWidget`         | Iframe configuration    | Default instrument fallback                   | `MarketHoursWidget.test.tsx` |
-| Completed | `FR-UI-261`    | Provide customizable timezone offset configuration defaulting to UTC/GMT (`0`).                                                     | `MarketHoursWidget`         | Iframe configuration    | Fallback to `0` UTC                           | `MarketHoursWidget.test.tsx` |
-| Completed | `FR-UI-262`    | Provide live status badge and loading overlay indicating external online data connectivity.                                          | `MarketHoursWidget`         | Iframe reload           | Visual loading spinner during initialization  | `MarketHoursWidget.test.tsx` |
-| Completed | `FR-UI-263`    | Register the `market-hours` widget type in workspace contracts, allowing docking, splitting, and layout persistence.                | Workspace contracts, host   | Layout persistence      | Registered-type validation                    | `MarketHoursWidget.test.tsx` |
-| Completed | `FR-UI-264`    | Provide a standalone workstation page route (`/workstation/market-hours`) with full-screen layout.                                   | `/workstation/market-hours` | Client routing          | Protected layout                              | `MarketHoursWidget.test.tsx` |
-| Completed | `FR-UI-277`    | Render the historical simulation catalogue from the server run listing with explicit loading, empty, and refusal states, bounded paging, and an Analytics hand-off link per run; never present a placeholder in place of recorded evidence. | `RunCataloguePanel`, `SimulationHome` history mode | Server catalogue read | Server refusal and transport failure surface as an alert | `RunCataloguePanel.test.tsx`; `SimulationHome.test.tsx` |
-| Completed | `FR-UI-278`    | Render an explicit unknown-section state for an unrecognized Analytics run segment instead of silently falling back to the overview tab. | `AnalyticsWorkspace` | Client state | Unknown segment states what is missing | `src/widgets/analytics-workbench/AnalyticsWorkspace.test.tsx` |
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
 
-### Configuration and Limits Manifest
+#### Functional Requirements (FR)
 
-- External source: `https://freeserv-static.dukascopy.com/2.0/core.js`.
-- Applet type: `fxmarkethours`.
-- Supported market sessions: Asian (Tokyo/Sydney), European (London/Frankfurt), North American (New York).
-- Supported indicators: Spreads, Volatility, Volume.
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-15-001` | Register exact widget/version/generation contributions containing stable public refs, selection, filters, safe labels/errors, focus, capture/expiry/hash and schema. | `AT-UI-15-001` | Raw DOM, screenshots, credentials, private state and executable instruction fields are rejected. |
+| PENDING | `FR-TRC-UI-15-002` | Capture a new bounded WorkspaceContextSnapshot for every message and drop unmounted/expired contributions. | `AT-UI-15-002` | A removed widget never contributes to the next turn; navigation cannot rewrite a turn’s already-pinned snapshot. |
+| PENDING | `FR-TRC-UI-15-003` | Keep account/permission projection and stable typed cross-widget selection distinct from authoritative market/result facts. | `AT-UI-15-003` | A manipulated browser metric cannot override an owner-refreshed value; cross-account context is denied. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-15-001` | Removing FEAT-UI-15 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-15-001` | Disable and physically remove context; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-15): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/context/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/context/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-15/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-15`. Withdraw `ui.chat-context@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-## 5. Package-Wide Requirements and Shared Configuration
+<a id="feat-ui-16"></a>
+### 4.4 `layout/` — `FEAT-UI-16`
 
-| Status    | Requirement ID | Type            | Responsibility                                                                                                                                                                       | Verification                                                      |
-| --------- | -------------- | --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
-| Completed | `NFR-UI-001` | Freshness       | Stale, unavailable, and unknown evidence is explicit and cannot be presented as current governed evidence.                                                                           | `src/context/nfr.test.ts`                                       |
-| Completed | `NFR-UI-002` | Accessibility   | Core workflows target WCAG 2.1 AA and keep critical controls keyboard reachable.                                                                                                     | `src/components/workflow/nfr.test.tsx`                          |
-| Completed | `NFR-UI-003` | Testing         | Completed features have focused unit/component evidence; typed clients have API contract-parity evidence; cross-boundary workflows add integration/browser evidence where necessary. | Vitest suite and structural tests                                 |
-| Completed | `NFR-UI-004` | Quality         | Format, typecheck, tests, contract checks, and production build are runnable in CI.                                                                                                  | TypeScript, Vitest, Next build                                    |
-| Completed | `NFR-UI-005` | Security        | UI never exposes credentials, opens broker sessions, or directly connects to MT5.                                                                                                    | Boundary review and secret scan                                   |
-| Completed | `NFR-UI-006` | Architecture    | UI contains presentation and interaction behavior only; API and service domains remain authoritative.                                                                                | Registry and import review                                        |
-| Pending   | `NFR-UI-007` | Data provenance | No production module imports fixture data from`src/mock/`.                                                                                                                         | Import review; currently violated by four modules (see Section 6) |
-| Pending   | `NFR-UI-008` | Data provenance | Every displayed value traces to a registered API operation or is labelled a client-side preference.                                                                                  | Registry and component review                                     |
+> **Feature ID:** `FEAT-UI-16`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/components/layout/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-### UI verification-evidence exception
+#### Purpose
 
-Unlike service domains, `FEAT-UI-*` features do not require separate numbered
-standalone usage programs. Production UI is not verification evidence. Completion
-requires focused unit/component tests and integration, contract, or browser evidence
-where a workflow crosses boundaries. This exception supersedes only the template's
-usage-program rows and checklist items; every non-UI domain retains the repository-wide
-standalone usage rule.
+Navigate capabilities and explain workspace controls. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.shell-navigation@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-16) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/components/layout/contracts.ts`](src/components/layout/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-16-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-16 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-16 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-16 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-16-001` | Present compact research navigation, global job indicators, recent items and commands from actual registered capability/widget metadata. | `AT-UI-16-001` | Missing providers disable only affected actions with a reason; no menu item is declared operational from documentation alone. |
+| PENDING | `FR-TRC-UI-16-002` | Provide contextual control help, readiness checklist, original examples and links to authorized reports/settings. | `AT-UI-16-002` | Help describes declared semantics and never invents a live value or qualification state. |
+| PENDING | `FR-TRC-UI-16-003` | Preserve keyboard navigation, selected workspace/account orientation and safe focus after panel changes. | `AT-UI-16-003` | Keyboard-only flows reach every available command and restore focus to a valid visible control. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-16-001` | Removing FEAT-UI-16 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-16-001` | Disable and physically remove layout; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-16): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/components/layout/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/components/layout/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-16/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-16`. Withdraw `ui.shell-navigation@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
+<a id="feat-ui-17"></a>
+### 4.5 `app/` — `FEAT-UI-17`
+
+> **Feature ID:** `FEAT-UI-17`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/app/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Present session access and scope changes. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.access-gate@1`.
+
+**Required capabilities:**
+
+`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-17) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/app/contracts.ts`](src/app/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-17 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-17 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-17 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-17-001` | Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change. | `AT-UI-17-001` | Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. |
+| PENDING | `FR-TRC-UI-17-002` | Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework. | `AT-UI-17-002` | A browser toggle cannot authorize a server request; no replacement SPA/authentication system is introduced. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-17-001` | Removing FEAT-UI-17 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-17-001` | Disable and physically remove app; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-17): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/app/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/app/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-17/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-17`. Withdraw `ui.access-gate@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
 ---
+
+<a id="feat-ui-13"></a>
+### 4.6 `system-settings/` — `FEAT-UI-13`
+
+> **Feature ID:** `FEAT-UI-13`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/system-settings/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Review effective settings and safe configuration changes. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.system-settings@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-13) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/system-settings/contracts.ts`](src/widgets/system-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-13-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-13 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-13 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-13 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-13-001` | Render all CAT-SETTINGS categories, effective defaults/overrides, narrower policy, supported values and restart/remount impact. | `AT-UI-13-001` | A CPU/memory/tick setting cannot silently change historical runs or override a stricter owner policy. |
+| PENDING | `FR-TRC-UI-13-002` | Support load/save/reset/diff/presets with dirty-state protection and field/summary owner errors. | `AT-UI-13-002` | A failed update leaves the prior configuration intact; stale expected revisions require explicit conflict handling. |
+| PENDING | `FR-TRC-UI-13-003` | Render SMTP test and remote/MCP status through permission-gated typed actions with no credential values. | `AT-UI-13-003` | Test send names recipient/scope and has its own action; an unconfigured service remains unavailable. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-13-001` | Removing FEAT-UI-13 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-13-001` | Disable and physically remove system-settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-13): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/system-settings/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/system-settings/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-13/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-13`. Withdraw `ui.system-settings@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-18"></a>
+### 4.7 `workflow/` — `FEAT-UI-18`
+
+> **Feature ID:** `FEAT-UI-18`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/components/workflow/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Operate the Data Manager workspace. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.data-workflow@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-18) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/components/workflow/contracts.ts`](src/components/workflow/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-18-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-18 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-18 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-18 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-18-001` | Render series/reference grids with all CAT-DATA fields and supported source/profile/instrument/session/group/external-series controls. | `AT-UI-18-001` | Filtering/selection/batch actions preserve stable IDs; missing capabilities are explicit and system/protected items cannot be edited locally. |
+| PENDING | `FR-TRC-UI-18-002` | Preview owner import mappings/counts, quality findings/repairs, timezone clone/merge/export and dependency-aware deletion. | `AT-UI-18-002` | A confirmation names exact object/count/dependencies/reversibility/retained artifacts; browser previews never imply backend success. |
+| PENDING | `FR-TRC-UI-18-003` | Observe download/import/update jobs with supported pause/resume/stop and authorized bounded raw-data/chart previews. | `AT-UI-18-003` | Closing the Data view leaves accepted downloads running; explicit cancellation uses the owner and incomplete coverage stays labelled. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-18-001` | Removing FEAT-UI-18 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-18-001` | Disable and physically remove workflow; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-18): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/components/workflow/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/components/workflow/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-18/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-18`. Withdraw `ui.data-workflow@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-view-collections"></a>
+### 4.8 `collection-grid/` — `FEAT-UI-VIEW_COLLECTIONS`
+
+> **Feature ID:** `FEAT-UI-VIEW_COLLECTIONS`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/collection-grid/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Navigate large typed collections accessibly. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.collection-grid@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-view-collections) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/collection-grid/contracts.ts`](src/widgets/collection-grid/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-VIEW_COLLECTIONS-003`, `NFR-TRC-UI-VIEW_COLLECTIONS-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-VIEW_COLLECTIONS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-VIEW_COLLECTIONS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-VIEW_COLLECTIONS | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-VIEW_COLLECTIONS-001` | Render stable-ID typed columns with server-side cursor sorting/filtering, pin/reorder/resize/hide/group and explicit null/undefined states. | `AT-UI-VIEW_COLLECTIONS-001` | Numeric/date/null sorts preserve owner semantics; unknown/missing plugin columns have a recoverable unavailable state. |
+| PENDING | `FR-TRC-UI-VIEW_COLLECTIONS-002` | Support single/range/toggle/select-all-except snapshot selection, context menus, keyboard focus and query-backed bulk previews. | `AT-UI-VIEW_COLLECTIONS-002` | Selecting 1M logical rows retains a bounded token/window, not a million browser objects. |
+| PENDING | `FR-TRC-UI-VIEW_COLLECTIONS-003` | Deliver loading/empty/partial/stale/error/denied states and bounded update coalescing for every CAT-GRIDS family. | `AT-UI-VIEW_COLLECTIONS-003` | First useful page p95 ≤1 s, indexed filter p95 ≤750 ms, typical scrolling 55+ FPS and ≤10 visual batches/s on the pinned fixture/hardware. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-VIEW_COLLECTIONS-001` | The grid holds only the virtualized window and bounded selection/query metadata. | `ATN-UI-VIEW_COLLECTIONS-001` | 10k/100k/1M logical-row fixtures prove resident-row/DOM/memory bounds and selection correctness during churn. |
+| PENDING | `NFR-TRC-UI-VIEW_COLLECTIONS-002` | Unmount cancels all timers/listeners/observers/queries and releases workers/buffers. | `ATN-UI-VIEW_COLLECTIONS-002` | Repeated mount/unmount plus heap/native/browser profiles show no continuing growth beyond declared caches. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-view-collections): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/collection-grid/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/collection-grid/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-VIEW_COLLECTIONS`. Withdraw `ui.collection-grid@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-review-drafts"></a>
+### 4.9 `draft-review/` — `FEAT-UI-REVIEW_DRAFTS`
+
+> **Feature ID:** `FEAT-UI-REVIEW_DRAFTS`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/draft-review/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Review typed edits and consequential action scope. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.draft-review@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-review-drafts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/draft-review/contracts.ts`](src/widgets/draft-review/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-REVIEW_DRAFTS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-REVIEW_DRAFTS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-REVIEW_DRAFTS | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-REVIEW_DRAFTS-001` | Provide one accessible overlay foundation with focus trap/restore, labelled title/description, escape/scroll policy and restrained announcements. | `AT-UI-REVIEW_DRAFTS-001` | Keyboard/screen-reader fixtures reach confirm/cancel and restore focus; nested-modal traps are replaced with drawer/route/back navigation. |
+| PENDING | `FR-TRC-UI-REVIEW_DRAFTS-002` | Preserve typed dirty draft state and show both client hints and authoritative field/summary errors. | `AT-UI-REVIEW_DRAFTS-002` | Cancelling a harmless chooser discards no unrelated draft; abandoning a destructive/long form warns on unsaved changes. |
+| PENDING | `FR-TRC-UI-REVIEW_DRAFTS-003` | Bind confirmation/review to exact object, count, dependencies, reversibility, retained state, candidate hash and expected revision. | `AT-UI-REVIEW_DRAFTS-003` | A changed scope/hash invalidates the review; model prose cannot manufacture a clickable server action. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-REVIEW_DRAFTS-001` | Removing FEAT-UI-REVIEW_DRAFTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-REVIEW_DRAFTS-001` | Disable and physically remove draft-review; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-review-drafts): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/draft-review/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/draft-review/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-REVIEW_DRAFTS`. Withdraw `ui.draft-review@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-04"></a>
+### 4.10 `chart/` — `FEAT-UI-04`
+
+> **Feature ID:** `FEAT-UI-04`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/chart/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect market charts and typed overlays. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.market-chart@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-04) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/chart/contracts.ts`](src/widgets/chart/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-04-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-04 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-04 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-04 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-04-001` | Render declared market-series windows, price/volume/layer units, timezone/calendar, gaps and indicator/entry/exit overlays. | `AT-UI-04-001` | Unavailable/wrong-series market data is not substituted; source version and synthetic/recorded labels remain visible. |
+| PENDING | `FR-TRC-UI-04-002` | Support crosshair/zoom/selection with typed timestamps/series/trade references and bounded LOD/decoding. | `AT-UI-04-002` | Changing zoom changes display sampling only; numeric calculations remain unchanged and past selections retain their identity. |
+| PENDING | `FR-TRC-UI-04-003` | Offer keyboard/table equivalents and no-WebGL fallback where applicable. | `AT-UI-04-003` | GPU-off and color-blind/keyboard fixtures preserve access to equivalent values and labels. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-04-001` | Removing FEAT-UI-04 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-04-001` | Disable and physically remove chart; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-04): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/chart/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/chart/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-04/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-04`. Withdraw `ui.market-chart@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-27"></a>
+### 4.11 `simulator/` — `FEAT-UI-27`
+
+> **Feature ID:** `FEAT-UI-27`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/simulator/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Configure and observe a canonical backtest. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.canonical-backtest@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-27) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/simulator/contracts.ts`](src/widgets/simulator/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-27-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-27 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-27 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-27 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-27-001` | Present strategy revision/parameters, primary/additional data, tick-method evidence class/coverage, costs, account, sample, output and resource preview. | `AT-UI-27-001` | No method is silently selected; actual source/emitted/estimated tick counts are labelled correctly. |
+| PENDING | `FR-TRC-UI-27-002` | Submit one governed owner request, observe progress/log/warnings and expose supported cancel/pause/retry. | `AT-UI-27-002` | Double-click Start returns one run; pause waits for acknowledgement/checkpoint; retry creates the owner’s linked identity. |
+| PENDING | `FR-TRC-UI-27-003` | Open the committed Analytics result by stable ID and retain partial/unavailable/failed states. | `AT-UI-27-003` | A browser timeout or closed panel cannot be relabelled a failed/completed simulation without owner evidence. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-27-001` | Removing FEAT-UI-27 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-27-001` | Disable and physically remove simulator; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-27): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/simulator/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/simulator/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-27/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-27`. Withdraw `ui.canonical-backtest@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-28"></a>
+### 4.12 `research/` — `FEAT-UI-28`
+
+> **Feature ID:** `FEAT-UI-28`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/research/`
+> **First release milestone:** `U3`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect research campaigns, protocols and evidence. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.research-workbench@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-28) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/research/contracts.ts`](src/widgets/research/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-28-001`, `FR-TRC-UI-28-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-28 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-28 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-28 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-28-001` | Display canonical campaign/family/protocol/sample/budget/holdout identities, attempt conservation and receiver lineage. | `AT-UI-28-001` | Failed/null/refused/invalid/pruned and cache-hit evidence is not hidden by winner-only filters. |
+| PENDING | `FR-TRC-UI-28-002` | Present research draft, supported evidence and qualified outcomes as different states, with exact owner reasons and limitations. | `AT-UI-28-002` | A draft or successful worker job cannot look like research qualification or live approval. |
+| PENDING | `FR-TRC-UI-28-003` | Expose compatible research navigation, comparison and immutable artifact history through registered contributions. | `AT-UI-28-003` | Removing Builder/Retester or Agentic leaves the Research evidence browser usable for existing records. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-28-001` | Removing FEAT-UI-28 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-28-001` | Disable and physically remove research; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-28): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/research/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/research/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-28/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-28`. Withdraw `ui.research-workbench@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-32"></a>
+### 4.13 `analytics/` — `FEAT-UI-32`
+
+> **Feature ID:** `FEAT-UI-32`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/analytics/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Compose the result inspection workspace. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.results-workbench@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-32) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/analytics/contracts.ts`](src/widgets/analytics/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-32-001`, `FR-TRC-UI-32-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-32 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-32 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-32 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-32-001` | Discover compatible result views by result kind/schema/capability and restore safe per-view layout/selection. | `AT-UI-32-001` | Removing one panel/provider produces a named unavailable view without breaking other result views. |
+| PENDING | `FR-TRC-UI-32-002` | Expose result/config/data/metric/method/sample/precision/partial/imported provenance and deep links. | `AT-UI-32-002` | Current Strategy settings cannot silently replace the run-time snapshot; imported results keep source attribution. |
+| PENDING | `FR-TRC-UI-32-003` | Coordinate typed stable selections among independent panels without shared mutable domain state. | `AT-UI-32-003` | A trade/result/window selection retains the same owner identity across views and is cleared safely when inaccessible. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-32-001` | Removing FEAT-UI-32 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-32-001` | Disable and physically remove analytics; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-32): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/analytics/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/analytics/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-32/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-32`. Withdraw `ui.results-workbench@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-strategy-studio"></a>
+### 4.14 `strategy-editor/` — `FEAT-UI-STRATEGY_STUDIO`
+
+> **Feature ID:** `FEAT-UI-STRATEGY_STUDIO`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/strategy-editor/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Edit and review a strategy. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.strategy-editor@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-studio) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/strategy-editor/contracts.ts`](src/widgets/strategy-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-STRATEGY_STUDIO-002`, `NFR-TRC-UI-STRATEGY_STUDIO-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-STRATEGY_STUDIO | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-STRATEGY_STUDIO | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-STRATEGY_STUDIO | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-STRATEGY_STUDIO-001` | Keep canvas, keyboard tree/forms and HSL projections semantically equivalent with stable node IDs and incremental path diagnostics. | `AT-UI-STRATEGY_STUDIO-001` | Round-trip edits and undo/redo preserve all supported nodes, order, parameters and bindings; invalid/unknown nodes remain inspectable but unrunnable. |
+| PENDING | `FR-TRC-UI-STRATEGY_STUDIO-002` | Preview new definitions and base-bound granular AI patches with assumptions, affected paths, diagnostics, hashes and compatible operation closure. | `AT-UI-STRATEGY_STUDIO-002` | A stale revision or changed selection requires new review; accepting a draft saves only after the Strategy receipt, without starting a run. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-STRATEGY_STUDIO-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-STRATEGY_STUDIO-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-STRATEGY_STUDIO-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-STRATEGY_STUDIO-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-studio): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/strategy-editor/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/strategy-editor/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_STUDIO/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_STUDIO`. Withdraw `ui.strategy-editor@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-strategy-builder"></a>
+### 4.15 `strategy-search-space/` — `FEAT-UI-STRATEGY_BUILDER`
+
+> **Feature ID:** `FEAT-UI-STRATEGY_BUILDER`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/strategy-search-space/`
+> **First release milestone:** `U5`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Configure and run strategy generation. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.strategy-search-space@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/strategy-search-space/contracts.ts`](src/widgets/strategy-search-space/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-STRATEGY_BUILDER-001`, `NFR-TRC-UI-STRATEGY_BUILDER-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-STRATEGY_BUILDER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-STRATEGY_BUILDER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-STRATEGY_BUILDER | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-STRATEGY_BUILDER-001` | Render every CAT-BUILDER control from owner schemas, showing effective overrides, scale, compatibility and finite budgets before start. | `AT-UI-STRATEGY_BUILDER-001` | Impossible constraints, missing blocks and denied resource estimates remain visible; UI never creates executable strategy source or private sampling logic. |
+| PENDING | `FR-TRC-UI-STRATEGY_BUILDER-002` | Save/load/clone/diff/preset plans and observe actual generation/island/evaluation/rejection/progress/results. | `AT-UI-STRATEGY_BUILDER-002` | Counter meanings distinguish AST attempts, evaluated candidates and committed results; pause/stop follows owner acknowledgement. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-STRATEGY_BUILDER-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-STRATEGY_BUILDER-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-STRATEGY_BUILDER-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-STRATEGY_BUILDER-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-builder): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/strategy-search-space/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/strategy-search-space/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_BUILDER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_BUILDER`. Withdraw `ui.strategy-search-space@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-strategy-retester"></a>
+### 4.16 `research-settings/` — `FEAT-UI-STRATEGY_RETESTER`
+
+> **Feature ID:** `FEAT-UI-STRATEGY_RETESTER`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/research-settings/`
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Retest a fixed strategy population. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.research-settings@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-retester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/research-settings/contracts.ts`](src/widgets/research-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-STRATEGY_RETESTER-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-STRATEGY_RETESTER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-STRATEGY_RETESTER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-STRATEGY_RETESTER | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-STRATEGY_RETESTER-001` | Resolve and preview the exact immutable population and effective override diff, warning about source and method/sample incompatibility. | `AT-UI-STRATEGY_RETESTER-001` | A query changing later cannot alter an active retest set; originals remain unchanged. |
+| PENDING | `FR-TRC-UI-STRATEGY_RETESTER-002` | Show per-stage results/failures/partial states and typed baseline deltas with atomic output routing preview. | `AT-UI-STRATEGY_RETESTER-002` | Unexecuted stages are not passed; a ledger statistic cannot be labelled a new backtest. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-STRATEGY_RETESTER-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-STRATEGY_RETESTER-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-STRATEGY_RETESTER-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-STRATEGY_RETESTER-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-retester): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/research-settings/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/research-settings/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_RETESTER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_RETESTER`. Withdraw `ui.research-settings@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-parameter-optimizer"></a>
+### 4.17 `optimization-settings/` — `FEAT-UI-PARAMETER_OPTIMIZER`
+
+> **Feature ID:** `FEAT-UI-PARAMETER_OPTIMIZER`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/optimization-settings/`
+> **First release milestone:** `U6`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Plan and inspect parameter optimization. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.optimization-settings@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-parameter-optimizer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/optimization-settings/contracts.ts`](src/widgets/optimization-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-PARAMETER_OPTIMIZER-001`, `NFR-TRC-UI-PARAMETER_OPTIMIZER-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-PARAMETER_OPTIMIZER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-PARAMETER_OPTIMIZER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-PARAMETER_OPTIMIZER | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-PARAMETER_OPTIMIZER-001` | Display legal parameter domains, exact Cartesian count, constraints, method/seed/resource/output estimates and validation diagnostics. | `AT-UI-PARAMETER_OPTIMIZER-001` | No hidden parameter coercion, full browser Cartesian expansion or gateway-side optimization occurs. |
+| PENDING | `FR-TRC-UI-PARAMETER_OPTIMIZER-002` | Inspect trials, best/selected point, stability and OOS evidence and hand off a selected tuple for a reviewed new Strategy revision. | `AT-UI-PARAMETER_OPTIMIZER-002` | Selecting a point does not mutate the original; failed/undefined/pruned trials and sampled surfaces remain labelled. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-PARAMETER_OPTIMIZER-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-PARAMETER_OPTIMIZER-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-PARAMETER_OPTIMIZER-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-PARAMETER_OPTIMIZER-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-parameter-optimizer): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/optimization-settings/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/optimization-settings/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-PARAMETER_OPTIMIZER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-PARAMETER_OPTIMIZER`. Withdraw `ui.optimization-settings@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-databank-grid"></a>
+### 4.18 `databank-grid/` — `FEAT-UI-DATABANK_GRID`
+
+> **Feature ID:** `FEAT-UI-DATABANK_GRID`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/databank-grid/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Organize and act on a databank. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.databank-grid@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-databank-grid) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/databank-grid/contracts.ts`](src/widgets/databank-grid/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-DATABANK_GRID-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-DATABANK_GRID | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-DATABANK_GRID | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-DATABANK_GRID | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-DATABANK_GRID-001` | Render the typed metric/metadata catalogue and persisted views with server query tokens and all supported ribbon/context-menu controls. | `AT-UI-DATABANK_GRID-001` | Removing a contributed column does not discard other view settings or change data; visible-row count is never substituted for selected population count. |
+| PENDING | `FR-TRC-UI-DATABANK_GRID-002` | Preview bulk object/count/conflict/atomicity/dependency effects and bind confirmation to the exact resolved population. | `AT-UI-DATABANK_GRID-002` | A move is atomic per item and default transaction-wide policy is preserved; row removal is not underlying result deletion. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-DATABANK_GRID-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-DATABANK_GRID-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-DATABANK_GRID-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-DATABANK_GRID-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-databank-grid): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/databank-grid/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/databank-grid/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-DATABANK_GRID/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-DATABANK_GRID`. Withdraw `ui.databank-grid@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-result-overview"></a>
+### 4.19 `result-overview/` — `FEAT-UI-RESULT_OVERVIEW`
+
+> **Feature ID:** `FEAT-UI-RESULT_OVERVIEW`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/result-overview/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Read a provenance-rich result summary. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.result-overview@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-result-overview) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/result-overview/contracts.ts`](src/widgets/result-overview/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-RESULT_OVERVIEW-001`, `FR-TRC-UI-RESULT_OVERVIEW-002`, `NFR-TRC-UI-RESULT_OVERVIEW-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-RESULT_OVERVIEW | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-RESULT_OVERVIEW | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-RESULT_OVERVIEW | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-RESULT_OVERVIEW-001` | Render canonical/derived/presentation-only fields distinctly with source definition/version, units, precision and null reasons. | `AT-UI-RESULT_OVERVIEW-001` | No-loss Profit Factor and undefined Sharpe remain unavailable; imported or incomplete data cannot appear natively qualified. |
+| PENDING | `FR-TRC-UI-RESULT_OVERVIEW-002` | Select versioned report/view templates and preserve a safe built-in fallback. | `AT-UI-RESULT_OVERVIEW-002` | A missing template/provider changes presentation availability only, not the result’s values or hash. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-RESULT_OVERVIEW-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-RESULT_OVERVIEW-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-RESULT_OVERVIEW-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-RESULT_OVERVIEW-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-result-overview): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/result-overview/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/result-overview/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-RESULT_OVERVIEW/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-RESULT_OVERVIEW`. Withdraw `ui.result-overview@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-trade-list"></a>
+### 4.20 `trade-list/` — `FEAT-UI-TRADE_LIST`
+
+> **Feature ID:** `FEAT-UI-TRADE_LIST`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/trade-list/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect and select individual trades. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.trade-list@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-list) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/trade-list/contracts.ts`](src/widgets/trade-list/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-TRADE_LIST-001`, `NFR-TRC-UI-TRADE_LIST-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-TRADE_LIST | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-TRADE_LIST | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-TRADE_LIST | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-TRADE_LIST-001` | Use stable trade IDs and typed sample/time/column filters with bounded paging. | `AT-UI-TRADE_LIST-001` | Cross-page selection opens the exact ticket; missing R/MAE/MFE is not displayed as zero. |
+| PENDING | `FR-TRC-UI-TRADE_LIST-002` | Publish typed selections and export the server-resolved projection, not just visible rows. | `AT-UI-TRADE_LIST-002` | Linked panels receive the same trade identity; CSV output respects formula-injection protection and manifest counts. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-TRADE_LIST-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-TRADE_LIST-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-TRADE_LIST-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-TRADE_LIST-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-list): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/trade-list/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/trade-list/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-TRADE_LIST/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-TRADE_LIST`. Withdraw `ui.trade-list@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-equity-chart"></a>
+### 4.21 `equity-chart/` — `FEAT-UI-EQUITY_CHART`
+
+> **Feature ID:** `FEAT-UI-EQUITY_CHART`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/equity-chart/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect equity, drawdown and benchmark paths. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.equity-chart@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-equity-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/equity-chart/contracts.ts`](src/widgets/equity-chart/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-EQUITY_CHART-001`, `FR-TRC-UI-EQUITY_CHART-002`, `NFR-TRC-UI-EQUITY_CHART-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-EQUITY_CHART | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-EQUITY_CHART | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-EQUITY_CHART | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-EQUITY_CHART-001` | Render owner-projected equity/balance/benchmark/drawdown/volume layers with source/sampling/precision labels. | `AT-UI-EQUITY_CHART-001` | Zoom/downsampling cannot alter risk metrics; time and trade-index axes are not silently interchanged. |
+| PENDING | `FR-TRC-UI-EQUITY_CHART-002` | Synchronize cursor/range/trade selections with bounded buffers and accessible equivalent table. | `AT-UI-EQUITY_CHART-002` | Keyboard and non-GPU paths expose the same selected values; unmount releases decoding workers and listeners. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-EQUITY_CHART-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-EQUITY_CHART-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-EQUITY_CHART-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-EQUITY_CHART-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-equity-chart): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/equity-chart/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/equity-chart/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-EQUITY_CHART/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-EQUITY_CHART`. Withdraw `ui.equity-chart@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-trade-analysis"></a>
+### 4.22 `trade-analysis/` — `FEAT-UI-TRADE_ANALYSIS`
+
+> **Feature ID:** `FEAT-UI-TRADE_ANALYSIS`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/trade-analysis/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Compare trade behavior across dimensions. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.trade-analysis@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/trade-analysis/contracts.ts`](src/widgets/trade-analysis/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-TRADE_ANALYSIS-001`, `NFR-TRC-UI-TRADE_ANALYSIS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-TRADE_ANALYSIS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-TRADE_ANALYSIS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-TRADE_ANALYSIS | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-TRADE_ANALYSIS-001` | Configure bounded analysis slots from compatible owner dimensions/metrics, showing selected sample/currency/calendar/time basis. | `AT-UI-TRADE_ANALYSIS-001` | Open/close-time changes request a new projection and do not move source trades; missing categories are explicit. |
+| PENDING | `FR-TRC-UI-TRADE_ANALYSIS-002` | Drill through a group to its exact trade population and compare period/distribution panels. | `AT-UI-TRADE_ANALYSIS-002` | A group selection resolves the same server snapshot; display sorting does not recompute the statistic. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-TRADE_ANALYSIS-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-TRADE_ANALYSIS-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-TRADE_ANALYSIS-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-TRADE_ANALYSIS-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trade-analysis): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/trade-analysis/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/trade-analysis/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-TRADE_ANALYSIS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-TRADE_ANALYSIS`. Withdraw `ui.trade-analysis@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-trades-on-chart"></a>
+### 4.23 `trades-on-chart/` — `FEAT-UI-TRADES_ON_CHART`
+
+> **Feature ID:** `FEAT-UI-TRADES_ON_CHART`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/trades-on-chart/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect fills against their actual market context. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.trades-on-chart@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trades-on-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/trades-on-chart/contracts.ts`](src/widgets/trades-on-chart/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-TRADES_ON_CHART-001`, `NFR-TRC-UI-TRADES_ON_CHART-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-TRADES_ON_CHART | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-TRADES_ON_CHART | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-TRADES_ON_CHART | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-TRADES_ON_CHART-001` | Resolve the exact run-bound market series and selected trade/position references before rendering overlays. | `AT-UI-TRADES_ON_CHART-001` | Missing data produces an authorized resolution action; a similarly named series is never substituted. |
+| PENDING | `FR-TRC-UI-TRADES_ON_CHART-002` | Display generated/recorded method evidence and supported overlays without browser execution reconstruction. | `AT-UI-TRADES_ON_CHART-002` | A generated path stays labelled modeled evidence; unretained excursions remain unavailable. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-TRADES_ON_CHART-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-TRADES_ON_CHART-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-TRADES_ON_CHART-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-TRADES_ON_CHART-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-trades-on-chart): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/trades-on-chart/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/trades-on-chart/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-TRADES_ON_CHART`. Withdraw `ui.trades-on-chart@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-robustness-results"></a>
+### 4.24 `robustness-results/` — `FEAT-UI-ROBUSTNESS_RESULTS`
+
+> **Feature ID:** `FEAT-UI-ROBUSTNESS_RESULTS`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/robustness-results/`
+> **First release milestone:** `U4`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect robustness and scenario evidence. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.robustness-results@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-robustness-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/robustness-results/contracts.ts`](src/widgets/robustness-results/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-ROBUSTNESS_RESULTS-001`, `NFR-TRC-UI-ROBUSTNESS_RESULTS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-ROBUSTNESS_RESULTS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-ROBUSTNESS_RESULTS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-ROBUSTNESS_RESULTS | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-ROBUSTNESS_RESULTS-001` | Render each stage’s method, evidence class, seed/count/sample, pass rule and partial/failure status. | `AT-UI-ROBUSTNESS_RESULTS-001` | A reshuffled ledger is labelled statistical and a cancelled stage cannot appear passed. |
+| PENDING | `FR-TRC-UI-ROBUSTNESS_RESULTS-002` | Show percentile direction, assumptions and compatible distribution/scenario drilldowns. | `AT-UI-ROBUSTNESS_RESULTS-002` | The UI never assumes a high percentile is conservative or invents a missing distribution. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-ROBUSTNESS_RESULTS-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-ROBUSTNESS_RESULTS-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-ROBUSTNESS_RESULTS-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-ROBUSTNESS_RESULTS-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-robustness-results): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/robustness-results/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/robustness-results/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-ROBUSTNESS_RESULTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-ROBUSTNESS_RESULTS`. Withdraw `ui.robustness-results@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-optimization-results"></a>
+### 4.25 `optimization-results/` — `FEAT-UI-OPTIMIZATION_RESULTS`
+
+> **Feature ID:** `FEAT-UI-OPTIMIZATION_RESULTS`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/optimization-results/`
+> **First release milestone:** `U6`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect parameter surfaces and walk-forward evidence. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.optimization-results@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-optimization-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/optimization-results/contracts.ts`](src/widgets/optimization-results/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-OPTIMIZATION_RESULTS-001`, `NFR-TRC-UI-OPTIMIZATION_RESULTS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-OPTIMIZATION_RESULTS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-OPTIMIZATION_RESULTS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-OPTIMIZATION_RESULTS | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-OPTIMIZATION_RESULTS-001` | Render typed parameter/fold/window coordinates, all failures/undefined values and exact-versus-sampled surface coverage. | `AT-UI-OPTIMIZATION_RESULTS-001` | An omitted cell is not zero; selecting a point retains exact parameter and result IDs. |
+| PENDING | `FR-TRC-UI-OPTIMIZATION_RESULTS-002` | Expose stability/plateau and OOS evidence as owner projections and route promotion to Strategy review. | `AT-UI-OPTIMIZATION_RESULTS-002` | A visible plateau is not a qualification decision; U10 3D is optional with equivalent 2D/table access. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-OPTIMIZATION_RESULTS-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-OPTIMIZATION_RESULTS-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-OPTIMIZATION_RESULTS-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-OPTIMIZATION_RESULTS-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-optimization-results): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/optimization-results/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/optimization-results/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-OPTIMIZATION_RESULTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-OPTIMIZATION_RESULTS`. Withdraw `ui.optimization-results@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-portfolio-composer"></a>
+### 4.26 `portfolio-composer/` — `FEAT-UI-PORTFOLIO_COMPOSER`
+
+> **Feature ID:** `FEAT-UI-PORTFOLIO_COMPOSER`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/portfolio-composer/`
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Compose and compare a portfolio. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.portfolio-composer@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-composer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/portfolio-composer/contracts.ts`](src/widgets/portfolio-composer/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-PORTFOLIO_COMPOSER-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-PORTFOLIO_COMPOSER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-PORTFOLIO_COMPOSER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-PORTFOLIO_COMPOSER | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-PORTFOLIO_COMPOSER-001` | Display exact constituent sources, compatibility issues and weight/capital policy, including solver infeasibility. | `AT-UI-PORTFOLIO_COMPOSER-001` | No silent weight normalization, constraint relaxation or hidden Buy & Hold series occurs. |
+| PENDING | `FR-TRC-UI-PORTFOLIO_COMPOSER-002` | Save definitions and request ledger aggregation or interacting tick simulation as separate owner actions. | `AT-UI-PORTFOLIO_COMPOSER-002` | Closing/reordering the widget does not change business results; accepted output includes real run receipts. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-PORTFOLIO_COMPOSER-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-PORTFOLIO_COMPOSER-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-PORTFOLIO_COMPOSER-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-PORTFOLIO_COMPOSER-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-composer): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/portfolio-composer/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/portfolio-composer/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-PORTFOLIO_COMPOSER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-PORTFOLIO_COMPOSER`. Withdraw `ui.portfolio-composer@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-portfolio-builder"></a>
+### 4.27 `portfolio-builder/` — `FEAT-UI-PORTFOLIO_BUILDER`
+
+> **Feature ID:** `FEAT-UI-PORTFOLIO_BUILDER`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/portfolio-builder/`
+> **First release milestone:** `U7`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Search a bounded portfolio universe. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.portfolio-builder@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/portfolio-builder/contracts.ts`](src/widgets/portfolio-builder/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-PORTFOLIO_BUILDER-001`, `NFR-TRC-UI-PORTFOLIO_BUILDER-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-PORTFOLIO_BUILDER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-PORTFOLIO_BUILDER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-PORTFOLIO_BUILDER | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-PORTFOLIO_BUILDER-001` | Preview the resolved population, combination estimate and finite work/retention constraints. | `AT-UI-PORTFOLIO_BUILDER-001` | The browser does not materialize a power set or calculate correlation. |
+| PENDING | `FR-TRC-UI-PORTFOLIO_BUILDER-002` | Observe candidate/attempt progress and preview atomic selected membership publication. | `AT-UI-PORTFOLIO_BUILDER-002` | Intermediate results are not confused with committed portfolios; every candidate retains constituent lineage. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-PORTFOLIO_BUILDER-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-PORTFOLIO_BUILDER-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-PORTFOLIO_BUILDER-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-PORTFOLIO_BUILDER-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-builder): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/portfolio-builder/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/portfolio-builder/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-PORTFOLIO_BUILDER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-PORTFOLIO_BUILDER`. Withdraw `ui.portfolio-builder@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-project-editor"></a>
+### 4.28 `project-editor/` — `FEAT-UI-PROJECT_EDITOR`
+
+> **Feature ID:** `FEAT-UI-PROJECT_EDITOR`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/project-editor/`
+> **First release milestone:** `U8`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Compose and control a research project. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.project-editor@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-project-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/project-editor/contracts.ts`](src/widgets/project-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-PROJECT_EDITOR-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-PROJECT_EDITOR | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-PROJECT_EDITOR | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-PROJECT_EDITOR | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-PROJECT_EDITOR-001` | Render graph and accessible ordered-list forms with owner diagnostics and separate layout coordinates. | `AT-UI-PROJECT_EDITOR-001` | Graph cycles/unbounded loops/incompatible inputs are owner errors; dragging a node cannot alter a running graph revision. |
+| PENDING | `FR-TRC-UI-PROJECT_EDITOR-002` | Preview reused inputs/skips/exact selected nodes and display condition/attempt/receiver/artifact lineage. | `AT-UI-PROJECT_EDITOR-002` | Retry/pause/stop follows owner state; UI never privately calls a sequence of domain commands. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-PROJECT_EDITOR-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-PROJECT_EDITOR-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-PROJECT_EDITOR-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-PROJECT_EDITOR-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-project-editor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/project-editor/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/project-editor/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-PROJECT_EDITOR/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-PROJECT_EDITOR`. Withdraw `ui.project-editor@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-code-editor"></a>
+### 4.29 `code-editor/` — `FEAT-UI-CODE_EDITOR`
+
+> **Feature ID:** `FEAT-UI-CODE_EDITOR`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/code-editor/`
+> **First release milestone:** `U9`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Edit scoped code and inspect build evidence. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.code-editor@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-code-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/code-editor/contracts.ts`](src/widgets/code-editor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-CODE_EDITOR-002`, `NFR-TRC-UI-CODE_EDITOR-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-CODE_EDITOR | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-CODE_EDITOR | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-CODE_EDITOR | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-CODE_EDITOR-001` | Edit only authorized package resource IDs and show dirty/protected/fork/three-way revision conflict states. | `AT-UI-CODE_EDITOR-001` | Builtin source is not overwritten; unsaved edits survive failed compile/save and conflicting revisions require review. |
+| PENDING | `FR-TRC-UI-CODE_EDITOR-002` | Submit bounded build/test requests and show exact file/range/code diagnostics with sanitized logs. | `AT-UI-CODE_EDITOR-002` | No generated/imported code executes in the browser/app process; compile success does not install or deploy it. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-CODE_EDITOR-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-CODE_EDITOR-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-CODE_EDITOR-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-CODE_EDITOR-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-code-editor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/code-editor/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/code-editor/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-CODE_EDITOR/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-CODE_EDITOR`. Withdraw `ui.code-editor@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-indicator-tester"></a>
+### 4.30 `indicator-tester/` — `FEAT-UI-INDICATOR_TESTER`
+
+> **Feature ID:** `FEAT-UI-INDICATOR_TESTER`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/indicator-tester/`
+> **First release milestone:** `U9`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Compare indicator providers and previews. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.indicator-tester@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-indicator-tester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/indicator-tester/contracts.ts`](src/widgets/indicator-tester/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-INDICATOR_TESTER-001`, `NFR-TRC-UI-INDICATOR_TESTER-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-INDICATOR_TESTER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-INDICATOR_TESTER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-INDICATOR_TESTER | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-INDICATOR_TESTER-001` | Configure explicit source data, provider/version/parameters, reference and numerical tolerance and show per-case results. | `AT-UI-INDICATOR_TESTER-001` | A missing file/provider or unsupported reference is unavailable; the UI does not compute the indicator itself. |
+| PENDING | `FR-TRC-UI-INDICATOR_TESTER-002` | Run tests/preview only in the declared isolated owner runtime and release it on cancellation/removal. | `AT-UI-INDICATOR_TESTER-002` | Expected/actual boundary and constant-series results remain visible; replay/live preview cannot inherit production credentials. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-INDICATOR_TESTER-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-INDICATOR_TESTER-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-INDICATOR_TESTER-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-INDICATOR_TESTER-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-indicator-tester): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/indicator-tester/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/indicator-tester/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-INDICATOR_TESTER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-INDICATOR_TESTER`. Withdraw `ui.indicator-tester@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-run-monitor"></a>
+### 4.31 `run-monitor/` — `FEAT-UI-RUN_MONITOR`
+
+> **Feature ID:** `FEAT-UI-RUN_MONITOR`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/run-monitor/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect and control jobs and workers. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.run-monitor@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-run-monitor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/run-monitor/contracts.ts`](src/widgets/run-monitor/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-RUN_MONITOR-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-RUN_MONITOR | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-RUN_MONITOR | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-RUN_MONITOR | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-RUN_MONITOR-001` | Render unknown totals distinctly, domain outcome separately from infrastructure status and desired control separately from acknowledgement. | `AT-UI-RUN_MONITOR-001` | A correctly produced refusal is not a successful research badge; waiting for a person holds no fabricated worker slot. |
+| PENDING | `FR-TRC-UI-RUN_MONITOR-002` | Issue only permission-gated supported controls and follow actual terminal/result receipts. | `AT-UI-RUN_MONITOR-002` | Unsupported pause and stale control revisions fail visibly; a late fenced result is not shown as accepted. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-RUN_MONITOR-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-RUN_MONITOR-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-RUN_MONITOR-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-RUN_MONITOR-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-run-monitor): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/run-monitor/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/run-monitor/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-RUN_MONITOR/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-RUN_MONITOR`. Withdraw `ui.run-monitor@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-debug-console"></a>
+### 4.32 `debug-console/` — `FEAT-UI-DEBUG_CONSOLE`
+
+> **Feature ID:** `FEAT-UI-DEBUG_CONSOLE`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/debug-console/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect bounded redacted diagnostic logs. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.debug-console@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-debug-console) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/debug-console/contracts.ts`](src/widgets/debug-console/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-DEBUG_CONSOLE-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-DEBUG_CONSOLE | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-DEBUG_CONSOLE | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-DEBUG_CONSOLE | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-DEBUG_CONSOLE-001` | Display paged/redacted structured logs with exact timestamps/identity and explicit truncated-window indicators. | `AT-UI-DEBUG_CONSOLE-001` | Clear display does not delete retained audit; attacker-controlled log text cannot execute markup. |
+| PENDING | `FR-TRC-UI-DEBUG_CONSOLE-002` | Show developer diagnostics only under the declared permission/enablement policy and dispose subscriptions on close. | `AT-UI-DEBUG_CONSOLE-002` | A disabled/unauthorized console receives no sensitive payload and leaves no observer behind. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-DEBUG_CONSOLE-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-DEBUG_CONSOLE-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-DEBUG_CONSOLE-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-DEBUG_CONSOLE-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-debug-console): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/debug-console/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/debug-console/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-DEBUG_CONSOLE/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-DEBUG_CONSOLE`. Withdraw `ui.debug-console@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-chat-bot"></a>
+### 4.33 `chat-bot/` — `FEAT-UI-CHAT_BOT`
+
+> **Feature ID:** `FEAT-UI-CHAT_BOT`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/chat-bot/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Ask context-aware questions and review specialist output. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.chat-bot@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.chat-context@1` — [`FEAT-UI-15`](#feat-ui-15)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-chat-bot) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/chat-bot/contracts.ts`](src/widgets/chat-bot/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-CHAT_BOT-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-CHAT_BOT | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-CHAT_BOT | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-CHAT_BOT | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-CHAT_BOT-001` | Capture fresh typed context for each turn and render all idle/submitting/validating/routing/queued/working/waiting/streaming/partial/completed/refused/unavailable/unauthorized/stale/cancelled/failed states. | `AT-UI-CHAT_BOT-001` | Removed widgets do not appear next turn; provisional deltas cannot trigger commands or become canonical artifacts. |
+| PENDING | `FR-TRC-UI-CHAT_BOT-002` | Render exact role/evidence/uncertainty/dissent and receipt-backed Draft ready/Draft saved/Backtest queued/completed states. | `AT-UI-CHAT_BOT-002` | A changed patch selection/base requires new review; saving and backtesting remain separate authorized actions. |
+| PENDING | `FR-TRC-UI-CHAT_BOT-003` | Use accessible keyboard composer and restrained live announcements, sanitize Markdown/links and resume streams or fetch snapshots. | `AT-UI-CHAT_BOT-003` | Screen readers are not flooded per token; evidence links reauthorize on open; closing the widget only closes its observers. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-CHAT_BOT-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-CHAT_BOT-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-CHAT_BOT-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-CHAT_BOT-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-chat-bot): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/chat-bot/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/chat-bot/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-CHAT_BOT/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-CHAT_BOT`. Withdraw `ui.chat-bot@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-agentic-run-inspector"></a>
+### 4.34 `agentic-run-inspector/` — `FEAT-UI-AGENTIC_RUN_INSPECTOR`
+
+> **Feature ID:** `FEAT-UI-AGENTIC_RUN_INSPECTOR`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/agentic-run-inspector/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect Agentic evidence and governed work. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.agentic-run-inspector@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-agentic-run-inspector) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/agentic-run-inspector/contracts.ts`](src/widgets/agentic-run-inspector/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-AGENTIC_RUN_INSPECTOR-002`, `NFR-TRC-UI-AGENTIC_RUN_INSPECTOR-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-AGENTIC_RUN_INSPECTOR | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-AGENTIC_RUN_INSPECTOR | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-AGENTIC_RUN_INSPECTOR | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-AGENTIC_RUN_INSPECTOR-001` | Render canonical graph/status/history and separate semantic outcome/job infrastructure with exact evidence references. | `AT-UI-AGENTIC_RUN_INSPECTOR-001` | A transcript or model confidence never replaces claim/evidence truth; status changes preserve immutable content identity. |
+| PENDING | `FR-TRC-UI-AGENTIC_RUN_INSPECTOR-002` | Expose permitted inspect/cancel/human-action/evidence-export controls bound to exact owner actions. | `AT-UI-AGENTIC_RUN_INSPECTOR-002` | Hidden chain-of-thought and secrets are not displayed; replay validation never replays receiver side effects. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-AGENTIC_RUN_INSPECTOR-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-AGENTIC_RUN_INSPECTOR-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-AGENTIC_RUN_INSPECTOR-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-AGENTIC_RUN_INSPECTOR-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-agentic-run-inspector): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/agentic-run-inspector/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/agentic-run-inspector/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-AGENTIC_RUN_INSPECTOR/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-AGENTIC_RUN_INSPECTOR`. Withdraw `ui.agentic-run-inspector@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-neural-research"></a>
+### 4.35 `neural-research/` — `FEAT-UI-NEURAL_RESEARCH`
+
+> **Feature ID:** `FEAT-UI-NEURAL_RESEARCH`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/neural-research/`
+> **First release milestone:** `U11`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Design, train and validate neural research. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.neural-research@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-neural-research) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/neural-research/contracts.ts`](src/widgets/neural-research/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-NEURAL_RESEARCH-001`, `FR-TRC-UI-NEURAL_RESEARCH-002`, `NFR-TRC-UI-NEURAL_RESEARCH-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-NEURAL_RESEARCH | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-NEURAL_RESEARCH | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-NEURAL_RESEARCH | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-NEURAL_RESEARCH-001` | Render explicit fit windows, label ambiguity/missing counts, model shapes/causality, budgets and provider support. | `AT-UI-NEURAL_RESEARCH-001` | A preprocessing fit cannot use final OOS; unsupported class/metric/model/target states remain unavailable. |
+| PENDING | `FR-TRC-UI-NEURAL_RESEARCH-002` | Display prediction metrics separately from net strategy performance and show repeatability/limitations/model-card provenance. | `AT-UI-NEURAL_RESEARCH-002` | Training success cannot become strategy qualification; browser graphics do not run authoritative training or inference. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-NEURAL_RESEARCH-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-NEURAL_RESEARCH-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-NEURAL_RESEARCH-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-NEURAL_RESEARCH-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-neural-research): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/neural-research/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/neural-research/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-NEURAL_RESEARCH/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-NEURAL_RESEARCH`. Withdraw `ui.neural-research@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-strategy-packager"></a>
+### 4.36 `strategy-packager/` — `FEAT-UI-STRATEGY_PACKAGER`
+
+> **Feature ID:** `FEAT-UI-STRATEGY_PACKAGER`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/strategy-packager/`
+> **First release milestone:** `U13`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Review and build strategy distribution packages. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.strategy-packager@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-packager) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/strategy-packager/contracts.ts`](src/widgets/strategy-packager/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-STRATEGY_PACKAGER-001`, `FR-TRC-UI-STRATEGY_PACKAGER-002`, `NFR-TRC-UI-STRATEGY_PACKAGER-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-STRATEGY_PACKAGER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-STRATEGY_PACKAGER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-STRATEGY_PACKAGER | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-STRATEGY_PACKAGER-001` | Render target-supported package/restriction schemas and compatibility diagnostics before build. | `AT-UI-STRATEGY_PACKAGER-001` | Hidden parameters are not described as secrecy; unsupported restriction combinations remain unavailable. |
+| PENDING | `FR-TRC-UI-STRATEGY_PACKAGER-002` | Observe bounded isolated build and receipt-backed output/signature verification. | `AT-UI-STRATEGY_PACKAGER-002` | No secret enters UI/logs and no package action installs or activates a live strategy. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-STRATEGY_PACKAGER-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-STRATEGY_PACKAGER-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-STRATEGY_PACKAGER-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-STRATEGY_PACKAGER-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-strategy-packager): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/strategy-packager/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/strategy-packager/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-STRATEGY_PACKAGER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-STRATEGY_PACKAGER`. Withdraw `ui.strategy-packager@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-advanced-analysis"></a>
+### 4.37 `advanced-analysis/` — `FEAT-UI-ADVANCED_ANALYSIS`
+
+> **Feature ID:** `FEAT-UI-ADVANCED_ANALYSIS`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/advanced-analysis/`
+> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Explore advanced statistical and profile visualizations. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.advanced-analysis@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-advanced-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/advanced-analysis/contracts.ts`](src/widgets/advanced-analysis/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-ADVANCED_ANALYSIS-002`, `NFR-TRC-UI-ADVANCED_ANALYSIS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-ADVANCED_ANALYSIS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-ADVANCED_ANALYSIS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-ADVANCED_ANALYSIS | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-ADVANCED_ANALYSIS-001` | Render only owner-projected statistical/3D/profile data with exact/aggregated/sampled/partial labels and units. | `AT-UI-ADVANCED_ANALYSIS-001` | GPU-off and unsupported WebGL paths expose complete 2D/table values; the visual engine computes no trading metric. |
+| PENDING | `FR-TRC-UI-ADVANCED_ANALYSIS-002` | Bound GPU buffers, decoding and panel memory and release all resources when closed. | `AT-UI-ADVANCED_ANALYSIS-002` | Large surfaces use admitted/tiled/LOD data; repeated mount/unmount returns buffers/listeners/workers to baseline. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-ADVANCED_ANALYSIS-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-ADVANCED_ANALYSIS-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-ADVANCED_ANALYSIS-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-ADVANCED_ANALYSIS-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-advanced-analysis): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/advanced-analysis/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/advanced-analysis/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-ADVANCED_ANALYSIS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-ADVANCED_ANALYSIS`. Withdraw `ui.advanced-analysis@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+<a id="feat-ui-performance-lab"></a>
+### 4.38 `performance-lab/` — `FEAT-UI-PERFORMANCE_LAB`
+
+> **Feature ID:** `FEAT-UI-PERFORMANCE_LAB`
+> **Domain:** `ui`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/ui/src/widgets/performance-lab/`
+> **First release milestone:** `U10`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Inspect reproducible performance and lifecycle evidence. Present and interact with authoritative owner results; no numerical or economic policy is reimplemented in the browser.
+
+#### Capability Declarations
+
+**Provides:** `ui.performance-lab@1`.
+
+**Required capabilities:**
+
+`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-performance-lab) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/ui/src/widgets/performance-lab/contracts.ts`](src/widgets/performance-lab/contracts.ts). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted contribution configuration in strict config / manifest.ts / workflow README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `NFR-TRC-UI-PERFORMANCE_LAB-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Contribution and view registration | FEAT-UI-PERFORMANCE_LAB | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-PERFORMANCE_LAB | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-PERFORMANCE_LAB | Release buffers/observers; remove stale context contributions; restore valid focus. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Presentation-only state.
+
+**Records:** Scoped component/request state; explicitly safe layout preferences may be persisted by the existing UI owner.
+
+**Retention and deletion:** No business database or authority. Clear scoped selections and observations on account change/removal.
+
+**Namespace / schema / driver binding:** No backend StateDeclaration is created for a widget. Preserve existing layout schema/version bindings. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
+| manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
+| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| index.ts | Public contribution exports | Do not expose private backend objects. |
+| Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
+| contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-UI-PERFORMANCE_LAB-001` | Run the developer-only deterministic grid operation stream with insert 20 ms/remove 30 ms/update 40 ms and at most ten visual batches per second. | `AT-UI-PERFORMANCE_LAB-001` | Simulated-clock replay gives identical selection/operation order; stop/unmount leaves no timer/listener/worker/request. |
+| PENDING | `FR-TRC-UI-PERFORMANCE_LAB-002` | Inspect matched benchmark reports with source/emitted/consumed ticks, tick-strategy evaluations, outputs, cache/cold/warm and stage time/memory/copy/I/O distinctions. | `AT-UI-PERFORMANCE_LAB-002` | A target without a measurement or a mismatched fixture cannot be marked passed; throughput excludes exact result-cache hits. |
+
+**Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-UI-PERFORMANCE_LAB-001` | Support keyboard/focus/labelled error/empty/partial/stale/unavailable/denied states and scoped removal without cancelling unrelated accepted work. | `ATN-UI-PERFORMANCE_LAB-001` | Component/Playwright accessibility and lifecycle fixtures exercise provider absence, reconnect, cancellation, navigation and physical widget deletion. |
+| PENDING | `NFR-TRC-UI-PERFORMANCE_LAB-002` | Keep view state, event queues and render buffers bounded and label exact versus sampled/derived content. | `ATN-UI-PERFORMANCE_LAB-002` | Large-data/mixed-load fixtures use only viewport/projection windows, preserve §18.3 targets and release observers/workers/buffers on unmount. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-ui-performance-lab): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/ui/widgets/performance-lab/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/ui/widgets/performance-lab/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-PERFORMANCE_LAB/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-UI-PERFORMANCE_LAB`. Withdraw `ui.performance-lab@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+
+---
+
+## 5. Package-Wide Requirements, Configuration, and Architecture Invariants
+
+| ID | Category | Rule / architectural constraint | Verification |
+| --- | --- | --- | --- |
+| ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
+| ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
+| ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
+
+| Policy | Binding requirement | Verification |
+| --- | --- | --- |
+| Focused responsibility | Each file has one focused responsibility; feature identity is not split by algorithm variant, workflow, role or test. | Review and module/ownership checks. |
+| Type safety | Follow the template’s Python 3.14 strict-typing target and reconcile the actual repository/lockfile runtime in Phase 0; no type-ignore bypasses. UI follows the existing strict TypeScript build. | mypy / TypeScript checks against the ratified environment. |
+| Coverage | At least 80% line and branch coverage, retaining any stronger applicable repository or owner floor. | Actual coverage reports at the approved quality boundary. |
+| Configuration parity | Exact accepted keys agree between strict config, manifest and feature-local README; request/profile controls do not become implicit feature settings. | Positive/negative parsing and parity fixtures. |
+| Numerical / resource truth | Use the domain-specific §9 rules, exact source algorithms, finite admission and explicit measurement fixtures. Targets are not measurements. | Golden, causal, overflow, bounded-memory and native/reference evidence where applicable. |
+| Scope and authority | Identity, environment, account, dataset, approval and receiver boundaries are rechecked by their actual owners. | Wrong-scope, stale, refusal, idempotency and removal tests. |
+| Shared NFR applicability | Apply only the exact shared-NFR bindings of each source feature card; all applicable requirements remain mandatory. | Expanded per-feature acceptance mapping, not a blanket global pass. |
 
 ## 6. Open Decisions
 
-Widget ownership is resolved in the Feature Registry and module sections. The
-following owner choices remain unresolved.
+The following are explicit documentary/implementation-entry gaps, not deferred permission to invent a design. Resolve the affected binding before production use. This documentation delivery does not close Preparation 0.03 or certify Phase 1 entry.
 
-| Decision                                     | Detail                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| No owning backend domain for two surfaces    | Learning content (`FEAT-UI-11`) and multi-participant challenges (`FEAT-UI-12`) have no owning service domain. `docs/PROJECT.md` retired documentation file I/O on the same ground. Each stays blocked until an owner is named or the scope is recorded as withdrawn.                                                                                                                                                                                                                                  |
-| Fixture data reaches production modules      | `src/mock/` is imported by the retired `OptionsGridWidget.tsx`, `EducationWidget.tsx`, and `store/useTradingStore.ts` (`MarketsWidget.tsx` no longer imports it as of `FEAT-UI-02`). Those legacy/registered surfaces can display values with no API origin, against `NFR-UI-007` and `AGENTS.md` §3 "No Invented Data". The retired options implementation requires separately approved cleanup, and affected registered features cannot become `Completed` while they consume fixtures. |
-| Remaining overlapping presentation paradigms | The owner resolved Trading action ownership by consolidating the former order-ticket/options targets and`TradingWidget` into primary `FEAT-UI-06`. Other primary widgets and layered cockpit features (`FEAT-UI-18`–`FEAT-UI-24`) still overlap in market-state presentation; whether those remaining surfaces converge or stay distinct is undecided.                                                                                                                                              |
-| Five registered folders do not yet exist     | `FEAT-UI-08`–`FEAT-UI-12` register target paths whose code still resides in previous locations. Until the moves land, those features do not satisfy the one-feature-one-folder structure rule. `FEAT-UI-01`–`FEAT-UI-06` and `FEAT-UI-13` completed their moves and are no longer in this set.                                                                                                                                                             |
-
----
+| State | Decision / evidence label | Required resolution | Constraints | Impact |
+| --- | --- | --- | --- | --- |
+| OPEN | SOURCE-RECONCILIATION | Reconcile clause-level differences among the register’s source specification, the plan’s inspected specification and the current fetched specification. | Retain the supplied 205-feature identity set unless explicitly changed; differing hashes are not a semantic diff. | All source-dependent behavior. |
+| OPEN | EVD-CONTRACT-01 | Bind exact current protocol/DTO symbols, callable signatures, error branches, accepted config keys/defaults and literal state namespace/schema/driver. | Reuse compatible existing public contracts; no duplicate owner or invented field. Source-selected capability keys and target modules are retained here. | Each affected feature before its production consumer. |
+| OPEN | CURRENT-OWNER-BINDING | Reconcile selected target paths, compatible existing aliases, unrelated domain scope and actual implementation progress. | No automatic rename, overwrite of unrelated README entries or assumption that a missing target folder means missing behavior. | All target owners; especially legacy semantic folders and permanent UI IDs. |
+| OPEN | FIXTURE-AND-USAGE-BINDING | Pin concrete deterministic request/response fixtures, intended test symbols and runnable `_usage.py` or UI examples. | Use every existing acceptance oracle; a planned command or path is not a passing example. | Every feature acceptance bundle. |
+| OPEN | OPERATION-QUALIFICATION | Expand applicable shared-NFR/catalogue/source/operation tables into the actual per-feature evidence manifest and qualify real providers. | Complete registered adapter behavior once; an absent later provider gates only affected operations. Contract stubs are not real-provider evidence. | Applicable later-operation and release claims. |
+| CLOSED — documentary scope | IDENTITY-AND-BOUNDARY | Use the register feature/FR/local-NFR identities and exact primary-capability / required-provider bindings. | No additional feature for roles, algorithms, workflows, tests, performance or later UI integration. | The selected features in §2. |
 
 ## 7. Tests and Definition of Done
 
-### Test and usage locations
+### Test Suite Structure
 
-```text
-app/ui/src/**/*.test.ts(x)             # Unit, component, NFR, and contract evidence
-tests/ui/structural/                    # Repository ownership/registry evidence
-```
-
-There is intentionally no `tests/ui/usage/` directory under the approved UI evidence
-exception.
+Focused feature tests live at the intended owners named in §4. Add config, manifest, lifecycle, failure, boundary, numerical and replay coverage where applicable. Cross-feature contract, composition, Interfaces, browser, accessibility, physical-removal and leak evidence remains independent of feature unit tests. Do not mislabel an offline fixture as production integration.
 
 ### Commands
 
+The following are target verification recipes. Bind actual paths and runner scripts before use; none is reported as executed by this documentation delivery.
+
 ```powershell
 Set-Location app/ui
-npm test -- --run
+npm run test -- <selected-test-path>
 npm run typecheck
 npm run build
-
-Set-Location ../..
-uv run pytest -o addopts='' tests/ui/structural/test_feature_registry.py -q
-uv run ruff check tests/ui/structural/test_feature_registry.py
-uv run ruff format --check tests/ui/structural/test_feature_registry.py
+npm run e2e -- <selected-browser-test-path>
 ```
 
-### Required test levels
+Use the existing UI removal and leak harness, not the Python entry-point remover. Reconcile the package manager and scripts against the existing lockfile/package.json; do not introduce a replacement runner.
 
-- **Unit/component:** Verify each completed `FR-UI-*` behavior and failure state.
-- **Contract:** Verify typed API operation parity in both directions.
-- **Integration/browser:** Required where route, session, stream, or governed-action
-  collaboration cannot be established adequately by a focused component test.
-- **Usage:** Exempt for UI only; production rendering is not evidence.
+### Acceptance evidence model
 
-### Package completion checklist
+For each feature, retain `docs/dev/SQX/evidence/features/<FEAT-ID>/acceptance.json` with source/README hashes, actual tested tree/commit, paths and symbols, FR/local/shared-NFR/catalogue/source/acceptance mappings, fixture hashes, environment, exact commands and exit codes, reports, usage transcript or browser trace, operation-qualification state, lifecycle/removal results and independent review. No credentials or private raw data enter this evidence. The final accepted commit is recorded after creation to avoid a self-referential hash.
 
-- [ ] The final package tree matches Section 2. `FEAT-UI-08`–`FEAT-UI-12` still reside in their previous locations.
-- [X] Completed module sections are arranged in dependency order.
-- [ ] Every registered feature owns one focused folder. Pending the `FEAT-UI-08`–`FEAT-UI-12` moves.
-- [X] Every completed functional requirement has focused automated evidence.
-- [ ] Every registered functional requirement has focused automated evidence. 54 requirements remain `Pending`.
-- [ ] No production module imports fixture data (`NFR-UI-007`).
-- [X] Typed API clients have route-contract parity evidence.
-- [X] UI owns no durable state, business calculation, authorization, or broker connection.
-- [X] No UI usage program is required under the documented exception.
-- [X] Widget-classification decisions are resolved in the owning feature descriptions.
-- [X] Tests, typecheck, production build, structural reconciliation, and secret scan pass.
+| Stage | Current README evidence state | What closes it |
+| --- | --- | --- |
+| Contract | NOT_REVALIDATED | Exact compatible schema, operation, config and error bindings plus contract tests. |
+| Provider | NOT_REVALIDATED | Actual implementation satisfies every owned FR/local NFR and applicable numerical/resource rule. |
+| Composition | NOT_REVALIDATED | Real registration, dependency closure, mount rollback and physical removal. |
+| Interfaces | NOT_REVALIDATED | Typed authenticated owner routing and parity; justify genuine nonapplicability. |
+| UI | NOT_REVALIDATED | Reachable truthful interaction, accessibility, cleanup and owner outcome. |
+| End-to-end | NOT_REVALIDATED | Real-provider workflow with canonical receipts and complete acceptance oracles. |
 
----
+### Feature Definition of Done Checklist
+
+- [ ] 1. Stable feature ID: retain the registered identity, including permanent numeric UI IDs.
+- [ ] 2. Single domain ownership: each feature has exactly one semantic owner and one implementation task.
+- [ ] 3. Cohesive capability: implement the complete registered behavior, not merely an adapter-shaped stub.
+- [ ] 4. External contracts: reuse compatible public contracts outside removable implementation packages; UI contribution contracts consume the generated wire boundary.
+- [ ] 5. Declared dependencies: manifest provides/requires/optional keys agree with the resolved public contracts and operation gates.
+- [ ] 6. Zero private feature imports: use public contracts and context-resolved capabilities only.
+- [ ] 7. Zero import-time I/O or registration: initialization remains pure.
+- [ ] 8. Scoped runtime effects: bindings, tasks, listeners, requests, workers and buffers have exact owners and disposers.
+- [ ] 9. Mount rollback: injected mount failure releases every partial contribution.
+- [ ] 10. Idempotent teardown: repeated scope closure is safe and leaves no orphan runtime effect.
+- [ ] 11. Required-dependency loss: absent/removed required providers block only dependent behavior and yield the declared failure state.
+- [ ] 12. Optional-dependency loss: affected operations fail explicitly; no substitute provider, fabricated data or silently reduced semantics.
+- [ ] 13. Persistent state: literal namespace/schema/driver/retention/purge and migrations are bound where state is owned; otherwise explicitly none.
+- [ ] 14. Irreversible-action safety: exact scope, idempotency, receiver reconciliation and retained audit are tested.
+- [ ] 15. Starts feature-absent: deleting the feature physically does not break unrelated startup and capabilities.
+- [ ] 16. Interfaces/UI degradation: typed unavailable/denied/partial states remain usable and truthful.
+- [ ] 17. README parity: feature-local documentation, this domain entry, manifests, configuration and contracts agree.
+- [ ] 18. Module usage: focused capability modules document public Python/API or interactive UI use and failure cases.
+- [ ] 19. Usage evidence: every backend feature has one required `_usage.py` with bounded offline `__main__` scenarios; UI has real interaction evidence instead.
+- [ ] 20. Quality and acceptance: mapped FR/local/shared NFR, catalogue, source, workflow, removal and actual-provider evidence passes all applicable gates; no target is reported as a measurement.
+
+The ordinary ≥80% coverage floor is not proof of semantic completeness. Repeated enable/disable, failed mount, dependency loss/replacement and physical removal must demonstrate exact cleanup; use 100-cycle tests where specified. Stronger owner-specific limits and evaluation thresholds take precedence. Missing mandatory evidence prevents acceptance; a future optional provider must remain explicitly OPERATION_NOT_QUALIFIED.
 
 ## 8. Change Process
 
-For every future UI change:
+Update this domain card first, then reconcile the contract and source scope. A breaking public change bumps the capability major rather than shadowing an existing contract. Keep manifest declarations, strict configuration, feature-local README and state migrations aligned. Implement only the selected feature’s cohesive behavior, update its required `_usage.py` scenarios or UI workflow, and add the exact acceptance and failure assertions. Verify dependency/removal behavior and actual provider integration, then run the approved quality gates and independent review.
 
-```text
-1. Update this README first.
-2. Resolve or record any owner decision that would otherwise require guessing.
-3. Add or change the workflow and FR-UI requirement.
-4. Update the focused module, file responsibilities, exports, and dependencies.
-5. Implement the smallest presentation or interaction change.
-6. Add focused unit/component evidence and contract/integration/browser evidence as needed.
-7. Run UI tests, typecheck, build, structural checks, and secret scan.
-8. Mark a feature Completed only after structure and evidence both pass.
-```
+Maintain one feature task and its accepted implementation commit in the existing Planner → Executor → Reviewer workflow. A verified existing feature keeps its slot and evidence; do not force a rewrite or empty commit. The phase’s last feature owns its cross-feature checkpoint, not a new feature. Later providers add real integration evidence to the already complete consumer adapter; they do not authorize unnoticed extra implementation scope. Record progress in the tracker and receipts, never by declaring all targets Implemented in this README. Preserve unrelated current domain entries when merging this selected scope.
 
-UI changes never authorize direct provider access, MT5 connections, service-domain
-calculations, or unverified success presentation.
+## 9. Normative Domain Specification
+
+The following domain-specific rules explain the source requirements and ownership boundaries. Stable labels here are navigation labels, **not newly counted FR/NFR or feature IDs**. The feature FR/local-NFR tables and exact linked source semantics remain binding; these explanations never replace an algorithm definition, contract schema, catalogue entry or release qualification gate.
+
+<a id="ui-identity-paths"></a>
+### 9.1 UI-IDENTITY-PATHS
+
+Preserve permanent numeric feature IDs and the selected register paths. FEAT-UI-01 owns widgets/workspaces; FEAT-UI-14 owns clients; FEAT-UI-15 owns context; FEAT-UI-16 and FEAT-UI-18 retain components/layout and components/workflow; FEAT-UI-17 retains app. These are documented legacy bindings, not permission to add a second registry or duplicate features.
+
+<a id="ui-contracts"></a>
+### 9.2 UI-CONTRACTS
+
+Backend public UI/wire contracts remain outside widgets under app/contracts/ui/ and the relevant owner contracts; generated TypeScript is not hand-edited. The register’s feature-local contracts.ts targets describe typed UI contribution/view boundaries. They must consume generated owner DTOs, not redefine backend business schemas.
+
+<a id="ui-composition"></a>
+### 9.3 UI-COMPOSITION
+
+One lazy widget registry supplies host, navigation, templates and type validation. Typed manifests declare owner ID, version, capability needs, placement, commands, config migration, subscriptions and disposer. A feature may contribute multiple widgets, but each widget has exactly one owner.
+
+<a id="ui-state-lifecycle"></a>
+### 9.4 UI-STATE-LIFECYCLE
+
+Restore valid siblings even when one saved widget is missing or invalid. Unmount releases timers, listeners, observers, workers, streams, pending requests and GPU resources. Keep closing an observer separate from an explicit authorized cancel command for accepted work.
+
+<a id="ui-bounds"></a>
+### 9.5 UI-BOUNDS
+
+Use server queries and viewport virtualization; large collection data never becomes a full browser array. Preserve the selected page-size and stream/batch limits. UI latency/FPS targets require matched real measurements, not screenshots. Sampled or level-of-detail visuals remain labelled and do not replace exact metrics.
+
+<a id="ui-accessibility"></a>
+### 9.6 UI-ACCESSIBILITY
+
+Every affected view provides keyboard navigation, focus recovery, labels and distinct empty/loading/partial/stale/unavailable/denied/error states. GPU-off and unsupported-WebGL paths retain complete accessible 2D/table meaning. Screen readers are not flooded with per-token chat announcements.
+
+<a id="ui-review"></a>
+### 9.7 UI-REVIEW
+
+Draft forms preserve unsaved work across failed validation/builds. Destructive actions show exact scoped impact, protected references and revision conflicts. Base/patch-selection changes invalidate review. Owner receipts alone distinguish saved, queued, completed, qualified and refused states.
+
+<a id="ui-chat"></a>
+### 9.8 UI-CHAT
+
+The operator-visible name is Chat Bot. Capture fresh typed contributions each turn, not DOM scraping or retained private component state. Show specialist attribution, evidence, uncertainty, dissent and provisional streaming states; neither a delta nor a model sentence can issue a command.
+
+<a id="ui-developer-tools"></a>
+### 9.9 UI-DEVELOPER-TOOLS
+
+Code editing uses authorized package resource IDs and isolated owner build/test actions, never browser or app-process execution of generated code. The developer-only Performance Lab preserves the deterministic 20 ms insert / 30 ms remove / 40 ms update stream and at most ten visual batches per second; stop/unmount leaves no effect.
+
+<a id="ui-preservation"></a>
+### 9.10 UI-PRESERVATION
+
+Only the selected Data/QDM behavior of FEAT-UI-18 is normalized here; its unrelated existing workflow-view behavior is not deleted or renumbered. Retain the existing Next/React/Dockview workstation and compatible donor UI; do not create a replacement SPA merely to align a folder spelling.
+
+### Normative source and acceptance binding
+
+Each §4 source-card link incorporates only that feature’s shared NFR applicability, operation-gated dependencies, detailed catalogue entries, original source-ID relationships and source clauses. Open the linked entry, not a similarly named legacy feature. The register-wide inventories contain 66 shared NFRs, 646 catalogue entries, 389 original requirement-ID mappings and 233 operation-time dependency edges. Those inventories are **retained by scoped reference**, not reproduced or independently expanded in this delivery. The actual acceptance manifest must enumerate their applicable members before scope can be signed off.
+
+### Source fingerprint record
+
+| Source | Git blob identity | Role |
+| --- | --- | --- |
+| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/templates/README.md`](../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
+
+The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
+
+### Delivery evidence boundary
+
+This is a documentation projection and proposed domain-registry update. Generated-document checks may establish identity/count/graph/anchor consistency; they do not establish current code parity, external-provider licensing/support, native throughput, model eligibility, browser behavior, successful live connectivity or Phase 0 completion. No application suite or live operation was executed as part of authoring this README.

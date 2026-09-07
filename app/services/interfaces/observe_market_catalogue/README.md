@@ -72,7 +72,7 @@ domain.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.interfaces.observe_market_catalogue.gateway
+uv run python -m app.services.interfaces.observe_market_catalogue._usage
 ```
 
 ## Failure Behavior

@@ -81,7 +81,7 @@ retention and replay truth remain owned by the Data provider.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.interfaces.observe_market_data.gateway
+uv run python -m app.services.interfaces.observe_market_data._usage
 ```
 
 ## Failure Behavior

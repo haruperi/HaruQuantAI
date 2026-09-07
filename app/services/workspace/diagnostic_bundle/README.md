@@ -37,7 +37,7 @@ Produce a redacted diagnostic bundle.
 Run the executable usage demonstration:
 
 ```bash
-uv run python -m app.services.workspace.diagnostic_bundle.diagnostic_bundle
+uv run python -m app.services.workspace.diagnostic_bundle._usage
 ```
 
 ## Runtime Effects

@@ -1,876 +1,1119 @@
 # Catalogue
 
 > **Package:** `app/services/catalogue/`
-> **Status:** `Partial — identity, provider mapping, and sessions complete`
-> **Last updated:** `2026-09-01`
+> **Status:** `Partial` — documentary target; runtime acceptance is **NOT_REVALIDATED**.
+> **Last updated:** `2026-09-06`
 > **Domain ID:** `D-CAT`
 
-> This README is the domain package's **single source of truth** for domain boundaries, composable feature capabilities, architecture invariants, implementation sequence, progress, usage examples, and tests.
-> Update this document before modifying or adding code.
+> This README is the domain target registry for boundaries, composable feature capabilities, requirements, ownership, workflows, acceptance, and removal. Update it before changing the affected implementation. It does not certify that a target package, contract, test, usage demonstration or provider is already implemented.
+
+**Selected scope:** 7 features · 14 owned functional requirements · 7 feature-local non-functional requirements. All original feature and requirement IDs are retained. These selected workbench obligations do **not** delete unrelated existing domain behavior. This document must be merged with current evidence and any out-of-scope entries before replacing an existing domain registry.
+
+**Sources:** [Unified Specification](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) · [Feature–Requirement Traceability Register](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) · [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) · [README template](../../../docs/templates/README.md). Source fingerprints and unresolved bindings are recorded in §6 and §9. The feature cards below reproduce owned requirements and acceptance oracles; their scoped shared-NFR, catalogue, original-ID and operation-gate tables remain binding through the linked source card.
 
 ---
 
 ## Code-Aligned Implementation Convention
 
-This README is the sole current target registry for this domain's feature IDs and statuses, functional requirements, domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence, and deletion behavior. `PROJECT.md` owns system scope, cross-domain behavior, system NFRs, and release gates; `ARCHITECTURE.md` owns universal package and runtime constraints. Feature-local READMEs, manifests, contract definitions, migrations, and tests provide current implementation evidence without silently changing this target registry.
+This domain README defines target behavior; `PROJECT.md` retains system scope, cross-domain policy, system NFRs and release gates, and `ARCHITECTURE.md` retains universal package/runtime constraints. Feature-local READMEs, manifests, contracts, migrations and evidence mirror rather than silently redefine this target. For focused work, load §1, the affected §4 card, applicable §5 and §9 rules, and §7. Follow the [Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md).
 
-Implementation uses the repository's existing feature substrate: each feature lives directly at `app/services/<domain>/<feature>/`, is discovered through the `haruquantai.features` Python entry-point group, and declares one immutable `FeatureSpec` in `manifest.py`. There are no domain or feature YAML manifests.
+Implement one feature directly in its selected owner folder and discover it through the `haruquantai.features` Python entry-point group. Declare one immutable `SPEC = FeatureSpec(...)` in `manifest.py`; do not introduce a domain registry or YAML manifest. The feature contains pure `__init__.py`, a runtime-validated `README.md`, strict `config.py` with `.from_dict()`, lifecycle `feature.py`, focused logic modules and required `_usage.py`. Add `_persistence.py` only when the feature performs database operations. Effects and dependencies flow through `FeatureContext` and `FeatureScope`; durable state is declared by `FeatureSpec.state`. Existing compatible public contracts and owners are reused, not copied into a parallel implementation.
 
-Every implemented feature also contains a mandatory runtime-validated `README.md`, pure `__init__.py`, strict `config.py`, lifecycle `feature.py`, and focused implementation modules. Dependencies and effects flow through `FeatureContext`/`FeatureScope`; cross-feature implementation imports are forbidden. Persistent state is declared by `FeatureSpec.state`; any migrations and storage adapters remain with the owning feature. Capability keys use `<domain>.<name>@<major>`. FR IDs remain product, acceptance, and test-trace identities rather than one runtime registration per FR. A requirement `Depends` cell expresses product sequencing, traceability, or acceptance evidence only; runtime dependencies are declared separately with exact keys in `FeatureSpec.requires` or `FeatureSpec.optional`.
+Each core logic module documents its public API. Every service feature has one required `_usage.py` containing its bounded offline `if __name__ == "__main__":` scenarios; production logic modules do not contain demonstrations. Optional `_persistence.py` owns all feature-local database operations when durable state is required. The paths below are documentary targets pending current-code reconciliation, not claims of executable files. Tests verify the scenarios independently.
 
-Feature-level automated tests live at `tests/services/catalogue/<feature>/`. Usage examples never live under `tests/`; they belong to each feature's designated primary domain-logic module. Broader automated verification retains its documented architecture, composition, API, integration, or system test location. The code-backed procedure is the [Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md).
+FR and acceptance IDs are trace identities, not runtime registrations. Required-provider keys below reproduce the register’s required graph. Optional providers are operation-gated: they must be declared and tested without making an absent future extension a universal startup dependency. The plan’s P1–P16 execution phases are distinct from specification U0–U13 release milestones; a U label is not proof of readiness or a new feature task.
 
 ## 1. Purpose and Boundary
 
 ### Purpose
 
-The Catalogue domain delivers instruments, broker mappings, sessions, calendars, universes, trading constraints, costs, and currency topology. Its public feature capabilities are registered and remain independent of package-import order. Removing the domain produces the degradation defined below rather than preventing the shared substrate or unrelated domains from starting.
-
-Task 1.02 makes the three completed features the authoritative destination for
-the former Broker instrument-profile and symbol-map behavior. They are registered
-as `catalogue.catalog-instruments@1`, `catalogue.map-providers@1`, and
-`catalogue.define-sessions@1`. Provider mappings preserve the exact configured
-`provider_symbol`; Data resolves that value before a Broker call and Brokers
-receives it unchanged.
+Give all data, strategy and execution consumers the same versioned definition of instruments, venue constraints, sessions and universes. Historical runs must resolve the identities and rules they accepted, not today’s editable display settings.
 
 ### Owns
 
-- `FEAT-CAT-CATALOG_INSTRUMENTS` — Instrument Catalogue.
-- `FEAT-CAT-MAP_PROVIDERS` — Provider and Broker Mapping.
-- `FEAT-CAT-DEFINE_SESSIONS` — Sessions and Calendars.
-- `FEAT-CAT-DEFINE_TRADING_RULES` — Trading Rules and Costs.
-- `FEAT-CAT-MANAGE_UNIVERSES` — Baskets and Universes.
-- `FEAT-CAT-CONVERT_CURRENCIES` — Currency Conversion Graph.
-- `FEAT-CAT-EXCHANGE_CATALOGUE` — Catalogue Interchange.
+Stable instrument identities and price/quantity units; provider-symbol and broker-profile mappings; calendar/session definitions; cost and venue-rule profiles; versioned universes; causal currency conversion paths; safe exchange of catalogue definitions.
 
 ### Does not own
 
-- Historical-series storage, strategy logic, execution, or analytics; it owns market identity and trading-rule semantics only.
-- Composition lifecycle, dependency resolution, effect reversal, and transactional replacement; those belong to the non-domain shared substrate (`app/contracts/`, `app/kernel/`, and `app/composition/`).
-- **Deletion boundary:** deleting `app/services/catalogue/` means catalogue editing and resolution disappear; persisted catalogue versions remain opaque and workflows requiring instrument semantics are disabled. The kernel and unrelated domains shall remain healthy.
+Broker sessions and credentials; market-data acquisition or storage; trading orders; statistical metric calculations; portfolio weights. A provider mapping is not authority to substitute a different provider.
 
 ### Shared Contracts
 
-This domain semantically owns the contracts listed below, but their sole physical definitions live in `app/contracts/catalogue/` and wire schemas in `app/contracts/catalogue/wire/`. `app/services/catalogue/` contains implementations only and shall not define or re-export substitute public contract types. Contract versions and semantic owners must agree with `PROJECT.md` and this README. Feature IDs and FR IDs are documentation, lifecycle, acceptance, and traceability identities; runtime bindings use exact versioned `CapabilityKey` declarations in contracts and `FeatureSpec`. The exact public records and capability bundles are listed in the [Shared Contracts README](../../contracts/README.md#42-appcontractscatalogue).
+**Owned by this domain.** Status is an evidence state. Contract modules are selected public boundaries; an unbound symbol/DTO must be reconciled before implementing its production consumer. Do not infer a callable signature from the English title.
 
-Rows labelled `FEAT-* capability surface` describe planned semantic contract bundles, not literal runtime capability keys. A listed counterparty may produce, consume, or observe the bundle and does not establish package-import or runtime dependency direction.
+| Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
+| --- | --- | --- | --- | --- |
+| NOT_REVALIDATED | `catalogue.catalog-instruments@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/catalogue/instruments.py`](../../contracts/catalogue/instruments.py) | 1 | Version instrument identities and tradable units |
+| NOT_REVALIDATED | `catalogue.map-providers@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/catalogue/provider_mapping.py`](../../contracts/catalogue/provider_mapping.py) | 1 | Resolve provider symbols and broker profiles |
+| NOT_REVALIDATED | `catalogue.define-sessions@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/catalogue/sessions.py`](../../contracts/catalogue/sessions.py) | 1 | Define market sessions and calendar availability |
+| NOT_REVALIDATED | `catalogue.define-trading-rules@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/catalogue/define_trading_rules.py`](../../contracts/catalogue/define_trading_rules.py) | 1 | Version trading costs and venue constraints |
+| NOT_REVALIDATED | `catalogue.manage-universes@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/catalogue/manage_universes.py`](../../contracts/catalogue/manage_universes.py) | 1 | Version instrument groups and equity universes |
+| NOT_REVALIDATED | `catalogue.convert-currencies@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/catalogue/convert_currencies.py`](../../contracts/catalogue/convert_currencies.py) | 1 | Resolve causal currency conversion paths |
+| NOT_REVALIDATED | `catalogue.exchange-catalogue@1` | Public operation/DTO symbols in the selected contract; literal binding remains open.<br>[`app/contracts/catalogue/exchange_catalogue.py`](../../contracts/catalogue/exchange_catalogue.py) | 1 | Exchange catalogue definitions safely |
 
-**Owned by this domain**
+**Consumed from other domains — required providers.** Runtime resolution is through the exact key; the provider’s implementation folder is not an import target. Same-domain edges are listed in the owning feature card.
 
-| Status | Contract | Version | Counterparty | Purpose |
-|---|---|---|---|---|
-| Complete | `FEAT-CAT-CATALOG_INSTRUMENTS` capability surface | `v1` | Workspace | Instrument Catalogue. |
-| Complete | `FEAT-CAT-MAP_PROVIDERS` capability surface | `v1` | Workspace | Provider and Broker Mapping. |
-| Complete | `FEAT-CAT-DEFINE_SESSIONS` capability surface | `v1` | Workspace | Sessions and Calendars. |
-| Missing | `FEAT-CAT-DEFINE_TRADING_RULES` capability surface | `v1` | Workspace | Trading Rules and Costs. |
-| Missing | `FEAT-CAT-MANAGE_UNIVERSES` capability surface | `v1` | Workspace | Baskets and Universes. |
-| Missing | `FEAT-CAT-CONVERT_CURRENCIES` capability surface | `v1` | Workspace | Currency Conversion Graph. |
-| Missing | `FEAT-CAT-EXCHANGE_CATALOGUE` capability surface | `v1` | Workspace | Catalogue Interchange. |
+| Capability | Owner | Binding | Consuming feature | Used for |
+| --- | --- | --- | --- | --- |
+| `workspace.artifacts@1` | Workspace | Required | [`FEAT-CAT-EXCHANGE_CATALOGUE`](#feat-cat-exchange-catalogue) | Publish and retain immutable artifact bytes |
 
-#### Ratified v1 public records
-
-These target wire records are strict frozen Pydantic v2 models with unknown fields forbidden. They use the common aliases and envelopes in the [Shared Contracts README](../../contracts/README.md#public-wire-model-boundary). UUID fields are UUIDv7, versions are positive, and effective intervals are half-open with `effective_to > effective_from` when present.
-
-| Record | Exact fields and constraints | Requirement authority |
-| --- | --- | --- |
-| `AssetClass` | Closed enum `FOREX`, `EQUITY`, `ETF`, `INDEX`, `FUTURE`, `OPTION`, `BOND`, `COMMODITY`, `CRYPTO`. | `FR-CAT-DEFINE_INSTRUMENTS` |
-| `InstrumentRef` | `instrument_id: Uuid7`. | `FR-CAT-DEFINE_INSTRUMENTS` |
-| `ProviderRef` | `provider_id: Uuid7`; `provider_name: nonempty str`. | `FR-CAT-MAP_PROVIDER_IDENTITIES` |
-| `BrokerRef` | `broker_id: Uuid7`; `broker_name: nonempty str`. | `FR-CAT-MAP_BROKER_SYMBOLS` |
-| `CostModelRef` | `cost_model_id: Uuid7`; `version: int >= 1`. | `FR-CAT-RESOLVE_TRADING_COSTS` |
-| `UniverseRef` | `universe_id: Uuid7`. | `FR-CAT-VERSION_UNIVERSES` |
-| `TradingInterval` | ISO `day_of_week` 1–7; `open_local` and `close_local` as `HH:MM:SS`; `spans_next_day: bool = false`; equal open/close is invalid. | `FR-CAT-DEFINE_TRADING_SESSIONS` |
-| `CalendarEarlyClose` | `date: date`; `close_local: HH:MM:SS`. | `FR-CAT-DEFINE_MARKET_CALENDARS` |
-| `MarketCalendarVersion` | `calendar_id: Uuid7`; `version: int >= 1`; `timezone: IANA timezone`; `holiday_dates: sorted unique tuple[date, ...] = ()`; `early_closes: sorted unique tuple[CalendarEarlyClose, ...] = ()`; `content_hash: ContentHash`. | `FR-CAT-DEFINE_MARKET_CALENDARS` |
-| `TradingSessionDefinition` | `session_id: Uuid7`; `version: int >= 1`; `name: nonempty str`; `timezone: IANA timezone`; `intervals: nonempty tuple[TradingInterval, ...]`; `calendar: MarketCalendarVersion`; `end_of_day_policy: Literal["SESSION_CLOSE", "UTC_MIDNIGHT"]`; `content_hash: ContentHash`. Intervals may not overlap. | `FR-CAT-DEFINE_TRADING_SESSIONS`, `FR-CAT-PREVIEW_TRADING_INTERVALS` |
-| `OrderConstraints` | `min_quantity: DecimalValue > 0`; `max_quantity: DecimalValue >= min_quantity`; `quantity_step: DecimalValue > 0`; `min_order_distance: DecimalValue >= 0`; `supported_order_types: nonempty tuple[OrderType, ...]`; `supported_time_in_force: nonempty tuple[TimeInForce, ...]`. | `FR-CAT-DEFINE_INSTRUMENTS`, `FR-CAT-ROUND_ORDER_VALUES` |
-| `InstrumentVersion` | `instrument_id: Uuid7`; `version: int >= 1`; `symbol: nonempty str`; `display_name: nonempty str`; `asset_class: AssetClass`; `base_currency: CurrencyCode`; `quote_currency: CurrencyCode`; `settlement_currency: CurrencyCode`; `point_value: DecimalValue > 0`; `tick_size: DecimalValue > 0`; `price_decimals: int` 0–18; `quantity_multiplier: DecimalValue > 0`; `order_constraints: OrderConstraints`; `default_spread: DecimalValue >= 0`; `default_commission: Money | None`; `default_swap_long: Money | None`; `default_swap_short: Money | None`; `exchange: nonempty str`; `timezone: IANA timezone`; `session_id: Uuid7`; `effective_from: UtcTimestamp`; `effective_to: UtcTimestamp | None = None`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Tick size must be representable at the declared decimals; equal base/quote is allowed only for a non-traded reference index. | `FR-CAT-DEFINE_INSTRUMENTS`, `FR-CAT-VERSION_INSTRUMENTS`, `FR-CAT-PROTECT_REFERENCED_VERSIONS` |
-| `ProviderSymbolMapping` | `mapping_id: Uuid7`; `instrument: InstrumentRef`; `instrument_version: int >= 1`; `provider: ProviderRef`; `broker: BrokerRef | None`; `provider_symbol: nonempty str`; `effective_from: UtcTimestamp`; `effective_to: UtcTimestamp | None = None`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Provider/broker/symbol/effective interval is unique and mappings may not overlap. | `FR-CAT-MAP_BROKER_SYMBOLS`, `FR-CAT-MAP_PROVIDER_IDENTITIES` |
-| `TradingRuleSet` | `rule_set_id: Uuid7`; `instrument: InstrumentRef`; `instrument_version: int >= 1`; `order_constraints: OrderConstraints`; `price_rounding: Rounding`; `quantity_rounding: Literal["TOWARD_ZERO"]`; `cost_model: CostModelRef`; `effective_from: UtcTimestamp`; `effective_to: UtcTimestamp | None = None`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. | `FR-CAT-ROUND_ORDER_VALUES`, `FR-CAT-RESOLVE_TRADING_COSTS` |
-| `UniverseMembership` | `instrument: InstrumentRef`; `instrument_version: int >= 1`; `effective_from: UtcTimestamp`; `effective_to: UtcTimestamp | None = None`; `weight_hint: DecimalValue >= 0 | None = None`; `tags: sorted unique tuple[str, ...] = ()`. | `FR-CAT-TIMEBOUND_UNIVERSE_MEMBERS` |
-| `UniverseVersion` | `universe_id: Uuid7`; `version: int >= 1`; `name: nonempty str`; `memberships: tuple[UniverseMembership, ...]`; `effective_from: UtcTimestamp`; `effective_to: UtcTimestamp | None = None`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Member intervals intersect the universe interval and duplicate instrument/version intervals are invalid. | `FR-CAT-VERSION_UNIVERSES`, `FR-CAT-TIMEBOUND_UNIVERSE_MEMBERS` |
-| `FxRateObservation` | `observation_id: Uuid7`; `base_currency: CurrencyCode`; `quote_currency: CurrencyCode`; `rate: DecimalValue > 0`; `observed_at: UtcTimestamp`; `source_provider: ProviderRef`; `source_instrument: InstrumentRef | None = None`; `freshness_expires_at: UtcTimestamp`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Currencies differ and expiry follows observation. | `FR-CAT-CONVERT_CURRENCIES` |
-| `CurrencyConversionPath` | `from_currency: CurrencyCode`; `to_currency: CurrencyCode`; `as_of: UtcTimestamp`; `observations: nonempty ordered tuple[FxRateObservation, ...]`; `converted_rate: DecimalValue > 0`; `hop_count: int >= 1`; `path_hash: ContentHash`; `schema_version: Literal[1] = 1`. Observations form a continuous directed path, hop count equals tuple length, and canonical multiplication equals the rate. | `FR-CAT-CONVERT_CURRENCIES` |
-| `CatalogueExchangePackage` | `package_id: Uuid7`; `exported_at: UtcTimestamp`; `catalogue_schema_version: Literal[1]`; `instrument_versions: tuple[InstrumentVersion, ...]`; `provider_mappings: tuple[ProviderSymbolMapping, ...]`; `sessions: tuple[TradingSessionDefinition, ...]`; `calendars: tuple[MarketCalendarVersion, ...]`; `trading_rules: tuple[TradingRuleSet, ...]`; `universes: tuple[UniverseVersion, ...]`; `external_refs: sorted unique tuple[Uuid7, ...] = ()`; `content_hash: ContentHash`; `schema_version: Literal[1] = 1`. Every reference resolves internally or appears in `external_refs`. | `FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS` |
-
-#### Ratified v1 capabilities and operation envelopes
-
-All ports are runtime-checkable async protocols. Every request has `request_id: Uuid7`, `capability_snapshot_id: Uuid7`, and `schema_version: Literal[1] = 1`. Every success has `outcome: Literal["SUCCESS"] = "SUCCESS"`, `request_id: Uuid7`, `result_version: Literal[1] = 1`, and `schema_version: Literal[1] = 1`. `CatalogueFailure` has `outcome: Literal["FAILURE"] = "FAILURE"`, `request_id: Uuid7`, `code` as the closed literal union `CATALOGUE_VALIDATION_FAILED | CATALOGUE_NOT_FOUND | CATALOGUE_VERSION_CONFLICT | CATALOGUE_REFERENCE_PROTECTED | CATALOGUE_MAPPING_OVERLAP | CATALOGUE_SESSION_INVALID | CATALOGUE_RULE_UNSUPPORTED | CATALOGUE_UNIVERSE_INVALID | CATALOGUE_FX_PATH_UNAVAILABLE | CATALOGUE_EXCHANGE_INCOMPATIBLE | CAPABILITY_UNAVAILABLE`, `problem: ProblemDetails`, `conflicting_refs: tuple[Uuid7, ...] = ()`, and `schema_version: Literal[1] = 1`.
-
-| Key / exact port signature | Exact request fields after the common request fields | Exact success fields after the common success fields | Typed events |
-| --- | --- | --- | --- |
-| `catalogue.catalog-instruments@1`; `CatalogInstrumentsCapability.catalog_instruments(request: CatalogInstrumentsRequest) -> CatalogInstrumentsSuccess | CatalogueFailure` | `operation: Literal["GET", "LIST", "UPSERT_VERSION", "DELETE_VERSION"]`; `instrument_ref: InstrumentRef | None = None`; `instrument_version: InstrumentVersion | None = None`; `expected_version: int >= 1 | None = None`; `page_size: int` 1–500 `= 100`; `page_cursor: str | None = None`. GET requires only ref; LIST permits only paging; UPSERT requires only version plus optional expected version; DELETE requires ref and expected version. | `instruments: tuple[InstrumentVersion, ...] = ()`; `next_cursor: str | None = None`; `deleted: bool = false`. | `InstrumentVersionCreated | InstrumentVersionDeleted`. |
-| `catalogue.map-providers@1`; `MapProvidersCapability.map_providers(request: MapProvidersRequest) -> MapProvidersSuccess | CatalogueFailure` | `operation: Literal["RESOLVE", "UPSERT", "DELETE"]`; `mapping: ProviderSymbolMapping | None = None`; `provider: ProviderRef | None = None`; `broker: BrokerRef | None = None`; `provider_symbol: str | None = None`; `as_of: UtcTimestamp | None = None`. UPSERT/DELETE require mapping and forbid resolution fields; RESOLVE requires provider, provider symbol, and time and forbids mapping. | `mappings: tuple[ProviderSymbolMapping, ...] = ()`; `deleted: bool = false`. | `ProviderSymbolMappingChanged | ProviderSymbolMappingDeleted`. |
-| `catalogue.define-sessions@1`; `DefineSessionsCapability.define_sessions(request: DefineSessionsRequest) -> DefineSessionsSuccess | CatalogueFailure` | `operation: Literal["GET", "UPSERT_SESSION", "UPSERT_CALENDAR", "PREVIEW"]`; `session: TradingSessionDefinition | None = None`; `calendar: MarketCalendarVersion | None = None`; `session_id: Uuid7 | None = None`; `from_at: UtcTimestamp | None = None`; `to_at: UtcTimestamp | None = None`. GET requires only ID; each UPSERT requires only its record; PREVIEW requires ID and `to_at > from_at`. | `session: TradingSessionDefinition | None = None`; `calendar: MarketCalendarVersion | None = None`; `effective_intervals: tuple[{from_at: UtcTimestamp, to_at: UtcTimestamp}, ...] = ()`, each with `to_at > from_at`. | `TradingSessionChanged | MarketCalendarChanged`. |
-| `catalogue.define-trading-rules@1`; `DefineTradingRulesCapability.define_trading_rules(request: DefineTradingRulesRequest) -> DefineTradingRulesSuccess | CatalogueFailure` | `operation: Literal["GET", "UPSERT", "NORMALIZE"]`; `rule_set: TradingRuleSet | None = None`; `instrument: InstrumentRef | None = None`; `instrument_version: int >= 1 | None = None`; `as_of: UtcTimestamp | None = None`; `price: DecimalValue | None = None`; `quantity: DecimalValue | None = None`. UPSERT requires only rule set; GET requires identity/time; NORMALIZE requires identity/time and at least price or quantity. | `rule_set: TradingRuleSet | None = None`; `normalized_price: DecimalValue | None = None`; `normalized_quantity: DecimalValue | None = None`; `cost_model: CostModelRef | None = None`. | `TradingRuleSetChanged`. |
-| `catalogue.manage-universes@1`; `ManageUniversesCapability.manage_universes(request: ManageUniversesRequest) -> ManageUniversesSuccess | CatalogueFailure` | `operation: Literal["GET", "UPSERT_VERSION", "RESOLVE_MEMBERS"]`; `universe_ref: UniverseRef | None = None`; `universe_version: UniverseVersion | None = None`; `as_of: UtcTimestamp | None = None`. UPSERT requires only version; GET requires only ref; RESOLVE_MEMBERS requires ref and time. | `universe: UniverseVersion | None = None`; `members: tuple[UniverseMembership, ...] = ()`. | `UniverseVersionCreated`. |
-| `catalogue.convert-currencies@1`; `ConvertCurrenciesCapability.convert_currencies(request: ConvertCurrenciesRequest) -> ConvertCurrenciesSuccess | CatalogueFailure` | `amount: Money`; `to_currency: CurrencyCode`; `as_of: UtcTimestamp`; `max_hops: int` 1–4 `= 3`; `freshness_limit_seconds: int >= 1`. | `converted: Money`; `path: CurrencyConversionPath`. | Empty union; pure query. |
-| `catalogue.exchange-catalogue@1`; `ExchangeCatalogueCapability.exchange_catalogue(request: ExchangeCatalogueRequest) -> ExchangeCatalogueSuccess | CatalogueFailure` | `operation: Literal["EXPORT", "VALIDATE_IMPORT", "IMPORT"]`; `package: CatalogueExchangePackage | None = None`; `selected_instrument_ids: tuple[Uuid7, ...] = ()`; `conflict_policy: Literal["REJECT", "KEEP_EXISTING", "CREATE_NEW_VERSION"] = "REJECT"`. EXPORT forbids package; validate/import require package. | `package: CatalogueExchangePackage | None = None`; `imported_refs: tuple[Uuid7, ...] = ()`; `warnings: tuple[ValidationIssue, ...] = ()`. | `CataloguePackageImported`; export/validation emit none. |
-
-#### Ratified v1 event payloads
-
-Every member uses the common `DomainEvent` envelope. Its strict payload includes `schema_version: Literal[1] = 1` plus the fields below; `event_type` is the closed discriminator.
-
-| Event | `event_type` | Exact payload fields |
-| --- | --- | --- |
-| `InstrumentVersionCreated` | `catalogue.instrument-version-created` | `instrument: InstrumentRef`; `instrument_version: int >= 1`; `content_hash: ContentHash`. |
-| `InstrumentVersionDeleted` | `catalogue.instrument-version-deleted` | `instrument: InstrumentRef`; `instrument_version: int >= 1`; `prior_content_hash: ContentHash`. |
-| `ProviderSymbolMappingChanged` | `catalogue.provider-symbol-mapping-changed` | `mapping_id: Uuid7`; `instrument: InstrumentRef`; `instrument_version: int >= 1`; `provider: ProviderRef`; `broker: BrokerRef | None`; `provider_symbol: nonempty str`; `content_hash: ContentHash`. |
-| `ProviderSymbolMappingDeleted` | `catalogue.provider-symbol-mapping-deleted` | `mapping_id: Uuid7`; `instrument: InstrumentRef`; `instrument_version: int >= 1`; `provider: ProviderRef`; `broker: BrokerRef | None`; `provider_symbol: nonempty str`; `prior_content_hash: ContentHash`. |
-| `TradingSessionChanged` | `catalogue.trading-session-changed` | `session_id: Uuid7`; `version: int >= 1`; `content_hash: ContentHash`. |
-| `MarketCalendarChanged` | `catalogue.market-calendar-changed` | `calendar_id: Uuid7`; `version: int >= 1`; `content_hash: ContentHash`. |
-| `TradingRuleSetChanged` | `catalogue.trading-rule-set-changed` | `rule_set_id: Uuid7`; `instrument: InstrumentRef`; `instrument_version: int >= 1`; `content_hash: ContentHash`. |
-| `UniverseVersionCreated` | `catalogue.universe-version-created` | `universe: UniverseRef`; `version: int >= 1`; `content_hash: ContentHash`. |
-| `CataloguePackageImported` | `catalogue.package-imported` | `package_id: Uuid7`; `content_hash: ContentHash`; `imported_refs: tuple[Uuid7, ...]`. |
-
-Capability absence and every validation/version/reference failure are deterministic and side-effect free. Conversion's event union is empty; export and validation emit no event.
-
-**Cross-domain requirement references (not runtime dependencies)**
-
-The rows below summarize foreign owner tokens found in FR `Depends` cells. They express product sequencing, traceability, or acceptance-evidence relationships only. Actual runtime consumption must name an exact versioned capability key in the consuming feature's `FeatureSpec.requires` or `FeatureSpec.optional` and must follow the dependency direction in `PROJECT.md` and `ARCHITECTURE.md`.
-
-| Referenced domain set | Documentation version | Owner | Meaning |
-|---|---|---|---|
-| `D-WS` public capability set | `v1` | Workspace | Requirements whose `Depends` cell names `WS-*`. |
+**Operation-gated providers.** For each §4 feature, its linked source card’s complete “Operation-gated providers” table defines applicability, exact provider identity and absence behavior. This is scoped incorporation, not permission to treat all 233 register-wide operation edges as optional for every feature. Resolve those provider IDs to their primary capability keys in the corresponding domain README; bind actual operations in the acceptance record. An omitted local duplicate table does not waive a source dependency.
 
 ### Persisted State Ownership
 
-| Status | State / Store | Read access (via contract) | Migration definitions |
-|---|---|---|---|
-| Missing | instruments, instrument_versions, brokers, broker_versions, sessions, session_versions, calendars, calendar_versions | Other domains through `D-CAT` public capabilities only | The owning feature's `StateDeclaration` and migration/storage adapter |
+Immutable instrument, provider-profile, session/calendar, trading-rule and universe revisions, plus authorized exchange receipts. Conversion outputs pin the source observations and path used.
+
+| Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-CAT-MAP_PROVIDERS`](#feat-cat-map-providers) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-CAT-DEFINE_SESSIONS`](#feat-cat-define-sessions) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-CAT-DEFINE_TRADING_RULES`](#feat-cat-define-trading-rules) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-CAT-MANAGE_UNIVERSES`](#feat-cat-manage-universes) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| BINDING_PENDING | [`FEAT-CAT-CONVERT_CURRENCIES`](#feat-cat-convert-currencies) | No new durable business partition selected here | No new business driver. | Release local buffers/caches on teardown. Retaining an artifact requires the declared custody capability and an explicit owner policy. |
+| BINDING_PENDING | [`FEAT-CAT-EXCHANGE_CATALOGUE`](#feat-cat-exchange-catalogue) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+
+A feature’s exact durable namespace, schema version and migrations are taken from its reconciled manifest and contract, not guessed from its folder name. External consumers access semantic state only through the owner capability. Workspace persistence/artifact custody never acquires that semantic ownership.
 
 ### Four-Level Structural Hierarchy
 
-| Code level | Represents | This package |
-|---|---|---|
-| **Package** | Domain | `app/services/catalogue/` / `D-CAT` |
-| **Module folder** | Feature / capability | One folder for each of: Instrument Catalogue, Provider and Broker Mapping, Sessions and Calendars, Trading Rules and Costs, Baskets and Universes, Currency Conversion Graph, Catalogue Interchange |
-| **File** | Use case or focused responsibility | Exactly the responsibility file named in each module specification |
-| **Class / function / method** | Functional requirement behavior | Exactly one registered `fr_*` behavior per `FR-*` row |
-
-```text
-Package (Domain)
-└── Module folder (Feature)
-    └── File (Responsibility)
-        └── Registered function (Functional requirement behavior)
-```
+| Code level | Represents | Domain example |
+| --- | --- | --- |
+| Package | Domain boundary | `app/services/catalogue/` |
+| Module folder | Composable feature owner | `app/services/catalogue/instrument_catalogue/` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments) |
+| File | Manifest, strict configuration, lifecycle or focused use case | `manifest.py`, `config.py`, `feature.py`, focused logic module |
+| Class / function / method | One or more traced requirement behaviors | `FR-TRC-CAT-CATALOG_INSTRUMENTS-001` and its acceptance oracle |
 
 ### Domain Capability Map
 
-```mermaid
-flowchart TD
-    DOMAIN[[D-CAT: Catalogue]]
-    DOMAIN --> FEAT_CAT_CATALOG_INSTRUMENTS[[FEAT-CAT-CATALOG_INSTRUMENTS: Instrument Catalogue]]
-    FEAT_CAT_CATALOG_INSTRUMENTS --> FEAT_CAT_CATALOG_INSTRUMENTS_FILE[instrument_catalogue.py: RESP-CAT-01-01]
-    DOMAIN --> FEAT_CAT_MAP_PROVIDERS[[FEAT-CAT-MAP_PROVIDERS: Provider and Broker Mapping]]
-    FEAT_CAT_MAP_PROVIDERS --> FEAT_CAT_MAP_PROVIDERS_FILE[provider_mapping.py: RESP-CAT-02-01]
-    DOMAIN --> FEAT_CAT_DEFINE_SESSIONS[[FEAT-CAT-DEFINE_SESSIONS: Sessions and Calendars]]
-    FEAT_CAT_DEFINE_SESSIONS --> FEAT_CAT_DEFINE_SESSIONS_FILE[session_calendar.py: RESP-CAT-03-01]
-    DOMAIN --> FEAT_CAT_DEFINE_TRADING_RULES[[FEAT-CAT-DEFINE_TRADING_RULES: Trading Rules and Costs]]
-    FEAT_CAT_DEFINE_TRADING_RULES --> FEAT_CAT_DEFINE_TRADING_RULES_FILE[trading_rules_costs.py: RESP-CAT-04-01]
-    DOMAIN --> FEAT_CAT_MANAGE_UNIVERSES[[FEAT-CAT-MANAGE_UNIVERSES: Baskets and Universes]]
-    FEAT_CAT_MANAGE_UNIVERSES --> FEAT_CAT_MANAGE_UNIVERSES_FILE[basket_universe.py: RESP-CAT-05-01]
-    DOMAIN --> FEAT_CAT_CONVERT_CURRENCIES[[FEAT-CAT-CONVERT_CURRENCIES: Currency Conversion Graph]]
-    FEAT_CAT_CONVERT_CURRENCIES --> FEAT_CAT_CONVERT_CURRENCIES_FILE[currency_graph.py: RESP-CAT-06-01]
-    DOMAIN --> FEAT_CAT_EXCHANGE_CATALOGUE[[FEAT-CAT-EXCHANGE_CATALOGUE: Catalogue Interchange]]
-    FEAT_CAT_EXCHANGE_CATALOGUE --> FEAT_CAT_EXCHANGE_CATALOGUE_FILE[catalogue_interchange.py: RESP-CAT-07-01]
-```
+The table in §2 is the complete domain capability map. Edges below illustrate dependency direction, not a new orchestrator or private import relationship.
 
----
+```mermaid
+flowchart LR
+    Caller["Caller / consuming feature"] --> Contract["Versioned public contract"]
+    Provider["Removable domain feature"] -->|provides| Contract
+    Provider --> Scope["Scoped effects and disposal"]
+    Provider --> State["Own records only, when declared"]
+```
 
 ## 2. Final Package Structure and Feature Independence
 
+Feature owners are independent and physically removable. The selected package is a target binding: reconcile known current aliases and preserve compatible existing identities before creating a folder. Folder absence does not prove behavior absence. Removing a feature withdraws its contributions; it does not delete another feature’s source or retained evidence.
+
+| Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
+| --- | --- | --- | --- | --- | --- | --- |
+| [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments) | Version instrument identities and tradable units | `app/services/catalogue/instrument_catalogue/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-CAT-MAP_PROVIDERS`](#feat-cat-map-providers) | Resolve provider symbols and broker profiles | `app/services/catalogue/provider_mapping/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-CAT-DEFINE_SESSIONS`](#feat-cat-define-sessions) | Define market sessions and calendar availability | `app/services/catalogue/session_calendar/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-CAT-DEFINE_TRADING_RULES`](#feat-cat-define-trading-rules) | Version trading costs and venue constraints | `app/services/catalogue/define_trading_rules/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-CAT-MANAGE_UNIVERSES`](#feat-cat-manage-universes) | Version instrument groups and equity universes | `app/services/catalogue/manage_universes/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-CAT-CONVERT_CURRENCIES`](#feat-cat-convert-currencies) | Resolve causal currency conversion paths | `app/services/catalogue/convert_currencies/` | U2 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-CAT-EXCHANGE_CATALOGUE`](#feat-cat-exchange-catalogue) | Exchange catalogue definitions safely | `app/services/catalogue/exchange_catalogue/` | U1 | 2 | 1 | NOT_REVALIDATED |
+
 ```text
-catalogue/
-├── README.md
-├── __init__.py
-├── instrument_catalogue/                    # FEAT-CAT-CATALOG_INSTRUMENTS: Instrument Catalogue
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── instrument_catalogue.py              # RESP-CAT-01-01
-├── provider_mapping/                    # FEAT-CAT-MAP_PROVIDERS: Provider and Broker Mapping
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── provider_mapping.py              # RESP-CAT-02-01
-├── session_calendar/                    # FEAT-CAT-DEFINE_SESSIONS: Sessions and Calendars
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── session_calendar.py              # RESP-CAT-03-01
-├── trading_rules_costs/                    # FEAT-CAT-DEFINE_TRADING_RULES: Trading Rules and Costs
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── trading_rules_costs.py              # RESP-CAT-04-01
-├── basket_universe/                    # FEAT-CAT-MANAGE_UNIVERSES: Baskets and Universes
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── basket_universe.py              # RESP-CAT-05-01
-├── currency_graph/                    # FEAT-CAT-CONVERT_CURRENCIES: Currency Conversion Graph
-│   ├── README.md
-│   ├── __init__.py
-│   ├── manifest.py
-│   ├── config.py
-│   ├── feature.py
-│   └── currency_graph.py              # RESP-CAT-06-01
-└── catalogue_interchange/                    # FEAT-CAT-EXCHANGE_CATALOGUE: Catalogue Interchange
-    ├── README.md
-    ├── __init__.py
-    ├── manifest.py
-    ├── config.py
-    ├── feature.py
-    └── catalogue_interchange.py              # RESP-CAT-07-01
+app/services/catalogue/
+├── README.md  # this domain target registry
+├── __init__.py  # docstring only
+├── instrument_catalogue/  # FEAT-CAT-CATALOG_INSTRUMENTS
+├── provider_mapping/  # FEAT-CAT-MAP_PROVIDERS
+├── session_calendar/  # FEAT-CAT-DEFINE_SESSIONS
+├── define_trading_rules/  # FEAT-CAT-DEFINE_TRADING_RULES
+├── manage_universes/  # FEAT-CAT-MANAGE_UNIVERSES
+├── convert_currencies/  # FEAT-CAT-CONVERT_CURRENCIES
+└── exchange_catalogue/  # FEAT-CAT-EXCHANGE_CATALOGUE
 ```
 
-### Module dependency diagram
+Every feature folder contains `README.md`, docstring-only `__init__.py`, `manifest.py`, `config.py`, `feature.py` and its focused logic modules. Shared contract definitions live outside those removable packages. The primary logic-module designation in §4 is a target for usage ownership; adapt a compatible existing module rather than duplicate its service.
 
-Feature modules do not import one another's private files. Runtime dependencies resolve through kernel capabilities obtained from `FeatureContext`; composition selects providers and reconciles changes, so reciprocal workflow participation cannot create a package-import cycle.
+### Feature Capability Dependency Direction
 
-```mermaid
-flowchart LR
-    K[[Kernel capability registry]]
-    K --> FEAT_CAT_CATALOG_INSTRUMENTS[[FEAT-CAT-CATALOG_INSTRUMENTS: Instrument Catalogue]]
-    K --> FEAT_CAT_MAP_PROVIDERS[[FEAT-CAT-MAP_PROVIDERS: Provider and Broker Mapping]]
-    K --> FEAT_CAT_DEFINE_SESSIONS[[FEAT-CAT-DEFINE_SESSIONS: Sessions and Calendars]]
-    K --> FEAT_CAT_DEFINE_TRADING_RULES[[FEAT-CAT-DEFINE_TRADING_RULES: Trading Rules and Costs]]
-    K --> FEAT_CAT_MANAGE_UNIVERSES[[FEAT-CAT-MANAGE_UNIVERSES: Baskets and Universes]]
-    K --> FEAT_CAT_CONVERT_CURRENCIES[[FEAT-CAT-CONVERT_CURRENCIES: Currency Conversion Graph]]
-    K --> FEAT_CAT_EXCHANGE_CATALOGUE[[FEAT-CAT-EXCHANGE_CATALOGUE: Catalogue Interchange]]
-```
-
-### Structure rules
-
-- The package root contains `README.md`, import-pure `__init__.py`, and one direct folder per feature; discovery uses the `haruquantai.features` entry-point group.
-- Each feature folder contains mandatory `README.md`, pure `__init__.py`, `manifest.py`, `config.py`, `feature.py`, and focused responsibility modules.
-- `FR-*`/`fr_*` names provide product, implementation, and test traceability inside the feature; they are not separate runtime registrations or capability keys.
-- Cross-feature and cross-domain behavior is injected by capability key. Direct private-file imports are prohibited.
-- Every core capability module documents Python and CLI usage; exactly one designated primary domain-logic module owns the feature's executable `__main__` demonstration. Usage examples never live under `tests/`.
-
----
+A required edge means “consumer requires the provider’s public capability.” It never means “import the provider package.” Optional operation closure is resolved by the composition/runtime boundary and rechecked at invocation. Physical removal must cause the declared unavailable or blocked state while unrelated capabilities remain usable.
 
 ## 3. Workflows
 
-| Status | Workflow ID | Scope | Workflow | Trigger / Input boundary | Final outcome / Output boundary | Requirement sequence |
-|---|---|---|---|---|---|---|
-| Complete | `WF-CAT-001` | Cross-domain | Instrument Catalogue | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-CAT-DEFINE_INSTRUMENTS` → `FR-CAT-VERSION_INSTRUMENTS` → `FR-CAT-PROTECT_REFERENCED_VERSIONS` |
-| Complete | `WF-CAT-002` | Internal | Provider and Broker Mapping | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-CAT-MAP_BROKER_SYMBOLS` → `FR-CAT-MAP_PROVIDER_IDENTITIES` |
-| Complete | `WF-CAT-003` | Internal | Sessions and Calendars | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-CAT-DEFINE_TRADING_SESSIONS` → `FR-CAT-DEFINE_MARKET_CALENDARS` → `FR-CAT-PREVIEW_TRADING_INTERVALS` |
-| Missing | `WF-CAT-004` | Internal | Trading Rules and Costs | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-CAT-ROUND_ORDER_VALUES` → `FR-CAT-RESOLVE_TRADING_COSTS` |
-| Missing | `WF-CAT-005` | Internal | Baskets and Universes | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-CAT-VERSION_UNIVERSES` → `FR-CAT-TIMEBOUND_UNIVERSE_MEMBERS` |
-| Missing | `WF-CAT-006` | Internal | Currency Conversion Graph | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-CAT-CONVERT_CURRENCIES` |
-| Missing | `WF-CAT-007` | Internal | Catalogue Interchange | Validated command/query and required capability bindings | Requirement-defined result, artifact, event, or degradation | `FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS` |
+Workflows connect existing features; they do not create additional feature owners. “Internal” means all participating behavior is domain-local. “Cross-Domain” means collaboration through public contracts. Participant lists below are **not** a substitute for the plan’s execution schedule or the workflow’s validated operation graph.
 
-### `WF-CAT-001` — Instrument Catalogue
+### Domain-local reading sequence — Resolve reproducible reference data
 
-**Scope:** `Cross-domain` when the request requires another domain capability; otherwise `Internal`.
+**Input boundary:** An explicitly selected instrument, provider and profile revision.
 
-**System workflow:** `SYS-WF-002`
+**Output boundary:** Stable identities, legal units, a pinned session interpretation and an exact provider symbol.
 
-**Input boundary:** A validated request/query plus an immutable capability snapshot and provider bindings.
+**Capabilities to inspect:** [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments) → [`FEAT-CAT-MAP_PROVIDERS`](#feat-cat-map-providers) → [`FEAT-CAT-DEFINE_SESSIONS`](#feat-cat-define-sessions) → [`FEAT-CAT-DEFINE_TRADING_RULES`](#feat-cat-define-trading-rules).
 
-**Output boundary:** The result/artifact/event defined by the participating `FR-*` rows, or their exact structured failure/degradation outcome.
+This is a domain-oriented explanation, not an additional canonical `WF-*` identity. Apply every FR of the participating operation, not only its first validation step. Validate scope and immutable references, resolve admitted providers, perform owner work, verify the owner receipt, and then expose the result. Invalid input, provider absence, stale revision and cancellation retain separate typed outcomes.
 
-1. `Feature.mount()` resolves its declared required capabilities through `FeatureContext`.
-2. `instrument_catalogue.py` executes `fr_cat_define_instruments`, `fr_cat_version_instruments`, `fr_cat_protect_referenced_versions` in the requirement-defined order.
-3. Scoped effects are committed or reversed under `FR-KERN-DEFINE_REQUIREMENT_BEHAVIOR, FR-KERN-DEFINE_LIFECYCLE_CONTEXT, FR-KERN-DECLARE_BEHAVIOR_DEPENDENCIES, FR-KERN-REGISTER_FEATURE_MODULES, FR-KERN-DEFINE_RESPONSIBILITY_FILES, FR-KERN-IMPLEMENT_REQUIREMENT_FUNCTIONS, FR-KERN-DEPEND_PUBLIC_PORTS, FR-KERN-NAMESPACE_CAPABILITY_KEYS, FR-KERN-DECLARE_DEPENDENCY_RULES, FR-KERN-REEVALUATE_DEPENDENCIES, FR-KERN-DEFINE_SCOPE_HIERARCHY, FR-KERN-PASS_EFFECT_SCOPES, FR-KERN-REGISTER_EFFECT_REVERSALS, FR-KERN-REVERSE_EFFECTS_LIFO, FR-KERN-ROLLBACK_FAILED_ACTIVATION, FR-KERN-MANAGE_COMPONENT_LIFECYCLE, FR-KERN-COMMIT_CAPABILITY_SWAP, FR-KERN-QUIESCE_DEPENDENT_WORK, FR-KERN-REMOVE_DEPENDENT_COMPONENTS, FR-KERN-ISOLATE_DISPOSAL_FAILURES, FR-KERN-RECONCILE_DESIRED_STATE, FR-KERN-REPLACE_COMPONENTS_TRANSACTIONALLY, FR-KERN-PROVIDE_SCOPED_REGISTRARS, FR-KERN-DRAIN_REMOVED_BEHAVIORS, FR-KERN-CLASSIFY_COMPONENT_EFFECTS, FR-KERN-NAMESPACE_COMPONENT_STATE, FR-KERN-REGISTER_EXTENSION_POINTS, FR-KERN-EMIT_CAUSAL_EVENTS, FR-KERN-REJECT_DEPENDENCY_CYCLES, FR-KERN-PIN_CAPABILITY_SNAPSHOTS, FR-KERN-TEST_COMPONENT_REMOVAL, FR-KERN-VERIFY_EXACT_REMOVAL, FR-KERN-ROUTE_MULTIPLE_PROVIDERS`.
-4. The feature returns or publishes only the documented output boundary.
-
-**Failure behaviour:**
-
-- Feature unavailable → instrument creation/edit/delete is unavailable; pinned versions remain stored. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- Missing/incompatible required capability → `CAPABILITY_UNAVAILABLE` or `CAPABILITY_INCOMPATIBLE`; no partial mutation.
-
-**Integration test:**
-`tests/services/catalogue/integration/test_instrument_catalogue.py::test_instrument_catalogue_workflow()`
-
-```mermaid
-flowchart LR
-    INPUT[Validated input + capability snapshot]
-    FEATURE[[FEAT-CAT-CATALOG_INSTRUMENTS: Instrument Catalogue]]
-    FILE[instrument_catalogue.py: RESP-CAT-01-01]
-    OUTPUT[Committed result or structured failure]
-    INPUT --> FEATURE --> FILE --> OUTPUT
-```
-
----
+No separate named workflow in the register’s 20-workflow set assigns this domain a participant here. The feature capabilities still participate in their actual caller/provider integration tests and release gates; the local reading sequence is not counted as a 21st workflow.
 
 ## 4. Composable Feature Specifications
 
-Implement module sections from top to bottom. Requirement `Depends` cells define product and implementation ordering; runtime capability dependencies must be declared separately in the owning `FeatureSpec`.
+Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. All acceptance states are PENDING / NOT_REVALIDATED. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
+
+<a id="feat-cat-catalog-instruments"></a>
+### 4.1 `instrument_catalogue/` — `FEAT-CAT-CATALOG_INSTRUMENTS`
+
+> **Feature ID:** `FEAT-CAT-CATALOG_INSTRUMENTS`
+> **Domain:** `catalogue`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/catalogue/instrument_catalogue/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
+
+#### Purpose
+
+Version instrument identities and tradable units. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
+
+#### Capability Declarations
+
+**Provides:** `catalogue.catalog-instruments@1`.
+
+**Required capabilities:**
+
+None (root with respect to the register’s required-provider graph)..
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-catalog-instruments) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/catalogue/instruments.py`](../../contracts/catalogue/instruments.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-CAT-CATALOG_INSTRUMENTS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `catalogue.catalog-instruments@1` | FEAT-CAT-CATALOG_INSTRUMENTS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-CAT-CATALOG_INSTRUMENTS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable instrument, provider-profile, session/calendar, trading-rule and universe revisions, plus authorized exchange receipts. Conversion outputs pin the source observations and path used.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| catalog_instruments.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-CAT-CATALOG_INSTRUMENTS-001` | Create/clone/edit/search/page instruments and preview mass edits and referenced-object deletion impact. | `AT-CAT-CATALOG_INSTRUMENTS-001` | A mass edit identifies exact affected IDs; referenced historical revisions remain readable after a new version is published. |
+| PENDING | `FR-TRC-CAT-CATALOG_INSTRUMENTS-002` | Publish point value, tick/pip size/step, quantity multiplier/step and finite units with explicit revisions. | `AT-CAT-CATALOG_INSTRUMENTS-002` | Zero/negative step or incompatible unit inputs fail; a run continues using its original instrument revision. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-CAT-CATALOG_INSTRUMENTS-001` | Removing FEAT-CAT-CATALOG_INSTRUMENTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-CAT-CATALOG_INSTRUMENTS-001` | Disable and physically remove instrument_catalogue; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-catalog-instruments): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/catalogue/instrument_catalogue/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/catalogue/instrument_catalogue/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-CAT-CATALOG_INSTRUMENTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.catalogue.instrument_catalogue._usage
+```
+
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+
+#### Removal Behaviour
+
+Disable and physically remove the actual reconciled owner of `FEAT-CAT-CATALOG_INSTRUMENTS`. Withdraw `catalogue.catalog-instruments@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.1 `instrument_catalogue/` — Instrument Catalogue
+<a id="feat-cat-map-providers"></a>
+### 4.2 `provider_mapping/` — `FEAT-CAT-MAP_PROVIDERS`
 
-**Feature ID:** `FEAT-CAT-CATALOG_INSTRUMENTS`
+> **Feature ID:** `FEAT-CAT-MAP_PROVIDERS`
+> **Domain:** `catalogue`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/catalogue/provider_mapping/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Manage, version, retain, and protect canonical instruments.
+#### Purpose
 
-**Deletion contract:** instrument creation/edit/delete is unavailable; pinned versions remain stored. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Resolve provider symbols and broker profiles. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → instrument_catalogue.py
-  → fr_cat_define_instruments, fr_cat_version_instruments, fr_cat_protect_referenced_versions
-  → requirement-defined output or structured failure
+**Provides:** `catalogue.map-providers@1`.
+
+**Required capabilities:**
+
+`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-map-providers) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/catalogue/provider_mapping.py`](../../contracts/catalogue/provider_mapping.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-CAT-MAP_PROVIDERS-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `catalogue.map-providers@1` | FEAT-CAT-MAP_PROVIDERS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-CAT-MAP_PROVIDERS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable instrument, provider-profile, session/calendar, trading-rule and universe revisions, plus authorized exchange receipts. Conversion outputs pin the source observations and path used.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| map_providers.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-CAT-MAP_PROVIDERS-001` | Version exact provider symbols, postfix/mapping rules, timezone and customized instrument/session associations. | `AT-CAT-MAP_PROVIDERS-001` | The selected provider_symbol is passed unchanged to the adapter; a profile edit creates a new version. |
+| PENDING | `FR-TRC-CAT-MAP_PROVIDERS-002` | Clone/import/export supported profiles and protect system profiles and incompatible timezone changes. | `AT-CAT-MAP_PROVIDERS-002` | Deleting a protected profile fails; changing timezone while referenced data exists yields an impact report rather than relabeling old observations. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-CAT-MAP_PROVIDERS-001` | Removing FEAT-CAT-MAP_PROVIDERS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-CAT-MAP_PROVIDERS-001` | Disable and physically remove provider_mapping; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-map-providers): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/catalogue/provider_mapping/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/catalogue/provider_mapping/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-CAT-MAP_PROVIDERS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.catalogue.provider_mapping._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Complete | `instrument_catalogue.py` | Manage, version, retain, and protect canonical instruments | `fr_cat_define_instruments`, `fr_cat_version_instruments`, `fr_cat_protect_referenced_versions` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Complete | `feature.py` | Mount `FEAT-CAT-CATALOG_INSTRUMENTS` through `FeatureContext` and stage its declared providers/effects | `FEAT-CAT-CATALOG_INSTRUMENTS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Complete | `manifest.py` | Define the immutable `FEAT-CAT-CATALOG_INSTRUMENTS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-CAT-CATALOG_INSTRUMENTS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Complete | `FEAT-CAT-CATALOG_INSTRUMENTS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `instrument_catalogue.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `instrument_catalogue.py` — Manage, version, retain, and protect canonical instruments
-
-**File responsibility:** Manage, version, retain, and protect canonical instruments.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Complete | `FR-CAT-DEFINE_INSTRUMENTS` | Parity | P0 | The system shall manage canonical instruments with symbol, asset type, point value, tick size, price decimals, size multiplier/step/min/max, minimum order distance, default spread, commission, swap, currency, exchange, and timezone. | `fr_cat_define_instruments` implementation trace | Event publication | Invalid nonpositive increments or inconsistent decimal/tick settings are rejected. | FR-WS-INITIALIZE_WORKSPACE | Installed metadata model; Verified | **Usage:** `app/services/catalogue/instrument_catalogue/instrument_catalogue.py::__main__` scenario `FR-CAT-DEFINE_INSTRUMENTS`<br>**Unit:** `tests/services/catalogue/instrument_catalogue/test_instrument_catalogue.py::test_cat_define_instruments()` |
-| Complete | `FR-CAT-VERSION_INSTRUMENTS` | Target | P1 | Edits to an instrument used by a committed data or result manifest shall create a new instrument version. | `fr_cat_version_instruments` implementation trace | Persistence write; Local state mutation | Old result manifests continue resolving the prior version after an edit. | FR-CAT-DEFINE_INSTRUMENTS | `BD-08`; Target | **Usage:** `app/services/catalogue/instrument_catalogue/instrument_catalogue.py::__main__` scenario `FR-CAT-VERSION_INSTRUMENTS`<br>**Unit:** `tests/services/catalogue/instrument_catalogue/test_instrument_catalogue.py::test_cat_version_instruments()` |
-| Complete | `FR-CAT-PROTECT_REFERENCED_VERSIONS` | Target | P1 | The system shall reject deletion of a catalogue version referenced by a committed manifest. | `fr_cat_protect_referenced_versions` implementation trace | Persistence write | Deletion returns dependencies and leaves all records unchanged. | FR-CAT-VERSION_INSTRUMENTS | Referential integrity; Verified concept | **Usage:** `app/services/catalogue/instrument_catalogue/instrument_catalogue.py::__main__` scenario `FR-CAT-PROTECT_REFERENCED_VERSIONS`<br>**Unit:** `tests/services/catalogue/instrument_catalogue/test_instrument_catalogue.py::test_cat_protect_referenced_versions()` |
-
-**Rules:**
-
-- instrument creation/edit/delete is unavailable; pinned versions remain stored. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/catalogue/instrument_catalogue/instrument_catalogue.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-CAT-MAP_PROVIDERS`. Withdraw `catalogue.map-providers@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.2 `provider_mapping/` — Provider and Broker Mapping
+<a id="feat-cat-define-sessions"></a>
+### 4.3 `session_calendar/` — `FEAT-CAT-DEFINE_SESSIONS`
 
-**Feature ID:** `FEAT-CAT-MAP_PROVIDERS`
+> **Feature ID:** `FEAT-CAT-DEFINE_SESSIONS`
+> **Domain:** `catalogue`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/catalogue/session_calendar/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Map broker/provider identities to canonical instruments.
+#### Purpose
 
-**Deletion contract:** provider symbol translation is unavailable; canonical instruments remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Define market sessions and calendar availability. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → provider_mapping.py
-  → fr_cat_map_broker_symbols, fr_cat_map_provider_identities
-  → requirement-defined output or structured failure
+**Provides:** `catalogue.define-sessions@1`.
+
+**Required capabilities:**
+
+None (root with respect to the register’s required-provider graph)..
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-define-sessions) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/catalogue/sessions.py`](../../contracts/catalogue/sessions.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-CAT-DEFINE_SESSIONS-001`, `FR-TRC-CAT-DEFINE_SESSIONS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `catalogue.define-sessions@1` | FEAT-CAT-DEFINE_SESSIONS | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-CAT-DEFINE_SESSIONS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable instrument, provider-profile, session/calendar, trading-rule and universe revisions, plus authorized exchange receipts. Conversion outputs pin the source observations and path used.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| define_sessions.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-CAT-DEFINE_SESSIONS-001` | Create/clone/edit ordered day/time session elements, SEOC flags and weekday templates in a named timezone/calendar version. | `AT-CAT-DEFINE_SESSIONS-001` | Overlapping/invalid intervals are rejected; a weekday shortcut expands to the exact stored ordered elements. |
+| PENDING | `FR-TRC-CAT-DEFINE_SESSIONS-002` | Resolve market boundaries across DST, holidays, gaps and half-open intervals without inventing a tradable quote. | `AT-CAT-DEFINE_SESSIONS-002` | Boundary fixtures classify an event at the close in the next interval; missing market observations remain missing. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-CAT-DEFINE_SESSIONS-001` | Removing FEAT-CAT-DEFINE_SESSIONS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-CAT-DEFINE_SESSIONS-001` | Disable and physically remove session_calendar; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-define-sessions): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/catalogue/session_calendar/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/catalogue/session_calendar/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-CAT-DEFINE_SESSIONS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.catalogue.session_calendar._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Complete | `provider_mapping.py` | Map broker/provider identities to canonical instruments | `fr_cat_map_broker_symbols`, `fr_cat_map_provider_identities` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Complete | `feature.py` | Mount `FEAT-CAT-MAP_PROVIDERS` through `FeatureContext` and stage its declared providers/effects | `FEAT-CAT-MAP_PROVIDERS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Complete | `manifest.py` | Define the immutable `FEAT-CAT-MAP_PROVIDERS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-CAT-MAP_PROVIDERS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Complete | `FEAT-CAT-MAP_PROVIDERS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `provider_mapping.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `provider_mapping.py` — Map broker/provider identities to canonical instruments
-
-**File responsibility:** Map broker/provider identities to canonical instruments.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Complete | `FR-CAT-MAP_BROKER_SYMBOLS` | Parity | P1 | The system shall manage broker profiles and map canonical instruments to external symbols and broker-specific properties. | `fr_cat_map_broker_symbols` implementation trace | None | Two broker profiles may map the same instrument to different symbols/cost defaults without conflict. | FR-CAT-DEFINE_INSTRUMENTS | Reference Data Manager; Verified | **Usage:** `app/services/catalogue/provider_mapping/provider_mapping.py::__main__` scenario `FR-CAT-MAP_BROKER_SYMBOLS`<br>**Unit:** `tests/services/catalogue/provider_mapping/test_provider_mapping.py::test_cat_map_broker_symbols()` |
-| Complete | `FR-CAT-MAP_PROVIDER_IDENTITIES` | Adapter | P1 | Provider-specific symbols, time zones, units, and corporate-action identifiers shall map to canonical instruments through versioned adapter records. | `fr_cat_map_provider_identities` implementation trace | External API call; Persistence write | Ambiguous or incomplete mappings block synchronization. | FR-CAT-VERSION_INSTRUMENTS | Phase 4 connectors | **Usage:** `app/services/catalogue/provider_mapping/provider_mapping.py::__main__` scenario `FR-CAT-MAP_PROVIDER_IDENTITIES`<br>**Unit:** `tests/services/catalogue/provider_mapping/test_provider_mapping.py::test_cat_map_provider_identities()` |
-
-**Rules:**
-
-- provider symbol translation is unavailable; canonical instruments remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/catalogue/provider_mapping/provider_mapping.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-CAT-DEFINE_SESSIONS`. Withdraw `catalogue.define-sessions@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.3 `session_calendar/` — Sessions and Calendars
+<a id="feat-cat-define-trading-rules"></a>
+### 4.4 `define_trading_rules/` — `FEAT-CAT-DEFINE_TRADING_RULES`
 
-**Feature ID:** `FEAT-CAT-DEFINE_SESSIONS`
+> **Feature ID:** `FEAT-CAT-DEFINE_TRADING_RULES`
+> **Domain:** `catalogue`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/catalogue/define_trading_rules/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Manage and preview effective trading intervals.
+#### Purpose
 
-**Deletion contract:** session-aware workflows are disabled; raw data remains readable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Version trading costs and venue constraints. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → session_calendar.py
-  → fr_cat_define_trading_sessions, fr_cat_define_market_calendars, fr_cat_preview_trading_intervals
-  → requirement-defined output or structured failure
+**Provides:** `catalogue.define-trading-rules@1`.
+
+**Required capabilities:**
+
+`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](#feat-cat-define-sessions).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-define-trading-rules) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/catalogue/define_trading_rules.py`](../../contracts/catalogue/define_trading_rules.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `catalogue.define-trading-rules@1` | FEAT-CAT-DEFINE_TRADING_RULES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-CAT-DEFINE_TRADING_RULES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable instrument, provider-profile, session/calendar, trading-rule and universe revisions, plus authorized exchange receipts. Conversion outputs pin the source observations and path used.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| define_trading_rules.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-CAT-DEFINE_TRADING_RULES-001` | Publish typed commission, swap, spread/slippage, minimum-distance, lot/size and netting/hedging profile descriptors with revision and units. | `AT-CAT-DEFINE_TRADING_RULES-001` | Mixed/unknown units or invalid bounds fail validation; current profile changes do not alter a pinned run. |
+| PENDING | `FR-TRC-CAT-DEFINE_TRADING_RULES-002` | Resolve effective overrides with explicit precedence and report incompatible instrument/session combinations. | `AT-CAT-DEFINE_TRADING_RULES-002` | A Retester override is recorded on its run and leaves the source Strategy/profile hashes unchanged. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-CAT-DEFINE_TRADING_RULES-001` | Removing FEAT-CAT-DEFINE_TRADING_RULES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-CAT-DEFINE_TRADING_RULES-001` | Disable and physically remove define_trading_rules; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-define-trading-rules): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/catalogue/define_trading_rules/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/catalogue/define_trading_rules/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-CAT-DEFINE_TRADING_RULES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.catalogue.define_trading_rules._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Complete | `session_calendar.py` | Manage and preview effective trading intervals | `fr_cat_define_trading_sessions`, `fr_cat_define_market_calendars`, `fr_cat_preview_trading_intervals` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Complete | `feature.py` | Mount `FEAT-CAT-DEFINE_SESSIONS` through `FeatureContext` and stage its declared providers/effects | `FEAT-CAT-DEFINE_SESSIONS` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Complete | `manifest.py` | Define the immutable `FEAT-CAT-DEFINE_SESSIONS` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-CAT-DEFINE_SESSIONS` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Complete | `FEAT-CAT-DEFINE_SESSIONS.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `session_calendar.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `session_calendar.py` — Manage and preview effective trading intervals
-
-**File responsibility:** Manage and preview effective trading intervals.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Complete | `FR-CAT-DEFINE_TRADING_SESSIONS` | Parity | P0 | The system shall manage reusable timezone-aware sessions containing ordered weekday/time intervals and an end-of-day boundary. | `fr_cat_define_trading_sessions` implementation trace | None | Overnight and week-crossing sessions normalize deterministically; invalid overlaps are reported. | FR-CAT-DEFINE_INSTRUMENTS | Reference sessions; Verified | **Usage:** `app/services/catalogue/session_calendar/session_calendar.py::__main__` scenario `FR-CAT-DEFINE_TRADING_SESSIONS`<br>**Unit:** `tests/services/catalogue/session_calendar/test_session_calendar.py::test_cat_define_trading_sessions()` |
-| Complete | `FR-CAT-DEFINE_MARKET_CALENDARS` | Target | P0 | The system shall manage versioned calendars containing holidays, early closes, late opens, and exceptional full sessions. | `fr_cat_define_market_calendars` implementation trace | None | A calendar exception overrides the normal session only for its declared date and version. | FR-CAT-DEFINE_TRADING_SESSIONS | Baseline time rules; Target | **Usage:** `app/services/catalogue/session_calendar/session_calendar.py::__main__` scenario `FR-CAT-DEFINE_MARKET_CALENDARS`<br>**Unit:** `tests/services/catalogue/session_calendar/test_session_calendar.py::test_cat_define_market_calendars()` |
-| Complete | `FR-CAT-PREVIEW_TRADING_INTERVALS` | Target | P1 | The system shall preview the effective tradable intervals for a date range after session/calendar/timezone composition. | `fr_cat_preview_trading_intervals` implementation trace | None | DST transition fixtures show unambiguous UTC intervals and both repeated local-hour offsets. | FR-CAT-DEFINE_TRADING_SESSIONS, FR-CAT-DEFINE_MARKET_CALENDARS | Test backlog P0; Target | **Usage:** `app/services/catalogue/session_calendar/session_calendar.py::__main__` scenario `FR-CAT-PREVIEW_TRADING_INTERVALS`<br>**Unit:** `tests/services/catalogue/session_calendar/test_session_calendar.py::test_cat_preview_trading_intervals()` |
-
-**Rules:**
-
-- session-aware workflows are disabled; raw data remains readable. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/catalogue/session_calendar/session_calendar.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-CAT-DEFINE_TRADING_RULES`. Withdraw `catalogue.define-trading-rules@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.4 `trading_rules_costs/` — Trading Rules and Costs
+<a id="feat-cat-manage-universes"></a>
+### 4.5 `manage_universes/` — `FEAT-CAT-MANAGE_UNIVERSES`
 
-**Feature ID:** `FEAT-CAT-DEFINE_TRADING_RULES`
+> **Feature ID:** `FEAT-CAT-MANAGE_UNIVERSES`
+> **Domain:** `catalogue`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/catalogue/manage_universes/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Resolve rounding, distance, and default cost rules.
+#### Purpose
 
-**Deletion contract:** orders requiring the removed rules fail capability validation rather than guessing. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Version instrument groups and equity universes. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → trading_rules_costs.py
-  → fr_cat_round_order_values, fr_cat_resolve_trading_costs
-  → requirement-defined output or structured failure
+**Provides:** `catalogue.manage-universes@1`.
+
+**Required capabilities:**
+
+`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-manage-universes) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/catalogue/manage_universes.py`](../../contracts/catalogue/manage_universes.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `catalogue.manage-universes@1` | FEAT-CAT-MANAGE_UNIVERSES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-CAT-MANAGE_UNIVERSES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable instrument, provider-profile, session/calendar, trading-rule and universe revisions, plus authorized exchange receipts. Conversion outputs pin the source observations and path used.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| manage_universes.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-CAT-MANAGE_UNIVERSES-001` | Create/edit/import/export/search groups and page their members with counts and protected-system status. | `AT-CAT-MANAGE_UNIVERSES-001` | CSV/XML membership exchange round-trips stable instrument IDs; protected group deletion is rejected. |
+| PENDING | `FR-TRC-CAT-MANAGE_UNIVERSES-002` | Resolve an as-of universe and link data readiness/coverage without hiding delisted or unavailable members. | `AT-CAT-MANAGE_UNIVERSES-002` | A historical snapshot does not acquire a later-added instrument; missing coverage is itemized, not treated as a zero return. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-CAT-MANAGE_UNIVERSES-001` | Removing FEAT-CAT-MANAGE_UNIVERSES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-CAT-MANAGE_UNIVERSES-001` | Disable and physically remove manage_universes; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-manage-universes): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/catalogue/manage_universes/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/catalogue/manage_universes/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-CAT-MANAGE_UNIVERSES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.catalogue.manage_universes._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Missing | `trading_rules_costs.py` | Resolve rounding, distance, and default cost rules | `fr_cat_round_order_values`, `fr_cat_resolve_trading_costs` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Missing | `feature.py` | Mount `FEAT-CAT-DEFINE_TRADING_RULES` through `FeatureContext` and stage its declared providers/effects | `FEAT-CAT-DEFINE_TRADING_RULES` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Missing | `manifest.py` | Define the immutable `FEAT-CAT-DEFINE_TRADING_RULES` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-CAT-DEFINE_TRADING_RULES` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `FEAT-CAT-DEFINE_TRADING_RULES.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `trading_rules_costs.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `trading_rules_costs.py` — Resolve rounding, distance, and default cost rules
-
-**File responsibility:** Resolve rounding, distance, and default cost rules.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Missing | `FR-CAT-ROUND_ORDER_VALUES` | Target | P1 | The system shall calculate and expose valid price and quantity rounding for an instrument before order creation. | `fr_cat_round_order_values` implementation trace | Read-only | Boundary fixtures at half-step, minimum, and maximum match the selected rounding policy. | FR-CAT-DEFINE_INSTRUMENTS | Numeric baseline; Target | **Usage:** `app/services/catalogue/trading_rules_costs/trading_rules_costs.py::__main__` scenario `FR-CAT-ROUND_ORDER_VALUES`<br>**Unit:** `tests/services/catalogue/trading_rules_costs/test_trading_rules_costs.py::test_cat_round_order_values()` |
-| Missing | `FR-CAT-RESOLVE_TRADING_COSTS` | Target | P1 | The system shall store cost defaults separately from per-run overrides and expose final effective values in the run manifest. | `fr_cat_resolve_trading_costs` implementation trace | Persistence write | A run override changes only the run and records both default source and override. | FR-CAT-DEFINE_INSTRUMENTS | Specified §§18.4, 22.2 | **Usage:** `app/services/catalogue/trading_rules_costs/trading_rules_costs.py::__main__` scenario `FR-CAT-RESOLVE_TRADING_COSTS`<br>**Unit:** `tests/services/catalogue/trading_rules_costs/test_trading_rules_costs.py::test_cat_resolve_trading_costs()` |
-
-**Rules:**
-
-- orders requiring the removed rules fail capability validation rather than guessing. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/catalogue/trading_rules_costs/trading_rules_costs.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-CAT-MANAGE_UNIVERSES`. Withdraw `catalogue.manage-universes@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.5 `basket_universe/` — Baskets and Universes
+<a id="feat-cat-convert-currencies"></a>
+### 4.6 `convert_currencies/` — `FEAT-CAT-CONVERT_CURRENCIES`
 
-**Feature ID:** `FEAT-CAT-MANAGE_UNIVERSES`
+> **Feature ID:** `FEAT-CAT-CONVERT_CURRENCIES`
+> **Domain:** `catalogue`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/catalogue/convert_currencies/`
+> **First release milestone:** `U2`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Version instrument sets and historical membership.
+#### Purpose
 
-**Deletion contract:** universe-based research is unavailable; single-instrument capabilities remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Resolve causal currency conversion paths. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → basket_universe.py
-  → fr_cat_version_universes, fr_cat_timebound_universe_members
-  → requirement-defined output or structured failure
+**Provides:** `catalogue.convert-currencies@1`.
+
+**Required capabilities:**
+
+`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-convert-currencies) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/catalogue/convert_currencies.py`](../../contracts/catalogue/convert_currencies.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-CAT-CONVERT_CURRENCIES-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `catalogue.convert-currencies@1` | FEAT-CAT-CONVERT_CURRENCIES | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-CAT-CONVERT_CURRENCIES | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** No new durable business partition selected here.
+
+**Records:** Validated inputs and bounded computation/runtime state; immutable source references are owned elsewhere.
+
+**Retention and deletion:** Release local buffers/caches on teardown. Retaining an artifact requires the declared custody capability and an explicit owner policy.
+
+**Namespace / schema / driver binding:** Do not infer persistence merely because the template contains a state section. A durable cache, if selected, needs a separate explicit state declaration within this feature. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| convert_currencies.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-CAT-CONVERT_CURRENCIES-001` | Resolve currency paths using only rates available by the pinned observation cutoff and expose rate/path provenance. | `AT-CAT-CONVERT_CURRENCIES-001` | A future quote cannot complete a historical path; missing or stale paths return typed unavailability. |
+| PENDING | `FR-TRC-CAT-CONVERT_CURRENCIES-002` | Apply declared scale, rounding and intermediate-range policies to conversions. | `AT-CAT-CONVERT_CURRENCIES-002` | Boundary and large-notional fixtures agree with the exact Decimal oracle; overflow fails rather than wrapping or switching to float. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-CAT-CONVERT_CURRENCIES-001` | Removing FEAT-CAT-CONVERT_CURRENCIES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-CAT-CONVERT_CURRENCIES-001` | Disable and physically remove convert_currencies; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-convert-currencies): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/catalogue/convert_currencies/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/catalogue/convert_currencies/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-CAT-CONVERT_CURRENCIES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.catalogue.convert_currencies._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Missing | `basket_universe.py` | Version instrument sets and historical membership | `fr_cat_version_universes`, `fr_cat_timebound_universe_members` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Missing | `feature.py` | Mount `FEAT-CAT-MANAGE_UNIVERSES` through `FeatureContext` and stage its declared providers/effects | `FEAT-CAT-MANAGE_UNIVERSES` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Missing | `manifest.py` | Define the immutable `FEAT-CAT-MANAGE_UNIVERSES` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-CAT-MANAGE_UNIVERSES` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `FEAT-CAT-MANAGE_UNIVERSES.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `basket_universe.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `basket_universe.py` — Version instrument sets and historical membership
-
-**File responsibility:** Version instrument sets and historical membership.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Missing | `FR-CAT-VERSION_UNIVERSES` | Target | P0 | The catalogue shall version named baskets and universes as ordered or rule-derived instrument sets. | `fr_cat_version_universes` implementation trace | None | A run resolves one immutable constituent snapshot; missing constituents fail admission or follow an explicit policy. | FR-CAT-MAP_BROKER_SYMBOLS, FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS | Phase 2 baseline | **Usage:** `app/services/catalogue/basket_universe/basket_universe.py::__main__` scenario `FR-CAT-VERSION_UNIVERSES`<br>**Unit:** `tests/services/catalogue/basket_universe/test_basket_universe.py::test_cat_version_universes()` |
-| Missing | `FR-CAT-TIMEBOUND_UNIVERSE_MEMBERS` | Target | P1 | Universe membership shall support effective-from/effective-to validity and provenance. | `fr_cat_timebound_universe_members` implementation trace | Read-only | A historical rotation fixture cannot observe future membership. | FR-CAT-VERSION_UNIVERSES | Phase 4 Stockpicker baseline | **Usage:** `app/services/catalogue/basket_universe/basket_universe.py::__main__` scenario `FR-CAT-TIMEBOUND_UNIVERSE_MEMBERS`<br>**Unit:** `tests/services/catalogue/basket_universe/test_basket_universe.py::test_cat_timebound_universe_members()` |
-
-**Rules:**
-
-- universe-based research is unavailable; single-instrument capabilities remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/catalogue/basket_universe/basket_universe.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-CAT-CONVERT_CURRENCIES`. Withdraw `catalogue.convert-currencies@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-### 4.6 `currency_graph/` — Currency Conversion Graph
+<a id="feat-cat-exchange-catalogue"></a>
+### 4.7 `exchange_catalogue/` — `FEAT-CAT-EXCHANGE_CATALOGUE`
 
-**Feature ID:** `FEAT-CAT-CONVERT_CURRENCIES`
+> **Feature ID:** `FEAT-CAT-EXCHANGE_CATALOGUE`
+> **Domain:** `catalogue`
+> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Selected owner:** `app/services/catalogue/exchange_catalogue/`
+> **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
-**Purpose:** Resolve deterministic currency conversion paths.
+#### Purpose
 
-**Deletion contract:** cross-currency workflows are disabled; same-currency workflows remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
+Exchange catalogue definitions safely. Deliver the bounded behaviors in the FR table through this feature’s declared public capability; retain the domain boundary in §1.
 
-**Module flow:**
+#### Capability Declarations
 
-```text
-validated input and capability bindings
-  → currency_graph.py
-  → fr_cat_convert_currencies
-  → requirement-defined output or structured failure
+**Provides:** `catalogue.exchange-catalogue@1`.
+
+**Required capabilities:**
+
+`catalogue.catalog-instruments@1` — [`FEAT-CAT-CATALOG_INSTRUMENTS`](#feat-cat-catalog-instruments)<br>`catalogue.map-providers@1` — [`FEAT-CAT-MAP_PROVIDERS`](#feat-cat-map-providers)<br>`catalogue.define-sessions@1` — [`FEAT-CAT-DEFINE_SESSIONS`](#feat-cat-define-sessions)<br>`catalogue.manage-universes@1` — [`FEAT-CAT-MANAGE_UNIVERSES`](#feat-cat-manage-universes)<br>`workspace.artifacts@1` — [`FEAT-WS-MANAGE_ARTIFACTS`](../workspace/README.md#feat-ws-manage-artifacts).
+
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-exchange-catalogue) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+
+**Public contract target:** [`app/contracts/catalogue/exchange_catalogue.py`](../../contracts/catalogue/exchange_catalogue.py). **Literal protocol/DTO/operation symbols:** bind to the compatible selected contract before implementation; no alternate signature is invented here.
+
+**Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
+
+#### Feature Configuration & Limits Manifest
+
+| Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
+| --- | --- | --- | --- | --- |
+| BINDING_PENDING | Exact accepted feature config keys in reconciled config.py / manifest.py / feature README | Owner-declared types and defaults only; none fabricated by this README. | As declared by the owner. | Unknown keys and invalid values fail validation; manifest/config/README key parity is mandatory. |
+| NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
+| NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
+
+**Feature-specific parameter/limit obligations:** `FR-TRC-CAT-EXCHANGE_CATALOGUE-001`, `FR-TRC-CAT-EXCHANGE_CATALOGUE-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+
+#### Runtime Effects & Scope Disposal
+
+| Effect | Owner | Disposal mechanism |
+| --- | --- | --- |
+| Capability binding `catalogue.exchange-catalogue@1` | FEAT-CAT-EXCHANGE_CATALOGUE | Unregister when the reconciler closes the feature scope. |
+| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-CAT-EXCHANGE_CATALOGUE | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
+
+Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+
+#### Persistent State Ownership
+
+**Ownership class:** Feature-owned semantic state.
+
+**Records:** Only records/artifact references required by the functional requirements below; Immutable instrument, provider-profile, session/calendar, trading-rule and universe revisions, plus authorized exchange receipts. Conversion outputs pin the source observations and path used.
+
+**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+
+**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+
+#### Feature Package Structure & Files
+
+| Target file within owner package | Responsibility | Exports / dependency boundary |
+| --- | --- | --- |
+| __init__.py | Pure package description | Docstring only. |
+| README.md | Runtime-validated mirror of this feature scope | Document exact keys, paths and evidence. |
+| manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
+| config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
+| feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
+| exchange_catalogue.py | Focused production domain-logic module | Compatible contract operation binding. |
+| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
+
+These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
+
+#### Functional Requirements (FR)
+
+| Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `FR-TRC-CAT-EXCHANGE_CATALOGUE-001` | Inspect supported CSV/XML catalogue schemas in a bounded parser and map to typed owner revisions. | `AT-CAT-EXCHANGE_CATALOGUE-001` | XXE/DTD/network resolution and duplicate identities fail; supported fixtures preserve units, timezone and mapping semantics. |
+| PENDING | `FR-TRC-CAT-EXCHANGE_CATALOGUE-002` | Preview reuse/fork/new-version/reject outcomes and publish accepted definitions with an immutable conversion report. | `AT-CAT-EXCHANGE_CATALOGUE-002` | A colliding display name never replaces another object; retry preserves a single receipt and identical output references. |
+
+**Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
+
+#### Non-Functional Requirements (Local)
+
+| Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
+| --- | --- | --- | --- | --- |
+| PENDING | `NFR-TRC-CAT-EXCHANGE_CATALOGUE-001` | Removing FEAT-CAT-EXCHANGE_CATALOGUE withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-CAT-EXCHANGE_CATALOGUE-001` | Disable and physically remove exchange_catalogue; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+
+#### Applicable Shared NFRs, Catalogue and Source Bindings
+
+[source feature card](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md#feat-cat-exchange-catalogue): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+
+#### Acceptance Tests and Evidence
+
+| Acceptance family | Intended test owner | Required evidence state |
+| --- | --- | --- |
+| Every AT ID in this card | `tests/services/catalogue/exchange_catalogue/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
+| Every ATN ID in this card | `tests/services/catalogue/exchange_catalogue/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-CAT-EXCHANGE_CATALOGUE/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+
+Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
+
+#### Feature Usage Examples
+
+**Required `_usage.py` command - planned, not executed:**
+
+```powershell
+uv run --frozen python -m app.services.catalogue.exchange_catalogue._usage
 ```
 
-#### Files
+`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
 
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Missing | `currency_graph.py` | Resolve deterministic currency conversion paths | `fr_cat_convert_currencies` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Missing | `feature.py` | Mount `FEAT-CAT-CONVERT_CURRENCIES` through `FeatureContext` and stage its declared providers/effects | `FEAT-CAT-CONVERT_CURRENCIES` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Missing | `manifest.py` | Define the immutable `FEAT-CAT-CONVERT_CURRENCIES` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-CAT-CONVERT_CURRENCIES` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
+#### Removal Behaviour
 
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `FEAT-CAT-CONVERT_CURRENCIES.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `currency_graph.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `currency_graph.py` — Resolve deterministic currency conversion paths
-
-**File responsibility:** Resolve deterministic currency conversion paths.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Missing | `FR-CAT-CONVERT_CURRENCIES` | Target | P0 | The catalogue shall expose a versioned currency-conversion graph with explicit direct, inverse, triangulated, and missing-rate policies. | `fr_cat_convert_currencies` implementation trace | Read-only | Cross-currency cost and portfolio fixtures record the exact conversion path. | FR-CAT-DEFINE_INSTRUMENTS | Portfolio baseline | **Usage:** `app/services/catalogue/currency_graph/currency_graph.py::__main__` scenario `FR-CAT-CONVERT_CURRENCIES`<br>**Unit:** `tests/services/catalogue/currency_graph/test_currency_graph.py::test_cat_convert_currencies()` |
-
-**Rules:**
-
-- cross-currency workflows are disabled; same-currency workflows remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/catalogue/currency_graph/currency_graph.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
-
----
-
-### 4.7 `catalogue_interchange/` — Catalogue Interchange
-
-**Feature ID:** `FEAT-CAT-EXCHANGE_CATALOGUE`
-
-**Purpose:** Import and export versioned catalogue definitions.
-
-**Deletion contract:** catalogue interchange is unavailable; catalogue editing and resolution remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-
-**Module flow:**
-
-```text
-validated input and capability bindings
-  → catalogue_interchange.py
-  → fr_cat_exchange_catalogue_definitions
-  → requirement-defined output or structured failure
-```
-
-#### Files
-
-| Status | File | Responsibility | Key exports | Dependencies |
-|---|---|---|---|---|
-| Missing | `catalogue_interchange.py` | Import and export versioned catalogue definitions | `fr_cat_exchange_catalogue_definitions` | **Standard library:** selected per implementation and recorded before code<br>**Required third-party:** only libraries mandated by `PROJECT.md` or the requirement boundary<br>**Local:** capabilities declared by the owning `FeatureSpec`; no private cross-feature import |
-| Missing | `feature.py` | Mount `FEAT-CAT-EXCHANGE_CATALOGUE` through `FeatureContext` and stage its declared providers/effects | `FEAT-CAT-EXCHANGE_CATALOGUE` `Feature.mount` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `manifest.py`, `config.py`, and focused responsibility modules |
-| Missing | `manifest.py` | Define the immutable `FEAT-CAT-EXCHANGE_CATALOGUE` `FeatureSpec`: identity, domain, provided/required/optional capabilities, conflicts, state, and configuration keys | `FEAT-CAT-EXCHANGE_CATALOGUE` `FeatureSpec` | **Standard library:** None<br>**Required third-party:** None<br>**Local:** `app.kernel.feature.FeatureSpec` |
-
-#### Configuration and Limits Manifest
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `FEAT-CAT-EXCHANGE_CATALOGUE.configuration` | Versioned schema | No implicit defaults | Yes when referenced | `catalogue_interchange.py` | Exact fields, defaults, limits, and failure rules are those stated by the requirements and the normative technical appendices in `PROJECT.md`; unspecified values are rejected under Project §6. |
-
-#### `catalogue_interchange.py` — Import and export versioned catalogue definitions
-
-**File responsibility:** Import and export versioned catalogue definitions.
-
-| Status | Requirement ID | Class | Pri | Responsibility | Class / Function / Method | Side Effects | Raises / failure | Depends | Source / confidence | Usage / Test |
-|---|---|---|---|---|---|---|---|---|---|---|
-| Missing | `FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS` | Target | P1 | The system shall support import/export of catalogue definitions through a versioned JSON format with stable IDs and conflict policy. | `fr_cat_exchange_catalogue_definitions` implementation trace | Persistence write | Export→import into an empty workspace preserves normalized hashes; conflicts require `reject`, `map`, or `create_new`. | FR-CAT-DEFINE_INSTRUMENTS, FR-CAT-VERSION_INSTRUMENTS, FR-CAT-MAP_BROKER_SYMBOLS, FR-CAT-DEFINE_TRADING_SESSIONS, FR-CAT-DEFINE_MARKET_CALENDARS | Adapter decision; Target | **Usage:** `app/services/catalogue/catalogue_interchange/catalogue_interchange.py::__main__` scenario `FR-CAT-EXCHANGE_CATALOGUE_DEFINITIONS`<br>**Unit:** `tests/services/catalogue/catalogue_interchange/test_catalogue_interchange.py::test_cat_exchange_catalogue_definitions()` |
-
-**Rules:**
-
-- catalogue interchange is unavailable; catalogue editing and resolution remain. Requests requiring a removed feature capability return `CAPABILITY_UNAVAILABLE`; the domain continues loading.
-- no business-domain dependency is resolved at package import; the owning `FeatureSpec` declares runtime dependencies once and this behavior consumes only that committed feature context.
-- Each `FR-*` row maps to focused implementation and acceptance evidence inside this feature; removal occurs at feature-package granularity.
-- Every effect must be scoped and classified under `FR-KERN-CLASSIFY_COMPONENT_EFFECTS`; the inferred table label must be corrected before implementation if the concrete adapter requires a narrower or additional effect class.
-
-**Implementation notes:**
-
-- Preserve the requirement statement, acceptance/failure behavior, dependencies, and source confidence as one indivisible implementation contract.
-- Reuse public capability contracts; never copy another feature's or domain's business logic.
-- Add private helpers only when needed by these public behaviors; helpers do not become new requirements.
-
-#### Feature usage examples
-
-The primary domain-logic module `app/services/catalogue/catalogue_interchange/catalogue_interchange.py` owns the executable `__main__` usage harness, with one named scenario per requirement listed above.
+Disable and physically remove the actual reconciled owner of `FEAT-CAT-EXCHANGE_CATALOGUE`. Withdraw `catalogue.exchange-catalogue@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Retain committed source objects and evidence; no cross-provider substitute or implicit purge is permitted. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
 ## 5. Package-Wide Requirements, Configuration, and Architecture Invariants
 
-### Persistence - Database
+| ID | Category | Rule / architectural constraint | Verification |
+| --- | --- | --- | --- |
+| ARCH-001 | Init purity | All backend __init__.py files contain only docstrings; no imports, registration or I/O. | Architecture check and AST review. |
+| ARCH-002 | Managed tasks | Spawn asynchronous service work through FeatureContext.spawn(); own all effects in FeatureScope. | Architecture check; lifecycle, failure and cancellation tests. |
+| ARCH-003 | Logging hygiene | No root logging.basicConfig() in service packages; preserve scoped structured redaction. | Static checks and secret/redaction fixtures. |
+| ARCH-004 | Contract purity | Public backend contracts live in app/contracts/ and depend on no removable service implementation. | Import Linter and AST checks. |
+| ARCH-005 | Interfaces purity | Gateways use contracts and declared capabilities; no service imports, business computations or business persistence. | Import/architecture checks and real-owner parity tests. |
+| ARCH-006 | Feature independence | A feature never imports another feature’s implementation, including siblings in the same domain. | Import Linter, physical removal and startup tests. |
 
-The domain-owned table namespace is `catalogue_`. The authoritative logical entities are: instruments, instrument_versions, brokers, broker_versions, sessions, session_versions, calendars, calendar_versions. Universal representation and persistence rules are owned by `app/contracts/README.md` §§15 and 23.12; Catalogue-specific storage semantics remain here.
-
-Migration definitions shall live in The owning feature's `StateDeclaration` and migration/storage adapter. Only this domain may write its tables; other domains use the public capability contracts in Section 1.
-
-### Shared Configuration
-
-| Status | Setting / Limit | Type | Default | Required | Used by | Description |
-|---|---|---|---|---|---|---|
-| Missing | `[features.FEAT-*].config` | Strict TOML feature configuration | Feature-owned defaults only | Per feature | The owning feature | Accepted keys match `FeatureSpec.config_keys` and `config.py`; provider choice belongs in `[providers]`. |
-
-### Non-Functional Requirements
-
-No domain-private NFR IDs are introduced. The following project-owned requirements apply without duplication:
-
-| Status | Requirement ID | Type | Responsibility | Verification |
-|---|---|---|---|---|
-| Missing | `FR-KERN-DEFINE_REQUIREMENT_BEHAVIOR, FR-KERN-DEFINE_LIFECYCLE_CONTEXT, FR-KERN-DECLARE_BEHAVIOR_DEPENDENCIES, FR-KERN-REGISTER_FEATURE_MODULES, FR-KERN-DEFINE_RESPONSIBILITY_FILES, FR-KERN-IMPLEMENT_REQUIREMENT_FUNCTIONS, FR-KERN-DEPEND_PUBLIC_PORTS, FR-KERN-NAMESPACE_CAPABILITY_KEYS, FR-KERN-DECLARE_DEPENDENCY_RULES, FR-KERN-REEVALUATE_DEPENDENCIES, FR-KERN-DEFINE_SCOPE_HIERARCHY, FR-KERN-PASS_EFFECT_SCOPES, FR-KERN-REGISTER_EFFECT_REVERSALS, FR-KERN-REVERSE_EFFECTS_LIFO, FR-KERN-ROLLBACK_FAILED_ACTIVATION, FR-KERN-MANAGE_COMPONENT_LIFECYCLE, FR-KERN-COMMIT_CAPABILITY_SWAP, FR-KERN-QUIESCE_DEPENDENT_WORK, FR-KERN-REMOVE_DEPENDENT_COMPONENTS, FR-KERN-ISOLATE_DISPOSAL_FAILURES, FR-KERN-RECONCILE_DESIRED_STATE, FR-KERN-REPLACE_COMPONENTS_TRANSACTIONALLY, FR-KERN-PROVIDE_SCOPED_REGISTRARS, FR-KERN-DRAIN_REMOVED_BEHAVIORS, FR-KERN-CLASSIFY_COMPONENT_EFFECTS, FR-KERN-NAMESPACE_COMPONENT_STATE, FR-KERN-REGISTER_EXTENSION_POINTS, FR-KERN-EMIT_CAUSAL_EVENTS, FR-KERN-REJECT_DEPENDENCY_CYCLES, FR-KERN-PIN_CAPABILITY_SNAPSHOTS, FR-KERN-TEST_COMPONENT_REMOVAL, FR-KERN-VERIFY_EXACT_REMOVAL, FR-KERN-ROUTE_MULTIPLE_PROVIDERS` | Architecture | Spatiotemporal composition, deletion, lifecycle, dependency, HMR, effect, and fixture guarantees. | Composition/deletion matrix |
-| Missing | `NFR-DET-*` | Determinism | Applicable deterministic behavior reproduces under pinned inputs and versions. | Determinism corpus |
-| Missing | `NFR-DUR-*` | Durability | Committed state, recovery, leases, checkpoints, and retained metadata follow system rules. | Fault/recovery corpus |
-| Missing | `NFR-PERF-*` | Performance | Applicable latency, throughput, memory, and benchmark gates pass. | Named performance corpus |
-| Missing | `NFR-ISO-*` | Isolation | Processes, permissions, paths, secrets, and workspace boundaries remain isolated. | Security/isolation corpus |
-| Missing | `NFR-OBS-*` | Observability | Operations emit causal, redacted logs/events/metrics/traces. | Lineage reconstruction |
-| Missing | `NFR-COMP-*` | Compatibility | Public contracts, schemas, packages, and providers evolve through declared compatibility rules. | Compatibility corpus |
-
----
+| Policy | Binding requirement | Verification |
+| --- | --- | --- |
+| Focused responsibility | Each file has one focused responsibility; feature identity is not split by algorithm variant, workflow, role or test. | Review and module/ownership checks. |
+| Type safety | Follow the template’s Python 3.14 strict-typing target and reconcile the actual repository/lockfile runtime in Phase 0; no type-ignore bypasses. UI follows the existing strict TypeScript build. | mypy / TypeScript checks against the ratified environment. |
+| Coverage | At least 80% line and branch coverage, retaining any stronger applicable repository or owner floor. | Actual coverage reports at the approved quality boundary. |
+| Configuration parity | Exact accepted keys agree between strict config, manifest and feature-local README; request/profile controls do not become implicit feature settings. | Positive/negative parsing and parity fixtures. |
+| Numerical / resource truth | Use the domain-specific §9 rules, exact source algorithms, finite admission and explicit measurement fixtures. Targets are not measurements. | Golden, causal, overflow, bounded-memory and native/reference evidence where applicable. |
+| Scope and authority | Identity, environment, account, dataset, approval and receiver boundaries are rechecked by their actual owners. | Wrong-scope, stale, refusal, idempotency and removal tests. |
+| Shared NFR applicability | Apply only the exact shared-NFR bindings of each source feature card; all applicable requirements remain mandatory. | Expanded per-feature acceptance mapping, not a blanket global pass. |
 
 ## 6. Open Decisions
 
-None. Any behavior not specified by this README and the normative project appendices is unsupported and must fail capability validation rather than be guessed.
+The following are explicit documentary/implementation-entry gaps, not deferred permission to invent a design. Resolve the affected binding before production use. This documentation delivery does not close Preparation 0.03 or certify Phase 1 entry.
 
----
+| State | Decision / evidence label | Required resolution | Constraints | Impact |
+| --- | --- | --- | --- | --- |
+| OPEN | SOURCE-RECONCILIATION | Reconcile clause-level differences among the register’s source specification, the plan’s inspected specification and the current fetched specification. | Retain the supplied 205-feature identity set unless explicitly changed; differing hashes are not a semantic diff. | All source-dependent behavior. |
+| OPEN | EVD-CONTRACT-01 | Bind exact current protocol/DTO symbols, callable signatures, error branches, accepted config keys/defaults and literal state namespace/schema/driver. | Reuse compatible existing public contracts; no duplicate owner or invented field. Source-selected capability keys and target modules are retained here. | Each affected feature before its production consumer. |
+| OPEN | CURRENT-OWNER-BINDING | Reconcile selected target paths, compatible existing aliases, unrelated domain scope and actual implementation progress. | No automatic rename, overwrite of unrelated README entries or assumption that a missing target folder means missing behavior. | All target owners; especially legacy semantic folders and permanent UI IDs. |
+| OPEN | FIXTURE-AND-USAGE-BINDING | Pin concrete deterministic request/response fixtures, intended test symbols and runnable `_usage.py` or UI examples. | Use every existing acceptance oracle; a planned command or path is not a passing example. | Every feature acceptance bundle. |
+| OPEN | OPERATION-QUALIFICATION | Expand applicable shared-NFR/catalogue/source/operation tables into the actual per-feature evidence manifest and qualify real providers. | Complete registered adapter behavior once; an absent later provider gates only affected operations. Contract stubs are not real-provider evidence. | Applicable later-operation and release claims. |
+| CLOSED — documentary scope | IDENTITY-AND-BOUNDARY | Use the register feature/FR/local-NFR identities and exact primary-capability / required-provider bindings. | No additional feature for roles, algorithms, workflows, tests, performance or later UI integration. | The selected features in §2. |
 
 ## 7. Tests and Definition of Done
 
-### Test and usage locations
+### Test Suite Structure
 
-```text
-tests/services/catalogue/
-└── <feature>/                 # feature automated verification
-```
+Focused feature tests live at the intended owners named in §4. Add config, manifest, lifecycle, failure, boundary, numerical and replay coverage where applicable. Cross-feature contract, composition, Interfaces, browser, accessibility, physical-removal and leak evidence remains independent of feature unit tests. Do not mislabel an offline fixture as production integration.
 
 ### Commands
 
-```bash
-uv run ruff check app/services/catalogue
-uv run ruff format --check app/services/catalogue
-uv run mypy app/services/catalogue
-uv run pytest tests/services/catalogue/<feature>/
-uv run pytest tests/catalogue --cov=app/services/catalogue --cov-fail-under=80
+The following are target verification recipes. Bind actual paths and runner scripts before use; none is reported as executed by this documentation delivery.
+
+```powershell
+uv run --frozen pytest --no-cov tests/services/catalogue/instrument_catalogue
+uv run --frozen ruff format --check .
+uv run --frozen ruff check .
+uv run --frozen mypy
+uv run --frozen lint-imports
+uv run --frozen python scripts/architecture_check.py
+uv run --frozen python scripts/validate_feature_docs.py
+uv run --frozen python scripts/verify_feature_removal.py --feature FEAT-CAT-CATALOG_INSTRUMENTS --report removal-report.json
 ```
 
-### Required test levels
+The first test/removal command illustrates this domain’s first feature; use the affected feature’s exact owner path and ID for other cards. The full `scripts/ci_check.py` and coverage gate run at the approved pre-commit/CI/release boundary, not as a substitute for focused iterative checks.
 
-- **Unit:** Verify every `FR-*` behavior and every failure path.
-- **Integration:** Verify internal feature workflows, capability binding, disable/re-enable, physical removal, replacement where applicable, and leak freedom.
-- **Usage:** Execute each feature's designated primary domain-logic module and verify every named FR scenario.
+### Acceptance evidence model
 
-### Package completion checklist
+For each feature, retain `docs/dev/SQX/evidence/features/<FEAT-ID>/acceptance.json` with source/README hashes, actual tested tree/commit, paths and symbols, FR/local/shared-NFR/catalogue/source/acceptance mappings, fixture hashes, environment, exact commands and exit codes, reports, usage transcript or browser trace, operation-qualification state, lifecycle/removal results and independent review. No credentials or private raw data enter this evidence. The final accepted commit is recorded after creation to avoid a self-referential hash.
 
-- [ ] The actual package tree matches Section 2.
-- [ ] Modules and files remain arranged in documented implementation order.
-- [ ] Every module represents one feature and every file one focused responsibility.
-- [ ] Every requirement, workflow, manifest, configuration, and test row is `Implemented`.
-- [ ] Every public export, dependency, effect, error, owned state, and contract is documented.
-- [ ] Every requirement maps to a named scenario in the primary module's executable usage harness and has focused automated verification; collaborating behaviors have integration tests where applicable.
-- [ ] Feature disable/re-enable, physical removal, failed activation/cleanup, transactional replacement where applicable, and leak tests pass.
-- [ ] No private cross-feature/domain import or duplicated business logic exists.
-- [ ] No unresolved decision affects implementation.
-- [ ] All quality, security, determinism, durability, performance, observability, and compatibility gates pass.
+| Stage | Current README evidence state | What closes it |
+| --- | --- | --- |
+| Contract | NOT_REVALIDATED | Exact compatible schema, operation, config and error bindings plus contract tests. |
+| Provider | NOT_REVALIDATED | Actual implementation satisfies every owned FR/local NFR and applicable numerical/resource rule. |
+| Composition | NOT_REVALIDATED | Real registration, dependency closure, mount rollback and physical removal. |
+| Interfaces | NOT_REVALIDATED | Typed authenticated owner routing and parity; justify genuine nonapplicability. |
+| UI | NOT_REVALIDATED | Reachable truthful interaction, accessibility, cleanup and owner outcome. |
+| End-to-end | NOT_REVALIDATED | Real-provider workflow with canonical receipts and complete acceptance oracles. |
 
----
+### Feature Definition of Done Checklist
+
+- [ ] 1. Stable feature ID: retain the registered identity, including permanent numeric UI IDs.
+- [ ] 2. Single domain ownership: each feature has exactly one semantic owner and one implementation task.
+- [ ] 3. Cohesive capability: implement the complete registered behavior, not merely an adapter-shaped stub.
+- [ ] 4. External contracts: reuse compatible public contracts outside removable implementation packages; UI contribution contracts consume the generated wire boundary.
+- [ ] 5. Declared dependencies: manifest provides/requires/optional keys agree with the resolved public contracts and operation gates.
+- [ ] 6. Zero private feature imports: use public contracts and context-resolved capabilities only.
+- [ ] 7. Zero import-time I/O or registration: initialization remains pure.
+- [ ] 8. Scoped runtime effects: bindings, tasks, listeners, requests, workers and buffers have exact owners and disposers.
+- [ ] 9. Mount rollback: injected mount failure releases every partial contribution.
+- [ ] 10. Idempotent teardown: repeated scope closure is safe and leaves no orphan runtime effect.
+- [ ] 11. Required-dependency loss: absent/removed required providers block only dependent behavior and yield the declared failure state.
+- [ ] 12. Optional-dependency loss: affected operations fail explicitly; no substitute provider, fabricated data or silently reduced semantics.
+- [ ] 13. Persistent state: literal namespace/schema/driver/retention/purge and migrations are bound where state is owned; otherwise explicitly none.
+- [ ] 14. Irreversible-action safety: exact scope, idempotency, receiver reconciliation and retained audit are tested.
+- [ ] 15. Starts feature-absent: deleting the feature physically does not break unrelated startup and capabilities.
+- [ ] 16. Interfaces/UI degradation: typed unavailable/denied/partial states remain usable and truthful.
+- [ ] 17. README parity: feature-local documentation, this domain entry, manifests, configuration and contracts agree.
+- [ ] 18. Module usage: focused capability modules document public Python/API or interactive UI use and failure cases.
+- [ ] 19. Usage evidence: every backend feature has one required `_usage.py` with the bounded offline `__main__` scenarios; UI has real interaction evidence instead.
+- [ ] 20. Quality and acceptance: mapped FR/local/shared NFR, catalogue, source, workflow, removal and actual-provider evidence passes all applicable gates; no target is reported as a measurement.
+
+The ordinary ≥80% coverage floor is not proof of semantic completeness. Repeated enable/disable, failed mount, dependency loss/replacement and physical removal must demonstrate exact cleanup; use 100-cycle tests where specified. Stronger owner-specific limits and evaluation thresholds take precedence. Missing mandatory evidence prevents acceptance; a future optional provider must remain explicitly OPERATION_NOT_QUALIFIED.
 
 ## 8. Change Process
 
-```text
-1. Update this README first.
-2. Update owned/consumed contracts and affected project workflows.
-3. Resolve or record any decision that would otherwise require guessing.
-4. Add or change the functional requirement row, effect, failure behavior, and dependency.
-5. Update files, exports, manifests, configuration, and implementation order.
-6. Implement the smallest code change through public capability boundaries.
-7. Update and execute the primary-module usage harness; add or update unit, integration, deletion, and fault tests.
-8. Change status to `Implemented` only after every relevant gate passes.
-```
+Update this domain card first, then reconcile the contract and source scope. A breaking public change bumps the capability major rather than shadowing an existing contract. Keep manifest declarations, strict configuration, feature-local README and state migrations aligned. Implement only the selected feature’s cohesive behavior, update its required `_usage.py` scenarios or UI workflow, and add the exact acceptance and failure assertions. Verify dependency/removal behavior and actual provider integration, then run the approved quality gates and independent review.
 
-This keeps documentation, composition boundaries, implementation, usage examples, and verification aligned.
-
----
+Maintain one feature task and its accepted implementation commit in the existing Planner → Executor → Reviewer workflow. A verified existing feature keeps its slot and evidence; do not force a rewrite or empty commit. The phase’s last feature owns its cross-feature checkpoint, not a new feature. Later providers add real integration evidence to the already complete consumer adapter; they do not authorize unnoticed extra implementation scope. Record progress in the tracker and receipts, never by declaring all targets Implemented in this README. Preserve unrelated current domain entries when merging this selected scope.
 
 ## 9. Normative Domain Specification
 
-The stable `§x.y` labels below are preserved for cross-document references. They are authoritative here and no longer identify sections in `docs/PROJECT.md`.
+The following domain-specific rules explain the source requirements and ownership boundaries. Stable labels here are navigation labels, **not newly counted FR/NFR or feature IDs**. The feature FR/local-NFR tables and exact linked source semantics remain binding; these explanations never replace an algorithm definition, contract schema, catalogue entry or release qualification gate.
 
-### §16 — Complete market-data and catalogue specification
+<a id="cat-identity"></a>
+### 9.1 CAT-IDENTITY
 
-### §16.1 — Instrument schema and validation
+Use stable identities rather than display names as keys. Price tick size, quantity step, currencies and applicable constraints are versioned. Historical references never silently rebind to an edited profile.
 
-An `InstrumentVersion` payload contains exactly these fields:
+<a id="cat-mapping"></a>
+### 9.2 CAT-MAPPING
 
-| Field | Type/default | Normative rule |
+Pass the selected provider_symbol unchanged to the adapter. Version postfix/mapping rules and customized instrument/session associations. A timezone change while data is referenced produces an impact report; it must not relabel historical observations.
+
+<a id="cat-calendar"></a>
+### 9.3 CAT-CALENDAR
+
+Bars, labels, fills and charts use the same pinned timezone, daylight-saving, holiday and session definition. Calendar availability is explicit. Missing calendar evidence is not interpreted as an always-open market.
+
+<a id="cat-costs"></a>
+### 9.4 CAT-COSTS
+
+Fees, swaps, spread assumptions and venue size/price restrictions remain pinned to the accepted profile. Use exact legal units and deterministic quantization; execution and sizing providers consume this policy rather than duplicate it.
+
+<a id="cat-universe-fx"></a>
+### 9.5 CAT-UNIVERSE-FX
+
+Universe membership and coverage are explicit and versioned. Currency conversion uses observations available at the decision time, a reproducible path and explicit missing/stale outcomes. Do not use a future quote to complete a historical conversion.
+
+<a id="cat-exchange"></a>
+### 9.6 CAT-EXCHANGE
+
+Import/export protects system definitions, checks compatibility and identifies conflicts by stable identity and version. A matching display name never authorizes overwrite; conflicting or incompatible definitions require an explicit disposition.
+
+### Normative source and acceptance binding
+
+Each §4 source-card link incorporates only that feature’s shared NFR applicability, operation-gated dependencies, detailed catalogue entries, original source-ID relationships and source clauses. Open the linked entry, not a similarly named legacy feature. The register-wide inventories contain 66 shared NFRs, 646 catalogue entries, 389 original requirement-ID mappings and 233 operation-time dependency edges. Those inventories are **retained by scoped reference**, not reproduced or independently expanded in this delivery. The actual acceptance manifest must enumerate their applicable members before scope can be signed off.
+
+### Source fingerprint record
+
+| Source | Git blob identity | Role |
 | --- | --- | --- |
-| `symbol` | string 1–64 | Case-sensitive canonical symbol; trimmed; `/`, `\\`, control characters, and leading/trailing whitespace forbidden. |
-| `asset_type` | enum | `FOREX`, `CFD`, `FUTURE`, `STOCK`, `ETF`, `INDEX`, `CRYPTO`, or `OTHER`. |
-| `base_currency` | ISO-4217/crypto code | 3–12 uppercase ASCII; required for FOREX/CRYPTO. |
-| `quote_currency` | ISO-4217/crypto code | Result currency for one price unit; required. |
-| `settlement_currency` | code/default quote | Currency used for realized P/L and costs. |
-| `exchange` | string/default empty | Informational venue identifier. |
-| `timezone` | IANA zone | Required and resolvable in pinned tzdb. |
-| `tick_size` | decimal > 0 | Smallest executable price increment. |
-| `point_value` | decimal > 0 | Money in settlement currency per one whole price-unit move for quantity 1. |
-| `contract_multiplier` | decimal > 0/default 1 | Multiplies price P/L before currency conversion. |
-| `price_decimals` | integer 0–12 | Display only; cannot imply a finer increment than tick size. |
-| `quantity_unit` | enum/default `UNIT` | `UNIT`, `LOT`, `CONTRACT`, `SHARE`, or `COIN`; determines labels and per-lot conversion. |
-| `units_per_lot` | decimal >0/default 1 | `lots=quantity` when quantity unit is LOT, otherwise `quantity/units_per_lot`. |
-| `size_step` | decimal > 0 | Smallest executable quantity increment. |
-| `size_min` | decimal >= 0 | Must be an exact multiple of size step. |
-| `size_max` | decimal >= size_min | Must be an exact multiple of size step. |
-| `minimum_order_distance` | decimal >= 0 | Distance in price units from current bid/ask. |
-| `default_spread` | decimal >= 0 | Full bid/ask difference in price units. |
-| `commission_profile_id` | UUID nullable | Pinned version is resolved into each run manifest. |
-| `swap_long`, `swap_short` | decimal/default 0 | Daily financing per quantity unit in settlement currency unless profile selects points/percent. |
-| `triple_swap_day` | ISO weekday/default Wednesday | Day multiplier 3; other rollover days multiplier 1. |
-| `session_version_id` | UUID | Required trading session/calendar version. |
+| [`docs/dev/SQX/HaruQuantAI_Unified_Specification.md`](../../../docs/dev/SQX/HaruQuantAI_Unified_Specification.md) | `f805dff20c0f7bb00ed897f112a73e853ccf91a3` | Product and domain semantics; current fetched identity; differences from the register baseline remain unresolved. |
+| [`docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md`](../../../docs/dev/HaruQuantAI_Feature_Requirement_Traceability_Register.md) | `32d7ff8ea18784c66b479beae822f17744462044` | Selected feature identities, owned FRs/local NFRs, capability and dependency targets, catalogues, source mappings, and workflow scope. |
+| [`docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md`](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md) | `ffe9b7d3a3a29b32f7a6559122f32d73258709f8` | One task per feature; execution phases, evidence states, readiness and acceptance procedure. |
+| [`docs/templates/README.md`](../../../docs/templates/README.md) | `8d6fb9075784113e95857555c17f7182996f7cc3` | README structure and code-aligned conventions. |
 
-Price P/L before costs is `(exit_price-entry_price) * direction_sign * quantity * point_value * contract_multiplier`. `direction_sign` is `+1` long and `-1` short.
+The register records specification blob `7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd` at commit `c06456fe2c03bc89f52edad1a0a8428118287377`. The phased plan records inspected specification blob `d69bef59cb981350cd6f2ebdccc31b231a4e0950` at commit `a3c81dff4e5b903e749259ff463b8d9280d6fc26`. The fetched specification identity above differs from both. This delivery records the mismatch but does not claim a clause-level reconciliation or authorize a silent change to the 205-feature scope.
 
-### §16.2 — Session/calendar composition
+### Delivery evidence boundary
 
-- A session contains zero or more nonoverlapping local intervals per ISO weekday. An interval with `close <= open` continues into the next local day. Intervals are normalized to UTC for each date using §15.4.
-- A holiday may close the whole trading day. An early close truncates matching intervals; a late open advances their start; an exceptional full session replaces rather than merges the normal weekday intervals.
-- Precedence is exceptional full session, full holiday close, late/early overrides, then weekly template.
-- Orders may be submitted only while the instrument is open unless their type/profile explicitly supports off-session staging. Fills occur only in an open session. A pending order crossing a closed interval remains pending unless DAY expiry or a trading option cancels it.
-- Session day identity is the local date of the session's configured end-of-day boundary. Trade-count-per-day, EOD exits, daily bars, and swaps use that identity.
-
-
-### §16.7 — Universes, currencies, and market transformations
-
-A basket is an immutable ordered list of instrument-version IDs. A rule-derived universe stores its eligible catalogue query and materializes immutable membership rows `{instrument_version_id,effective_from,effective_to,provenance}` with half-open validity; a historical decision at t may see only rows whose effective-from and publication timestamps are `<=t` and whose effective-to is `>t`. Missing constituents follow exactly `FAIL`, `EXCLUDE_AND_REPORT`, or `KEEP_UNAVAILABLE`; there is no implicit symbol substitution.
-
-The currency graph at time t contains the most recent nonstale directed quote edges at or before t. A base/terms quote at rate r creates direct multiplier r and inverse `1/r`. Policy is `DIRECT_ONLY`, `DIRECT_THEN_INVERSE`, or `TRIANGULATE`. Triangulation chooses the fewest edges, then lowest maximum edge age, then lexicographically smallest currency sequence; maximum hops defaults 3. Conversion multiplies without intermediate rounding and rounds only the final amount. Missing policies are `FAIL`, `CARRY_LAST_WITH_MAX_AGE`, and explicit fixed fallback. The path and rates are persisted per valuation/fill.
-
-Corporate actions are immutable events effective at a session boundary. `SPLIT(r)` means r new units per old unit; for samples before the event, backward split adjustment divides OHLC by cumulative r and multiplies volume by r. `CASH_DIVIDEND(d)` in `TOTAL_RETURN_BACK_ADJUSTED` multiplies every prior OHLC by `(P-d)/P`, where P is the last unadjusted close before ex-date; nonpositive P/factor rejects the transform, and volume is unchanged. `SYMBOL_CHANGE` links identities without altering values. Tick/size rounding occurs after all factors. Raw source is never modified, and the transformed version records every event/factor.
-
-Continuous futures select one contract per session using `CALENDAR`, `VOLUME`, or `OPEN_INTEREST`. Calendar selection uses declared roll dates. Volume/open-interest compares the prior completed session only and rolls when the next contract exceeds the current for the declared consecutive-session count. At roll, `NONE` leaves a gap, `BACKWARD_DIFFERENCE` adds `old_close-new_close` to all newer-contract values when creating the backward-continuous history, and `BACKWARD_RATIO` multiplies by `old_close/new_close`; factors compose from newest to oldest. Decisions, source contracts, raw prices, factors, and transformed prices are retained, and no future session statistic is visible.
+This is a documentation projection and proposed domain-registry update. Generated-document checks may establish identity/count/graph/anchor consistency; they do not establish current code parity, external-provider licensing/support, native throughput, model eligibility, browser behavior, successful live connectivity or Phase 0 completion. No application suite or live operation was executed as part of authoring this README.

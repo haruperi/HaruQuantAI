@@ -362,9 +362,12 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 ### 4.9 `app/contracts/orchestration/`
 
-**Public records:** `ProjectRef`, `ProjectVersion`, `ProjectGraph`, `TaskDefinition`, `TaskContract`, `TaskState`, `ProjectRunRef`, `TaskRunRef`, `TaskAttemptRef`, `TaskLease`, `TaskCheckpoint`, `TaskOutputCommit`, `ProjectVariable`, `ProjectExpression`, `DomainTaskRequest`, `UtilityTaskRequest`, `ExecutableAllowlistEntry`, `NotificationChannelConfig`, `NotificationTemplate`, `NotificationSession`, `NotificationReceipt`, `ProjectProgress`, `ProjectHistoryEntry`, `NetworkTrainingPlan`, and `NetworkTrainingResult`.
+**Public records:** `ProjectRef`, `ProjectVersion`, `ProjectGraph`, `TaskDefinition`, `TaskContract`, `TaskState`, `ProjectRunRef`, `TaskRunRef`, `TaskAttemptRef`, `TaskLease`, `TaskCheckpoint`, `TaskOutputCommit`, `ProjectVariable`, `ProjectExpression`, `DomainTaskRequest`, `UtilityTaskRequest`, `ExecutableAllowlistEntry`, `NotificationChannelConfig`, `NotificationTemplate`, `NotificationSession`, `NotificationReceipt`, `JobRecord`, `ProgressEvent`, `ProjectProgress`, `ProjectHistoryEntry`, `NetworkTrainingPlan`, and `NetworkTrainingResult`.
 
-**Capability bundles (7):** `DefineProjectsCapability`, `RunTasksCapability`, `EvaluateConditionsCapability`, `RunDomainTasksCapability`, `RunUtilityTasksCapability`, `TrackRunHistoryCapability`, and `TrainNetworksCapability`.
+**Capability bundles (9):** `DefineProjectsCapability`, `RunTasksCapability`,
+`EvaluateConditionsCapability`, `RunDomainTasksCapability`, `RunUtilityTasksCapability`,
+`TrackRunHistoryCapability`, `TrainNetworksCapability`, `ManageJobsCapability`, and
+`DeliverNotificationsCapability`.
 
 ### 4.10 `app/contracts/interfaces/`
 
@@ -406,7 +409,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 | Status | Namespace | Responsibility |
 |---|---|---|
-| Completed | `app/contracts/common/` | Shared wire base, response metadata/envelopes, authentication/audit/event helpers, validation, health, idempotency records, numeric/sentinel constants, and `DateTimeParts`. |
+| Completed | `app/contracts/common/` | Shared wire base, canonical `StandardResponse`, response metadata, authentication/audit/event helpers, validation, health, idempotency records, numeric/sentinel constants, and `DateTimeParts`. |
 | Completed | `app/contracts/indicator/` | Focused versioned indicator contract slices plus generated indicator constants, error codes, and `IndicatorParameter`. |
 | Completed | `app/contracts/notification/` | Focused versioned notification-delivery records and port. |
 

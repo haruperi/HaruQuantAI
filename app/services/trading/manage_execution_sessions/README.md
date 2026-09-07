@@ -64,5 +64,5 @@ in the database; re-mounting resumes on the existing records.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.trading.manage_execution_sessions.execution_sessions
+uv run python -m app.services.trading.manage_execution_sessions._usage
 ```

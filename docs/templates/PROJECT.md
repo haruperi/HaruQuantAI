@@ -406,13 +406,13 @@ uv run [system-start-command]
 Keep detailed feature usage examples in:
 
 ```text
-tests/[domain]/usage/
+app/services/[domain]/[feature]/_usage.py
 ```
 
 Keep full-system usage examples in:
 
 ```text
-tests/system/usage/
+examples/system/
 ```
 
 ---
@@ -423,26 +423,22 @@ tests/system/usage/
 
 ```text
 tests/
-├── [domain]/
-│   ├── unit/
-│   ├── integration/
-│   └── usage/
+├── services/[domain]/[feature]/ # Feature behavior and lifecycle tests
 └── system/
-    ├── integration/              # Cross-domain workflows
-    └── usage/                    # Complete system examples
+    └── integration/              # Cross-domain workflows
 ```
 
 ### Commands
 
 ```bash
-# Domain tests
-uv run pytest tests/[domain]/unit
-uv run pytest tests/[domain]/integration
-uv run pytest tests/[domain]/usage
+# Feature tests
+uv run pytest --no-cov tests/services/[domain]/[feature]/
 
 # System tests
-uv run pytest tests/system/integration
-uv run pytest tests/system/usage
+uv run pytest --no-cov tests/system/integration
+
+# Feature usage scenarios
+uv run python -m app.services.[domain].[feature]._usage
 
 # Complete test suite
 uv run pytest tests

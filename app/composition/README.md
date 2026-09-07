@@ -204,7 +204,12 @@ Profile readiness reports capability presence; it does not grant business author
 |---|---|---|---|
 | Completed | `logging.py` | Deterministic JSON/text formatting, redaction, correlation, capture, rotation, configuration, and cleanup | `LoggingConfig`, `LoggingHandle`, `configure_logging`, `bind_correlation`, `DiagnosticCaptureHandler` |
 
-Logging installation is explicit and returns an owned handle. Sensitive values are redacted/fingerprinted and bounded before encoding. Correlation context uses context-local state, and cleanup closes only the handlers created by that handle. Service packages obtain named loggers and never configure global logging.
+Logging installation is explicit and returns an owned handle. Console and file I/O runs behind a
+bounded queue, so application threads never wait on those sinks. When the queue is saturated, the
+newest record is dropped and the owned handle exposes the drop count. Sensitive values are copied,
+redacted, fingerprinted, and bounded before entering the queue. Correlation context uses
+context-local state, and cleanup drains accepted records before closing only the handlers created by
+that handle. Service packages obtain named loggers and never configure global logging.
 
 ### 4.5 Runtime Effects and Disposal
 
@@ -213,6 +218,7 @@ Logging installation is explicit and returns an owned handle. Sensitive values a
 | Feature scopes and bindings | Kernel, invoked by `CompositionEngine` | Dependency-safe reconciliation/runtime close |
 | Configuration watcher task/resource | Composition runtime | Explicit watcher stop/close |
 | Logging handlers | `LoggingHandle` | Flush and close owned handlers only |
+| Logging queue/listener | `LoggingHandle` | Drain accepted records, stop listener, and close sinks |
 | Diagnostic capture entries | `DiagnosticCaptureHandler` | Bounded capacity/expiry and handler close |
 
 Composition owns no implicit process-lifetime effect. Every installed runtime or logging effect must have an explicit close path.

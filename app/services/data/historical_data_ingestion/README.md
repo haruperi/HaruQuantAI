@@ -55,4 +55,4 @@ Removing this feature withdraws its scoped `data.ingest-history@1` provider. Com
 
 ## Evidence
 
-Run `uv run python -m app.services.data.historical_data_ingestion.historical_data_ingestion` for the executable scenario harness. Automated tests live in `tests/services/data/historical_data_ingestion/`.
+Run `uv run python -m app.services.data.historical_data_ingestion._usage` for the executable scenario harness. Automated tests live in `tests/services/data/historical_data_ingestion/`.

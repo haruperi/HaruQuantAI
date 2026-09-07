@@ -60,4 +60,4 @@ Removing this feature withdraws `data.track-market-news@1`. Research, Trading, o
 
 ## Evidence
 
-Run `uv run python -m app.services.data.economic_news_evidence.economic_news_evidence` for the executable scenario harness. Automated unit tests live in `tests/services/data/economic_news_evidence/`.
+Run `uv run python -m app.services.data.economic_news_evidence._usage` for the executable scenario harness. Automated unit tests live in `tests/services/data/economic_news_evidence/`.

@@ -58,4 +58,4 @@ Removing this feature withdraws its scoped `data.bind-run-data@1` provider. Exec
 
 ## Evidence
 
-Run `uv run python -m app.services.data.run_data_binding.run_data_binding` for the executable scenario harness. Automated tests live in `tests/services/data/run_data_binding/`.
+Run `uv run python -m app.services.data.run_data_binding._usage` for the executable scenario harness. Automated tests live in `tests/services/data/run_data_binding/`.

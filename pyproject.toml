@@ -80,6 +80,8 @@ interfaces-operate-trading = "app.services.interfaces.operate_trading.feature:fe
 interfaces-observe-market-reference = "app.services.interfaces.observe_market_reference.feature:feature"
 trading-manage-execution-sessions = "app.services.trading.manage_execution_sessions.feature:feature"
 data-browse-reference = "app.services.data.browse_reference.feature:feature"
+orchestration-manage-jobs = "app.services.orchestration.manage_jobs.feature:feature"
+orchestration-deliver-notifications = "app.services.orchestration.deliver_notifications.feature:feature"
 
 
 # ============================================================================

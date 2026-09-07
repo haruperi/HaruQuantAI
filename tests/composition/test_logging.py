@@ -4,6 +4,8 @@ import asyncio
 import io
 import json
 import logging
+import queue
+import time
 import zipfile
 from pathlib import Path
 from typing import Any, override
@@ -14,6 +16,7 @@ from app.composition.logging import (
     DiagnosticCaptureHandler,
     LoggingConfig,
     LoggingHandle,
+    NonBlockingQueueHandler,
     StructuredJsonFormatter,
     bind_correlation,
     compute_secret_fingerprint,
@@ -407,6 +410,8 @@ def test_logging_config_validation_and_case_normalization() -> None:
         LoggingConfig(backup_count=0).validate()
     with pytest.raises(ValueError, match="capture_capacity must be strictly positive"):
         LoggingConfig(capture_capacity=0).validate()
+    with pytest.raises(ValueError, match="queue_capacity must be strictly positive"):
+        LoggingConfig(queue_capacity=0).validate()
     with pytest.raises(ValueError, match="retention_days must be strictly positive"):
         LoggingConfig(retention_days=0).validate()
     with pytest.raises(ValueError, match="Unsupported logging compression"):
@@ -557,3 +562,53 @@ def test_logging_usage_scenarios() -> None:
     from app.composition.logging import _harness_main
 
     assert _harness_main() == 0
+
+
+def test_non_blocking_queue_handler_drops_newest_without_waiting() -> None:
+    """A saturated output queue never blocks the emitting thread."""
+
+    class SlowHandler(logging.Handler):
+        @override
+        def emit(self, record: logging.LogRecord) -> None:
+            del record
+            time.sleep(0.05)
+
+    record_queue: queue.Queue[logging.LogRecord] = queue.Queue(maxsize=1)
+    handler = NonBlockingQueueHandler(record_queue, [SlowHandler()])
+    record_queue.put_nowait(_record("occupied"))
+    started = time.perf_counter()
+    handler.emit(_record("drop me"))
+    elapsed = time.perf_counter() - started
+    handler.close()
+
+    assert elapsed < 0.02
+    assert handler.dropped_records == 1
+
+
+def test_configured_io_uses_lifecycle_owned_queue(tmp_path: Path) -> None:
+    """Configured file I/O is queued and accepted records drain on close."""
+    target = logging.getLogger("test.nonblocking.configured")
+    previous_level = target.level
+    previous_propagate = target.propagate
+    target.propagate = False
+    log_file = tmp_path / "queued.log"
+    handle = configure_logging(
+        LoggingConfig(
+            console=False,
+            file_path=log_file,
+            log_directory=None,
+            queue_capacity=8,
+        ),
+        target,
+    )
+    try:
+        assert any(
+            isinstance(item, NonBlockingQueueHandler) for item in handle.handlers
+        )
+        target.info("queued record", extra={"event": "QUEUED"})
+    finally:
+        handle.close()
+        target.setLevel(previous_level)
+        target.propagate = previous_propagate
+
+    assert "queued record" in log_file.read_text(encoding="utf-8")

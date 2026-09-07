@@ -71,5 +71,5 @@ Upstream data reference state and storage remain unaffected.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.interfaces.observe_market_reference.gateway
+uv run python -m app.services.interfaces.observe_market_reference._usage
 ```

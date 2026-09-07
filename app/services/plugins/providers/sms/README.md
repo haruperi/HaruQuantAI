@@ -3,8 +3,9 @@
 > **Provider ID:** `notification.delivery.sms`
 > **Capability:** `notification.delivery.v1`
 > **Lifecycle:** Scoped, `reversible_ephemeral`
-> **Status:** Active
+> **Status:** Adapter implemented; backend readiness is configuration-dependent
 
 ## Overview
-Implements Twilio SMS notification delivery capability adhering to `NotificationDeliveryCapabilityV1`.
-Lifecycle cleanups release underlying transport resources.
+
+Adapts an injected, lifecycle-scoped SMS backend to `NotificationDeliveryCapabilityV1`.
+The provider never imports a removed utility implementation or performs I/O at import time.

@@ -56,4 +56,4 @@ Removing this feature withdraws its scoped `data.resolve-quality@1` provider. Au
 
 ## Evidence
 
-Run `uv run python -m app.services.data.data_quality_resolution.data_quality_resolution` for the executable scenario harness. Automated tests live in `tests/services/data/data_quality_resolution/`.
+Run `uv run python -m app.services.data.data_quality_resolution._usage` for the executable scenario harness. Automated tests live in `tests/services/data/data_quality_resolution/`.

@@ -40,7 +40,7 @@ Isolate result-panel frontend bundles behind a narrow read-only bridge with stri
 Run the executable usage demonstration:
 
 ```bash
-uv run python -m app.services.plugins.result_panels.plugin_result_panels
+uv run python -m app.services.plugins.result_panels._usage
 ```
 
 ## Runtime Effects

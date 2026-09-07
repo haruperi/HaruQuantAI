@@ -79,5 +79,5 @@ Interfaces features stay active.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.interfaces.operate_identity.gateway
+uv run python -m app.services.interfaces.operate_identity._usage
 ```

@@ -57,4 +57,4 @@ Removing this feature withdraws its scoped `data.import-indicators@1` provider. 
 
 ## Evidence
 
-Run `uv run python -m app.services.data.external_indicator_series.external_indicator_series` for the executable scenario harness. Automated tests live in `tests/services/data/external_indicator_series/`.
+Run `uv run python -m app.services.data.external_indicator_series._usage` for the executable scenario harness. Automated tests live in `tests/services/data/external_indicator_series/`.

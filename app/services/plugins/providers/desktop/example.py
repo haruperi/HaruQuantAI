@@ -11,24 +11,18 @@ if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 
 from app.kernel.effects import EffectScope
-from app.utils.notifications.desktop import (  # type: ignore[import-untyped]
-    build_desktop_notification_config,
-)
-from app.utils.notifications.providers.desktop.plugin import (  # type: ignore[import-untyped]
+from app.services.plugins.providers._notification import DisabledNotificationBackend
+from app.services.plugins.providers.desktop.plugin import (
     create_provider,
 )
 
 
 def main() -> None:
     """Demonstrate Desktop notification provider initialization without I/O."""
-    config = build_desktop_notification_config(
-        enabled=False,
-        timeout_seconds=5.0,
-    )
     scope = EffectScope()
     adapter = create_provider(
         dependencies={},
-        config={"configuration": config},
+        config={"configuration": DisabledNotificationBackend()},
         scope=scope,
     )
     print(f"{adapter.channel}: active={adapter.active}")

@@ -56,4 +56,4 @@ Removing this feature withdraws its scoped `data.manage-retention@1` provider. I
 
 ## Evidence
 
-Run `uv run python -m app.services.data.data_inspection_retention.data_inspection_retention` for the executable scenario harness. Automated tests live in `tests/services/data/data_inspection_retention/`.
+Run `uv run python -m app.services.data.data_inspection_retention._usage` for the executable scenario harness. Automated tests live in `tests/services/data/data_inspection_retention/`.

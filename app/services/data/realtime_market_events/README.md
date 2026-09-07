@@ -72,4 +72,4 @@ Removing this feature withdraws `data.stream-market-events@1`. Operational consu
 
 ## Evidence
 
-Run `uv run python -m app.services.data.realtime_market_events.realtime_market_events` for the executable scenario harness. Automated unit tests live in `tests/services/data/realtime_market_events/`.
+Run `uv run python -m app.services.data.realtime_market_events._usage` for the executable scenario harness. Automated unit tests live in `tests/services/data/realtime_market_events/`.

@@ -38,7 +38,7 @@ Register typed plugin contribution capabilities across all supported plugin type
 Run the executable usage demonstration:
 
 ```bash
-uv run python -m app.services.plugins.contributions.plugin_contributions
+uv run python -m app.services.plugins.contributions._usage
 ```
 
 ## Runtime Effects

@@ -52,4 +52,4 @@ Removing this feature withdraws its scoped `data.normalize-ticks@1` provider. Ti
 
 ## Evidence
 
-Run `uv run python -m app.services.data.tick_normalization.tick_normalization` for the executable scenario harness. Automated tests live in `tests/services/data/tick_normalization/`.
+Run `uv run python -m app.services.data.tick_normalization._usage` for the executable scenario harness. Automated tests live in `tests/services/data/tick_normalization/`.

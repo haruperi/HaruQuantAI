@@ -57,4 +57,4 @@ Removing this feature withdraws its scoped `data.align-series@1` provider. Strat
 
 ## Evidence
 
-Run `uv run python -m app.services.data.external_series_alignment.external_series_alignment` for the executable scenario harness. Automated tests live in `tests/services/data/external_series_alignment/`.
+Run `uv run python -m app.services.data.external_series_alignment._usage` for the executable scenario harness. Automated tests live in `tests/services/data/external_series_alignment/`.

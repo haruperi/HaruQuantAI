@@ -18,9 +18,9 @@ For focused work, load §1 for the boundary, the affected §4 feature entry, app
 
 Implement each feature directly at `app/services/[domain]/[feature]/`, discover it through the `haruquantai.features` Python entry-point group, and declare one immutable `FeatureSpec` in `manifest.py`. Domain registries and YAML manifests are not used.
 
-Every implemented feature contains a mandatory runtime-validated `README.md`, pure `__init__.py`, strict `config.py`, lifecycle `feature.py`, and focused implementation modules. Dependencies and effects flow through `FeatureContext` and `FeatureScope`; cross-feature implementation imports are forbidden. Persistent state is declared by `FeatureSpec.state`. Capability keys use `<domain>.<name>@<major>`. FR IDs remain product, acceptance, and test-trace identities rather than separate runtime registrations. A requirement `Depends` cell expresses product sequencing, traceability, or acceptance evidence only; runtime dependencies are declared separately with exact keys in `FeatureSpec.requires` or `FeatureSpec.optional`.
+Every implemented feature contains a mandatory runtime-validated `README.md`, pure `__init__.py`, strict `config.py`, lifecycle `feature.py`, focused implementation modules, and one required `_usage.py`. A feature adds `_persistence.py` only when it performs database operations. Dependencies and effects flow through `FeatureContext` and `FeatureScope`; cross-feature implementation imports are forbidden. Persistent state is declared by `FeatureSpec.state`. Capability keys use `<domain>.<name>@<major>`. FR IDs remain product, acceptance, and test-trace identities rather than separate runtime registrations. A requirement `Depends` cell expresses product sequencing, traceability, or acceptance evidence only; runtime dependencies are declared separately with exact keys in `FeatureSpec.requires` or `FeatureSpec.optional`.
 
-Feature-local automated tests live at `tests/services/[domain]/[feature]/`. Usage examples do not live under `tests/`: every core capability module documents Python and CLI usage, and exactly one designated primary domain-logic module per service feature contains the executable `if __name__ == "__main__":` demonstration. Follow the [Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md).
+Feature-local automated tests live at `tests/services/[domain]/[feature]/`. Usage examples do not live under `tests/` or in production logic modules: every core capability module documents its Python API, while the feature's required `_usage.py` contains the sole executable `if __name__ == "__main__":` demonstration. Follow the [Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md).
 
 For `D-UI`, substitute package `app/ui/` and the single-page workstation variant in `app/ui/README.md`. A `FEAT-UI-*` remains the capability/acceptance/removal owner; each visual contribution lives at `app/ui/src/widgets/[widget]/`, has exactly one owning feature, and uses a typed `manifest.ts`, strict configuration, lifecycle/render adapter, public `index.ts`, focused components, and an owning workflow README. One feature may contribute multiple widgets. Nonvisual infrastructure may live only in the documented `runtime/`, `workspaces/`, `clients/`, `context/`, `contracts/generated/`, and dev-only `mocks/` support folders, which own no second feature registry or product policy. Public contracts remain under `app/contracts/ui/`; generated TypeScript contracts are never hand-edited. Focused component tests may be colocated, while cross-widget, workspace, accessibility, browser, contract-parity, removal, and leak evidence lives under `tests/ui/`. UI features follow the same Domain → Feature → Responsibility → Functional Requirement identities and removal rules, but they do not use Python entry points or Python `__main__` harnesses. Production UI and its documentation are not verification evidence. The UI owns presentation, interaction, subscription lifecycle, and presentation state only, never business policy or authoritative domain state.
 
@@ -271,7 +271,9 @@ All runtime effects are owned by `FeatureScope` and disposed when reconciliation
 | Missing | `manifest.py` | Declare `FeatureSpec` (`SPEC`) | `SPEC`, `FEATURE_ID` | Standard: None<br>Contracts: `[CAPABILITY_KEY]`<br>Kernel: `FeatureSpec`, `CapabilityKey` |
 | Missing | `config.py` | Validate feature configuration schema | `[FeatureConfig]` | Standard: `dataclasses`, `typing`<br>Contracts: None |
 | Missing | `feature.py` | Implement asynchronous `mount()` and the zero-argument factory | `[FeatureClass]`, `create_feature()` | Standard: `typing`<br>Kernel: `FeatureContext`, `FeatureScope` |
-| Missing | `[use_case_1].py` | Execute core business logic; this designated primary module owns the feature's `__main__` usage harness | `[UseCaseService]`, `_run_usage_example()` | Standard: `datetime`, `decimal`<br>Contracts: `[DTOs]` |
+| Missing | `[use_case_1].py` | Execute focused production domain logic | `[UseCaseService]` | Standard: `datetime`, `decimal`<br>Contracts: `[DTOs]` |
+| Optional | `_persistence.py` | Own all feature-local database operations when durable state is required | Internal persistence helpers; no business policy | Public Workspace persistence contract; no raw connection |
+| Missing | `_usage.py` | Demonstrate all mapped FR scenarios with bounded safe inputs | `_run_usage_example()`, `__main__` | Public contracts and this feature's production modules |
 | Missing | `README.md` | Feature-level specification | None | Markdown documentation |
 
 #### Functional Requirements (FR)
@@ -279,7 +281,7 @@ All runtime effects are owned by `FeatureScope` and disposed when reconciliation
 | Status | Requirement ID | Responsibility | Implementing Symbol | Side Effects | Raises | Usage / Test |
 |---|---|---|---|---|---|---|
 | Missing | `FR-[DOM]-VALIDATE_CONFIG` | Validate feature configuration parameters | `[FeatureConfig].from_dict()` | None | `ValueError`: invalid config | **Unit:** `tests/services/[domain]/[feature]/test_config.py` |
-| Missing | `FR-[DOM]-[ACTION_1]` | The system shall [perform observable action] | `[function_name](...) -> DTO` | `None` (pure) | `ValueError`: invalid input | **Unit:** `tests/services/[domain]/[feature]/test_[use_case].py`<br>**Usage:** `app/services/[domain]/[feature]/[use_case_1].py::__main__` scenario `[action_1]` |
+| Missing | `FR-[DOM]-[ACTION_1]` | The system shall [perform observable action] | `[function_name](...) -> DTO` | `None` (pure) | `ValueError`: invalid input | **Unit:** `tests/services/[domain]/[feature]/test_[use_case].py`<br>**Usage:** `app/services/[domain]/[feature]/_usage.py` scenario `[action_1]` |
 | Missing | `FR-[DOM]-[ACTION_2]` | The system shall [persist state / coordinate] | `[Service.execute](...) -> Result` | `Persistence write` | `RuntimeError`: failed storage | **Unit:** `tests/services/[domain]/[feature]/test_[use_case].py` |
 
 #### Failure Behaviour
@@ -296,10 +298,10 @@ Physically removing or disabling this feature unbinds `[domain].[capability-name
 
 ### Feature Usage Examples
 
-Every core capability module starts with a comprehensive header docstring covering its purpose, key capabilities, Python API usage, and executable module command. Exactly one primary domain-logic module owns the service feature's executable demonstration:
+Every core capability module starts with a comprehensive header docstring covering its purpose, key capabilities, and Python API usage. The required `_usage.py` is the service feature's sole executable demonstration owner:
 
 ```python
-# app/services/[domain]/[feature]/[use_case_1].py
+# app/services/[domain]/[feature]/_usage.py
 def _run_usage_example() -> None:
     """Demonstrate and verify the feature with bounded safe inputs."""
     request = [RequestDTO](...)
@@ -313,7 +315,7 @@ if __name__ == "__main__":
     _run_usage_example()
 ```
 
-Run it with `uv run python -m app.services.[domain].[feature].[use_case_1]`. Map every applicable FR to a named scenario in this single harness. Automated tests verify the behavior separately and are not usage examples.
+Run it with `uv run python -m app.services.[domain].[feature]._usage`. Map every applicable FR to a named scenario in this single harness. `_usage.py` imports production behavior but does not implement it. Automated tests verify the behavior separately and are not usage examples.
 
 ---
 
@@ -401,8 +403,8 @@ A feature within this domain is not complete until all 20 criteria are verified:
 - [ ] 15. **Starts Feature-Absent:** Application starts and operates cleanly with the feature deleted from disk.
 - [ ] 16. **Interfaces / UI Degradation Handled:** Public gateways expose stable unavailability or withdraw affected surfaces when the feature is absent.
 - [ ] 17. **README Complete:** README documents purpose, capability, dependencies, effects, state, and removal behavior.
-- [ ] 18. **Module Usage Documented:** Every core capability module documents purpose, key capabilities, Python API usage, and its executable command.
-- [ ] 19. **Usage Harness Green:** Exactly one primary domain-logic module owns a passing, bounded `if __name__ == "__main__":` harness covering every mapped FR scenario.
+- [ ] 18. **Module Usage Documented:** Every core capability module documents purpose, key capabilities, and Python API usage and refers readers to `_usage.py`.
+- [ ] 19. **Usage Harness Green:** The required `_usage.py` owns a passing, bounded `if __name__ == "__main__":` harness covering every mapped FR scenario.
 - [ ] 20. **Quality Gates Green:** Ruff, Mypy, Import Linter, AST Invariants, and Pytest pass with $\ge 80\%$ coverage.
 
 ---
@@ -417,7 +419,7 @@ For any future modification:
 3. Update FeatureSpec in manifest.py (requires, optional, provides).
 4. Update config schema in config.py if settings change.
 5. Implement minimal code changes within the focused use case file.
-6. Update comprehensive module documentation and the primary module's __main__ usage harness.
+6. Update comprehensive module documentation and the required `_usage.py` harness.
 7. Execute the usage harness and verify every mapped FR scenario.
 8. Add or update unit tests under tests/services/[domain]/[feature]/.
 9. Verify physical removability with scripts/verify_feature_removal.py.

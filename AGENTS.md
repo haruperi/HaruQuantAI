@@ -22,7 +22,10 @@
 - Cross-boundary DTOs, protocols, events, errors, and capability keys live in `app/contracts/`; business-neutral lifecycle/composition primitives live in `app/kernel/` and `app/composition/` according to `docs/ARCHITECTURE.md`.
 - A feature never imports another feature implementation. Consumers declare exact capability dependencies and resolve providers through `FeatureContext`.
 - A domain-level shared support capability is permitted only when at least three registered features genuinely consume the same coherent capability, unless another explicit architecture exception applies.
-- Persistent domains may use the documented persistence/migration conventions in the owning README and architecture guide; persistence support never absorbs authorization, policy, orchestration, or feature semantics.
+- A stateful service feature may add one feature-local `_persistence.py` module as the single owner of
+  its database operations. It uses public Workspace persistence contracts, never raw connections or
+  unrestricted SQL. Stateless features omit it. Persistence support follows the owning README and
+  architecture guide and never absorbs authorization, policy, orchestration, or feature semantics.
 - D-UI follows its own owning README: registered `FEAT-UI-*` capabilities own widgets; widgets never have multiple feature owners; shared UI support folders do not become product-policy owners.
 
 ## 2. Atomic Task workflow
@@ -236,7 +239,9 @@ Normal Task branch, Reviewer, commit, and no-ff merge rules remain unchanged.
 - No bare `except:` and no silent failures.
 - Application/library code uses `logging.getLogger(__name__)`, not `print`; bounded executable teaching/usage harnesses may print secret-safe results.
 - Do not log secrets, credentials, personal information, full sensitive payloads, or trading account data.
-- Every service feature has one designated primary domain-logic module with bounded executable usage evidence. Tests verify behavior but do not become a second usage implementation.
+- Every service feature has one or more focused domain-logic modules and one required `_usage.py`
+  module containing its bounded executable examples. Domain-logic modules do not contain usage
+  harnesses, and tests verify behavior without becoming a second usage implementation.
 - Feature-level tests belong under the owning test namespace; system architecture/composition/removability tests remain in their documented locations.
 - Close SQLite handles, sockets, files, and subprocesses explicitly. Async mocks must return genuine awaitables.
 

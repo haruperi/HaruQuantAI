@@ -447,6 +447,79 @@
       "title": "ExecutableAllowlistEntry",
       "type": "object"
     },
+    "JobRecord": {
+      "additionalProperties": false,
+      "description": "Authoritative state of one accepted logical job.",
+      "properties": {
+        "created_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Created At",
+          "type": "string"
+        },
+        "idempotency_key": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "job_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "message": {
+          "default": "",
+          "title": "Message",
+          "type": "string"
+        },
+        "progress": {
+          "default": "0",
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Progress",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "state": {
+          "$ref": "#/$defs/JobState"
+        },
+        "updated_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Updated At",
+          "type": "string"
+        },
+        "version": {
+          "minimum": 1,
+          "title": "Version",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "job_id",
+        "idempotency_key",
+        "state",
+        "version",
+        "created_at",
+        "updated_at"
+      ],
+      "title": "JobRecord",
+      "type": "object"
+    },
+    "JobState": {
+      "enum": [
+        "QUEUED",
+        "LEASED",
+        "RUNNING",
+        "PAUSING",
+        "PAUSED",
+        "RESUMING",
+        "STOPPING",
+        "STOPPED",
+        "COMPLETED",
+        "FAILED",
+        "CANCELLED"
+      ],
+      "type": "string"
+    },
     "JsonObject": {
       "additionalProperties": {
         "$ref": "#/$defs/JsonValue"
@@ -753,8 +826,10 @@
         },
         "status": {
           "enum": [
+            "PENDING",
             "DELIVERED",
             "FAILED",
+            "UNKNOWN",
             "SUPPRESSED_RATE_LIMIT",
             "DISABLED"
           ],
@@ -1095,6 +1170,49 @@
         }
       },
       "title": "ProblemDetails",
+      "type": "object"
+    },
+    "ProgressEvent": {
+      "additionalProperties": false,
+      "description": "Ordered progress observation emitted after durable state changes.",
+      "properties": {
+        "job_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "occurred_at": {
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "progress": {
+          "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d*[1-9])?$",
+          "title": "Progress",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": 1,
+          "default": 1,
+          "title": "Schema Version",
+          "type": "integer"
+        },
+        "sequence": {
+          "minimum": 1,
+          "title": "Sequence",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "job_id",
+        "sequence",
+        "progress",
+        "message",
+        "occurred_at"
+      ],
+      "title": "ProgressEvent",
       "type": "object"
     },
     "ProjectExpression": {
@@ -3005,6 +3123,9 @@
     "ExecutableAllowlistEntry": {
       "$ref": "#/$defs/ExecutableAllowlistEntry"
     },
+    "JobRecord": {
+      "$ref": "#/$defs/JobRecord"
+    },
     "NetworkTrainingPlan": {
       "$ref": "#/$defs/NetworkTrainingPlan"
     },
@@ -3025,6 +3146,9 @@
     },
     "PortSpec": {
       "$ref": "#/$defs/PortSpec"
+    },
+    "ProgressEvent": {
+      "$ref": "#/$defs/ProgressEvent"
     },
     "ProjectExpression": {
       "$ref": "#/$defs/ProjectExpression"

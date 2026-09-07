@@ -68,7 +68,7 @@ None. Durable watchlist state remains owned by the Workspace feature.
 Run the bounded executable demonstration with:
 
 ```powershell
-uv run python -m app.services.interfaces.operate_watchlists.gateway
+uv run python -m app.services.interfaces.operate_watchlists._usage
 ```
 
 ## Failure Behavior
