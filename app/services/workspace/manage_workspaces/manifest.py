@@ -1,4 +1,4 @@
-"""Feature specification for Workspace Lifecycle."""
+"""Feature specification for workspace management."""
 
 from app.contracts.workspace.capabilities import MANAGE_WORKSPACES_CAPABILITY
 from app.kernel.feature import FeatureSpec
@@ -11,12 +11,20 @@ SPEC: FeatureSpec = FeatureSpec(
     requires=frozenset(),
     optional=frozenset(),
     conflicts=frozenset(),
-    description="Initialize, migrate, lock, recover, and back up a workspace.",
+    description="Open, fence, recover, back up, and restore a workspace.",
     state=StateDeclaration(
         namespace="workspace",
-        schema_version=1,
+        schema_version=2,
         retention_policy=RetentionPolicy.RETAIN,
         description="Workspace metadata database, schema migrations, and leases",
     ),
-    config_keys=frozenset(),
+    config_keys=frozenset(
+        {
+            "auto_migrate",
+            "busy_timeout_seconds",
+            "staged_grace_period_seconds",
+            "max_manifest_files",
+            "max_backup_bytes",
+        }
+    ),
 )

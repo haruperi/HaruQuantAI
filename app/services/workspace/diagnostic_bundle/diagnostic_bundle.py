@@ -33,7 +33,7 @@ import sys
 import zipfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 from uuid import uuid4
 
 from app.contracts.workspace.errors import (
@@ -48,12 +48,14 @@ from app.contracts.workspace.models import (
 from app.contracts.workspace.ports import (
     BuildDiagnosticsCapability,
     ConfigureRuntimeCapability,
-    ManageWorkspacesCapability,
     SecureLocalAccessCapability,
 )
 from app.services.workspace.diagnostic_bundle.config import (
     DiagnosticBundleConfig,
 )
+
+if TYPE_CHECKING:
+    from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
 
 BUILD_VERSION = "0.1.0"
 BUILD_COMMIT = "90b002c"

@@ -28,7 +28,7 @@
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
       "target_dir": "app/services/workspace/manage_workspaces",
-      "reuse_path": "app/services/workspace/workspace_lifecycle",
+      "reuse_path": "app/services/workspace/manage_workspaces",
       "usage_module": "app.services.workspace.manage_workspaces._usage",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json"
     },

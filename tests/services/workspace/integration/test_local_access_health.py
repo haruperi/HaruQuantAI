@@ -26,11 +26,11 @@ from app.kernel.scope import FeatureScope
 from app.services.workspace.local_access_health.feature import (
     feature as local_access_feature,
 )
+from app.services.workspace.manage_workspaces.feature import (
+    feature as manage_workspaces_feature,
+)
 from app.services.workspace.runtime_configuration.feature import (
     feature as runtime_config_feature,
-)
-from app.services.workspace.workspace_lifecycle.feature import (
-    feature as workspace_lifecycle_feature,
 )
 
 if TYPE_CHECKING:
@@ -67,7 +67,7 @@ async def test_workflow_ws_003_secure_local_access_and_health(
     event_bus = EventBus()
 
     # Mount lifecycle, runtime config, and local access features
-    await _mount_feature(workspace_lifecycle_feature(), registry, event_bus)
+    await _mount_feature(manage_workspaces_feature(), registry, event_bus)
     await _mount_feature(runtime_config_feature(), registry, event_bus)
     await _mount_feature(local_access_feature(), registry, event_bus)
 
@@ -119,7 +119,7 @@ async def test_workflow_ws_003_secure_local_access_and_health(
 
     ready_readiness = secure_access.report_system_readiness(workspace=ws_ref)
     assert ready_readiness.ready is True
-    assert ready_readiness.schema_version == 1
+    assert ready_readiness.schema_version == 2
     assert ready_readiness.worker_capacity >= 1
 
     # Redaction checks

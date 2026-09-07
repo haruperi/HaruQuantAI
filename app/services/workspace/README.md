@@ -104,7 +104,7 @@ Feature owners are independent and physically removable. The selected package is
 
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) | Open, recover and back up a workspace | `app/services/workspace/manage_workspaces/` | U0 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) | Open, recover and back up a workspace | `app/services/workspace/manage_workspaces/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) | Execute bounded feature-owned transactions | `app/services/workspace/execute_persistence/` | U0 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Publish and retain immutable artifact bytes | `app/services/workspace/manage_artifacts/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Verify accounts, principals and sessions | `app/services/workspace/manage_accounts/` | U0 | 3 | 1 | NOT_REVALIDATED |
@@ -203,7 +203,7 @@ Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expe
 
 > **Feature ID:** `FEAT-WS-MANAGE_WORKSPACES`
 > **Domain:** `workspace`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — implementation and full scoped acceptance evidence **VERIFIED**.
 > **Selected owner:** `app/services/workspace/manage_workspaces/`
 > **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/HaruQuantAI_Phased_Feature_Implementation_Plan.md).
 
@@ -272,9 +272,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-WS-MANAGE_WORKSPACES-001` | Initialize/open a workspace with one active writer fence and explicit read-only recovery mode. | `AT-WS-MANAGE_WORKSPACES-001` | Two concurrent writers yield one owner and one denied/read-only session; reopening preserves the same workspace ID. |
-| PENDING | `FR-TRC-WS-MANAGE_WORKSPACES-002` | Back up metadata and referenced immutable artifacts as one verified manifest and restore into empty staging before switching the active workspace. | `AT-WS-MANAGE_WORKSPACES-002` | Corrupt one member: restore is rejected before switch; a valid restore reconciles all counts, hashes and references. |
-| PENDING | `FR-TRC-WS-MANAGE_WORKSPACES-003` | Reconcile incomplete migration/publication records after a crash without deleting committed domain evidence. | `AT-WS-MANAGE_WORKSPACES-003` | Inject crashes before promotion and after promotion/before catalogue commit; no committed row points at partial bytes and orphan custody is reported. |
+| VERIFIED | `FR-TRC-WS-MANAGE_WORKSPACES-001` | Initialize/open a workspace with one active writer fence and explicit read-only recovery mode. | `AT-WS-MANAGE_WORKSPACES-001` | Two concurrent writers yield one owner and one denied/read-only session; reopening preserves the same workspace ID. |
+| VERIFIED | `FR-TRC-WS-MANAGE_WORKSPACES-002` | Back up metadata and referenced immutable artifacts as one verified manifest and restore into empty staging before switching the active workspace. | `AT-WS-MANAGE_WORKSPACES-002` | Corrupt one member: restore is rejected before switch; a valid restore reconciles all counts, hashes and references. |
+| VERIFIED | `FR-TRC-WS-MANAGE_WORKSPACES-003` | Reconcile incomplete migration/publication records after a crash without deleting committed domain evidence. | `AT-WS-MANAGE_WORKSPACES-003` | Inject crashes before promotion and after promotion/before catalogue commit; no committed row points at partial bytes and orphan custody is reported. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -282,7 +282,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-WS-MANAGE_WORKSPACES-001` | Removing FEAT-WS-MANAGE_WORKSPACES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_WORKSPACES-001` | Disable and physically remove manage_workspaces; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| VERIFIED | `NFR-TRC-WS-MANAGE_WORKSPACES-001` | Removing FEAT-WS-MANAGE_WORKSPACES withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_WORKSPACES-001` | Disable and physically remove manage_workspaces; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -292,15 +292,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/workspace/manage_workspaces/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/workspace/manage_workspaces/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/workspace/manage_workspaces/test_traceability.py` | VERIFIED: exact named tests bind all three acceptance oracles. |
+| Every ATN ID in this card | `tests/services/workspace/manage_workspaces/test_lifecycle.py` | VERIFIED: withdrawal, unrelated capability survival, retained data and idempotent cleanup. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-WS-MANAGE_WORKSPACES/acceptance.json` | VERIFIED for contract/provider/composition/end-to-end; Interfaces and UI are inapplicable to this local root capability. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Verified `_usage.py` command:**
 
 ```powershell
 uv run --frozen python -m app.services.workspace.manage_workspaces._usage

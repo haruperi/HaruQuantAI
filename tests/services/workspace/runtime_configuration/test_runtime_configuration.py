@@ -20,13 +20,13 @@ from app.contracts.workspace.models import (
     StorageGuardLimits,
     WorkspaceSettings,
 )
+from app.services.workspace.manage_workspaces.manage_workspaces import (
+    WorkspaceLifecycleService,
+)
 from app.services.workspace.runtime_configuration.runtime_configuration import (
     SUPPORT_PROFILE_VERSION,
     RuntimeConfigurationService,
     fr_ws_evaluate_runtime_resources,
-)
-from app.services.workspace.workspace_lifecycle.workspace_lifecycle import (
-    WorkspaceLifecycleService,
 )
 
 PROBE_PORT = 48812

@@ -23,7 +23,7 @@ from app.services.workspace.local_access_health.local_access_health import (
     BUILD_VERSION,
     LocalAccessHealthService,
 )
-from app.services.workspace.workspace_lifecycle.workspace_lifecycle import (
+from app.services.workspace.manage_workspaces.manage_workspaces import (
     WorkspaceLifecycleService,
 )
 
@@ -174,7 +174,7 @@ def test_ws_report_system_readiness(
     ready_status = service.report_system_readiness(workspace=ref)
     assert ready_status.ready is True
     assert ready_status.healthy is True
-    assert ready_status.schema_version == 1
+    assert ready_status.schema_version == 2
     assert ready_status.migrations_current is True
     assert ready_status.state_recovered is True
     assert ready_status.worker_capacity >= 1

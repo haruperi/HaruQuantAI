@@ -43,7 +43,7 @@ import secrets
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import override
+from typing import TYPE_CHECKING, override
 from uuid import uuid4
 
 from app.contracts.workspace.errors import (
@@ -62,12 +62,14 @@ from app.contracts.workspace.models import (
 )
 from app.contracts.workspace.ports import (
     ConfigureRuntimeCapability,
-    ManageWorkspacesCapability,
     SecureLocalAccessCapability,
 )
 from app.services.workspace.local_access_health.config import (
     LocalAccessHealthConfig,
 )
+
+if TYPE_CHECKING:
+    from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
 
 BUILD_VERSION = "0.1.0"
 

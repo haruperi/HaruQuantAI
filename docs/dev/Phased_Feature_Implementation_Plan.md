@@ -339,9 +339,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-03"></a>
 
-### - [ ] Task 1.03 — FEAT-WS-MANAGE_WORKSPACES — Open, recover and back up a workspace
+### - [x] Task 1.03 — FEAT-WS-MANAGE_WORKSPACES — Open, recover and back up a workspace
 
-**Status:** `PARTIAL` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
+**Status:** `COMPLETE` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
 
 **Order prerequisites:** Phase 0 entry gate; no feature-task predecessor.
 
@@ -349,7 +349,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 A user can reopen the same workspace after a crash without losing committed metadata or artifact references.
 
-**Reuse:** `app/services/workspace/workspace_lifecycle`. The current workspace_lifecycle package exists with the four delivery files, but it is not listed in the inspected feature entry-point group. Preserve its recovery logic; reconcile target path/key and provide registration, resource-aware backup/publication and complete traceability evidence.
+**Reconciled owner:** `app/services/workspace/manage_workspaces`. The former `workspace_lifecycle` implementation was adapted into the canonical package, registered as `workspace-manage-workspaces`, and verified with resource-aware backup/publication recovery and complete scoped traceability evidence.
 
 #### ii. Functional and non-functional requirements
 
@@ -389,7 +389,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `fix(workspace): complete FEAT-WS-MANAGE_WORKSPACES`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted state:** Quick-fix implementation and validation completed directly on `main`; the worktree remains uncommitted until a separate owner commit request, as required by quick-fix mode.
 
 ---
 

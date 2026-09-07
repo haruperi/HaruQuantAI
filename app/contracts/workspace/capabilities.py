@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
+    from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
     from app.contracts.workspace.ports import (
         AdministerSettingsCapability,
         BuildDiagnosticsCapability,
@@ -13,7 +14,6 @@ if TYPE_CHECKING:
         HostWorkspacesCapability,
         ManageAccountsCapability,
         ManageWatchlistsCapability,
-        ManageWorkspacesCapability,
         SecureLocalAccessCapability,
     )
 

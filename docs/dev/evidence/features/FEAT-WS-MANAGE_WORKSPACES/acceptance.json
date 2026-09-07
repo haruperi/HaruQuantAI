@@ -1,0 +1,80 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
+  "task_id": "1.03",
+  "status": "ACCEPTED",
+  "baseline_commit": "edcf358f69d80f383c8e840ed641f807c04259f5",
+  "acceptance_commit": "UNCOMMITTED_QUICK_FIX_ON_MAIN",
+  "requirements": [
+    {
+      "id": "FR-TRC-WS-MANAGE_WORKSPACES-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_workspaces/test_traceability.py::test_trc_manage_workspaces_001"
+    },
+    {
+      "id": "FR-TRC-WS-MANAGE_WORKSPACES-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_workspaces/test_traceability.py::test_trc_manage_workspaces_002"
+    },
+    {
+      "id": "FR-TRC-WS-MANAGE_WORKSPACES-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_workspaces/test_traceability.py::test_trc_manage_workspaces_003"
+    },
+    {
+      "id": "NFR-TRC-WS-MANAGE_WORKSPACES-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_workspaces/test_lifecycle.py::test_trc_manage_workspaces_nfr_001"
+    },
+    {
+      "id": "CONTRACT_PROVIDER_COMPOSITION_E2E",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/integration/test_manage_workspaces.py"
+    },
+    {
+      "id": "ARCH-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_workspaces/test_logging.py"
+    },
+    {
+      "id": "INTERFACES_STAGE",
+      "status": "WAIVED",
+      "evidence_target": "Local filesystem root capability; no Interfaces adapter is owned by this feature."
+    },
+    {
+      "id": "UI_STAGE",
+      "status": "WAIVED",
+      "evidence_target": "No widget or UI surface is owned by this feature."
+    }
+  ],
+  "commands": [
+    {
+      "command": "uv run pytest --no-cov tests/services/workspace/manage_workspaces tests/services/workspace/integration/test_manage_workspaces.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy app/contracts/workspace/manage_workspaces.py app/services/workspace/manage_workspaces tests/services/workspace/manage_workspaces",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff check <changed Python paths>",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run python -m app.services.workspace.manage_workspaces._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run pre-commit run",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run pre-commit run --hook-stage pre-push",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "APPROVED",
+    "reviewer_notes": "Owner-approved interactive quick-fix verification in the same chat; independent Reviewer is intentionally not part of quick-fix mode. The baseline HEAD remains unchanged and no commit, merge, or push was performed."
+  }
+}

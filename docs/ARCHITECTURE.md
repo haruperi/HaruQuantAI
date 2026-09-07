@@ -377,8 +377,15 @@ Composition owns logging setup, structured JSON formatting, correlation context,
 diagnostic capture, and handler lifecycle. Console and file sinks run behind one lifecycle-owned,
 bounded queue; producer threads never wait on sink I/O, and saturation drops the newest record with
 an observable counter. Shutdown drains accepted records before closing owned sinks. Modules emit
-with `logging.getLogger(__name__)`; services do not configure global logging or import Composition
-merely to log. Owners define audit meaning; logs never become authorization or canonical state.
+through the system-wide structured facade by importing `get_logger` from
+`app.composition.logging` and declaring `logger = get_logger(__name__)`. Application and service
+modules never configure handlers or global logging; direct standard-library logger construction is
+reserved for logging/bootstrap infrastructure that implements or configures the facade. Owners
+define audit meaning; logs never become authorization or canonical state. Operational events use
+bounded structured fields at workflow boundaries, public service entry points, external
+interactions, state transitions, side-effect boundaries, important decisions, retries and failures.
+Pure helpers, trivial accessors, deterministic transformations and high-frequency numerical paths
+remain log-free unless an owning requirement explicitly needs telemetry.
 
 Telemetry is bounded, redacted, and causally links applicable request, workspace, account, job, run,
 result, provider, and operational identities. Measurement separates queue, compilation, compute,

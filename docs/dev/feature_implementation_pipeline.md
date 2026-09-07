@@ -52,7 +52,23 @@ These boundaries are enforced by `.importlinter`, `scripts/architecture_check.py
 | Import-time safety | Feature modules perform no runtime registration, I/O, task creation, connection, or other external mutation during import. |
 | UI adapter purity | `app/ui/` imports only generated/public contracts and UI-local modules; it never imports private services, accesses persistence/provider SDKs, or implements business policy. |
 
-Logging follows the same dependency discipline. A module that needs logging declares `logger = logging.getLogger(__name__)`; there is no `app.utils.logger` or other shared logger singleton. Application logging configuration belongs to `app/composition/logging.py` and is invoked at the `app/main.py` bootstrap boundary. Composition owns handlers, structured formatting, redaction, correlation context, retention integration, and cleanup. Feature packages never call `logging.basicConfig()`, import Composition to obtain a logger, or treat operational audit records as ordinary diagnostic logs. Pure contracts, DTOs, deterministic helpers, trivial accessors, and high-frequency numerical functions do not emit logs unless an owning requirement explicitly needs them.
+Logging follows the same dependency discipline. A module that needs operational logging imports
+`get_logger` from `app.composition.logging` and declares
+`logger = get_logger(__name__)`; the removed `app.utils.logger` singleton is not reintroduced.
+Application logging configuration remains in `app/composition/logging.py` and is invoked only at the
+`app/main.py` bootstrap boundary. Composition owns handlers, structured formatting, redaction,
+correlation context, retention integration and cleanup. Feature packages obtain the facade but never
+call `logging.basicConfig()`, configure handlers, or treat operational audit records as ordinary
+diagnostic logs. Emit bounded structured events at workflow boundaries, public service entry points,
+external interactions, state transitions, side-effect boundaries, important decisions, retries and
+failures. Pure contracts, DTOs, deterministic helpers, trivial accessors and high-frequency
+numerical functions remain log-free unless an owning requirement explicitly needs telemetry. Logs
+never expose secrets, credentials, personal information, complete sensitive payloads, local paths,
+session/fence tokens or sensitive trading/account data; use stable error codes and exception types
+instead of raw exception messages where those messages can carry sensitive context.
+Direct `logging.getLogger(__name__)` calls that predate this rule are migration debt, not precedent;
+reconcile them to the facade when their owning feature is implemented or reviewed, while keeping
+logging internals and bootstrap configuration on the standard-library primitives they implement.
 
 Cross-feature collaboration uses public contracts:
 
@@ -437,9 +453,12 @@ purge rules. Stateless features omit this file.
 
 ### 4.8 `_usage.py`
 
-Every service feature provides `_usage.py` as its sole executable usage owner. It may contain as many
-named scenarios as needed to demonstrate every mapped FR without making production modules large or
-mixing teaching code with domain behavior:
+Every service feature provides `_usage.py` as its sole executable usage owner. It calls every public
+operation and constructor owned by the feature through the documented public API, using realistic,
+bounded, secret-safe offline data or genuine bounded runtime state. It includes useful success,
+invalid/unavailable/refusal and cleanup observations and may contain as many named scenarios as
+needed to demonstrate every mapped FR without making production modules large or mixing teaching
+code with domain behavior:
 
 ```python
 def _run_usage_example() -> None:
@@ -461,8 +480,10 @@ The harness may print concise results because it is an explicitly executed teach
 uv run python -m app.services.<domain>.<feature_slug>._usage
 ```
 
-`_usage.py` imports and composes production behavior but never implements business logic. Focused
-modules document their Python API and refer to `_usage.py` instead of creating competing `__main__`
+`_usage.py` is executed directly, is excluded from pytest collection, and imports and composes
+production behavior without implementing business logic. Automated tests remain separate
+verification evidence and never become a second usage implementation. Focused modules document
+their Python API and refer to `_usage.py` instead of creating competing `__main__`
 demonstrations. The owning domain README maps each applicable FR to a named scenario in this harness.
 The `tests/` tree contains automated verification only and never owns usage examples.
 

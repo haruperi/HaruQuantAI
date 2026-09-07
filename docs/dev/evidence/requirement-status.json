@@ -66,7 +66,7 @@
       "task_id": "1.03",
       "text": "Initialize/open a workspace with one active writer fence and explicit read-only recovery mode.",
       "disposition": "adapt",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "fr_id": "FR-TRC-WS-MANAGE_WORKSPACES-002",
@@ -74,7 +74,7 @@
       "task_id": "1.03",
       "text": "Back up metadata and referenced immutable artifacts as one verified manifest and restore into empty staging before switching the active workspace.",
       "disposition": "adapt",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "fr_id": "FR-TRC-WS-MANAGE_WORKSPACES-003",
@@ -82,7 +82,7 @@
       "task_id": "1.03",
       "text": "Reconcile incomplete migration/publication records after a crash without deleting committed domain evidence.",
       "disposition": "adapt",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "fr_id": "FR-TRC-WS-MANAGE_ACCOUNTS-001",
@@ -4633,7 +4633,7 @@
       "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
       "task_id": "1.03",
       "text": "Removing FEAT-WS-MANAGE_WORKSPACES withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "current_status": "PENDING_EXECUTION"
+      "current_status": "VERIFIED"
     },
     {
       "nfr_id": "NFR-TRC-WS-MANAGE_ACCOUNTS-001",

@@ -37,15 +37,15 @@
       "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
       "title": "Open, recover and back up a workspace",
       "domain": "Workspace",
-      "status": "PARTIAL",
+      "status": "COMPLETE",
       "first_slice": "U0",
       "owner_specification": "app/services/workspace/README.md",
-      "reuse_path": "app/services/workspace/workspace_lifecycle",
-      "entry_point_registered": false,
+      "reuse_path": "app/services/workspace/manage_workspaces",
+      "entry_point_registered": true,
       "fr_count": 3,
       "local_nfr_count": 1,
       "at_count": 4,
-      "disposition": "REUSE_ADAPT"
+      "disposition": "REUSE_ADAPTED"
     },
     {
       "task_id": "1.04",

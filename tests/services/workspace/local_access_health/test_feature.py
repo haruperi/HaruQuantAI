@@ -19,7 +19,7 @@ from app.services.workspace.local_access_health.feature import (
     feature,
 )
 from app.services.workspace.local_access_health.manifest import SPEC
-from app.services.workspace.workspace_lifecycle.workspace_lifecycle import (
+from app.services.workspace.manage_workspaces.manage_workspaces import (
     WorkspaceLifecycleService,
 )
 

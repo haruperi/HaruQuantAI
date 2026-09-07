@@ -12,11 +12,11 @@ from app.services.workspace.diagnostic_bundle.diagnostic_bundle import (
 from app.services.workspace.local_access_health.local_access_health import (
     LocalAccessHealthService,
 )
+from app.services.workspace.manage_workspaces.manage_workspaces import (
+    WorkspaceLifecycleService,
+)
 from app.services.workspace.runtime_configuration.runtime_configuration import (
     RuntimeConfigurationService,
-)
-from app.services.workspace.workspace_lifecycle.workspace_lifecycle import (
-    WorkspaceLifecycleService,
 )
 
 

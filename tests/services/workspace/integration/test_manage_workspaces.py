@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import hashlib
+import sqlite3
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -13,14 +15,17 @@ from app.kernel.context import DefaultFeatureContext
 from app.kernel.events import EventBus
 from app.kernel.registry import ServiceRegistry
 from app.kernel.scope import FeatureScope
-from app.services.workspace.workspace_lifecycle.feature import feature
+from app.services.workspace.manage_workspaces.feature import feature
+from app.services.workspace.manage_workspaces.manage_workspaces import (
+    ManageWorkspacesService,
+)
 
 if TYPE_CHECKING:
     from app.kernel.capability import CapabilityKey
 
 
 @pytest.mark.asyncio
-async def test_workspace_lifecycle_workflow(tmp_path: Path) -> None:
+async def test_manage_workspaces_workflow(tmp_path: Path) -> None:
     """Verify WF-WS-001: end-to-end lifecycle through mounted capability context."""
     feat = feature()
     registry = ServiceRegistry()
@@ -49,6 +54,7 @@ async def test_workspace_lifecycle_workflow(tmp_path: Path) -> None:
     workspace_service = registry.resolve(MANAGE_WORKSPACES_CAPABILITY)
     assert workspace_service is not None
     assert isinstance(workspace_service, ManageWorkspacesCapability)
+    assert isinstance(workspace_service, ManageWorkspacesService)
 
     ws_root = tmp_path / "lifecycle_ws"
     backup_root = tmp_path / "backups"
@@ -70,6 +76,23 @@ async def test_workspace_lifecycle_workflow(tmp_path: Path) -> None:
     # 6. FR-WS-RECOVER_WORKSPACE_STATE: Recover staged artifacts
     staged_file = ws_root / "staging" / "test_uncommitted.tmp"
     staged_file.write_text("in-flight work", encoding="utf-8")
+    connection = sqlite3.connect(ws_root / "metadata" / "workspace.db")
+    try:
+        with connection:
+            connection.execute(
+                "INSERT INTO publication_journal "
+                "(publication_id, content_hash, staged_relative_path, "
+                "final_relative_path, state, created_at) "
+                "VALUES ('integration-stage', ?, ?, ?, 'STAGED', ?)",
+                (
+                    hashlib.sha256(b"in-flight work").hexdigest(),
+                    "staging/test_uncommitted.tmp",
+                    "artifacts/objects/test-uncommitted.bin",
+                    "2026-01-01T00:00:00.000000Z",
+                ),
+            )
+    finally:
+        connection.close()
     recovery = workspace_service.recover_workspace_state(ref)
     assert recovery.staged_artifacts_cleaned == 1
     assert not staged_file.exists()
@@ -77,6 +100,7 @@ async def test_workspace_lifecycle_workflow(tmp_path: Path) -> None:
     # 7. Add sample committed artifact
     sample_blob = ws_root / "artifacts" / "objects" / "sample_series.parquet"
     sample_blob.write_bytes(b"PARQUET_MAGIC_SAMPLE_DATA")
+    workspace_service.catalogue_artifact(ref, sample_blob)
 
     # 8. FR-WS-BACKUP_WORKSPACE: Produce verified backup snapshot
     manifest = workspace_service.backup_workspace(ref, backup_root)

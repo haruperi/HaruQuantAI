@@ -39,17 +39,6 @@ repos:
       - id: debug-statements
         stages: [pre-commit]
 
-  # Secret detection
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
-    hooks:
-      - id: detect-secrets
-        args:
-          - "--baseline"
-          - ".github/.secrets.baseline"
-        exclude: \.secrets\.baseline$
-        stages: [pre-commit]
-
   # Project development tools
   - repo: local
     hooks:
@@ -98,3 +87,14 @@ repos:
         pass_filenames: false
         files: ^(\.agents/|AGENTS\.md$|docs/templates/prompt/)
         stages: [pre-push]
+
+  # Secret detection runs after formatting so it scans the exact final bytes.
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args:
+          - "--baseline"
+          - ".github/.secrets.baseline"
+        exclude: \.secrets\.baseline$
+        stages: [pre-commit]

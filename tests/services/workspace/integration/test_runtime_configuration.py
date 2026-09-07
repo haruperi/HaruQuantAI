@@ -25,11 +25,11 @@ from app.kernel.context import DefaultFeatureContext
 from app.kernel.events import EventBus
 from app.kernel.registry import ServiceRegistry
 from app.kernel.scope import FeatureScope
+from app.services.workspace.manage_workspaces.feature import (
+    feature as lifecycle_feature,
+)
 from app.services.workspace.runtime_configuration.feature import (
     feature as runtime_feature,
-)
-from app.services.workspace.workspace_lifecycle.feature import (
-    feature as lifecycle_feature,
 )
 
 if TYPE_CHECKING:

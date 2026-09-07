@@ -251,16 +251,56 @@ every non-Quick-Fix mode.
 
 ## 3. Coding style and verification
 
-- Follow the Google Python Style Guide and repository Ruff configuration. Use 4-space indentation and `ruff format`.
-- Public/module code uses explicit typing and appropriate Google-style docstrings. Run configured mypy strict checks for applicable code.
-- No bare `except:` and no silent failures.
-- Application/library code uses `logging.getLogger(__name__)`, not `print`; bounded executable teaching/usage harnesses may print secret-safe results.
-- Do not log secrets, credentials, personal information, full sensitive payloads, or trading account data.
-- Every service feature has one or more focused domain-logic modules and one required `_usage.py`
-  module containing its bounded executable examples. Domain-logic modules do not contain usage
-  harnesses, and tests verify behavior without becoming a second usage implementation.
-- Feature-level tests belong under the owning test namespace; system architecture/composition/removability tests remain in their documented locations.
-- Close SQLite handles, sockets, files, and subprocesses explicitly. Async mocks must return genuine awaitables.
+- **Strict adherence.** Follow the
+  [Google Python Style Guide](https://google.github.io/styleguide/pyguide.html)
+  and the repository Ruff configuration.
+- **Formatting.** Use 4-space indentation and `ruff format` (double quotes and
+  magic trailing commas apply). The pre-commit order is repository hygiene and
+  syntax checks, Ruff fix, Ruff format, then secret detection. Pre-push runs
+  strict mypy, the complete pytest coverage gate, and applicable workflow checks.
+- **Typing and documentation.** Add explicit type hints to every signature and
+  run the configured strict mypy checks. Every module, public class, public
+  function, and non-obvious private function has a properly fitted Google-style
+  docstring containing its description and all applicable `Args`, `Returns`,
+  `Raises`, and type semantics; do not add empty sections that do not apply.
+- **System-wide structured logger.** Code that needs operational logging imports
+  `get_logger` from `app.composition.logging` and declares
+  `logger = get_logger(__name__)`. Use it at workflow boundaries, public service
+  entry points, external interactions, state transitions, side-effect
+  boundaries, important decisions, retries, and failures. Pure helpers, trivial
+  accessors, deterministic transformations, and high-frequency numerical
+  functions do not require logging unless an owning requirement says otherwise.
+  Application and service modules never configure handlers or global logging.
+- **Logging safety.** Never log secrets, credentials, personal information,
+  complete sensitive payloads, workspace paths, fence/session tokens, or
+  sensitive trading/account data. Prefer bounded structured fields and stable
+  error codes over interpolated payloads or raw exception messages.
+- **Imports.** Use absolute imports grouped as standard library, third party, and
+  local application imports.
+- **Versioning.** Confirm dependency versions from `pyproject.toml` and the lock
+  file before coding against a library; the pinned repository version is the
+  default authority.
+- **Quality.** Maintain at least 80 percent project pytest coverage. No bare
+  `except:`, silent failure, or application/library `print`. Directly executable
+  teaching and usage harnesses may print bounded, secret-safe observations.
+- **Usage evidence.** Every service feature has one required feature-local
+  `_usage.py`, which is the sole executable usage owner and defines a bounded
+  `main()` or `_run_usage_example()` called under an
+  `if __name__ == "__main__":` guard. It exercises every public operation and
+  constructor owned by the feature through documented public APIs, including a
+  useful scenario, failure/unavailable behavior, and cleanup, using realistic
+  offline secret-safe inputs or genuine bounded runtime state. It is executed
+  directly and excluded from pytest collection. Tests verify behavior without
+  becoming a second usage implementation; domain-logic modules contain no usage
+  harnesses.
+- **Test ownership.** Feature-level tests belong under the owning test namespace;
+  system architecture, composition, and removability tests remain in their
+  documented locations.
+- **Clean resource lifecycles.** Close SQLite handles, sockets, files, and
+  subprocesses explicitly in production and test teardown or context managers.
+- **Async mocking rigor.** Mocks for asynchronous operations return genuine
+  coroutines, futures, or other awaitables so no unawaited-coroutine warning is
+  tolerated.
 
 ### Change-scoped testing
 

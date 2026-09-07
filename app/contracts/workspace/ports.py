@@ -178,6 +178,10 @@ class ManageWorkspacesCapability(Protocol):
         ...
 
 
+# Granular compatibility port for existing local health and diagnostics consumers.
+# New operation-level consumers use ``workspace.manage_workspaces`` directly.
+
+
 @runtime_checkable
 class ConfigureRuntimeCapability(Protocol):
     """Capability protocol for workspace runtime configuration and admission."""
