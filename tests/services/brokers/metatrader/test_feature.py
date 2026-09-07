@@ -99,7 +99,7 @@ async def test_mount_stages_provider_and_scope_withdraws_it(
     assert resolved_mt5 is feature_instance.service
 
     conn_res = resolved_ops.connect()
-    assert conn_res["status"] == "success"
+    assert conn_res["status"] == "connected"
 
     await scope.close()
     assert registry.resolve(BROKER_OPERATIONS_CAPABILITY) is None

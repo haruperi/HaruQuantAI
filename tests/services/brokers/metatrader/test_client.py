@@ -150,7 +150,7 @@ def test_connection_lifecycle(client: MT5Client) -> None:
     """Verify connect, disconnect, and is_connected methods on MT5Client."""
     conn_res = client.connect(login=61563411, server="DemoServer")
     assert isinstance(conn_res, StandardResponse)
-    assert conn_res.status == "success"
+    assert conn_res.status == "connected"
     assert conn_res.data["connected"] is True
     assert conn_res.data["login"] == 61563411
     assert client.is_connected() is True
@@ -284,18 +284,15 @@ def test_error_handling(monkeypatch: pytest.MonkeyPatch) -> None:
 
     conn_res = client.connect()
     assert conn_res.status == "error"
-    assert conn_res.error is not None
-    assert conn_res.error.details["code"] == -10004
+    assert conn_res.error["code"] == -10004
 
     term_res = client.get_terminal_info()
     assert term_res.status == "error"
-    assert term_res.error is not None
-    assert term_res.error.details["code"] == -10004
+    assert term_res.error["code"] == -10004
 
     acc_res = client.get_account_info()
     assert acc_res.status == "error"
-    assert acc_res.error is not None
-    assert acc_res.error.details["code"] == -10004
+    assert acc_res.error["code"] == -10004
 
     sym_res = client.get_symbol_info("EURUSD")
     assert sym_res.status == "error"
@@ -319,7 +316,7 @@ def test_error_handling(monkeypatch: pytest.MonkeyPatch) -> None:
 def test_capability_protocol(client: MT5Client) -> None:
     """Verify MT5Client class implements capability protocol."""
     conn_res = client.connect()
-    assert conn_res.status == "success"
+    assert conn_res.status == "connected"
     assert client.is_connected() is True
 
     acc = client.get_account_info()
