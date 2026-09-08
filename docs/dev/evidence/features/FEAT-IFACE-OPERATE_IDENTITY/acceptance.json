@@ -1,0 +1,105 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-IFACE-OPERATE_IDENTITY",
+  "task_id": "1.13",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/interfaces/README.md",
+  "baseline_commit": "4c01fff53b79d6d1d1157f0b17553e3e6104d248",
+  "requirements": [
+    {
+      "id": "FR-TRC-IFACE-OPERATE_IDENTITY-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_traceability.py::test_trc_operate_identity_001"
+    },
+    {
+      "id": "FR-TRC-IFACE-OPERATE_IDENTITY-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_traceability.py::test_trc_operate_identity_002"
+    },
+    {
+      "id": "NFR-TRC-IFACE-OPERATE_IDENTITY-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_lifecycle.py::test_trc_operate_identity_nfr_001"
+    },
+    {
+      "id": "NFR-TRC-IFACE-OPERATE_IDENTITY-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_lifecycle.py::test_trc_operate_identity_nfr_002"
+    },
+    {
+      "id": "AT-IFACE-OPERATE_IDENTITY-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_traceability.py::test_trc_operate_identity_001"
+    },
+    {
+      "id": "AT-IFACE-OPERATE_IDENTITY-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_traceability.py::test_trc_operate_identity_002"
+    },
+    {
+      "id": "ATN-IFACE-OPERATE_IDENTITY-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_lifecycle.py::test_trc_operate_identity_nfr_001"
+    },
+    {
+      "id": "ATN-IFACE-OPERATE_IDENTITY-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/operate_identity/test_lifecycle.py::test_trc_operate_identity_nfr_002"
+    }
+  ],
+  "catalogue_entries": [
+    "Authentication/session/logout/revocation; hq_session/hq_csrf; principal/scope projection",
+    "Translate authenticated account/session operations into Workspace identity contract",
+    "Enforce verified session principal preservation preventing browser spoofing",
+    "Default principal fallback when username is unspecified for operations requiring principal",
+    "Fail-closed CAPABILITY_UNAVAILABLE mapping upon gateway disposal or provider loss"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/interfaces/models.py OperateIdentityRequest/Success and app/contracts/workspace/models.py AccountRecord verified."
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "IdentityGateway translates REGISTER/LOGIN/ME/LOGOUT onto manage-accounts capability."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "OperateIdentityFeature provides OPERATE_IDENTITY_CAPABILITY and registers gateway.close with FeatureContext."
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "Validated in tests/services/interfaces/operate_identity/."
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-IFACE-OPERATE_IDENTITY is a core Interfaces translation capability; presentation widgets live in FEAT-UI-SESSION_ACCESS."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/interfaces/operate_identity/_usage.py executed with exit code 0 covering all 5 operational scenarios."
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run pytest tests/services/interfaces/operate_identity/ -o addopts=\"\"",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python -m app.services.interfaces.operate_identity._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy app/services/interfaces/operate_identity/ tests/services/interfaces/operate_identity/",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff check app/services/interfaces/operate_identity/ tests/services/interfaces/operate_identity/",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All 2 FRs, 2 local NFRs, traceability test suites, offline usage recipe, mypy, and ruff checks pass."
+  }
+}

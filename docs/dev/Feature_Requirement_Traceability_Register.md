@@ -11273,14 +11273,14 @@ Authentication/session/logout/revocation; hq_session/hq_csrf; principal/scope pr
 #### Acceptance tests and evidence
 | Acceptance ID | Intended test path | Intended test symbol | State |
 | --- | --- | --- | --- |
-| AT-IFACE-OPERATE_IDENTITY-001 | `tests/services/interfaces/operate_identity/test_traceability.py` | `test_trc_operate_identity_001` | PENDING |
-| AT-IFACE-OPERATE_IDENTITY-002 | `tests/services/interfaces/operate_identity/test_traceability.py` | `test_trc_operate_identity_002` | PENDING |
-| ATN-IFACE-OPERATE_IDENTITY-001 | `tests/services/interfaces/operate_identity/test_lifecycle.py` | `test_trc_operate_identity_nfr_001` | PENDING |
-| ATN-IFACE-OPERATE_IDENTITY-002 | `tests/services/interfaces/operate_identity/test_lifecycle.py` | `test_trc_operate_identity_nfr_002` | PENDING |
+| AT-IFACE-OPERATE_IDENTITY-001 | `tests/services/interfaces/operate_identity/test_traceability.py` | `test_trc_operate_identity_001` | PASS |
+| AT-IFACE-OPERATE_IDENTITY-002 | `tests/services/interfaces/operate_identity/test_traceability.py` | `test_trc_operate_identity_002` | PASS |
+| ATN-IFACE-OPERATE_IDENTITY-001 | `tests/services/interfaces/operate_identity/test_lifecycle.py` | `test_trc_operate_identity_nfr_001` | PASS |
+| ATN-IFACE-OPERATE_IDENTITY-002 | `tests/services/interfaces/operate_identity/test_lifecycle.py` | `test_trc_operate_identity_nfr_002` | PASS |
 
 **Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
-**Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
+**Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **PROVED_COMPLETE** in `docs/dev/evidence/features/FEAT-IFACE-OPERATE_IDENTITY/acceptance.json`; final Reviewer authority and the Task commit remain controlled by the atomic workflow.
 
 **Source scope:** §22.2, §23, §26.2, §42.1, §45.4, §53.1. **Original source IDs:** Derived from the listed unnumbered source obligations and catalogues; not an invented duplicate source ID..
 

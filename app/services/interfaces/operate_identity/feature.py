@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.composition.logging import get_logger
 from app.contracts.interfaces.capabilities import OPERATE_IDENTITY_CAPABILITY
 from app.contracts.workspace.capabilities import MANAGE_ACCOUNTS_CAPABILITY
 from app.services.interfaces.operate_identity.config import (
@@ -16,6 +17,8 @@ from app.services.interfaces.operate_identity.manifest import SPEC
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
     from app.kernel.feature import FeatureSpec
+
+logger = get_logger(__name__)
 
 
 class OperateIdentityFeature:
@@ -52,6 +55,10 @@ class OperateIdentityFeature:
             CapabilityUnavailableError: If the required Workspace
                 capability has no active provider.
         """
+        logger.info(
+            "Mounting OperateIdentityFeature",
+            capability=OPERATE_IDENTITY_CAPABILITY.identifier,
+        )
         if config is None or isinstance(config, dict):
             parsed = from_dict(config)
         elif isinstance(config, OperateIdentityConfig):
@@ -67,6 +74,10 @@ class OperateIdentityFeature:
         context.register_callback(gateway.close)
         context.provide(OPERATE_IDENTITY_CAPABILITY, gateway)
         self._gateway = gateway
+        logger.info(
+            "OperateIdentityFeature mounted successfully",
+            capability=OPERATE_IDENTITY_CAPABILITY.identifier,
+        )
 
 
 def feature() -> OperateIdentityFeature:
