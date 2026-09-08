@@ -187,7 +187,7 @@
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
       "usage_target": "app/services/orchestration/reserve_resources/_usage.py",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "uv run --frozen python -m app.services.orchestration.reserve_resources._usage",
       "test_targets": [
         "tests/services/orchestration/reserve_resources/test_traceability.py",

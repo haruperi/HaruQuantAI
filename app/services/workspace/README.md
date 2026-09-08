@@ -648,7 +648,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/services/workspace/manage_accounts/test_traceability.py` | PASS: exact register symbols and assertions are implemented. |
 | Every ATN ID in this card | `tests/services/workspace/manage_accounts/test_lifecycle.py` | PASS: exact withdrawal, sibling survival, state retention and remount are proven. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json` | PROVED_COMPLETE: all six stages have focused evidence; Reviewer authority remains pending. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json` | ACCEPTED: all six stages verified passing; Reviewer verified and approved under Review 6. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 

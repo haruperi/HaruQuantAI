@@ -398,7 +398,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 ### - [x] Task 1.04 — FEAT-WS-MANAGE_ACCOUNTS — Verify accounts, principals and sessions
 
-**Status:** `PROVED_COMPLETE` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
+**Status:** `ACCEPTED` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
 
 **Order prerequisites:** Phase 0 entry gate; no feature-task predecessor.
 
@@ -438,7 +438,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline `_usage.py` demonstration using a temporary workspace and the pinned fixture for: Verify session expiry, revocation, principal and authorized account/workspace before returning a bounded identity projection. Expected: Expired, revoked and wrong-account sessions produce denial before any receiver mutation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`. Terminal Executor results are recorded with Reviewer authority still pending.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`. Verified and accepted under Review 6.
 
 #### iv. Definition of Done and commit
 
@@ -446,7 +446,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(workspace): complete FEAT-WS-MANAGE_ACCOUNTS`
 
-**Accepted commit:** `task-closeout:20260907-203821-559690-v3-phases-1-16-1.04-manage-accounts` — pending the authorized Task commit and no-ff merge transaction.
+**Accepted commit:** `task-closeout:20260907-203821-559690-v3-phases-1-16-1.04-manage-accounts` · reconciled owner, contracts, tests, usage recipe, and evidence manifest.
 
 ---
 

@@ -5,8 +5,8 @@
     "total_local_nfrs": 276,
     "disposition_counts": {
       "ADAPT": 40,
-      "IMPLEMENT": 647,
-      "PROVED_COMPLETE": 52,
+      "IMPLEMENT": 641,
+      "PROVED_COMPLETE": 58,
       "VERIFY": 112
     }
   },
@@ -304,7 +304,7 @@
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
       "text": "Reserve a finite hierarchical resource profile for every heavy operation and reject/queue impossible requests before allocation.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json"
     },
     {
@@ -312,7 +312,7 @@
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
       "text": "Enforce the source workstation defaults: 70% memory envelope, 85%/95% pressure actions, reserved control CPUs, 256 ready descriptors, two prefetch chunks, 64 MiB buffers, 20% cache ceiling and one compile job.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json"
     },
     {
@@ -320,7 +320,7 @@
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
       "text": "Budget temporary disk as min(16 GiB,25% free) at initialization and preserve at least 10% free space; reconcile actual native/shared/device use.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json"
     },
     {
@@ -328,7 +328,7 @@
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
       "text": "Provide fair queues with bounded aging and reserved interactive/cancellation capacity; existing safety-critical execution keeps priority.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json"
     },
     {
@@ -4746,7 +4746,7 @@
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
       "text": "Resource accounting covers native allocations, unique resident shared pages, mappings, caches, decode/output buffers and VRAM, not only Python allocations.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json"
     },
     {
@@ -4754,7 +4754,7 @@
       "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
       "task_id": "1.14",
       "text": "Control latency and cancellation capacity remain reserved while bulk work is admitted.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json"
     },
     {
