@@ -238,13 +238,17 @@
       "state_ownership": "Existing Workspace account/session records; preserve current tables and compatibility.",
       "primary_capability": "workspace.manage-accounts@1",
       "contract_target": "app/contracts/workspace/manage_accounts.py",
-      "contract_target_exists": false,
-      "public_symbols": [],
+      "contract_target_exists": true,
+      "public_symbols": [
+        "ManageAccountsCapability"
+      ],
       "binding_state": "SELECTED_CONTRACT_TARGET_NOT_RUNTIME_CERTIFICATION",
       "operation_scope": "MANAGE ACCOUNTS",
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "A request carries a real authenticated principal and workspace/account scope rather than browser-asserted identity. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
-      "required_providers": [],
+      "required_providers": [
+        "FEAT-WS-EXECUTE_PERSISTENCE"
+      ],
       "operation_gates": [],
       "requirements": [
         {

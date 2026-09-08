@@ -55,16 +55,16 @@
       "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
       "title": "Verify accounts, principals and sessions",
       "domain": "Workspace",
-      "status": "EXISTING_UNVERIFIED",
-      "disposition": "VERIFY",
+      "status": "PROVED_COMPLETE",
+      "disposition": "BLOCKED",
       "first_slice": "U0",
       "owner_specification": "app/services/workspace/README.md",
       "owner_path": "app/services/workspace/manage_accounts",
       "owner_path_exists": true,
       "entry_point_registered": true,
-      "accepted_commit": null,
+      "accepted_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.04-manage-accounts",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json",
-      "remaining_obligation": "Complete the exact plan card and acceptance evidence."
+      "remaining_obligation": null
     },
     {
       "task_id": "1.05",

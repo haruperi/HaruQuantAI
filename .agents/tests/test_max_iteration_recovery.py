@@ -81,10 +81,72 @@ def test_reopens_exact_next_iteration_without_mutating_worktree(
     assert state["status"] == "RUNNING"
     assert state["phase"] == "planner"
     assert state["iteration"] == 6
+    assert state["effective_max_iterations"] == 6
     assert Path(cfg["next_agent"]).read_bytes() == prompt_before
     assert {
         role: path.read_bytes() for role, path in cfg["journals"].items()
     } == journals_before
+
+
+def test_solo_recovery_requires_no_role_session_ledger(
+    orc: ModuleType,
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    repo: Path,
+) -> None:
+    """IDE solo recovery relies on its inline chat, not a session ledger."""
+    _prepare(orc, cfg, state, repo)
+    state["runtime_mode"] = "solo"
+    ledger = repo / ".agents/runs" / state["run_id"] / "role-sessions.json"
+    ledger.unlink()
+
+    orc.recover_max_iterations(
+        cfg,
+        state,
+        expected_run_id=state["run_id"],
+        expected_iteration=6,
+        expected_worktree_fingerprint=orc._worktree_fingerprint(repo),
+    )
+
+    assert state["status"] == "RUNNING"
+    assert state["effective_max_iterations"] == 6
+
+
+def test_solo_scope_blocker_recovery_restores_canonical_planner_prompt(
+    orc: ModuleType,
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    repo: Path,
+) -> None:
+    """Max recovery recreates an uninvoked scope-blocked Planner boundary."""
+    _prepare(orc, cfg, state, repo)
+    state["runtime_mode"] = "solo"
+    ledger = repo / ".agents/runs" / state["run_id"] / "role-sessions.json"
+    ledger.unlink()
+    fingerprint = orc._worktree_fingerprint(repo)
+    state["scope_blocker"] = {
+        "iteration": 5,
+        "offending_paths": ["evidence.json"],
+        "worktree_sha256": "stale-after-authorized-controller-repair",
+    }
+    state["next_agent"] = {
+        "target_role": "PLANNER",
+        "handoff": "SCOPE_BLOCKED",
+    }
+
+    orc.recover_max_iterations(
+        cfg,
+        state,
+        expected_run_id=state["run_id"],
+        expected_iteration=6,
+        expected_worktree_fingerprint=fingerprint,
+    )
+
+    artifact = orc.parse_next_agent(Path(cfg["next_agent"]))
+    assert artifact.metadata["source_role"] == "ORCHESTRATOR"
+    assert artifact.metadata["target_role"] == "PLANNER"
+    assert artifact.metadata["handoff"] == "SCOPE_BLOCKED"
+    assert state["effective_max_iterations"] == 6
 
 
 def test_rejects_more_than_one_iteration_extension(

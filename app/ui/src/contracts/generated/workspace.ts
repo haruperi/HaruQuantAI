@@ -5,6 +5,9 @@ import type { ProblemDetails, ResultState } from "./common";
 export interface AccountRecord {
   user_id: NonEmptyStr;
   username: NonEmptyStr;
+  account_id: NonEmptyStr;
+  workspace_id: NonEmptyStr;
+  authentication_audit_ref: NonEmptyStr;
   expires_at: string;
   runtime_profile?: string;  // default: "research"
   schema_version?: 1;  // default: 1
@@ -169,6 +172,8 @@ export interface ManageAccountsRequest {
   request_id: string;
   capability_snapshot_id: string;
   operation: "REGISTER" | "LOGIN" | "ME" | "LOGOUT";
+  account_id?: NonEmptyStr;  // default: "local"
+  workspace_id?: NonEmptyStr;  // default: "local"
   username?: string | null;  // default: null
   password?: string | null;  // default: null
   session_token?: string | null;  // default: null

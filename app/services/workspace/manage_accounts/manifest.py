@@ -1,6 +1,9 @@
 """Feature specification for the account registry."""
 
-from app.contracts.workspace.capabilities import MANAGE_ACCOUNTS_CAPABILITY
+from app.contracts.workspace.capabilities import (
+    MANAGE_ACCOUNTS_CAPABILITY,
+    PERSISTENCE_CAPABILITY,
+)
 from app.kernel.feature import FeatureSpec
 from app.kernel.state import RetentionPolicy, StateDeclaration
 
@@ -8,7 +11,7 @@ SPEC: FeatureSpec = FeatureSpec(
     feature_id="FEAT-WS-MANAGE_ACCOUNTS",
     domain="workspace",
     provides=frozenset({MANAGE_ACCOUNTS_CAPABILITY}),
-    requires=frozenset(),
+    requires=frozenset({PERSISTENCE_CAPABILITY}),
     optional=frozenset(),
     conflicts=frozenset(),
     description=(
@@ -18,7 +21,7 @@ SPEC: FeatureSpec = FeatureSpec(
     ),
     state=StateDeclaration(
         namespace="workspace.manage_accounts",
-        schema_version=1,
+        schema_version=2,
         retention_policy=RetentionPolicy.RETAIN,
         description=(
             "Retained account records and digest-only session records "

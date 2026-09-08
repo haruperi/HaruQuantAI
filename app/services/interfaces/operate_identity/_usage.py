@@ -7,12 +7,12 @@ from typing import override
 from uuid import uuid7
 
 from app.contracts.interfaces.models import OperateIdentityRequest
+from app.contracts.workspace.manage_accounts import ManageAccountsCapability
 from app.contracts.workspace.models import (
     AccountRecord,
     ManageAccountsRequest,
     ManageAccountsSuccess,
 )
-from app.contracts.workspace.ports import ManageAccountsCapability
 from app.services.interfaces.operate_identity.config import (
     OperateIdentityConfig,
 )
@@ -29,6 +29,9 @@ class _MockAccountsProvider(ManageAccountsCapability):
         user = AccountRecord(
             user_id="usr_demo_1",
             username=request.username or "demo_user",
+            account_id=request.account_id,
+            workspace_id=request.workspace_id,
+            authentication_audit_ref="auth_demo_reference",
             expires_at="2026-09-11T00:00:00Z",
             runtime_profile=request.runtime_profile,
         )

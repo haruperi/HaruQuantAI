@@ -1,15 +1,7 @@
 # Manage Accounts (`FEAT-WS-MANAGE_ACCOUNTS`)
 
-## Purpose
-
-Own the workstation's account registry and opaque server-side sessions:
-user registration with versioned scrypt password hashing, login with
-constant-time verification, digest-only session validation, and session
-revocation. The feature persists to the shared workspace database
-(`users`, `user_sessions`) and exposes every operation through the
-operation-discriminated `workspace.manage-accounts@1` capability. Session
-and CSRF tokens are generated here and returned exactly once; only their
-SHA-256 digests are stored.
+> **Status:** Implemented and verified
+> **Capability:** `workspace.manage-accounts@1`
 
 ## Domain
 
@@ -17,55 +9,102 @@ SHA-256 digests are stored.
 
 ## Provides
 
-- `workspace.manage-accounts@1`
+`workspace.manage-accounts@1`
 
 ## Required Capabilities
 
-None
+`workspace.persistence@1`
 
 ## Optional Capabilities
 
-None
+None.
+
+## Purpose
+
+Own workstation account registration and account/workspace-bound opaque sessions.
+The feature applies versioned scrypt password hashing, stores only session digests,
+revalidates every identity read against current retained state, and returns a bounded
+identity projection with a safe `authentication_audit_ref`. Interfaces owns cookie
+and CSRF transport; this feature does not mint roles or widget permissions.
+
+## Public API and Dependencies
+
+The canonical protocol is `app/contracts/workspace/manage_accounts.py`; request,
+success, account, and typed failure wire records remain in
+`app/contracts/workspace/models.py` and `app/contracts/workspace/errors.py`.
+
+- Provides: `workspace.manage-accounts@1`.
+- Requires: `workspace.persistence@1`, provided by
+  `FEAT-WS-EXECUTE_PERSISTENCE`.
+- Optional capabilities: none.
+
+Mount fails before registration when persistence is unavailable. All feature-owned
+database operations live in `_persistence.py` and use only the public persistence
+capability; this package never opens a raw database connection.
 
 ## Configuration
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
-| `database_path` | string / Path | `data/database/haruquantai.db` | Shared workspace SQLite database holding the account tables. |
+| `database_path` | `str` or `Path` | `<repo>/data/workspaces/local` | Compatibility key naming a workspace root or its canonical `metadata/workspace.db`. |
 
-Unknown keys are rejected with `ValueError`.
+Unknown keys, wrong types, and non-canonical database filenames fail closed.
 
 ## Runtime Effects
 
-- Opens exactly one SQLite connection per mounted feature generation and
-  ensures the `users` and `user_sessions` tables exist (`IF NOT EXISTS`).
-- Registers one scope cleanup callback closing the connection.
-- Starts no sockets, listeners, or background tasks.
+Mount applies the two ordered additive migrations through persistence and registers
+only `workspace.manage-accounts@1`. It starts no sockets, listeners, or background
+tasks. Closing its scope withdraws that capability without closing the shared
+persistence provider.
 
 ## Persistent State
 
-Namespace `workspace.manage_accounts` retaining account records and
-digest-only session records in the shared workspace database
-(`users.user_id`, `user_sessions.session_digest`).
+Namespace `workspace.manage_accounts`, schema version 2, retention policy `RETAIN`.
+The namespace owns `users` and `user_sessions`; session material is stored only as
+SHA-256 digests, with account/workspace scope and an opaque audit reference.
+Closing the feature does not purge retained rows; remounting recovers those rows.
 
 ## Failure Behavior
 
-- Username policy violations, short passwords, and duplicate usernames
-  return `ACCOUNT_REGISTRATION_FAILED` failures without mutation.
-- Unknown credentials, inactive accounts, and invalid or expired sessions
-  return `ACCOUNT_AUTHENTICATION_FAILED` failures without mutation.
-- LOGOUT of an unknown token succeeds idempotently.
+- Invalid username/password policy and duplicate usernames return
+  `ACCOUNT_REGISTRATION_FAILED` without partial mutation.
+- Unknown credentials, inactive accounts, expired/revoked sessions, and account or
+  workspace scope mismatch return `ACCOUNT_AUTHENTICATION_FAILED` before a receiver
+  can consume an identity.
+- Every `ME` call performs a new persistence read; a captured UI identity is never
+  treated as current authorization.
+- `LOGOUT` is idempotent for an unknown or already-revoked token.
+- Public model serialization, structured logs, and safe audit exports exclude
+  passwords, raw session/CSRF tokens, hashes, digests, and broker credentials.
 
 ## Removal Behavior
 
-Unmounting the feature withdraws the `workspace.manage-accounts@1`
-provider; consumers fail closed. Account and session rows are retained
-(removal never purges accounts); re-mounting resumes on the same tables.
+Removal withdraws only `workspace.manage-accounts@1`. The shared persistence
+provider and unrelated capabilities remain mounted, and account/session rows remain
+available to a later remount. No substitute account provider is selected silently.
 
-## Evidence
+## Traceability
 
-Run the bounded executable demonstration with:
+| Requirement | Acceptance evidence |
+| --- | --- |
+| `FR-TRC-WS-MANAGE_ACCOUNTS-001` | `test_traceability.py::test_trc_manage_accounts_001` |
+| `FR-TRC-WS-MANAGE_ACCOUNTS-002` | `test_traceability.py::test_trc_manage_accounts_002` |
+| `FR-TRC-WS-MANAGE_ACCOUNTS-003` | `test_traceability.py::test_trc_manage_accounts_003` |
+| `NFR-TRC-WS-MANAGE_ACCOUNTS-001` | `test_lifecycle.py::test_trc_manage_accounts_nfr_001` |
+
+Composition, logging, configuration, legacy compatibility, Interfaces gateway, API,
+UI client/context, and generated-contract checks provide the remaining six-stage
+evidence recorded in
+`docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`.
+
+## Usage
+
+Run the bounded offline scenario with:
 
 ```powershell
-uv run python -m app.services.workspace.manage_accounts._usage
+uv run --frozen python -m app.services.workspace.manage_accounts._usage
 ```
+
+It mounts the public persistence provider through entry-point discovery, proves
+registration/current identity, wrong-scope denial, revoke-before-revalidation,
+safe audit output, exact capability withdrawal, retained-state remount, and cleanup.

@@ -26,6 +26,9 @@ from app.services.workspace.administer_settings.administer_settings import (
     SettingsService,
 )
 from app.services.workspace.administer_settings.config import AdministerSettingsConfig
+from app.services.workspace.execute_persistence.execute_persistence import (
+    ExecutePersistenceService,
+)
 from app.services.workspace.manage_accounts.accounts import AccountService
 from app.services.workspace.manage_accounts.config import ManageAccountsConfig
 from app.services.workspace.manage_watchlists.config import ManageWatchlistsConfig
@@ -75,12 +78,16 @@ async def mount_identity_stack(
         Registry, store scope, and gateway scope.
     """
     registry = ServiceRegistry()
+    requested = Path(db_path) if db_path is not None else None
+    workspace_path = (
+        requested.parent / requested.stem if requested is not None else None
+    )
     config = (
-        ManageAccountsConfig(database_path=db_path)
-        if db_path is not None
+        ManageAccountsConfig(database_path=workspace_path)
+        if workspace_path is not None
         else ManageAccountsConfig()
     )
-    store = AccountService(config)
+    store = AccountService(ExecutePersistenceService(), config)
     store_scope = FeatureScope(owner_id="FEAT-WS-MANAGE_ACCOUNTS")
     registry.register(
         MANAGE_ACCOUNTS_CAPABILITY,

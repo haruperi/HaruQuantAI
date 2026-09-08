@@ -136,6 +136,29 @@ def test_recovery_routes_same_sessions_to_planner_iteration_two(
     } == product_before
 
 
+def test_solo_recovery_requires_no_role_session_ledger(
+    orc: ModuleType,
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    repo: Path,
+) -> None:
+    """IDE solo recovers inline without inventing a native session ledger."""
+    _ignore_runtime(repo, state)
+    state = _executor_state(state)
+    state["runtime_mode"] = "solo"
+    (repo / "approved.txt").write_text("keep approved\n", encoding="utf-8")
+    (repo / "outside.txt").write_text("keep outside\n", encoding="utf-8")
+
+    orc.recover_scope_blocker(cfg, state)
+
+    assert state["phase"] == "planner"
+    assert state["iteration"] == 2
+    assert state["scope_blocker"]["offending_paths"] == ["outside.txt"]
+    assert not (
+        repo / ".agents" / "runs" / state["run_id"] / "role-sessions.json"
+    ).exists()
+
+
 def test_uninvoked_planner_recovery_prompt_can_refresh_legacy_evidence(
     orc: ModuleType,
     cfg: dict[str, Any],

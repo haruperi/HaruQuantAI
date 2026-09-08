@@ -18,7 +18,7 @@ working tree on 2026-09-07.
 | Check | Exact command | Observed result |
 | --- | --- | --- |
 | Combined repository gate | `uv run --frozen python scripts/ci_check.py` | PASS — all configured steps completed |
-| Phase 0 ratification | `uv run --frozen python scripts/validate_phase0.py` | PASS — 205 tasks, 8 preparations, 476 required edges, 233 operation gates |
+| Phase 0 ratification | `uv run --frozen python scripts/validate_phase0.py` | PASS — 205 tasks, 8 preparations, 477 required edges, 233 operation gates |
 | Ruff lint | `uv run --frozen ruff check .` | PASS — zero findings |
 | Ruff format | `uv run --frozen ruff format --check .` | PASS — all checked Python files formatted |
 | Strict typing | `uv run --frozen mypy` | PASS — 855 source files |

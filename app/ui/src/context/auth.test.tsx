@@ -32,8 +32,11 @@ function okIdentity() {
       message: "ok",
       data: {
         user_id: "u_1",
+        account_id: "account-1",
+        workspace_id: "workspace-1",
         username: "alice",
         expires_at: new Date(Date.now() + 3600_000).toISOString(),
+        authentication_audit_ref: "auth-audit-1",
       },
       error: null,
       metadata: {
@@ -101,8 +104,11 @@ function identityResponse(status = 200) {
       message: "ok",
       data: {
         user_id: "u_1",
+        account_id: "account-1",
+        workspace_id: "workspace-1",
         username: "alice",
         expires_at: new Date(Date.now() + 3600_000).toISOString(),
+        authentication_audit_ref: "auth-audit-1",
       },
       error: null,
       metadata: {

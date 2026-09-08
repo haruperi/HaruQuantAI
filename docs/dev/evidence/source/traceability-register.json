@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0",
   "source": "docs/dev/Feature_Requirement_Traceability_Register.md",
-  "source_sha256": "e2b7fae2c76c2cfead8dece02d50058e6283618bbe396dc74c209de7df5d81ef",
+  "source_sha256": "ea7bbee01e6fb51c7059c9a193b931036d7c0cca904524d1ffd2ae3d0d70e9de",
   "features": [
     {
       "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
@@ -230,13 +230,17 @@
       "state_ownership": "Existing Workspace account/session records; preserve current tables and compatibility.",
       "primary_capability": "workspace.manage-accounts@1",
       "contract_target": "app/contracts/workspace/manage_accounts.py",
-      "contract_target_exists": false,
-      "public_symbols": [],
+      "contract_target_exists": true,
+      "public_symbols": [
+        "ManageAccountsCapability"
+      ],
       "binding_state": "SELECTED_CONTRACT_TARGET_NOT_RUNTIME_CERTIFICATION",
       "operation_scope": "MANAGE ACCOUNTS",
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "A request carries a real authenticated principal and workspace/account scope rather than browser-asserted identity. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
-      "required_providers": [],
+      "required_providers": [
+        "FEAT-WS-EXECUTE_PERSISTENCE"
+      ],
       "operation_gates": [],
       "requirements": [
         {

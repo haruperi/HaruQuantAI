@@ -1826,6 +1826,9 @@ class AccountRecord(WireModel):
 
     user_id: NonEmptyStr
     username: NonEmptyStr
+    account_id: NonEmptyStr
+    workspace_id: NonEmptyStr
+    authentication_audit_ref: NonEmptyStr
     expires_at: UtcTimestamp
     runtime_profile: str = "research"
     schema_version: Literal[1] = 1
@@ -1842,9 +1845,11 @@ class ManageAccountsRequest(WireModel):
     request_id: Uuid7
     capability_snapshot_id: Uuid7
     operation: Literal["REGISTER", "LOGIN", "ME", "LOGOUT"]
+    account_id: NonEmptyStr = "local"
+    workspace_id: NonEmptyStr = "local"
     username: str | None = None
-    password: str | None = None
-    session_token: str | None = None
+    password: str | None = Field(default=None, exclude=True, repr=False)
+    session_token: str | None = Field(default=None, exclude=True, repr=False)
     runtime_profile: str = "research"
     schema_version: Literal[1] = 1
 
@@ -1889,8 +1894,8 @@ class ManageAccountsSuccess(WireModel):
     request_id: Uuid7
     result_version: Literal[1] = 1
     user: AccountRecord | None = None
-    session_token: str = ""
-    csrf_token: str = ""
+    session_token: str = Field(default="", exclude=True, repr=False)
+    csrf_token: str = Field(default="", exclude=True, repr=False)
     revoked: bool = False
     schema_version: Literal[1] = 1
 

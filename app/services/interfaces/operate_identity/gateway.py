@@ -33,7 +33,7 @@ from app.contracts.workspace.errors import WorkspaceFailure
 from app.contracts.workspace.models import ManageAccountsRequest
 
 if TYPE_CHECKING:
-    from app.contracts.workspace.ports import ManageAccountsCapability
+    from app.contracts.workspace.manage_accounts import ManageAccountsCapability
     from app.services.interfaces.operate_identity.config import (
         OperateIdentityConfig,
     )
@@ -124,6 +124,8 @@ class IdentityGateway:
             request_id=request.request_id,
             capability_snapshot_id=request.capability_snapshot_id,
             operation=request.operation,
+            account_id=request.account_id,
+            workspace_id=request.workspace_id,
             username=request.username,
             password=request.password,
             session_token=request.session_token,

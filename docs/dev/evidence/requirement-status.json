@@ -6,8 +6,8 @@
     "disposition_counts": {
       "ADAPT": 55,
       "IMPLEMENT": 656,
-      "PROVED_COMPLETE": 16,
-      "VERIFY": 124
+      "PROVED_COMPLETE": 20,
+      "VERIFY": 120
     }
   },
   "requirements": [
@@ -88,7 +88,7 @@
       "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
       "task_id": "1.04",
       "text": "Verify session expiry, revocation, principal and authorized account/workspace before returning a bounded identity projection.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json"
     },
     {
@@ -96,7 +96,7 @@
       "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
       "task_id": "1.04",
       "text": "Revalidate identity on resumed work and evidence access rather than trusting a previously captured UI context.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json"
     },
     {
@@ -104,7 +104,7 @@
       "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
       "task_id": "1.04",
       "text": "Retain redacted authentication/audit references and keep credential material out of public session records.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json"
     },
     {
@@ -4642,7 +4642,7 @@
       "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
       "task_id": "1.04",
       "text": "Removing FEAT-WS-MANAGE_ACCOUNTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json"
     },
     {

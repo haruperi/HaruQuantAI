@@ -35,7 +35,7 @@ FEATURE_EVIDENCE_REQUIRED = {
 STAGES = {"contract", "provider", "composition", "interfaces", "ui", "end_to_end"}
 EXPECTED_FEATURES = 205
 EXPECTED_PREPARATIONS = 8
-EXPECTED_REQUIRED_EDGES = 476
+EXPECTED_REQUIRED_EDGES = 477
 EXPECTED_OPERATION_EDGES = 233
 EXPECTED_REQUIREMENTS = 575
 EXPECTED_LOCAL_NFRS = 276
@@ -130,6 +130,56 @@ def _git_path_object(object_id: str, path: str) -> str:
 def _valid_acceptance_reference(value: object) -> bool:
     """Return whether a value identifies a commit or Task close-out receipt."""
     return isinstance(value, str) and ACCEPTANCE_REF_RE.fullmatch(value) is not None
+
+
+def _git_is_ancestor(ancestor: str, descendant: str) -> bool:
+    """Return whether one commit is an ancestor of another commit."""
+    result = subprocess.run(
+        ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+        cwd=REPO,
+        capture_output=True,
+        check=False,
+    )
+    return result.returncode == 0
+
+
+def _accepted_provider_precedes_consumer(
+    provider_task: dict[str, Any],
+    consumer_task: dict[str, Any],
+) -> bool:
+    """Prove an accepted provider was delivered before a consumer baseline.
+
+    Args:
+        provider_task: Parsed provider task from the phased plan.
+        consumer_task: Parsed consumer task from the phased plan.
+
+    Returns:
+        Whether exact terminal manifests and Git ancestry prove delivery order.
+    """
+    try:
+        provider = _load(REPO / str(provider_task["evidence_path"]))
+        consumer = _load(REPO / str(consumer_task["evidence_path"]))
+    except KeyError, OSError, TypeError, ValueError, json.JSONDecodeError:
+        return False
+
+    for payload, task in ((provider, provider_task), (consumer, consumer_task)):
+        if (
+            payload.get("feature_id") != task.get("feature_id")
+            or payload.get("task_id") != task.get("task_id")
+            or payload.get("status") != "ACCEPTED"
+        ):
+            return False
+
+    provider_commit = provider.get("acceptance_commit")
+    consumer_baseline = consumer.get("baseline_commit")
+    if not (
+        isinstance(provider_commit, str)
+        and re.fullmatch(r"[a-f0-9]{40}", provider_commit)
+        and isinstance(consumer_baseline, str)
+        and re.fullmatch(r"[a-f0-9]{40}", consumer_baseline)
+    ):
+        return False
+    return _git_is_ancestor(provider_commit, consumer_baseline)
 
 
 def _validate_task_progress(
@@ -270,17 +320,25 @@ def validate() -> list[str]:  # noqa: C901, PLR0912, PLR0915
     ):
         errors.append("dependency graph node set differs from the plan")
     if len(required_edges) != EXPECTED_REQUIRED_EDGES:
-        errors.append("dependency graph must enumerate 476 required edges")
+        errors.append(
+            f"dependency graph must enumerate {EXPECTED_REQUIRED_EDGES} required edges"
+        )
     if len(operation_edges) != EXPECTED_OPERATION_EDGES:
         errors.append("dependency graph must enumerate 233 operation edges")
     order = {feature: index for index, feature in enumerate(feature_ids)}
+    tasks_by_feature = {str(task["feature_id"]): task for task in tasks}
     for edge in required_edges:
         if (
             edge.get("provider") not in feature_set
             or edge.get("consumer") not in feature_set
         ):
             errors.append(f"required edge has unknown endpoint: {edge}")
-        elif order[str(edge["provider"])] >= order[str(edge["consumer"])]:
+        elif order[str(edge["provider"])] >= order[str(edge["consumer"])] and not (
+            _accepted_provider_precedes_consumer(
+                tasks_by_feature[str(edge["provider"])],
+                tasks_by_feature[str(edge["consumer"])],
+            )
+        ):
             errors.append(f"required provider is not earlier: {edge}")
     for edge in operation_edges:
         missing = {
@@ -467,7 +525,7 @@ def main() -> int:
         return 1
     print(
         "[OK] Phase 0 is fully ratified: 205 tasks, 8 preparations, "
-        "476 required edges, 233 operation gates"
+        f"{EXPECTED_REQUIRED_EDGES} required edges, 233 operation gates"
     )
     return 0
 

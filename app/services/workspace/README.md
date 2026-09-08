@@ -107,7 +107,7 @@ Feature owners are independent and physically removable. The selected package is
 | [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) | Open, recover and back up a workspace | `app/services/workspace/manage_workspaces/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) | Execute bounded feature-owned transactions | `app/services/workspace/execute_persistence/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Publish and retain immutable artifact bytes | `app/services/workspace/manage_artifacts/` | U1 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Verify accounts, principals and sessions | `app/services/workspace/manage_accounts/` | U0 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Verify accounts, principals and sessions | `app/services/workspace/manage_accounts/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-SECURE_LOCAL_ACCESS`](#feat-ws-secure-local-access) | Resolve secrets and protect host access | `app/services/workspace/secure_local_access/` | U0 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-ADMINISTER_SETTINGS`](#feat-ws-administer-settings) | Version user-visible system settings | `app/services/workspace/administer_settings/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations) | Retain scoped conversations without losing canonical evidence | `app/services/workspace/manage_conversations/` | U2 | 3 | 1 | NOT_REVALIDATED |
@@ -555,7 +555,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-WS-MANAGE_ART
 
 > **Feature ID:** `FEAT-WS-MANAGE_ACCOUNTS`
 > **Domain:** `workspace`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Implemented and verified` — terminal Executor evidence recorded; independent Reviewer authority remains pending.
 > **Selected owner:** `app/services/workspace/manage_accounts/`
 > **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -569,7 +569,7 @@ Verify accounts, principals and sessions. Deliver the bounded behaviors in the F
 
 **Required capabilities:**
 
-None (root with respect to the register’s required-provider graph)..
+`workspace.persistence@1`, provided by `FEAT-WS-EXECUTE_PERSISTENCE`.
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ws-manage-accounts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -581,7 +581,7 @@ None (root with respect to the register’s required-provider graph)..
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| PHASE0_BOUND | Existing registered `FeatureSpec.config_keys`, or no feature configuration for a planned owner unless this card explicitly declares a key. | Exact selected types/defaults only; request and profile fields are not implicit feature configuration. | As declared by the owner card. | Unknown keys and invalid values fail closed; implementation records manifest/config/README parity before COMPLETE. |
+| VERIFIED | `database_path` compatibility key | `str` or `Path`; `<repo>/data/workspaces/local` | No | Must name a workspace root or its canonical `metadata/workspace.db`; unknown keys and other filenames fail closed. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
@@ -592,7 +592,7 @@ None (root with respect to the register’s required-provider graph)..
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
 | Capability binding `workspace.manage-accounts@1` | FEAT-WS-MANAGE_ACCOUNTS | Unregister when the reconciler closes the feature scope. |
-| Tasks, listeners, requests, workers, leases or buffers actually created by this feature | FEAT-WS-MANAGE_ACCOUNTS | Register exact disposers; cancel/await/release on failure or removal. A pure provider must not create unnecessary effects. |
+| Persistence namespace registration and bounded transactions | FEAT-WS-MANAGE_ACCOUNTS through `workspace.persistence@1` | Feature closure stops new operations; shared persistence lifecycle remains owned by its provider. |
 | Accepted owner work and committed records | Their declared semantic owner | Observation cleanup does not secretly cancel accepted work or purge committed evidence; use explicit owner commands. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
@@ -601,11 +601,11 @@ Teardown is idempotent. Failed mount unwinds partial effects. Dependency replace
 
 **Ownership class:** Feature-owned semantic state.
 
-**Records:** Only records/artifact references required by the functional requirements below; Workspace and account/session metadata, execution/migration receipts, artifact-custody metadata, settings revisions, independently retained conversations, diagnostic/distribution references. Domain tables remain owned by their declaring feature.
+**Records:** `users` and `user_sessions`, including account/workspace scope, password hash metadata, digest-only sessions, expiry/revocation state and opaque authentication audit references.
 
 **Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
 
-**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+**Namespace / schema / driver binding:** `workspace.manage_accounts`, schema version 2, through the public `workspace.persistence@1` contract. Two ordered additive migrations preserve the legacy tables and add scoped identity/audit fields.
 
 #### Feature Package Structure & Files
 
@@ -616,8 +616,8 @@ Teardown is idempotent. Failed mount unwinds partial effects. Dependency replace
 | manifest.py | Immutable identity, capabilities, config keys and optional state declaration | SPEC : FeatureSpec; metadata only. |
 | config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
 | feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
-| manage_accounts.py | Focused production domain-logic module | Compatible contract operation binding. |
-| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| accounts.py | Focused production domain-logic module | `AccountService.manage_accounts()` and safe audit projection. |
+| _persistence.py | Sole owner of feature-local database operations | Namespace-fenced operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
 | _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
 
 These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.
@@ -626,9 +626,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-WS-MANAGE_ACCOUNTS-001` | Verify session expiry, revocation, principal and authorized account/workspace before returning a bounded identity projection. | `AT-WS-MANAGE_ACCOUNTS-001` | Expired, revoked and wrong-account sessions produce denial before any receiver mutation. |
-| PENDING | `FR-TRC-WS-MANAGE_ACCOUNTS-002` | Revalidate identity on resumed work and evidence access rather than trusting a previously captured UI context. | `AT-WS-MANAGE_ACCOUNTS-002` | Revoke access between capture and use: the next read/handoff fails despite an otherwise valid snapshot. |
-| PENDING | `FR-TRC-WS-MANAGE_ACCOUNTS-003` | Retain redacted authentication/audit references and keep credential material out of public session records. | `AT-WS-MANAGE_ACCOUNTS-003` | Wire/log/export fixtures contain no password, raw token or broker credential. |
+| PASS | `FR-TRC-WS-MANAGE_ACCOUNTS-001` | Verify session expiry, revocation, principal and authorized account/workspace before returning a bounded identity projection. | `AT-WS-MANAGE_ACCOUNTS-001` | Expired, revoked and wrong-account sessions produce denial before any receiver mutation. |
+| PASS | `FR-TRC-WS-MANAGE_ACCOUNTS-002` | Revalidate identity on resumed work and evidence access rather than trusting a previously captured UI context. | `AT-WS-MANAGE_ACCOUNTS-002` | Revoke access between capture and use: the next read/handoff fails despite an otherwise valid snapshot. |
+| PASS | `FR-TRC-WS-MANAGE_ACCOUNTS-003` | Retain redacted authentication/audit references and keep credential material out of public session records. | `AT-WS-MANAGE_ACCOUNTS-003` | Wire/log/export fixtures contain no password, raw token or broker credential. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -636,7 +636,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-WS-MANAGE_ACCOUNTS-001` | Removing FEAT-WS-MANAGE_ACCOUNTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_ACCOUNTS-001` | Disable and physically remove manage_accounts; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PASS | `NFR-TRC-WS-MANAGE_ACCOUNTS-001` | Removing FEAT-WS-MANAGE_ACCOUNTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_ACCOUNTS-001` | Disable and physically remove manage_accounts; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -646,21 +646,21 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/workspace/manage_accounts/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/workspace/manage_accounts/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/workspace/manage_accounts/test_traceability.py` | PASS: exact register symbols and assertions are implemented. |
+| Every ATN ID in this card | `tests/services/workspace/manage_accounts/test_lifecycle.py` | PASS: exact withdrawal, sibling survival, state retention and remount are proven. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json` | PROVED_COMPLETE: all six stages have focused evidence; Reviewer authority remains pending. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Verified `_usage.py` command:**
 
 ```powershell
 uv run --frozen python -m app.services.workspace.manage_accounts._usage
 ```
 
-`_usage.py` uses bounded deterministic offline inputs and composes production behavior through public contracts or this feature's focused modules. It demonstrates a useful accepted operation, the appropriate invalid/unavailable/refusal case, and exact cleanup without owning business logic. Map each FR above to a named scenario; the expected observations are its acceptance oracles, not invented console output. Do not import sibling implementations, require live credentials/network by default, or put the public example under tests. Before marking it runnable, bind concrete fixture values and record its actual command, output and exit code.
+The bounded offline scenario discovers the persistence feature by entry point, composes both providers through public contracts, and proves scoped registration, current-state revalidation, safe audit output, removal, retained-state remount and cleanup. It exits zero with no credential or token output.
 
 #### Removal Behaviour
 

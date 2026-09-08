@@ -3,7 +3,7 @@
   "dag_properties": {
     "is_acyclic": true,
     "total_nodes": 205,
-    "total_required_edges": 476,
+    "total_required_edges": 477,
     "total_operation_edges": 233,
     "total_schedule_constraints": 729
   },
@@ -590,6 +590,13 @@
     {
       "consumer": "FEAT-WS-MANAGE_ARTIFACTS",
       "consumer_task": "1.17",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
+      "consumer": "FEAT-WS-MANAGE_ACCOUNTS",
+      "consumer_task": "1.04",
       "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
       "provider_task": "1.09",
       "provider_capability": "workspace.persistence@1"
