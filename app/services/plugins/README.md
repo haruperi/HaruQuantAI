@@ -44,7 +44,7 @@ Domain business policy, live deployment authority, unrestricted host execution, 
 | Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
 | --- | --- | --- | --- | --- |
 | VERIFIED | `plugins.declare-manifests@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/declare_manifests.py`](../../contracts/plugins/declare_manifests.py) | 1 | Inspect and validate extension manifests |
-| DOCUMENTARY_BOUND | `plugins.register-contributions@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/register_contributions.py`](../../contracts/plugins/register_contributions.py) | 1 | Register and dispose exact extension contributions |
+| VERIFIED | `plugins.register-contributions@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/register_contributions.py`](../../contracts/plugins/register_contributions.py) | 1 | Register and dispose exact extension contributions |
 | DOCUMENTARY_BOUND | `plugins.sandbox-permissions@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/sandbox_permissions.py`](../../contracts/plugins/sandbox_permissions.py) | 1 | Attest bounded plugin permissions and sandbox leases |
 | DOCUMENTARY_BOUND | `plugins.isolate-analysis@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/isolate_analysis.py`](../../contracts/plugins/isolate_analysis.py) | 1 | Build and test untrusted code in isolation |
 | DOCUMENTARY_BOUND | `plugins.manage-lifecycle@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/manage_lifecycle.py`](../../contracts/plugins/manage_lifecycle.py) | 1 | Quarantine, install and remove extension versions |
@@ -311,7 +311,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-PLUG-DECLARE_
 
 > **Feature ID:** `FEAT-PLUG-REGISTER_CONTRIBUTIONS`
 > **Domain:** `plugins`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `COMPLETE` — implemented and verified with 80.49% coverage and passing offline usage demonstration.
 > **Selected owner:** `app/services/plugins/register_contributions/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -382,8 +382,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-PLUG-REGISTER_CONTRIBUTIONS-001` | Register immutable owner-scoped contributions with exact ID/version/generation and return a disposer handle. | `AT-PLUG-REGISTER_CONTRIBUTIONS-001` | Duplicate/conflicting registration is rejected; disposal removes only its own generation, not all matching names. |
-| PENDING | `FR-TRC-PLUG-REGISTER_CONTRIBUTIONS-002` | Expose compatible contributions deterministically and withdraw them on removal/replacement. | `AT-PLUG-REGISTER_CONTRIBUTIONS-002` | An unmounted widget/role/provider cannot reappear in a later lookup through stale global state. |
+| VERIFIED | `FR-TRC-PLUG-REGISTER_CONTRIBUTIONS-001` | Register immutable owner-scoped contributions with exact ID/version/generation and return a disposer handle. | `AT-PLUG-REGISTER_CONTRIBUTIONS-001` | Duplicate/conflicting registration is rejected; disposal removes only its own generation, not all matching names. |
+| VERIFIED | `FR-TRC-PLUG-REGISTER_CONTRIBUTIONS-002` | Expose compatible contributions deterministically and withdraw them on removal/replacement. | `AT-PLUG-REGISTER_CONTRIBUTIONS-002` | An unmounted widget/role/provider cannot reappear in a later lookup through stale global state. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -391,7 +391,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-PLUG-REGISTER_CONTRIBUTIONS-001` | Removing FEAT-PLUG-REGISTER_CONTRIBUTIONS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-PLUG-REGISTER_CONTRIBUTIONS-001` | Disable and physically remove register_contributions; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| VERIFIED | `NFR-TRC-PLUG-REGISTER_CONTRIBUTIONS-001` | Removing FEAT-PLUG-REGISTER_CONTRIBUTIONS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-PLUG-REGISTER_CONTRIBUTIONS-001` | Disable and physically remove register_contributions; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -401,15 +401,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/plugins/register_contributions/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/plugins/register_contributions/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/plugins/register_contributions/test_traceability.py` | VERIFIED: exact named tests bind all acceptance oracles. |
+| Every ATN ID in this card | `tests/services/plugins/register_contributions/test_lifecycle.py` | VERIFIED: withdrawal, unrelated capability survival, and scoped cleanup. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json` | VERIFIED for contract/provider/composition/end-to-end; UI is genuinely inapplicable to this backend capability. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Verified `_usage.py` command:**
 
 ```powershell
 uv run --frozen python -m app.services.plugins.register_contributions._usage

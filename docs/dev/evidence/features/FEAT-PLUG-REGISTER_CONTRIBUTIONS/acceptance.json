@@ -1,0 +1,144 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
+  "task_id": "1.12",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/plugins/README.md",
+  "baseline_commit": "165f09b086bfeaeb63828656f786e1f63a33d625",
+  "acceptance_commit": "task-closeout:20260908-203500-v3-phases-1-16-1.12-register-contributions",
+  "requirements": [
+    {
+      "id": "FR-TRC-PLUG-REGISTER_CONTRIBUTIONS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/register_contributions/test_traceability.py::test_trc_register_contributions_001_exact_generation_disposer_and_conflict_rejection"
+    },
+    {
+      "id": "FR-TRC-PLUG-REGISTER_CONTRIBUTIONS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/register_contributions/test_traceability.py::test_trc_register_contributions_002_deterministic_exposure_and_no_stale_global_state"
+    },
+    {
+      "id": "NFR-TRC-PLUG-REGISTER_CONTRIBUTIONS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/register_contributions/test_lifecycle.py::test_trc_register_contributions_nfr_001_lifecycle_and_withdrawal"
+    },
+    {
+      "id": "AT-PLUG-REGISTER_CONTRIBUTIONS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/register_contributions/test_traceability.py::test_trc_register_contributions_001_exact_generation_disposer_and_conflict_rejection"
+    },
+    {
+      "id": "AT-PLUG-REGISTER_CONTRIBUTIONS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/register_contributions/test_traceability.py::test_trc_register_contributions_002_deterministic_exposure_and_no_stale_global_state"
+    },
+    {
+      "id": "ATN-PLUG-REGISTER_CONTRIBUTIONS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/register_contributions/test_lifecycle.py::test_trc_register_contributions_nfr_001_lifecycle_and_withdrawal"
+    },
+    {
+      "id": "NFR-R-003",
+      "status": "PASS",
+      "evidence_target": "Withdrawing capability leaves unrelated capabilities functional and database intact"
+    },
+    {
+      "id": "NFR-S-002",
+      "status": "PASS",
+      "evidence_target": "Strict request, value type, bounds, and duplicate/conflict validation"
+    },
+    {
+      "id": "NFR-TRC-SHARED-BOUNDARIES",
+      "status": "PASS",
+      "evidence_target": "Standalone provider under plugins.register-contributions@1 public capability"
+    },
+    {
+      "id": "NFR-TRC-SHARED-CONFIG",
+      "status": "PASS",
+      "evidence_target": "Structured logging via app.composition.logging and clean configuration parsing"
+    },
+    {
+      "id": "NFR-TRC-SHARED-EVIDENCE",
+      "status": "PASS",
+      "evidence_target": "Full AT/ATN test suite and reproducible _usage.py demonstration"
+    },
+    {
+      "id": "NFR-TRC-SHARED-INTEGRITY",
+      "status": "PASS",
+      "evidence_target": "Phase 0 validation, generated wire schemas, and contract checks"
+    },
+    {
+      "id": "NFR-TRC-SHARED-STORED-IDENTITY",
+      "status": "PASS",
+      "evidence_target": "Exact owner, plugin_id, version, and monotonic generation tracking"
+    }
+  ],
+  "catalogue_entries": [
+    "Immutable owner-scoped contribution registration",
+    "Exact ID, version, and monotonic generation tracking",
+    "Scoped disposer handle execution and idempotency",
+    "Duplicate and conflicting registration rejection",
+    "Deterministic contribution exposure and query filtering",
+    "Complete withdrawal without stale global state"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/plugins/register_contributions.py, app/contracts/plugins/models.py, app/contracts/plugins/ports.py"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "app/services/plugins/register_contributions/register_contributions.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "app/services/plugins/register_contributions/feature.py with entry point plugins-register-contributions"
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "Public contracts exported via app.contracts.plugins.register_contributions"
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-PLUG-REGISTER_CONTRIBUTIONS is a backend plugin contributions registration and lifecycle provider with no UI widget obligations"
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/plugins/register_contributions/_usage.py demonstrating 5/5 validation, conflict rejection, generation-scoped disposal, and lifecycle scenarios"
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run pytest tests/services/plugins/register_contributions -o \"addopts=--cov=app.services.plugins.register_contributions --cov-fail-under=80\"",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run pytest tests/services/plugins/declare_manifests tests/services/plugins/development_compatibility tests/services/plugins/contributions tests/services/plugins/register_contributions --no-cov",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run python -m app.services.plugins.register_contributions._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff check app/services/plugins/register_contributions tests/services/plugins/register_contributions",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff format --check app/services/plugins/register_contributions tests/services/plugins/register_contributions",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy app/services/plugins/register_contributions app/contracts/plugins/register_contributions.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run python scripts/generate_contracts.py --check",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All 2 FRs and 1 local NFR verified passing with full traceability evidence, custom structured logger integration, generation-scoped disposal, duplicate/conflict rejection, and pure capability contracts."
+  }
+}

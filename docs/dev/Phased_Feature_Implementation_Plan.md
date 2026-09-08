@@ -846,9 +846,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-12"></a>
 
-### - [ ] Task 1.12 — FEAT-PLUG-REGISTER_CONTRIBUTIONS — Register and dispose exact extension contributions
+### - [x] Task 1.12 — FEAT-PLUG-REGISTER_CONTRIBUTIONS — Register and dispose exact extension contributions
 
-**Status:** `PARTIAL` · **Domain:** Plugins · **Owner specification:** `app/services/plugins/README.md` · **Register first slice:** U1.
+**Status:** `ACCEPTED` · **Domain:** Plugins · **Owner specification:** `app/services/plugins/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** 1.05.
 

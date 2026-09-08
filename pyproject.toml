@@ -86,6 +86,7 @@ data-browse-reference = "app.services.data.browse_reference.feature:feature"
 orchestration-manage-jobs = "app.services.orchestration.manage_jobs.feature:feature"
 orchestration-deliver-notifications = "app.services.orchestration.deliver_notifications.feature:feature"
 plugins-declare-manifests = "app.services.plugins.declare_manifests.feature:feature"
+plugins-register-contributions = "app.services.plugins.register_contributions.feature:feature"
 
 
 # ============================================================================

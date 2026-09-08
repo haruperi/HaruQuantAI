@@ -137,6 +137,18 @@ class RegisterContributionsCapability(Protocol):
         """
         ...
 
+    def dispose_generation(self, plugin_id: str, generation: int) -> int:
+        """Dispose only contributions belonging to a specific generation of a plugin.
+
+        Args:
+            plugin_id: Identifier of the owning plugin.
+            generation: Specific registration generation to remove.
+
+        Returns:
+            Count of removed contribution descriptors for that generation.
+        """
+        ...
+
     def get_contributions(
         self, plugin_type: PluginType | None = None
     ) -> tuple[PluginContributionDescriptor, ...]:

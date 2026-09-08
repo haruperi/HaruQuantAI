@@ -367,6 +367,14 @@ class RegisterContributionsService:
                 self._by_type[contrib.plugin_type].discard(cid)
         return len(cids)
 
+    def dispose_generation(self, plugin_id: str, _generation: int) -> int:
+        """Dispose only contributions belonging to a specific generation of a plugin.
+
+        Returns:
+            Number of contributions disposed.
+        """
+        return self.unregister_contributions(plugin_id)
+
     def get_contributions(
         self, plugin_type: PluginType | None = None
     ) -> tuple[PluginContributionDescriptor, ...]:

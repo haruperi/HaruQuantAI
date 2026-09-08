@@ -153,6 +153,8 @@ class PluginContributionDescriptor:
     description: str = ""
     schema_ref: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
+    version: str = "1.0.0"
+    generation: int = 1
 
 
 @dataclass(frozen=True, slots=True)
@@ -175,6 +177,8 @@ class ContributionRegistrationResult:
     test_results: tuple[ContributionTestResult, ...] = ()
     is_successful: bool = True
     errors: tuple[str, ...] = ()
+    generation: int = 1
+    disposer: Any = None
 
 
 # ---------------------------------------------------------------------------

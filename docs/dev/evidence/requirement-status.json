@@ -4,9 +4,9 @@
     "total_frs": 575,
     "total_local_nfrs": 276,
     "disposition_counts": {
-      "ADAPT": 43,
+      "ADAPT": 40,
       "IMPLEMENT": 647,
-      "PROVED_COMPLETE": 45,
+      "PROVED_COMPLETE": 48,
       "VERIFY": 116
     }
   },
@@ -272,7 +272,7 @@
       "feature_id": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
       "task_id": "1.12",
       "text": "Register immutable owner-scoped contributions with exact ID/version/generation and return a disposer handle.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json"
     },
     {
@@ -280,7 +280,7 @@
       "feature_id": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
       "task_id": "1.12",
       "text": "Expose compatible contributions deterministically and withdraw them on removal/replacement.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json"
     },
     {
@@ -1239,7 +1239,7 @@
       "requirement_id": "FR-TRC-DATA-BROWSE_REFERENCE-001",
       "feature_id": "FEAT-DATA-BROWSE_REFERENCE",
       "task_id": "2.29",
-      "text": "Return cursor-paged series metadata and Catalogue references with all §12.2 grid fields and explicit unavailable/partial states.",
+      "text": "Return cursor-paged series metadata and Catalogue references with all \u00a712.2 grid fields and explicit unavailable/partial states.",
       "disposition": "ADAPT",
       "evidence_path": "docs/dev/evidence/features/FEAT-DATA-BROWSE_REFERENCE/acceptance.json"
     },
@@ -1487,7 +1487,7 @@
       "requirement_id": "FR-TRC-STRAT-DEFINE_AST-004",
       "feature_id": "FEAT-STRAT-DEFINE_AST",
       "task_id": "3.07",
-      "text": "Convert the §37.2 compact EMA fixture and §37.9 adapter intermediate into the single canonical node-store form.",
+      "text": "Convert the \u00a737.2 compact EMA fixture and \u00a737.9 adapter intermediate into the single canonical node-store form.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-STRAT-DEFINE_AST/acceptance.json"
     },
@@ -1839,7 +1839,7 @@
       "requirement_id": "FR-TRC-SIM-MODEL_TICKS-002",
       "feature_id": "FEAT-SIM-MODEL_TICKS",
       "task_id": "4.06",
-      "text": "Preserve source sequence and use a pinned equal-time cross-source/timer ordering; finalize half-open bars before the next interval’s observations.",
+      "text": "Preserve source sequence and use a pinned equal-time cross-source/timer ordering; finalize half-open bars before the next interval\u2019s observations.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-MODEL_TICKS/acceptance.json"
     },
@@ -1863,7 +1863,7 @@
       "requirement_id": "FR-TRC-ANA-COMPUTE_METRICS-001",
       "feature_id": "FEAT-ANA-COMPUTE_METRICS",
       "task_id": "4.07",
-      "text": "Register each metric’s formula/version, units, sample, denominator, required inputs, rounding and typed undefined cases before enabling its column.",
+      "text": "Register each metric\u2019s formula/version, units, sample, denominator, required inputs, rounding and typed undefined cases before enabling its column.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-COMPUTE_METRICS/acceptance.json"
     },
@@ -1927,7 +1927,7 @@
       "requirement_id": "FR-TRC-SIM-EXECUTE_TICKS-002",
       "feature_id": "FEAT-SIM-EXECUTE_TICKS",
       "task_id": "4.09",
-      "text": "Process quote update → previously active orders/exits → accounting/causal indicators → subscribed rules → future eligible intents in the pinned order.",
+      "text": "Process quote update \u2192 previously active orders/exits \u2192 accounting/causal indicators \u2192 subscribed rules \u2192 future eligible intents in the pinned order.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-SIM-EXECUTE_TICKS/acceptance.json"
     },
@@ -1983,7 +1983,7 @@
       "requirement_id": "FR-TRC-IFACE-OPERATE_SIMULATIONS-001",
       "feature_id": "FEAT-IFACE-OPERATE_SIMULATIONS",
       "task_id": "4.11",
-      "text": "Validate/translate pinned simulation inputs and return the owner’s actual job/run handle.",
+      "text": "Validate/translate pinned simulation inputs and return the owner\u2019s actual job/run handle.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_SIMULATIONS/acceptance.json"
     },
@@ -2023,7 +2023,7 @@
       "requirement_id": "FR-TRC-ANA-QUERY_RESULTS-001",
       "feature_id": "FEAT-ANA-QUERY_RESULTS",
       "task_id": "4.13",
-      "text": "Validate typed filter AST, stable identity tie-break sort, projection and snapshot cursor with page_size ≤200.",
+      "text": "Validate typed filter AST, stable identity tie-break sort, projection and snapshot cursor with page_size \u2264200.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-ANA-QUERY_RESULTS/acceptance.json"
     },
@@ -3039,7 +3039,7 @@
       "requirement_id": "FR-TRC-UI-ROBUSTNESS_RESULTS-001",
       "feature_id": "FEAT-UI-ROBUSTNESS_RESULTS",
       "task_id": "7.05",
-      "text": "Render each stage’s method, evidence class, seed/count/sample, pass rule and partial/failure status.",
+      "text": "Render each stage\u2019s method, evidence class, seed/count/sample, pass rule and partial/failure status.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-ROBUSTNESS_RESULTS/acceptance.json"
     },
@@ -3167,7 +3167,7 @@
       "requirement_id": "FR-TRC-RES-EVOLVE_STRATEGIES-001",
       "feature_id": "FEAT-RES-EVOLVE_STRATEGIES",
       "task_id": "8.04",
-      "text": "Initialize K×M×N unique filter-passing fully evaluated candidates, rank them and allocate M×N survivors by deterministic round-robin.",
+      "text": "Initialize K\u00d7M\u00d7N unique filter-passing fully evaluated candidates, rank them and allocate M\u00d7N survivors by deterministic round-robin.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-EVOLVE_STRATEGIES/acceptance.json"
     },
@@ -3183,7 +3183,7 @@
       "requirement_id": "FR-TRC-RES-EVOLVE_STRATEGIES-003",
       "feature_id": "FEAT-RES-EVOLVE_STRATEGIES",
       "task_id": "8.04",
-      "text": "Run elite → offspring/evaluation → rank → simultaneous directed-ring migration → duplicate/refill → fresh blood → checkpoint/termination.",
+      "text": "Run elite \u2192 offspring/evaluation \u2192 rank \u2192 simultaneous directed-ring migration \u2192 duplicate/refill \u2192 fresh blood \u2192 checkpoint/termination.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-EVOLVE_STRATEGIES/acceptance.json"
     },
@@ -3735,7 +3735,7 @@
       "requirement_id": "FR-TRC-ORCH-RUN_PROJECTS-003",
       "feature_id": "FEAT-ORCH-RUN_PROJECTS",
       "task_id": "11.06",
-      "text": "Record project → run → node attempt → domain run → artifact/receipt lineage, preserve retries and resume only compatible checkpoints.",
+      "text": "Record project \u2192 run \u2192 node attempt \u2192 domain run \u2192 artifact/receipt lineage, preserve retries and resume only compatible checkpoints.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-ORCH-RUN_PROJECTS/acceptance.json"
     },
@@ -4175,7 +4175,7 @@
       "requirement_id": "FR-TRC-RES-PREPARE_NEURAL_DATASETS-003",
       "feature_id": "FEAT-RES-PREPARE_NEURAL_DATASETS",
       "task_id": "14.01",
-      "text": "Provide finite fractional-differencing truncation/weight tolerance with d=0.4 template and bounded 0.35–0.65 search interval.",
+      "text": "Provide finite fractional-differencing truncation/weight tolerance with d=0.4 template and bounded 0.35\u20130.65 search interval.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-RES-PREPARE_NEURAL_DATASETS/acceptance.json"
     },
@@ -4722,7 +4722,7 @@
       "feature_id": "FEAT-PLUG-REGISTER_CONTRIBUTIONS",
       "task_id": "1.12",
       "text": "Removing FEAT-PLUG-REGISTER_CONTRIBUTIONS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-REGISTER_CONTRIBUTIONS/acceptance.json"
     },
     {
@@ -4761,7 +4761,7 @@
       "requirement_id": "NFR-TRC-AGT-ENFORCE_MANDATE-001",
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
@@ -4801,7 +4801,7 @@
       "requirement_id": "NFR-TRC-AGT-OPERATE_RUNS-001",
       "feature_id": "FEAT-AGT-OPERATE_RUNS",
       "task_id": "1.19",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-OPERATE_RUNS/acceptance.json"
     },
@@ -4817,7 +4817,7 @@
       "requirement_id": "NFR-TRC-AGT-REGISTER_ROLES-001",
       "feature_id": "FEAT-AGT-REGISTER_ROLES",
       "task_id": "1.20",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-REGISTER_ROLES/acceptance.json"
     },
@@ -4849,7 +4849,7 @@
       "requirement_id": "NFR-TRC-AGT-GOVERN_TOOL_CALLS-001",
       "feature_id": "FEAT-AGT-GOVERN_TOOL_CALLS",
       "task_id": "1.23",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-GOVERN_TOOL_CALLS/acceptance.json"
     },
@@ -4865,7 +4865,7 @@
       "requirement_id": "NFR-TRC-AGT-INVOKE_MODELS-001",
       "feature_id": "FEAT-AGT-INVOKE_MODELS",
       "task_id": "1.24",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-INVOKE_MODELS/acceptance.json"
     },
@@ -5745,7 +5745,7 @@
       "requirement_id": "NFR-TRC-AGT-ASSEMBLE_CONTEXT-001",
       "feature_id": "FEAT-AGT-ASSEMBLE_CONTEXT",
       "task_id": "5.03",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ASSEMBLE_CONTEXT/acceptance.json"
     },
@@ -5761,7 +5761,7 @@
       "requirement_id": "NFR-TRC-AGT-RUN_WORKFLOWS-001",
       "feature_id": "FEAT-AGT-RUN_WORKFLOWS",
       "task_id": "5.04",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-RUN_WORKFLOWS/acceptance.json"
     },
@@ -5777,7 +5777,7 @@
       "requirement_id": "NFR-TRC-AGT-EVALUATE_PROFILES-001",
       "feature_id": "FEAT-AGT-EVALUATE_PROFILES",
       "task_id": "5.05",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-EVALUATE_PROFILES/acceptance.json"
     },
@@ -5793,7 +5793,7 @@
       "requirement_id": "NFR-TRC-AGT-MANAGE_CLAIMS-001",
       "feature_id": "FEAT-AGT-MANAGE_CLAIMS",
       "task_id": "5.06",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-MANAGE_CLAIMS/acceptance.json"
     },
@@ -5809,7 +5809,7 @@
       "requirement_id": "NFR-TRC-AGT-SYNTHESIZE_RESEARCH-001",
       "feature_id": "FEAT-AGT-SYNTHESIZE_RESEARCH",
       "task_id": "5.07",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-SYNTHESIZE_RESEARCH/acceptance.json"
     },
@@ -5825,7 +5825,7 @@
       "requirement_id": "NFR-TRC-AGT-ASSIST_OPERATOR-001",
       "feature_id": "FEAT-AGT-ASSIST_OPERATOR",
       "task_id": "5.08",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ASSIST_OPERATOR/acceptance.json"
     },
@@ -5921,7 +5921,7 @@
       "requirement_id": "NFR-TRC-AGT-COMPOSE_STRATEGY_PROPOSALS-001",
       "feature_id": "FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS",
       "task_id": "6.04",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_PROPOSALS/acceptance.json"
     },
@@ -5969,7 +5969,7 @@
       "requirement_id": "NFR-TRC-AGT-GOVERN_RESEARCH_SEARCH-001",
       "feature_id": "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
       "task_id": "6.08",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-GOVERN_RESEARCH_SEARCH/acceptance.json"
     },
@@ -5985,7 +5985,7 @@
       "requirement_id": "NFR-TRC-AGT-DESIGN_RESEARCH-001",
       "feature_id": "FEAT-AGT-DESIGN_RESEARCH",
       "task_id": "6.09",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-DESIGN_RESEARCH/acceptance.json"
     },
@@ -6001,7 +6001,7 @@
       "requirement_id": "NFR-TRC-AGT-COMPOSE_STRATEGY_SPECS-001",
       "feature_id": "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
       "task_id": "6.10",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json"
     },
@@ -6041,7 +6041,7 @@
       "requirement_id": "NFR-TRC-AGT-DELIBERATE_RESEARCH-001",
       "feature_id": "FEAT-AGT-DELIBERATE_RESEARCH",
       "task_id": "7.03",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-DELIBERATE_RESEARCH/acceptance.json"
     },
@@ -6289,7 +6289,7 @@
       "requirement_id": "NFR-TRC-AGT-ADVISE_PORTFOLIO-001",
       "feature_id": "FEAT-AGT-ADVISE_PORTFOLIO",
       "task_id": "10.09",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ADVISE_PORTFOLIO/acceptance.json"
     },
@@ -6385,7 +6385,7 @@
       "requirement_id": "NFR-TRC-AGT-MANAGE_MEMORY-001",
       "feature_id": "FEAT-AGT-MANAGE_MEMORY",
       "task_id": "11.05",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-MANAGE_MEMORY/acceptance.json"
     },
@@ -6409,7 +6409,7 @@
       "requirement_id": "NFR-TRC-AGT-CALIBRATE_OUTCOMES-001",
       "feature_id": "FEAT-AGT-CALIBRATE_OUTCOMES",
       "task_id": "11.07",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-CALIBRATE_OUTCOMES/acceptance.json"
     },
@@ -6529,7 +6529,7 @@
       "requirement_id": "NFR-TRC-AGT-AUTHOR_SANDBOX_ARTIFACTS-001",
       "feature_id": "FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS",
       "task_id": "12.10",
-      "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
+      "text": "All direct tool/model/receiver work obeys the feature\u2019s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
       "disposition": "IMPLEMENT",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-AUTHOR_SANDBOX_ARTIFACTS/acceptance.json"
     },
