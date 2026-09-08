@@ -81,9 +81,10 @@ async def test_trc_manage_accounts_nfr_001(tmp_path: Any) -> None:
 
     instance = feature()
     account_scope = FeatureScope(owner_id=instance.spec.feature_id)
+    test_db = tmp_path / "database" / "haruquantai.db"
     await instance.mount(
         _context(instance, registry, account_scope),
-        {"database_path": tmp_path / "workspace"},
+        {"database_path": test_db},
     )
     provider = registry.require(MANAGE_ACCOUNTS_CAPABILITY)
     registered = await provider.manage_accounts(
@@ -99,13 +100,13 @@ async def test_trc_manage_accounts_nfr_001(tmp_path: Any) -> None:
     assert registry.resolve(MANAGE_ACCOUNTS_CAPABILITY) is None
     assert registry.resolve(PERSISTENCE_CAPABILITY) is persistence
     assert registry.resolve(unrelated_key) is unrelated
-    assert (tmp_path / "workspace" / "metadata" / "workspace.db").is_file()
+    assert test_db.is_file()
 
     replacement = feature()
     replacement_scope = FeatureScope(owner_id=replacement.spec.feature_id)
     await replacement.mount(
         _context(replacement, registry, replacement_scope),
-        {"database_path": tmp_path / "workspace"},
+        {"database_path": test_db},
     )
     retained_login = await registry.require(MANAGE_ACCOUNTS_CAPABILITY).manage_accounts(
         _request(

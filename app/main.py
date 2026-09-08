@@ -340,6 +340,8 @@ async def _serve(args: argparse.Namespace) -> int:
                 profile="research",
                 features={
                     "FEAT-CAT-CATALOG_INSTRUMENTS": FeatureConfig(enabled=True),
+                    "FEAT-WS-MANAGE_WORKSPACES": FeatureConfig(enabled=True),
+                    "FEAT-WS-EXECUTE_PERSISTENCE": FeatureConfig(enabled=True),
                     "FEAT-WS-MANAGE_ACCOUNTS": FeatureConfig(enabled=True),
                     "FEAT-WS-MANAGE_WATCHLISTS": FeatureConfig(enabled=True),
                     "FEAT-WS-ADMINISTER_SETTINGS": FeatureConfig(enabled=True),

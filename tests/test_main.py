@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import override
 
 import pytest
+from app.composition.config import AppConfig
 from app.composition.logging import (
     _OWNED_HANDLER_ATTR,
     CleanupDiagnostic,
@@ -13,7 +14,54 @@ from app.composition.logging import (
     compute_secret_fingerprint,
     configure_logging,
 )
-from app.main import async_main, run
+from app.contracts.workspace.models import BridgeRuntimeSettings
+from app.main import _serve, async_main, build_parser, run
+
+
+@pytest.mark.asyncio
+async def test_main_serve_default_config_enables_identity_dependency_chain(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Launcher default --serve configuration enables the full identity dependency chain."""
+    captured_configs: list[AppConfig] = []
+
+    async def fake_reconcile(_self: object, config: AppConfig) -> None:
+        captured_configs.append(config)
+
+    async def fake_serve(_self: object) -> None:
+        pass
+
+    monkeypatch.setattr(
+        "app.services.workspace.administer_settings.administer_settings.read_bridge_runtime",
+        lambda *args, **kwargs: BridgeRuntimeSettings(),
+    )
+    monkeypatch.setattr(
+        "app.main.CompositionEngine.reconcile_with_config",
+        fake_reconcile,
+    )
+    monkeypatch.setattr(
+        "app.services.interfaces.serve_api_events.asgi.create_api_asgi_app",
+        lambda _registry: lambda scope, receive, send: None,
+    )
+    monkeypatch.setattr("uvicorn.Server.serve", fake_serve)
+
+    args = build_parser().parse_args([])
+    exit_code = await _serve(args)
+    assert exit_code == 0
+    assert len(captured_configs) == 1
+
+    default_config = captured_configs[0]
+    assert default_config.profile == "research"
+
+    expected_identity_chain = (
+        "FEAT-WS-MANAGE_WORKSPACES",
+        "FEAT-WS-EXECUTE_PERSISTENCE",
+        "FEAT-WS-MANAGE_ACCOUNTS",
+        "FEAT-IFACE-OPERATE_IDENTITY",
+    )
+    for feature_id in expected_identity_chain:
+        assert feature_id in default_config.features
+        assert default_config.features[feature_id].enabled is True
 
 
 @pytest.mark.asyncio

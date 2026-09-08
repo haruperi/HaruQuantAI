@@ -46,7 +46,7 @@ capability; this package never opens a raw database connection.
 
 | Key | Type | Default | Description |
 | --- | --- | --- | --- |
-| `database_path` | `str` or `Path` | `<repo>/data/workspaces/local` | Compatibility key naming a workspace root or its canonical `metadata/workspace.db`. |
+| `database_path` | `str` or `Path` | `<repo>/data/database/haruquantai.db` | Path naming the canonical `haruquantai.db` or its parent database directory. |
 
 Unknown keys, wrong types, and non-canonical database filenames fail closed.
 

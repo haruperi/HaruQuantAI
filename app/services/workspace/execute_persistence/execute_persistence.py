@@ -162,8 +162,13 @@ def _utc_now_iso() -> str:
 
 
 def _db_path(workspace_path: Path) -> Path:
-    """Return the canonical workspace database path."""
-    return workspace_path / "metadata" / "workspace.db"
+    """Return the canonical database path for persistence execution."""
+    if workspace_path.suffix == ".db":
+        return workspace_path
+    central_db = workspace_path / "database" / "haruquantai.db"
+    if central_db.exists():
+        return central_db
+    return workspace_path / "haruquantai.db"
 
 
 class ExecutePersistenceService:

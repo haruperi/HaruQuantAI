@@ -21,7 +21,7 @@ from typing import Any
 _ALLOWED_CONFIG_KEYS = frozenset({"database_path"})
 
 _DEFAULT_DATABASE_PATH = (
-    Path(__file__).resolve().parents[4] / "data" / "workspaces" / "local"
+    Path(__file__).resolve().parents[4] / "data" / "database" / "haruquantai.db"
 )
 
 
@@ -73,16 +73,13 @@ class ManageAccountsConfig:
 
         Raises:
             TypeError: If ``database_path`` is not a Path.
-            ValueError: If a database file is not the canonical workspace file.
+            ValueError: If a database file is not the canonical database file.
         """
         if not isinstance(self.database_path, Path):
             raise TypeError("database_path must be a Path")
-        if self.database_path.suffix and not (
-            self.database_path.name == "workspace.db"
-            and self.database_path.parent.name == "metadata"
-        ):
+        if self.database_path.suffix and self.database_path.name != "haruquantai.db":
             raise ValueError(
-                "database_path must be a workspace root or metadata/workspace.db"
+                "database_path must name haruquantai.db or a database directory"
             )
 
     @classmethod
@@ -99,11 +96,9 @@ class ManageAccountsConfig:
 
     @property
     def workspace_path(self) -> Path:
-        """Return the canonical workspace root used by persistence.
+        """Return the canonical database path used by persistence.
 
         Returns:
-            Workspace root directory, never a raw database path.
+            Central database path or directory.
         """
-        if self.database_path.name == "workspace.db":
-            return self.database_path.parent.parent
         return self.database_path

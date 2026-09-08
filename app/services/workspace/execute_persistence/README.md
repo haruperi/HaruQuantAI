@@ -32,7 +32,7 @@ Unknown keys, wrong types, and out-of-range values fail closed. Manifest and con
 
 ## Persistence and Safety
 
-`ExecutePersistenceService` executes against `metadata/workspace.db` in SQLite WAL mode.
+`ExecutePersistenceService` executes against `haruquantai.db` in SQLite WAL mode.
 All tables are partitioned strictly by feature namespace.
 Transactions targeting tables outside the registered namespace are denied.
 Append-only evidence tables reject `UPDATE` and `DELETE` attempts.

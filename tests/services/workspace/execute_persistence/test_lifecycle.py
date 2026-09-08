@@ -82,7 +82,7 @@ async def test_trc_execute_persistence_nfr_001(tmp_path: Path) -> None:
     assert registry.resolve(PERSISTENCE_CAPABILITY) is None
 
     # Underlying SQLite database file and records remain intact
-    db_file = workspace / "metadata" / "workspace.db"
+    db_file = workspace / "haruquantai.db"
     assert db_file.is_file()
 
     reader = ExecutePersistenceService()
