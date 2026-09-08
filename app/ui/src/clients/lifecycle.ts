@@ -3,29 +3,20 @@
 import type { ApiResponse, StreamEvent } from "./contracts";
 import { ApiClientError, request, type RequestOptions } from "./request";
 import type { RouteContract } from "./routes";
-import {
-  openStream,
-  type StreamTransportOptions,
-} from "./stream";
+import { currentSessionScopeSignal } from "./session-scope";
+import { openStream, type StreamTransportOptions } from "./stream";
 
 const MAX_KEY_LENGTH = 128;
 const MAX_STREAM_RECONNECTS = 1;
 const SAFE_KEY = /^[A-Za-z0-9._:-]+$/;
 
-/** Function boundary used to inject the request transport in offline tests. */
 export type RequestTransport = typeof request;
-/** Function boundary used to inject the stream transport in offline tests. */
 export type StreamTransport = typeof openStream;
-/** Listener for one validated stream event. */
 export type StreamListener = (event: StreamEvent) => void;
-/** Listener for a terminal stream failure. */
 export type StreamErrorListener = (error: ApiClientError) => void;
 
-/** Handle returned for one subscriber to a shared observation. */
 export interface StreamSubscription {
-  /** Settles when the shared underlying observation finishes. */
   readonly done: Promise<void>;
-  /** Remove this subscriber; the final removal aborts the shared stream. */
   dispose(): void;
 }
 
@@ -41,13 +32,8 @@ interface SharedStream {
   lastSequence?: number;
 }
 
-/** Assert that an ownership key contains no payload or credential material. */
 function validateKey(key: string): void {
-  if (
-    key.length === 0 ||
-    key.length > MAX_KEY_LENGTH ||
-    !SAFE_KEY.test(key)
-  ) {
+  if (key.length === 0 || key.length > MAX_KEY_LENGTH || !SAFE_KEY.test(key)) {
     throw new ApiClientError({
       message: "client lifecycle key is invalid",
       status: 0,
@@ -56,11 +42,7 @@ function validateKey(key: string): void {
   }
 }
 
-/** Link an optional caller signal to an owned controller. */
-function linkSignal(
-  source: AbortSignal | undefined,
-  target: AbortController,
-): () => void {
+function linkSignal(source: AbortSignal | undefined, target: AbortController): () => void {
   if (!source) return () => undefined;
   if (source.aborted) {
     target.abort(source.reason);
@@ -71,7 +53,6 @@ function linkSignal(
   return () => source.removeEventListener("abort", abort);
 }
 
-/** Convert an unknown terminal failure to the public typed error. */
 function typedStreamError(error: unknown): ApiClientError {
   if (error instanceof ApiClientError) return error;
   return new ApiClientError({
@@ -83,12 +64,6 @@ function typedStreamError(error: unknown): ApiClientError {
   });
 }
 
-/**
- * Own latest-only requests and shared stream observations for one UI scope.
- *
- * Instances are explicit lifecycle resources: there is no global registry,
- * import-time I/O, or hidden provider fallback.
- */
 export class TypedBackendLifecycle {
   private readonly requests = new Map<string, AbortController>();
   private readonly streams = new Map<string, SharedStream>();
@@ -100,14 +75,10 @@ export class TypedBackendLifecycle {
     private readonly streamTransport: StreamTransport = openStream,
   ) {}
 
-  /** Whether this feature scope has been disposed. */
   public get isDisposed(): boolean {
     return this.disposed;
   }
 
-  /**
-   * Run the latest request for a presentation key and abort its predecessor.
-   */
   public async requestLatest<T>(
     key: string,
     contract: RouteContract,
@@ -117,7 +88,8 @@ export class TypedBackendLifecycle {
     validateKey(key);
     this.requests.get(key)?.abort("superseded");
     const controller = new AbortController();
-    const unlink = linkSignal(options.signal, controller);
+    const unlinkCaller = linkSignal(options.signal, controller);
+    const unlinkSession = linkSignal(currentSessionScopeSignal(), controller);
     this.requests.set(key, controller);
     const operation = this.requestTransport<T>(contract, {
       ...options,
@@ -127,17 +99,13 @@ export class TypedBackendLifecycle {
     try {
       return await operation;
     } finally {
-      unlink();
+      unlinkCaller();
+      unlinkSession();
       this.tasks.delete(operation);
-      if (this.requests.get(key) === controller) {
-        this.requests.delete(key);
-      }
+      if (this.requests.get(key) === controller) this.requests.delete(key);
     }
   }
 
-  /**
-   * Share one cursor-resuming stream among subscribers with the same key.
-   */
   public subscribe(
     key: string,
     contract: RouteContract,
@@ -151,20 +119,16 @@ export class TypedBackendLifecycle {
     let shared = this.streams.get(key);
     if (!shared) {
       const controller = new AbortController();
-      const unlink = linkSignal(options.signal, controller);
+      const unlinkCaller = linkSignal(options.signal, controller);
+      const unlinkSession = linkSignal(currentSessionScopeSignal(), controller);
       const subscribers = new Set<Subscriber>();
-      const created: SharedStream = {
-        controller,
-        subscribers,
-        done: Promise.resolve(),
-      };
-      const done = this.consumeShared(key, contract, options, created).finally(
-        () => {
-          unlink();
-          this.tasks.delete(done);
-          if (this.streams.get(key) === created) this.streams.delete(key);
-        },
-      );
+      const created: SharedStream = { controller, subscribers, done: Promise.resolve() };
+      const done = this.consumeShared(key, contract, options, created).finally(() => {
+        unlinkCaller();
+        unlinkSession();
+        this.tasks.delete(done);
+        if (this.streams.get(key) === created) this.streams.delete(key);
+      });
       created.done = done;
       shared = created;
       this.streams.set(key, shared);
@@ -183,7 +147,6 @@ export class TypedBackendLifecycle {
     };
   }
 
-  /** Abort and await all feature-owned effects. Idempotent. */
   public async dispose(): Promise<void> {
     if (this.disposed) return;
     this.disposed = true;
@@ -220,9 +183,7 @@ export class TypedBackendLifecycle {
           signal: shared.controller.signal,
         })) {
           shared.lastSequence = event.sequence;
-          for (const subscriber of [...shared.subscribers]) {
-            subscriber.onEvent(event);
-          }
+          for (const subscriber of [...shared.subscribers]) subscriber.onEvent(event);
         }
         return;
       } catch (error) {
@@ -232,9 +193,7 @@ export class TypedBackendLifecycle {
           reconnects += 1;
           continue;
         }
-        for (const subscriber of [...shared.subscribers]) {
-          subscriber.onError?.(typed);
-        }
+        for (const subscriber of [...shared.subscribers]) subscriber.onError?.(typed);
         return;
       }
     }

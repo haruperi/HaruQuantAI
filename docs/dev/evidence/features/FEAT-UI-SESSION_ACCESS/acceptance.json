@@ -1,0 +1,11 @@
+{
+  "feature_id": "FEAT-UI-SESSION_ACCESS",
+  "task_id": "1.16",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id": "FR-TRC-UI-SESSION_ACCESS-001", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-UI-SESSION_ACCESS-002", "status": "IMPLEMENTED"},
+    {"id": "NFR-TRC-UI-SESSION_ACCESS-001", "status": "IMPLEMENTED"}
+  ],
+  "review": {"reviewer_verdict": "PENDING", "reviewer_notes": "CI/browser review pending."}
+}
