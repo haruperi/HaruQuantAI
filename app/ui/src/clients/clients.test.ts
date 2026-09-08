@@ -66,7 +66,17 @@ afterEach(() => {
 describe("auth client", () => {
   beforeEach(() => {
     fakeFetch(() =>
-      success({ user_id: "u1", username: "alice", expires_at: "2026-08-04T00:00:00Z" }, 201)
+      success(
+        {
+          user_id: "u1",
+          account_id: "account-1",
+          workspace_id: "workspace-1",
+          username: "alice",
+          expires_at: "2026-08-04T00:00:00Z",
+          authentication_audit_ref: "auth-audit-1",
+        },
+        201
+      )
     );
   });
 
@@ -96,7 +106,14 @@ describe("auth client", () => {
 
   it("me recovers the server-authoritative identity", async () => {
     fakeFetch(() =>
-      success({ user_id: "u1", username: "alice", expires_at: "2026-08-04T00:00:00Z" })
+      success({
+        user_id: "u1",
+        account_id: "account-1",
+        workspace_id: "workspace-1",
+        username: "alice",
+        expires_at: "2026-08-04T00:00:00Z",
+        authentication_audit_ref: "auth-audit-1",
+      })
     );
     const res = await apiClients.auth.me();
     expect(unwrapData(res).username).toBe("alice");

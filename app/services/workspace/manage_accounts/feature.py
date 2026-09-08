@@ -4,7 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from app.contracts.workspace.capabilities import MANAGE_ACCOUNTS_CAPABILITY
+from app.contracts.workspace.capabilities import (
+    MANAGE_ACCOUNTS_CAPABILITY,
+    PERSISTENCE_CAPABILITY,
+)
 from app.services.workspace.manage_accounts.accounts import AccountService
 from app.services.workspace.manage_accounts.config import (
     ManageAccountsConfig,
@@ -56,7 +59,8 @@ class ManageAccountsFeature:
         else:
             message = "manage-accounts configuration must be a mapping or config"
             raise TypeError(message)
-        service = AccountService(parsed)
+        persistence = context.require(PERSISTENCE_CAPABILITY)
+        service = AccountService(persistence, parsed)
         context.register_callback(service.close)
         context.provide(MANAGE_ACCOUNTS_CAPABILITY, service)
         self._service = service

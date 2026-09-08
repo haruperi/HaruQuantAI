@@ -41,8 +41,11 @@ const IDENTITY_STORAGE_KEY = "hq:identity";
 /** Authenticated principal metadata (non-secret; mirrors login/register body). */
 export interface AuthPrincipal {
   readonly user_id: string;
+  readonly account_id: string;
+  readonly workspace_id: string;
   readonly username: string;
   readonly expires_at: string;
+  readonly authentication_audit_ref: string;
   /** API-authoritative environment; absent until a route returns it. See FR-UI-017. */
   readonly runtime_profile?: string;
 }
@@ -131,8 +134,11 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
         // display-name fallback for offline reloads; the cookie is the proof.
         const next: AuthPrincipal = {
           user_id: response.data.user_id,
+          account_id: response.data.account_id,
+          workspace_id: response.data.workspace_id,
           username: response.data.username,
           expires_at: response.data.expires_at,
+          authentication_audit_ref: response.data.authentication_audit_ref,
           runtime_profile: response.data.runtime_profile,
         };
         writeStoredIdentity(next);
@@ -174,8 +180,11 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
       }
       const next: AuthPrincipal = {
         user_id: response.data.user_id,
+        account_id: response.data.account_id,
+        workspace_id: response.data.workspace_id,
         username: response.data.username,
         expires_at: response.data.expires_at,
+        authentication_audit_ref: response.data.authentication_audit_ref,
         runtime_profile: response.data.runtime_profile,
       };
       writeStoredIdentity(next);
@@ -200,8 +209,11 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
       }
       const next: AuthPrincipal = {
         user_id: response.data.user_id,
+        account_id: response.data.account_id,
+        workspace_id: response.data.workspace_id,
         username: response.data.username,
         expires_at: response.data.expires_at,
+        authentication_audit_ref: response.data.authentication_audit_ref,
         runtime_profile: response.data.runtime_profile,
       };
       writeStoredIdentity(next);

@@ -10,7 +10,7 @@ This plan answers **what to implement and when**. The Feature–Requirement Trac
 
 **Delivery is Agile and vertically integrated.** Each phase produces a user-visible workflow through actual providers, its Interfaces boundary and the UI. Data is not considered delivered merely because its Python providers exist: Phase 2 includes Data Manager and chart behaviour plus real end-to-end verification. The same pattern repeats for strategy authoring, simulation/results, Chat Bot, research, retesting, Builder, optimization, portfolios and projects.
 
-**Readiness, not a missing provider, controls sequencing.** The register contains 476 required edges and 233 operation-time dependencies. All 476 required edges are preserved. The schedule adds real-provider sequencing where the necessary provider is available in or before the same phase. Thirty-eight dependencies intentionally await later optional providers; their guard and contract adapter are implemented once in the consuming feature, and the later provider task supplies actual integration evidence. An unavailable optional operation must fail explicitly. It is never replaced with fabricated data or a fixture-labelled-as-production.
+**Readiness, not a missing provider, controls sequencing.** The register contains 477 required edges and 233 operation-time dependencies. All 477 required edges are preserved. The schedule adds real-provider sequencing where the necessary provider is available in or before the same phase. Thirty-eight dependencies intentionally await later optional providers; their guard and contract adapter are implemented once in the consuming feature, and the later provider task supplies actual integration evidence. An unavailable optional operation must fail explicitly. It is never replaced with fabricated data or a fixture-labelled-as-production.
 
 **One open feature task has one accepted implementation commit** under the existing Planner → Executor → Reviewer workflow, plus the normal explicit merge record required by repository governance. A verified already-complete feature retains its task slot and links its existing acceptance commit; do not force a rewrite or an empty commit. Phase 0/phase checkpoint evidence does not authorize any live-trading action.
 
@@ -396,9 +396,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-04"></a>
 
-### - [ ] Task 1.04 — FEAT-WS-MANAGE_ACCOUNTS — Verify accounts, principals and sessions
+### - [x] Task 1.04 — FEAT-WS-MANAGE_ACCOUNTS — Verify accounts, principals and sessions
 
-**Status:** `EXISTING_UNVERIFIED` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
+**Status:** `PROVED_COMPLETE` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
 
 **Order prerequisites:** Phase 0 entry gate; no feature-task predecessor.
 
@@ -438,7 +438,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Usage example to document and run:** Run the feature's bounded, offline `_usage.py` demonstration using a temporary workspace and the pinned fixture for: Verify session expiry, revocation, principal and authorized account/workspace before returning a bounded identity projection. Expected: Expired, revoked and wrong-account sessions produce denial before any receiver mutation. Repeat its declared invalid/unavailable case, close the feature scope and show retained-state/cleanup results. No credentials, network or live orders are implicit.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`. Terminal Executor results are recorded with Reviewer authority still pending.
 
 #### iv. Definition of Done and commit
 
@@ -446,7 +446,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(workspace): complete FEAT-WS-MANAGE_ACCOUNTS`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260907-203821-559690-v3-phases-1-16-1.04-manage-accounts` — pending the authorized Task commit and no-ff merge transaction.
 
 ---
 

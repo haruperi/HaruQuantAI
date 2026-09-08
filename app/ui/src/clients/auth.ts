@@ -29,8 +29,11 @@ export interface Credentials {
  */
 export const sessionSchema = z.object({
   user_id: z.string().min(1),
+  account_id: z.string().min(1),
+  workspace_id: z.string().min(1),
   username: z.string().min(1),
   expires_at: z.string().min(1),
+  authentication_audit_ref: z.string().min(1),
   runtime_profile: z.string().optional(),
 });
 export type Session = z.infer<typeof sessionSchema>;
@@ -71,8 +74,8 @@ export function logout(options?: RequestOptions): Promise<ApiResponse<null>> {
 /**
  * Recover the caller's non-secret identity from the server-side session.
  *
- * Hits `GET /api/v1/auth/me`: returns `{user_id, username, expires_at}` when
- * the cookie session is valid, 401 when missing/expired. This is the
+ * Hits `GET /api/v1/auth/me`: returns a bounded account/workspace identity
+ * when the cookie session is valid, 401 when missing/expired. This is the
  * server-authoritative identity source for `AuthProvider` recovery.
  */
 export function me(options?: RequestOptions): Promise<ApiResponse<Identity>> {

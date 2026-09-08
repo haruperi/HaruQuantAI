@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
+from app.contracts.workspace.manage_accounts import (
+    ManageAccountsCapability,  # noqa: F401
+)
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -18,8 +22,6 @@ if TYPE_CHECKING:
         HostWorkspacesSuccess,
         JobKind,
         LocalSession,
-        ManageAccountsRequest,
-        ManageAccountsSuccess,
         ManageWatchlistsRequest,
         ManageWatchlistsSuccess,
         RuntimeSupportProfile,
@@ -442,24 +444,6 @@ class ManageWatchlistsCapability(Protocol):
         Returns:
             The watchlist page, mutation result, or deletion flag on
             success, otherwise a structured workspace failure.
-        """
-        ...
-
-
-@runtime_checkable
-class ManageAccountsCapability(Protocol):
-    """Capability protocol for account and session operations."""
-
-    async def manage_accounts(
-        self, request: ManageAccountsRequest
-    ) -> ManageAccountsSuccess | WorkspaceFailure:
-        """Serve one operation-discriminated account request.
-
-        Args:
-            request: REGISTER, LOGIN, ME, or LOGOUT request.
-
-        Returns:
-            Account operation success, or a structured workspace failure.
         """
         ...
 

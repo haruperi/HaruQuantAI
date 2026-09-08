@@ -26,7 +26,7 @@ def test_plan_and_register_have_exact_feature_sets() -> None:
 
 
 def test_dependency_edges_are_complete_and_ordered() -> None:
-    """Every required provider precedes its consumer in the frozen schedule."""
+    """Required edges are forward except the ratified accepted-provider edge."""
     payloads = generator.build_payloads()
     graph = payloads[generator.SOURCE_DIR / "dependency-graph.json"]
     schedule = payloads[generator.EVIDENCE_DIR / "dependency-schedule.json"]
@@ -35,12 +35,22 @@ def test_dependency_edges_are_complete_and_ordered() -> None:
     ]
     order = {feature: index for index, feature in enumerate(ordered_features)}
 
-    assert len(graph["required_edges"]) == 476
+    assert len(graph["required_edges"]) == 477
     assert len(graph["operation_edges"]) == 233
-    assert all(
-        order[edge["provider"]] < order[edge["consumer"]]
+    backward_edges = [
+        edge
         for edge in graph["required_edges"]
-    )
+        if order[edge["provider"]] >= order[edge["consumer"]]
+    ]
+    assert backward_edges == [
+        {
+            "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+            "provider_task": "1.09",
+            "provider_capability": "workspace.persistence@1",
+            "consumer": "FEAT-WS-MANAGE_ACCOUNTS",
+            "consumer_task": "1.04",
+        }
+    ]
 
 
 def test_generated_inventory_matches_ratified_counts() -> None:
@@ -51,7 +61,7 @@ def test_generated_inventory_matches_ratified_counts() -> None:
     assert manifest["inventory"]["total_features"] == 205
     assert manifest["inventory"]["total_normalized_frs"] == 575
     assert manifest["inventory"]["total_local_nfrs"] == 276
-    assert manifest["inventory"]["total_required_edges"] == 476
+    assert manifest["inventory"]["total_required_edges"] == 477
     assert manifest["inventory"]["total_operation_gated_edges"] == 233
     assert manifest["baseline"]["plan_git_blob"] == (
         "a6a8754170c5ff1a0ba853f8b3d91f43a68aa2a3"

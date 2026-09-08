@@ -223,6 +223,13 @@
       "provider_capability": "workspace.persistence@1"
     },
     {
+      "consumer": "FEAT-WS-MANAGE_ACCOUNTS",
+      "consumer_task": "1.04",
+      "provider": "FEAT-WS-EXECUTE_PERSISTENCE",
+      "provider_task": "1.09",
+      "provider_capability": "workspace.persistence@1"
+    },
+    {
       "consumer": "FEAT-WS-SECURE_LOCAL_ACCESS",
       "consumer_task": "1.10",
       "provider": "FEAT-WS-MANAGE_ACCOUNTS",

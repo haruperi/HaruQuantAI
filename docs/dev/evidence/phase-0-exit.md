@@ -66,7 +66,7 @@ represented as a Git SHA.
 
 - The plan contains exactly 205 unique feature/task pairs: 2 accepted and 203
   still open.
-- The normalized inventory contains 575 FRs, 276 local NFRs, 476 required
+- The normalized inventory contains 575 FRs, 276 local NFRs, 477 required
   capability edges, and 233 operation-gated edges.
 - Every required provider precedes its consumer, and every deferred operation
   has a provider, guard, test owner, and fail-closed readiness state.

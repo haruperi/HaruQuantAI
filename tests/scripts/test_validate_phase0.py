@@ -2,6 +2,11 @@
 
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+import pytest
+
 from scripts import validate_phase0
 
 
@@ -62,3 +67,105 @@ def test_acceptance_reference_rejects_malformed_or_missing_values() -> None:
     assert not validate_phase0._valid_acceptance_reference(None)
     assert not validate_phase0._valid_acceptance_reference("pending")
     assert not validate_phase0._valid_acceptance_reference("task-closeout:")
+
+
+def _accepted_task(
+    evidence_path: Path,
+    task_id: str,
+    feature_id: str,
+    *,
+    acceptance_commit: str,
+    baseline_commit: str,
+) -> dict[str, object]:
+    """Write one accepted manifest and return its parsed-task identity."""
+    evidence_path.write_text(
+        json.dumps(
+            {
+                "feature_id": feature_id,
+                "task_id": task_id,
+                "status": "ACCEPTED",
+                "acceptance_commit": acceptance_commit,
+                "baseline_commit": baseline_commit,
+            }
+        ),
+        encoding="utf-8",
+    )
+    return {
+        "feature_id": feature_id,
+        "task_id": task_id,
+        "evidence_path": evidence_path.name,
+    }
+
+
+def test_accepted_provider_commit_may_precede_later_listed_consumer(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+) -> None:
+    """Git-proved accepted delivery may supersede static tracker ordering."""
+    provider_commit = "a" * 40
+    consumer_baseline = "b" * 40
+    provider = _accepted_task(
+        tmp_path / "provider.json",
+        "1.09",
+        "FEAT-PROVIDER",
+        acceptance_commit=provider_commit,
+        baseline_commit="c" * 40,
+    )
+    consumer = _accepted_task(
+        tmp_path / "consumer.json",
+        "1.04",
+        "FEAT-CONSUMER",
+        acceptance_commit="task-closeout:consumer",
+        baseline_commit=consumer_baseline,
+    )
+    monkeypatch.setattr(validate_phase0, "REPO", tmp_path)
+    monkeypatch.setattr(
+        validate_phase0,
+        "_git_is_ancestor",
+        lambda ancestor, descendant: (
+            (ancestor, descendant) == (provider_commit, consumer_baseline)
+        ),
+    )
+
+    assert validate_phase0._accepted_provider_precedes_consumer(provider, consumer)
+
+
+@pytest.mark.parametrize(
+    ("provider_status", "provider_commit", "is_ancestor"),
+    [
+        ("PENDING", "a" * 40, True),
+        ("ACCEPTED", "task-closeout:provider", True),
+        ("ACCEPTED", "a" * 40, False),
+    ],
+)
+def test_later_provider_requires_exact_commit_and_proved_ancestry(
+    monkeypatch: pytest.MonkeyPatch,
+    tmp_path: Path,
+    provider_status: str,
+    provider_commit: str,
+    is_ancestor: bool,
+) -> None:
+    """Incomplete, receipt-only, or non-ancestral evidence fails closed."""
+    provider = _accepted_task(
+        tmp_path / "provider.json",
+        "1.09",
+        "FEAT-PROVIDER",
+        acceptance_commit=provider_commit,
+        baseline_commit="c" * 40,
+    )
+    payload = json.loads((tmp_path / "provider.json").read_text(encoding="utf-8"))
+    payload["status"] = provider_status
+    (tmp_path / "provider.json").write_text(json.dumps(payload), encoding="utf-8")
+    consumer = _accepted_task(
+        tmp_path / "consumer.json",
+        "1.04",
+        "FEAT-CONSUMER",
+        acceptance_commit="task-closeout:consumer",
+        baseline_commit="b" * 40,
+    )
+    monkeypatch.setattr(validate_phase0, "REPO", tmp_path)
+    monkeypatch.setattr(
+        validate_phase0, "_git_is_ancestor", lambda _ancestor, _descendant: is_ancestor
+    )
+
+    assert not validate_phase0._accepted_provider_precedes_consumer(provider, consumer)

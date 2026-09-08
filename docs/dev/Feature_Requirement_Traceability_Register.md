@@ -34,7 +34,7 @@ Historical `§1`–`§56` labels and original source IDs are retained solely as 
 | Workflows | 20 | 8 workbench integrations +12 governed Agentic workflows; not features. |
 | Role profiles | 22 | On-demand contributions owned by20 Agentic features; not22 extra services. |
 | Source section allocations | 56 | All56 numbered top-level sections, plus26 focused subsection checks. |
-| Required dependency edges | 476 | Acyclic mount/prerequisite graph, separately validated from operation-gated edges. |
+| Required dependency edges | 477 | Acyclic mount/prerequisite graph, separately validated from operation-gated edges. |
 | Operation-gated edges | 233 | Resolve only for the named operation; absence cannot produce fabricated fallback results. |
 
 **Do not add 389 to 575.** Original source rows, master summaries, normalized FRs and catalogue entries are different traceability layers. A source row can be refined by several owned FRs; a shared rule can apply to many features. These links are not duplicate implementation tasks or independent counts of user behaviors.
@@ -1274,7 +1274,7 @@ The behavior, typed operations, local catalogue and requirements, and applicable
 
 **Output boundary:** A request carries a real authenticated principal and workspace/account scope rather than browser-asserted identity. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.
 
-**Required feature providers:** None.
+**Required feature providers:** [FEAT-WS-EXECUTE_PERSISTENCE](#feat-ws-execute-persistence), through `workspace.persistence@1`.
 
 **Operation-gated providers:** None beyond the declared request/record boundary.
 
@@ -1288,14 +1288,14 @@ The behavior, typed operations, local catalogue and requirements, and applicable
 #### Acceptance tests and evidence
 | Acceptance ID | Intended test path | Intended test symbol | State |
 | --- | --- | --- | --- |
-| AT-WS-MANAGE_ACCOUNTS-001 | `tests/services/workspace/manage_accounts/test_traceability.py` | `test_trc_manage_accounts_001` | PENDING |
-| AT-WS-MANAGE_ACCOUNTS-002 | `tests/services/workspace/manage_accounts/test_traceability.py` | `test_trc_manage_accounts_002` | PENDING |
-| AT-WS-MANAGE_ACCOUNTS-003 | `tests/services/workspace/manage_accounts/test_traceability.py` | `test_trc_manage_accounts_003` | PENDING |
-| ATN-WS-MANAGE_ACCOUNTS-001 | `tests/services/workspace/manage_accounts/test_lifecycle.py` | `test_trc_manage_accounts_nfr_001` | PENDING |
+| AT-WS-MANAGE_ACCOUNTS-001 | `tests/services/workspace/manage_accounts/test_traceability.py` | `test_trc_manage_accounts_001` | PASS |
+| AT-WS-MANAGE_ACCOUNTS-002 | `tests/services/workspace/manage_accounts/test_traceability.py` | `test_trc_manage_accounts_002` | PASS |
+| AT-WS-MANAGE_ACCOUNTS-003 | `tests/services/workspace/manage_accounts/test_traceability.py` | `test_trc_manage_accounts_003` | PASS |
+| ATN-WS-MANAGE_ACCOUNTS-001 | `tests/services/workspace/manage_accounts/test_lifecycle.py` | `test_trc_manage_accounts_nfr_001` | PASS |
 
 **Common delivery gate:** Apply [§11.1](#111-self-contained-shared-delivery-and-verification-gate), the feature's owned acceptance cells, applicable shared NFRs in §3, integration workflows in §6, release/evidence obligations in §9, and repository quality gates; no production pass is claimed.
 
-**Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **NOT_REVALIDATED**. Record commit, actual paths, test/usage report and any justified not-applicable stage during implementation.
+**Six-stage evidence:** contract, provider, registration/composition, Interfaces, UI and end-to-end are independently **PROVED_COMPLETE** in `docs/dev/evidence/features/FEAT-WS-MANAGE_ACCOUNTS/acceptance.json`; final Reviewer authority and the Task commit remain controlled by the atomic workflow.
 
 **Source scope:** §23.6, §42.1, §45.4, §47.2, §47.3. **Original source IDs:** `NFR-S-001`.
 

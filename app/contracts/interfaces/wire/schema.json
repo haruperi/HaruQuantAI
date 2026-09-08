@@ -4,6 +4,12 @@
       "additionalProperties": false,
       "description": "One workstation account's identity claims.\n\n``expires_at`` is the owning session's expiry; ``runtime_profile`` is\nthe account's execution profile selection.",
       "properties": {
+        "account_id": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
+        "authentication_audit_ref": {
+          "$ref": "#/$defs/NonEmptyStr"
+        },
         "expires_at": {
           "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{6}Z$",
           "title": "Expires At",
@@ -25,11 +31,17 @@
         },
         "username": {
           "$ref": "#/$defs/NonEmptyStr"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/NonEmptyStr"
         }
       },
       "required": [
         "user_id",
         "username",
+        "account_id",
+        "workspace_id",
+        "authentication_audit_ref",
         "expires_at"
       ],
       "title": "AccountRecord",
@@ -2945,6 +2957,10 @@
       "additionalProperties": false,
       "description": "Operation-discriminated identity gateway request.\n\nREGISTER/LOGIN require ``username`` and ``password``; ME/LOGOUT\nrequire ``session_token``. The shape mirrors the Workspace\nmanage-accounts contract without its coordination fields.",
       "properties": {
+        "account_id": {
+          "$ref": "#/$defs/NonEmptyStr",
+          "default": "local"
+        },
         "capability_snapshot_id": {
           "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-7[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$",
           "title": "Capability Snapshot Id",
@@ -3011,6 +3027,10 @@
           ],
           "default": null,
           "title": "Username"
+        },
+        "workspace_id": {
+          "$ref": "#/$defs/NonEmptyStr",
+          "default": "local"
         }
       },
       "required": [

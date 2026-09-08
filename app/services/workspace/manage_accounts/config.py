@@ -21,7 +21,7 @@ from typing import Any
 _ALLOWED_CONFIG_KEYS = frozenset({"database_path"})
 
 _DEFAULT_DATABASE_PATH = (
-    Path(__file__).resolve().parents[4] / "data" / "database" / "haruquantai.db"
+    Path(__file__).resolve().parents[4] / "data" / "workspaces" / "local"
 )
 
 
@@ -67,3 +67,43 @@ class ManageAccountsConfig:
     """
 
     database_path: Path = _DEFAULT_DATABASE_PATH
+
+    def __post_init__(self) -> None:
+        """Validate the compatibility path without granting raw-file access.
+
+        Raises:
+            TypeError: If ``database_path`` is not a Path.
+            ValueError: If a database file is not the canonical workspace file.
+        """
+        if not isinstance(self.database_path, Path):
+            raise TypeError("database_path must be a Path")
+        if self.database_path.suffix and not (
+            self.database_path.name == "workspace.db"
+            and self.database_path.parent.name == "metadata"
+        ):
+            raise ValueError(
+                "database_path must be a workspace root or metadata/workspace.db"
+            )
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> ManageAccountsConfig:
+        """Build a strict configuration from a mapping.
+
+        Args:
+            data: Configuration mapping or None.
+
+        Returns:
+            Validated immutable configuration.
+        """
+        return from_dict(data)
+
+    @property
+    def workspace_path(self) -> Path:
+        """Return the canonical workspace root used by persistence.
+
+        Returns:
+            Workspace root directory, never a raw database path.
+        """
+        if self.database_path.name == "workspace.db":
+            return self.database_path.parent.parent
+        return self.database_path

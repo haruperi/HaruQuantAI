@@ -47,7 +47,7 @@
       "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
       "task_id": "1.04",
       "usage_target": "app/services/workspace/manage_accounts/_usage.py",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "uv run --frozen python -m app.services.workspace.manage_accounts._usage",
       "test_targets": [
         "tests/services/workspace/manage_accounts/test_traceability.py",

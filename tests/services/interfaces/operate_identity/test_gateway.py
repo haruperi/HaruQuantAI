@@ -22,6 +22,9 @@ from app.services.interfaces.operate_identity.config import OperateIdentityConfi
 from app.services.interfaces.operate_identity.feature import OperateIdentityFeature
 from app.services.interfaces.operate_identity.gateway import IdentityGateway
 from app.services.interfaces.operate_identity.manifest import SPEC
+from app.services.workspace.execute_persistence.execute_persistence import (
+    ExecutePersistenceService,
+)
 from app.services.workspace.manage_accounts.accounts import AccountService
 from app.services.workspace.manage_accounts.config import ManageAccountsConfig
 
@@ -74,8 +77,10 @@ def test_manifest_spec() -> None:
 @pytest.mark.asyncio
 async def test_identity_gateway_translation_flow(tmp_path: Path) -> None:
     """Verify identity gateway translates register, login, me, and logout."""
-    db_file = tmp_path / "test_identity.db"
-    store = AccountService(ManageAccountsConfig(database_path=db_file))
+    store = AccountService(
+        ExecutePersistenceService(),
+        ManageAccountsConfig(database_path=tmp_path / "identity-workspace"),
+    )
     gateway = IdentityGateway(store, OperateIdentityConfig())
 
     # Register
@@ -142,8 +147,10 @@ async def test_feature_mount_lifecycle(tmp_path: Path) -> None:
         await feature.mount(context_fail, None)
 
     # Present provider succeeds
-    db_file = tmp_path / "test_lifecycle.db"
-    store = AccountService(ManageAccountsConfig(database_path=db_file))
+    store = AccountService(
+        ExecutePersistenceService(),
+        ManageAccountsConfig(database_path=tmp_path / "lifecycle-workspace"),
+    )
     store_scope = FeatureScope(owner_id="FEAT-WS-MANAGE_ACCOUNTS")
     registry.register(
         MANAGE_ACCOUNTS_CAPABILITY,

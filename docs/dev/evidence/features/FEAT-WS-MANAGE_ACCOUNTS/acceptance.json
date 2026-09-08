@@ -1,0 +1,106 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-WS-MANAGE_ACCOUNTS",
+  "task_id": "1.04",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/workspace/manage_accounts/README.md",
+  "baseline_commit": "31598f4ba0323b1eec68bc7625db49bc4f0f35f8",
+  "acceptance_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.04-manage-accounts",
+  "requirements": [
+    {
+      "id": "FR-TRC-WS-MANAGE_ACCOUNTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_accounts/test_traceability.py::test_trc_manage_accounts_001"
+    },
+    {
+      "id": "FR-TRC-WS-MANAGE_ACCOUNTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_accounts/test_traceability.py::test_trc_manage_accounts_002"
+    },
+    {
+      "id": "FR-TRC-WS-MANAGE_ACCOUNTS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_accounts/test_traceability.py::test_trc_manage_accounts_003"
+    },
+    {
+      "id": "NFR-TRC-WS-MANAGE_ACCOUNTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_accounts/test_lifecycle.py::test_trc_manage_accounts_nfr_001"
+    },
+    { "id": "NFR-R-001", "status": "PASS", "evidence_target": "Expiry, revocation and remount recovery acceptance tests" },
+    { "id": "NFR-R-002", "status": "PASS", "evidence_target": "Typed fail-closed authentication outcomes" },
+    { "id": "NFR-R-003", "status": "PASS", "evidence_target": "Fresh persistence reads and current-state revalidation" },
+    { "id": "NFR-R-004", "status": "PASS", "evidence_target": "Digest-only retained sessions and additive migrations" },
+    { "id": "NFR-S-001", "status": "PASS", "evidence_target": "Strict public request and result contracts" },
+    { "id": "NFR-S-002", "status": "PASS", "evidence_target": "Interfaces cookie and CSRF boundary tests" },
+    { "id": "NFR-S-003", "status": "PASS", "evidence_target": "Safe structured logging acceptance tests" },
+    { "id": "NFR-S-004", "status": "PASS", "evidence_target": "Credential-free model, log and audit serialization" },
+    { "id": "NFR-S-005", "status": "PASS", "evidence_target": "Strict models, config and generated schemas" },
+    { "id": "NFR-S-006", "status": "PASS", "evidence_target": "Offline usage and repository secret scan" },
+    { "id": "NFR-TRC-SHARED-BOUNDARIES", "status": "PASS", "evidence_target": "Public capability, feature-local persistence and lifecycle evidence" },
+    { "id": "NFR-TRC-SHARED-CONFIG", "status": "PASS", "evidence_target": "Manifest/config/README parity and config tests" },
+    { "id": "NFR-TRC-SHARED-EVIDENCE", "status": "PASS", "evidence_target": "Named AT/ATN tests, usage and this acceptance manifest" },
+    { "id": "NFR-TRC-SHARED-INTEGRITY", "status": "PASS", "evidence_target": "Generated-contract and Phase-0 drift checks" },
+    { "id": "NFR-TRC-SHARED-STORED-IDENTITY", "status": "PASS", "evidence_target": "Account/workspace/session/audit identity persistence tests" }
+  ],
+  "catalogue_entries": [
+    "Account/workspace-bound opaque session",
+    "Current-state identity revalidation",
+    "Digest-only session retention and revocation",
+    "Opaque authentication audit reference"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "Workspace and Interfaces public models, protocols, generated JSON Schema and TypeScript mirrors"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/manage_accounts/test_traceability.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "Required workspace.persistence@1 mount and exact-withdrawal lifecycle tests"
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "Operate Identity gateway and Serve API Events ASGI auth tests"
+    },
+    "ui": {
+      "status": "PASS",
+      "evidence": "Auth client/context focused Vitest and TypeScript typecheck"
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "Mounted public persistence/account usage plus Interfaces ASGI auth flow"
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run --frozen pytest --no-cov tests/services/workspace/manage_accounts tests/services/interfaces/operate_identity/test_gateway.py tests/services/interfaces/serve_api_events/test_asgi.py",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui test -- --run src/clients/clients.test.ts src/context/auth.test.tsx",
+      "exit_code": 0
+    },
+    { "command": "npm --prefix app/ui run typecheck", "exit_code": 0 },
+    {
+      "command": "uv run --frozen python -m app.services.workspace.manage_accounts._usage",
+      "exit_code": 0
+    },
+    { "command": "uv run --frozen ruff check <approved Python paths>", "exit_code": 0 },
+    { "command": "uv run --frozen ruff format --check <approved Python paths>", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/generate_contracts.py --check", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/generate_phase0_evidence.py --check", "exit_code": 0 },
+    { "command": "uv run --frozen pytest --no-cov .agents/tests/test_scope_recovery.py tests/scripts/test_validate_phase0.py", "exit_code": 0 },
+    { "command": "uv run --frozen mypy .agents/task_api.py scripts/validate_phase0.py app/contracts/workspace/manage_accounts.py app/services/workspace/manage_accounts app/services/interfaces/operate_identity/gateway.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_phase0.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_feature_docs.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/architecture_check.py", "exit_code": 0 }
+  ],
+  "review": {
+    "reviewer_verdict": "PENDING",
+    "reviewer_notes": "Executor evidence is terminal but untrusted until independent Review 1. No future approval is claimed."
+  }
+}

@@ -292,6 +292,8 @@ export interface OperateIdentityRequest {
   request_id: string;
   capability_snapshot_id: string;
   operation: "REGISTER" | "LOGIN" | "ME" | "LOGOUT";
+  account_id?: NonEmptyStr;  // default: "local"
+  workspace_id?: NonEmptyStr;  // default: "local"
   username?: string | null;  // default: null
   password?: string | null;  // default: null
   session_token?: string | null;  // default: null

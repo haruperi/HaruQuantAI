@@ -11,6 +11,9 @@ from app.contracts.workspace.models import (
     ManageAccountsRequest,
     ManageAccountsSuccess,
 )
+from app.services.workspace.execute_persistence.execute_persistence import (
+    ExecutePersistenceService,
+)
 from app.services.workspace.manage_accounts.accounts import (
     AccountService,
     hash_password,
@@ -33,13 +36,25 @@ def _request(operation: str, **kwargs: object) -> ManageAccountsRequest:
     )
 
 
+def _service(workspace: Path) -> tuple[AccountService, ExecutePersistenceService]:
+    """Create an account service over the real bounded persistence provider."""
+    persistence = ExecutePersistenceService()
+    return (
+        AccountService(persistence, ManageAccountsConfig(database_path=workspace)),
+        persistence,
+    )
+
+
 def test_manifest_spec() -> None:
     """Verify feature specification and declared durable state."""
     assert SPEC.feature_id == "FEAT-WS-MANAGE_ACCOUNTS"
     (provided,) = SPEC.provides
     assert provided.identifier == "workspace.manage-accounts@1"
+    (required,) = SPEC.requires
+    assert required.identifier == "workspace.persistence@1"
     assert SPEC.state is not None
     assert SPEC.state.namespace == "workspace.manage_accounts"
+    assert SPEC.state.schema_version == 2
     SPEC.validate()
 
 
@@ -61,8 +76,7 @@ def test_password_hashing_and_verification() -> None:
 @pytest.mark.asyncio
 async def test_register_and_login_flow(tmp_path: Path) -> None:
     """Verify registering a user, creating session, and logging in."""
-    db_file = tmp_path / "test_accounts.db"
-    service = AccountService(ManageAccountsConfig(database_path=db_file))
+    service, persistence = _service(tmp_path / "register-workspace")
 
     reg_req = _request(
         "REGISTER",
@@ -75,6 +89,9 @@ async def test_register_and_login_flow(tmp_path: Path) -> None:
     assert reg_result.user is not None
     assert reg_result.user.username == "alice_quant"
     assert reg_result.user.runtime_profile == "simulation"
+    assert reg_result.user.account_id == "local"
+    assert reg_result.user.workspace_id == "local"
+    assert reg_result.user.authentication_audit_ref.startswith("auth_")
     sess_tok = reg_result.session_token
     csrf_tok = reg_result.csrf_token
     assert len(sess_tok) > 20
@@ -123,13 +140,13 @@ async def test_register_and_login_flow(tmp_path: Path) -> None:
     assert bad_login.code == "ACCOUNT_AUTHENTICATION_FAILED"
 
     service.close()
+    persistence.close()
 
 
 @pytest.mark.asyncio
 async def test_registration_validation(tmp_path: Path) -> None:
     """Verify username and password validation constraints."""
-    db_file = tmp_path / "test_accounts.db"
-    service = AccountService(ManageAccountsConfig(database_path=db_file))
+    service, persistence = _service(tmp_path / "validation-workspace")
 
     short_user = await service.manage_accounts(
         _request(
@@ -160,13 +177,13 @@ async def test_registration_validation(tmp_path: Path) -> None:
     assert short_pass.code == "ACCOUNT_REGISTRATION_FAILED"
 
     service.close()
+    persistence.close()
 
 
 @pytest.mark.asyncio
 async def test_session_revocation(tmp_path: Path) -> None:
     """Verify session revocation via LOGOUT."""
-    db_file = tmp_path / "test_accounts.db"
-    service = AccountService(ManageAccountsConfig(database_path=db_file))
+    service, persistence = _service(tmp_path / "revocation-workspace")
 
     reg_result = await service.manage_accounts(
         _request(
@@ -202,3 +219,4 @@ async def test_session_revocation(tmp_path: Path) -> None:
     assert fake_me.code == "ACCOUNT_AUTHENTICATION_FAILED"
 
     service.close()
+    persistence.close()

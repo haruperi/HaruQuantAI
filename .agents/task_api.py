@@ -193,7 +193,14 @@ def _current_worktree_paths(repo: Path) -> set[str]:
 def _validate_scope_recovery_sessions(
     cfg: dict[str, Any], state: dict[str, Any]
 ) -> None:
-    """Require the existing P/E ledger and absence of a Reviewer session."""
+    """Validate transport-owned role continuity before scope recovery.
+
+    IDE solo deliberately has no role-session ledger because one child chat
+    performs every role inline. Other modes retain the exact existing
+    Planner/Executor ledger requirement and Reviewer exclusion.
+    """
+    if state.get("runtime_mode") == "solo":
+        return
     ledger_path = (
         Path(cfg["repo"])
         / ".agents"
@@ -670,7 +677,7 @@ def recover_max_iterations(
     expected_iteration: int,
     expected_worktree_fingerprint: str,
 ) -> None:
-    """Reopen one owner-authorized exact post-review max-iteration correction."""
+    """Reopen one owner-authorized exact max-iteration correction."""
     repo = Path(cfg["repo"])
     if (
         state.get("status") != "MAX_ITERATIONS"
@@ -689,44 +696,68 @@ def recover_max_iterations(
         raise OrchestratorError("Max-iteration recovery HEAD mismatch.")
     if _worktree_fingerprint(repo) != expected_worktree_fingerprint:
         raise OrchestratorError("Max-iteration recovery fingerprint mismatch.")
-    artifact = validate_next_agent(
-        cfg,
-        state,
-        expected_source="REVIEWER",
-        expected_handoff="CHANGES_REQUESTED",
+    scope_blocker = state.get("scope_blocker")
+    recorded_next_agent = state.get("next_agent")
+    scope_recovery = (
+        isinstance(scope_blocker, dict)
+        and bool(scope_blocker.get("offending_paths"))
+        and int(scope_blocker.get("iteration", 0)) + 1 == expected_iteration
+        and isinstance(recorded_next_agent, dict)
+        and recorded_next_agent.get("target_role") == "PLANNER"
+        and recorded_next_agent.get("handoff") == "SCOPE_BLOCKED"
     )
+    if scope_recovery:
+        _write_orchestrator_planner_prompt(cfg, state, "SCOPE_BLOCKED")
+        artifact = validate_next_agent(
+            cfg,
+            state,
+            expected_source="ORCHESTRATOR",
+            expected_handoff="SCOPE_BLOCKED",
+        )
+    else:
+        artifact = validate_next_agent(
+            cfg,
+            state,
+            expected_source="REVIEWER",
+            expected_handoff="CHANGES_REQUESTED",
+        )
     if (
         artifact.metadata.get("target_role") != "PLANNER"
         or int(artifact.metadata.get("iteration", 0)) != expected_iteration
     ):
         raise OrchestratorError("Max-iteration recovery Planner prompt mismatch.")
-    ledger_path = repo / ".agents/runs" / expected_run_id / "role-sessions.json"
-    try:
-        ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError) as exc:
-        raise OrchestratorError(f"Invalid role-session ledger: {exc}") from exc
-    sessions = ledger.get("sessions") if isinstance(ledger, dict) else None
-    if not isinstance(sessions, dict) or set(sessions) != {
-        "PLANNER",
-        "EXECUTOR",
-        "REVIEWER",
-    }:
-        raise OrchestratorError("Max-iteration recovery requires exact P/E/R sessions.")
-    for role in ("PLANNER", "EXECUTOR", "REVIEWER"):
-        session = sessions[role]
-        if (
-            not isinstance(session, dict)
-            or int(session.get("last_iteration", 0)) != expected_iteration - 1
-        ):
+    if state.get("runtime_mode") != "solo":
+        ledger_path = repo / ".agents/runs" / expected_run_id / "role-sessions.json"
+        try:
+            ledger = json.loads(ledger_path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError) as exc:
+            raise OrchestratorError(f"Invalid role-session ledger: {exc}") from exc
+        sessions = ledger.get("sessions") if isinstance(ledger, dict) else None
+        if not isinstance(sessions, dict) or set(sessions) != {
+            "PLANNER",
+            "EXECUTOR",
+            "REVIEWER",
+        }:
             raise OrchestratorError(
-                f"Max-iteration recovery {role} session continuity mismatch."
+                "Max-iteration recovery requires exact P/E/R sessions."
             )
+        for role in ("PLANNER", "EXECUTOR", "REVIEWER"):
+            session = sessions[role]
+            if (
+                not isinstance(session, dict)
+                or int(session.get("last_iteration", 0)) != expected_iteration - 1
+            ):
+                raise OrchestratorError(
+                    f"Max-iteration recovery {role} session continuity mismatch."
+                )
     state["status"] = "RUNNING"
+    state["effective_max_iterations"] = expected_iteration
     _record(
         state,
         "max_iterations_owner_recovery",
         planner_iteration=expected_iteration,
         previous_limit=int(cfg["max_iterations"]),
+        scope_recovery=scope_recovery,
     )
     _save_state(cfg, state)
 

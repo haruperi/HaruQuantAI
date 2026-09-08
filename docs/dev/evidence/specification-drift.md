@@ -40,7 +40,7 @@ owner approval and regeneration; it cannot appear as an implicit 206th task.
 
 ## Current-source reconciliation
 
-The source register contains 205 unique cards, 575 FRs, 276 local NFRs, 476
+The source register contains 205 unique cards, 575 FRs, 276 local NFRs, 477
 required edges and 233 operation-gated edges. The phased plan contains the same
 205 feature IDs exactly once plus eight non-feature preparations. The generated
 Phase 0 validator checks those sets and counts directly; timestamps and narrative
