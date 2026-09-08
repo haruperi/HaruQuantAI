@@ -20,6 +20,7 @@ export interface AdministerSettingsRequest {
   slot?: string | null;  // default: null
   material?: { [key: string]: string };
   changed_by?: string;  // default: "system"
+  expected_revision?: number | null;  // default: null
   schema_version?: 1;  // default: 1
 }
 export interface AdministerSettingsSuccess {
@@ -260,6 +261,11 @@ export interface SettingDefinition {
   minimum?: number | null;  // default: null
   maximum?: number | null;  // default: null
   activation?: "hot" | "restart_required";  // default: "restart_required"
+  owner?: string;  // default: "workspace"
+  effective_default?: string;  // default: ""
+  narrower_policy?: string | null;  // default: null
+  remount_effect?: string | null;  // default: null
+  secret_reference_slots?: string[];  // default: []
   schema_version?: 1;  // default: 1
 }
 export interface StorageGuardPolicy {

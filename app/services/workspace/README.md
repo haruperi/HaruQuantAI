@@ -109,7 +109,7 @@ Feature owners are independent and physically removable. The selected package is
 | [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Publish and retain immutable artifact bytes | `app/services/workspace/manage_artifacts/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Verify accounts, principals and sessions | `app/services/workspace/manage_accounts/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-SECURE_LOCAL_ACCESS`](#feat-ws-secure-local-access) | Resolve secrets and protect host access | `app/services/workspace/secure_local_access/` | U0 | 3 | 1 | VERIFIED |
-| [`FEAT-WS-ADMINISTER_SETTINGS`](#feat-ws-administer-settings) | Version user-visible system settings | `app/services/workspace/administer_settings/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-ADMINISTER_SETTINGS`](#feat-ws-administer-settings) | Version user-visible system settings | `app/services/workspace/administer_settings/` | U1 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-MANAGE_CONVERSATIONS`](#feat-ws-manage-conversations) | Retain scoped conversations without losing canonical evidence | `app/services/workspace/manage_conversations/` | U2 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-BUILD_DIAGNOSTICS`](#feat-ws-build-diagnostics) | Explain runtime health and export safe diagnostics | `app/services/workspace/build_diagnostics/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-WS-DISTRIBUTE_APPLICATION`](#feat-ws-distribute-application) | Build installable desktop and headless application distributions | `app/services/workspace/distribute_application/` | U13 | 3 | 1 | NOT_REVALIDATED |
@@ -791,7 +791,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-WS-SECURE_LOC
 
 > **Feature ID:** `FEAT-WS-ADMINISTER_SETTINGS`
 > **Domain:** `workspace`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — implementation and full scoped acceptance evidence **VERIFIED**.
 > **Selected owner:** `app/services/workspace/administer_settings/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -862,9 +862,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-WS-ADMINISTER_SETTINGS-001` | Read and update schema-validated setting revisions using expected revision; reject unknown keys and incompatible combinations. | `AT-WS-ADMINISTER_SETTINGS-001` | A stale update conflicts; invalid values do not increment the version or partially apply. |
-| PENDING | `FR-TRC-WS-ADMINISTER_SETTINGS-002` | Expose owner, effective default, narrower policy, remount/restart effect and secret-reference slots for each setting. | `AT-WS-ADMINISTER_SETTINGS-002` | Selecting a larger UI CPU value cannot override the effective Orchestration envelope; the UI shows the stricter value and reason. |
-| PENDING | `FR-TRC-WS-ADMINISTER_SETTINGS-003` | Preserve user-visible units, locale, theme, sound, picker/view defaults and report header/footer without placing business data in layout state. | `AT-WS-ADMINISTER_SETTINGS-003` | Changing locale changes display only; stored capability IDs, numerical values and source hashes stay unchanged. |
+| PASS | `FR-TRC-WS-ADMINISTER_SETTINGS-001` | Read and update schema-validated setting revisions using expected revision; reject unknown keys and incompatible combinations. | `AT-WS-ADMINISTER_SETTINGS-001` | A stale update conflicts; invalid values do not increment the version or partially apply. |
+| PASS | `FR-TRC-WS-ADMINISTER_SETTINGS-002` | Expose owner, effective default, narrower policy, remount/restart effect and secret-reference slots for each setting. | `AT-WS-ADMINISTER_SETTINGS-002` | Selecting a larger UI CPU value cannot override the effective Orchestration envelope; the UI shows the stricter value and reason. |
+| PASS | `FR-TRC-WS-ADMINISTER_SETTINGS-003` | Preserve user-visible units, locale, theme, sound, picker/view defaults and report header/footer without placing business data in layout state. | `AT-WS-ADMINISTER_SETTINGS-003` | Changing locale changes display only; stored capability IDs, numerical values and source hashes stay unchanged. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -872,7 +872,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-WS-ADMINISTER_SETTINGS-001` | Removing FEAT-WS-ADMINISTER_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-ADMINISTER_SETTINGS-001` | Disable and physically remove administer_settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PASS | `NFR-TRC-WS-ADMINISTER_SETTINGS-001` | Removing FEAT-WS-ADMINISTER_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-ADMINISTER_SETTINGS-001` | Disable and physically remove administer_settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -882,15 +882,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/workspace/administer_settings/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/workspace/administer_settings/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/workspace/administer_settings/test_traceability.py` | PASS: exact register symbols and assertions are implemented. |
+| Every ATN ID in this card | `tests/services/workspace/administer_settings/test_lifecycle.py` | PASS: exact withdrawal and table preservation are proven. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json` | PROVED_COMPLETE: all six stages have focused evidence; Reviewer authority remains pending. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Verified `_usage.py` command:**
 
 ```powershell
 uv run --frozen python -m app.services.workspace.administer_settings._usage

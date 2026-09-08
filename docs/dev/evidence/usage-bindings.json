@@ -145,7 +145,7 @@
       "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
       "task_id": "1.11",
       "usage_target": "app/services/workspace/administer_settings/_usage.py",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "uv run --frozen python -m app.services.workspace.administer_settings._usage",
       "test_targets": [
         "tests/services/workspace/administer_settings/test_traceability.py",

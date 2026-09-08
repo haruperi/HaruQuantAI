@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
+from app.contracts.workspace.administer_settings import (
+    AdministerSettingsCapability,
+)
 from app.contracts.workspace.manage_accounts import (
     ManageAccountsCapability,
 )
@@ -16,8 +19,6 @@ if TYPE_CHECKING:
 
     from app.contracts.workspace.errors import WorkspaceFailure
     from app.contracts.workspace.models import (
-        AdministerSettingsRequest,
-        AdministerSettingsSuccess,
         DiagnosticBundleRef,
         DistributeWorkersRequest,
         DistributeWorkersSuccess,
@@ -359,25 +360,6 @@ class ManageWatchlistsCapability(Protocol):
         Returns:
             The watchlist page, mutation result, or deletion flag on
             success, otherwise a structured workspace failure.
-        """
-        ...
-
-
-@runtime_checkable
-class AdministerSettingsCapability(Protocol):
-    """Capability protocol for system settings administration."""
-
-    async def administer_settings(
-        self, request: AdministerSettingsRequest
-    ) -> AdministerSettingsSuccess | WorkspaceFailure:
-        """Serve one operation-discriminated settings request.
-
-        Args:
-            request: Settings read/update/manifest/credentials/bridge
-                request.
-
-        Returns:
-            Settings operation success, or a structured workspace failure.
         """
         ...
 

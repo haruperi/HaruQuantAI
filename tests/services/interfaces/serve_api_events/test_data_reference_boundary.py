@@ -73,7 +73,7 @@ async def test_settings_boundary_matches_workstation_contract(
     manifest_res = await client.get("/api/v1/settings/manifest")
     assert manifest_res.status_code == 200
     manifest = manifest_res.json()["data"]
-    assert len(manifest) == 49
+    assert len(manifest) == 59
     by_key = {definition["key"]: definition for definition in manifest}
     account_mode = by_key["ACCOUNT_MODE"]
     assert account_mode["value_kind"] == "string"

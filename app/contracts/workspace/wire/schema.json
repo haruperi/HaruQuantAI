@@ -61,6 +61,18 @@
           "title": "Changed By",
           "type": "string"
         },
+        "expected_revision": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Revision"
+        },
         "material": {
           "additionalProperties": {
             "type": "string"
@@ -1832,6 +1844,11 @@
           "title": "Description",
           "type": "string"
         },
+        "effective_default": {
+          "default": "",
+          "title": "Effective Default",
+          "type": "string"
+        },
         "key": {
           "$ref": "#/$defs/NonEmptyStr"
         },
@@ -1862,11 +1879,48 @@
           "default": null,
           "title": "Minimum"
         },
+        "narrower_policy": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Narrower Policy"
+        },
+        "owner": {
+          "default": "workspace",
+          "title": "Owner",
+          "type": "string"
+        },
+        "remount_effect": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Remount Effect"
+        },
         "schema_version": {
           "const": 1,
           "default": 1,
           "title": "Schema Version",
           "type": "integer"
+        },
+        "secret_reference_slots": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Secret Reference Slots",
+          "type": "array"
         },
         "value_kind": {
           "default": "string",

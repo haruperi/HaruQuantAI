@@ -97,7 +97,7 @@ async def test_settings_service_operations(tmp_path: Path) -> None:
     # Read manifest
     manifest_res = await service.administer_settings(_request("READ_MANIFEST"))
     assert isinstance(manifest_res, AdministerSettingsSuccess)
-    assert len(manifest_res.manifest) == 49
+    assert len(manifest_res.manifest) == 59
 
     # Read system settings (seeds defaults)
     read_res = await service.administer_settings(_request("READ_SYSTEM"))

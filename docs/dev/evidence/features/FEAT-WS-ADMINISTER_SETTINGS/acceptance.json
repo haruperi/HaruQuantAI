@@ -1,0 +1,163 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
+  "task_id": "1.11",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/workspace/README.md",
+  "baseline_commit": "c118e9f49a7d99af27d85be972b09c2c39527929",
+  "acceptance_commit": "task-closeout:20260908-195000-v3-phases-1-16-1.11-administer-settings",
+  "requirements": [
+    {
+      "id": "FR-TRC-WS-ADMINISTER_SETTINGS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_traceability.py::test_trc_administer_settings_001"
+    },
+    {
+      "id": "FR-TRC-WS-ADMINISTER_SETTINGS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_traceability.py::test_trc_administer_settings_002"
+    },
+    {
+      "id": "FR-TRC-WS-ADMINISTER_SETTINGS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_traceability.py::test_trc_administer_settings_003"
+    },
+    {
+      "id": "NFR-TRC-WS-ADMINISTER_SETTINGS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_lifecycle.py::test_trc_administer_settings_nfr_001"
+    },
+    {
+      "id": "AT-WS-ADMINISTER_SETTINGS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_traceability.py::test_trc_administer_settings_001"
+    },
+    {
+      "id": "AT-WS-ADMINISTER_SETTINGS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_traceability.py::test_trc_administer_settings_002"
+    },
+    {
+      "id": "AT-WS-ADMINISTER_SETTINGS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_traceability.py::test_trc_administer_settings_003"
+    },
+    {
+      "id": "ATN-WS-ADMINISTER_SETTINGS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/administer_settings/test_lifecycle.py::test_trc_administer_settings_nfr_001"
+    },
+    {
+      "id": "NFR-R-002",
+      "status": "PASS",
+      "evidence_target": "Optimistic concurrency revision checks and atomic transactions"
+    },
+    {
+      "id": "NFR-R-003",
+      "status": "PASS",
+      "evidence_target": "Withdrawing capability leaves unrelated capabilities functional and database intact"
+    },
+    {
+      "id": "NFR-S-001",
+      "status": "PASS",
+      "evidence_target": "Write-only credential slots and secret reference slot exposure without plaintext leakage"
+    },
+    {
+      "id": "NFR-S-002",
+      "status": "PASS",
+      "evidence_target": "Strict request, value type, bounds, and incompatible configuration validation"
+    },
+    {
+      "id": "NFR-TRC-SHARED-BOUNDARIES",
+      "status": "PASS",
+      "evidence_target": "Standalone provider under workspace.administer-settings@1 public capability"
+    },
+    {
+      "id": "NFR-TRC-SHARED-CONFIG",
+      "status": "PASS",
+      "evidence_target": "Structured logging via app.composition.logging and clean configuration parsing"
+    },
+    {
+      "id": "NFR-TRC-SHARED-EVIDENCE",
+      "status": "PASS",
+      "evidence_target": "Full AT/ATN test suite and reproducible _usage.py demonstration"
+    },
+    {
+      "id": "NFR-TRC-SHARED-INTEGRITY",
+      "status": "PASS",
+      "evidence_target": "Phase 0 validation, generated wire schemas, and contract checks"
+    },
+    {
+      "id": "NFR-TRC-SHARED-STORED-IDENTITY",
+      "status": "PASS",
+      "evidence_target": "Monotonic versioning and settings_history audit log persistence"
+    }
+  ],
+  "catalogue_entries": [
+    "Authoritative setting-definition manifest",
+    "Versioned system settings with optimistic concurrency",
+    "Write-only credential slots",
+    "MT5 snapshot bridge runtime projection",
+    "Host orchestration CPU envelope clamping"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/workspace/administer_settings.py, models.py, ports.py, capabilities.py and wire schema"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/administer_settings/test_traceability.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/administer_settings/test_lifecycle.py"
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "tests/services/interfaces/operate_settings/test_gateway.py and tests/services/interfaces/serve_api_events/test_data_reference_boundary.py"
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Settings administered backend provider; UI presentation consumed in FEAT-UI-SYSTEM_SETTINGS"
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/workspace/administer_settings/_usage.py"
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run --frozen pytest --no-cov tests/services/workspace/administer_settings",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python -m app.services.workspace.administer_settings._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen ruff check app/services/workspace/administer_settings tests/services/workspace/administer_settings",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen mypy app/contracts/workspace/administer_settings.py app/services/workspace/administer_settings tests/services/workspace/administer_settings",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/generate_contracts.py --check",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/validate_phase0.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/validate_feature_docs.py",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All 3 FRs and 1 local NFR verified passing with full traceability evidence, custom structured logger integration, host orchestration CPU envelope clamping, optimistic concurrency, and pure capability contracts."
+  }
+}

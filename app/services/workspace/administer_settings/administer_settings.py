@@ -28,7 +28,13 @@ from datetime import UTC, datetime
 from typing import TYPE_CHECKING, Final, Literal, cast
 from uuid import uuid7
 
-from app.contracts.workspace.errors import WorkspaceFailure
+from app.composition.logging import get_logger
+from app.contracts.common.models import ProblemDetails, Uuid7
+from app.contracts.workspace.administer_settings import (
+    SettingsConflictError,
+    SettingsValidationError,
+)
+from app.contracts.workspace.errors import WorkspaceFailure, WorkspaceFailureCode
 from app.contracts.workspace.models import (
     AdministerSettingsRequest,
     AdministerSettingsSuccess,
@@ -39,6 +45,8 @@ from app.contracts.workspace.models import (
 )
 from app.services.workspace.administer_settings import _store
 
+logger = get_logger(__name__)
+
 if TYPE_CHECKING:
     from pathlib import Path
 
@@ -47,6 +55,37 @@ if TYPE_CHECKING:
     )
 
 _TIMESTAMP_FORMAT: Final = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+
+def _settings_failure(
+    request_id: Uuid7,
+    code: WorkspaceFailureCode,
+    title: str,
+    detail: str,
+    status: int,
+) -> WorkspaceFailure:
+    """Construct a structured WorkspaceFailure envelope.
+
+    Args:
+        request_id: Echoed request identifier.
+        code: Closed workspace failure code.
+        title: Short failure title.
+        detail: Human-readable failure detail.
+        status: HTTP-equivalent status code.
+
+    Returns:
+        Structured WorkspaceFailure envelope.
+    """
+    return WorkspaceFailure(
+        request_id=request_id,
+        code=code,
+        problem=ProblemDetails(
+            title=title,
+            status=status,
+            code=code,
+            detail=detail,
+        ),
+    )
 
 
 def _normalize_iso(val: object) -> str:
@@ -101,7 +140,7 @@ class SettingsService:
         """
         self._config = config
 
-    async def administer_settings(
+    async def administer_settings(  # noqa: PLR0911
         self, request: AdministerSettingsRequest
     ) -> AdministerSettingsSuccess | WorkspaceFailure:
         """Serve one operation-discriminated settings request.
@@ -114,6 +153,13 @@ class SettingsService:
             Settings operation success, or a structured workspace failure.
         """
         db_path = self._config.database_path if self._config is not None else None
+        logger.info(
+            "Administer settings request received",
+            request_id=str(request.request_id),
+            operation=request.operation,
+            changed_by=request.changed_by,
+            event="settings.request.received",
+        )
         if request.operation == "READ_SYSTEM":
             record = _store.get_system_settings(db_path=db_path)
             return AdministerSettingsSuccess(
@@ -121,15 +167,51 @@ class SettingsService:
                 system=self._system_record(record),
             )
         if request.operation == "UPDATE_SYSTEM":
-            record = _store.update_system_settings(
-                dict(request.settings),
-                changed_by=request.changed_by,
-                db_path=db_path,
-            )
-            return AdministerSettingsSuccess(
-                request_id=request.request_id,
-                system=self._system_record(record),
-            )
+            try:
+                record = _store.update_system_settings(
+                    dict(request.settings),
+                    changed_by=request.changed_by,
+                    expected_revision=request.expected_revision,
+                    db_path=db_path,
+                )
+                logger.info(
+                    "System settings updated",
+                    request_id=str(request.request_id),
+                    version=record.get("version"),
+                    event="settings.updated",
+                )
+                return AdministerSettingsSuccess(
+                    request_id=request.request_id,
+                    system=self._system_record(record),
+                )
+            except SettingsConflictError as exc:
+                logger.warning(
+                    "Settings update conflict",
+                    request_id=str(request.request_id),
+                    error=str(exc),
+                    event="settings.update.conflict",
+                )
+                return _settings_failure(
+                    request_id=request.request_id,
+                    code="WORKSPACE_VALIDATION_FAILED",
+                    title="Settings Conflict",
+                    detail=str(exc),
+                    status=409,
+                )
+            except SettingsValidationError as exc:
+                logger.warning(
+                    "Settings validation failed",
+                    request_id=str(request.request_id),
+                    error=str(exc),
+                    event="settings.update.validation_failed",
+                )
+                return _settings_failure(
+                    request_id=request.request_id,
+                    code="WORKSPACE_VALIDATION_FAILED",
+                    title="Settings Validation Failed",
+                    detail=str(exc),
+                    status=400,
+                )
         if request.operation == "READ_MANIFEST":
             definitions = _store.get_settings_manifest(db_path=db_path)
             return AdministerSettingsSuccess(
@@ -159,6 +241,17 @@ class SettingsService:
                         activation=cast(
                             "Literal['hot', 'restart_required']",
                             str(item["activation"]),
+                        ),
+                        owner=str(item.get("owner", "")),
+                        effective_default=str(item.get("effective_default", "")),
+                        narrower_policy=(
+                            str(item["narrower_policy"])
+                            if item.get("narrower_policy") is not None
+                            else None
+                        ),
+                        remount_effect=str(item.get("remount_effect", "none")),
+                        secret_reference_slots=tuple(
+                            str(s) for s in item.get("secret_reference_slots", ())
                         ),
                     )
                     for item in definitions

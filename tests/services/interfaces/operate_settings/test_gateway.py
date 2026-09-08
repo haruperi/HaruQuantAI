@@ -103,7 +103,7 @@ async def test_settings_gateway_translation_flow(tmp_path: Path) -> None:
     # Read manifest
     man_res = await gateway.administer_settings(_request("READ_MANIFEST"))
     assert isinstance(man_res, OperateSettingsSuccess)
-    assert len(man_res.manifest) == 49
+    assert len(man_res.manifest) == 59
 
     # Read credentials
     cred_res = await gateway.administer_settings(_request("READ_CREDENTIALS"))

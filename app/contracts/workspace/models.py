@@ -1924,6 +1924,11 @@ class SettingDefinition(WireModel):
     minimum: float | None = None
     maximum: float | None = None
     activation: Literal["hot", "restart_required"] = "restart_required"
+    owner: str = "workspace"
+    effective_default: str = ""
+    narrower_policy: str | None = None
+    remount_effect: str | None = None
+    secret_reference_slots: tuple[str, ...] = ()
     schema_version: Literal[1] = 1
 
 
@@ -1976,6 +1981,7 @@ class AdministerSettingsRequest(WireModel):
     slot: str | None = None
     material: dict[str, str] = Field(default_factory=dict)
     changed_by: str = "system"
+    expected_revision: int | None = None
     schema_version: Literal[1] = 1
 
     @model_validator(mode="after")

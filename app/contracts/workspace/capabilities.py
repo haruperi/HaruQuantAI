@@ -5,11 +5,13 @@ from typing import TYPE_CHECKING
 from app.kernel.capability import CapabilityKey
 
 if TYPE_CHECKING:
+    from app.contracts.workspace.administer_settings import (
+        AdministerSettingsCapability,
+    )
     from app.contracts.workspace.manage_accounts import ManageAccountsCapability
     from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
     from app.contracts.workspace.persistence import PersistenceCapability
     from app.contracts.workspace.ports import (
-        AdministerSettingsCapability,
         BuildDiagnosticsCapability,
         ConfigureRuntimeCapability,
         DistributeWorkersCapability,

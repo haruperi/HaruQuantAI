@@ -6,8 +6,8 @@
     "disposition_counts": {
       "ADAPT": 43,
       "IMPLEMENT": 647,
-      "PROVED_COMPLETE": 41,
-      "VERIFY": 120
+      "PROVED_COMPLETE": 45,
+      "VERIFY": 116
     }
   },
   "requirements": [
@@ -248,7 +248,7 @@
       "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
       "task_id": "1.11",
       "text": "Read and update schema-validated setting revisions using expected revision; reject unknown keys and incompatible combinations.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json"
     },
     {
@@ -256,7 +256,7 @@
       "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
       "task_id": "1.11",
       "text": "Expose owner, effective default, narrower policy, remount/restart effect and secret-reference slots for each setting.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json"
     },
     {
@@ -264,7 +264,7 @@
       "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
       "task_id": "1.11",
       "text": "Preserve user-visible units, locale, theme, sound, picker/view defaults and report header/footer without placing business data in layout state.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json"
     },
     {
@@ -4714,7 +4714,7 @@
       "feature_id": "FEAT-WS-ADMINISTER_SETTINGS",
       "task_id": "1.11",
       "text": "Removing FEAT-WS-ADMINISTER_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "VERIFY",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-ADMINISTER_SETTINGS/acceptance.json"
     },
     {
