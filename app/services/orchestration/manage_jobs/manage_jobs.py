@@ -1,4 +1,4 @@
-"""Durable job lifecycle and non-blocking progress observation."""
+"""Durable job lifecycle, attempts, controls, and bounded progress observation."""
 
 from __future__ import annotations
 
@@ -9,7 +9,10 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import TYPE_CHECKING, Any, Protocol
 
-from app.contracts.orchestration.jobs import JobRecord, ProgressCallback, ProgressEvent
+from app.contracts.orchestration.jobs import (
+    ControlIntent, DomainOutcome, EffectReconciliation, JobRecord, JobSemanticRecord,
+    JobSubmission, ProgressCallback, ProgressEvent,
+)
 
 if TYPE_CHECKING:
     from app.contracts.common.models import DecimalValue
@@ -34,28 +37,13 @@ class _Subscription:
 
 
 class _TaskSpawner(Protocol):
-    def __call__(
-        self, coroutine: Coroutine[Any, Any, None], *, name: str
-    ) -> asyncio.Task[None]: ...
+    def __call__(self, coroutine: Coroutine[Any, Any, None], *, name: str) -> asyncio.Task[None]: ...
 
 
 class ManageJobsService:
-    """Own accepted jobs and isolate progress observers from state mutation."""
+    """Own accepted logical jobs while isolating observers from durable state."""
 
-    def __init__(
-        self,
-        store: JobStore,
-        callback_queue_capacity: int = 128,
-        task_spawner: _TaskSpawner | None = None,
-    ) -> None:
-        """Initialize durable state and bounded callback delivery.
-
-        Args:
-            store: Feature-owned job persistence.
-            callback_queue_capacity: Per-observer queue capacity.
-            task_spawner: Lifecycle-aware task factory; defaults to asyncio for
-                direct tests and the offline usage harness.
-        """
+    def __init__(self, store: JobStore, callback_queue_capacity: int = 128, task_spawner: _TaskSpawner | None = None) -> None:
         self._store = store
         self._callback_queue_capacity = callback_queue_capacity
         self._task_spawner = task_spawner or asyncio.create_task
@@ -65,75 +53,77 @@ class ManageJobsService:
 
     @property
     def callback_failures(self) -> int:
-        """Return the bounded diagnostic count of observer failures."""
         return self._callback_failures
 
     async def submit(self, *, idempotency_key: str, job_id: str) -> JobRecord:
-        """Persist or resolve one idempotent job.
-
-        Returns:
-            New or previously accepted job record.
-        """
         self._ensure_open()
         return self._store.submit(job_id, idempotency_key)
 
-    async def transition(
-        self, job_id: str, *, expected_version: int, event: str
-    ) -> JobRecord:
-        """Apply one declared expected-version transition.
+    async def submit_job(self, submission: JobSubmission) -> JobSemanticRecord:
+        self._ensure_open()
+        return self._store.submit_job(submission)
 
-        Returns:
-            Updated job record.
+    async def get_semantics(self, job_id: str) -> JobSemanticRecord:
+        self._ensure_open()
+        return self._store.get_semantics(job_id)
 
-        Raises:
-            ValueError: If the transition or expected version is invalid.
-        """
+    async def request_control(self, job_id: str, *, expected_version: int, control: ControlIntent) -> JobSemanticRecord:
+        self._ensure_open()
+        job = self._store.get(job_id)
+        if job.version != expected_version:
+            raise ValueError("JOB_VERSION_CONFLICT")
+        current = self._store.get_semantics(job_id)
+        if control is ControlIntent.PAUSE and not current.supports_pause:
+            raise ValueError("JOB_PAUSE_UNSUPPORTED")
+        if control is ControlIntent.RESUME and job.state != "PAUSED":
+            raise ValueError("JOB_RESUME_UNSUPPORTED")
+        if control is ControlIntent.CANCEL and job.state in {"COMPLETED", "FAILED", "CANCELLED"}:
+            raise ValueError("JOB_CONTROL_TERMINAL")
+        return self._store.update_semantics(job_id, desired_control=control)
+
+    async def acknowledge_control(self, job_id: str, *, control: ControlIntent) -> JobSemanticRecord:
+        self._ensure_open()
+        current = self._store.get_semantics(job_id)
+        if current.desired_control is not control:
+            raise ValueError("JOB_CONTROL_ACK_MISMATCH")
+        return self._store.update_semantics(job_id, acknowledged_control=control)
+
+    async def record_domain_outcome(self, job_id: str, outcome: DomainOutcome, *, waiting_for_human: bool = False) -> JobSemanticRecord:
+        self._ensure_open()
+        return self._store.update_semantics(job_id, domain_outcome=outcome, waiting_for_human=waiting_for_human)
+
+    async def retry_terminal(self, job_id: str) -> JobSemanticRecord:
+        self._ensure_open()
+        return self._store.retry(job_id)
+
+    async def reconcile_effect(self, reconciliation: EffectReconciliation) -> EffectReconciliation:
+        self._ensure_open()
+        return self._store.reconcile_effect(reconciliation)
+
+    async def transition(self, job_id: str, *, expected_version: int, event: str) -> JobRecord:
         self._ensure_open()
         current = self._store.get(job_id)
+        semantics = None
+        try:
+            semantics = self._store.get_semantics(job_id)
+        except KeyError:
+            pass
+        if event == "PAUSE" and semantics is not None and not semantics.supports_pause:
+            raise ValueError("JOB_PAUSE_UNSUPPORTED")
         target = _TRANSITIONS.get((current.state, event))
         if target is None:
             raise ValueError("JOB_TRANSITION_INVALID")
-        record, _sequence = self._store.update(
-            job_id, expected_version=expected_version, state=target
-        )
+        record, _sequence = self._store.update(job_id, expected_version=expected_version, state=target)
         return record
 
-    async def report_progress(
-        self,
-        job_id: str,
-        *,
-        expected_version: int,
-        progress: DecimalValue,
-        message: str = "",
-    ) -> ProgressEvent:
-        """Persist monotonic progress and enqueue callbacks without waiting.
-
-        Returns:
-            Persisted progress event.
-
-        Raises:
-            ValueError: If progress regresses, exceeds its range, or conflicts.
-        """
+    async def report_progress(self, job_id: str, *, expected_version: int, progress: DecimalValue, message: str = "") -> ProgressEvent:
         self._ensure_open()
         current = self._store.get(job_id)
         requested = Decimal(progress)
-        if requested < Decimal(current.progress) or not Decimal(
-            0
-        ) <= requested <= Decimal(1):
+        if requested < Decimal(current.progress) or not Decimal(0) <= requested <= Decimal(1):
             raise ValueError("JOB_PROGRESS_INVALID")
-        record, sequence = self._store.update(
-            job_id,
-            expected_version=expected_version,
-            progress=str(progress),
-            message=message,
-        )
-        update = ProgressEvent(
-            job_id=job_id,
-            sequence=sequence,
-            progress=record.progress,
-            message=message,
-            occurred_at=record.updated_at,
-        )
+        record, sequence = self._store.update(job_id, expected_version=expected_version, progress=str(progress), message=message)
+        update = ProgressEvent(job_id=job_id, sequence=sequence, progress=record.progress, message=message, occurred_at=record.updated_at)
         for subscription in self._subscriptions.values():
             try:
                 subscription.queue.put_nowait(update)
@@ -142,33 +132,23 @@ class ManageJobsService:
         return update
 
     async def subscribe(self, callback: ProgressCallback) -> str:
-        """Register one isolated callback worker.
-
-        Returns:
-            Opaque subscription identity.
-        """
         self._ensure_open()
         subscription_id = f"progress-{uuid.uuid4().hex}"
-        callback_queue: asyncio.Queue[ProgressEvent | None] = asyncio.Queue(
-            maxsize=self._callback_queue_capacity
-        )
-
+        callback_queue: asyncio.Queue[ProgressEvent | None] = asyncio.Queue(maxsize=self._callback_queue_capacity)
         async def consume() -> None:
             while (item := await callback_queue.get()) is not None:
                 try:
                     await callback(item)
-                except Exception:  # noqa: BLE001 - observers cannot break job state.
+                except Exception:
                     self._callback_failures += 1
                 finally:
                     callback_queue.task_done()
             callback_queue.task_done()
-
         task = self._task_spawner(consume(), name=subscription_id)
         self._subscriptions[subscription_id] = _Subscription(callback_queue, task)
         return subscription_id
 
     async def unsubscribe(self, subscription_id: str) -> None:
-        """Remove and drain one observer idempotently."""
         subscription = self._subscriptions.pop(subscription_id, None)
         if subscription is None:
             return
@@ -176,7 +156,6 @@ class ManageJobsService:
         await subscription.task
 
     async def close(self) -> None:
-        """Stop observers and close persistence exactly once."""
         if self._closed:
             return
         self._closed = True
@@ -185,10 +164,5 @@ class ManageJobsService:
         self._store.close()
 
     def _ensure_open(self) -> None:
-        """Reject operations after lifecycle shutdown.
-
-        Raises:
-            RuntimeError: If this service has already been closed.
-        """
         if self._closed:
             raise RuntimeError("manage-jobs service is closed")

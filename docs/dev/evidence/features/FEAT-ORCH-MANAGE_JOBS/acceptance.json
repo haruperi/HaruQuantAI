@@ -1,0 +1,13 @@
+{
+  "feature_id": "FEAT-ORCH-MANAGE_JOBS",
+  "task_id": "1.18",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id": "FR-TRC-ORCH-MANAGE_JOBS-001", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-ORCH-MANAGE_JOBS-002", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-ORCH-MANAGE_JOBS-003", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-ORCH-MANAGE_JOBS-004", "status": "IMPLEMENTED"},
+    {"id": "NFR-TRC-ORCH-MANAGE_JOBS-001", "status": "IMPLEMENTED"}
+  ],
+  "review": {"reviewer_verdict": "PENDING", "reviewer_notes": "CI/reviewer evidence pending."}
+}
