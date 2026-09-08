@@ -1,0 +1,126 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-ORCH-RESERVE_RESOURCES",
+  "task_id": "1.14",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/orchestration/README.md",
+  "baseline_commit": "fe9a16aa2cc5032854bbaa0a60f5e7fe275ef361",
+  "acceptance_commit": "task-closeout:20260908-175504-814467-complete-selected-implementation-entries-1.14-reserve-resources",
+  "requirements": [
+    {
+      "id": "FR-TRC-ORCH-RESERVE_RESOURCES-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_001_hierarchical_profiles"
+    },
+    {
+      "id": "FR-TRC-ORCH-RESERVE_RESOURCES-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_002_workstation_defaults"
+    },
+    {
+      "id": "FR-TRC-ORCH-RESERVE_RESOURCES-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_003_disk_headroom_and_accounting"
+    },
+    {
+      "id": "FR-TRC-ORCH-RESERVE_RESOURCES-004",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_004_priority_queues_and_starvation_prevention"
+    },
+    {
+      "id": "NFR-TRC-ORCH-RESERVE_RESOURCES-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_nfr_001_larger_than_ram_streams"
+    },
+    {
+      "id": "NFR-TRC-ORCH-RESERVE_RESOURCES-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_nfr_002_warm_metadata_responsiveness"
+    },
+    {
+      "id": "AT-ORCH-RESERVE_RESOURCES-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_001_hierarchical_profiles"
+    },
+    {
+      "id": "AT-ORCH-RESERVE_RESOURCES-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_002_workstation_defaults"
+    },
+    {
+      "id": "AT-ORCH-RESERVE_RESOURCES-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_003_disk_headroom_and_accounting"
+    },
+    {
+      "id": "AT-ORCH-RESERVE_RESOURCES-004",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_004_priority_queues_and_starvation_prevention"
+    },
+    {
+      "id": "ATN-ORCH-RESERVE_RESOURCES-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_nfr_001_larger_than_ram_streams"
+    },
+    {
+      "id": "ATN-ORCH-RESERVE_RESOURCES-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/orchestration/reserve_resources/test_traceability.py::test_trc_reserve_resources_nfr_002_warm_metadata_responsiveness"
+    }
+  ],
+  "catalogue_entries": [
+    "Admit finite hierarchical work under one authoritative resource ledger",
+    "Finite resource profiles with memory, threads, temp disk, vram, compile slots, ready descriptors",
+    "Hierarchical child lease delegation without double-spending parent capacity",
+    "Priority queueing (SAFETY > CONTROL > BULK) with reserved control partitions",
+    "Physical usage and VRAM reconciliation against admitted profiles"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/orchestration/resources.py ResourceAdmissionPort, FiniteResourceProfile, ResourceAdmissionRequest, ResourceLease, ResourceAdmissionDecision, ResourceLedgerSnapshot."
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "ReserveResourcesService and ResourceReservationStore provide durable atomic lease admission and capacity management."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "ReserveResourcesFeature provides RESERVE_RESOURCES_CAPABILITY and registers service.close with FeatureContext."
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "Validated in tests/services/orchestration/reserve_resources/test_traceability.py and test_lifecycle.py."
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-ORCH-RESERVE_RESOURCES is an orchestration domain resource management capability; presentation widgets live in FEAT-UI-*."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/orchestration/reserve_resources/_usage.py executed with exit code 0 covering all 6 operational scenarios."
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run pytest tests/services/orchestration/reserve_resources/ -o addopts=\"\"",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run python -m app.services.orchestration.reserve_resources._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy app/contracts/orchestration/resources.py app/services/orchestration/reserve_resources/ tests/services/orchestration/reserve_resources/",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff check app/contracts/orchestration/capabilities.py app/contracts/orchestration/resources.py app/services/orchestration/reserve_resources/ tests/services/orchestration/reserve_resources/",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All 4 FRs, 2 NFRs, traceability and lifecycle test suites, offline usage recipe, mypy, and ruff checks pass cleanly."
+  }
+}

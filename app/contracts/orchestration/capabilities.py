@@ -18,6 +18,7 @@ if TYPE_CHECKING:
         TrackRunHistoryCapability,
         TrainNetworksCapability,
     )
+    from app.contracts.orchestration.resources import ResourceAdmissionPort
 DEFINE_PROJECTS_CAPABILITY: CapabilityKey[DefineProjectsCapability] = CapabilityKey(
     name="orchestration.define-projects",
     major=1,
@@ -62,4 +63,9 @@ MANAGE_JOBS_CAPABILITY: CapabilityKey[ManageJobsCapability] = CapabilityKey(
 
 DELIVER_NOTIFICATIONS_CAPABILITY: CapabilityKey[DeliverNotificationsCapability] = (
     CapabilityKey(name="orchestration.deliver-notifications", major=1)
+)
+
+RESERVE_RESOURCES_CAPABILITY: CapabilityKey[ResourceAdmissionPort] = CapabilityKey(
+    name="orchestration.resource-admission",
+    major=1,
 )
