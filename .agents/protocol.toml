@@ -93,6 +93,18 @@ target_template = "docs/templates/prompt/planner.md"
 
 [[transitions]]
 source_role = "ORCHESTRATOR"
+handoff = "BASELINE_REFRESHED"
+target_role = "REVIEWER"
+target_template = "docs/templates/prompt/reviewer.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "INTEGRATION_REPLAN"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
 handoff = "SCOPE_BLOCKED"
 target_role = "PLANNER"
 target_template = "docs/templates/prompt/planner.md"

@@ -311,6 +311,7 @@ def _render_next_agent(metadata: dict[str, Any], body: str) -> str:
         "requires_owner_gate",
         "owner_gate",
         "allowed_write_paths",
+        "deferred_integration_paths",
     ]
     lines = ["+++"]
     for key in ordered:

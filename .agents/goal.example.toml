@@ -21,6 +21,12 @@ execution_order = "tracker"
 skip_completed = true
 stop_on_blocked = true
 
+# Optional only with schema-v4 [parallel].enabled = true. Leaving parallelism
+# at one preserves the existing sequential Goal workflow.
+parallelism = 1
+lane_names = []
+dependency_schedule = "docs/dev/evidence/dependency-schedule.json"
+
 # Unattended-only alternative: one bounded, audited assumption retry per child.
 # This never skips children or overrides protected/external blockers.
 # stop_on_blocked = false

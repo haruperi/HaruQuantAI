@@ -12,6 +12,8 @@ agent_retry_attempts = 1
 protocol = ".agents/protocol.toml"
 logs_dir = ".agents/logs"
 runs_dir = ".agents/runs"
+worktrees_dir = ".agents/worktrees"
+integration_dir = ".agents/goals"
 
 [roles]
 planner = "planner.toml"

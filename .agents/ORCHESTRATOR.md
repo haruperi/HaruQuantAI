@@ -1,5 +1,10 @@
 # Chat Orchestrator Playbook
 
+Schema-v4 adds optional three-lane Goal supervision. The primary checkout is
+the single writer for Goal state, readiness, path leases, and the integration
+lock. Lane worktrees own child Task journals, prompts, run state, and role
+transport. Existing sequential Task and Goal routing remains the default.
+
 You — this chat — orchestrate HaruQuantAI Task and Goal workflows defined by shared rules in `AGENTS.md`, the Task machine contract in `.agents/protocol.toml`, complete role contracts in `docs/templates/prompt/`, and Goal supervision in `.agents/GOALS.md`. Modes change transport only.
 
 ## 1. Non-negotiable protocol
@@ -7,7 +12,7 @@ You — this chat — orchestrate HaruQuantAI Task and Goal workflows defined by
 - Repository evidence and deterministic controller state are authoritative; conversation memory is context only.
 - The deterministic controller component is routing/validation/transport, not a reasoning role. In IDE `solo`, this same chat may adopt the currently prepared reasoning role only after the controller has validated its complete prompt.
 - Goal Controller and Task Orchestrator are two deterministic state-machine layers inside one orchestration system, not two AI agents.
-- Exactly one child Task and exactly one reasoning role within that Task may write at a time.
+- Sequential Goals permit exactly one active child. Opt-in parallel Goals permit at most one active child per governed lane; exactly one reasoning role may write within each child Task.
 - Active Task coordination lives in `.agents/task/{planner,executor,reviewer,next-agent}.md`.
 - Role journals are append-only; `next-agent.md` is replace-only.
 - No reasoning role may run without a complete validated current `next-agent.md`.
@@ -56,7 +61,7 @@ GOAL ACTIVATED
   → GOAL ACCEPTED
 ```
 
-The Goal supervisor stores child Task run IDs and progress only. It never stores role-session IDs, creates a Goal branch, creates a Goal commit, or adds owner gates. Only one child may be active. Accepted children remain committed if a later child blocks.
+The Goal supervisor stores child Task run IDs and progress only. It never stores role-session IDs, creates a Goal branch, creates a Goal commit, or adds owner gates. Sequential Goals permit one active child; opt-in parallel Goals permit one active child per governed lane while serializing final integration. Accepted children remain committed if a later child blocks.
 
 ## 4. IDE SOLO
 
@@ -80,7 +85,7 @@ uv run .agents/orchestrator.py goal-start --goal-file .agents/goal.toml
 
 Each Goal child gets a new Task run ID, so session ledgers are naturally isolated by child. The Goal Engine never calls `session_runner.py` directly; it calls the reusable Task API, which invokes the unchanged Task engine.
 
-The schema-v3 runtime policy and frozen Task/Goal scope are hashed into run state. Interactive gates require exact owner messages. Every mode may instead use unattended gates with explicit frozen local permissions. Automatic Sol/high recovery-session generation is a separate headless-only option and adds at most one correction iteration before terminal blocking.
+The schema-v4 runtime policy and frozen Task/Goal scope are hashed into run state; schema-v2/v3 runs retain their existing fingerprints and sequential behavior. Interactive gates require exact owner messages. Every mode may instead use unattended gates with explicit frozen local permissions. Automatic Sol/high recovery-session generation is a separate headless-only option and adds at most one correction iteration before terminal blocking.
 
 ## 7. MANUAL
 

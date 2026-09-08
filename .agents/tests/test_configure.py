@@ -21,7 +21,7 @@ def _load_configure(orc: ModuleType) -> ModuleType:
     return module
 
 
-def test_schema_v3_configuration_is_complete_toml(orc: ModuleType) -> None:
+def test_schema_v4_configuration_is_complete_toml(orc: ModuleType) -> None:
     module = _load_configure(orc)
     shared = {
         "vendor": "codex",
@@ -40,7 +40,7 @@ def test_schema_v3_configuration_is_complete_toml(orc: ModuleType) -> None:
         recovery_enabled=True,
     )
     parsed = tomllib.loads(text)
-    assert parsed["schema_version"] == 3
+    assert parsed["schema_version"] == 4
     assert parsed["mode"] == "solo-headless"
     assert parsed["approval_policy"] == "unattended"
     assert parsed["max_iterations"] == 7
@@ -147,6 +147,7 @@ def test_non_headless_modes_render_unattended_gate_permissions(
         "Preauthorize plan execution?",
         "Preauthorize local Task commit?",
         "Preauthorize local no-ff merge?",
+        "Enable governed three-worktree parallel Goals?",
     ]
 
 

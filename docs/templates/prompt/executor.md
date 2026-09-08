@@ -24,6 +24,8 @@ Owner execution notes: `{{owner_execution_notes}}`
 Implementation tracker: `{{implementation_file}}` entry `{{implementation_entry}}`
 Approved plan hash: `{{approved_plan_hash}}`
 Main baseline commit: `{{baseline_commit}}`
+Parallel lane, when applicable: `{{lane}}`
+Deferred integration paths: `{{deferred_integration_paths}}`
 
 ### Structured Handoff Facts
 
@@ -32,6 +34,9 @@ Main baseline commit: `{{baseline_commit}}`
 ## 3. Instruction / Task
 
 Verify the authorization source, baseline/branch/path inventory, frozen policy/scope fingerprints when present, and gate hash of the exact Planner-journal bytes preceding the current gate record. Do not hash the entire post-authorization journal. Read the approved plan and routed authorities, implement only that scope, run only its change-scoped validation, and append `Report {{iteration}}` to `.agents/task/executor.md`.
+
+For a parallel draft, do not modify a deferred integration path. Report those
+obligations as pending serialized reconciliation; do not claim them complete.
 
 After appending the report, compute the SHA-256 of the entire Executor journal in that state and pass that exact value into the Reviewer prompt's `executor_report_hash` field.
 

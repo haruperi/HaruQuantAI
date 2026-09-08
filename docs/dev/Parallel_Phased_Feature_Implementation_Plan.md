@@ -20,19 +20,17 @@ This schedule was calculated from 205 unique Tasks, eight accepted Tasks, 197 op
 schedule constraints. It has 67 waves, at most three Tasks per wave and no known predecessor
 violation at the pinned baseline.
 
-## 2. Governance prerequisite — not executable yet
+## 2. Governance prerequisite
 
-The current repository workflow permits only one active Goal child and requires every Task to begin
-from the latest clean accepted `main`. Its close-out merge must use that recorded baseline as the
-merge commit's first parent. Consequently, three ordinary Task branches created from one baseline
-cannot all be accepted: after the first merge, the other two baselines are stale. Normal workflow
-also does not authorize an orchestrator to rebase, cherry-pick, resolve merge conflicts or mutate
-product files.
+The default repository workflow permits only one active Goal child. Schema-v4 adds opt-in parallel
+drafts without weakening the rule that every accepted Task must be refreshed onto latest clean
+accepted `main` and merged with exact parent lineage. Stale drafts are never merged directly, and
+the controller does not rebase, cherry-pick or resolve semantic conflicts mechanically.
 
-Therefore this document is a ratification proposal, not authority to start concurrent writes. Before
-using the three lanes, a separately planned, reviewed and accepted workflow Task must update the
-repository constitution, protocol, runtime state, controller and tests to support all of the
-following:
+This schedule becomes executable only after the schema-v4 parallel workflow implementation is
+committed, a non-Quick-Fix runtime policy explicitly enables it, and a Goal selects
+`parallelism = 3`. Merely opening three chats or clones remains insufficient. The governed
+controller provides all of the following:
 
 1. Three isolated worktrees and namespaced active-Task workspaces, with no shared mutable runtime
    journals.
@@ -49,8 +47,9 @@ following:
 8. Tests proving that stale baselines, overlapping paths, predecessor loss and integration conflicts
    fail closed.
 
-Until that Task is accepted, continue using the existing sequential Goal/Task workflow. Merely
-opening three chats or clones does not satisfy this prerequisite.
+Until the schema-v4 implementation is committed and explicitly configured, continue using the
+existing sequential Goal/Task workflow. Merely opening three chats or clones does not satisfy this
+prerequisite.
 
 ## 3. Parallel execution contract
 

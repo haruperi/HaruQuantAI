@@ -58,7 +58,11 @@ def _build_spec(args: argparse.Namespace) -> dict[str, Any]:
         else "tracker",
         "skip_completed": True,
         "stop_on_blocked": not bool(getattr(args, "continue_on_blocked", False)),
+        "parallelism": int(getattr(args, "parallelism", 1)),
     }
+    if spec["parallelism"] == 3:
+        spec["lane_names"] = ["codex", "gemini", "zcode"]
+        spec["dependency_schedule"] = str(args.dependency_schedule)
     if args.child_additional_context is not None:
         child_context = args.child_additional_context
         if not isinstance(child_context, str) or not child_context.strip():
@@ -100,6 +104,15 @@ def _render(spec: dict[str, Any]) -> str:
             + ("true" if bool(spec["stop_on_blocked"]) else "false"),
         ]
     )
+    if int(spec.get("parallelism", 1)) == 3:
+        lanes = ", ".join(_q(str(value)) for value in spec["lane_names"])
+        lines.extend(
+            [
+                "parallelism = 3",
+                f"lane_names = [{lanes}]",
+                f"dependency_schedule = {_q(str(spec['dependency_schedule']))}",
+            ]
+        )
     return "\n".join(lines) + "\n"
 
 
@@ -111,6 +124,18 @@ def main() -> int:
     selection.add_argument("--all-open", action="store_true")
     parser.add_argument(
         "--file", default="docs/dev/Phased_Feature_Implementation_Plan.md"
+    )
+    parser.add_argument(
+        "--parallelism",
+        type=int,
+        choices=(1, 3),
+        default=1,
+        help="Use one sequential child or three governed worktree lanes.",
+    )
+    parser.add_argument(
+        "--dependency-schedule",
+        default="docs/dev/evidence/dependency-schedule.json",
+        help="Repository-relative canonical predecessor schedule for parallel Goals.",
     )
     parser.add_argument("--out", default=str(AGENTS_DIR / "goal.toml"))
     parser.add_argument("--goal-id")

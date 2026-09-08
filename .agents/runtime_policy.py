@@ -5,13 +5,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 import sys
 import tomllib
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, cast
 
-RUNTIME_SCHEMA_VERSION = 3
+RUNTIME_SCHEMA_VERSION = 4
 SCHEMA_V2_MODES = frozenset({"solo", "delegate", "multi-delegate", "manual"})
 SUPPORTED_MODES = frozenset(
     {
@@ -80,6 +81,15 @@ class RecoveryPolicy:
 
 
 @dataclass(frozen=True, slots=True)
+class ParallelPolicy:
+    """Opt-in parallel Goal policy; Task role transport remains independent."""
+
+    enabled: bool = False
+    max_lanes: int = 1
+    lane_names: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
 class RuntimePolicy:
     """Complete validated runtime policy for Task and Goal execution."""
 
@@ -90,6 +100,7 @@ class RuntimePolicy:
     roles: dict[str, RolePolicy]
     unattended: UnattendedPolicy
     recovery: RecoveryPolicy
+    parallel: ParallelPolicy = ParallelPolicy()
     legacy_compatibility: bool = False
 
     @property
@@ -267,7 +278,7 @@ def _session_command(
 
 
 def _parse_versioned(raw: dict[str, Any], schema_version: int) -> RuntimePolicy:
-    """Parse a schema-v2 compatibility policy or canonical schema-v3 policy."""
+    """Parse a compatible schema-v2/v3 policy or canonical schema-v4 policy."""
     mode = str(raw.get("mode", ""))
     approval_policy = str(raw.get("approval_policy", "interactive"))
     max_iterations = raw.get("max_iterations", 5)
@@ -355,6 +366,44 @@ def _parse_versioned(raw: dict[str, Any], schema_version: int) -> RuntimePolicy:
     ) != ("codex", "gpt-5.6-sol", "high"):
         raise RuntimePolicyError("Recovery identity must be codex/gpt-5.6-sol/high.")
 
+    parallel = ParallelPolicy()
+    parallel_raw = raw.get("parallel", {})
+    if schema_version >= 4:
+        if not isinstance(parallel_raw, dict):
+            raise RuntimePolicyError("parallel must be a TOML table.")
+        parallel_section = cast("dict[str, Any]", parallel_raw)
+        parallel_enabled = _require_bool(parallel_section, "enabled")
+        max_lanes = parallel_section.get("max_lanes", 3 if parallel_enabled else 1)
+        lane_values = parallel_section.get(
+            "lane_names", ["codex", "gemini", "zcode"] if parallel_enabled else []
+        )
+        if not isinstance(max_lanes, int) or isinstance(max_lanes, bool):
+            raise RuntimePolicyError("parallel.max_lanes must be an integer.")
+        if max_lanes not in ({3} if parallel_enabled else {1}):
+            raise RuntimePolicyError(
+                "Parallel execution requires exactly three lanes when enabled."
+            )
+        if not isinstance(lane_values, list) or not all(
+            isinstance(item, str) for item in lane_values
+        ):
+            raise RuntimePolicyError("parallel.lane_names must be a string array.")
+        lane_names = tuple(item.strip().lower() for item in lane_values)
+        if parallel_enabled and (
+            len(lane_names) != 3
+            or len(set(lane_names)) != 3
+            or any(
+                not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", lane) for lane in lane_names
+            )
+        ):
+            raise RuntimePolicyError(
+                "Parallel execution requires three unique filesystem-safe lane names."
+            )
+        if not parallel_enabled and lane_names:
+            raise RuntimePolicyError("Disabled parallel policy cannot declare lanes.")
+        if parallel_enabled and effective_mode == "quick-fix":
+            raise RuntimePolicyError("Quick-Fix mode cannot enable parallel Goals.")
+        parallel = ParallelPolicy(parallel_enabled, max_lanes, lane_names)
+
     return RuntimePolicy(
         schema_version=schema_version,
         mode=mode,
@@ -363,6 +412,7 @@ def _parse_versioned(raw: dict[str, Any], schema_version: int) -> RuntimePolicy:
         roles=roles,
         unattended=unattended,
         recovery=recovery,
+        parallel=parallel,
     )
 
 
@@ -395,10 +445,10 @@ def load_runtime_policy(
             recovery=RecoveryPolicy(),
             legacy_compatibility=True,
         )
-    if schema not in {2, RUNTIME_SCHEMA_VERSION}:
+    if schema not in {2, 3, RUNTIME_SCHEMA_VERSION}:
         raise RuntimePolicyError(
             f"Unsupported runtime schema {schema!r}; expected 2 or "
-            f"{RUNTIME_SCHEMA_VERSION}."
+            f"3, or {RUNTIME_SCHEMA_VERSION}."
         )
     return _parse_versioned(raw, int(schema))
 
@@ -408,6 +458,7 @@ __all__ = [
     "IDE_MODES",
     "ROLE_NAMES",
     "RUNTIME_SCHEMA_VERSION",
+    "ParallelPolicy",
     "RecoveryPolicy",
     "RolePolicy",
     "RuntimePolicy",

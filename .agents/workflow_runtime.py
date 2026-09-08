@@ -411,6 +411,14 @@ def _build_fields(state: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
         "iteration": state["iteration"],
         "branch": state.get("branch") or "(created by orchestrator during activation)",
         "baseline_commit": state["baseline"],
+        "lane": state.get("lane", "SEQUENTIAL"),
+        "integration_baseline": state.get("integration_baseline") or "NOT_REFRESHED",
+        "deferred_integration_paths": ", ".join(
+            str(path) for path in state.get("deferred_integration_paths", [])
+        )
+        or "NONE",
+        "refresh_evidence": state.get("refresh_evidence", "NONE"),
+        "primary_repo_path": state.get("primary_repo_path", str(cfg["repo"])),
         "correction_context": state.get("correction_context", "None"),
         "owner_feedback": state.get("owner_feedback", "None") or "None",
         "approved_plan_hash": state.get(
@@ -538,6 +546,18 @@ def _append_gate_authorization(
             approved_write_paths = _normalize_path_list(approved_paths_raw)
         else:
             approved_write_paths = []
+        deferred_raw = artifact.metadata.get("deferred_integration_paths", [])
+        if not isinstance(deferred_raw, list):
+            raise OrchestratorError(
+                "deferred_integration_paths metadata must be a string array."
+            )
+        deferred_paths = _normalize_path_list([str(path) for path in deferred_raw])
+        if not set(deferred_paths).issubset(approved_write_paths):
+            raise OrchestratorError(
+                "Deferred integration paths must be included in allowed_write_paths."
+            )
+        state["deferred_integration_paths"] = deferred_paths
+        approved_write_paths = sorted(set(approved_write_paths) - set(deferred_paths))
     else:
         approved_write_paths = []
     state["approved_write_paths"] = approved_write_paths

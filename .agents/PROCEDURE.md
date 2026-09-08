@@ -1,5 +1,10 @@
 <!-- markdownlint-disable-file MD013 MD024 MD025 MD060 -->
 
+> Schema-v4 parallel Goals are opt-in. Generate one with `--parallelism 3` and
+> target every gate or role completion with `--lane codex`, `--lane gemini`, or
+> `--lane zcode`. Each agent consumes the prompt in its own worktree. Draft
+> review is followed by serialized baseline refresh and a fresh final review.
+
 # Agent Workflow — Complete Operational Procedures
 
 HaruQuantAI has one atomic Planner → Executor → Reviewer Task workflow and one deterministic Goal supervisor above it. Six normal transport modes share those semantics. `quick-fix` is the explicit chat-direct exception outside those state machines.
@@ -379,13 +384,13 @@ For a fully preauthorized manual Task:
 
 ## Part 4 — Goal Orchestration
 
-A Goal supervises multiple ordinary Tasks sequentially. Read `.agents/GOALS.md` before operating a Goal.
+A Goal supervises multiple ordinary Tasks sequentially by default or through three explicitly enabled governed draft lanes. Read `.agents/GOALS.md` before operating a Goal.
 
 ## Goal invariants
 
 - Goal Controller is deterministic, not an LLM reasoning role.
 - Selection resolves once and freezes at Goal activation.
-- Exactly one child Task may be active.
+- A sequential Goal permits exactly one active child. An opt-in parallel Goal permits one active child per governed lane and serializes final integration.
 - Every child uses the normal Task workflow unchanged and produces its own commit.
 - Goal has no Goal branch, Goal commit, Planner/Executor/Reviewer session, or additional owner gate.
 - Same-role continuity exists only inside a child Task; next child starts a fresh P/E/R set.

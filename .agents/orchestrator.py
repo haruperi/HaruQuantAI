@@ -20,8 +20,10 @@ from goal_engine import (
     advance_goal,
     cancel_goal,
     format_goal_status,
+    integrate_parallel_draft,
     load_goal_spec,
     load_goal_state,
+    migrate_goal_to_parallel,
     save_goal_state,
     start_goal,
 )
@@ -633,6 +635,7 @@ def cmd_goal_start(args: argparse.Namespace) -> int:
                 commit_reject_feedback=args.reject_commit_feedback,
                 role_complete=args.role_complete,
                 app_agent_id=args.app_agent_id,
+                lane=args.lane,
             )
         except KeyboardInterrupt:
             print("\nStopped by owner; Goal and child Task checkpoints were preserved.")
@@ -665,6 +668,7 @@ def cmd_goal_resume(args: argparse.Namespace) -> int:
                 claim_child_chat=args.claim_child_chat,
                 role_complete=args.role_complete,
                 app_agent_id=args.app_agent_id,
+                lane=args.lane,
             )
         except KeyboardInterrupt:
             print("\nStopped by owner; Goal and child Task checkpoints were preserved.")
@@ -679,6 +683,34 @@ def cmd_goal_status(args: argparse.Namespace) -> int:
     cfg = assemble_config(args.repo)
     print(format_goal_status(load_goal_state(cfg, args.goal_run_id)))
     return 0
+
+
+def cmd_goal_integrate(args: argparse.Namespace) -> int:
+    """Refresh the deterministic queue-head draft for final review."""
+    cfg = assemble_config(args.repo)
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
+    try:
+        state = load_goal_state(cfg, args.goal_run_id)
+        state = integrate_parallel_draft(cfg, state, lane=args.lane)
+        print(format_goal_status(state))
+        return 0
+    finally:
+        lock.release()
+
+
+def cmd_goal_migrate_parallel(args: argparse.Namespace) -> int:
+    """Explicitly migrate an inactive sequential Goal to three lanes."""
+    cfg = assemble_config(args.repo)
+    lock = WorkflowLock(cfg["repo"])
+    lock.acquire()
+    try:
+        state = load_goal_state(cfg, args.goal_run_id)
+        state = migrate_goal_to_parallel(cfg, state)
+        print(format_goal_status(state))
+        return 0
+    finally:
+        lock.release()
 
 
 def cmd_goal_cancel(args: argparse.Namespace) -> int:
@@ -1002,6 +1034,12 @@ def _add_common(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--reject-commit-feedback", default=None)
     parser.add_argument("--role-complete", action="store_true")
     parser.add_argument("--app-agent-id", default=None)
+    parser.add_argument(
+        "--lane",
+        choices=("codex", "gemini", "zcode"),
+        default=None,
+        help="Target exactly one active parallel Goal lane.",
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -1063,6 +1101,19 @@ def build_parser() -> argparse.ArgumentParser:
     goal_status.add_argument("--goal-run-id", default=None)
     goal_status.add_argument("--repo", default=None)
     goal_status.set_defaults(func=cmd_goal_status)
+
+    goal_integrate = subs.add_parser("goal-integrate")
+    goal_integrate.add_argument("--goal-run-id", default=None)
+    goal_integrate.add_argument(
+        "--lane", choices=("codex", "gemini", "zcode"), required=True
+    )
+    goal_integrate.add_argument("--repo", default=None)
+    goal_integrate.set_defaults(func=cmd_goal_integrate)
+
+    goal_migrate = subs.add_parser("goal-migrate-parallel")
+    goal_migrate.add_argument("--goal-run-id", required=True)
+    goal_migrate.add_argument("--repo", default=None)
+    goal_migrate.set_defaults(func=cmd_goal_migrate_parallel)
 
     goal_cancel = subs.add_parser("goal-cancel")
     goal_cancel.add_argument("--goal-run-id", default=None)

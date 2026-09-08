@@ -1,6 +1,6 @@
 # `.agents` — Artifact-Driven Task and Goal Workflow
 
-HaruQuantAI implements one atomic Planner → Executor → Reviewer **Task workflow** and a deterministic **Goal supervisor** that can execute many such Tasks sequentially. Repository state and deterministic controller state are authoritative; conversation history is context only.
+HaruQuantAI implements one atomic Planner → Executor → Reviewer **Task workflow** and a deterministic **Goal supervisor**. Goals remain sequential by default and may explicitly opt into three governed parallel draft lanes. Repository state and deterministic controller state are authoritative; conversation history is context only.
 
 ## Atomic Task workspace
 
@@ -68,7 +68,7 @@ branches, a Reviewer, a commit gate, commits, merges, or Goal children.
 
 Schema-v3 `.agents/run-config.toml` is authoritative for mode, headless role models/effort/providers, approval policy, normal iteration limit, unattended local permissions, and bounded recovery. The deterministic CLI drives Task/Goal state in every mode except chat-direct `quick-fix`, for which Task/Goal activation fails before mutation. Only `solo-headless`, `delegate-headless`, and `delegate-multi` use `.agents/session_runner.py` to launch reasoning-role CLI sessions. IDE `solo` performs the prepared role in the current chat; IDE `delegate` invokes/resumes app-native inspectable agents; `manual` waits for operator-managed chats.
 
-Schema-v2 configurations remain resume-compatible with their old transport meaning and unchanged policy fingerprint. A missing-schema legacy file may continue an already-active legacy Task only. New Tasks and Goals fail closed until `.agents/configure.py` writes a complete schema-v3 policy.
+Schema-v2/v3 configurations remain resume-compatible with their existing sequential transport meaning and unchanged policy fingerprint. A missing-schema legacy file may continue an already-active legacy Task only. New Tasks and Goals fail closed until `.agents/configure.py` writes a complete schema-v4 policy.
 
 `approval_policy = "interactive"` requires the exact owner gate messages. In every mode, `approval_policy = "unattended"` uses frozen run preauthorization only for permissions explicitly enabled in `[unattended]`; it changes gate authorization, not role transport. It never authorizes push, external/live actions, destructive operations, or scope expansion. In headless modes only, optional recovery creates one fresh `codex/gpt-5.6-sol/high` session generation for one additional correction iteration, then stops at `MAX_ITERATIONS`.
 
@@ -161,6 +161,15 @@ uv run .agents/orchestrator.py resume --role-complete
 # Inspectable app-native delegate completed the prepared role
 uv run .agents/orchestrator.py resume --role-complete --app-agent-id <opaque-id>
 ```
+
+## Optional schema-v4 parallel Goals
+
+Goals remain sequential unless both runtime policy and the Goal opt in. With
+`[parallel].enabled = true` and `parallelism = 3`, the primary checkout owns
+readiness, leases, and serialized integration while `codex`, `gemini`, and
+`zcode` worktrees own independent child Task artifacts. Lane actions use
+`--lane <name>`. A draft review is not commit authority: every draft is
+refreshed onto latest accepted `main` and independently reviewed again.
 
 ## Goal quick start
 

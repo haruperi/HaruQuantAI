@@ -130,6 +130,63 @@ def prepare_task_run(
     return state
 
 
+def prepare_lane_task_run(
+    cfg: dict[str, Any],
+    task: dict[str, Any],
+    *,
+    run_id: str,
+    lane: str,
+    branch: str,
+    baseline: str,
+) -> dict[str, Any]:
+    """Create Task state for a controller-prepared parallel lane branch.
+
+    Unlike :func:`prepare_task_run`, this does not weaken or bypass the ordinary
+    clean-main entry gate. The parallel controller must already have created a
+    clean isolated worktree and checked out ``branch`` exactly at ``baseline``.
+    """
+    policy = cfg.get("runtime_policy")
+    if not isinstance(policy, RuntimePolicy) or not policy.parallel.enabled:
+        raise OrchestratorError(
+            "Lane Task activation requires an enabled schema-v4 parallel policy."
+        )
+    if policy.effective_mode == "quick-fix":
+        raise OrchestratorError("Quick-Fix cannot activate lane Task state.")
+    repo = Path(cfg["repo"])
+    if _git_ok(repo, "branch", "--show-current") != branch:
+        raise OrchestratorError("Lane worktree is not on its assigned Task branch.")
+    if _git_ok(repo, "rev-parse", "HEAD") != baseline:
+        raise OrchestratorError("Lane Task branch is not at its dispatch baseline.")
+    dirty = _git_ok(repo, "status", "--porcelain")
+    if dirty:
+        raise OrchestratorError(
+            f"Lane worktree must be clean before activation:\n{dirty}"
+        )
+    for path in [*cfg["journals"].values(), cfg["next_agent"]]:
+        if not path.exists() or path.stat().st_size != 0:
+            raise OrchestratorError(
+                f"Lane active-task artifact must be an existing empty file: {path}"
+            )
+    state = create_task_state(task, baseline, run_id=run_id)
+    state.update(
+        {
+            "branch": branch,
+            "lane": lane,
+            "parallel_draft": True,
+            "planning_baseline": baseline,
+            "integration_baseline": None,
+            "runtime_policy_fingerprint": policy.fingerprint,
+            "runtime_policy_schema_version": policy.schema_version,
+            "runtime_mode": policy.effective_mode,
+            "approval_policy": policy.approval_policy,
+            "effective_max_iterations": policy.max_iterations,
+            "scope_fingerprint": scope_fingerprint(task),
+        }
+    )
+    _save_state(cfg, state)
+    return state
+
+
 def resume_task_run(
     cfg: dict[str, Any],
     state: dict[str, Any],
@@ -945,6 +1002,7 @@ __all__ = [
     "create_task_state",
     "materialize_executor_handoff_correction",
     "materialize_reviewer_handoff_correction",
+    "prepare_lane_task_run",
     "prepare_task_run",
     "record_scope_blocker",
     "recover_completed_closeout",

@@ -135,8 +135,8 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         journal=cfg["journals"]["planner"],
         iteration=state["iteration"],
         task_id=state["task"]["task_id"],
-        baseline=state["baseline"],
-        branch=state["branch"],
+        baseline=state.get("planning_baseline", state["baseline"]),
+        branch=state.get("planning_branch", state["branch"]),
         approved_plan_hash=state.get("approved_plan_hash", ""),
         authorization_source=state.get("execute_authorization_source", "OWNER_MESSAGE"),
         runtime_policy_fingerprint=state.get("runtime_policy_fingerprint", ""),
@@ -205,8 +205,8 @@ def _handle_reviewer(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         journal=cfg["journals"]["planner"],
         iteration=state["iteration"],
         task_id=state["task"]["task_id"],
-        baseline=state["baseline"],
-        branch=state["branch"],
+        baseline=state.get("planning_baseline", state["baseline"]),
+        branch=state.get("planning_branch", state["branch"]),
         approved_plan_hash=state.get("approved_plan_hash", ""),
         authorization_source=state.get("execute_authorization_source", "OWNER_MESSAGE"),
         runtime_policy_fingerprint=state.get("runtime_policy_fingerprint", ""),
@@ -240,7 +240,17 @@ def _handle_reviewer(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         )
         state["reviewed_head"] = _git_ok(cfg["repo"], "rev-parse", "HEAD")
         state["reviewed_worktree_hash"] = _worktree_fingerprint(cfg["repo"])
-        state["phase"] = "commit_gate"
+        if state.get("parallel_draft") and not state.get("integration_refreshed"):
+            state["draft_review"] = {
+                "iteration": state["iteration"],
+                "baseline": state["baseline"],
+                "reviewed_head": state["reviewed_head"],
+                "worktree_sha256": state["reviewed_worktree_hash"],
+                "reviewer_journal_sha256": _sha_file(cfg["journals"]["reviewer"]),
+            }
+            state["phase"] = "draft_reviewed"
+        else:
+            state["phase"] = "commit_gate"
     finish_ide_role(state)
     _save_state(cfg, state)
 
@@ -330,9 +340,9 @@ def _verify_closeout_lineage(
     state: dict[str, Any],
 ) -> None:
     """Verify the explicit Task merge and post-close-out repository state."""
-    repo = cfg["repo"]
+    repo = Path(state.get("primary_repo_path", cfg["repo"]))
     main_branch = cfg["main_branch"]
-    baseline = state["baseline"]
+    baseline = state.get("integration_baseline") or state["baseline"]
     current_branch = _git_ok(repo, "branch", "--show-current")
     if current_branch != main_branch:
         msg = f"Close-out did not return to {main_branch}: current={current_branch!r}"
@@ -485,6 +495,9 @@ def router(  # noqa: PLR0911
             _save_state(cfg, state)
             return state
         phase = state["phase"]
+        if phase == "draft_reviewed":
+            print("Parallel Task draft is reviewed and waiting for integration.")
+            return state
         if phase == "task_activation":
             _handle_task_activation(cfg, state)
         elif cfg.get("mode") in IDE_MODES and phase in {

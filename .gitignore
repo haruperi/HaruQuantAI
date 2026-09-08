@@ -393,6 +393,7 @@ artifacts/
 # Agent orchestrator logs
 # ============================================================================
 .agents/logs/
+.agents/worktrees/
 
 # V2 UI migration donor tree (docs/dev/UI_MIGRATION_PLAN.md Phase 0)
 .migration/

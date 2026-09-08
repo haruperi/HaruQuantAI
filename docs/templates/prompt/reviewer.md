@@ -21,6 +21,9 @@ Task ID: `{{task_id}}`
 Dry-run/report number: `{{iteration}}`
 Original task request: `{{task_request}}`
 Main baseline commit: `{{baseline_commit}}`
+Parallel lane, when applicable: `{{lane}}`
+Integration baseline, when refreshed: `{{integration_baseline}}`
+Refresh evidence: `{{refresh_evidence}}`
 Approved plan hash: `{{approved_plan_hash}}`
 Executor report hash: `{{executor_report_hash}}`
 Additional review focus: `{{review_focus}}`
@@ -42,6 +45,11 @@ When the Task carries the unattended Goal assumption policy, independently recon
 
 If any issue exists, write a complete Planner correction prompt for iteration **{{iteration}} + 1** to `.agents/task/next-agent.md`.
 If every applicable gate passes, write a complete Reviewer close-out prompt for the current iteration to `.agents/task/next-agent.md` using `docs/templates/prompt/reviewer-closeout.md`; do not commit yet.
+
+For an unrefreshed parallel draft, a passed review establishes only a reviewed
+draft for the integration queue and never commit authority. After refresh,
+independently verify the new baseline, replay evidence, complete diff and
+deferred work; the earlier review is not acceptance evidence.
 
 ## 4. Specification
 

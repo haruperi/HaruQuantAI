@@ -2,6 +2,17 @@
 
 A HaruQuantAI **Goal** is a deterministic supervisory objective that executes multiple ordinary Task workflows in sequence. It is not a reasoning role and does not replace the existing Planner → Executor → Reviewer Task workflow.
 
+## Optional schema-v4 parallel execution
+
+With `[parallel].enabled = true` in schema-v4 runtime policy and
+`parallelism = 3` in the Goal, the controller creates `codex`, `gemini`, and
+`zcode` worktrees. Readiness comes from the frozen dependency schedule and
+exact paths are leased before each Executor runs. Drafts may overlap through
+review, but one integration queue refreshes them onto latest accepted `main`.
+Overlap or deferred semantic work returns to Planner, and every refresh needs
+a new independent review before the ordinary commit gate. Without this exact
+opt-in, the sequential lifecycle below is unchanged.
+
 ## Architecture
 
 ```text
@@ -59,7 +70,7 @@ selection_type = "all_open"
 
 At activation the selected child list is resolved from the implementation tracker, completed entries are optionally removed, and the resulting ordered list is **frozen**. Later tracker edits never silently add child Tasks to the active Goal.
 
-`stop_on_blocked=false` is supported only with schema-v3 `approval_policy="unattended"` in any transport mode. It does not skip blocked children. Instead, the same child Planner receives one bounded retry directive to resolve non-critical ambiguity through explicit, reversible, repository-grounded assumptions. Owner authorization, credentials, external facts, live-action safety, destructive authority, security policy, acceptance evidence and scope expansion can never be assumed; those blockers still pause the Goal.
+`stop_on_blocked=false` is supported only with schema-v3/v4 `approval_policy="unattended"` in any transport mode. It does not skip blocked children. Instead, the same child Planner receives one bounded retry directive to resolve non-critical ambiguity through explicit, reversible, repository-grounded assumptions. Owner authorization, credentials, external facts, live-action safety, destructive authority, security policy, acceptance evidence and scope expansion can never be assumed; those blockers still pause the Goal.
 
 ### Common child context
 
@@ -86,7 +97,7 @@ For `stop_on_blocked=false`, state also records `assumption_reviews` for every a
 
 ## Child lifecycle
 
-Only one child may be active:
+In the default sequential mode, only one child may be active:
 
 ```text
 Goal
@@ -209,4 +220,4 @@ selected because chat-direct Quick-Fix never activates Task/Goal state and omits
 the branch, independent review, Task commit, and no-ff merge required for Goal
 children.
 
-The schema-v3 runtime-policy and frozen Goal scope fingerprints are recorded at activation and checked before progress. Unattended headless children may receive one fresh `codex/gpt-5.6-sol/high` recovery generation for exactly one additional correction iteration. If that generation fails, the child reaches `MAX_ITERATIONS` and the Goal blocks; the next independently started Goal/Task always begins with its configured normal identities.
+The schema-v4 runtime-policy and frozen Goal scope fingerprints are recorded at activation and checked before progress; schema-v2/v3 runs preserve their existing sequential fingerprints. Unattended headless children may receive one fresh `codex/gpt-5.6-sol/high` recovery generation for exactly one additional correction iteration. If that generation fails, the child reaches `MAX_ITERATIONS` and the Goal blocks; the next independently started Goal/Task always begins with its configured normal identities.

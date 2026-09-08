@@ -934,6 +934,12 @@ For D-UI, replace the six Python package items above with `README.md`, `manifest
 
 ## 12. Change workflow
 
+An explicitly configured schema-v4 parallel Goal may perform planning,
+implementation, and draft review in three isolated worktrees. Exact
+non-deferred paths are leased before execution. Draft review is not acceptance:
+integration is serialized, refreshed onto latest accepted `main`, and reviewed
+again before the ordinary commit gate. Sequential workflows remain the default.
+
 For every new, migrated, or changed feature:
 
 1. Establish the owning V3 README and public contracts as implementation authority.

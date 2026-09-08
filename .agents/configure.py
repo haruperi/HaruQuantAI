@@ -113,6 +113,7 @@ def _render_config(
     allow_commit: bool,
     allow_merge: bool,
     recovery_enabled: bool,
+    parallel_enabled: bool = False,
 ) -> str:
     """Render one complete schema-v3 runtime policy."""
     lines = [
@@ -135,6 +136,15 @@ def _render_config(
         'vendor = "codex"',
         'model = "gpt-5.6-sol"',
         'effort = "high"',
+        "",
+        "[parallel]",
+        f"enabled = {str(parallel_enabled).lower()}",
+        f"max_lanes = {3 if parallel_enabled else 1}",
+        (
+            'lane_names = ["codex", "gemini", "zcode"]'
+            if parallel_enabled
+            else "lane_names = []"
+        ),
     ]
     for role in ROLES:
         if role in roles:
@@ -193,6 +203,9 @@ def main() -> int:
             "Automatic Sol/High recovery sessions are headless-only; "
             "recovery remains disabled."
         )
+    parallel_enabled = False
+    if mode != "quick-fix":
+        parallel_enabled = _yes_no("Enable governed three-worktree parallel Goals?")
     rendered = _render_config(
         mode=mode,
         approval_policy=approval_policy,
@@ -202,6 +215,7 @@ def main() -> int:
         allow_commit=allow_commit,
         allow_merge=allow_merge,
         recovery_enabled=recovery,
+        parallel_enabled=parallel_enabled,
     )
     RUN_CONFIG.write_text(rendered, encoding="utf-8")
     print(f"[ok] wrote {RUN_CONFIG}")

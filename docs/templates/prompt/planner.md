@@ -26,6 +26,8 @@ Explicit exclusions: `{{exclusions}}`
 Iteration: `{{iteration}}`
 Task branch: `{{branch}}`
 Main baseline commit: `{{baseline_commit}}`
+Parallel lane, when applicable: `{{lane}}`
+Integration baseline, when refreshed: `{{integration_baseline}}`
 Implementation tracker: `{{implementation_file}}` entry `{{implementation_entry}}`
 Correction/blocker context: {{correction_context}}
 Owner direction: {{owner_feedback}}
@@ -74,6 +76,12 @@ ALLOWED_WRITE_PATHS:
 - exact/path.py
 END_ALLOWED_WRITE_PATHS:
 ```
+
+For a parallel draft, list shared paths that cannot safely receive concurrent
+writes in `deferred_integration_paths` front matter and in a matching
+`DEFERRED_INTEGRATION_PATHS` journal block. Deferred paths remain in Task scope
+but the draft Executor may not modify them; they are reconciled only after
+serialized baseline refresh.
 
 If planning is itself blocked, instantiate `docs/templates/prompt/planner.md` into `.agents/task/next-agent.md` for a future Planner retry and set `HANDOFF : BLOCKED`.
 

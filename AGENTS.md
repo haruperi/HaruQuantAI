@@ -104,7 +104,7 @@ Correction paths:
 - Planner blocker resolution replaces the stale retry artifact with a fresh canonical `ORCHESTRATOR / BLOCKER_RESOLVED → PLANNER` prompt fingerprinted against the resolved repository state.
 - Owner cancellation records terminal `CANCELLED` state and preserves Task branch, worktree, journals, run evidence, and role-session evidence.
 
-In `approval_policy = "interactive"`, execution authorization is valid only when the entire trimmed owner message is exactly `APPROVED: EXECUTE`, and commit authorization is valid only when it is exactly `APPROVED: COMMIT`. In `approval_policy = "unattended"`, those same protocol gates may instead be satisfied by `RUN_PREAUTHORIZATION` frozen from schema-v3 `.agents/run-config.toml` at run activation. Execute requires `allow_execute`; close-out requires both `allow_local_commit` and `allow_local_merge`. A preauthorization record must state its true source plus the frozen policy and scope SHA-256 values and must never claim that a human sent an approval message.
+In `approval_policy = "interactive"`, execution authorization is valid only when the entire trimmed owner message is exactly `APPROVED: EXECUTE`, and commit authorization is valid only when it is exactly `APPROVED: COMMIT`. In `approval_policy = "unattended"`, those same protocol gates may instead be satisfied by `RUN_PREAUTHORIZATION` frozen from schema-v3/v4 `.agents/run-config.toml` at run activation. Execute requires `allow_execute`; close-out requires both `allow_local_commit` and `allow_local_merge`. A preauthorization record must state its true source plus the frozen policy and scope SHA-256 values and must never claim that a human sent an approval message.
 
 After either valid execute-gate source, the orchestrator may append only the deterministic factual gate record to Planner journal. The approved plan SHA-256 is computed from exact pre-gate Planner bytes and independently verified before Executor/Reviewer invocation.
 
@@ -159,6 +159,10 @@ Schema-v3 `.agents/run-config.toml` is authoritative for mode, headless role ide
 
 Unattended runs remain finite. If the normal iteration limit is exceeded and recovery is enabled, the controller may create exactly one fresh recovery session generation for Planner/Executor/Reviewer using `codex/gpt-5.6-sol/high` and allow exactly one additional correction iteration. Exhaustion after that generation is terminal `MAX_ITERATIONS`. Recovery sessions never replace the configured parent identities and are never reused by the next Task or Goal child.
 
+Schema-v4 is the canonical extension of schema-v3 and adds only the optional
+parallel Goal policy. Schema-v2/v3 inputs retain their existing sequential
+semantics and fingerprints.
+
 ### 2.9 Deterministic Goal supervision
 
 A **Goal** is a supervisory implementation objective containing multiple independently reviewable/committable Tasks. Goal orchestration extends the workflow **above** the atomic Task workflow; it does not modify or duplicate the Planner → Executor → Reviewer state machine.
@@ -184,8 +188,8 @@ Rules:
 - Goal Controller never performs Planner/Executor/Reviewer reasoning and never directly invokes role-session transport.
 - `.agents/goal.toml` is runtime Goal input; `.agents/goals/<goal-run-id>/state.json` is runtime Goal state. Goal runtime state stores child Task run IDs but no Planner/Executor/Reviewer session IDs.
 - Supported v1 Goal selection is explicit tracker entries, one numbered phase/prefix, or all open tracker entries. Selection is resolved and frozen at Goal activation; later tracker edits never silently expand active Goal scope.
-- Exactly one child Task may be active. Child Tasks run sequentially through the existing Task API and existing Task protocol.
-- Every child Task begins from the latest clean accepted `main`, owns its own Task branch, Task run ID, P/E/R role-session set, owner gates, review, exactly one Task implementation commit, and one explicit merge commit on `main`.
+- Sequential Goals retain exactly one active child. An explicitly configured schema-v4 parallel Goal may own at most three active draft children, one per isolated lane worktree. Parallel children retain the ordinary Task protocol, independent run/session/journal state and exact owner gates; only draft work overlaps in time and acceptance remains serialized.
+- Every child Task begins from a recorded clean accepted `main`, owns its own Task branch, Task run ID, P/E/R role-session set, owner gates, review, exactly one Task implementation commit, and one explicit merge commit on `main`. A parallel draft whose baseline becomes stale must be archived and refreshed onto latest accepted `main`; overlapping or deferred paths return to Planner, and every refresh requires a fresh independent review before commit authorization.
 - Same-role session continuity is bounded to a child Task. Child N+1 always starts a fresh Planner/Executor/Reviewer conversation set. In `solo`, that logical boundary is also a physical IDE chat boundary guarded by a persisted handoff claim.
 - A Goal has no Goal branch and no Goal commit. Its durable implementation history is the ordered set of accepted child Task implementation commits and their explicit merge commits on `main`.
 - Goals add no authorization token. `APPROVED: EXECUTE` and `APPROVED: COMMIT` remain the only gate labels and always apply to the active child Task; each may be satisfied by its configured interactive or frozen unattended source.
@@ -195,6 +199,17 @@ Rules:
 - After child `ACCEPTED`, Goal Controller must verify clean `main`, zero-byte active Task workspace, child-run identity and completion of the frozen implementation tracker entry before starting the next child.
 - Child cancellation, max iterations, preparation failure or acceptance reconciliation failure blocks the Goal. Previously accepted child commits remain on `main`; Goal supervision never auto-rolls them back.
 - Goal becomes `ACCEPTED` only when every frozen child is accepted, every selected tracker entry is complete, `main` is clean, and no Task is active.
+
+Parallel Goal extension:
+
+- Parallelism is opt-in and orthogonal to role transport. Schema-v2/v3 policies and Goals without `parallelism = 3` retain sequential behavior.
+- The only standard lanes are `codex`, `gemini`, and `zcode`. Each lane uses a controller-owned worktree under `.agents/worktrees/<goal-run-id>/<lane>` and its own `.agents/task/`, runs, logs, lock and role-session evidence.
+- The controller derives readiness from the frozen SHA-256 of `docs/dev/evidence/dependency-schedule.json` `schedule_constraints`. Every predecessor must be accepted on `main`; manifest drift fails closed.
+- Planner may run before path leasing. Before an execute gate is applied, the controller atomically leases every exact non-deferred write path. A collision blocks that child without granting execution. Deferred shared paths are forbidden to the draft Executor and are reconciled only after serialized refresh.
+- A passed draft review is `DRAFT_REVIEWED`, not acceptance evidence and not commit authority. Reviewed drafts retain their leases while queued.
+- Exactly one integration transaction may run. It archives and hashes the reviewed draft, compares its paths with upstream changes, and recreates the Task directly above latest accepted `main`. It never rebases, cherry-picks, or resolves semantic conflicts mechanically. Overlap or deferred work returns the same Task to Planner; an exact disjoint replay still requires a fresh Reviewer decision.
+- Interactive approval is lane-scoped by the validated command/worktree context. If more than one lane is active, omission of lane identity fails before applying `APPROVED: EXECUTE` or `APPROVED: COMMIT`; one token never authorizes multiple children.
+- Lane cleanup removes only clean controller-owned worktrees. Dirty, blocked, cancelled, unarchived or unmerged work is preserved. No force removal or force branch deletion is implied.
 
 Transport symmetry:
 
@@ -209,7 +224,7 @@ Transport symmetry:
 
 ### 2.10 Quick-Fix mode
 
-`quick-fix` is an explicit schema-v3, interactive, chat-direct exception for an
+`quick-fix` is an explicit versioned, interactive, chat-direct exception for an
 owner who does not want to activate the atomic Task workflow. Its name does not
 limit task size: broad or multi-file work is permitted when the approved dry run
 fully scopes it. It cannot run or become a Goal child.
@@ -340,7 +355,7 @@ Planner identifies documentation impact; Executor applies only approved document
 
 ## 7. Git authority summary
 
-- Goal Controller: no Goal branch, no Goal commit, no direct product mutation; it may prepare runtime Goal/child Task state and invoke the existing Task API sequentially.
+- Goal Controller: no Goal branch, no Goal commit, no direct product mutation; it may prepare runtime Goal/child Task state and invoke the existing Task API sequentially or through explicitly enabled parallel draft lanes.
 - Task Orchestrator: deterministic clean-main entry gate + one Task-branch creation/switch during `TASK_ACTIVATED`; no reasoning conclusions, ordinary commits, merge, or push.
 - Planner: no branch creation/switch and no commits/merge/push.
 - Executor: no branch creation/switch, commits/merge/push.

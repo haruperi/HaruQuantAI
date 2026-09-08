@@ -250,6 +250,65 @@ effort = "high"
         load_runtime_policy(path, legacy_roles={}, default_max_iterations=5)
 
 
+def test_schema_v4_parallel_policy_is_explicit_and_three_lane(tmp_path: Path) -> None:
+    path = tmp_path / "run-config.toml"
+    path.write_text(
+        """schema_version = 4
+mode = "manual"
+approval_policy = "interactive"
+max_iterations = 4
+
+[unattended]
+allow_execute = false
+allow_local_commit = false
+allow_local_merge = false
+
+[recovery]
+enabled = false
+max_escalations = 0
+additional_iterations = 0
+
+[parallel]
+enabled = true
+max_lanes = 3
+lane_names = ["codex", "gemini", "zcode"]
+""",
+        encoding="utf-8",
+    )
+    policy = load_runtime_policy(path, legacy_roles={}, default_max_iterations=5)
+    assert policy.parallel.enabled
+    assert policy.parallel.lane_names == ("codex", "gemini", "zcode")
+
+
+def test_quick_fix_cannot_enable_parallel_policy(tmp_path: Path) -> None:
+    path = tmp_path / "run-config.toml"
+    path.write_text(
+        """schema_version = 4
+mode = "quick-fix"
+approval_policy = "interactive"
+max_iterations = 4
+
+[unattended]
+allow_execute = false
+allow_local_commit = false
+allow_local_merge = false
+
+[recovery]
+enabled = false
+max_escalations = 0
+additional_iterations = 0
+
+[parallel]
+enabled = true
+max_lanes = 3
+lane_names = ["codex", "gemini", "zcode"]
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(RuntimePolicyError, match="Quick-Fix"):
+        load_runtime_policy(path, legacy_roles={}, default_max_iterations=5)
+
+
 def test_schema_v2_never_falls_back_to_tracked_role_configs(tmp_path: Path) -> None:
     path = tmp_path / "run-config.toml"
     _write_policy(path)
