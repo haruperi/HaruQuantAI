@@ -7,11 +7,11 @@ from app.kernel.capability import CapabilityKey
 if TYPE_CHECKING:
     from app.contracts.workspace.administer_settings import AdministerSettingsCapability
     from app.contracts.workspace.artifacts import ArtifactCapability
+    from app.contracts.workspace.build_diagnostics import BuildDiagnosticsCapability
     from app.contracts.workspace.manage_accounts import ManageAccountsCapability
     from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
     from app.contracts.workspace.persistence import PersistenceCapability
     from app.contracts.workspace.ports import (
-        BuildDiagnosticsCapability,
         ConfigureRuntimeCapability,
         DistributeWorkersCapability,
         HostWorkspacesCapability,
