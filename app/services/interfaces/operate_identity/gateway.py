@@ -7,6 +7,9 @@ Purpose:
 
 Key capabilities:
     * Serve operation-discriminated identity requests.
+    * Fallback to default_principal when username is unspecified for
+      operations requiring a principal.
+    * Prevent browser-supplied principal from replacing verified session principal.
     * Map workspace failures to the stable interface failure envelope.
     * Fail closed with CAPABILITY_UNAVAILABLE after disposal.
 
@@ -23,6 +26,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from uuid import uuid7
 
+from app.composition.logging import get_logger
 from app.contracts.common.models import ProblemDetails
 from app.contracts.interfaces.errors import InterfaceFailure
 from app.contracts.interfaces.models import (
@@ -37,6 +41,8 @@ if TYPE_CHECKING:
     from app.services.interfaces.operate_identity.config import (
         OperateIdentityConfig,
     )
+
+logger = get_logger(__name__)
 
 
 def _failure_from_workspace(failure: WorkspaceFailure) -> InterfaceFailure:
@@ -95,6 +101,10 @@ class IdentityGateway:
         self._provider = provider
         self._config = config
         self._closed = False
+        logger.info(
+            "IdentityGateway initialized",
+            default_principal=config.default_principal,
+        )
 
     @property
     def config(self) -> OperateIdentityConfig:
@@ -118,22 +128,52 @@ class IdentityGateway:
             The operation result on success, otherwise a structured
             interface failure.
         """
+        logger.info(
+            "Serving operate_identity request",
+            request_id=request.request_id,
+            operation=request.operation,
+        )
         if self._closed:
+            logger.warning(
+                "IdentityGateway is disposed; rejecting request",
+                request_id=request.request_id,
+            )
             return _closed_failure()
+
+        username = request.username
+        if request.operation in ("REGISTER", "LOGIN"):
+            if username is None or not username.strip():
+                username = self._config.default_principal
+        elif request.operation in ("ME", "LOGOUT"):
+            # Enforce that browser-supplied principal cannot replace verified
+            # session principal. Verified identity comes strictly from session token.
+            username = None
+
         provider_request = ManageAccountsRequest(
             request_id=request.request_id,
             capability_snapshot_id=request.capability_snapshot_id,
             operation=request.operation,
             account_id=request.account_id,
             workspace_id=request.workspace_id,
-            username=request.username,
+            username=username,
             password=request.password,
             session_token=request.session_token,
             runtime_profile=request.runtime_profile,
         )
         result = await self._provider.manage_accounts(provider_request)
         if isinstance(result, WorkspaceFailure):
+            logger.warning(
+                "ManageAccounts operation failed",
+                request_id=request.request_id,
+                code=result.code,
+                operation=request.operation,
+            )
             return _failure_from_workspace(result)
+        logger.info(
+            "OperateIdentity request succeeded",
+            request_id=request.request_id,
+            operation=request.operation,
+        )
         return OperateIdentitySuccess(
             request_id=request.request_id,
             user=result.user,
@@ -145,6 +185,7 @@ class IdentityGateway:
     def close(self) -> None:
         """Dispose the gateway; safe to call repeatedly."""
         self._closed = True
+        logger.info("IdentityGateway closed")
 
 
 def _run_usage_example() -> None:  # pragma: no cover - usage harness

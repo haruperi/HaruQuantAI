@@ -55,6 +55,20 @@ Unknown keys are rejected with `ValueError`.
 
 None. Account and session state remain owned by the Workspace feature.
 
+## Functional Requirements
+
+| Requirement | Requirement statement | Verification test |
+| --- | --- | --- |
+| FR-TRC-IFACE-OPERATE_IDENTITY-001 | Translate authenticated account/session operations into the Workspace identity contract with current cookie/CSRF semantics. | `tests/services/interfaces/operate_identity/test_traceability.py::test_trc_operate_identity_001` |
+| FR-TRC-IFACE-OPERATE_IDENTITY-002 | Return truthful current identity and permission metadata for UI context and owner requests (browser-supplied principal cannot replace verified session principal). | `tests/services/interfaces/operate_identity/test_traceability.py::test_trc_operate_identity_002` |
+
+## Non-Functional Requirements
+
+| Requirement | Requirement statement | Verification test |
+| --- | --- | --- |
+| NFR-TRC-IFACE-OPERATE_IDENTITY-001 | Heavy CPU/serialization/export work is delegated as admitted jobs; transport keeps bounded pages/events and remains responsive (BM-APP-01 control/metadata p95 <= 250ms and p99 <= 1s). | `tests/services/interfaces/operate_identity/test_lifecycle.py::test_trc_operate_identity_nfr_001` |
+| NFR-TRC-IFACE-OPERATE_IDENTITY-002 | Provider loss or scope revocation returns CAPABILITY_UNAVAILABLE/typed denial without selecting a substitute. | `tests/services/interfaces/operate_identity/test_lifecycle.py::test_trc_operate_identity_nfr_002` |
+
 ## Failure Behavior
 
 - Missing `workspace.manage-accounts@1` provider blocks activation
@@ -76,7 +90,13 @@ Interfaces features stay active.
 
 ## Evidence
 
-Run the bounded executable demonstration with:
+Run the verified test suite:
+
+```powershell
+uv run pytest tests/services/interfaces/operate_identity/ -o addopts=""
+```
+
+Run the bounded executable demonstration:
 
 ```powershell
 uv run python -m app.services.interfaces.operate_identity._usage
