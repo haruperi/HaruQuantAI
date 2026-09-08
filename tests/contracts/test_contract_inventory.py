@@ -72,7 +72,7 @@ EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
     "analytics": 9,
     "research": 13,
     "portfolio": 8,
-    "orchestration": 9,
+    "orchestration": 10,
     "interfaces": 13,
     "ui": 17,
     "plugins": 7,

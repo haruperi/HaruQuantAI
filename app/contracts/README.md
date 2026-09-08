@@ -364,10 +364,10 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Public records:** `ProjectRef`, `ProjectVersion`, `ProjectGraph`, `TaskDefinition`, `TaskContract`, `TaskState`, `ProjectRunRef`, `TaskRunRef`, `TaskAttemptRef`, `TaskLease`, `TaskCheckpoint`, `TaskOutputCommit`, `ProjectVariable`, `ProjectExpression`, `DomainTaskRequest`, `UtilityTaskRequest`, `ExecutableAllowlistEntry`, `NotificationChannelConfig`, `NotificationTemplate`, `NotificationSession`, `NotificationReceipt`, `JobRecord`, `ProgressEvent`, `ProjectProgress`, `ProjectHistoryEntry`, `NetworkTrainingPlan`, and `NetworkTrainingResult`.
 
-**Capability bundles (9):** `DefineProjectsCapability`, `RunTasksCapability`,
+**Capability bundles (10):** `DefineProjectsCapability`, `RunTasksCapability`,
 `EvaluateConditionsCapability`, `RunDomainTasksCapability`, `RunUtilityTasksCapability`,
-`TrackRunHistoryCapability`, `TrainNetworksCapability`, `ManageJobsCapability`, and
-`DeliverNotificationsCapability`.
+`TrackRunHistoryCapability`, `TrainNetworksCapability`, `ManageJobsCapability`,
+`DeliverNotificationsCapability`, and `ReserveResourcesCapability`.
 
 ### 4.10 `app/contracts/interfaces/`
 
