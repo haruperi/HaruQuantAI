@@ -1,0 +1,12 @@
+{
+  "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
+  "task_id": "1.15",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "baseline_commit": "d583e4c99204c3510f6363ad8e5154af01b1096f",
+  "requirements": [
+    {"id": "FR-AGT-VALIDATE_MANDATE", "status": "IMPLEMENTED"},
+    {"id": "FR-AGT-ENFORCE_AUTHORITY_BOUNDARY", "status": "IMPLEMENTED"},
+    {"id": "FR-AGT-FAIL_CLOSED_ON_MANDATE", "status": "IMPLEMENTED"}
+  ],
+  "review": {"reviewer_verdict": "PENDING", "reviewer_notes": "CI/reviewer evidence must replace IMPLEMENTED_UNVERIFIED."}
+}
