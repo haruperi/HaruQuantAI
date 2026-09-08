@@ -1,0 +1,10 @@
+{
+  "feature_id": "FEAT-AGT-OPERATE_RUNS", "task_id": "1.19", "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id":"FR-AGT-RECORD_OPERATIONS","status":"IMPLEMENTED"},
+    {"id":"FR-AGT-CONTAIN_INCIDENTS","status":"IMPLEMENTED"},
+    {"id":"FR-AGT-VALIDATE_REPLAY","status":"IMPLEMENTED"},
+    {"id":"FR-AGT-PUBLISH_AGENTIC_READINESS","status":"IMPLEMENTED"}
+  ],
+  "review":{"reviewer_verdict":"PENDING","reviewer_notes":"CI/reviewer evidence pending."}
+}
