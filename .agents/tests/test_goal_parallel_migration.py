@@ -31,6 +31,25 @@ dependency_schedule = "docs/dev/evidence/dependency-schedule.json"
     assert spec["lane_names"] == ["codex", "gemini", "zcode"]
 
 
+def test_parallel_state_discards_sequential_child_chat_handoff(
+    tmp_path: Path,
+) -> None:
+    parallel = __import__("parallel_goal_engine")
+    schedule = tmp_path / "schedule.json"
+    schedule.write_text(
+        '{"dag_properties":{"is_acyclic":true},"phases":[],"schedule_constraints":[]}',
+        encoding="utf-8",
+    )
+
+    state = parallel.create_parallel_state(
+        {"active_child": None, "child_chat_handoff": {"status": "REQUIRED"}},
+        lanes=["codex", "gemini", "zcode"],
+        schedule_path=schedule,
+    )
+
+    assert "child_chat_handoff" not in state
+
+
 def test_migration_rejects_active_child(orc: ModuleType, cfg: dict[str, Any]) -> None:
     del orc
     goal = __import__("goal_engine")

@@ -106,6 +106,7 @@ def create_parallel_state(
         }
     )
     state.pop("active_child", None)
+    state.pop("child_chat_handoff", None)
     return state
 
 
