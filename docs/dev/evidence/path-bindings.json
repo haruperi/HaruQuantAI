@@ -242,7 +242,10 @@
         "tests/services/interfaces/operate_identity/test_traceability.py",
         "tests/services/interfaces/operate_identity/test_lifecycle.py"
       ],
-      "existing_test_targets": [],
+      "existing_test_targets": [
+        "tests/services/interfaces/operate_identity/test_traceability.py",
+        "tests/services/interfaces/operate_identity/test_lifecycle.py"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_IDENTITY/acceptance.json"
     },
     {

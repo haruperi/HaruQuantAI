@@ -365,8 +365,12 @@
       "state_ownership": "Existing settings versions; secrets by reference only.",
       "primary_capability": "workspace.administer-settings@1",
       "contract_target": "app/contracts/workspace/administer_settings.py",
-      "contract_target_exists": false,
-      "public_symbols": [],
+      "contract_target_exists": true,
+      "public_symbols": [
+        "AdministerSettingsCapability",
+        "SettingsConflictError",
+        "SettingsValidationError"
+      ],
       "binding_state": "SELECTED_CONTRACT_TARGET_NOT_RUNTIME_CERTIFICATION",
       "operation_scope": "ADMINISTER SETTINGS",
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
@@ -10404,8 +10408,10 @@
       "state_ownership": "Scoped contribution handles and immutable manifests; no shared domain data ownership.",
       "primary_capability": "plugins.register-contributions@1",
       "contract_target": "app/contracts/plugins/register_contributions.py",
-      "contract_target_exists": false,
-      "public_symbols": [],
+      "contract_target_exists": true,
+      "public_symbols": [
+        "ContributionDisposer"
+      ],
       "binding_state": "SELECTED_CONTRACT_TARGET_NOT_RUNTIME_CERTIFICATION",
       "operation_scope": "REGISTER CONTRIBUTIONS",
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",

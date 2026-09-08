@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0",
   "source": "docs/dev/Feature_Requirement_Traceability_Register.md",
-  "source_sha256": "4e3f60f0f5166bf372e51a0c991f3d312a998049b5a44e1db7d9d5e876575b58",
+  "source_sha256": "5035ba4e81f3c62efcf6a40edc678c3a03aa52c5d71a3b867e728ba0d53e27d2",
   "features": [
     {
       "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
@@ -357,8 +357,12 @@
       "state_ownership": "Existing settings versions; secrets by reference only.",
       "primary_capability": "workspace.administer-settings@1",
       "contract_target": "app/contracts/workspace/administer_settings.py",
-      "contract_target_exists": false,
-      "public_symbols": [],
+      "contract_target_exists": true,
+      "public_symbols": [
+        "AdministerSettingsCapability",
+        "SettingsConflictError",
+        "SettingsValidationError"
+      ],
       "binding_state": "SELECTED_CONTRACT_TARGET_NOT_RUNTIME_CERTIFICATION",
       "operation_scope": "ADMINISTER SETTINGS",
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
@@ -10396,8 +10400,10 @@
       "state_ownership": "Scoped contribution handles and immutable manifests; no shared domain data ownership.",
       "primary_capability": "plugins.register-contributions@1",
       "contract_target": "app/contracts/plugins/register_contributions.py",
-      "contract_target_exists": false,
-      "public_symbols": [],
+      "contract_target_exists": true,
+      "public_symbols": [
+        "ContributionDisposer"
+      ],
       "binding_state": "SELECTED_CONTRACT_TARGET_NOT_RUNTIME_CERTIFICATION",
       "operation_scope": "REGISTER CONTRIBUTIONS",
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",

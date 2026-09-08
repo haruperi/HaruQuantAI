@@ -5,6 +5,7 @@
   "status": "ACCEPTED",
   "owner_specification": "app/services/interfaces/README.md",
   "baseline_commit": "4c01fff53b79d6d1d1157f0b17553e3e6104d248",
+  "acceptance_commit": "task-closeout:20260908-175504-814467-complete-selected-implementation-entries-1.13-operate-identity",
   "requirements": [
     {
       "id": "FR-TRC-IFACE-OPERATE_IDENTITY-001",
