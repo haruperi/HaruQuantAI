@@ -99,10 +99,62 @@ evidence recorded in
 
 ## Usage
 
-Run the bounded offline scenario with:
+### Interactive Python API Walkthrough
+
+```python
+import asyncio
+from uuid import uuid7
+from app.contracts.workspace.models import ManageAccountsRequest
+from app.services.workspace.execute_persistence.execute_persistence import ExecutePersistenceService
+from app.services.workspace.manage_accounts.accounts import AccountService
+from app.services.workspace.manage_accounts.config import ManageAccountsConfig
+
+async def main() -> None:
+    # 1. Initialize services pointing to the central haruquantai.db
+    persistence = ExecutePersistenceService()
+    accounts = AccountService(persistence, ManageAccountsConfig())
+
+    # 2. Register a new user
+    reg_req = ManageAccountsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="REGISTER",
+        username="trader_alice",
+        password="SuperSecurePassword123!",  # pragma: allowlist secret
+        runtime_profile="research",
+    )
+    reg_res = await accounts.manage_accounts(reg_req)
+    print(f"Registered user: {reg_res.user.username} (ID: {reg_res.user.user_id})")
+
+    # 3. Revalidate current session via 'ME'
+    me_req = ManageAccountsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="ME",
+        session_token=reg_res.session_token,
+    )
+    me_res = await accounts.manage_accounts(me_req)
+    print(f"Session valid for: {me_res.user.username}, expires: {me_res.user.expires_at}")
+
+    # 4. Logout (revokes session token)
+    logout_req = ManageAccountsRequest(
+        request_id=str(uuid7()),
+        capability_snapshot_id=str(uuid7()),
+        operation="LOGOUT",
+        session_token=reg_res.session_token,
+    )
+    logout_res = await accounts.manage_accounts(logout_req)
+    print(f"Logged out: {logout_res.revoked}")
+
+asyncio.run(main())
+```
+
+### Bounded Offline CLI Verification
+
+Run the comprehensive offline verification scenario with:
 
 ```powershell
-uv run --frozen python -m app.services.workspace.manage_accounts._usage
+uv run python -m app.services.workspace.manage_accounts._usage
 ```
 
 It mounts the public persistence provider through entry-point discovery, proves

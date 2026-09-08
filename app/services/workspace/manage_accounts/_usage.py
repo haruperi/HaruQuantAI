@@ -89,7 +89,7 @@ def _request(operation: str, **values: object) -> ManageAccountsRequest:
     )
 
 
-async def _run_usage_example() -> None:
+async def _run_usage_example() -> None:  # noqa: PLR0915
     """Exercise scoped identity, denial, revalidation, retention, and cleanup.
 
     Raises:
@@ -125,6 +125,8 @@ async def _run_usage_example() -> None:
         )
         provider = registry.require(MANAGE_ACCOUNTS_CAPABILITY)
 
+        print("Executing Manage Accounts (_usage) scenarios...")
+        print("[1/4] Registering user with scrypt password hashing...")
         registered = await provider.manage_accounts(
             _request(
                 "REGISTER",
@@ -136,13 +138,20 @@ async def _run_usage_example() -> None:
             raise RuntimeError("usage registration did not succeed")
         session_token = registered.session_token
         captured = registered.user
+        print(f"      Registered user: {captured.username} (ID: {captured.user_id})")
 
+        print("[2/4] Validating active session claims via ME...")
         current = await provider.manage_accounts(
             _request("ME", session_token=session_token)
         )
         if not isinstance(current, ManageAccountsSuccess) or current.user != captured:
             raise RuntimeError("usage current-scope verification failed")
+        print(
+            f"      Session valid for: {current.user.username}, "
+            f"expires: {current.user.expires_at}"
+        )
 
+        print("[3/4] Enforcing scope isolation (mismatched account/workspace)...")
         wrong_scope = await provider.manage_accounts(
             ManageAccountsRequest(
                 request_id=str(uuid7()),
@@ -157,7 +166,9 @@ async def _run_usage_example() -> None:
             raise RuntimeError(  # noqa: TRY004 - verifies a domain result.
                 "usage wrong-account verification did not fail"
             )
+        print("      Mismatched scope access denied successfully.")
 
+        print("[4/4] Revoking session via LOGOUT and asserting revalidation denial...")
         await provider.manage_accounts(_request("LOGOUT", session_token=session_token))
         revalidated = await provider.manage_accounts(
             _request("ME", session_token=session_token)
@@ -166,6 +177,7 @@ async def _run_usage_example() -> None:
             raise RuntimeError(  # noqa: TRY004 - verifies a domain result.
                 "usage revoked snapshot was trusted"
             )
+        print("      Revoked session token denied on subsequent ME revalidation.")
 
         service = cast("AccountService", provider)
         audit_rows = service.safe_session_audit_records(
@@ -206,10 +218,7 @@ async def _run_usage_example() -> None:
 
         await replacement_scope.close()
         await persistence_scope.close()
-        print(
-            "Manage Accounts usage: scoped verification, denial, revalidation, "
-            "retention, and cleanup passed."
-        )
+        print("[SUCCESS] Manage Accounts usage: all scenarios passed.")
 
 
 def main() -> None:
