@@ -1,5 +1,5 @@
 /**
- * Analytics chart primitive tests (FEAT-UI-32, P3-T03).
+ * Analytics chart primitive tests (FEAT-UI-RESEARCH_WORKBENCH, P3-T03).
  *
  * Every chart must declare its source payload, unit, sample count, truncation
  * state, and unavailable reason, and must offer the same evidence as a table

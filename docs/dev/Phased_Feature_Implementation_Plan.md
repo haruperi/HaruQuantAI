@@ -228,7 +228,7 @@ Review source reconciliation, 205 one-to-one task slots, canonical README entrie
 
 <a id="task-1-01"></a>
 
-### - [x] Task 1.01 — FEAT-UI-01 — Compose and restore the research workspace
+### - [x] Task 1.01 — FEAT-UI-COMPOSE_WORKSPACE — Compose and restore the research workspace
 
 **Status:** `COMPLETE` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
@@ -244,15 +244,15 @@ The user can add, remove, dock, tab, resize and restore independently registered
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-01-001 | Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry. |
-| FR-TRC-UI-01-002 | Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery. |
-| FR-TRC-UI-01-003 | Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery. |
-| FR-TRC-UI-01-004 | Keep closing an observer distinct from cancelling its accepted owner job. |
+| FR-TRC-UI-COMPOSE_WORKSPACE-001 | Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry. |
+| FR-TRC-UI-COMPOSE_WORKSPACE-002 | Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery. |
+| FR-TRC-UI-COMPOSE_WORKSPACE-003 | Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery. |
+| FR-TRC-UI-COMPOSE_WORKSPACE-004 | Keep closing an observer distinct from cancelling its accepted owner job. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-01-001 | Each widget and registration proves exact cleanup and isolated layout failure. |
+| NFR-TRC-UI-COMPOSE_WORKSPACE-001 | Each widget and registration proves exact cleanup and isolated layout failure. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -261,24 +261,24 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-01-001 | Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. |
-| AT-UI-01-002 | One invalid/missing widget does not discard valid siblings; secrets, strategies, raw rows and provider objects never enter saved layout. |
-| AT-UI-01-003 | Persist/restore round-trips panel topology and stable identity; unsupported cross-window behavior is explicitly disabled rather than falsely advertised. |
-| AT-UI-01-004 | Unmount releases timers/listeners/workers/requests but a running backtest continues unless the explicit owner cancellation command is issued. |
-| ATN-UI-01-001 | 100 enable/disable cycles, physical widget removal and partially corrupt persisted layouts leave no leaked effect or lost valid sibling. |
+| AT-UI-COMPOSE_WORKSPACE-001 | Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. |
+| AT-UI-COMPOSE_WORKSPACE-002 | One invalid/missing widget does not discard valid siblings; secrets, strategies, raw rows and provider objects never enter saved layout. |
+| AT-UI-COMPOSE_WORKSPACE-003 | Persist/restore round-trips panel topology and stable identity; unsupported cross-window behavior is explicitly disabled rather than falsely advertised. |
+| AT-UI-COMPOSE_WORKSPACE-004 | Unmount releases timers/listeners/workers/requests but a running backtest continues unless the explicit owner cancellation command is issued. |
+| ATN-UI-COMPOSE_WORKSPACE-001 | 100 enable/disable cycles, physical widget removal and partially corrupt persisted layouts leave no leaked effect or lost valid sibling. |
 
 
 **Acceptance test targets:** `app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx`; `app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compose and restore the research workspace). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-01/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-01`
+**Commit message:** `feat(ui): complete FEAT-UI-COMPOSE_WORKSPACE`
 
 **Accepted commit:** `task-closeout:20260907-203821-559690-v3-phases-1-16-1.01-01`.
 
@@ -286,7 +286,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-02"></a>
 
-### - [x] Task 1.02 — FEAT-UI-14 — Call the typed backend and resume observation
+### - [x] Task 1.02 — FEAT-UI-TYPED_BACKEND — Call the typed backend and resume observation
 
 **Status:** `COMPLETE` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
@@ -302,13 +302,13 @@ Widgets share compatible authenticated requests, typed errors and reconnect beha
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-14-001 | Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts. |
-| FR-TRC-UI-14-002 | Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions. |
+| FR-TRC-UI-TYPED_BACKEND-001 | Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts. |
+| FR-TRC-UI-TYPED_BACKEND-002 | Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-14-001 | Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-TYPED_BACKEND-001 | Removing FEAT-UI-TYPED_BACKEND withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -317,22 +317,22 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-14-001 | Schema drift and wrong response shapes fail visibly; no unchecked any/object fallback supplies a business value. |
-| AT-UI-14-002 | Mutations are retried only by their original idempotency identity and reconciliation policy; navigation aborts stale observations. |
-| ATN-UI-14-001 | Disable and physically remove clients; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-TYPED_BACKEND-001 | Schema drift and wrong response shapes fail visibly; no unchecked any/object fallback supplies a business value. |
+| AT-UI-TYPED_BACKEND-002 | Mutations are retried only by their original idempotency identity and reconciliation policy; navigation aborts stale observations. |
+| ATN-UI-TYPED_BACKEND-001 | Disable and physically remove clients; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/clients/__tests__/traceability.test.ts`; `app/ui/src/clients/__tests__/lifecycle.test.ts`. The exact register test symbols and audited path binding are retained in terminal evidence.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Call the typed backend and resume observation). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Schema drift and wrong response shapes fail visibly; no unchecked any/object fallback supplies a business value. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-14/acceptance.json`. Terminal Executor results are recorded with Reviewer authority still pending.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-TYPED_BACKEND/acceptance.json`. Terminal Executor results are recorded with Reviewer authority still pending.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-14`
+**Commit message:** `feat(ui): complete FEAT-UI-TYPED_BACKEND`
 
 **Accepted commit:** `task-closeout:20260907-203821-559690-v3-phases-1-16-1.02-14` — pending the authorized Task commit and no-ff merge transaction.
 
@@ -1074,7 +1074,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-16"></a>
 
-### - [ ] Task 1.16 — FEAT-UI-17 — Present session access and scope changes
+### - [ ] Task 1.16 — FEAT-UI-SESSION_ACCESS — Present session access and scope changes
 
 **Status:** `PARTIAL` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
@@ -1090,13 +1090,13 @@ The user sees why a page or action is unavailable without browser logic becoming
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-17-001 | Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change. |
-| FR-TRC-UI-17-002 | Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework. |
+| FR-TRC-UI-SESSION_ACCESS-001 | Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change. |
+| FR-TRC-UI-SESSION_ACCESS-002 | Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-17-001 | Removing FEAT-UI-17 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-SESSION_ACCESS-001 | Removing FEAT-UI-SESSION_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -1105,22 +1105,22 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-17-001 | Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. |
-| AT-UI-17-002 | A browser toggle cannot authorize a server request; no replacement SPA/authentication system is introduced. |
-| ATN-UI-17-001 | Disable and physically remove app; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-SESSION_ACCESS-001 | Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. |
+| AT-UI-SESSION_ACCESS-002 | A browser toggle cannot authorize a server request; no replacement SPA/authentication system is introduced. |
+| ATN-UI-SESSION_ACCESS-001 | Disable and physically remove app; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/app/__tests__/traceability.test.tsx`; `app/ui/src/app/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Present session access and scope changes). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-17/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `fix(ui): complete FEAT-UI-17`
+**Commit message:** `fix(ui): complete FEAT-UI-SESSION_ACCESS`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -1710,7 +1710,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-27"></a>
 
-### - [ ] Task 1.27 — FEAT-UI-16 — Navigate capabilities and explain workspace controls
+### - [ ] Task 1.27 — FEAT-UI-WORKSPACE_NAVIGATION — Navigate capabilities and explain workspace controls
 
 **Status:** `PARTIAL` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
@@ -1726,14 +1726,14 @@ The user finds available tools, recent resources, help and health without enteri
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-16-001 | Present compact research navigation, global job indicators, recent items and commands from actual registered capability/widget metadata. |
-| FR-TRC-UI-16-002 | Provide contextual control help, readiness checklist, original examples and links to authorized reports/settings. |
-| FR-TRC-UI-16-003 | Preserve keyboard navigation, selected workspace/account orientation and safe focus after panel changes. |
+| FR-TRC-UI-WORKSPACE_NAVIGATION-001 | Present compact research navigation, global job indicators, recent items and commands from actual registered capability/widget metadata. |
+| FR-TRC-UI-WORKSPACE_NAVIGATION-002 | Provide contextual control help, readiness checklist, original examples and links to authorized reports/settings. |
+| FR-TRC-UI-WORKSPACE_NAVIGATION-003 | Preserve keyboard navigation, selected workspace/account orientation and safe focus after panel changes. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-16-001 | Removing FEAT-UI-16 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-WORKSPACE_NAVIGATION-001 | Removing FEAT-UI-WORKSPACE_NAVIGATION withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -1742,23 +1742,23 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-16-001 | Missing providers disable only affected actions with a reason; no menu item is declared operational from documentation alone. |
-| AT-UI-16-002 | Help describes declared semantics and never invents a live value or qualification state. |
-| AT-UI-16-003 | Keyboard-only flows reach every available command and restore focus to a valid visible control. |
-| ATN-UI-16-001 | Disable and physically remove layout; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-WORKSPACE_NAVIGATION-001 | Missing providers disable only affected actions with a reason; no menu item is declared operational from documentation alone. |
+| AT-UI-WORKSPACE_NAVIGATION-002 | Help describes declared semantics and never invents a live value or qualification state. |
+| AT-UI-WORKSPACE_NAVIGATION-003 | Keyboard-only flows reach every available command and restore focus to a valid visible control. |
+| ATN-UI-WORKSPACE_NAVIGATION-001 | Disable and physically remove layout; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/components/layout/__tests__/traceability.test.tsx`; `app/ui/src/components/layout/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Navigate capabilities and explain workspace controls). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Missing providers disable only affected actions with a reason; no menu item is declared operational from documentation alone. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-16/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `fix(ui): complete FEAT-UI-16`
+**Commit message:** `fix(ui): complete FEAT-UI-WORKSPACE_NAVIGATION`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -1766,7 +1766,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-28"></a>
 
-### - [ ] Task 1.28 — FEAT-UI-13 — Review effective settings and safe configuration changes
+### - [ ] Task 1.28 — FEAT-UI-SYSTEM_SETTINGS — Review effective settings and safe configuration changes
 
 **Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
@@ -1782,14 +1782,14 @@ The user edits settings with typed validation, explicit defaults, impacts and se
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-13-001 | Render all CAT-SETTINGS categories, effective defaults/overrides, narrower policy, supported values and restart/remount impact. |
-| FR-TRC-UI-13-002 | Support load/save/reset/diff/presets with dirty-state protection and field/summary owner errors. |
-| FR-TRC-UI-13-003 | Render SMTP test and remote/MCP status through permission-gated typed actions with no credential values. |
+| FR-TRC-UI-SYSTEM_SETTINGS-001 | Render all CAT-SETTINGS categories, effective defaults/overrides, narrower policy, supported values and restart/remount impact. |
+| FR-TRC-UI-SYSTEM_SETTINGS-002 | Support load/save/reset/diff/presets with dirty-state protection and field/summary owner errors. |
+| FR-TRC-UI-SYSTEM_SETTINGS-003 | Render SMTP test and remote/MCP status through permission-gated typed actions with no credential values. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-13-001 | Removing FEAT-UI-13 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-SYSTEM_SETTINGS-001 | Removing FEAT-UI-SYSTEM_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -1798,23 +1798,23 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-13-001 | A CPU/memory/tick setting cannot silently change historical runs or override a stricter owner policy. |
-| AT-UI-13-002 | A failed update leaves the prior configuration intact; stale expected revisions require explicit conflict handling. |
-| AT-UI-13-003 | Test send names recipient/scope and has its own action; an unconfigured service remains unavailable. |
-| ATN-UI-13-001 | Disable and physically remove system-settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-SYSTEM_SETTINGS-001 | A CPU/memory/tick setting cannot silently change historical runs or override a stricter owner policy. |
+| AT-UI-SYSTEM_SETTINGS-002 | A failed update leaves the prior configuration intact; stale expected revisions require explicit conflict handling. |
+| AT-UI-SYSTEM_SETTINGS-003 | Test send names recipient/scope and has its own action; an unconfigured service remains unavailable. |
+| ATN-UI-SYSTEM_SETTINGS-001 | Disable and physically remove system-settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/widgets/system-settings/__tests__/traceability.test.tsx`; `app/ui/src/widgets/system-settings/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Review effective settings and safe configuration changes). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: A CPU/memory/tick setting cannot silently change historical runs or override a stricter owner policy. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-13/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-13`
+**Commit message:** `feat(ui): complete FEAT-UI-SYSTEM_SETTINGS`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -3586,7 +3586,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-2-31"></a>
 
-### - [ ] Task 2.31 — FEAT-UI-18 — Operate the Data Manager workspace
+### - [ ] Task 2.31 — FEAT-UI-DATA_MANAGER — Operate the Data Manager workspace
 
 **Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
@@ -3602,14 +3602,14 @@ The user discovers, imports, inspects, fixes, exports and updates historical dat
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-18-001 | Render series/reference grids with all CAT-DATA fields and supported source/profile/instrument/session/group/external-series controls. |
-| FR-TRC-UI-18-002 | Preview owner import mappings/counts, quality findings/repairs, timezone clone/merge/export and dependency-aware deletion. |
-| FR-TRC-UI-18-003 | Observe download/import/update jobs with supported pause/resume/stop and authorized bounded raw-data/chart previews. |
+| FR-TRC-UI-DATA_MANAGER-001 | Render series/reference grids with all CAT-DATA fields and supported source/profile/instrument/session/group/external-series controls. |
+| FR-TRC-UI-DATA_MANAGER-002 | Preview owner import mappings/counts, quality findings/repairs, timezone clone/merge/export and dependency-aware deletion. |
+| FR-TRC-UI-DATA_MANAGER-003 | Observe download/import/update jobs with supported pause/resume/stop and authorized bounded raw-data/chart previews. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-18-001 | Removing FEAT-UI-18 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-DATA_MANAGER-001 | Removing FEAT-UI-DATA_MANAGER withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -3618,23 +3618,23 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-18-001 | Filtering/selection/batch actions preserve stable IDs; missing capabilities are explicit and system/protected items cannot be edited locally. |
-| AT-UI-18-002 | A confirmation names exact object/count/dependencies/reversibility/retained artifacts; browser previews never imply backend success. |
-| AT-UI-18-003 | Closing the Data view leaves accepted downloads running; explicit cancellation uses the owner and incomplete coverage stays labelled. |
-| ATN-UI-18-001 | Disable and physically remove workflow; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-DATA_MANAGER-001 | Filtering/selection/batch actions preserve stable IDs; missing capabilities are explicit and system/protected items cannot be edited locally. |
+| AT-UI-DATA_MANAGER-002 | A confirmation names exact object/count/dependencies/reversibility/retained artifacts; browser previews never imply backend success. |
+| AT-UI-DATA_MANAGER-003 | Closing the Data view leaves accepted downloads running; explicit cancellation uses the owner and incomplete coverage stays labelled. |
+| ATN-UI-DATA_MANAGER-001 | Disable and physically remove workflow; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/components/workflow/__tests__/traceability.test.tsx`; `app/ui/src/components/workflow/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Operate the Data Manager workspace). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Filtering/selection/batch actions preserve stable IDs; missing capabilities are explicit and system/protected items cannot be edited locally. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-18/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-18`
+**Commit message:** `feat(ui): complete FEAT-UI-DATA_MANAGER`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -3642,7 +3642,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-2-32"></a>
 
-### - [ ] Task 2.32 — FEAT-UI-04 — Inspect market charts and typed overlays
+### - [ ] Task 2.32 — FEAT-UI-MARKET_CHARTS — Inspect market charts and typed overlays
 
 **Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U2.
 
@@ -3658,14 +3658,14 @@ The user navigates actual market history with sessions, gaps and linked selectio
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-04-001 | Render declared market-series windows, price/volume/layer units, timezone/calendar, gaps and indicator/entry/exit overlays. |
-| FR-TRC-UI-04-002 | Support crosshair/zoom/selection with typed timestamps/series/trade references and bounded LOD/decoding. |
-| FR-TRC-UI-04-003 | Offer keyboard/table equivalents and no-WebGL fallback where applicable. |
+| FR-TRC-UI-MARKET_CHARTS-001 | Render declared market-series windows, price/volume/layer units, timezone/calendar, gaps and indicator/entry/exit overlays. |
+| FR-TRC-UI-MARKET_CHARTS-002 | Support crosshair/zoom/selection with typed timestamps/series/trade references and bounded LOD/decoding. |
+| FR-TRC-UI-MARKET_CHARTS-003 | Offer keyboard/table equivalents and no-WebGL fallback where applicable. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-04-001 | Removing FEAT-UI-04 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-MARKET_CHARTS-001 | Removing FEAT-UI-MARKET_CHARTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -3674,17 +3674,17 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-04-001 | Unavailable/wrong-series market data is not substituted; source version and synthetic/recorded labels remain visible. |
-| AT-UI-04-002 | Changing zoom changes display sampling only; numeric calculations remain unchanged and past selections retain their identity. |
-| AT-UI-04-003 | GPU-off and color-blind/keyboard fixtures preserve access to equivalent values and labels. |
-| ATN-UI-04-001 | Disable and physically remove chart; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-MARKET_CHARTS-001 | Unavailable/wrong-series market data is not substituted; source version and synthetic/recorded labels remain visible. |
+| AT-UI-MARKET_CHARTS-002 | Changing zoom changes display sampling only; numeric calculations remain unchanged and past selections retain their identity. |
+| AT-UI-MARKET_CHARTS-003 | GPU-off and color-blind/keyboard fixtures preserve access to equivalent values and labels. |
+| ATN-UI-MARKET_CHARTS-001 | Disable and physically remove chart; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/widgets/chart/__tests__/traceability.test.tsx`; `app/ui/src/widgets/chart/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect market charts and typed overlays). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Unavailable/wrong-series market data is not substituted; source version and synthetic/recorded labels remain visible. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-04/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json`. Record results; no pass is prefilled.
 
 **Later-provider qualification:** FEAT-IFACE-OPERATE_RESULTS (Task 4.19, Phase 4). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
@@ -3694,7 +3694,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-04`
+**Commit message:** `feat(ui): complete FEAT-UI-MARKET_CHARTS`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -5818,7 +5818,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Later-provider qualification:** FEAT-ANA-FILTER_CORRELATION (Task 10.03, Phase 10); FEAT-ANA-PROVIDE_CUSTOM_ANALYSIS (Task 12.07, Phase 12). Complete this adapter now, prove its explicit unavailable path, and do not claim the future operation works until the provider task publishes real integration evidence. The exact conditions are in the owning README and `Operation_Readiness.md`.
 
-**This provider also qualifies earlier consumers:** Task 2.32 (FEAT-UI-04). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
+**This provider also qualifies earlier consumers:** Task 2.32 (FEAT-UI-MARKET_CHARTS). Run those owner-bound integration checks through unchanged public contracts and update their operation evidence; these are not new feature tasks.
 
 #### iv. Definition of Done and commit
 
@@ -5832,7 +5832,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-4-20"></a>
 
-### - [ ] Task 4.20 — FEAT-UI-27 — Configure and observe a canonical backtest
+### - [ ] Task 4.20 — FEAT-UI-RUN_BACKTEST — Configure and observe a canonical backtest
 
 **Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U2.
 
@@ -5848,14 +5848,14 @@ A user can backtest the selected strategy with explicit execution fidelity and s
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-27-001 | Present strategy revision/parameters, primary/additional data, tick-method evidence class/coverage, costs, account, sample, output and resource preview. |
-| FR-TRC-UI-27-002 | Submit one governed owner request, observe progress/log/warnings and expose supported cancel/pause/retry. |
-| FR-TRC-UI-27-003 | Open the committed Analytics result by stable ID and retain partial/unavailable/failed states. |
+| FR-TRC-UI-RUN_BACKTEST-001 | Present strategy revision/parameters, primary/additional data, tick-method evidence class/coverage, costs, account, sample, output and resource preview. |
+| FR-TRC-UI-RUN_BACKTEST-002 | Submit one governed owner request, observe progress/log/warnings and expose supported cancel/pause/retry. |
+| FR-TRC-UI-RUN_BACKTEST-003 | Open the committed Analytics result by stable ID and retain partial/unavailable/failed states. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-27-001 | Removing FEAT-UI-27 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-RUN_BACKTEST-001 | Removing FEAT-UI-RUN_BACKTEST withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -5864,23 +5864,23 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-27-001 | No method is silently selected; actual source/emitted/estimated tick counts are labelled correctly. |
-| AT-UI-27-002 | Double-click Start returns one run; pause waits for acknowledgement/checkpoint; retry creates the owner’s linked identity. |
-| AT-UI-27-003 | A browser timeout or closed panel cannot be relabelled a failed/completed simulation without owner evidence. |
-| ATN-UI-27-001 | Disable and physically remove simulator; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-RUN_BACKTEST-001 | No method is silently selected; actual source/emitted/estimated tick counts are labelled correctly. |
+| AT-UI-RUN_BACKTEST-002 | Double-click Start returns one run; pause waits for acknowledgement/checkpoint; retry creates the owner’s linked identity. |
+| AT-UI-RUN_BACKTEST-003 | A browser timeout or closed panel cannot be relabelled a failed/completed simulation without owner evidence. |
+| ATN-UI-RUN_BACKTEST-001 | Disable and physically remove simulator; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/widgets/simulator/__tests__/traceability.test.tsx`; `app/ui/src/widgets/simulator/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Configure and observe a canonical backtest). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: No method is silently selected; actual source/emitted/estimated tick counts are labelled correctly. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-27/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-27`
+**Commit message:** `feat(ui): complete FEAT-UI-RUN_BACKTEST`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -5888,7 +5888,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-4-21"></a>
 
-### - [ ] Task 4.21 — FEAT-UI-32 — Compose the result inspection workspace
+### - [ ] Task 4.21 — FEAT-UI-RESEARCH_WORKBENCH — Compose the result inspection workspace
 
 **Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U2.
 
@@ -5904,14 +5904,14 @@ A selected result opens only compatible registered views with clear completeness
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-32-001 | Discover compatible result views by result kind/schema/capability and restore safe per-view layout/selection. |
-| FR-TRC-UI-32-002 | Expose result/config/data/metric/method/sample/precision/partial/imported provenance and deep links. |
-| FR-TRC-UI-32-003 | Coordinate typed stable selections among independent panels without shared mutable domain state. |
+| FR-TRC-UI-RESEARCH_WORKBENCH-001 | Discover compatible result views by result kind/schema/capability and restore safe per-view layout/selection. |
+| FR-TRC-UI-RESEARCH_WORKBENCH-002 | Expose result/config/data/metric/method/sample/precision/partial/imported provenance and deep links. |
+| FR-TRC-UI-RESEARCH_WORKBENCH-003 | Coordinate typed stable selections among independent panels without shared mutable domain state. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-32-001 | Removing FEAT-UI-32 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-RESEARCH_WORKBENCH-001 | Removing FEAT-UI-RESEARCH_WORKBENCH withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -5920,23 +5920,23 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-32-001 | Removing one panel/provider produces a named unavailable view without breaking other result views. |
-| AT-UI-32-002 | Current Strategy settings cannot silently replace the run-time snapshot; imported results keep source attribution. |
-| AT-UI-32-003 | A trade/result/window selection retains the same owner identity across views and is cleared safely when inaccessible. |
-| ATN-UI-32-001 | Disable and physically remove analytics; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-RESEARCH_WORKBENCH-001 | Removing one panel/provider produces a named unavailable view without breaking other result views. |
+| AT-UI-RESEARCH_WORKBENCH-002 | Current Strategy settings cannot silently replace the run-time snapshot; imported results keep source attribution. |
+| AT-UI-RESEARCH_WORKBENCH-003 | A trade/result/window selection retains the same owner identity across views and is cleared safely when inaccessible. |
+| ATN-UI-RESEARCH_WORKBENCH-001 | Disable and physically remove analytics; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/widgets/analytics/__tests__/traceability.test.tsx`; `app/ui/src/widgets/analytics/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Compose the result inspection workspace). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Removing one panel/provider produces a named unavailable view without breaking other result views. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-32/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-32`
+**Commit message:** `feat(ui): complete FEAT-UI-RESEARCH_WORKBENCH`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -6292,7 +6292,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-5-01"></a>
 
-### - [ ] Task 5.01 — FEAT-UI-15 — Capture current authorized widget context
+### - [ ] Task 5.01 — FEAT-UI-SESSION_CONTEXT — Capture current authorized widget context
 
 **Status:** `PARTIAL` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U2.
 
@@ -6308,14 +6308,14 @@ Chat and governed previews refer to exactly what the user selected on the curren
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-15-001 | Register exact widget/version/generation contributions containing stable public refs, selection, filters, safe labels/errors, focus, capture/expiry/hash and schema. |
-| FR-TRC-UI-15-002 | Capture a new bounded WorkspaceContextSnapshot for every message and drop unmounted/expired contributions. |
-| FR-TRC-UI-15-003 | Keep account/permission projection and stable typed cross-widget selection distinct from authoritative market/result facts. |
+| FR-TRC-UI-SESSION_CONTEXT-001 | Register exact widget/version/generation contributions containing stable public refs, selection, filters, safe labels/errors, focus, capture/expiry/hash and schema. |
+| FR-TRC-UI-SESSION_CONTEXT-002 | Capture a new bounded WorkspaceContextSnapshot for every message and drop unmounted/expired contributions. |
+| FR-TRC-UI-SESSION_CONTEXT-003 | Keep account/permission projection and stable typed cross-widget selection distinct from authoritative market/result facts. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-15-001 | Removing FEAT-UI-15 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-SESSION_CONTEXT-001 | Removing FEAT-UI-SESSION_CONTEXT withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -6324,23 +6324,23 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-15-001 | Raw DOM, screenshots, credentials, private state and executable instruction fields are rejected. |
-| AT-UI-15-002 | A removed widget never contributes to the next turn; navigation cannot rewrite a turn’s already-pinned snapshot. |
-| AT-UI-15-003 | A manipulated browser metric cannot override an owner-refreshed value; cross-account context is denied. |
-| ATN-UI-15-001 | Disable and physically remove context; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-SESSION_CONTEXT-001 | Raw DOM, screenshots, credentials, private state and executable instruction fields are rejected. |
+| AT-UI-SESSION_CONTEXT-002 | A removed widget never contributes to the next turn; navigation cannot rewrite a turn’s already-pinned snapshot. |
+| AT-UI-SESSION_CONTEXT-003 | A manipulated browser metric cannot override an owner-refreshed value; cross-account context is denied. |
+| ATN-UI-SESSION_CONTEXT-001 | Disable and physically remove context; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/context/__tests__/traceability.test.tsx`; `app/ui/src/context/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Capture current authorized widget context). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Raw DOM, screenshots, credentials, private state and executable instruction fields are rejected. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-15/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json`. Record results; no pass is prefilled.
 
 #### iv. Definition of Done and commit
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `fix(ui): complete FEAT-UI-15`
+**Commit message:** `fix(ui): complete FEAT-UI-SESSION_CONTEXT`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 
@@ -7546,7 +7546,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-6-11"></a>
 
-### - [ ] Task 6.11 — FEAT-UI-28 — Inspect research campaigns, protocols and evidence
+### - [ ] Task 6.11 — FEAT-UI-EXECUTE_ORDERS — Inspect research campaigns, protocols and evidence
 
 **Status:** `EXISTING_UNVERIFIED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U3.
 
@@ -7562,14 +7562,14 @@ The user can see a research question, its attempts and qualification evidence wi
 
 | FR ID | Required behaviour |
 | --- | --- |
-| FR-TRC-UI-28-001 | Display canonical campaign/family/protocol/sample/budget/holdout identities, attempt conservation and receiver lineage. |
-| FR-TRC-UI-28-002 | Present research draft, supported evidence and qualified outcomes as different states, with exact owner reasons and limitations. |
-| FR-TRC-UI-28-003 | Expose compatible research navigation, comparison and immutable artifact history through registered contributions. |
+| FR-TRC-UI-EXECUTE_ORDERS-001 | Display canonical campaign/family/protocol/sample/budget/holdout identities, attempt conservation and receiver lineage. |
+| FR-TRC-UI-EXECUTE_ORDERS-002 | Present research draft, supported evidence and qualified outcomes as different states, with exact owner reasons and limitations. |
+| FR-TRC-UI-EXECUTE_ORDERS-003 | Expose compatible research navigation, comparison and immutable artifact history through registered contributions. |
 
 
 | Local NFR ID | Required quality or boundary |
 | --- | --- |
-| NFR-TRC-UI-28-001 | Removing FEAT-UI-28 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
+| NFR-TRC-UI-EXECUTE_ORDERS-001 | Removing FEAT-UI-EXECUTE_ORDERS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. |
 
 
 Applicable shared NFRs, original source refinements and catalogue obligations are mandatory through the owning README; they are not new tasks.
@@ -7578,17 +7578,17 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 | Acceptance ID | Expected result / oracle |
 | --- | --- |
-| AT-UI-28-001 | Failed/null/refused/invalid/pruned and cache-hit evidence is not hidden by winner-only filters. |
-| AT-UI-28-002 | A draft or successful worker job cannot look like research qualification or live approval. |
-| AT-UI-28-003 | Removing Builder/Retester or Agentic leaves the Research evidence browser usable for existing records. |
-| ATN-UI-28-001 | Disable and physically remove research; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| AT-UI-EXECUTE_ORDERS-001 | Failed/null/refused/invalid/pruned and cache-hit evidence is not hidden by winner-only filters. |
+| AT-UI-EXECUTE_ORDERS-002 | A draft or successful worker job cannot look like research qualification or live approval. |
+| AT-UI-EXECUTE_ORDERS-003 | Removing Builder/Retester or Agentic leaves the Research evidence browser usable for existing records. |
+| ATN-UI-EXECUTE_ORDERS-001 | Disable and physically remove research; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 
 **Acceptance test targets:** `app/ui/src/widgets/research/__tests__/traceability.test.tsx`; `app/ui/src/widgets/research/__tests__/lifecycle.test.tsx`. Retain the register test symbols and record any audited path binding.
 
 **Usage example to document and run:** In a blank or Research-template workspace, open this feature's owned surface (Inspect research campaigns, protocols and evidence). Exercise its first listed FR with the Phase 0 pinned resource/role fixture, then repeat with the resource or capability unavailable. Expected: Failed/null/refused/invalid/pruned and cache-hit evidence is not hidden by winner-only filters. Save/reopen presentation state and close the widget; the domain job/data must remain unchanged.
 
-**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-28/acceptance.json`. Record results; no pass is prefilled.
+**Evidence manifest:** `docs/dev/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json`. Record results; no pass is prefilled.
 
 **Phase checkpoint owner:** Run E2E-P06 — Describe an idea, register campaign/protocol/holdout policy, review an HSL draft or base-bound patch, accept the exact candidate, then separately authorize a bounded backtest from the existing UI. Publish `docs/dev/evidence/phases/phase-06.json` before closing this task/phase; use real providers, retained outputs and browser interaction assertions.
 
@@ -7596,7 +7596,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Done when:** DOD-F is satisfied for this feature; every listed acceptance oracle and applicable README/shared/catalogue obligation has evidence; reuse gaps are closed; its documented usage and affected UI workflow pass; no unimplemented owner behaviour remains behind a disabled control. The review and accepted feature commit are linked in the evidence manifest.
 
-**Commit message:** `feat(ui): complete FEAT-UI-28`
+**Commit message:** `feat(ui): complete FEAT-UI-EXECUTE_ORDERS`
 
 **Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
 

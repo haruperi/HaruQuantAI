@@ -1,4 +1,4 @@
-/** Lifecycle and physical-removal acceptance tests for FEAT-UI-01. */
+/** Lifecycle and physical-removal acceptance tests for FEAT-UI-COMPOSE_WORKSPACE. */
 
 import React, { useEffect } from "react";
 import { render, screen } from "@testing-library/react";
@@ -12,7 +12,7 @@ import {
   withdrawWidget,
 } from "../registry";
 
-describe("FEAT-UI-01 lifecycle", () => {
+describe("FEAT-UI-COMPOSE_WORKSPACE lifecycle", () => {
   it("test_trc_host_workspace_nfr_001", () => {
     const original = getWidgetRegistration("markets");
     if (original === undefined) throw new Error("markets registration missing");

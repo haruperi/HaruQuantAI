@@ -132,7 +132,7 @@ workspace_probe = "app.ui.src.widgets.workspaces:feature"
     workspace = next(
         feature
         for feature in current["features"]
-        if feature["feature_id"] == "FEAT-UI-01"
+        if feature["feature_id"] == "FEAT-UI-COMPOSE_WORKSPACE"
     )
 
     assert manifest["inventory"]["registered_entry_points"] == 41

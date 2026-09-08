@@ -1,5 +1,5 @@
 /**
- * Modeling panel (FEAT-UI-28, plan §10.12).
+ * Modeling panel (FEAT-UI-EXECUTE_ORDERS, plan §10.12).
  *
  * Realizes the V1 "Unsupervised Structure" intent under V2 ownership: the
  * preprocessing, PCA variance and loadings, cluster sizes, and risk-factor

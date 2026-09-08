@@ -1,5 +1,5 @@
 /**
- * Stress panel (FEAT-UI-28, plan §10.15).
+ * Stress panel (FEAT-UI-EXECUTE_ORDERS, plan §10.15).
  *
  * A V2-only view over the stress-scenario evidence Research persists. A shock
  * is only shown when it cites a basis Research validated; the panel invents no

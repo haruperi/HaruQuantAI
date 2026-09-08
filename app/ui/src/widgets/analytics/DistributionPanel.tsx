@@ -1,5 +1,5 @@
 /**
- * Distribution and statistics panel (FEAT-UI-32).
+ * Distribution and statistics panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders the Analytics-owned distribution, histogram, outliers, excursions,
  * and duration sections. The panel bins nothing and flags no outlier of its

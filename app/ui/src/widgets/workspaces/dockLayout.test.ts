@@ -1,5 +1,5 @@
 /**
- * Unit tests for the docking layout tree factory (FEAT-UI-01,
+ * Unit tests for the docking layout tree factory (FEAT-UI-COMPOSE_WORKSPACE,
  * FR-UI-024/025/201 in `app/ui/README.md` §4.1).
  */
 import { describe, expect, it } from "vitest";

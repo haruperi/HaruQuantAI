@@ -1,6 +1,6 @@
 # Charting Tools Widget
 
-`FEAT-UI-04` presents Data-owned historical bars, Indicators-owned overlays,
+`FEAT-UI-MARKET_CHARTS` presents Data-owned historical bars, Indicators-owned overlays,
 and non-authoritative drawing and appearance controls.
 
 ## Market-data lifecycle

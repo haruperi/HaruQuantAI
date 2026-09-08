@@ -1,5 +1,5 @@
 /**
- * Curated chart gallery (FEAT-UI-32).
+ * Curated chart gallery (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * One gallery grouped by subject rather than one route per chart. Every chart
  * declares its own source payload, unit, sample count, truncation, and

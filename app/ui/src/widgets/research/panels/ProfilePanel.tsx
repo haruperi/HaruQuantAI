@@ -1,5 +1,5 @@
 /**
- * Profile & Scorecard panel (FEAT-UI-28, plan §10.13).
+ * Profile & Scorecard panel (FEAT-UI-EXECUTE_ORDERS, plan §10.13).
  *
  * Covers the V1 Scorecard using V2 readiness vocabulary. The browser renders
  * the score rows, readiness, and reasons Research published; it never rebuilds

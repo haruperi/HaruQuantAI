@@ -1,5 +1,5 @@
 /**
- * Strict FEAT-UI-13 widget configuration (D-UI pipeline §4.8).
+ * Strict FEAT-UI-SYSTEM_SETTINGS widget configuration (D-UI pipeline §4.8).
  *
  * Unknown fields and invalid values fail loudly; provided fields overlay
  * the documented defaults.

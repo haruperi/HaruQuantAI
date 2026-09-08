@@ -1,5 +1,5 @@
 /**
- * Risk and drawdown panel (FEAT-UI-32).
+ * Risk and drawdown panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders the Analytics-owned drawdown curve, streaks, and risk metrics. Risk
  * figures V2 does not calculate are named explicitly rather than estimated

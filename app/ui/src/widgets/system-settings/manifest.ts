@@ -1,5 +1,5 @@
 /**
- * FEAT-UI-13 typed widget manifest (D-UI pipeline §4.8).
+ * FEAT-UI-SYSTEM_SETTINGS typed widget manifest (D-UI pipeline §4.8).
  *
  * Data only: declares identity, dependencies, placement, effects,
  * accessibility, and removal semantics. Never registers at import time.
@@ -8,7 +8,7 @@
 import type { WidgetManifest } from "../../types/widget-manifest";
 
 export const SYSTEM_SETTINGS_MANIFEST: WidgetManifest = {
-  featureId: "FEAT-UI-13",
+  featureId: "FEAT-UI-SYSTEM_SETTINGS",
   widgetType: "systemSettings",
   widgetVersion: 1,
   title: "System Settings",

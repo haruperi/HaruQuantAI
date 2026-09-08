@@ -1,6 +1,6 @@
 {
   "$schema": "../../evidence-schema.json",
-  "feature_id": "FEAT-UI-14",
+  "feature_id": "FEAT-UI-TYPED_BACKEND",
   "task_id": "1.02",
   "status": "ACCEPTED",
   "owner_specification": "app/ui/README.md",
@@ -8,17 +8,17 @@
   "acceptance_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.02-14",
   "requirements": [
     {
-      "id": "FR-TRC-UI-14-001",
+      "id": "FR-TRC-UI-TYPED_BACKEND-001",
       "status": "PASS",
       "evidence_target": "app/ui/src/clients/__tests__/traceability.test.ts::test_trc_call_typed_backend_001"
     },
     {
-      "id": "FR-TRC-UI-14-002",
+      "id": "FR-TRC-UI-TYPED_BACKEND-002",
       "status": "PASS",
       "evidence_target": "app/ui/src/clients/__tests__/lifecycle.test.ts::test_trc_call_typed_backend_002 and request/stream focused tests"
     },
     {
-      "id": "NFR-TRC-UI-14-001",
+      "id": "NFR-TRC-UI-TYPED_BACKEND-001",
       "status": "PASS",
       "evidence_target": "app/ui/src/clients/__tests__/lifecycle.test.ts::test_trc_call_typed_backend_nfr_001"
     },
@@ -56,11 +56,11 @@
   "stages": {
     "contract": {
       "status": "PASS",
-      "evidence": "Strict Zod wire mirrors and AT-UI-14-001 schema-drift tests"
+      "evidence": "Strict Zod wire mirrors and AT-UI-TYPED_BACKEND-001 schema-drift tests"
     },
     "provider": {
       "status": "NOT_APPLICABLE",
-      "evidence": "FEAT-UI-14 is the presentation transport consumer and owns no backend provider."
+      "evidence": "FEAT-UI-TYPED_BACKEND is the presentation transport consumer and owns no backend provider."
     },
     "composition": {
       "status": "PASS",

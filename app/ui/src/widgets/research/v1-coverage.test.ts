@@ -1,5 +1,5 @@
 /**
- * V1 coverage manifest (FEAT-UI-28, plan §14.4).
+ * V1 coverage manifest (FEAT-UI-EXECUTE_ORDERS, plan §14.4).
  *
  * Every V1 Edge Lab capability resolves here to a V2 route, a V2 component, an
  * owning domain, a test reference, and an explicit status. This exists so a

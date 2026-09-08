@@ -14,7 +14,7 @@
     {
       "phase": 2,
       "checkpoint_task": "2.32",
-      "checkpoint_feature": "FEAT-UI-04",
+      "checkpoint_feature": "FEAT-UI-MARKET_CHARTS",
       "test_target": "app/ui/e2e/research/phase_02.spec.ts",
       "evidence_path": "docs/dev/evidence/phases/phase-02.json",
       "provider_mode": "REAL_LOCAL_ASGI",
@@ -50,7 +50,7 @@
     {
       "phase": 6,
       "checkpoint_task": "6.11",
-      "checkpoint_feature": "FEAT-UI-28",
+      "checkpoint_feature": "FEAT-UI-EXECUTE_ORDERS",
       "test_target": "app/ui/e2e/research/phase_06.spec.ts",
       "evidence_path": "docs/dev/evidence/phases/phase-06.json",
       "provider_mode": "REAL_LOCAL_ASGI",

@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Explicit empty-workspace prompt (FEAT-UI-01, FR-UI-026/197).
+ * Explicit empty-workspace prompt (FEAT-UI-COMPOSE_WORKSPACE, FR-UI-026/197).
  *
  * Rendered by `WorkspaceGrid` when the active workspace has no widgets - for
  * example right after applying the Blank template - so an empty workspace

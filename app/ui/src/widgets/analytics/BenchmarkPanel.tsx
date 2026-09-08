@@ -1,5 +1,5 @@
 /**
- * Benchmark and cost panel (FEAT-UI-32).
+ * Benchmark and cost panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders the Analytics-owned benchmark comparison and cost drag. Relative
  * performance is only shown when the owner supplied a benchmark: comparing a

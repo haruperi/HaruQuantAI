@@ -1,5 +1,5 @@
 /**
- * Display-only Research workbench store (FEAT-UI-28).
+ * Display-only Research workbench store (FEAT-UI-EXECUTE_ORDERS).
  *
  * The URL is the primary navigation state — experiment, run, and stage all
  * live in the route. This store holds only what the URL cannot: an unsaved

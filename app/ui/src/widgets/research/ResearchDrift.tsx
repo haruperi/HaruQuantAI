@@ -1,5 +1,5 @@
 /**
- * Drift monitor (FEAT-UI-28, plan §10.19).
+ * Drift monitor (FEAT-UI-EXECUTE_ORDERS, plan §10.19).
  *
  * Shows baseline, latest observation, metric deltas, threshold breaches, and
  * any advisory suspension proposal Research recorded. The UI never enacts a

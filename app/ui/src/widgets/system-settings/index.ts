@@ -1,5 +1,5 @@
 /**
- * System settings widget barrel (FEAT-UI-13).
+ * System settings widget barrel (FEAT-UI-SYSTEM_SETTINGS).
  */
 
 export { SYSTEM_SETTINGS_MANIFEST } from "./manifest";

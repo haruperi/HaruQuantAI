@@ -1,5 +1,5 @@
 /**
- * Analytics Workspace root shell component (FEAT-UI-32).
+ * Analytics Workspace root shell component (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Exposes the Analytics performance workbench across 7 dedicated sections:
  * - Summary & ratios

@@ -1,5 +1,5 @@
 /**
- * Intelligence panel (FEAT-UI-28, plan §10.14).
+ * Intelligence panel (FEAT-UI-EXECUTE_ORDERS, plan §10.14).
  *
  * A V2-only view over the point-in-time fundamental, sentiment, and
  * applicability evidence Research owns. When no asset class was declared for

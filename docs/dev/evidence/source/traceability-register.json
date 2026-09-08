@@ -1,7 +1,7 @@
 {
   "manifest_version": "2.0",
   "source": "docs/dev/Feature_Requirement_Traceability_Register.md",
-  "source_sha256": "ea7bbee01e6fb51c7059c9a193b931036d7c0cca904524d1ffd2ae3d0d70e9de",
+  "source_sha256": "4e3f60f0f5166bf372e51a0c991f3d312a998049b5a44e1db7d9d5e876575b58",
   "features": [
     {
       "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
@@ -14168,7 +14168,7 @@
       "source_ids": []
     },
     {
-      "feature_id": "FEAT-UI-01",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "title": "Compose and restore the research workspace",
       "owner_path": "app/ui/src/widgets/workspaces",
       "state_ownership": "Non-authoritative versioned layout/config preferences only; domain records remain backend-owned.",
@@ -14201,23 +14201,23 @@
       "operation_gates": [],
       "requirements": [
         {
-          "id": "FR-TRC-UI-01-001",
+          "id": "FR-TRC-UI-COMPOSE_WORKSPACE-001",
           "text": "Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry."
         },
         {
-          "id": "FR-TRC-UI-01-002",
+          "id": "FR-TRC-UI-COMPOSE_WORKSPACE-002",
           "text": "Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery."
         },
         {
-          "id": "FR-TRC-UI-01-003",
+          "id": "FR-TRC-UI-COMPOSE_WORKSPACE-003",
           "text": "Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery."
         },
         {
-          "id": "FR-TRC-UI-01-004",
+          "id": "FR-TRC-UI-COMPOSE_WORKSPACE-004",
           "text": "Keep closing an observer distinct from cancelling its accepted owner job."
         },
         {
-          "id": "NFR-TRC-UI-01-001",
+          "id": "NFR-TRC-UI-COMPOSE_WORKSPACE-001",
           "text": "Each widget and registration proves exact cleanup and isolated layout failure."
         }
       ],
@@ -14274,7 +14274,7 @@
       ]
     },
     {
-      "feature_id": "FEAT-UI-14",
+      "feature_id": "FEAT-UI-TYPED_BACKEND",
       "title": "Call the typed backend and resume observation",
       "owner_path": "app/ui/src/clients",
       "state_ownership": "Ephemeral request/stream state only.",
@@ -14311,16 +14311,16 @@
       "operation_gates": [],
       "requirements": [
         {
-          "id": "FR-TRC-UI-14-001",
+          "id": "FR-TRC-UI-TYPED_BACKEND-001",
           "text": "Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts."
         },
         {
-          "id": "FR-TRC-UI-14-002",
+          "id": "FR-TRC-UI-TYPED_BACKEND-002",
           "text": "Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions."
         },
         {
-          "id": "NFR-TRC-UI-14-001",
-          "text": "Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-TYPED_BACKEND-001",
+          "text": "Removing FEAT-UI-TYPED_BACKEND withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -14354,7 +14354,7 @@
       "source_ids": []
     },
     {
-      "feature_id": "FEAT-UI-15",
+      "feature_id": "FEAT-UI-SESSION_CONTEXT",
       "title": "Capture current authorized widget context",
       "owner_path": "app/ui/src/context",
       "state_ownership": "Ephemeral scoped contributions/snapshots; no transcript or business database.",
@@ -14367,26 +14367,26 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Chat and governed previews refer to exactly what the user selected on the current page, not stale or private component state. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [],
       "requirements": [
         {
-          "id": "FR-TRC-UI-15-001",
+          "id": "FR-TRC-UI-SESSION_CONTEXT-001",
           "text": "Register exact widget/version/generation contributions containing stable public refs, selection, filters, safe labels/errors, focus, capture/expiry/hash and schema."
         },
         {
-          "id": "FR-TRC-UI-15-002",
+          "id": "FR-TRC-UI-SESSION_CONTEXT-002",
           "text": "Capture a new bounded WorkspaceContextSnapshot for every message and drop unmounted/expired contributions."
         },
         {
-          "id": "FR-TRC-UI-15-003",
+          "id": "FR-TRC-UI-SESSION_CONTEXT-003",
           "text": "Keep account/permission projection and stable typed cross-widget selection distinct from authoritative market/result facts."
         },
         {
-          "id": "NFR-TRC-UI-15-001",
-          "text": "Removing FEAT-UI-15 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-SESSION_CONTEXT-001",
+          "text": "Removing FEAT-UI-SESSION_CONTEXT withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -14429,7 +14429,7 @@
       ]
     },
     {
-      "feature_id": "FEAT-UI-16",
+      "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
       "title": "Navigate capabilities and explain workspace controls",
       "owner_path": "app/ui/src/components/layout",
       "state_ownership": "Navigation/display preferences only.",
@@ -14442,37 +14442,37 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "The user finds available tools, recent resources, help and health without entering a dead or misleading screen. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-16",
+          "consumer": "FEAT-UI-WORKSPACE_NAVIGATION",
           "provider": "FEAT-IFACE-OPERATE_JOBS",
           "guard": "Job indicators require current owner projections."
         },
         {
-          "consumer": "FEAT-UI-16",
+          "consumer": "FEAT-UI-WORKSPACE_NAVIGATION",
           "provider": "FEAT-IFACE-OPERATE_SETTINGS",
           "guard": "Health/settings/diagnostics use their authenticated gateway."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-16-001",
+          "id": "FR-TRC-UI-WORKSPACE_NAVIGATION-001",
           "text": "Present compact research navigation, global job indicators, recent items and commands from actual registered capability/widget metadata."
         },
         {
-          "id": "FR-TRC-UI-16-002",
+          "id": "FR-TRC-UI-WORKSPACE_NAVIGATION-002",
           "text": "Provide contextual control help, readiness checklist, original examples and links to authorized reports/settings."
         },
         {
-          "id": "FR-TRC-UI-16-003",
+          "id": "FR-TRC-UI-WORKSPACE_NAVIGATION-003",
           "text": "Preserve keyboard navigation, selected workspace/account orientation and safe focus after panel changes."
         },
         {
-          "id": "NFR-TRC-UI-16-001",
-          "text": "Removing FEAT-UI-16 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-WORKSPACE_NAVIGATION-001",
+          "text": "Removing FEAT-UI-WORKSPACE_NAVIGATION withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -14514,7 +14514,7 @@
       ]
     },
     {
-      "feature_id": "FEAT-UI-17",
+      "feature_id": "FEAT-UI-SESSION_ACCESS",
       "title": "Present session access and scope changes",
       "owner_path": "app/ui/src/app",
       "state_ownership": "Ephemeral session projection only.",
@@ -14527,27 +14527,27 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "The user sees why a page or action is unavailable without browser logic becoming the permission authority. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-14"
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-17",
+          "consumer": "FEAT-UI-SESSION_ACCESS",
           "provider": "FEAT-IFACE-OPERATE_IDENTITY",
           "guard": "Verified session comes from the identity gateway."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-17-001",
+          "id": "FR-TRC-UI-SESSION_ACCESS-001",
           "text": "Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change."
         },
         {
-          "id": "FR-TRC-UI-17-002",
+          "id": "FR-TRC-UI-SESSION_ACCESS-002",
           "text": "Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework."
         },
         {
-          "id": "NFR-TRC-UI-17-001",
-          "text": "Removing FEAT-UI-17 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-SESSION_ACCESS-001",
+          "text": "Removing FEAT-UI-SESSION_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -14581,7 +14581,7 @@
       "source_ids": []
     },
     {
-      "feature_id": "FEAT-UI-13",
+      "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
       "title": "Review effective settings and safe configuration changes",
       "owner_path": "app/ui/src/widgets/system-settings",
       "state_ownership": "Unsaved UI draft/display preferences only.",
@@ -14596,32 +14596,32 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "The user edits settings with typed validation, explicit defaults, impacts and secret-reference controls. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-13",
+          "consumer": "FEAT-UI-SYSTEM_SETTINGS",
           "provider": "FEAT-IFACE-OPERATE_SETTINGS",
           "guard": "Settings and diagnostics are owner-backed."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-13-001",
+          "id": "FR-TRC-UI-SYSTEM_SETTINGS-001",
           "text": "Render all CAT-SETTINGS categories, effective defaults/overrides, narrower policy, supported values and restart/remount impact."
         },
         {
-          "id": "FR-TRC-UI-13-002",
+          "id": "FR-TRC-UI-SYSTEM_SETTINGS-002",
           "text": "Support load/save/reset/diff/presets with dirty-state protection and field/summary owner errors."
         },
         {
-          "id": "FR-TRC-UI-13-003",
+          "id": "FR-TRC-UI-SYSTEM_SETTINGS-003",
           "text": "Render SMTP test and remote/MCP status through permission-gated typed actions with no credential values."
         },
         {
-          "id": "NFR-TRC-UI-13-001",
-          "text": "Removing FEAT-UI-13 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-SYSTEM_SETTINGS-001",
+          "text": "Removing FEAT-UI-SYSTEM_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -14660,7 +14660,7 @@
       ]
     },
     {
-      "feature_id": "FEAT-UI-18",
+      "feature_id": "FEAT-UI-DATA_MANAGER",
       "title": "Operate the Data Manager workspace",
       "owner_path": "app/ui/src/components/workflow",
       "state_ownership": "Display configuration and drafts; existing QDM resources remain the reuse source.",
@@ -14673,33 +14673,33 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "The user discovers, imports, inspects, fixes, exports and updates historical data through the existing QDM workflow. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-18",
+          "consumer": "FEAT-UI-DATA_MANAGER",
           "provider": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
           "guard": "All Data Manager operations use the existing public boundary."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-18-001",
+          "id": "FR-TRC-UI-DATA_MANAGER-001",
           "text": "Render series/reference grids with all CAT-DATA fields and supported source/profile/instrument/session/group/external-series controls."
         },
         {
-          "id": "FR-TRC-UI-18-002",
+          "id": "FR-TRC-UI-DATA_MANAGER-002",
           "text": "Preview owner import mappings/counts, quality findings/repairs, timezone clone/merge/export and dependency-aware deletion."
         },
         {
-          "id": "FR-TRC-UI-18-003",
+          "id": "FR-TRC-UI-DATA_MANAGER-003",
           "text": "Observe download/import/update jobs with supported pause/resume/stop and authorized bounded raw-data/chart previews."
         },
         {
-          "id": "NFR-TRC-UI-18-001",
-          "text": "Removing FEAT-UI-18 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-DATA_MANAGER-001",
+          "text": "Removing FEAT-UI-DATA_MANAGER withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -14748,8 +14748,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Any workbench collection supports predictable sorting, selection and inspection without loading its entire dataset. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [],
       "requirements": [
@@ -14843,7 +14843,7 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "The user can safely finish or abandon a form and understand exactly what a destructive or reviewed operation will affect. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01"
+        "FEAT-UI-COMPOSE_WORKSPACE"
       ],
       "operation_gates": [],
       "requirements": [
@@ -14906,7 +14906,7 @@
       ]
     },
     {
-      "feature_id": "FEAT-UI-04",
+      "feature_id": "FEAT-UI-MARKET_CHARTS",
       "title": "Inspect market charts and typed overlays",
       "owner_path": "app/ui/src/widgets/chart",
       "state_ownership": "Chart view preferences/viewport only.",
@@ -14919,37 +14919,37 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "The user navigates actual market history with sessions, gaps and linked selections without treating drawn pixels as numerical truth. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-04",
+          "consumer": "FEAT-UI-MARKET_CHARTS",
           "provider": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
           "guard": "Market windows use Data projections."
         },
         {
-          "consumer": "FEAT-UI-04",
+          "consumer": "FEAT-UI-MARKET_CHARTS",
           "provider": "FEAT-IFACE-OPERATE_RESULTS",
           "guard": "Result overlays use Analytics series."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-04-001",
+          "id": "FR-TRC-UI-MARKET_CHARTS-001",
           "text": "Render declared market-series windows, price/volume/layer units, timezone/calendar, gaps and indicator/entry/exit overlays."
         },
         {
-          "id": "FR-TRC-UI-04-002",
+          "id": "FR-TRC-UI-MARKET_CHARTS-002",
           "text": "Support crosshair/zoom/selection with typed timestamps/series/trade references and bounded LOD/decoding."
         },
         {
-          "id": "FR-TRC-UI-04-003",
+          "id": "FR-TRC-UI-MARKET_CHARTS-003",
           "text": "Offer keyboard/table equivalents and no-WebGL fallback where applicable."
         },
         {
-          "id": "NFR-TRC-UI-04-001",
-          "text": "Removing FEAT-UI-04 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-MARKET_CHARTS-001",
+          "text": "Removing FEAT-UI-MARKET_CHARTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -15011,7 +15011,7 @@
       ]
     },
     {
-      "feature_id": "FEAT-UI-27",
+      "feature_id": "FEAT-UI-RUN_BACKTEST",
       "title": "Configure and observe a canonical backtest",
       "owner_path": "app/ui/src/widgets/simulator",
       "state_ownership": "Unsaved form and observer state only.",
@@ -15024,38 +15024,38 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "A user can backtest the selected strategy with explicit execution fidelity and see the real run/result outcome. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-REVIEW_DRAFTS"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-27",
+          "consumer": "FEAT-UI-RUN_BACKTEST",
           "provider": "FEAT-IFACE-OPERATE_SIMULATIONS",
           "guard": "Canonical simulation gateway required for commands."
         },
         {
-          "consumer": "FEAT-UI-27",
+          "consumer": "FEAT-UI-RUN_BACKTEST",
           "provider": "FEAT-IFACE-OPERATE_RESULTS",
           "guard": "Result inspection is owner-backed."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-27-001",
+          "id": "FR-TRC-UI-RUN_BACKTEST-001",
           "text": "Present strategy revision/parameters, primary/additional data, tick-method evidence class/coverage, costs, account, sample, output and resource preview."
         },
         {
-          "id": "FR-TRC-UI-27-002",
+          "id": "FR-TRC-UI-RUN_BACKTEST-002",
           "text": "Submit one governed owner request, observe progress/log/warnings and expose supported cancel/pause/retry."
         },
         {
-          "id": "FR-TRC-UI-27-003",
+          "id": "FR-TRC-UI-RUN_BACKTEST-003",
           "text": "Open the committed Analytics result by stable ID and retain partial/unavailable/failed states."
         },
         {
-          "id": "NFR-TRC-UI-27-001",
-          "text": "Removing FEAT-UI-27 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-RUN_BACKTEST-001",
+          "text": "Removing FEAT-UI-RUN_BACKTEST withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -15091,7 +15091,7 @@
       ]
     },
     {
-      "feature_id": "FEAT-UI-28",
+      "feature_id": "FEAT-UI-EXECUTE_ORDERS",
       "title": "Inspect research campaigns, protocols and evidence",
       "owner_path": "app/ui/src/widgets/research",
       "state_ownership": "Display state only.",
@@ -15104,38 +15104,38 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "The user can see a research question, its attempts and qualification evidence without confusing it with job infrastructure or a winning candidate. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-28",
+          "consumer": "FEAT-UI-EXECUTE_ORDERS",
           "provider": "FEAT-IFACE-OPERATE_RESEARCH",
           "guard": "Research projections and commands."
         },
         {
-          "consumer": "FEAT-UI-28",
+          "consumer": "FEAT-UI-EXECUTE_ORDERS",
           "provider": "FEAT-IFACE-OPERATE_RESULTS",
           "guard": "Analysis comparison projections."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-28-001",
+          "id": "FR-TRC-UI-EXECUTE_ORDERS-001",
           "text": "Display canonical campaign/family/protocol/sample/budget/holdout identities, attempt conservation and receiver lineage."
         },
         {
-          "id": "FR-TRC-UI-28-002",
+          "id": "FR-TRC-UI-EXECUTE_ORDERS-002",
           "text": "Present research draft, supported evidence and qualified outcomes as different states, with exact owner reasons and limitations."
         },
         {
-          "id": "FR-TRC-UI-28-003",
+          "id": "FR-TRC-UI-EXECUTE_ORDERS-003",
           "text": "Expose compatible research navigation, comparison and immutable artifact history through registered contributions."
         },
         {
-          "id": "NFR-TRC-UI-28-001",
-          "text": "Removing FEAT-UI-28 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-EXECUTE_ORDERS-001",
+          "text": "Removing FEAT-UI-EXECUTE_ORDERS withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -15169,7 +15169,7 @@
       "source_ids": []
     },
     {
-      "feature_id": "FEAT-UI-32",
+      "feature_id": "FEAT-UI-RESEARCH_WORKBENCH",
       "title": "Compose the result inspection workspace",
       "owner_path": "app/ui/src/widgets/analytics",
       "state_ownership": "Presentation-only layout/tab/selection preferences.",
@@ -15182,32 +15182,32 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "A selected result opens only compatible registered views with clear completeness and provenance. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
-          "consumer": "FEAT-UI-32",
+          "consumer": "FEAT-UI-RESEARCH_WORKBENCH",
           "provider": "FEAT-IFACE-OPERATE_RESULTS",
           "guard": "Result identity/compatibility comes from Analytics."
         }
       ],
       "requirements": [
         {
-          "id": "FR-TRC-UI-32-001",
+          "id": "FR-TRC-UI-RESEARCH_WORKBENCH-001",
           "text": "Discover compatible result views by result kind/schema/capability and restore safe per-view layout/selection."
         },
         {
-          "id": "FR-TRC-UI-32-002",
+          "id": "FR-TRC-UI-RESEARCH_WORKBENCH-002",
           "text": "Expose result/config/data/metric/method/sample/precision/partial/imported provenance and deep links."
         },
         {
-          "id": "FR-TRC-UI-32-003",
+          "id": "FR-TRC-UI-RESEARCH_WORKBENCH-003",
           "text": "Coordinate typed stable selections among independent panels without shared mutable domain state."
         },
         {
-          "id": "NFR-TRC-UI-32-001",
-          "text": "Removing FEAT-UI-32 withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
+          "id": "NFR-TRC-UI-RESEARCH_WORKBENCH-001",
+          "text": "Removing FEAT-UI-RESEARCH_WORKBENCH withdraws only its declared contribution; no dependent operation may silently select a substitute provider."
         }
       ],
       "shared_nfrs": [
@@ -15264,8 +15264,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Author one HSL definition through equivalent visual/tree/form views, with safe immutable revision acceptance. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -15354,8 +15354,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Construct a bounded effective search plan and inspect why candidates were accepted or dismissed. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -15432,8 +15432,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Re-evaluate immutable source strategies under explicitly changed contexts and ordered robustness stages. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -15506,8 +15506,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Explore a finite legal parameter space with exact work estimates and honest search/fold evidence. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -15581,8 +15581,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Browse huge result sets and perform exact, reviewable bulk actions without destructive ambiguity. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -15654,8 +15654,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Understand performance with units, samples, undefined cases and template fallback visible. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -15732,8 +15732,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Follow one trade consistently from pageable ledger through detail, equity and market views. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -15809,8 +15809,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Explore a result’s time path while knowing which series, aggregation and units are displayed. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -15884,8 +15884,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Inspect grouped trade behavior using an explicit time basis and canonical metrics. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -15959,8 +15959,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "See how a chosen trade aligns with the exact price history, indicators and execution evidence used by its run. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -16034,8 +16034,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Understand stage outcomes, distributions and limitations without treating every Monte Carlo operation as a simulation. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -16108,8 +16108,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Compare parameter, sequential, SPP and WFO/WFM results with honest sampling and stable selection. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -16185,8 +16185,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Build a versioned composition with explicit weights, capital, compatibility and evaluation mode. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -16263,8 +16263,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Search compatible combinations and inspect why candidates met or failed the selected constraints. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -16338,8 +16338,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Build a typed graph and execute a reviewed scope without scripting hidden cross-domain behavior in the browser. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -16415,8 +16415,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Create or fork package resources and run isolated compilation/tests without unrestricted filesystem access. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -16491,8 +16491,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Verify an indicator’s actual values against a selected reference before treating it as compatible. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -16566,8 +16566,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Understand what is queued, working, waiting, cancelled or complete and which controls the owner supports. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -16643,8 +16643,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Trace a failure with correlations and owner evidence without exposing sensitive content. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -16717,9 +16717,9 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Talk to the named Chat Bot and receive attributed specialist answers or reviewable HSL candidates in the same conversation. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
-        "FEAT-UI-15",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
+        "FEAT-UI-SESSION_CONTEXT",
         "FEAT-UI-REVIEW_DRAFTS"
       ],
       "operation_gates": [
@@ -16798,8 +16798,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Audit claims, permissions, costs, waits and receiver outcomes without exposing hidden reasoning. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14",
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND",
         "FEAT-UI-VIEW_COLLECTIONS"
       ],
       "operation_gates": [
@@ -16871,8 +16871,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Define causal features/labels and inspect training/validation/inference support before integrating a model. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -16943,8 +16943,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Configure a package and see exactly which target restrictions and resources are verified. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -17015,8 +17015,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "Inspect higher-dimensional evidence without losing source semantics or accessible alternatives. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {
@@ -17094,8 +17094,8 @@
       "input_boundary": "Authenticated/scoped typed request and immutable owner references described by owned FRs and linked record/catalogue inventories; numerical providers accept validated typed buffers.",
       "output_boundary": "A developer can compare measured workloads and UI churn without mistaking targets or cache hits for real speed evidence. Return explicit typed invalid/unavailable/refused/partial/conflict outcomes where the feature requirements specify them.",
       "required_providers": [
-        "FEAT-UI-01",
-        "FEAT-UI-14"
+        "FEAT-UI-COMPOSE_WORKSPACE",
+        "FEAT-UI-TYPED_BACKEND"
       ],
       "operation_gates": [
         {

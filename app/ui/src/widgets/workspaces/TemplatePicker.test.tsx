@@ -1,5 +1,5 @@
 /**
- * Component tests for the new-workspace template picker (FEAT-UI-01,
+ * Component tests for the new-workspace template picker (FEAT-UI-COMPOSE_WORKSPACE,
  * FR-UI-195 through FR-UI-198 in `app/ui/README.md` §4.1).
  */
 import { beforeEach, describe, expect, it } from "vitest";

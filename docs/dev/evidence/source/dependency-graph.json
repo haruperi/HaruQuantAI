@@ -1,8 +1,8 @@
 {
   "manifest_version": "2.0",
   "nodes": [
-    "FEAT-UI-01",
-    "FEAT-UI-14",
+    "FEAT-UI-COMPOSE_WORKSPACE",
+    "FEAT-UI-TYPED_BACKEND",
     "FEAT-WS-MANAGE_WORKSPACES",
     "FEAT-WS-MANAGE_ACCOUNTS",
     "FEAT-PLUG-DECLARE_MANIFESTS",
@@ -16,7 +16,7 @@
     "FEAT-IFACE-OPERATE_IDENTITY",
     "FEAT-ORCH-RESERVE_RESOURCES",
     "FEAT-AGT-ENFORCE_MANDATE",
-    "FEAT-UI-17",
+    "FEAT-UI-SESSION_ACCESS",
     "FEAT-WS-MANAGE_ARTIFACTS",
     "FEAT-ORCH-MANAGE_JOBS",
     "FEAT-AGT-OPERATE_RUNS",
@@ -27,8 +27,8 @@
     "FEAT-AGT-INVOKE_MODELS",
     "FEAT-IFACE-OPERATE_SETTINGS",
     "FEAT-IFACE-OPERATE_JOBS",
-    "FEAT-UI-16",
-    "FEAT-UI-13",
+    "FEAT-UI-WORKSPACE_NAVIGATION",
+    "FEAT-UI-SYSTEM_SETTINGS",
     "FEAT-UI-RUN_MONITOR",
     "FEAT-UI-DEBUG_CONSOLE",
     "FEAT-CAT-CATALOG_INSTRUMENTS",
@@ -61,8 +61,8 @@
     "FEAT-DATA-IMPORT_INDICATORS",
     "FEAT-DATA-BROWSE_REFERENCE",
     "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
-    "FEAT-UI-18",
-    "FEAT-UI-04",
+    "FEAT-UI-DATA_MANAGER",
+    "FEAT-UI-MARKET_CHARTS",
     "FEAT-IND-CALCULATE_TREND",
     "FEAT-IND-CALCULATE_MOMENTUM",
     "FEAT-IND-CALCULATE_VOLATILITY",
@@ -100,15 +100,15 @@
     "FEAT-ANA-COMPARE_RESULTS",
     "FEAT-ANA-EXCHANGE_RESULTS",
     "FEAT-IFACE-OPERATE_RESULTS",
-    "FEAT-UI-27",
-    "FEAT-UI-32",
+    "FEAT-UI-RUN_BACKTEST",
+    "FEAT-UI-RESEARCH_WORKBENCH",
     "FEAT-UI-DATABANK_GRID",
     "FEAT-UI-RESULT_OVERVIEW",
     "FEAT-UI-TRADE_LIST",
     "FEAT-UI-EQUITY_CHART",
     "FEAT-UI-TRADE_ANALYSIS",
     "FEAT-UI-TRADES_ON_CHART",
-    "FEAT-UI-15",
+    "FEAT-UI-SESSION_CONTEXT",
     "FEAT-WS-MANAGE_CONVERSATIONS",
     "FEAT-AGT-ASSEMBLE_CONTEXT",
     "FEAT-AGT-RUN_WORKFLOWS",
@@ -129,7 +129,7 @@
     "FEAT-AGT-GOVERN_RESEARCH_SEARCH",
     "FEAT-AGT-DESIGN_RESEARCH",
     "FEAT-AGT-COMPOSE_STRATEGY_SPECS",
-    "FEAT-UI-28",
+    "FEAT-UI-EXECUTE_ORDERS",
     "FEAT-SIM-PERTURB_INPUTS",
     "FEAT-ANA-ANALYZE_DISTRIBUTIONS",
     "FEAT-AGT-DELIBERATE_RESEARCH",
@@ -2953,70 +2953,70 @@
       "provider_capability": "interfaces.serve-api-events@1"
     },
     {
-      "consumer": "FEAT-UI-15",
+      "consumer": "FEAT-UI-SESSION_CONTEXT",
       "consumer_task": "5.01",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-15",
+      "consumer": "FEAT-UI-SESSION_CONTEXT",
       "consumer_task": "5.01",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-16",
+      "consumer": "FEAT-UI-WORKSPACE_NAVIGATION",
       "consumer_task": "1.27",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-16",
+      "consumer": "FEAT-UI-WORKSPACE_NAVIGATION",
       "consumer_task": "1.27",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-17",
+      "consumer": "FEAT-UI-SESSION_ACCESS",
       "consumer_task": "1.16",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-13",
+      "consumer": "FEAT-UI-SYSTEM_SETTINGS",
       "consumer_task": "1.28",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-13",
+      "consumer": "FEAT-UI-SYSTEM_SETTINGS",
       "consumer_task": "1.28",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-18",
+      "consumer": "FEAT-UI-DATA_MANAGER",
       "consumer_task": "2.31",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-18",
+      "consumer": "FEAT-UI-DATA_MANAGER",
       "consumer_task": "2.31",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-18",
+      "consumer": "FEAT-UI-DATA_MANAGER",
       "consumer_task": "2.31",
       "provider": "FEAT-UI-VIEW_COLLECTIONS",
       "provider_task": "1.06",
@@ -3025,147 +3025,147 @@
     {
       "consumer": "FEAT-UI-VIEW_COLLECTIONS",
       "consumer_task": "1.06",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-VIEW_COLLECTIONS",
       "consumer_task": "1.06",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-REVIEW_DRAFTS",
       "consumer_task": "1.07",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-04",
+      "consumer": "FEAT-UI-MARKET_CHARTS",
       "consumer_task": "2.32",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-04",
+      "consumer": "FEAT-UI-MARKET_CHARTS",
       "consumer_task": "2.32",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-27",
+      "consumer": "FEAT-UI-RUN_BACKTEST",
       "consumer_task": "4.20",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-27",
+      "consumer": "FEAT-UI-RUN_BACKTEST",
       "consumer_task": "4.20",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-27",
+      "consumer": "FEAT-UI-RUN_BACKTEST",
       "consumer_task": "4.20",
       "provider": "FEAT-UI-REVIEW_DRAFTS",
       "provider_task": "1.07",
       "provider_capability": "ui.draft-review@1"
     },
     {
-      "consumer": "FEAT-UI-28",
+      "consumer": "FEAT-UI-EXECUTE_ORDERS",
       "consumer_task": "6.11",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-28",
+      "consumer": "FEAT-UI-EXECUTE_ORDERS",
       "consumer_task": "6.11",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
-      "consumer": "FEAT-UI-28",
+      "consumer": "FEAT-UI-EXECUTE_ORDERS",
       "consumer_task": "6.11",
       "provider": "FEAT-UI-VIEW_COLLECTIONS",
       "provider_task": "1.06",
       "provider_capability": "ui.collection-grid@1"
     },
     {
-      "consumer": "FEAT-UI-32",
+      "consumer": "FEAT-UI-RESEARCH_WORKBENCH",
       "consumer_task": "4.21",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
-      "consumer": "FEAT-UI-32",
+      "consumer": "FEAT-UI-RESEARCH_WORKBENCH",
       "consumer_task": "4.21",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_STUDIO",
       "consumer_task": "3.18",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_STUDIO",
       "consumer_task": "3.18",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_BUILDER",
       "consumer_task": "8.05",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_BUILDER",
       "consumer_task": "8.05",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_RETESTER",
       "consumer_task": "7.07",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_RETESTER",
       "consumer_task": "7.07",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-PARAMETER_OPTIMIZER",
       "consumer_task": "9.05",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-PARAMETER_OPTIMIZER",
       "consumer_task": "9.05",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3179,14 +3179,14 @@
     {
       "consumer": "FEAT-UI-DATABANK_GRID",
       "consumer_task": "4.22",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-DATABANK_GRID",
       "consumer_task": "4.22",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3200,28 +3200,28 @@
     {
       "consumer": "FEAT-UI-RESULT_OVERVIEW",
       "consumer_task": "4.23",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-RESULT_OVERVIEW",
       "consumer_task": "4.23",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-TRADE_LIST",
       "consumer_task": "4.24",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-TRADE_LIST",
       "consumer_task": "4.24",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3235,70 +3235,70 @@
     {
       "consumer": "FEAT-UI-EQUITY_CHART",
       "consumer_task": "4.25",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-EQUITY_CHART",
       "consumer_task": "4.25",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-TRADE_ANALYSIS",
       "consumer_task": "4.26",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-TRADE_ANALYSIS",
       "consumer_task": "4.26",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-TRADES_ON_CHART",
       "consumer_task": "4.27",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-TRADES_ON_CHART",
       "consumer_task": "4.27",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-ROBUSTNESS_RESULTS",
       "consumer_task": "7.05",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-ROBUSTNESS_RESULTS",
       "consumer_task": "7.05",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-OPTIMIZATION_RESULTS",
       "consumer_task": "9.06",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-OPTIMIZATION_RESULTS",
       "consumer_task": "9.06",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3312,14 +3312,14 @@
     {
       "consumer": "FEAT-UI-PORTFOLIO_COMPOSER",
       "consumer_task": "10.11",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-PORTFOLIO_COMPOSER",
       "consumer_task": "10.11",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3333,14 +3333,14 @@
     {
       "consumer": "FEAT-UI-PORTFOLIO_BUILDER",
       "consumer_task": "10.12",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-PORTFOLIO_BUILDER",
       "consumer_task": "10.12",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3354,14 +3354,14 @@
     {
       "consumer": "FEAT-UI-PROJECT_EDITOR",
       "consumer_task": "11.09",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-PROJECT_EDITOR",
       "consumer_task": "11.09",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3375,28 +3375,28 @@
     {
       "consumer": "FEAT-UI-CODE_EDITOR",
       "consumer_task": "12.12",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-CODE_EDITOR",
       "consumer_task": "12.12",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-INDICATOR_TESTER",
       "consumer_task": "12.13",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-INDICATOR_TESTER",
       "consumer_task": "12.13",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3410,14 +3410,14 @@
     {
       "consumer": "FEAT-UI-RUN_MONITOR",
       "consumer_task": "1.29",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-RUN_MONITOR",
       "consumer_task": "1.29",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3431,35 +3431,35 @@
     {
       "consumer": "FEAT-UI-DEBUG_CONSOLE",
       "consumer_task": "1.30",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-DEBUG_CONSOLE",
       "consumer_task": "1.30",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-CHAT_BOT",
       "consumer_task": "5.10",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-CHAT_BOT",
       "consumer_task": "5.10",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-CHAT_BOT",
       "consumer_task": "5.10",
-      "provider": "FEAT-UI-15",
+      "provider": "FEAT-UI-SESSION_CONTEXT",
       "provider_task": "5.01",
       "provider_capability": "ui.chat-context@1"
     },
@@ -3473,14 +3473,14 @@
     {
       "consumer": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
       "consumer_task": "5.11",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-AGENTIC_RUN_INSPECTOR",
       "consumer_task": "5.11",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
@@ -3494,56 +3494,56 @@
     {
       "consumer": "FEAT-UI-NEURAL_RESEARCH",
       "consumer_task": "14.07",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-NEURAL_RESEARCH",
       "consumer_task": "14.07",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_PACKAGER",
       "consumer_task": "16.12",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-STRATEGY_PACKAGER",
       "consumer_task": "16.12",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-ADVANCED_ANALYSIS",
       "consumer_task": "13.04",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-ADVANCED_ANALYSIS",
       "consumer_task": "13.04",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     },
     {
       "consumer": "FEAT-UI-PERFORMANCE_LAB",
       "consumer_task": "4.01",
-      "provider": "FEAT-UI-01",
+      "provider": "FEAT-UI-COMPOSE_WORKSPACE",
       "provider_task": "1.01",
       "provider_capability": "ui.workspace-layout@1"
     },
     {
       "consumer": "FEAT-UI-PERFORMANCE_LAB",
       "consumer_task": "4.01",
-      "provider": "FEAT-UI-14",
+      "provider": "FEAT-UI-TYPED_BACKEND",
       "provider_task": "1.02",
       "provider_capability": "ui.typed-backend@1"
     }
@@ -5684,73 +5684,73 @@
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-16",
+      "consumer": "FEAT-UI-WORKSPACE_NAVIGATION",
       "provider": "FEAT-IFACE-OPERATE_JOBS",
       "guard": "Job indicators require current owner projections.",
       "consumer_task": "1.27",
       "provider_task": "1.26",
       "provider_capability": "interfaces.operate-jobs@1",
       "test_owner_task": "1.27",
-      "test_owner_feature": "FEAT-UI-16",
+      "test_owner_feature": "FEAT-UI-WORKSPACE_NAVIGATION",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-16",
+      "consumer": "FEAT-UI-WORKSPACE_NAVIGATION",
       "provider": "FEAT-IFACE-OPERATE_SETTINGS",
       "guard": "Health/settings/diagnostics use their authenticated gateway.",
       "consumer_task": "1.27",
       "provider_task": "1.25",
       "provider_capability": "interfaces.operate-settings@1",
       "test_owner_task": "1.27",
-      "test_owner_feature": "FEAT-UI-16",
+      "test_owner_feature": "FEAT-UI-WORKSPACE_NAVIGATION",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-17",
+      "consumer": "FEAT-UI-SESSION_ACCESS",
       "provider": "FEAT-IFACE-OPERATE_IDENTITY",
       "guard": "Verified session comes from the identity gateway.",
       "consumer_task": "1.16",
       "provider_task": "1.13",
       "provider_capability": "interfaces.operate-identity@1",
       "test_owner_task": "1.16",
-      "test_owner_feature": "FEAT-UI-17",
+      "test_owner_feature": "FEAT-UI-SESSION_ACCESS",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-13",
+      "consumer": "FEAT-UI-SYSTEM_SETTINGS",
       "provider": "FEAT-IFACE-OPERATE_SETTINGS",
       "guard": "Settings and diagnostics are owner-backed.",
       "consumer_task": "1.28",
       "provider_task": "1.25",
       "provider_capability": "interfaces.operate-settings@1",
       "test_owner_task": "1.28",
-      "test_owner_feature": "FEAT-UI-13",
+      "test_owner_feature": "FEAT-UI-SYSTEM_SETTINGS",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-18",
+      "consumer": "FEAT-UI-DATA_MANAGER",
       "provider": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
       "guard": "All Data Manager operations use the existing public boundary.",
       "consumer_task": "2.31",
       "provider_task": "2.30",
       "provider_capability": "interfaces.observe-market-reference@1",
       "test_owner_task": "2.31",
-      "test_owner_feature": "FEAT-UI-18",
+      "test_owner_feature": "FEAT-UI-DATA_MANAGER",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-04",
+      "consumer": "FEAT-UI-MARKET_CHARTS",
       "provider": "FEAT-IFACE-OBSERVE_MARKET_REFERENCE",
       "guard": "Market windows use Data projections.",
       "consumer_task": "2.32",
       "provider_task": "2.30",
       "provider_capability": "interfaces.observe-market-reference@1",
       "test_owner_task": "2.32",
-      "test_owner_feature": "FEAT-UI-04",
+      "test_owner_feature": "FEAT-UI-MARKET_CHARTS",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-04",
+      "consumer": "FEAT-UI-MARKET_CHARTS",
       "provider": "FEAT-IFACE-OPERATE_RESULTS",
       "guard": "Result overlays use Analytics series.",
       "consumer_task": "2.32",
@@ -5761,58 +5761,58 @@
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-27",
+      "consumer": "FEAT-UI-RUN_BACKTEST",
       "provider": "FEAT-IFACE-OPERATE_SIMULATIONS",
       "guard": "Canonical simulation gateway required for commands.",
       "consumer_task": "4.20",
       "provider_task": "4.11",
       "provider_capability": "interfaces.operate-simulations@1",
       "test_owner_task": "4.20",
-      "test_owner_feature": "FEAT-UI-27",
+      "test_owner_feature": "FEAT-UI-RUN_BACKTEST",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-27",
+      "consumer": "FEAT-UI-RUN_BACKTEST",
       "provider": "FEAT-IFACE-OPERATE_RESULTS",
       "guard": "Result inspection is owner-backed.",
       "consumer_task": "4.20",
       "provider_task": "4.19",
       "provider_capability": "interfaces.operate-results@1",
       "test_owner_task": "4.20",
-      "test_owner_feature": "FEAT-UI-27",
+      "test_owner_feature": "FEAT-UI-RUN_BACKTEST",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-28",
+      "consumer": "FEAT-UI-EXECUTE_ORDERS",
       "provider": "FEAT-IFACE-OPERATE_RESEARCH",
       "guard": "Research projections and commands.",
       "consumer_task": "6.11",
       "provider_task": "6.07",
       "provider_capability": "interfaces.operate-research@1",
       "test_owner_task": "6.11",
-      "test_owner_feature": "FEAT-UI-28",
+      "test_owner_feature": "FEAT-UI-EXECUTE_ORDERS",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-28",
+      "consumer": "FEAT-UI-EXECUTE_ORDERS",
       "provider": "FEAT-IFACE-OPERATE_RESULTS",
       "guard": "Analysis comparison projections.",
       "consumer_task": "6.11",
       "provider_task": "4.19",
       "provider_capability": "interfaces.operate-results@1",
       "test_owner_task": "6.11",
-      "test_owner_feature": "FEAT-UI-28",
+      "test_owner_feature": "FEAT-UI-EXECUTE_ORDERS",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {
-      "consumer": "FEAT-UI-32",
+      "consumer": "FEAT-UI-RESEARCH_WORKBENCH",
       "provider": "FEAT-IFACE-OPERATE_RESULTS",
       "guard": "Result identity/compatibility comes from Analytics.",
       "consumer_task": "4.21",
       "provider_task": "4.19",
       "provider_capability": "interfaces.operate-results@1",
       "test_owner_task": "4.21",
-      "test_owner_feature": "FEAT-UI-32",
+      "test_owner_feature": "FEAT-UI-RESEARCH_WORKBENCH",
       "readiness": "FAIL_CLOSED_UNTIL_QUALIFIED"
     },
     {

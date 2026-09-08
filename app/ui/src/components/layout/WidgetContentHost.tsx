@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Registry-backed widget rendering boundary (FEAT-UI-01/16).
+ * Registry-backed widget rendering boundary (FEAT-UI-COMPOSE_WORKSPACE/16).
  *
  * Shared by layout hosts so every surface that shows a widget renders the
  * exact same component for a given widget type. Extracted from the former

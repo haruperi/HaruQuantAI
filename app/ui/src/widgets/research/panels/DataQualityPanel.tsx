@@ -1,5 +1,5 @@
 /**
- * Data & Quality panel (FEAT-UI-28, plan §10.5).
+ * Data & Quality panel (FEAT-UI-EXECUTE_ORDERS, plan §10.5).
  *
  * Covers the V1 Data page under V2 ownership: the dataset identity, quality
  * decision, checks, cleaning actions, and provenance are Data- and

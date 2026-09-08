@@ -1,4 +1,4 @@
-/** Lifecycle/removal evidence for FEAT-UI-14. */
+/** Lifecycle/removal evidence for FEAT-UI-TYPED_BACKEND. */
 
 import { describe, expect, it, vi } from "vitest";
 
@@ -49,7 +49,7 @@ function event(sequence: number): StreamEvent {
   };
 }
 
-describe("FEAT-UI-14 lifecycle", () => {
+describe("FEAT-UI-TYPED_BACKEND lifecycle", () => {
   it("test_trc_call_typed_backend_002", async () => {
     const calls: AbortSignal[] = [];
     const requestTransport = (<T>(

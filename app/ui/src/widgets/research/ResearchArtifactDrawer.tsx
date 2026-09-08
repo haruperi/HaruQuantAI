@@ -1,5 +1,5 @@
 /**
- * Artifact drawer (FEAT-UI-28, plan §10.16).
+ * Artifact drawer (FEAT-UI-EXECUTE_ORDERS, plan §10.16).
  *
  * Lists the safe artifact references the server persisted for a run: relative
  * path, format, size, content hash, and audit event identity. The browser

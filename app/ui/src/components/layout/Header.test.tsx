@@ -1,5 +1,5 @@
 /**
- * Component tests for the header profile section (FEAT-UI-01, FR-UI-011/013/
+ * Component tests for the header profile section (FEAT-UI-COMPOSE_WORKSPACE, FR-UI-011/013/
  * FR-UI-016/017/203/204/205): digital clock segments, the 1-Click confirmation
  * switch, the colour-coded account-mode badge, and the profile dropdown opened
  * from the `<` chevron. Every dropdown action is asserted against the real

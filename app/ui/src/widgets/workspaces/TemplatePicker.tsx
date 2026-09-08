@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * New-workspace template picker (FEAT-UI-01, FR-UI-195/196/198).
+ * New-workspace template picker (FEAT-UI-COMPOSE_WORKSPACE, FR-UI-195/196/198).
  *
  * Rendered by `WorkspaceGrid` as the whole content of a workspace that is
  * still pending its template choice. Mirrors the CME Group Simulator's

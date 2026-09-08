@@ -1,4 +1,4 @@
-/** Bounded offline executable usage for FEAT-UI-01. */
+/** Bounded offline executable usage for FEAT-UI-COMPOSE_WORKSPACE. */
 
 import assert from "node:assert/strict";
 
@@ -84,7 +84,7 @@ function main(): void {
   assert.ok(getWidgetRegistration("chart"));
 
   console.log(
-    `FEAT-UI-01 usage passed: ${registrations.length} contributions, research layout restored, unavailable panel isolated, observer disposal did not cancel owner work.`,
+    `FEAT-UI-COMPOSE_WORKSPACE usage passed: ${registrations.length} contributions, research layout restored, unavailable panel isolated, observer disposal did not cancel owner work.`,
   );
 }
 

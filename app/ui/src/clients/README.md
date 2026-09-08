@@ -1,4 +1,4 @@
-# FEAT-UI-14 — Typed backend transport
+# FEAT-UI-TYPED_BACKEND — Typed backend transport
 
 This package owns `ui.typed-backend@1`: strict browser-side validation of the authoritative Interfaces wire envelopes plus scoped HTTP/SSE lifecycle management. It does not own backend routes, wire schemas, authorization, numerical policy, or business receipts.
 

@@ -12,52 +12,52 @@
   },
   "requirements": [
     {
-      "requirement_id": "FR-TRC-UI-01-001",
-      "feature_id": "FEAT-UI-01",
+      "requirement_id": "FR-TRC-UI-COMPOSE_WORKSPACE-001",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "task_id": "1.01",
       "text": "Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-01-002",
-      "feature_id": "FEAT-UI-01",
+      "requirement_id": "FR-TRC-UI-COMPOSE_WORKSPACE-002",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "task_id": "1.01",
       "text": "Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-01-003",
-      "feature_id": "FEAT-UI-01",
+      "requirement_id": "FR-TRC-UI-COMPOSE_WORKSPACE-003",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "task_id": "1.01",
       "text": "Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-01-004",
-      "feature_id": "FEAT-UI-01",
+      "requirement_id": "FR-TRC-UI-COMPOSE_WORKSPACE-004",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "task_id": "1.01",
       "text": "Keep closing an observer distinct from cancelling its accepted owner job.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-14-001",
-      "feature_id": "FEAT-UI-14",
+      "requirement_id": "FR-TRC-UI-TYPED_BACKEND-001",
+      "feature_id": "FEAT-UI-TYPED_BACKEND",
       "task_id": "1.02",
       "text": "Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TYPED_BACKEND/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-14-002",
-      "feature_id": "FEAT-UI-14",
+      "requirement_id": "FR-TRC-UI-TYPED_BACKEND-002",
+      "feature_id": "FEAT-UI-TYPED_BACKEND",
       "task_id": "1.02",
       "text": "Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TYPED_BACKEND/acceptance.json"
     },
     {
       "requirement_id": "FR-TRC-WS-MANAGE_WORKSPACES-001",
@@ -356,20 +356,20 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-17-001",
-      "feature_id": "FEAT-UI-17",
+      "requirement_id": "FR-TRC-UI-SESSION_ACCESS-001",
+      "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
       "text": "Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-17/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-17-002",
-      "feature_id": "FEAT-UI-17",
+      "requirement_id": "FR-TRC-UI-SESSION_ACCESS-002",
+      "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
       "text": "Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-17/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json"
     },
     {
       "requirement_id": "FR-TRC-WS-MANAGE_ARTIFACTS-001",
@@ -636,52 +636,52 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_JOBS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-16-001",
-      "feature_id": "FEAT-UI-16",
+      "requirement_id": "FR-TRC-UI-WORKSPACE_NAVIGATION-001",
+      "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
       "task_id": "1.27",
       "text": "Present compact research navigation, global job indicators, recent items and commands from actual registered capability/widget metadata.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-16-002",
-      "feature_id": "FEAT-UI-16",
+      "requirement_id": "FR-TRC-UI-WORKSPACE_NAVIGATION-002",
+      "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
       "task_id": "1.27",
       "text": "Provide contextual control help, readiness checklist, original examples and links to authorized reports/settings.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-16-003",
-      "feature_id": "FEAT-UI-16",
+      "requirement_id": "FR-TRC-UI-WORKSPACE_NAVIGATION-003",
+      "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
       "task_id": "1.27",
       "text": "Preserve keyboard navigation, selected workspace/account orientation and safe focus after panel changes.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-13-001",
-      "feature_id": "FEAT-UI-13",
+      "requirement_id": "FR-TRC-UI-SYSTEM_SETTINGS-001",
+      "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
       "task_id": "1.28",
       "text": "Render all CAT-SETTINGS categories, effective defaults/overrides, narrower policy, supported values and restart/remount impact.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-13-002",
-      "feature_id": "FEAT-UI-13",
+      "requirement_id": "FR-TRC-UI-SYSTEM_SETTINGS-002",
+      "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
       "task_id": "1.28",
       "text": "Support load/save/reset/diff/presets with dirty-state protection and field/summary owner errors.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-13-003",
-      "feature_id": "FEAT-UI-13",
+      "requirement_id": "FR-TRC-UI-SYSTEM_SETTINGS-003",
+      "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
       "task_id": "1.28",
       "text": "Render SMTP test and remote/MCP status through permission-gated typed actions with no credential values.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json"
     },
     {
       "requirement_id": "FR-TRC-UI-RUN_MONITOR-001",
@@ -1268,52 +1268,52 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OBSERVE_MARKET_REFERENCE/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-18-001",
-      "feature_id": "FEAT-UI-18",
+      "requirement_id": "FR-TRC-UI-DATA_MANAGER-001",
+      "feature_id": "FEAT-UI-DATA_MANAGER",
       "task_id": "2.31",
       "text": "Render series/reference grids with all CAT-DATA fields and supported source/profile/instrument/session/group/external-series controls.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-18-002",
-      "feature_id": "FEAT-UI-18",
+      "requirement_id": "FR-TRC-UI-DATA_MANAGER-002",
+      "feature_id": "FEAT-UI-DATA_MANAGER",
       "task_id": "2.31",
       "text": "Preview owner import mappings/counts, quality findings/repairs, timezone clone/merge/export and dependency-aware deletion.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-18-003",
-      "feature_id": "FEAT-UI-18",
+      "requirement_id": "FR-TRC-UI-DATA_MANAGER-003",
+      "feature_id": "FEAT-UI-DATA_MANAGER",
       "task_id": "2.31",
       "text": "Observe download/import/update jobs with supported pause/resume/stop and authorized bounded raw-data/chart previews.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-04-001",
-      "feature_id": "FEAT-UI-04",
+      "requirement_id": "FR-TRC-UI-MARKET_CHARTS-001",
+      "feature_id": "FEAT-UI-MARKET_CHARTS",
       "task_id": "2.32",
       "text": "Render declared market-series windows, price/volume/layer units, timezone/calendar, gaps and indicator/entry/exit overlays.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-04-002",
-      "feature_id": "FEAT-UI-04",
+      "requirement_id": "FR-TRC-UI-MARKET_CHARTS-002",
+      "feature_id": "FEAT-UI-MARKET_CHARTS",
       "task_id": "2.32",
       "text": "Support crosshair/zoom/selection with typed timestamps/series/trade references and bounded LOD/decoding.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-04-003",
-      "feature_id": "FEAT-UI-04",
+      "requirement_id": "FR-TRC-UI-MARKET_CHARTS-003",
+      "feature_id": "FEAT-UI-MARKET_CHARTS",
       "task_id": "2.32",
       "text": "Offer keyboard/table equivalents and no-WebGL fallback where applicable.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json"
     },
     {
       "requirement_id": "FR-TRC-IND-CALCULATE_TREND-001",
@@ -2188,52 +2188,52 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESULTS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-27-001",
-      "feature_id": "FEAT-UI-27",
+      "requirement_id": "FR-TRC-UI-RUN_BACKTEST-001",
+      "feature_id": "FEAT-UI-RUN_BACKTEST",
       "task_id": "4.20",
       "text": "Present strategy revision/parameters, primary/additional data, tick-method evidence class/coverage, costs, account, sample, output and resource preview.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-27-002",
-      "feature_id": "FEAT-UI-27",
+      "requirement_id": "FR-TRC-UI-RUN_BACKTEST-002",
+      "feature_id": "FEAT-UI-RUN_BACKTEST",
       "task_id": "4.20",
       "text": "Submit one governed owner request, observe progress/log/warnings and expose supported cancel/pause/retry.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-27-003",
-      "feature_id": "FEAT-UI-27",
+      "requirement_id": "FR-TRC-UI-RUN_BACKTEST-003",
+      "feature_id": "FEAT-UI-RUN_BACKTEST",
       "task_id": "4.20",
       "text": "Open the committed Analytics result by stable ID and retain partial/unavailable/failed states.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-32-001",
-      "feature_id": "FEAT-UI-32",
+      "requirement_id": "FR-TRC-UI-RESEARCH_WORKBENCH-001",
+      "feature_id": "FEAT-UI-RESEARCH_WORKBENCH",
       "task_id": "4.21",
       "text": "Discover compatible result views by result kind/schema/capability and restore safe per-view layout/selection.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-32-002",
-      "feature_id": "FEAT-UI-32",
+      "requirement_id": "FR-TRC-UI-RESEARCH_WORKBENCH-002",
+      "feature_id": "FEAT-UI-RESEARCH_WORKBENCH",
       "task_id": "4.21",
       "text": "Expose result/config/data/metric/method/sample/precision/partial/imported provenance and deep links.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-32-003",
-      "feature_id": "FEAT-UI-32",
+      "requirement_id": "FR-TRC-UI-RESEARCH_WORKBENCH-003",
+      "feature_id": "FEAT-UI-RESEARCH_WORKBENCH",
       "task_id": "4.21",
       "text": "Coordinate typed stable selections among independent panels without shared mutable domain state.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json"
     },
     {
       "requirement_id": "FR-TRC-UI-DATABANK_GRID-001",
@@ -2332,28 +2332,28 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-15-001",
-      "feature_id": "FEAT-UI-15",
+      "requirement_id": "FR-TRC-UI-SESSION_CONTEXT-001",
+      "feature_id": "FEAT-UI-SESSION_CONTEXT",
       "task_id": "5.01",
       "text": "Register exact widget/version/generation contributions containing stable public refs, selection, filters, safe labels/errors, focus, capture/expiry/hash and schema.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-15-002",
-      "feature_id": "FEAT-UI-15",
+      "requirement_id": "FR-TRC-UI-SESSION_CONTEXT-002",
+      "feature_id": "FEAT-UI-SESSION_CONTEXT",
       "task_id": "5.01",
       "text": "Capture a new bounded WorkspaceContextSnapshot for every message and drop unmounted/expired contributions.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-15-003",
-      "feature_id": "FEAT-UI-15",
+      "requirement_id": "FR-TRC-UI-SESSION_CONTEXT-003",
+      "feature_id": "FEAT-UI-SESSION_CONTEXT",
       "task_id": "5.01",
       "text": "Keep account/permission projection and stable typed cross-widget selection distinct from authoritative market/result facts.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json"
     },
     {
       "requirement_id": "FR-TRC-WS-MANAGE_CONVERSATIONS-001",
@@ -2908,28 +2908,28 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-28-001",
-      "feature_id": "FEAT-UI-28",
+      "requirement_id": "FR-TRC-UI-EXECUTE_ORDERS-001",
+      "feature_id": "FEAT-UI-EXECUTE_ORDERS",
       "task_id": "6.11",
       "text": "Display canonical campaign/family/protocol/sample/budget/holdout identities, attempt conservation and receiver lineage.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-28-002",
-      "feature_id": "FEAT-UI-28",
+      "requirement_id": "FR-TRC-UI-EXECUTE_ORDERS-002",
+      "feature_id": "FEAT-UI-EXECUTE_ORDERS",
       "task_id": "6.11",
       "text": "Present research draft, supported evidence and qualified outcomes as different states, with exact owner reasons and limitations.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json"
     },
     {
-      "requirement_id": "FR-TRC-UI-28-003",
-      "feature_id": "FEAT-UI-28",
+      "requirement_id": "FR-TRC-UI-EXECUTE_ORDERS-003",
+      "feature_id": "FEAT-UI-EXECUTE_ORDERS",
       "task_id": "6.11",
       "text": "Expose compatible research navigation, comparison and immutable artifact history through registered contributions.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json"
     },
     {
       "requirement_id": "FR-TRC-SIM-PERTURB_INPUTS-001",
@@ -4614,20 +4614,20 @@
   ],
   "local_nfrs": [
     {
-      "requirement_id": "NFR-TRC-UI-01-001",
-      "feature_id": "FEAT-UI-01",
+      "requirement_id": "NFR-TRC-UI-COMPOSE_WORKSPACE-001",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "task_id": "1.01",
       "text": "Each widget and registration proves exact cleanup and isolated layout failure.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-14-001",
-      "feature_id": "FEAT-UI-14",
+      "requirement_id": "NFR-TRC-UI-TYPED_BACKEND-001",
+      "feature_id": "FEAT-UI-TYPED_BACKEND",
       "task_id": "1.02",
-      "text": "Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-TYPED_BACKEND withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "PROVED_COMPLETE",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TYPED_BACKEND/acceptance.json"
     },
     {
       "requirement_id": "NFR-TRC-WS-MANAGE_WORKSPACES-001",
@@ -4774,12 +4774,12 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-17-001",
-      "feature_id": "FEAT-UI-17",
+      "requirement_id": "NFR-TRC-UI-SESSION_ACCESS-001",
+      "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
-      "text": "Removing FEAT-UI-17 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-SESSION_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-17/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json"
     },
     {
       "requirement_id": "NFR-TRC-WS-MANAGE_ARTIFACTS-001",
@@ -4910,20 +4910,20 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_JOBS/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-16-001",
-      "feature_id": "FEAT-UI-16",
+      "requirement_id": "NFR-TRC-UI-WORKSPACE_NAVIGATION-001",
+      "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
       "task_id": "1.27",
-      "text": "Removing FEAT-UI-16 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-WORKSPACE_NAVIGATION withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-13-001",
-      "feature_id": "FEAT-UI-13",
+      "requirement_id": "NFR-TRC-UI-SYSTEM_SETTINGS-001",
+      "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
       "task_id": "1.28",
-      "text": "Removing FEAT-UI-13 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-SYSTEM_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json"
     },
     {
       "requirement_id": "NFR-TRC-UI-RUN_MONITOR-001",
@@ -5206,20 +5206,20 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OBSERVE_MARKET_REFERENCE/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-18-001",
-      "feature_id": "FEAT-UI-18",
+      "requirement_id": "NFR-TRC-UI-DATA_MANAGER-001",
+      "feature_id": "FEAT-UI-DATA_MANAGER",
       "task_id": "2.31",
-      "text": "Removing FEAT-UI-18 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-DATA_MANAGER withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-04-001",
-      "feature_id": "FEAT-UI-04",
+      "requirement_id": "NFR-TRC-UI-MARKET_CHARTS-001",
+      "feature_id": "FEAT-UI-MARKET_CHARTS",
       "task_id": "2.32",
-      "text": "Removing FEAT-UI-04 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-MARKET_CHARTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json"
     },
     {
       "requirement_id": "NFR-TRC-IND-CALCULATE_TREND-001",
@@ -5614,20 +5614,20 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESULTS/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-27-001",
-      "feature_id": "FEAT-UI-27",
+      "requirement_id": "NFR-TRC-UI-RUN_BACKTEST-001",
+      "feature_id": "FEAT-UI-RUN_BACKTEST",
       "task_id": "4.20",
-      "text": "Removing FEAT-UI-27 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-RUN_BACKTEST withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-32-001",
-      "feature_id": "FEAT-UI-32",
+      "requirement_id": "NFR-TRC-UI-RESEARCH_WORKBENCH-001",
+      "feature_id": "FEAT-UI-RESEARCH_WORKBENCH",
       "task_id": "4.21",
-      "text": "Removing FEAT-UI-32 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-RESEARCH_WORKBENCH withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json"
     },
     {
       "requirement_id": "NFR-TRC-UI-DATABANK_GRID-001",
@@ -5726,12 +5726,12 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-15-001",
-      "feature_id": "FEAT-UI-15",
+      "requirement_id": "NFR-TRC-UI-SESSION_CONTEXT-001",
+      "feature_id": "FEAT-UI-SESSION_CONTEXT",
       "task_id": "5.01",
-      "text": "Removing FEAT-UI-15 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-SESSION_CONTEXT withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "ADAPT",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json"
     },
     {
       "requirement_id": "NFR-TRC-WS-MANAGE_CONVERSATIONS-001",
@@ -6014,12 +6014,12 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json"
     },
     {
-      "requirement_id": "NFR-TRC-UI-28-001",
-      "feature_id": "FEAT-UI-28",
+      "requirement_id": "NFR-TRC-UI-EXECUTE_ORDERS-001",
+      "feature_id": "FEAT-UI-EXECUTE_ORDERS",
       "task_id": "6.11",
-      "text": "Removing FEAT-UI-28 withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
+      "text": "Removing FEAT-UI-EXECUTE_ORDERS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
       "disposition": "VERIFY",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json"
     },
     {
       "requirement_id": "NFR-TRC-SIM-PERTURB_INPUTS-001",

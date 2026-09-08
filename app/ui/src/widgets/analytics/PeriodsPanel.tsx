@@ -1,5 +1,5 @@
 /**
- * Period aggregation panel (FEAT-UI-32).
+ * Period aggregation panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Every period dimension and context lives in the query string of the single
  * grouped route rather than in a route of its own. One route with explicit

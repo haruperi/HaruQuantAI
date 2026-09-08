@@ -1,5 +1,5 @@
 /**
- * Analytics workbench display store (FEAT-UI-32).
+ * Analytics workbench display store (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Holds only the operator's selection and presentation choices. No metric,
  * comparison result, or report payload is cached here: evidence is read from

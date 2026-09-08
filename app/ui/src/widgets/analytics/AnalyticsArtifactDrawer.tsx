@@ -1,5 +1,5 @@
 /**
- * Analytics artifact drawer (FEAT-UI-32).
+ * Analytics artifact drawer (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Lists the immutable artifact references recorded for one run, plus the
  * journal replay anchors. Artifacts are referenced, never deleted, and never

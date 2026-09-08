@@ -1,5 +1,5 @@
 /**
- * Period, benchmark, and chart gallery tests (FEAT-UI-32, P6-T02).
+ * Period, benchmark, and chart gallery tests (FEAT-UI-RESEARCH_WORKBENCH, P6-T02).
  *
  * Period dimensions and contexts travel in query parameters on one route, and
  * every chart declares its own owner payload rather than owning a route.

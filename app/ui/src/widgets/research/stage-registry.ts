@@ -1,5 +1,5 @@
 /**
- * Navigable stage registry for the Research workbench (FEAT-UI-28).
+ * Navigable stage registry for the Research workbench (FEAT-UI-EXECUTE_ORDERS).
  *
  * The registry names the stages and describes what each one shows. It does not
  * decide whether a stage has evidence: that status is server-derived and

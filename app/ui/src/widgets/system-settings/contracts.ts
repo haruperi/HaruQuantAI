@@ -1,5 +1,5 @@
 /**
- * System settings widget contracts (FEAT-UI-13).
+ * System settings widget contracts (FEAT-UI-SYSTEM_SETTINGS).
  */
 
 export interface SystemSettingsModalProps {

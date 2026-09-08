@@ -1,5 +1,5 @@
 /**
- * Returns and VAMI panel (FEAT-UI-32).
+ * Returns and VAMI panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders the Analytics-owned returns series, VAMI, and monthly returns. A
  * metric the V2 catalogue does not calculate is stated as such in the exact

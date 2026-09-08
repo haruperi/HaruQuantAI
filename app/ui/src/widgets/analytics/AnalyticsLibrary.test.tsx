@@ -1,5 +1,5 @@
 /**
- * Analytics library and overview tests (FEAT-UI-32, P3-T01).
+ * Analytics library and overview tests (FEAT-UI-RESEARCH_WORKBENCH, P3-T01).
  *
  * Covers server pagination, archive as a metadata-only transition, unavailable
  * metrics, units, quality flags, caveats, and long/short source contexts.

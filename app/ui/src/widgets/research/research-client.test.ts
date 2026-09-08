@@ -1,5 +1,5 @@
 /**
- * Research client contract tests (FEAT-UI-28, plan §14.1).
+ * Research client contract tests (FEAT-UI-EXECUTE_ORDERS, plan §14.1).
  *
  * Every operation is checked for method, path, response-schema validation, and
  * failure handling against the real transport — no client is stubbed out.

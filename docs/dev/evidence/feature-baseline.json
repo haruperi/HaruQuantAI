@@ -4,7 +4,7 @@
   "features": [
     {
       "task_id": "1.01",
-      "feature_id": "FEAT-UI-01",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "title": "Compose and restore the research workspace",
       "domain": "UI",
       "status": "COMPLETE",
@@ -15,12 +15,12 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.01-01",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json",
       "remaining_obligation": null
     },
     {
       "task_id": "1.02",
-      "feature_id": "FEAT-UI-14",
+      "feature_id": "FEAT-UI-TYPED_BACKEND",
       "title": "Call the typed backend and resume observation",
       "domain": "UI",
       "status": "COMPLETE",
@@ -31,7 +31,7 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.02-14",
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TYPED_BACKEND/acceptance.json",
       "remaining_obligation": null
     },
     {
@@ -244,7 +244,7 @@
     },
     {
       "task_id": "1.16",
-      "feature_id": "FEAT-UI-17",
+      "feature_id": "FEAT-UI-SESSION_ACCESS",
       "title": "Present session access and scope changes",
       "domain": "UI",
       "status": "PARTIAL",
@@ -255,7 +255,7 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-17/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
@@ -420,7 +420,7 @@
     },
     {
       "task_id": "1.27",
-      "feature_id": "FEAT-UI-16",
+      "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
       "title": "Navigate capabilities and explain workspace controls",
       "domain": "UI",
       "status": "PARTIAL",
@@ -431,12 +431,12 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
       "task_id": "1.28",
-      "feature_id": "FEAT-UI-13",
+      "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
       "title": "Review effective settings and safe configuration changes",
       "domain": "UI",
       "status": "EXISTING_UNVERIFIED",
@@ -447,7 +447,7 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
@@ -964,7 +964,7 @@
     },
     {
       "task_id": "2.31",
-      "feature_id": "FEAT-UI-18",
+      "feature_id": "FEAT-UI-DATA_MANAGER",
       "title": "Operate the Data Manager workspace",
       "domain": "UI",
       "status": "EXISTING_UNVERIFIED",
@@ -975,12 +975,12 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
       "task_id": "2.32",
-      "feature_id": "FEAT-UI-04",
+      "feature_id": "FEAT-UI-MARKET_CHARTS",
       "title": "Inspect market charts and typed overlays",
       "domain": "UI",
       "status": "EXISTING_UNVERIFIED",
@@ -991,7 +991,7 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
@@ -1588,7 +1588,7 @@
     },
     {
       "task_id": "4.20",
-      "feature_id": "FEAT-UI-27",
+      "feature_id": "FEAT-UI-RUN_BACKTEST",
       "title": "Configure and observe a canonical backtest",
       "domain": "UI",
       "status": "EXISTING_UNVERIFIED",
@@ -1599,12 +1599,12 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
       "task_id": "4.21",
-      "feature_id": "FEAT-UI-32",
+      "feature_id": "FEAT-UI-RESEARCH_WORKBENCH",
       "title": "Compose the result inspection workspace",
       "domain": "UI",
       "status": "EXISTING_UNVERIFIED",
@@ -1615,7 +1615,7 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
@@ -1716,7 +1716,7 @@
     },
     {
       "task_id": "5.01",
-      "feature_id": "FEAT-UI-15",
+      "feature_id": "FEAT-UI-SESSION_CONTEXT",
       "title": "Capture current authorized widget context",
       "domain": "UI",
       "status": "PARTIAL",
@@ -1727,7 +1727,7 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {
@@ -2052,7 +2052,7 @@
     },
     {
       "task_id": "6.11",
-      "feature_id": "FEAT-UI-28",
+      "feature_id": "FEAT-UI-EXECUTE_ORDERS",
       "title": "Inspect research campaigns, protocols and evidence",
       "domain": "UI",
       "status": "EXISTING_UNVERIFIED",
@@ -2063,7 +2063,7 @@
       "owner_path_exists": true,
       "entry_point_registered": false,
       "accepted_commit": null,
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json",
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json",
       "remaining_obligation": "Complete the exact plan card and acceptance evidence."
     },
     {

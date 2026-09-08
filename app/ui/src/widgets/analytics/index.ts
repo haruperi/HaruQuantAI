@@ -1,5 +1,5 @@
 /**
- * Analytics Workbench public surface (FEAT-UI-32).
+ * Analytics Workbench public surface (FEAT-UI-RESEARCH_WORKBENCH).
  */
 
 export {

@@ -1,5 +1,5 @@
 /**
- * Analytics time-series chart primitive (FEAT-UI-32).
+ * Analytics time-series chart primitive (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Plots one Analytics-owned series exactly as the owner supplied it. The chart
  * performs no smoothing, resampling, interpolation, or metric derivation: it

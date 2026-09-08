@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { SystemSettingsFeature } from "./feature";
 
-describe("SystemSettingsFeature (FEAT-UI-13)", () => {
+describe("SystemSettingsFeature (FEAT-UI-SYSTEM_SETTINGS)", () => {
   it("renders configuration error alert on invalid configuration", () => {
     render(<SystemSettingsFeature config={{ invalidKey: true }} />);
 

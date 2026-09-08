@@ -1,5 +1,5 @@
 /**
- * Bounded Dockview persistence boundary for FEAT-UI-01.
+ * Bounded Dockview persistence boundary for FEAT-UI-COMPOSE_WORKSPACE.
  *
  * Dockview serializes open-ended panel params and popout metadata. Workspace
  * persistence accepts only the minimum local widget topology and reconstructs

@@ -1,5 +1,5 @@
 /**
- * Realism and provenance panel tests (FEAT-UI-32, P3-T04).
+ * Realism and provenance panel tests (FEAT-UI-RESEARCH_WORKBENCH, P3-T04).
  *
  * Both panels must render owner evidence verbatim, including exact hashes,
  * assumptions, limitations, diagnostics, and manifest metadata, and must mark

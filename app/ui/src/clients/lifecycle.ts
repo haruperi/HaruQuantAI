@@ -1,4 +1,4 @@
-/** Scoped request and stream ownership for FEAT-UI-14. */
+/** Scoped request and stream ownership for FEAT-UI-TYPED_BACKEND. */
 
 import type { ApiResponse, StreamEvent } from "./contracts";
 import { ApiClientError, request, type RequestOptions } from "./request";

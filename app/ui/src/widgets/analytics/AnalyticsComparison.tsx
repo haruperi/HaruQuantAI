@@ -1,5 +1,5 @@
 /**
- * Analytics run comparison (FEAT-UI-32).
+ * Analytics run comparison (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Selects runs and asks Analytics to compare them. The comparison itself is
  * always the owner's: this surface never subtracts two payloads to produce a

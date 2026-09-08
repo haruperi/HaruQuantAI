@@ -1,5 +1,5 @@
 /**
- * Research automation (FEAT-UI-28, plan §10.18).
+ * Research automation (FEAT-UI-EXECUTE_ORDERS, plan §10.18).
  *
  * Covers V1's single and batch automation controls, and adds the V2
  * improvements: queued background jobs, per-symbol status, partial-failure

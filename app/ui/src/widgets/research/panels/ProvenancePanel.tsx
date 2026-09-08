@@ -1,5 +1,5 @@
 /**
- * Provenance panel (FEAT-UI-28, plan §10.16).
+ * Provenance panel (FEAT-UI-EXECUTE_ORDERS, plan §10.16).
  *
  * Hashes, seeds, dependency versions, source references, and duration — the
  * evidence that makes a run reproducible. The raw report is available here as

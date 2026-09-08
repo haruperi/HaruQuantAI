@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import { SYSTEM_SETTINGS_MANIFEST } from "./manifest";
 
-describe("SYSTEM_SETTINGS_MANIFEST (FEAT-UI-13)", () => {
+describe("SYSTEM_SETTINGS_MANIFEST (FEAT-UI-SYSTEM_SETTINGS)", () => {
   it("declares the permanent feature identity and type", () => {
-    expect(SYSTEM_SETTINGS_MANIFEST.featureId).toBe("FEAT-UI-13");
+    expect(SYSTEM_SETTINGS_MANIFEST.featureId).toBe("FEAT-UI-SYSTEM_SETTINGS");
     expect(SYSTEM_SETTINGS_MANIFEST.widgetType).toBe("systemSettings");
     expect(SYSTEM_SETTINGS_MANIFEST.widgetVersion).toBe(1);
   });

@@ -44,6 +44,20 @@ ORIGINAL_SPEC_BLOB = "7b592a2c25276ceae7cf7011f0a4f98eabe9c7fd"
 PINNED_SPEC_BLOB = "d69bef59cb981350cd6f2ebdccc31b231a4e0950"
 MINIMUM_TABLE_COLUMNS = 2
 
+FEATURE_ID_ALIASES: dict[str, str] = {
+    "FEAT-UI-01": "FEAT-UI-COMPOSE_WORKSPACE",
+    "FEAT-UI-04": "FEAT-UI-MARKET_CHARTS",
+    "FEAT-UI-13": "FEAT-UI-SYSTEM_SETTINGS",
+    "FEAT-UI-14": "FEAT-UI-TYPED_BACKEND",
+    "FEAT-UI-15": "FEAT-UI-SESSION_CONTEXT",
+    "FEAT-UI-16": "FEAT-UI-WORKSPACE_NAVIGATION",
+    "FEAT-UI-17": "FEAT-UI-SESSION_ACCESS",
+    "FEAT-UI-18": "FEAT-UI-DATA_MANAGER",
+    "FEAT-UI-27": "FEAT-UI-RUN_BACKTEST",
+    "FEAT-UI-28": "FEAT-UI-EXECUTE_ORDERS",
+    "FEAT-UI-32": "FEAT-UI-RESEARCH_WORKBENCH",
+}
+
 
 def _sha256(path: Path) -> str:
     """Return the SHA-256 digest of one file."""
@@ -145,10 +159,12 @@ def parse_plan(text: str) -> list[dict[str, Any]]:
         accepted_match = ACCEPTANCE_REF_RE.search(accepted_line)
         evidence_match = re.search(r"\*\*Evidence manifest:\*\*\s*`([^`]+)`", section)
         test_line = _field(section, "Acceptance test targets") or ""
+        feature_id = match.group("feature")
+        feature_id = FEATURE_ID_ALIASES.get(feature_id, feature_id)
         tasks.append(
             {
                 "task_id": match.group("task"),
-                "feature_id": match.group("feature"),
+                "feature_id": feature_id,
                 "title": match.group("title").strip(),
                 "complete": match.group("mark").lower() == "x",
                 "status": status,
@@ -187,8 +203,8 @@ def _operation_edges(section: str, consumer: str) -> list[dict[str, str]]:
         if len(cells) >= MINIMUM_TABLE_COLUMNS:
             edges.extend(
                 {
-                    "consumer": consumer,
-                    "provider": provider,
+                    "consumer": FEATURE_ID_ALIASES.get(consumer, consumer),
+                    "provider": FEATURE_ID_ALIASES.get(provider, provider),
                     "guard": cells[1],
                 }
                 for provider in providers
@@ -233,6 +249,7 @@ def parse_register(text: str) -> list[dict[str, Any]]:
     features: list[dict[str, Any]] = []
     for match, section in _sections(text, CARD_RE):
         feature_id = match.group("feature")
+        feature_id = FEATURE_ID_ALIASES.get(feature_id, feature_id)
         required_line = _field(section, "Required feature providers") or "None"
         contract_target = (_field(section, "Contract target") or "").strip("` .")
         owner_path = (_field(section, "Owning package") or "").strip("` .")
@@ -260,7 +277,10 @@ def parse_register(text: str) -> list[dict[str, Any]]:
                 "operation_scope": operation_scope,
                 "input_boundary": (_field(section, "Input boundary") or "").strip(),
                 "output_boundary": (_field(section, "Output boundary") or "").strip(),
-                "required_providers": FEATURE_RE.findall(required_line),
+                "required_providers": [
+                    FEATURE_ID_ALIASES.get(provider, provider)
+                    for provider in FEATURE_RE.findall(required_line)
+                ],
                 "operation_gates": _operation_edges(section, feature_id),
                 "requirements": requirements,
                 "shared_nfrs": sorted(

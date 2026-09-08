@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Workspace content router (FEAT-UI-16).
+ * Workspace content router (FEAT-UI-WORKSPACE_NAVIGATION).
  *
  * Decides what the workspace area shows for the active workspace: the template
  * picker while the workspace is pending its template choice, the explicit

@@ -1,5 +1,5 @@
 /**
- * Metrics panel (FEAT-UI-28, plan §10.8).
+ * Metrics panel (FEAT-UI-EXECUTE_ORDERS, plan §10.8).
  *
  * Covers V1 Core Metric with the seven canonical V2 metric families. Values,
  * units, sample sizes, and validity all come from Research; the browser sorts

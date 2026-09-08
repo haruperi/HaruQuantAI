@@ -1,5 +1,5 @@
 /**
- * Validation panel (FEAT-UI-28, plan §10.7).
+ * Validation panel (FEAT-UI-EXECUTE_ORDERS, plan §10.7).
  *
  * Two tabs over one stage view: the leakage evidence and chronological split
  * policy, and the seeded statistical evidence. Every p-value, interval, and

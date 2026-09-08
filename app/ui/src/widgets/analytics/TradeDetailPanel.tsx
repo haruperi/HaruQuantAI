@@ -1,5 +1,5 @@
 /**
- * Analytics trade detail panel (FEAT-UI-32).
+ * Analytics trade detail panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders the complete owner-supplied evidence for one canonical trade and the
  * replay handoff. The replay URL carries the exact encoded return context so a

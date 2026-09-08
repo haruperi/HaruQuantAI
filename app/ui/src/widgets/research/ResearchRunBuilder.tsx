@@ -1,5 +1,5 @@
 /**
- * New experiment / run builder (FEAT-UI-28, plan §10.2).
+ * New experiment / run builder (FEAT-UI-EXECUTE_ORDERS, plan §10.2).
  *
  * Six sections: hypothesis, dataset, stages, preset and approved overrides,
  * validation settings, and review. The builder submits a safe request — a

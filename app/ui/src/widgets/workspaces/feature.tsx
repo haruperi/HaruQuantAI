@@ -1,6 +1,6 @@
 "use client";
 
-/** Lifecycle boundary for the FEAT-UI-01 workspace-layout feature. */
+/** Lifecycle boundary for the FEAT-UI-COMPOSE_WORKSPACE workspace-layout feature. */
 
 import React from "react";
 

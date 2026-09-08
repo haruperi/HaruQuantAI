@@ -1,5 +1,5 @@
 /**
- * Experiment ledger and detail (FEAT-UI-28, plan §10.17).
+ * Experiment ledger and detail (FEAT-UI-EXECUTE_ORDERS, plan §10.17).
  *
  * The experiment list and one experiment's run history. Failed, cancelled, and
  * inconclusive runs are listed alongside successful ones.

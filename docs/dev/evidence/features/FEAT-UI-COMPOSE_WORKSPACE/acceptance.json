@@ -1,6 +1,6 @@
 {
   "$schema": "../../evidence-schema.json",
-  "feature_id": "FEAT-UI-01",
+  "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
   "task_id": "1.01",
   "status": "ACCEPTED",
   "owner_specification": "app/ui/README.md",
@@ -8,94 +8,94 @@
   "acceptance_commit": "task-closeout:20260907-203821-559690-v3-phases-1-16-1.01-01",
   "requirements": [
     {
-      "id": "FR-TRC-UI-01-001",
+      "id": "FR-TRC-UI-COMPOSE_WORKSPACE-001",
       "status": "PASS",
       "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_001"
     },
     {
-      "id": "FR-TRC-UI-01-002",
+      "id": "FR-TRC-UI-COMPOSE_WORKSPACE-002",
       "status": "PASS",
       "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_002"
     },
     {
-      "id": "FR-TRC-UI-01-003",
+      "id": "FR-TRC-UI-COMPOSE_WORKSPACE-003",
       "status": "PASS",
       "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_003"
     },
     {
-      "id": "FR-TRC-UI-01-004",
+      "id": "FR-TRC-UI-COMPOSE_WORKSPACE-004",
       "status": "PASS",
       "evidence_target": "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx::test_trc_host_workspace_004"
     },
     {
-      "id": "NFR-TRC-UI-01-001",
+      "id": "NFR-TRC-UI-COMPOSE_WORKSPACE-001",
       "status": "PASS",
       "evidence_target": "app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx::test_trc_host_workspace_nfr_001"
     },
     {
       "id": "NFR-A-001",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-A-002",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-A-003",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-A-004",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-A-005",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-A-006",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-P-002",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-P-003",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-P-005",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-P-013",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-R-002",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-R-003",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-R-005",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-S-001",
@@ -130,27 +130,27 @@
     {
       "id": "NFR-TRC-SHARED-BOUNDARIES",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-TRC-SHARED-CONFIG",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-TRC-SHARED-EVIDENCE",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-TRC-SHARED-INTEGRITY",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     },
     {
       "id": "NFR-TRC-SHARED-STORED-IDENTITY",
       "status": "PASS",
-      "evidence_target": "Focused FEAT-UI-01 registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
+      "evidence_target": "Focused FEAT-UI-COMPOSE_WORKSPACE registry, recovery, lifecycle, typecheck, build, documentation, and architecture evidence recorded below"
     }
   ],
   "catalogue_entries": [
@@ -166,7 +166,7 @@
     },
     "provider": {
       "status": "NOT_APPLICABLE",
-      "evidence": "FEAT-UI-01 is a presentation-only registry/layout owner and declares no backend provider."
+      "evidence": "FEAT-UI-COMPOSE_WORKSPACE is a presentation-only registry/layout owner and declares no backend provider."
     },
     "composition": {
       "status": "PASS",
@@ -182,7 +182,7 @@
     },
     "end_to_end": {
       "status": "NOT_APPLICABLE",
-      "evidence": "FEAT-UI-01 has no external provider or Interfaces route. Local component integration is recorded under composition/UI and is not labelled browser end-to-end; the phase-level real-provider browser checkpoint is owned by Task 1.30."
+      "evidence": "FEAT-UI-COMPOSE_WORKSPACE has no external provider or Interfaces route. Local component integration is recorded under composition/UI and is not labelled browser end-to-end; the phase-level real-provider browser checkpoint is owned by Task 1.30."
     }
   },
   "commands": [

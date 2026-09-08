@@ -1,5 +1,5 @@
 /**
- * Run comparison (FEAT-UI-28, plan §10.17).
+ * Run comparison (FEAT-UI-EXECUTE_ORDERS, plan §10.17).
  *
  * The comparison is computed by the server and rendered here. The browser
  * holds no V1-style snapshot, and computes no delta of its own beyond

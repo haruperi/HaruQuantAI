@@ -1,5 +1,5 @@
 /**
- * Workspace and widget layout contracts (FEAT-UI-01).
+ * Workspace and widget layout contracts (FEAT-UI-COMPOSE_WORKSPACE).
  *
  * `Widget`/`WidgetType`/`Workspace`/`GridRect` are UI-only presentation state -
  * never API contracts. The zod schemas exist solely to validate JSON recovered

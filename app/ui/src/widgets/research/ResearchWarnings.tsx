@@ -1,5 +1,5 @@
 /**
- * Run-level warning surface (FEAT-UI-28).
+ * Run-level warning surface (FEAT-UI-EXECUTE_ORDERS).
  *
  * Warnings are grouped by the severity Research assigned. Nothing is filtered
  * out: a research ledger that hides its caveats is not evidence.

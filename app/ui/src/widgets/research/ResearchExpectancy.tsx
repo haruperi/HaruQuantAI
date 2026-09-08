@@ -1,5 +1,5 @@
 /**
- * Expectancy page (FEAT-UI-28, plan §10.19).
+ * Expectancy page (FEAT-UI-EXECUTE_ORDERS, plan §10.19).
  *
  * Displays the approved expectancy profile, its lifecycle state, and its
  * eligibility evidence. Research remains the state-machine authority; permitted

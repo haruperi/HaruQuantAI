@@ -1,5 +1,5 @@
 /**
- * Features panel (FEAT-UI-28, plan §10.6).
+ * Features panel (FEAT-UI-EXECUTE_ORDERS, plan §10.6).
  *
  * A V2-only view. It renders the feature-frame shape, the declared windows and
  * forward horizons, and the no-lookahead classification Research published —

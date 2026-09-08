@@ -1,5 +1,5 @@
 /**
- * Canonical backtest simulator (FEAT-UI-27).
+ * Canonical backtest simulator (FEAT-UI-RUN_BACKTEST).
  *
  * Presents the run configuration a human actually chooses, starts the run as a
  * background job, follows its ordered progress, and renders the Analytics-owned

@@ -1,5 +1,5 @@
 /**
- * Analytics overview panel (FEAT-UI-32).
+ * Analytics overview panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders run identity, report status, and the Analytics-owned metric groups
  * for one run. Every figure comes from the owner projection: a metric the

@@ -1,5 +1,5 @@
 /**
- * Research workbench component tests (FEAT-UI-28, plan §14.2).
+ * Research workbench component tests (FEAT-UI-EXECUTE_ORDERS, plan §14.2).
  *
  * Covers stage status and prerequisites, warning grouping, readiness and score
  * rendering, study classification, seasonality heatmap cells, artifact

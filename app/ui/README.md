@@ -92,19 +92,19 @@ Versioned non-authoritative display/layout preferences and bounded transient dra
 
 | Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
 | --- | --- | --- | --- | --- |
-| PRESENTATION_ONLY | [`FEAT-UI-01`](#feat-ui-01) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-14`](#feat-ui-14) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-15`](#feat-ui-15) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-16`](#feat-ui-16) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-17`](#feat-ui-17) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-13`](#feat-ui-13) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-18`](#feat-ui-18) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-WORKSPACE_NAVIGATION`](#feat-ui-workspace-navigation) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-SESSION_ACCESS`](#feat-ui-session-access) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-SYSTEM_SETTINGS`](#feat-ui-system-settings) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-DATA_MANAGER`](#feat-ui-data-manager) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
 | PRESENTATION_ONLY | [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
 | PRESENTATION_ONLY | [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-04`](#feat-ui-04) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-27`](#feat-ui-27) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-28`](#feat-ui-28) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
-| PRESENTATION_ONLY | [`FEAT-UI-32`](#feat-ui-32) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-MARKET_CHARTS`](#feat-ui-market-charts) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-RUN_BACKTEST`](#feat-ui-run-backtest) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-EXECUTE_ORDERS`](#feat-ui-execute-orders) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
+| PRESENTATION_ONLY | [`FEAT-UI-RESEARCH_WORKBENCH`](#feat-ui-research-workbench) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
 | PRESENTATION_ONLY | [`FEAT-UI-STRATEGY_STUDIO`](#feat-ui-strategy-studio) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
 | PRESENTATION_ONLY | [`FEAT-UI-STRATEGY_BUILDER`](#feat-ui-strategy-builder) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
 | PRESENTATION_ONLY | [`FEAT-UI-STRATEGY_RETESTER`](#feat-ui-strategy-retester) | Presentation-only state | No new business driver. | No business database or authority. Clear scoped selections and observations on account change/removal. |
@@ -138,9 +138,9 @@ A feature’s exact durable namespace, schema version and migrations are taken f
 | Code level | Represents | Domain example |
 | --- | --- | --- |
 | Package | Domain boundary | `app/ui/` |
-| Module folder | Composable feature owner | `app/ui/src/widgets/workspaces/` — [`FEAT-UI-01`](#feat-ui-01) |
+| Module folder | Composable feature owner | `app/ui/src/widgets/workspaces/` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace) |
 | File | Manifest, strict configuration, lifecycle or focused use case | `manifest.ts`, `index.ts`, focused component |
-| Class / function / method | One or more traced requirement behaviors | `FR-TRC-UI-01-001` and its acceptance oracle |
+| Class / function / method | One or more traced requirement behaviors | `FR-TRC-UI-COMPOSE_WORKSPACE-001` and its acceptance oracle |
 
 ### Domain Capability Map
 
@@ -160,19 +160,19 @@ Feature owners are independent and physically removable. The selected package is
 
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| [`FEAT-UI-01`](#feat-ui-01) | Compose and restore the research workspace | `app/ui/src/widgets/workspaces/` | U1 | 4 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-14`](#feat-ui-14) | Call the typed backend and resume observation | `app/ui/src/clients/` | U1 | 2 | 1 | PROVED_COMPLETE |
-| [`FEAT-UI-15`](#feat-ui-15) | Capture current authorized widget context | `app/ui/src/context/` | U2 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-16`](#feat-ui-16) | Navigate capabilities and explain workspace controls | `app/ui/src/components/layout/` | U1 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-17`](#feat-ui-17) | Present session access and scope changes | `app/ui/src/app/` | U1 | 2 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-13`](#feat-ui-13) | Review effective settings and safe configuration changes | `app/ui/src/widgets/system-settings/` | U1 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-18`](#feat-ui-18) | Operate the Data Manager workspace | `app/ui/src/components/workflow/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace) | Compose and restore the research workspace | `app/ui/src/widgets/workspaces/` | U1 | 4 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend) | Call the typed backend and resume observation | `app/ui/src/clients/` | U1 | 2 | 1 | PROVED_COMPLETE |
+| [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context) | Capture current authorized widget context | `app/ui/src/context/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-WORKSPACE_NAVIGATION`](#feat-ui-workspace-navigation) | Navigate capabilities and explain workspace controls | `app/ui/src/components/layout/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-SESSION_ACCESS`](#feat-ui-session-access) | Present session access and scope changes | `app/ui/src/app/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-SYSTEM_SETTINGS`](#feat-ui-system-settings) | Review effective settings and safe configuration changes | `app/ui/src/widgets/system-settings/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-DATA_MANAGER`](#feat-ui-data-manager) | Operate the Data Manager workspace | `app/ui/src/components/workflow/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections) | Navigate large typed collections accessibly | `app/ui/src/widgets/collection-grid/` | U1 | 3 | 2 | NOT_REVALIDATED |
 | [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts) | Review typed edits and consequential action scope | `app/ui/src/widgets/draft-review/` | U1 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-04`](#feat-ui-04) | Inspect market charts and typed overlays | `app/ui/src/widgets/chart/` | U2 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-27`](#feat-ui-27) | Configure and observe a canonical backtest | `app/ui/src/widgets/simulator/` | U2 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-28`](#feat-ui-28) | Inspect research campaigns, protocols and evidence | `app/ui/src/widgets/research/` | U3 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-32`](#feat-ui-32) | Compose the result inspection workspace | `app/ui/src/widgets/analytics/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-MARKET_CHARTS`](#feat-ui-market-charts) | Inspect market charts and typed overlays | `app/ui/src/widgets/chart/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-RUN_BACKTEST`](#feat-ui-run-backtest) | Configure and observe a canonical backtest | `app/ui/src/widgets/simulator/` | U2 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-EXECUTE_ORDERS`](#feat-ui-execute-orders) | Inspect research campaigns, protocols and evidence | `app/ui/src/widgets/research/` | U3 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-RESEARCH_WORKBENCH`](#feat-ui-research-workbench) | Compose the result inspection workspace | `app/ui/src/widgets/analytics/` | U2 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-UI-STRATEGY_STUDIO`](#feat-ui-strategy-studio) | Edit and review a strategy | `app/ui/src/widgets/strategy-editor/` | U2 | 2 | 2 | NOT_REVALIDATED |
 | [`FEAT-UI-STRATEGY_BUILDER`](#feat-ui-strategy-builder) | Configure and run strategy generation | `app/ui/src/widgets/strategy-search-space/` | U5 | 2 | 2 | NOT_REVALIDATED |
 | [`FEAT-UI-STRATEGY_RETESTER`](#feat-ui-strategy-retester) | Retest a fixed strategy population | `app/ui/src/widgets/research-settings/` | U4 | 2 | 2 | NOT_REVALIDATED |
@@ -202,19 +202,19 @@ Feature owners are independent and physically removable. The selected package is
 ```text
 app/ui/
 ├── README.md  # this domain target registry
-├── src/widgets/workspaces/  # FEAT-UI-01
-├── src/clients/  # FEAT-UI-14
-├── src/context/  # FEAT-UI-15
-├── src/components/layout/  # FEAT-UI-16
-├── src/app/  # FEAT-UI-17
-├── src/widgets/system-settings/  # FEAT-UI-13
-├── src/components/workflow/  # FEAT-UI-18
+├── src/widgets/workspaces/  # FEAT-UI-COMPOSE_WORKSPACE
+├── src/clients/  # FEAT-UI-TYPED_BACKEND
+├── src/context/  # FEAT-UI-SESSION_CONTEXT
+├── src/components/layout/  # FEAT-UI-WORKSPACE_NAVIGATION
+├── src/app/  # FEAT-UI-SESSION_ACCESS
+├── src/widgets/system-settings/  # FEAT-UI-SYSTEM_SETTINGS
+├── src/components/workflow/  # FEAT-UI-DATA_MANAGER
 ├── src/widgets/collection-grid/  # FEAT-UI-VIEW_COLLECTIONS
 ├── src/widgets/draft-review/  # FEAT-UI-REVIEW_DRAFTS
-├── src/widgets/chart/  # FEAT-UI-04
-├── src/widgets/simulator/  # FEAT-UI-27
-├── src/widgets/research/  # FEAT-UI-28
-├── src/widgets/analytics/  # FEAT-UI-32
+├── src/widgets/chart/  # FEAT-UI-MARKET_CHARTS
+├── src/widgets/simulator/  # FEAT-UI-RUN_BACKTEST
+├── src/widgets/research/  # FEAT-UI-EXECUTE_ORDERS
+├── src/widgets/analytics/  # FEAT-UI-RESEARCH_WORKBENCH
 ├── src/widgets/strategy-editor/  # FEAT-UI-STRATEGY_STUDIO
 ├── src/widgets/strategy-search-space/  # FEAT-UI-STRATEGY_BUILDER
 ├── src/widgets/research-settings/  # FEAT-UI-STRATEGY_RETESTER
@@ -258,7 +258,7 @@ Workflows connect existing features; they do not create additional feature owner
 
 **Output boundary:** Accurate accessible views and receipt-backed actions; closing an observer releases effects without cancelling unrelated accepted work.
 
-**Capabilities to inspect:** [`FEAT-UI-01`](#feat-ui-01) → [`FEAT-UI-14`](#feat-ui-14) → [`FEAT-UI-15`](#feat-ui-15) → [`FEAT-UI-27`](#feat-ui-27) → [`FEAT-UI-32`](#feat-ui-32) → [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot).
+**Capabilities to inspect:** [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace) → [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend) → [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context) → [`FEAT-UI-RUN_BACKTEST`](#feat-ui-run-backtest) → [`FEAT-UI-RESEARCH_WORKBENCH`](#feat-ui-research-workbench) → [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot).
 
 This is a domain-oriented explanation, not an additional canonical `WF-*` identity. Apply every FR of the participating operation, not only its first validation step. Validate scope and immutable references, resolve admitted providers, perform owner work, verify the owner receipt, and then expose the result. Invalid input, provider absence, stale revision and cancellation retain separate typed outcomes.
 
@@ -279,9 +279,9 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Lead owner:** [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research). **Release gate:** U5. **State:** PENDING.
 
-**Participants:** [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research), [`FEAT-UI-01`](#feat-ui-01), [`FEAT-DATA-BIND_RUN_DATA`](../services/data/README.md#feat-data-bind-run-data), [`FEAT-STRAT-DEFINE_SEARCH_SPACES`](../services/strategy/README.md#feat-strat-define-search-spaces), [`FEAT-RES-GENERATE_STRATEGIES`](../services/research/README.md#feat-res-generate-strategies), [`FEAT-RES-EVOLVE_STRATEGIES`](../services/research/README.md#feat-res-evolve-strategies), [`FEAT-SIM-EXECUTE_TICKS`](../services/simulator/README.md#feat-sim-execute-ticks), [`FEAT-ANA-COMPUTE_METRICS`](../services/analytics/README.md#feat-ana-compute-metrics), [`FEAT-RES-TEST_ROBUSTNESS`](../services/research/README.md#feat-res-test-robustness), [`FEAT-RES-QUALIFY_RESEARCH`](../services/research/README.md#feat-res-qualify-research), [`FEAT-ANA-DATABANK_MEMBERSHIP`](../services/analytics/README.md#feat-ana-databank-membership), [`FEAT-UI-32`](#feat-ui-32).
+**Participants:** [`FEAT-RES-RUN_RESEARCH`](../services/research/README.md#feat-res-run-research), [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace), [`FEAT-DATA-BIND_RUN_DATA`](../services/data/README.md#feat-data-bind-run-data), [`FEAT-STRAT-DEFINE_SEARCH_SPACES`](../services/strategy/README.md#feat-strat-define-search-spaces), [`FEAT-RES-GENERATE_STRATEGIES`](../services/research/README.md#feat-res-generate-strategies), [`FEAT-RES-EVOLVE_STRATEGIES`](../services/research/README.md#feat-res-evolve-strategies), [`FEAT-SIM-EXECUTE_TICKS`](../services/simulator/README.md#feat-sim-execute-ticks), [`FEAT-ANA-COMPUTE_METRICS`](../services/analytics/README.md#feat-ana-compute-metrics), [`FEAT-RES-TEST_ROBUSTNESS`](../services/research/README.md#feat-res-test-robustness), [`FEAT-RES-QUALIFY_RESEARCH`](../services/research/README.md#feat-res-qualify-research), [`FEAT-ANA-DATABANK_MEMBERSHIP`](../services/analytics/README.md#feat-ana-databank-membership), [`FEAT-UI-RESEARCH_WORKBENCH`](#feat-ui-research-workbench).
 
-**This domain contributes:** [`FEAT-UI-01`](#feat-ui-01), [`FEAT-UI-32`](#feat-ui-32). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+**This domain contributes:** [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace), [`FEAT-UI-RESEARCH_WORKBENCH`](#feat-ui-research-workbench). Every participating feature’s scoped FR/local-NFR obligations remain binding.
 
 **Input/output and acceptance contract:** `ATW-WB-GENERATE_QUALIFY` — Pinned source/space/seed; one accepted research run; each candidate has actual simulation, filters and stage history; only qualified committed result references enter the destination databank.
 
@@ -357,9 +357,9 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
 
-**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator), [`FEAT-UI-32`](#feat-ui-32), [`FEAT-UI-15`](#feat-ui-15), [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot), [`FEAT-IFACE-AGENTIC_GATEWAY`](../services/interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../services/agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](../services/agentic/README.md#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](../services/agentic/README.md#feat-agt-synthesize-research), [`FEAT-ANA-QUERY_RESULTS`](../services/analytics/README.md#feat-ana-query-results), [`FEAT-WS-MANAGE_CONVERSATIONS`](../services/workspace/README.md#feat-ws-manage-conversations).
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator), [`FEAT-UI-RESEARCH_WORKBENCH`](#feat-ui-research-workbench), [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context), [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot), [`FEAT-IFACE-AGENTIC_GATEWAY`](../services/interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../services/agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-MANAGE_CLAIMS`](../services/agentic/README.md#feat-agt-manage-claims), [`FEAT-AGT-SYNTHESIZE_RESEARCH`](../services/agentic/README.md#feat-agt-synthesize-research), [`FEAT-ANA-QUERY_RESULTS`](../services/analytics/README.md#feat-ana-query-results), [`FEAT-WS-MANAGE_CONVERSATIONS`](../services/workspace/README.md#feat-ws-manage-conversations).
 
-**This domain contributes:** [`FEAT-UI-32`](#feat-ui-32), [`FEAT-UI-15`](#feat-ui-15), [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+**This domain contributes:** [`FEAT-UI-RESEARCH_WORKBENCH`](#feat-ui-research-workbench), [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context), [`FEAT-UI-CHAT_BOT`](#feat-ui-chat-bot). Every participating feature’s scoped FR/local-NFR obligations remain binding.
 
 **Input/output and acceptance contract:** `ATW-WB-CHAT_REVIEW` — Change the browser-displayed metric to an incorrect value: answer refreshes owner truth and cites exact evidence, same-conversation specialist attribution; stale or denied evidence cannot produce a claimed fact.
 
@@ -383,9 +383,9 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 **Lead owner:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator). **Release gate:** U2. **State:** PENDING.
 
-**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator), [`FEAT-AGT-ENFORCE_MANDATE`](../services/agentic/README.md#feat-agt-enforce-mandate), [`FEAT-AGT-RUN_WORKFLOWS`](../services/agentic/README.md#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../services/agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-REGISTER_ROLES`](../services/agentic/README.md#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](../services/agentic/README.md#feat-agt-invoke-models), [`FEAT-UI-15`](#feat-ui-15), [`FEAT-IFACE-AGENTIC_GATEWAY`](../services/interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-WS-MANAGE_CONVERSATIONS`](../services/workspace/README.md#feat-ws-manage-conversations).
+**Participants:** [`FEAT-AGT-ASSIST_OPERATOR`](../services/agentic/README.md#feat-agt-assist-operator), [`FEAT-AGT-ENFORCE_MANDATE`](../services/agentic/README.md#feat-agt-enforce-mandate), [`FEAT-AGT-RUN_WORKFLOWS`](../services/agentic/README.md#feat-agt-run-workflows), [`FEAT-AGT-ASSEMBLE_CONTEXT`](../services/agentic/README.md#feat-agt-assemble-context), [`FEAT-AGT-REGISTER_ROLES`](../services/agentic/README.md#feat-agt-register-roles), [`FEAT-AGT-INVOKE_MODELS`](../services/agentic/README.md#feat-agt-invoke-models), [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context), [`FEAT-IFACE-AGENTIC_GATEWAY`](../services/interfaces/README.md#feat-iface-agentic-gateway), [`FEAT-WS-MANAGE_CONVERSATIONS`](../services/workspace/README.md#feat-ws-manage-conversations).
 
-**This domain contributes:** [`FEAT-UI-15`](#feat-ui-15). Every participating feature’s scoped FR/local-NFR obligations remain binding.
+**This domain contributes:** [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context). Every participating feature’s scoped FR/local-NFR obligations remain binding.
 
 **Input/output and acceptance contract:** `ATW-AGT-ASSIST_OPERATOR` — Fresh verified scope and deterministic direct/specialist route; reply preserves attribution, refusals and evidence; no prose-triggered mutation.
 
@@ -395,12 +395,12 @@ This is a domain-oriented explanation, not an additional canonical `WF-*` identi
 
 Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expected acceptance outcomes are reproduced below. Acceptance states remain PENDING / NOT_REVALIDATED unless a card records newer evidence explicitly. Contract targets and intended tests do not prove runtime support. `Binding pending` prohibits executor invention: resolve the exact compatible contract, configuration, state and fixture before production use. The plan’s one-feature task rule includes all registered variants; future-provider qualification is not permission to leave owned adapter behavior unimplemented.
 
-<a id="feat-ui-01"></a>
-### 4.1 `workspaces/` — `FEAT-UI-01`
+<a id="feat-ui-compose-workspace"></a>
+### 4.1 `workspaces/` — `FEAT-UI-COMPOSE_WORKSPACE`
 
-> **Feature ID:** `FEAT-UI-01`
+> **Feature ID:** `FEAT-UI-COMPOSE_WORKSPACE`
 > **Domain:** `ui`
-> **Status:** `Implemented — terminal evidence ready for final review` — focused implementation, lifecycle, usage, typecheck, build, and prior independent-review evidence is recorded in `docs/dev/evidence/features/FEAT-UI-01/acceptance.json`; Reviewer 5 remains the final commit-gate authority.
+> **Status:** `Implemented — terminal evidence ready for final review` — focused implementation, lifecycle, usage, typecheck, build, and prior independent-review evidence is recorded in `docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json`; Reviewer 5 remains the final commit-gate authority.
 > **Selected owner:** `app/ui/src/widgets/workspaces/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -416,7 +416,7 @@ Compose and restore the research workspace. Present and interact with authoritat
 
 None (root with respect to the register’s required-provider graph)..
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-01) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-compose-workspace) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/widgets/workspaces/contracts.ts`](src/widgets/workspaces/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -430,15 +430,15 @@ None (root with respect to the register’s required-provider graph)..
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-01-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-COMPOSE_WORKSPACE-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-01 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-01 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-01 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-COMPOSE_WORKSPACE | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-COMPOSE_WORKSPACE | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-COMPOSE_WORKSPACE | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -486,10 +486,10 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PROVED_COMPLETE | `FR-TRC-UI-01-001` | Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry. | `AT-UI-01-001` | Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. |
-| PROVED_COMPLETE | `FR-TRC-UI-01-002` | Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery. | `AT-UI-01-002` | One invalid/missing widget does not discard valid siblings; secrets, strategies, raw rows and provider objects never enter saved layout. |
-| PROVED_COMPLETE | `FR-TRC-UI-01-003` | Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery. | `AT-UI-01-003` | Persist/restore round-trips panel topology and stable identity; unsupported cross-window behavior is explicitly disabled rather than falsely advertised. |
-| PROVED_COMPLETE | `FR-TRC-UI-01-004` | Keep closing an observer distinct from cancelling its accepted owner job. | `AT-UI-01-004` | Unmount releases timers/listeners/workers/requests but a running backtest continues unless the explicit owner cancellation command is issued. |
+| PROVED_COMPLETE | `FR-TRC-UI-COMPOSE_WORKSPACE-001` | Register widget type/version, feature/capabilities, placement/dimensions, commands, subscriptions, config migration and exact disposer in one lazy registry. | `AT-UI-COMPOSE_WORKSPACE-001` | Host/sidebar/type validation/templates all consume the same registry; a removed widget cannot be rediscovered by a stale static mapping. |
+| PROVED_COMPLETE | `FR-TRC-UI-COMPOSE_WORKSPACE-002` | Serialize safe stable resource IDs and display preferences only; restore layout topology with per-panel unknown/unavailable recovery. | `AT-UI-COMPOSE_WORKSPACE-002` | One invalid/missing widget does not discard valid siblings; secrets, strategies, raw rows and provider objects never enter saved layout. |
+| PROVED_COMPLETE | `FR-TRC-UI-COMPOSE_WORKSPACE-003` | Deliver research and existing workspace templates, tab/split/float/tear-off/reposition controls, empty state and keyboard focus recovery. | `AT-UI-COMPOSE_WORKSPACE-003` | Persist/restore round-trips panel topology and stable identity; unsupported cross-window behavior is explicitly disabled rather than falsely advertised. |
+| PROVED_COMPLETE | `FR-TRC-UI-COMPOSE_WORKSPACE-004` | Keep closing an observer distinct from cancelling its accepted owner job. | `AT-UI-COMPOSE_WORKSPACE-004` | Unmount releases timers/listeners/workers/requests but a running backtest continues unless the explicit owner cancellation command is issued. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -497,11 +497,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PROVED_COMPLETE | `NFR-TRC-UI-01-001` | Each widget and registration proves exact cleanup and isolated layout failure. | `ATN-UI-01-001` | 100 enable/disable cycles, physical widget removal and partially corrupt persisted layouts leave no leaked effect or lost valid sibling. |
+| PROVED_COMPLETE | `NFR-TRC-UI-COMPOSE_WORKSPACE-001` | Each widget and registration proves exact cleanup and isolated layout failure. | `ATN-UI-COMPOSE_WORKSPACE-001` | 100 enable/disable cycles, physical widget removal and partially corrupt persisted layouts leave no leaked effect or lost valid sibling. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-01): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-compose-workspace): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -509,7 +509,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx` | PROVED_COMPLETE: four named tests bind the four oracles. |
 | Every ATN ID in this card | `app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx` | PROVED_COMPLETE: 100-cycle, physical-removal, cleanup, and isolated-recovery evidence. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-01/acceptance.json` | Pre-review results recorded; final independent verdict remains pending. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json` | Pre-review results recorded; final independent verdict remains pending. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -519,14 +519,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-01`. Withdraw `ui.workspace-layout@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-COMPOSE_WORKSPACE`. Withdraw `ui.workspace-layout@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-14"></a>
-### 4.2 `clients/` — `FEAT-UI-14`
+<a id="feat-ui-typed-backend"></a>
+### 4.2 `clients/` — `FEAT-UI-TYPED_BACKEND`
 
-> **Feature ID:** `FEAT-UI-14`
+> **Feature ID:** `FEAT-UI-TYPED_BACKEND`
 > **Domain:** `ui`
 > **Status:** `Complete` — typed wire validation, scoped request/stream lifecycle, removal, usage and acceptance evidence **PROVED_COMPLETE**.
 > **Selected owner:** `app/ui/src/clients/`
@@ -544,7 +544,7 @@ Call the typed backend and resume observation. Present and interact with authori
 
 None (root with respect to the register’s required-provider graph)..
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-14) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-typed-backend) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/clients/contracts.ts`](src/clients/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -558,15 +558,15 @@ None (root with respect to the register’s required-provider graph)..
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-14-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-TYPED_BACKEND-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-14 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-14 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-14 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-TYPED_BACKEND | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-TYPED_BACKEND | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-TYPED_BACKEND | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -597,8 +597,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PROVED_COMPLETE | `FR-TRC-UI-14-001` | Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts. | `AT-UI-14-001` | Strict Zod mirrors reject unknown envelope fields, wrong versions/branches and invalid owner payloads; stream error objects are validated before safe-message projection. |
-| PROVED_COMPLETE | `FR-TRC-UI-14-002` | Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions. | `AT-UI-14-002` | One request identity survives the sole safe-read retry, mutations never enter the generic retry path, abort prevents a stale retry, and one keyed observation resumes once from its last validated sequence. |
+| PROVED_COMPLETE | `FR-TRC-UI-TYPED_BACKEND-001` | Validate generated/approved wire DTOs and preserve existing ApiResponse/ApiError/ApiMetadata/StreamEvent contracts. | `AT-UI-TYPED_BACKEND-001` | Strict Zod mirrors reject unknown envelope fields, wrong versions/branches and invalid owner payloads; stream error objects are validated before safe-message projection. |
+| PROVED_COMPLETE | `FR-TRC-UI-TYPED_BACKEND-002` | Manage cookie/CSRF headers, bounded safe-read retries, stream cursors, abort, stale request cancellation and deduplicated subscriptions. | `AT-UI-TYPED_BACKEND-002` | One request identity survives the sole safe-read retry, mutations never enter the generic retry path, abort prevents a stale retry, and one keyed observation resumes once from its last validated sequence. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -606,11 +606,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PROVED_COMPLETE | `NFR-TRC-UI-14-001` | Removing FEAT-UI-14 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-14-001` | Exact-key withdrawal disposes owned requests/streams, reports `DEPENDENCY_UNAVAILABLE`, and preserves an unrelated capability object without fallback selection. |
+| PROVED_COMPLETE | `NFR-TRC-UI-TYPED_BACKEND-001` | Removing FEAT-UI-TYPED_BACKEND withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-TYPED_BACKEND-001` | Exact-key withdrawal disposes owned requests/streams, reports `DEPENDENCY_UNAVAILABLE`, and preserves an unrelated capability object without fallback selection. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-14): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-typed-backend): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -618,7 +618,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `app/ui/src/clients/__tests__/traceability.test.ts`; `app/ui/src/clients/__tests__/lifecycle.test.ts`; retained focused transport tests | PROVED_COMPLETE: `test_trc_call_typed_backend_001` and `test_trc_call_typed_backend_002` bind strict schema and complete transport-lifecycle oracles. |
 | Every ATN ID in this card | `app/ui/src/clients/__tests__/lifecycle.test.ts` | PROVED_COMPLETE: `test_trc_call_typed_backend_nfr_001` binds exact withdrawal, unavailable behavior, unrelated-object preservation and cleanup. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-14/acceptance.json` | ACCEPTED evidence records actual contract, composition, Interfaces and UI gates; backend provider and browser E2E are correctly not applicable to this presentation transport feature. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-TYPED_BACKEND/acceptance.json` | ACCEPTED evidence records actual contract, composition, Interfaces and UI gates; backend provider and browser E2E are correctly not applicable to this presentation transport feature. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -630,14 +630,14 @@ The executable owner is `app/ui/src/clients/_usage.tsx`; it runs offline with in
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-14`. Withdraw `ui.typed-backend@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-TYPED_BACKEND`. Withdraw `ui.typed-backend@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-15"></a>
-### 4.3 `context/` — `FEAT-UI-15`
+<a id="feat-ui-session-context"></a>
+### 4.3 `context/` — `FEAT-UI-SESSION_CONTEXT`
 
-> **Feature ID:** `FEAT-UI-15`
+> **Feature ID:** `FEAT-UI-SESSION_CONTEXT`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/context/`
@@ -653,9 +653,9 @@ Capture current authorized widget context. Present and interact with authoritati
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-15) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-session-context) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/context/contracts.ts`](src/context/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -669,15 +669,15 @@ Capture current authorized widget context. Present and interact with authoritati
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-15-001`, `FR-TRC-UI-15-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-SESSION_CONTEXT-001`, `FR-TRC-UI-SESSION_CONTEXT-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-15 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-15 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-15 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-SESSION_CONTEXT | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-SESSION_CONTEXT | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-SESSION_CONTEXT | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -708,9 +708,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-15-001` | Register exact widget/version/generation contributions containing stable public refs, selection, filters, safe labels/errors, focus, capture/expiry/hash and schema. | `AT-UI-15-001` | Raw DOM, screenshots, credentials, private state and executable instruction fields are rejected. |
-| PENDING | `FR-TRC-UI-15-002` | Capture a new bounded WorkspaceContextSnapshot for every message and drop unmounted/expired contributions. | `AT-UI-15-002` | A removed widget never contributes to the next turn; navigation cannot rewrite a turn’s already-pinned snapshot. |
-| PENDING | `FR-TRC-UI-15-003` | Keep account/permission projection and stable typed cross-widget selection distinct from authoritative market/result facts. | `AT-UI-15-003` | A manipulated browser metric cannot override an owner-refreshed value; cross-account context is denied. |
+| PENDING | `FR-TRC-UI-SESSION_CONTEXT-001` | Register exact widget/version/generation contributions containing stable public refs, selection, filters, safe labels/errors, focus, capture/expiry/hash and schema. | `AT-UI-SESSION_CONTEXT-001` | Raw DOM, screenshots, credentials, private state and executable instruction fields are rejected. |
+| PENDING | `FR-TRC-UI-SESSION_CONTEXT-002` | Capture a new bounded WorkspaceContextSnapshot for every message and drop unmounted/expired contributions. | `AT-UI-SESSION_CONTEXT-002` | A removed widget never contributes to the next turn; navigation cannot rewrite a turn’s already-pinned snapshot. |
+| PENDING | `FR-TRC-UI-SESSION_CONTEXT-003` | Keep account/permission projection and stable typed cross-widget selection distinct from authoritative market/result facts. | `AT-UI-SESSION_CONTEXT-003` | A manipulated browser metric cannot override an owner-refreshed value; cross-account context is denied. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -718,11 +718,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-15-001` | Removing FEAT-UI-15 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-15-001` | Disable and physically remove context; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-SESSION_CONTEXT-001` | Removing FEAT-UI-SESSION_CONTEXT withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-SESSION_CONTEXT-001` | Disable and physically remove context; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-15): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-session-context): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -730,7 +730,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/context/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/context/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-15/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -740,14 +740,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-15`. Withdraw `ui.chat-context@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-SESSION_CONTEXT`. Withdraw `ui.chat-context@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-16"></a>
-### 4.4 `layout/` — `FEAT-UI-16`
+<a id="feat-ui-workspace-navigation"></a>
+### 4.4 `layout/` — `FEAT-UI-WORKSPACE_NAVIGATION`
 
-> **Feature ID:** `FEAT-UI-16`
+> **Feature ID:** `FEAT-UI-WORKSPACE_NAVIGATION`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/components/layout/`
@@ -763,9 +763,9 @@ Navigate capabilities and explain workspace controls. Present and interact with 
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-16) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-workspace-navigation) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/components/layout/contracts.ts`](src/components/layout/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -779,15 +779,15 @@ Navigate capabilities and explain workspace controls. Present and interact with 
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-16-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-WORKSPACE_NAVIGATION-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-16 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-16 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-16 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-WORKSPACE_NAVIGATION | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-WORKSPACE_NAVIGATION | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-WORKSPACE_NAVIGATION | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -818,9 +818,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-16-001` | Present compact research navigation, global job indicators, recent items and commands from actual registered capability/widget metadata. | `AT-UI-16-001` | Missing providers disable only affected actions with a reason; no menu item is declared operational from documentation alone. |
-| PENDING | `FR-TRC-UI-16-002` | Provide contextual control help, readiness checklist, original examples and links to authorized reports/settings. | `AT-UI-16-002` | Help describes declared semantics and never invents a live value or qualification state. |
-| PENDING | `FR-TRC-UI-16-003` | Preserve keyboard navigation, selected workspace/account orientation and safe focus after panel changes. | `AT-UI-16-003` | Keyboard-only flows reach every available command and restore focus to a valid visible control. |
+| PENDING | `FR-TRC-UI-WORKSPACE_NAVIGATION-001` | Present compact research navigation, global job indicators, recent items and commands from actual registered capability/widget metadata. | `AT-UI-WORKSPACE_NAVIGATION-001` | Missing providers disable only affected actions with a reason; no menu item is declared operational from documentation alone. |
+| PENDING | `FR-TRC-UI-WORKSPACE_NAVIGATION-002` | Provide contextual control help, readiness checklist, original examples and links to authorized reports/settings. | `AT-UI-WORKSPACE_NAVIGATION-002` | Help describes declared semantics and never invents a live value or qualification state. |
+| PENDING | `FR-TRC-UI-WORKSPACE_NAVIGATION-003` | Preserve keyboard navigation, selected workspace/account orientation and safe focus after panel changes. | `AT-UI-WORKSPACE_NAVIGATION-003` | Keyboard-only flows reach every available command and restore focus to a valid visible control. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -828,11 +828,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-16-001` | Removing FEAT-UI-16 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-16-001` | Disable and physically remove layout; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-WORKSPACE_NAVIGATION-001` | Removing FEAT-UI-WORKSPACE_NAVIGATION withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-WORKSPACE_NAVIGATION-001` | Disable and physically remove layout; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-16): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-workspace-navigation): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -840,7 +840,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/components/layout/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/components/layout/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-16/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -850,14 +850,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-16`. Withdraw `ui.shell-navigation@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-WORKSPACE_NAVIGATION`. Withdraw `ui.shell-navigation@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-17"></a>
-### 4.5 `app/` — `FEAT-UI-17`
+<a id="feat-ui-session-access"></a>
+### 4.5 `app/` — `FEAT-UI-SESSION_ACCESS`
 
-> **Feature ID:** `FEAT-UI-17`
+> **Feature ID:** `FEAT-UI-SESSION_ACCESS`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/app/`
@@ -873,9 +873,9 @@ Present session access and scope changes. Present and interact with authoritativ
 
 **Required capabilities:**
 
-`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-17) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-session-access) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/app/contracts.ts`](src/app/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -893,9 +893,9 @@ Present session access and scope changes. Present and interact with authoritativ
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-17 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-17 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-17 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-SESSION_ACCESS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-SESSION_ACCESS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-SESSION_ACCESS | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -926,8 +926,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-17-001` | Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change. | `AT-UI-17-001` | Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. |
-| PENDING | `FR-TRC-UI-17-002` | Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework. | `AT-UI-17-002` | A browser toggle cannot authorize a server request; no replacement SPA/authentication system is introduced. |
+| PENDING | `FR-TRC-UI-SESSION_ACCESS-001` | Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change. | `AT-UI-SESSION_ACCESS-001` | Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. |
+| PENDING | `FR-TRC-UI-SESSION_ACCESS-002` | Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework. | `AT-UI-SESSION_ACCESS-002` | A browser toggle cannot authorize a server request; no replacement SPA/authentication system is introduced. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -935,11 +935,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-17-001` | Removing FEAT-UI-17 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-17-001` | Disable and physically remove app; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-SESSION_ACCESS-001` | Removing FEAT-UI-SESSION_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-SESSION_ACCESS-001` | Disable and physically remove app; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-17): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-session-access): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -947,7 +947,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/app/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/app/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-17/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -957,14 +957,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-17`. Withdraw `ui.access-gate@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-SESSION_ACCESS`. Withdraw `ui.access-gate@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-13"></a>
-### 4.6 `system-settings/` — `FEAT-UI-13`
+<a id="feat-ui-system-settings"></a>
+### 4.6 `system-settings/` — `FEAT-UI-SYSTEM_SETTINGS`
 
-> **Feature ID:** `FEAT-UI-13`
+> **Feature ID:** `FEAT-UI-SYSTEM_SETTINGS`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/system-settings/`
@@ -980,9 +980,9 @@ Review effective settings and safe configuration changes. Present and interact w
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-13) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-system-settings) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/widgets/system-settings/contracts.ts`](src/widgets/system-settings/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -996,15 +996,15 @@ Review effective settings and safe configuration changes. Present and interact w
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-13-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-SYSTEM_SETTINGS-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-13 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-13 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-13 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-SYSTEM_SETTINGS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-SYSTEM_SETTINGS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-SYSTEM_SETTINGS | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -1035,9 +1035,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-13-001` | Render all CAT-SETTINGS categories, effective defaults/overrides, narrower policy, supported values and restart/remount impact. | `AT-UI-13-001` | A CPU/memory/tick setting cannot silently change historical runs or override a stricter owner policy. |
-| PENDING | `FR-TRC-UI-13-002` | Support load/save/reset/diff/presets with dirty-state protection and field/summary owner errors. | `AT-UI-13-002` | A failed update leaves the prior configuration intact; stale expected revisions require explicit conflict handling. |
-| PENDING | `FR-TRC-UI-13-003` | Render SMTP test and remote/MCP status through permission-gated typed actions with no credential values. | `AT-UI-13-003` | Test send names recipient/scope and has its own action; an unconfigured service remains unavailable. |
+| PENDING | `FR-TRC-UI-SYSTEM_SETTINGS-001` | Render all CAT-SETTINGS categories, effective defaults/overrides, narrower policy, supported values and restart/remount impact. | `AT-UI-SYSTEM_SETTINGS-001` | A CPU/memory/tick setting cannot silently change historical runs or override a stricter owner policy. |
+| PENDING | `FR-TRC-UI-SYSTEM_SETTINGS-002` | Support load/save/reset/diff/presets with dirty-state protection and field/summary owner errors. | `AT-UI-SYSTEM_SETTINGS-002` | A failed update leaves the prior configuration intact; stale expected revisions require explicit conflict handling. |
+| PENDING | `FR-TRC-UI-SYSTEM_SETTINGS-003` | Render SMTP test and remote/MCP status through permission-gated typed actions with no credential values. | `AT-UI-SYSTEM_SETTINGS-003` | Test send names recipient/scope and has its own action; an unconfigured service remains unavailable. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1045,11 +1045,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-13-001` | Removing FEAT-UI-13 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-13-001` | Disable and physically remove system-settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-SYSTEM_SETTINGS-001` | Removing FEAT-UI-SYSTEM_SETTINGS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-SYSTEM_SETTINGS-001` | Disable and physically remove system-settings; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-13): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-system-settings): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1057,7 +1057,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/widgets/system-settings/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/widgets/system-settings/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-13/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -1067,14 +1067,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-13`. Withdraw `ui.system-settings@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-SYSTEM_SETTINGS`. Withdraw `ui.system-settings@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-18"></a>
-### 4.7 `workflow/` — `FEAT-UI-18`
+<a id="feat-ui-data-manager"></a>
+### 4.7 `workflow/` — `FEAT-UI-DATA_MANAGER`
 
-> **Feature ID:** `FEAT-UI-18`
+> **Feature ID:** `FEAT-UI-DATA_MANAGER`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/components/workflow/`
@@ -1090,9 +1090,9 @@ Operate the Data Manager workspace. Present and interact with authoritative owne
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-18) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-data-manager) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/components/workflow/contracts.ts`](src/components/workflow/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -1106,15 +1106,15 @@ Operate the Data Manager workspace. Present and interact with authoritative owne
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-18-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-DATA_MANAGER-003`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-18 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-18 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-18 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-DATA_MANAGER | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-DATA_MANAGER | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-DATA_MANAGER | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -1145,9 +1145,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-18-001` | Render series/reference grids with all CAT-DATA fields and supported source/profile/instrument/session/group/external-series controls. | `AT-UI-18-001` | Filtering/selection/batch actions preserve stable IDs; missing capabilities are explicit and system/protected items cannot be edited locally. |
-| PENDING | `FR-TRC-UI-18-002` | Preview owner import mappings/counts, quality findings/repairs, timezone clone/merge/export and dependency-aware deletion. | `AT-UI-18-002` | A confirmation names exact object/count/dependencies/reversibility/retained artifacts; browser previews never imply backend success. |
-| PENDING | `FR-TRC-UI-18-003` | Observe download/import/update jobs with supported pause/resume/stop and authorized bounded raw-data/chart previews. | `AT-UI-18-003` | Closing the Data view leaves accepted downloads running; explicit cancellation uses the owner and incomplete coverage stays labelled. |
+| PENDING | `FR-TRC-UI-DATA_MANAGER-001` | Render series/reference grids with all CAT-DATA fields and supported source/profile/instrument/session/group/external-series controls. | `AT-UI-DATA_MANAGER-001` | Filtering/selection/batch actions preserve stable IDs; missing capabilities are explicit and system/protected items cannot be edited locally. |
+| PENDING | `FR-TRC-UI-DATA_MANAGER-002` | Preview owner import mappings/counts, quality findings/repairs, timezone clone/merge/export and dependency-aware deletion. | `AT-UI-DATA_MANAGER-002` | A confirmation names exact object/count/dependencies/reversibility/retained artifacts; browser previews never imply backend success. |
+| PENDING | `FR-TRC-UI-DATA_MANAGER-003` | Observe download/import/update jobs with supported pause/resume/stop and authorized bounded raw-data/chart previews. | `AT-UI-DATA_MANAGER-003` | Closing the Data view leaves accepted downloads running; explicit cancellation uses the owner and incomplete coverage stays labelled. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1155,11 +1155,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-18-001` | Removing FEAT-UI-18 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-18-001` | Disable and physically remove workflow; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-DATA_MANAGER-001` | Removing FEAT-UI-DATA_MANAGER withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-DATA_MANAGER-001` | Disable and physically remove workflow; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-18): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-data-manager): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1167,7 +1167,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/components/workflow/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/components/workflow/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-18/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -1177,7 +1177,7 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-18`. Withdraw `ui.data-workflow@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-DATA_MANAGER`. Withdraw `ui.data-workflow@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
@@ -1200,7 +1200,7 @@ Navigate large typed collections accessibly. Present and interact with authorita
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-view-collections) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -1311,7 +1311,7 @@ Review typed edits and consequential action scope. Present and interact with aut
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-review-drafts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -1400,10 +1400,10 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-REVIEW_DRA
 
 ---
 
-<a id="feat-ui-04"></a>
-### 4.10 `chart/` — `FEAT-UI-04`
+<a id="feat-ui-market-charts"></a>
+### 4.10 `chart/` — `FEAT-UI-MARKET_CHARTS`
 
-> **Feature ID:** `FEAT-UI-04`
+> **Feature ID:** `FEAT-UI-MARKET_CHARTS`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/chart/`
@@ -1419,9 +1419,9 @@ Inspect market charts and typed overlays. Present and interact with authoritativ
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-04) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-market-charts) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/widgets/chart/contracts.ts`](src/widgets/chart/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -1435,15 +1435,15 @@ Inspect market charts and typed overlays. Present and interact with authoritativ
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-04-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-MARKET_CHARTS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-04 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-04 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-04 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-MARKET_CHARTS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-MARKET_CHARTS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-MARKET_CHARTS | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -1474,9 +1474,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-04-001` | Render declared market-series windows, price/volume/layer units, timezone/calendar, gaps and indicator/entry/exit overlays. | `AT-UI-04-001` | Unavailable/wrong-series market data is not substituted; source version and synthetic/recorded labels remain visible. |
-| PENDING | `FR-TRC-UI-04-002` | Support crosshair/zoom/selection with typed timestamps/series/trade references and bounded LOD/decoding. | `AT-UI-04-002` | Changing zoom changes display sampling only; numeric calculations remain unchanged and past selections retain their identity. |
-| PENDING | `FR-TRC-UI-04-003` | Offer keyboard/table equivalents and no-WebGL fallback where applicable. | `AT-UI-04-003` | GPU-off and color-blind/keyboard fixtures preserve access to equivalent values and labels. |
+| PENDING | `FR-TRC-UI-MARKET_CHARTS-001` | Render declared market-series windows, price/volume/layer units, timezone/calendar, gaps and indicator/entry/exit overlays. | `AT-UI-MARKET_CHARTS-001` | Unavailable/wrong-series market data is not substituted; source version and synthetic/recorded labels remain visible. |
+| PENDING | `FR-TRC-UI-MARKET_CHARTS-002` | Support crosshair/zoom/selection with typed timestamps/series/trade references and bounded LOD/decoding. | `AT-UI-MARKET_CHARTS-002` | Changing zoom changes display sampling only; numeric calculations remain unchanged and past selections retain their identity. |
+| PENDING | `FR-TRC-UI-MARKET_CHARTS-003` | Offer keyboard/table equivalents and no-WebGL fallback where applicable. | `AT-UI-MARKET_CHARTS-003` | GPU-off and color-blind/keyboard fixtures preserve access to equivalent values and labels. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1484,11 +1484,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-04-001` | Removing FEAT-UI-04 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-04-001` | Disable and physically remove chart; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-MARKET_CHARTS-001` | Removing FEAT-UI-MARKET_CHARTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-MARKET_CHARTS-001` | Disable and physically remove chart; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-04): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-market-charts): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1496,7 +1496,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/widgets/chart/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/widgets/chart/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-04/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -1506,14 +1506,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-04`. Withdraw `ui.market-chart@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-MARKET_CHARTS`. Withdraw `ui.market-chart@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-27"></a>
-### 4.11 `simulator/` — `FEAT-UI-27`
+<a id="feat-ui-run-backtest"></a>
+### 4.11 `simulator/` — `FEAT-UI-RUN_BACKTEST`
 
-> **Feature ID:** `FEAT-UI-27`
+> **Feature ID:** `FEAT-UI-RUN_BACKTEST`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/simulator/`
@@ -1529,9 +1529,9 @@ Configure and observe a canonical backtest. Present and interact with authoritat
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-27) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-run-backtest) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/widgets/simulator/contracts.ts`](src/widgets/simulator/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -1545,15 +1545,15 @@ Configure and observe a canonical backtest. Present and interact with authoritat
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-27-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-RUN_BACKTEST-001`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-27 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-27 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-27 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-RUN_BACKTEST | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-RUN_BACKTEST | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-RUN_BACKTEST | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -1584,9 +1584,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-27-001` | Present strategy revision/parameters, primary/additional data, tick-method evidence class/coverage, costs, account, sample, output and resource preview. | `AT-UI-27-001` | No method is silently selected; actual source/emitted/estimated tick counts are labelled correctly. |
-| PENDING | `FR-TRC-UI-27-002` | Submit one governed owner request, observe progress/log/warnings and expose supported cancel/pause/retry. | `AT-UI-27-002` | Double-click Start returns one run; pause waits for acknowledgement/checkpoint; retry creates the owner’s linked identity. |
-| PENDING | `FR-TRC-UI-27-003` | Open the committed Analytics result by stable ID and retain partial/unavailable/failed states. | `AT-UI-27-003` | A browser timeout or closed panel cannot be relabelled a failed/completed simulation without owner evidence. |
+| PENDING | `FR-TRC-UI-RUN_BACKTEST-001` | Present strategy revision/parameters, primary/additional data, tick-method evidence class/coverage, costs, account, sample, output and resource preview. | `AT-UI-RUN_BACKTEST-001` | No method is silently selected; actual source/emitted/estimated tick counts are labelled correctly. |
+| PENDING | `FR-TRC-UI-RUN_BACKTEST-002` | Submit one governed owner request, observe progress/log/warnings and expose supported cancel/pause/retry. | `AT-UI-RUN_BACKTEST-002` | Double-click Start returns one run; pause waits for acknowledgement/checkpoint; retry creates the owner’s linked identity. |
+| PENDING | `FR-TRC-UI-RUN_BACKTEST-003` | Open the committed Analytics result by stable ID and retain partial/unavailable/failed states. | `AT-UI-RUN_BACKTEST-003` | A browser timeout or closed panel cannot be relabelled a failed/completed simulation without owner evidence. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1594,11 +1594,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-27-001` | Removing FEAT-UI-27 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-27-001` | Disable and physically remove simulator; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-RUN_BACKTEST-001` | Removing FEAT-UI-RUN_BACKTEST withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-RUN_BACKTEST-001` | Disable and physically remove simulator; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-27): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-run-backtest): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1606,7 +1606,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/widgets/simulator/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/widgets/simulator/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-27/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -1616,14 +1616,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-27`. Withdraw `ui.canonical-backtest@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-RUN_BACKTEST`. Withdraw `ui.canonical-backtest@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-28"></a>
-### 4.12 `research/` — `FEAT-UI-28`
+<a id="feat-ui-execute-orders"></a>
+### 4.12 `research/` — `FEAT-UI-EXECUTE_ORDERS`
 
-> **Feature ID:** `FEAT-UI-28`
+> **Feature ID:** `FEAT-UI-EXECUTE_ORDERS`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/research/`
@@ -1639,9 +1639,9 @@ Inspect research campaigns, protocols and evidence. Present and interact with au
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-28) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-execute-orders) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/widgets/research/contracts.ts`](src/widgets/research/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -1655,15 +1655,15 @@ Inspect research campaigns, protocols and evidence. Present and interact with au
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-28-001`, `FR-TRC-UI-28-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-EXECUTE_ORDERS-001`, `FR-TRC-UI-EXECUTE_ORDERS-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-28 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-28 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-28 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-EXECUTE_ORDERS | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-EXECUTE_ORDERS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-EXECUTE_ORDERS | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -1694,9 +1694,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-28-001` | Display canonical campaign/family/protocol/sample/budget/holdout identities, attempt conservation and receiver lineage. | `AT-UI-28-001` | Failed/null/refused/invalid/pruned and cache-hit evidence is not hidden by winner-only filters. |
-| PENDING | `FR-TRC-UI-28-002` | Present research draft, supported evidence and qualified outcomes as different states, with exact owner reasons and limitations. | `AT-UI-28-002` | A draft or successful worker job cannot look like research qualification or live approval. |
-| PENDING | `FR-TRC-UI-28-003` | Expose compatible research navigation, comparison and immutable artifact history through registered contributions. | `AT-UI-28-003` | Removing Builder/Retester or Agentic leaves the Research evidence browser usable for existing records. |
+| PENDING | `FR-TRC-UI-EXECUTE_ORDERS-001` | Display canonical campaign/family/protocol/sample/budget/holdout identities, attempt conservation and receiver lineage. | `AT-UI-EXECUTE_ORDERS-001` | Failed/null/refused/invalid/pruned and cache-hit evidence is not hidden by winner-only filters. |
+| PENDING | `FR-TRC-UI-EXECUTE_ORDERS-002` | Present research draft, supported evidence and qualified outcomes as different states, with exact owner reasons and limitations. | `AT-UI-EXECUTE_ORDERS-002` | A draft or successful worker job cannot look like research qualification or live approval. |
+| PENDING | `FR-TRC-UI-EXECUTE_ORDERS-003` | Expose compatible research navigation, comparison and immutable artifact history through registered contributions. | `AT-UI-EXECUTE_ORDERS-003` | Removing Builder/Retester or Agentic leaves the Research evidence browser usable for existing records. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1704,11 +1704,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-28-001` | Removing FEAT-UI-28 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-28-001` | Disable and physically remove research; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-EXECUTE_ORDERS-001` | Removing FEAT-UI-EXECUTE_ORDERS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-EXECUTE_ORDERS-001` | Disable and physically remove research; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-28): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-execute-orders): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1716,7 +1716,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/widgets/research/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/widgets/research/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-28/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -1726,14 +1726,14 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-28`. Withdraw `ui.research-workbench@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-EXECUTE_ORDERS`. Withdraw `ui.research-workbench@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
-<a id="feat-ui-32"></a>
-### 4.13 `analytics/` — `FEAT-UI-32`
+<a id="feat-ui-research-workbench"></a>
+### 4.13 `analytics/` — `FEAT-UI-RESEARCH_WORKBENCH`
 
-> **Feature ID:** `FEAT-UI-32`
+> **Feature ID:** `FEAT-UI-RESEARCH_WORKBENCH`
 > **Domain:** `ui`
 > **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
 > **Selected owner:** `app/ui/src/widgets/analytics/`
@@ -1749,9 +1749,9 @@ Compose the result inspection workspace. Present and interact with authoritative
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
-**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-32) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
+**Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-research-workbench) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
 **Public contract target:** [`app/ui/src/widgets/analytics/contracts.ts`](src/widgets/analytics/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
 
@@ -1765,15 +1765,15 @@ Compose the result inspection workspace. Present and interact with authoritative
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
-**Feature-specific parameter/limit obligations:** `FR-TRC-UI-32-001`, `FR-TRC-UI-32-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
+**Feature-specific parameter/limit obligations:** `FR-TRC-UI-RESEARCH_WORKBENCH-001`, `FR-TRC-UI-RESEARCH_WORKBENCH-002`. Their full text and test oracles below are binding; this list is an index, not a reduced schema.
 
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
 | --- | --- | --- |
-| Contribution and view registration | FEAT-UI-32 | Unregister exact type/version/generation contribution; preserve unrelated panels. |
-| Requests, streams, timers, listeners and workers | FEAT-UI-32 | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
-| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-32 | Release buffers/observers; remove stale context contributions; restore valid focus. |
+| Contribution and view registration | FEAT-UI-RESEARCH_WORKBENCH | Unregister exact type/version/generation contribution; preserve unrelated panels. |
+| Requests, streams, timers, listeners and workers | FEAT-UI-RESEARCH_WORKBENCH | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
+| Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-RESEARCH_WORKBENCH | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
 Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
@@ -1804,9 +1804,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-32-001` | Discover compatible result views by result kind/schema/capability and restore safe per-view layout/selection. | `AT-UI-32-001` | Removing one panel/provider produces a named unavailable view without breaking other result views. |
-| PENDING | `FR-TRC-UI-32-002` | Expose result/config/data/metric/method/sample/precision/partial/imported provenance and deep links. | `AT-UI-32-002` | Current Strategy settings cannot silently replace the run-time snapshot; imported results keep source attribution. |
-| PENDING | `FR-TRC-UI-32-003` | Coordinate typed stable selections among independent panels without shared mutable domain state. | `AT-UI-32-003` | A trade/result/window selection retains the same owner identity across views and is cleared safely when inaccessible. |
+| PENDING | `FR-TRC-UI-RESEARCH_WORKBENCH-001` | Discover compatible result views by result kind/schema/capability and restore safe per-view layout/selection. | `AT-UI-RESEARCH_WORKBENCH-001` | Removing one panel/provider produces a named unavailable view without breaking other result views. |
+| PENDING | `FR-TRC-UI-RESEARCH_WORKBENCH-002` | Expose result/config/data/metric/method/sample/precision/partial/imported provenance and deep links. | `AT-UI-RESEARCH_WORKBENCH-002` | Current Strategy settings cannot silently replace the run-time snapshot; imported results keep source attribution. |
+| PENDING | `FR-TRC-UI-RESEARCH_WORKBENCH-003` | Coordinate typed stable selections among independent panels without shared mutable domain state. | `AT-UI-RESEARCH_WORKBENCH-003` | A trade/result/window selection retains the same owner identity across views and is cleared safely when inaccessible. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1814,11 +1814,11 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-32-001` | Removing FEAT-UI-32 withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-32-001` | Disable and physically remove analytics; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PENDING | `NFR-TRC-UI-RESEARCH_WORKBENCH-001` | Removing FEAT-UI-RESEARCH_WORKBENCH withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-RESEARCH_WORKBENCH-001` | Disable and physically remove analytics; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
-[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-32): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
+[source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-research-workbench): the exact “Applicable shared NFRs,” “Detailed catalogue families,” “Catalogue entries, algorithms and controls delivered,” “Source scope / Original source IDs,” and operation-gated provider sections are incorporated for **this feature only**. These sections remain normative; an acceptance manifest must enumerate the actual linked IDs/entries and evidence, not just cite this paragraph. No source algorithm, control, permission or release condition is weakened by this domain projection.
 
 #### Acceptance Tests and Evidence
 
@@ -1826,7 +1826,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 | --- | --- | --- |
 | Every AT ID in this card | `tests/ui/widgets/analytics/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
 | Every ATN ID in this card | `tests/ui/widgets/analytics/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-32/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
@@ -1836,7 +1836,7 @@ Intended test paths may be mapped to a compatible current test owner; they are n
 
 #### Removal Behaviour
 
-Disable and physically remove the actual reconciled owner of `FEAT-UI-32`. Withdraw `ui.results-workbench@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
+Disable and physically remove the actual reconciled owner of `FEAT-UI-RESEARCH_WORKBENCH`. Withdraw `ui.results-workbench@1` and all its scoped contributions. Required dependents become BLOCKED/unavailable through their declared contract; operation-gated consumers disable only affected operations. Valid sibling panels/layout survive; unmount removes context contributions and observers but does not cancel accepted owner jobs. Exercise the local ATN oracles and §7 gates before restoring the feature.
 
 ---
 
@@ -1859,7 +1859,7 @@ Edit and review a strategy. Present and interact with authoritative owner result
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-studio) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -1969,7 +1969,7 @@ Configure and run strategy generation. Present and interact with authoritative o
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2079,7 +2079,7 @@ Retest a fixed strategy population. Present and interact with authoritative owne
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-retester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2189,7 +2189,7 @@ Plan and inspect parameter optimization. Present and interact with authoritative
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-parameter-optimizer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2299,7 +2299,7 @@ Organize and act on a databank. Present and interact with authoritative owner re
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-databank-grid) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2409,7 +2409,7 @@ Read a provenance-rich result summary. Present and interact with authoritative o
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-result-overview) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2519,7 +2519,7 @@ Inspect and select individual trades. Present and interact with authoritative ow
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trade-list) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2629,7 +2629,7 @@ Inspect equity, drawdown and benchmark paths. Present and interact with authorit
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-equity-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2739,7 +2739,7 @@ Compare trade behavior across dimensions. Present and interact with authoritativ
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trade-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2849,7 +2849,7 @@ Inspect fills against their actual market context. Present and interact with aut
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-trades-on-chart) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -2959,7 +2959,7 @@ Inspect robustness and scenario evidence. Present and interact with authoritativ
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-robustness-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3069,7 +3069,7 @@ Inspect parameter surfaces and walk-forward evidence. Present and interact with 
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-optimization-results) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3179,7 +3179,7 @@ Compose and compare a portfolio. Present and interact with authoritative owner r
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-composer) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3289,7 +3289,7 @@ Search a bounded portfolio universe. Present and interact with authoritative own
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-portfolio-builder) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3399,7 +3399,7 @@ Compose and control a research project. Present and interact with authoritative 
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-project-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3509,7 +3509,7 @@ Edit scoped code and inspect build evidence. Present and interact with authorita
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-code-editor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3619,7 +3619,7 @@ Compare indicator providers and previews. Present and interact with authoritativ
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-indicator-tester) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3729,7 +3729,7 @@ Inspect and control jobs and workers. Present and interact with authoritative ow
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-run-monitor) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3839,7 +3839,7 @@ Inspect bounded redacted diagnostic logs. Present and interact with authoritativ
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-debug-console) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -3949,7 +3949,7 @@ Ask context-aware questions and review specialist output. Present and interact w
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.chat-context@1` — [`FEAT-UI-15`](#feat-ui-15)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.chat-context@1` — [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context)<br>`ui.draft-review@1` — [`FEAT-UI-REVIEW_DRAFTS`](#feat-ui-review-drafts).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-chat-bot) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -4060,7 +4060,7 @@ Inspect Agentic evidence and governed work. Present and interact with authoritat
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend)<br>`ui.collection-grid@1` — [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-agentic-run-inspector) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -4170,7 +4170,7 @@ Design, train and validate neural research. Present and interact with authoritat
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-neural-research) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -4280,7 +4280,7 @@ Review and build strategy distribution packages. Present and interact with autho
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-strategy-packager) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -4390,7 +4390,7 @@ Explore advanced statistical and profile visualizations. Present and interact wi
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-advanced-analysis) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -4500,7 +4500,7 @@ Inspect reproducible performance and lifecycle evidence. Present and interact wi
 
 **Required capabilities:**
 
-`ui.workspace-layout@1` — [`FEAT-UI-01`](#feat-ui-01)<br>`ui.typed-backend@1` — [`FEAT-UI-14`](#feat-ui-14).
+`ui.workspace-layout@1` — [`FEAT-UI-COMPOSE_WORKSPACE`](#feat-ui-compose-workspace)<br>`ui.typed-backend@1` — [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend).
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-performance-lab) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
@@ -4696,7 +4696,7 @@ The following domain-specific rules explain the source requirements and ownershi
 <a id="ui-identity-paths"></a>
 ### 9.1 UI-IDENTITY-PATHS
 
-Preserve permanent numeric feature IDs and the selected register paths. FEAT-UI-01 owns widgets/workspaces; FEAT-UI-14 owns clients; FEAT-UI-15 owns context; FEAT-UI-16 and FEAT-UI-18 retain components/layout and components/workflow; FEAT-UI-17 retains app. These are documented legacy bindings, not permission to add a second registry or duplicate features.
+Preserve permanent numeric feature IDs and the selected register paths. FEAT-UI-COMPOSE_WORKSPACE owns widgets/workspaces; FEAT-UI-TYPED_BACKEND owns clients; FEAT-UI-SESSION_CONTEXT owns context; FEAT-UI-WORKSPACE_NAVIGATION and FEAT-UI-DATA_MANAGER retain components/layout and components/workflow; FEAT-UI-SESSION_ACCESS retains app. These are documented legacy bindings, not permission to add a second registry or duplicate features.
 
 <a id="ui-contracts"></a>
 ### 9.2 UI-CONTRACTS
@@ -4741,7 +4741,7 @@ Code editing uses authorized package resource IDs and isolated owner build/test 
 <a id="ui-preservation"></a>
 ### 9.10 UI-PRESERVATION
 
-Only the selected Data/QDM behavior of FEAT-UI-18 is normalized here; its unrelated existing workflow-view behavior is not deleted or renumbered. Retain the existing Next/React/Dockview workstation and compatible donor UI; do not create a replacement SPA merely to align a folder spelling.
+Only the selected Data/QDM behavior of FEAT-UI-DATA_MANAGER is normalized here; its unrelated existing workflow-view behavior is not deleted or renumbered. Retain the existing Next/React/Dockview workstation and compatible donor UI; do not create a replacement SPA merely to align a folder spelling.
 
 ### Normative source and acceptance binding
 

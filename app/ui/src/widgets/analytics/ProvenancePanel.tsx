@@ -1,5 +1,5 @@
 /**
- * Provenance and artifacts panel (FEAT-UI-32).
+ * Provenance and artifacts panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * The V2 destination for reproducibility evidence: exact hashes, versions,
  * revisions, seed, lineage, precision metadata, warnings, and the artifact

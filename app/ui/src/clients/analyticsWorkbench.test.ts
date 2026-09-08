@@ -1,5 +1,5 @@
 /**
- * Analytics Workbench client contract tests (FEAT-UI-32 / P1-T01).
+ * Analytics Workbench client contract tests (FEAT-UI-RESEARCH_WORKBENCH / P1-T01).
  *
  * Verifies that analyticsWorkbench client operations invoke correct routes,
  * methods, queries, parameter substitutions, and parse responses with Zod schemas.

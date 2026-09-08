@@ -1,5 +1,5 @@
 /**
- * Progressive stage navigation (FEAT-UI-28).
+ * Progressive stage navigation (FEAT-UI-EXECUTE_ORDERS).
  *
  * Preserves V1's progressive-stage idea while deriving every status from
  * server evidence rather than browser-held progress. A stage is never hidden:

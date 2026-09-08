@@ -1,5 +1,5 @@
 /**
- * Shared presentation primitives for Research evidence (FEAT-UI-28).
+ * Shared presentation primitives for Research evidence (FEAT-UI-EXECUTE_ORDERS).
  *
  * These components render values the backend already decided. They add no
  * calculation beyond layout arithmetic (bar widths, cell scaling), and every

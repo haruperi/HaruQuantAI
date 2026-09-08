@@ -1,5 +1,5 @@
 /**
- * Analytics distribution chart primitive (FEAT-UI-32).
+ * Analytics distribution chart primitive (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders an Analytics-owned histogram or distribution section as bars. Bucket
  * boundaries and counts come from the owner: this component never bins, never

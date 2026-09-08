@@ -1,5 +1,5 @@
 /**
- * Workspace layout and session-mode store (FEAT-UI-01).
+ * Workspace layout and session-mode store (FEAT-UI-COMPOSE_WORKSPACE).
  *
  * Owns non-authoritative workspace/widget layout, order-confirmation
  * presentation mode, and the app-wide account mode (sim/demo/live). Only

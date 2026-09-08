@@ -1,4 +1,4 @@
-/** Compatibility tests for the shared widget renderer (FEAT-UI-28). */
+/** Compatibility tests for the shared widget renderer (FEAT-UI-EXECUTE_ORDERS). */
 
 import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";

@@ -1,8 +1,8 @@
-/** Typed manifest for the FEAT-UI-01 workspace-layout composition feature. */
+/** Typed manifest for the FEAT-UI-COMPOSE_WORKSPACE workspace-layout composition feature. */
 
 /** Workspace layout feature identity and public capability declaration. */
 export const WORKSPACE_LAYOUT_MANIFEST = {
-  featureId: "FEAT-UI-01",
+  featureId: "FEAT-UI-COMPOSE_WORKSPACE",
   featureVersion: 1,
   provides: ["ui.workspace-layout@1"] as const,
   requiredCapabilities: [] as const,

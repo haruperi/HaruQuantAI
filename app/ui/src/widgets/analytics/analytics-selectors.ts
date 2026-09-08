@@ -1,5 +1,5 @@
 /**
- * Analytics presentation selectors (FEAT-UI-32).
+ * Analytics presentation selectors (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * These helpers project owner comparison evidence into rows a table can
  * render. They never subtract, rank, or otherwise combine two runs: a

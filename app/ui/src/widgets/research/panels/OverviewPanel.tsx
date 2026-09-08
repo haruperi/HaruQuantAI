@@ -1,5 +1,5 @@
 /**
- * Overview panel (FEAT-UI-28, plan §10.4).
+ * Overview panel (FEAT-UI-EXECUTE_ORDERS, plan §10.4).
  *
  * Composes the run's headline evidence from Research-owned fields only. The
  * "next action" wording is derived from explicit server statuses — it is never

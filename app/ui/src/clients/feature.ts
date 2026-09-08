@@ -1,4 +1,4 @@
-/** Explicit registration lifecycle for the FEAT-UI-14 capability. */
+/** Explicit registration lifecycle for the FEAT-UI-TYPED_BACKEND capability. */
 
 import { ApiClientError } from "./request";
 import { TypedBackendLifecycle } from "./lifecycle";
@@ -50,7 +50,7 @@ export class TypedBackendCapabilityRegistry {
     return this.entries.get(capability) as T | undefined;
   }
 
-  /** Resolve FEAT-UI-14 or fail with an explicit unavailable outcome. */
+  /** Resolve FEAT-UI-TYPED_BACKEND or fail with an explicit unavailable outcome. */
   public requireTypedBackend(): TypedBackendFeature {
     const feature = this.resolve<TypedBackendFeature>(TYPED_BACKEND_CAPABILITY);
     if (!feature) {
@@ -63,7 +63,7 @@ export class TypedBackendCapabilityRegistry {
     return feature;
   }
 
-  /** Register FEAT-UI-14 and return an async exact-generation disposer. */
+  /** Register FEAT-UI-TYPED_BACKEND and return an async exact-generation disposer. */
   public registerTypedBackend(feature: TypedBackendFeature): () => Promise<void> {
     const unregister = this.register(TYPED_BACKEND_CAPABILITY, feature);
     let active = true;

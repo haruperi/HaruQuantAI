@@ -1,5 +1,5 @@
 /**
- * Docking layout tree construction for workspace widget sets (FEAT-UI-01,
+ * Docking layout tree construction for workspace widget sets (FEAT-UI-COMPOSE_WORKSPACE,
  * FR-UI-201).
  *
  * Deterministically converts a widget list (with grid-rectangle

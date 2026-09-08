@@ -1,4 +1,4 @@
-/** Strict, pure persisted-layout configuration and migration for FEAT-UI-01. */
+/** Strict, pure persisted-layout configuration and migration for FEAT-UI-COMPOSE_WORKSPACE. */
 
 import { z } from "zod";
 

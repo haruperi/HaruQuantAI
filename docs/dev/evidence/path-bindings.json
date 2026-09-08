@@ -2,7 +2,7 @@
   "manifest_version": "2.0",
   "bindings": [
     {
-      "feature_id": "FEAT-UI-01",
+      "feature_id": "FEAT-UI-COMPOSE_WORKSPACE",
       "task_id": "1.01",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -18,10 +18,10 @@
         "app/ui/src/widgets/workspaces/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/workspaces/__tests__/lifecycle.test.tsx"
       ],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-01/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-COMPOSE_WORKSPACE/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-14",
+      "feature_id": "FEAT-UI-TYPED_BACKEND",
       "task_id": "1.02",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -37,7 +37,7 @@
         "app/ui/src/clients/__tests__/traceability.test.ts",
         "app/ui/src/clients/__tests__/lifecycle.test.ts"
       ],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-14/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-TYPED_BACKEND/acceptance.json"
     },
     {
       "feature_id": "FEAT-WS-MANAGE_WORKSPACES",
@@ -257,7 +257,7 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-17",
+      "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -270,7 +270,7 @@
         "app/ui/src/app/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-17/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json"
     },
     {
       "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
@@ -433,7 +433,7 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_JOBS/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-16",
+      "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
       "task_id": "1.27",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -446,10 +446,10 @@
         "app/ui/src/components/layout/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-16/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-WORKSPACE_NAVIGATION/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-13",
+      "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
       "task_id": "1.28",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -462,7 +462,7 @@
         "app/ui/src/widgets/system-settings/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-13/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SYSTEM_SETTINGS/acceptance.json"
     },
     {
       "feature_id": "FEAT-UI-RUN_MONITOR",
@@ -977,7 +977,7 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OBSERVE_MARKET_REFERENCE/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-18",
+      "feature_id": "FEAT-UI-DATA_MANAGER",
       "task_id": "2.31",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -990,10 +990,10 @@
         "app/ui/src/components/workflow/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-18/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-DATA_MANAGER/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-04",
+      "feature_id": "FEAT-UI-MARKET_CHARTS",
       "task_id": "2.32",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -1006,7 +1006,7 @@
         "app/ui/src/widgets/chart/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-04/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-MARKET_CHARTS/acceptance.json"
     },
     {
       "feature_id": "FEAT-IND-CALCULATE_TREND",
@@ -1601,7 +1601,7 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-OPERATE_RESULTS/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-27",
+      "feature_id": "FEAT-UI-RUN_BACKTEST",
       "task_id": "4.20",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -1614,10 +1614,10 @@
         "app/ui/src/widgets/simulator/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-27/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RUN_BACKTEST/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-32",
+      "feature_id": "FEAT-UI-RESEARCH_WORKBENCH",
       "task_id": "4.21",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -1630,7 +1630,7 @@
         "app/ui/src/widgets/analytics/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-32/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-RESEARCH_WORKBENCH/acceptance.json"
     },
     {
       "feature_id": "FEAT-UI-DATABANK_GRID",
@@ -1729,7 +1729,7 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-TRADES_ON_CHART/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-15",
+      "feature_id": "FEAT-UI-SESSION_CONTEXT",
       "task_id": "5.01",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -1742,7 +1742,7 @@
         "app/ui/src/context/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-15/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_CONTEXT/acceptance.json"
     },
     {
       "feature_id": "FEAT-WS-MANAGE_CONVERSATIONS",
@@ -2066,7 +2066,7 @@
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-COMPOSE_STRATEGY_SPECS/acceptance.json"
     },
     {
-      "feature_id": "FEAT-UI-28",
+      "feature_id": "FEAT-UI-EXECUTE_ORDERS",
       "task_id": "6.11",
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
@@ -2079,7 +2079,7 @@
         "app/ui/src/widgets/research/__tests__/lifecycle.test.tsx"
       ],
       "existing_test_targets": [],
-      "evidence_path": "docs/dev/evidence/features/FEAT-UI-28/acceptance.json"
+      "evidence_path": "docs/dev/evidence/features/FEAT-UI-EXECUTE_ORDERS/acceptance.json"
     },
     {
       "feature_id": "FEAT-SIM-PERTURB_INPUTS",

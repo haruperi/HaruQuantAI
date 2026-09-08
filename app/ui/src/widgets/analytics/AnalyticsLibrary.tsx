@@ -1,5 +1,5 @@
 /**
- * Analytics run library (FEAT-UI-32).
+ * Analytics run library (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Lists the caller's catalogue runs from the server, page by page, with the
  * columns and actions the Analytics library specifies. Archiving is a metadata

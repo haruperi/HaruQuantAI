@@ -1,5 +1,5 @@
 /**
- * Market Structure panel (FEAT-UI-28, plan §10.11).
+ * Market Structure panel (FEAT-UI-EXECUTE_ORDERS, plan §10.11).
  *
  * Replaces the V1 mega-page with focused tabs over the market-structure
  * evidence Research published: score inputs, geometry parameters,

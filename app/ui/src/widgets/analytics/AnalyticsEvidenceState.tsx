@@ -1,5 +1,5 @@
 /**
- * Shared Analytics evidence-state presentation (FEAT-UI-32).
+ * Shared Analytics evidence-state presentation (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Every Analytics surface renders owner-supplied evidence only. This module
  * holds the one place that decides how loading, error, unavailable, and

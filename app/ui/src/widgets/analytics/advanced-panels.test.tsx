@@ -1,5 +1,5 @@
 /**
- * Advanced Analytics evidence tests (FEAT-UI-32, P6-T01).
+ * Advanced Analytics evidence tests (FEAT-UI-RESEARCH_WORKBENCH, P6-T01).
  *
  * Unsupported metrics must render the exact agreed wording, and every
  * supported figure must come from the owner projection.

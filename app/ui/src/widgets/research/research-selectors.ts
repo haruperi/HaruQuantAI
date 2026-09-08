@@ -1,5 +1,5 @@
 /**
- * Read-only selectors and formatters for Research evidence (FEAT-UI-28).
+ * Read-only selectors and formatters for Research evidence (FEAT-UI-EXECUTE_ORDERS).
  *
  * Every function here reshapes or formats values the backend already decided.
  * Nothing in this module derives a score, readiness verdict, classification,

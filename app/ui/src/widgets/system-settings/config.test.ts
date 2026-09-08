@@ -7,7 +7,7 @@ import {
   resolveSystemSettingsConfig,
 } from "./config";
 
-describe("SystemSettingsConfig (FEAT-UI-13)", () => {
+describe("SystemSettingsConfig (FEAT-UI-SYSTEM_SETTINGS)", () => {
   it("resolves default configuration when input is undefined", () => {
     const resolved = resolveSystemSettingsConfig(undefined);
     expect(resolved).toEqual(DEFAULT_SYSTEM_SETTINGS_CONFIG);

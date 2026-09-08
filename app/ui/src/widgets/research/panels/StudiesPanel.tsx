@@ -1,5 +1,5 @@
 /**
- * Edge Studies panel (FEAT-UI-28, plan §10.9).
+ * Edge Studies panel (FEAT-UI-EXECUTE_ORDERS, plan §10.9).
  *
  * One tab per approved study plus a null-evidence tab. Every classification,
  * statistic, and null summary is a Research field; the browser never decides

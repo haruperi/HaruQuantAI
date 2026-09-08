@@ -1280,7 +1280,7 @@ body {
 }
 
 /* ==========================================================================
-   WORKSPACE TEMPLATE PICKER & EMPTY STATE (FEAT-UI-01, FR-UI-195..199)
+   WORKSPACE TEMPLATE PICKER & EMPTY STATE (FEAT-UI-COMPOSE_WORKSPACE, FR-UI-195..199)
    ========================================================================== */
 .workspace-template-picker {
   flex: 1;
@@ -1721,7 +1721,7 @@ body {
 }
 
 /* ==========================================================================
-   DOCKING WORKSPACE HOST (FEAT-UI-01/16, FR-UI-006..008/024/200/202)
+   DOCKING WORKSPACE HOST (FEAT-UI-COMPOSE_WORKSPACE/16, FR-UI-006..008/024/200/202)
    Dockview dark theme aligned with the app's CME-style tokens.
    ========================================================================== */
 .workspace-dock-shell {

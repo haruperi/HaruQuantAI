@@ -1,4 +1,4 @@
-/** Bounded offline executable TSX usage for FEAT-UI-14. */
+/** Bounded offline executable TSX usage for FEAT-UI-TYPED_BACKEND. */
 
 import assert from "node:assert/strict";
 import { z } from "zod";
@@ -155,7 +155,7 @@ async function main(): Promise<void> {
   assert.equal(registry.resolve("ui.unrelated@1"), unrelated);
 
   console.log(
-    "FEAT-UI-14 usage passed: typed schema rejection, latest-only request, shared cursor resume, exact withdrawal, and cleanup verified offline.",
+    "FEAT-UI-TYPED_BACKEND usage passed: typed schema rejection, latest-only request, shared cursor resume, exact withdrawal, and cleanup verified offline.",
   );
 }
 

@@ -1,5 +1,5 @@
 /**
- * Workspace template catalog (FEAT-UI-01, FR-UI-195 through FR-UI-197).
+ * Workspace template catalog (FEAT-UI-COMPOSE_WORKSPACE, FR-UI-195 through FR-UI-197).
  *
  * Templates seed a newly created workspace with a curated widget set,
  * mirroring the CME Group Simulator's "NEW WORKSPACE" template picker.

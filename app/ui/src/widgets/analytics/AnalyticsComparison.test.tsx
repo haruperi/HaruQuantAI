@@ -1,5 +1,5 @@
 /**
- * Run comparison tests (FEAT-UI-32, P6-T03).
+ * Run comparison tests (FEAT-UI-RESEARCH_WORKBENCH, P6-T03).
  *
  * The store holds only the selection and presentation choice, and the rendered
  * comparison is always the owner's: no difference is computed in the browser.

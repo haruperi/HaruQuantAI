@@ -1,4 +1,4 @@
-# Workspaces (`FEAT-UI-01`)
+# Workspaces (`FEAT-UI-COMPOSE_WORKSPACE`)
 
 ## Purpose
 
@@ -34,15 +34,15 @@ scoped observer cleanup. Domain jobs and business records remain owner-controlle
 
 ## Interactive Usage
 
-1. `FR-TRC-UI-01-001`: open the Sidebar and add a registered widget. Sidebar,
+1. `FR-TRC-UI-COMPOSE_WORKSPACE-001`: open the Sidebar and add a registered widget. Sidebar,
    type validation, templates, and rendering resolve the same registry entry.
-2. `FR-TRC-UI-01-002`: save and reopen a Research workspace. A malformed or
+2. `FR-TRC-UI-COMPOSE_WORKSPACE-002`: save and reopen a Research workspace. A malformed or
    removed panel becomes unavailable without removing valid siblings; secret,
    strategy, raw-row, provider, and request objects are not persisted.
-3. `FR-TRC-UI-01-003`: select Research or another template, then dock, tab,
+3. `FR-TRC-UI-COMPOSE_WORKSPACE-003`: select Research or another template, then dock, tab,
    split, float, resize, and move panels with Alt+Arrow. Focus remains within
    the workspace; cross-window popout is reported as unavailable.
-4. `FR-TRC-UI-01-004`: close an observing panel. Its scoped disposer releases
+4. `FR-TRC-UI-COMPOSE_WORKSPACE-004`: close an observing panel. Its scoped disposer releases
    browser effects, but no accepted owner job is cancelled. Use the owning job
    control when cancellation is intended.
 
@@ -58,8 +58,8 @@ not cancel owner work. It requires no credentials, network, or live action.
 
 ## Verification
 
-- `__tests__/traceability.test.tsx`: `AT-UI-01-001` through `AT-UI-01-004`.
-- `__tests__/lifecycle.test.tsx`: `ATN-UI-01-001`, including 100 registry
+- `__tests__/traceability.test.tsx`: `AT-UI-COMPOSE_WORKSPACE-001` through `AT-UI-COMPOSE_WORKSPACE-004`.
+- `__tests__/lifecycle.test.tsx`: `ATN-UI-COMPOSE_WORKSPACE-001`, including 100 registry
   enable/disable cycles, generation-stable lazy components, and physical
   contribution withdrawal.
 - `dockPersistence.test.ts`: safe split/tab/floating round-trip plus hostile,

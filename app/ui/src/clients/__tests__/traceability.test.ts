@@ -1,4 +1,4 @@
-/** Requirement-level evidence for FEAT-UI-14. */
+/** Requirement-level evidence for FEAT-UI-TYPED_BACKEND. */
 
 import { describe, expect, it } from "vitest";
 import { z } from "zod";
@@ -18,7 +18,7 @@ function metadata(): Record<string, unknown> {
   };
 }
 
-describe("FEAT-UI-14 traceability", () => {
+describe("FEAT-UI-TYPED_BACKEND traceability", () => {
   it("test_trc_call_typed_backend_001", () => {
     const schema = apiResponseSchema(
       z.object({ status: z.literal("healthy") }).strict(),
@@ -71,7 +71,7 @@ describe("FEAT-UI-14 traceability", () => {
 
   it("test_trc_call_typed_backend_002", () => {
     expect(TYPED_BACKEND_MANIFEST).toMatchObject({
-      featureId: "FEAT-UI-14",
+      featureId: "FEAT-UI-TYPED_BACKEND",
       provides: ["ui.typed-backend@1"],
       requiredCapabilities: [],
       configKeys: [],

@@ -1,4 +1,4 @@
-/** Requirement-mapped acceptance tests for FEAT-UI-01. */
+/** Requirement-mapped acceptance tests for FEAT-UI-COMPOSE_WORKSPACE. */
 
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
@@ -25,7 +25,7 @@ import { findWorkspaceTemplate, WORKSPACE_TEMPLATES } from "../templates";
 
 afterEach(cleanup);
 
-describe("FEAT-UI-01 traceability", () => {
+describe("FEAT-UI-COMPOSE_WORKSPACE traceability", () => {
   it("test_trc_host_workspace_001", () => {
     const registrations = listWidgetRegistrations();
     expect(registrations.map((value) => value.manifest.widgetType)).toEqual(
@@ -65,7 +65,7 @@ describe("FEAT-UI-01 traceability", () => {
     );
     expect(
       getWidgetRegistration("dashboard")?.manifest.qualification,
-    ).toMatchObject({ kind: "planned-feature", ownerId: "FEAT-UI-16" });
+    ).toMatchObject({ kind: "planned-feature", ownerId: "FEAT-UI-WORKSPACE_NAVIGATION" });
     expect(
       getWidgetRegistration("risk")?.manifest.qualification,
     ).toMatchObject({

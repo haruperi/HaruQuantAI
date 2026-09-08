@@ -1,5 +1,5 @@
 /**
- * Analytics trade ledger panel (FEAT-UI-32).
+ * Analytics trade ledger panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Pages and filters the canonical Simulation trade ledger entirely on the
  * server. The panel sorts, filters, and counts nothing locally: the page it

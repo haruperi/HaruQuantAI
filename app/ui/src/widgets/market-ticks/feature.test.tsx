@@ -198,6 +198,8 @@ describe("FEAT-UI-25 feature adapter — D-UI §4.8 lifecycle", () => {
     await waitFor(() =>
       expect(screen.getByText("Latest quotes")).toBeInTheDocument(),
     );
-    expect(screen.getByText("EURUSD")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByText("EURUSD")).toBeInTheDocument(),
+    );
   });
 });

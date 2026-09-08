@@ -95,6 +95,6 @@ represented as a Git SHA.
 
 ## Phase 1 entry
 
-Phase 1 may begin with Task 1.01 (`FEAT-UI-01`) through the configured atomic
+Phase 1 may begin with Task 1.01 (`FEAT-UI-COMPOSE_WORKSPACE`) through the configured atomic
 Task/Goal workflow. Each feature still requires its own complete implementation,
 usage evidence, independent review, accepted feature commit, and merge record.

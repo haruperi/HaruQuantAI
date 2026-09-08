@@ -1,5 +1,5 @@
 /**
- * Analytics Workbench shell tests (FEAT-UI-32 / P1-T04).
+ * Analytics Workbench shell tests (FEAT-UI-RESEARCH_WORKBENCH / P1-T04).
  *
  * Verifies that AnalyticsWorkspace renders all 7 analytical section tabs,
  * displays run metadata and evidence status, and handles tab switching.

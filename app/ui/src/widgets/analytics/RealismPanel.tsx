@@ -1,5 +1,5 @@
 /**
- * Simulation realism evidence panel (FEAT-UI-32).
+ * Simulation realism evidence panel (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Realism context lives on an Analytics screen because analytics without it can
  * mislead, but every value here is Simulation-owned. The panel reads the

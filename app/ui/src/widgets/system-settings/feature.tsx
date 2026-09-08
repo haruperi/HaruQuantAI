@@ -9,7 +9,7 @@ import {
 import { SYSTEM_SETTINGS_MANIFEST } from "./manifest";
 import { SystemSettingsModal } from "./SystemSettingsModal";
 
-/** Props for the FEAT-UI-13 lifecycle adapter. */
+/** Props for the FEAT-UI-SYSTEM_SETTINGS lifecycle adapter. */
 export interface SystemSettingsFeatureProps {
   /**
    * Raw widget configuration (strict schema); `undefined` selects the
@@ -36,7 +36,7 @@ function resolveConfig(input: unknown | undefined): ResolvedConfig {
 }
 
 /**
- * FEAT-UI-13 lifecycle adapter: it owns the widget configuration
+ * FEAT-UI-SYSTEM_SETTINGS lifecycle adapter: it owns the widget configuration
  * lifecycle and the explicit invalid-configuration response; `SystemSettingsModal`
  * remains focused presentation.
  */

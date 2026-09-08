@@ -1,5 +1,5 @@
 /**
- * Component tests for the docking workspace host (FEAT-UI-01/16,
+ * Component tests for the docking workspace host (FEAT-UI-COMPOSE_WORKSPACE/16,
  * FR-UI-006/007/008/201 in `app/ui/README.md` §4.1 and §4.16).
  *
  * Dockview itself is mocked: these tests verify the adapter's restore,

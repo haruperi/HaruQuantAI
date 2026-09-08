@@ -37,15 +37,19 @@ vi.mock("../../store/useTradingStore", () => ({
   }),
 }));
 
-vi.mock("../workspaces", () => ({
-  useWorkspaceStore: () => ({
-    orderConfirmationRequired: true,
-    workspaces: [],
-    activeWorkspaceId: 1,
-    addWidgetToWorkspace: addWidgetToWorkspaceMock,
-    setWidgetSymbol: setWidgetSymbolMock,
-  }),
-}));
+vi.mock("../workspaces", async (importOriginal) => {
+  const actual = await importOriginal<typeof import("../workspaces")>();
+  return {
+    ...actual,
+    useWorkspaceStore: () => ({
+      orderConfirmationRequired: true,
+      workspaces: [],
+      activeWorkspaceId: 1,
+      addWidgetToWorkspace: addWidgetToWorkspaceMock,
+      setWidgetSymbol: setWidgetSymbolMock,
+    }),
+  };
+});
 
 vi.mock("@/clients", async (importOriginal) => {
   const actual = await importOriginal<typeof import("../../clients")>();

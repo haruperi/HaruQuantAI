@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Docking layout host (FEAT-UI-01/16, FR-UI-006/007/008/024/200/202).
+ * Docking layout host (FEAT-UI-COMPOSE_WORKSPACE/16, FR-UI-006/007/008/024/200/202).
  *
  * Hosts a Dockview docking layout for one workspace, mirroring the CME Group
  * Simulator's workspace behaviour: fluid pixel-level splitters between regions,
@@ -11,7 +11,7 @@
  * registry; the serialized layout tree persists through the store and is
  * rebuilt deterministically for legacy grid layouts and template presets.
  * Cross-window popout is intentionally unsupported; in-workspace floating,
- * tabbing, splitting and repositioning remain available (FR-TRC-UI-01-003).
+ * tabbing, splitting and repositioning remain available (FR-TRC-UI-COMPOSE_WORKSPACE-003).
  */
 import React, { useCallback, useEffect, useRef } from 'react';
 import {

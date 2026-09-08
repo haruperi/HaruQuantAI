@@ -1,5 +1,5 @@
 /**
- * Research workbench feature barrel (FEAT-UI-28).
+ * Research workbench feature barrel (FEAT-UI-EXECUTE_ORDERS).
  *
  * One feature folder covers the whole workbench: the ledger, the run builder,
  * the stage shell, every evidence panel, and the expectancy and drift monitors.

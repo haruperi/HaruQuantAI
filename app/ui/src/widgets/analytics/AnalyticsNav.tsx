@@ -1,5 +1,5 @@
 /**
- * Analytics 7-tab sub-navigation (FEAT-UI-32).
+ * Analytics 7-tab sub-navigation (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Provides tab-based switching across all 18 Analytics-owned analytical sections:
  * 1. Overview (summary, ratios, quality flags)

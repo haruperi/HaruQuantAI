@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Sole lazy widget registry for FEAT-UI-01.
+ * Sole lazy widget registry for FEAT-UI-COMPOSE_WORKSPACE.
  *
  * Availability is intentionally separate from feature acceptance. Existing
  * pre-V3 manifests remain visible as legacy, unqualified provenance; ratified
@@ -143,7 +143,7 @@ const seeds = {
     load: async () => { const loaded = await import("../watchlists"); return { default: () => <loaded.WatchlistsFeature /> }; },
   },
   chart: {
-    provenance: plannedFeature("FEAT-UI-04"),
+    provenance: plannedFeature("FEAT-UI-MARKET_CHARTS"),
     domain: "indicators", label: "Chart", title: "EURUSD Chart", symbol: "EURUSD", icon: "line-chart",
     load: async () => { const loaded = await import("../chart"); return { default: ({ widget }: RegisteredWidgetProps) => <loaded.ChartWidget symbol={widget.symbol || "EURUSD"} widgetId={widget.id} /> }; },
   },
@@ -183,12 +183,12 @@ const seeds = {
     load: async () => { const loaded = await import("../training-ux"); return { default: () => <loaded.ChallengesWidget /> }; },
   },
   dashboard: {
-    provenance: plannedFeature("FEAT-UI-16"),
+    provenance: plannedFeature("FEAT-UI-WORKSPACE_NAVIGATION"),
     domain: "resources", label: "Dashboard", title: "Dashboard", icon: "layout-dashboard",
     load: async () => { const loaded = await import("../../components/workflow/dashboard"); return { default: () => <loaded.DashboardView /> }; },
   },
   data: {
-    provenance: plannedFeature("FEAT-UI-18"),
+    provenance: plannedFeature("FEAT-UI-DATA_MANAGER"),
     domain: "data", label: "Data Explorer", title: "Data Explorer", icon: "database",
     load: async () => { const loaded = await import("../../components/workflow/data"); return { default: () => <loaded.DataWorkspace /> }; },
   },
@@ -198,7 +198,7 @@ const seeds = {
     load: async () => { const loaded = await import("../../components/workflow/strategies"); return { default: () => <loaded.StrategyWorkspace /> }; },
   },
   research: {
-    provenance: plannedFeature("FEAT-UI-28"),
+    provenance: plannedFeature("FEAT-UI-EXECUTE_ORDERS"),
     domain: "research", label: "Edge Lab", title: "Edge Lab", icon: "flask-conical",
     load: async () => { const loaded = await import("../research"); return { default: () => <loaded.ResearchDashboard /> }; },
   },
@@ -218,7 +218,7 @@ const seeds = {
     load: async () => { const loaded = await import("../../components/workflow/agentic"); return { default: () => <loaded.AgenticView /> }; },
   },
   simulator: {
-    provenance: plannedFeature("FEAT-UI-27"),
+    provenance: plannedFeature("FEAT-UI-RUN_BACKTEST"),
     domain: "simulation", label: "Simulator", title: "Simulator", icon: "history",
     load: async () => { const loaded = await import("../simulator"); return { default: () => <loaded.SimulationHome /> }; },
   },
@@ -253,7 +253,7 @@ const seeds = {
     load: async () => { const loaded = await import("../market-hours"); return { default: () => <loaded.MarketHoursFeature /> }; },
   },
   analytics: {
-    provenance: plannedFeature("FEAT-UI-32"),
+    provenance: plannedFeature("FEAT-UI-RESEARCH_WORKBENCH"),
     domain: "analytics", label: "Analytics", title: "Analytics", icon: "bar-chart-2",
     load: async () => { const loaded = await import("../analytics"); return { default: ({ widget }: RegisteredWidgetProps) => <loaded.AnalyticsWorkspace runId={widget.runId} /> }; },
   },

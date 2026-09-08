@@ -1,5 +1,5 @@
 /**
- * Analytics calendar heatmap primitive (FEAT-UI-32).
+ * Analytics calendar heatmap primitive (FEAT-UI-RESEARCH_WORKBENCH).
  *
  * Renders one Analytics-owned calendar section as a grid of cells. Cell colour
  * is a presentation of the owner's own value; the component computes no

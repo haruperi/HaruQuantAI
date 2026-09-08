@@ -1,5 +1,5 @@
 /**
- * Component tests for the explicit empty-workspace prompt (FEAT-UI-01,
+ * Component tests for the explicit empty-workspace prompt (FEAT-UI-COMPOSE_WORKSPACE,
  * FR-UI-026 and FR-UI-197 in `app/ui/README.md` §4.1).
  */
 import { describe, expect, it } from "vitest";

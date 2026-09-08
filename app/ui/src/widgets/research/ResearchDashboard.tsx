@@ -1,5 +1,5 @@
 /**
- * Research dashboard (FEAT-UI-28, plan §10.1).
+ * Research dashboard (FEAT-UI-EXECUTE_ORDERS, plan §10.1).
  *
  * The workbench entry point and research ledger — the V2 realization of V1's
  * "Discovery" placeholder. It deliberately shows failed, contradicted, and

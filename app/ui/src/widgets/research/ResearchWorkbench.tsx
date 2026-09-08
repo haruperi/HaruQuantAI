@@ -1,5 +1,5 @@
 /**
- * Research workbench shell (FEAT-UI-28).
+ * Research workbench shell (FEAT-UI-EXECUTE_ORDERS).
  *
  * Composes layout only: the persistent run header, the stage navigator, the
  * live status strip, and whichever stage panel the route selected. It holds no

@@ -1,5 +1,5 @@
 /**
- * Seasonality panel (FEAT-UI-28, plan §10.10).
+ * Seasonality panel (FEAT-UI-EXECUTE_ORDERS, plan §10.10).
  *
  * Full V1 parity across six tabs — intraday bias, hour × day heatmaps,
  * calendar, sessions, opportunity windows, and the evidence table — drawn

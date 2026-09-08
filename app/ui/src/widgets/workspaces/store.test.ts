@@ -1,5 +1,5 @@
 /**
- * Unit tests for the FEAT-UI-01 workspace/session-mode store, mapped to
+ * Unit tests for the FEAT-UI-COMPOSE_WORKSPACE workspace/session-mode store, mapped to
  * FR-UI-001 through FR-UI-029, FR-UI-195 through FR-UI-199, and
  * FR-UI-200 through FR-UI-202 in `app/ui/README.md` §4.1.
  */

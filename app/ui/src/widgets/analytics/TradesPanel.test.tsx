@@ -1,5 +1,5 @@
 /**
- * Analytics trade analysis tests (FEAT-UI-32, P3-T02).
+ * Analytics trade analysis tests (FEAT-UI-RESEARCH_WORKBENCH, P3-T02).
  *
  * Covers server-side pagination and filtering, the trade detail evidence, the
  * exact encoded replay return context, and the artifact drawer.

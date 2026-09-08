@@ -1,7 +1,7 @@
 'use client';
 
 /**
- * Header profile dropdown (FEAT-UI-01, FR-UI-020).
+ * Header profile dropdown (FEAT-UI-COMPOSE_WORKSPACE, FR-UI-020).
  *
  * Mirrors the CME Group Simulator's profile menu: it drops from the `<`
  * chevron beside the user name and presents the account-mode section plus

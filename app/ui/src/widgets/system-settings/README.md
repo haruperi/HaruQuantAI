@@ -1,4 +1,4 @@
-# System Settings Widget (`FEAT-UI-13`)
+# System Settings Widget (`FEAT-UI-SYSTEM_SETTINGS`)
 
 > **Package:** `app/ui/src/widgets/system-settings/`
 > **System role:** Workstation modal for database-backed system settings, credentials, and runtime parameters.
@@ -9,7 +9,7 @@
 
 ## 1. Feature Identity & Manifest
 
-`FEAT-UI-13` declares the `SYSTEM_SETTINGS_MANIFEST`:
+`FEAT-UI-SYSTEM_SETTINGS` declares the `SYSTEM_SETTINGS_MANIFEST`:
 - **Widget Type:** `systemSettings`
 - **Required Capabilities:** `interfaces.serve-api-events@1`
 - **Optional Capabilities:** `none`
