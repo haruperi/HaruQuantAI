@@ -1,0 +1,9 @@
+{
+ "feature_id":"FEAT-AGT-REGISTER_ROLES","task_id":"1.20","status":"IMPLEMENTED_UNVERIFIED",
+ "requirements":[
+  {"id":"FR-AGT-REGISTER_ROLE_CONTRIBUTIONS","status":"IMPLEMENTED"},
+  {"id":"FR-AGT-VERIFY_ROLE_ARTIFACTS","status":"IMPLEMENTED"},
+  {"id":"FR-AGT-RESOLVE_ELIGIBLE_ROLES","status":"IMPLEMENTED"}
+ ],
+ "review":{"reviewer_verdict":"PENDING","reviewer_notes":"CI/reviewer evidence pending."}
+}
