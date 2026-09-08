@@ -956,9 +956,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-14"></a>
 
-### - [ ] Task 1.14 — FEAT-ORCH-RESERVE_RESOURCES — Admit finite work under one resource ledger
+### - [x] Task 1.14 — FEAT-ORCH-RESERVE_RESOURCES — Admit finite work under one resource ledger
 
-**Status:** `NOT_STARTED_IN_TARGET` · **Domain:** Orchestration · **Owner specification:** `app/services/orchestration/README.md` · **Register first slice:** U1.
+**Status:** `ACCEPTED` · **Domain:** Orchestration · **Owner specification:** `app/services/orchestration/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** 1.09, 1.11.
 
@@ -1010,7 +1010,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(orchestration): complete FEAT-ORCH-RESERVE_RESOURCES`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260908-175504-814467-complete-selected-implementation-entries-1.14-reserve-resources` · reconciled owner, contracts, tests, usage recipe, and evidence manifest.
 
 ---
 

@@ -111,7 +111,7 @@ Feature owners are independent and physically removable. The selected package is
 
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| [`FEAT-ORCH-RESERVE_RESOURCES`](#feat-orch-reserve-resources) | Admit finite work under one resource ledger | `app/services/orchestration/reserve_resources/` | U1 | 4 | 2 | NOT_REVALIDATED |
+| [`FEAT-ORCH-RESERVE_RESOURCES`](#feat-orch-reserve-resources) | Admit finite work under one resource ledger | `app/services/orchestration/reserve_resources/` | U1 | 4 | 2 | COMPLETE |
 | [`FEAT-ORCH-MANAGE_JOBS`](#feat-orch-manage-jobs) | Persist and control shared jobs and attempts | `app/services/orchestration/manage_jobs/` | U1 | 4 | 1 | NOT_REVALIDATED |
 | [`FEAT-ORCH-EXECUTE_LOCAL_WORK`](#feat-orch-execute-local-work) | Execute isolated spawn-safe local work units | `app/services/orchestration/execute_local_work/` | U2 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-ORCH-MANAGE_REMOTE_WORKERS`](#feat-orch-manage-remote-workers) | Lease and reconcile authenticated remote work | `app/services/orchestration/manage_remote_workers/` | U12 | 4 | 1 | NOT_REVALIDATED |
@@ -251,10 +251,10 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-ORCH-RESERVE_RESOURCES-001` | Reserve a finite hierarchical resource profile for every heavy operation and reject/queue impossible requests before allocation. | `AT-ORCH-RESERVE_RESOURCES-001` | A child job cannot reserve its parent’s capacity again; missing or negative caps do not mean unlimited permission. |
-| PENDING | `FR-TRC-ORCH-RESERVE_RESOURCES-002` | Enforce the source workstation defaults: 70% memory envelope, 85%/95% pressure actions, reserved control CPUs, 256 ready descriptors, two prefetch chunks, 64 MiB buffers, 20% cache ceiling and one compile job. | `AT-ORCH-RESERVE_RESOURCES-002` | Mixed-load fixtures cannot exceed combined runnable-thread or memory reservations; unknown estimates carry hard caps and visible capacity outcomes. |
-| PENDING | `FR-TRC-ORCH-RESERVE_RESOURCES-003` | Budget temporary disk as min(16 GiB,25% free) at initialization and preserve at least 10% free space; reconcile actual native/shared/device use. | `AT-ORCH-RESERVE_RESOURCES-003` | A new write is denied before violating disk headroom; shared resident pages are not double-counted and Python heap alone is not treated as total memory. |
-| PENDING | `FR-TRC-ORCH-RESERVE_RESOURCES-004` | Provide fair queues with bounded aging and reserved interactive/cancellation capacity; existing safety-critical execution keeps priority. | `AT-ORCH-RESERVE_RESOURCES-004` | Under BM-APP-01 bulk work cannot suppress control acknowledgement or disable risk/broker serialization checks. |
+| COMPLETE | `FR-TRC-ORCH-RESERVE_RESOURCES-001` | Reserve a finite hierarchical resource profile for every heavy operation and reject/queue impossible requests before allocation. | `AT-ORCH-RESERVE_RESOURCES-001` | A child job cannot reserve its parent’s capacity again; missing or negative caps do not mean unlimited permission. |
+| COMPLETE | `FR-TRC-ORCH-RESERVE_RESOURCES-002` | Enforce the source workstation defaults: 70% memory envelope, 85%/95% pressure actions, reserved control CPUs, 256 ready descriptors, two prefetch chunks, 64 MiB buffers, 20% cache ceiling and one compile job. | `AT-ORCH-RESERVE_RESOURCES-002` | Mixed-load fixtures cannot exceed combined runnable-thread or memory reservations; unknown estimates carry hard caps and visible capacity outcomes. |
+| COMPLETE | `FR-TRC-ORCH-RESERVE_RESOURCES-003` | Budget temporary disk as min(16 GiB,25% free) at initialization and preserve at least 10% free space; reconcile actual native/shared/device use. | `AT-ORCH-RESERVE_RESOURCES-003` | A new write is denied before violating disk headroom; shared resident pages are not double-counted and Python heap alone is not treated as total memory. |
+| COMPLETE | `FR-TRC-ORCH-RESERVE_RESOURCES-004` | Provide fair queues with bounded aging and reserved interactive/cancellation capacity; existing safety-critical execution keeps priority. | `AT-ORCH-RESERVE_RESOURCES-004` | Under BM-APP-01 bulk work cannot suppress control acknowledgement or disable risk/broker serialization checks. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -262,8 +262,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-ORCH-RESERVE_RESOURCES-001` | Resource accounting covers native allocations, unique resident shared pages, mappings, caches, decode/output buffers and VRAM, not only Python allocations. | `ATN-ORCH-RESERVE_RESOURCES-001` | Larger-than-RAM and mixed-load measurements stay inside the effective global and per-operation caps. |
-| PENDING | `NFR-TRC-ORCH-RESERVE_RESOURCES-002` | Control latency and cancellation capacity remain reserved while bulk work is admitted. | `ATN-ORCH-RESERVE_RESOURCES-002` | BM-APP-01 meets warm local metadata/control p95 ≤250 ms and p99 ≤1 s; over-capacity bulk work is visibly queued/refused. |
+| COMPLETE | `NFR-TRC-ORCH-RESERVE_RESOURCES-001` | Resource accounting covers native allocations, unique resident shared pages, mappings, caches, decode/output buffers and VRAM, not only Python allocations. | `ATN-ORCH-RESERVE_RESOURCES-001` | Larger-than-RAM and mixed-load measurements stay inside the effective global and per-operation caps. |
+| COMPLETE | `NFR-TRC-ORCH-RESERVE_RESOURCES-002` | Control latency and cancellation capacity remain reserved while bulk work is admitted. | `ATN-ORCH-RESERVE_RESOURCES-002` | BM-APP-01 meets warm local metadata/control p95 ≤250 ms and p99 ≤1 s; over-capacity bulk work is visibly queued/refused. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -273,15 +273,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/orchestration/reserve_resources/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/orchestration/reserve_resources/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/orchestration/reserve_resources/test_traceability.py` | COMPLETE: test_trc_reserve_resources_001..004 passing. |
+| Every ATN ID in this card | `tests/services/orchestration/reserve_resources/test_traceability.py` | COMPLETE: test_trc_reserve_resources_nfr_001..002 passing. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-ORCH-RESERVE_RESOURCES/acceptance.json` | COMPLETE: contract, provider, composition, interfaces, end_to_end pass; ui waived. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Required `_usage.py` command - executed:**
 
 ```powershell
 uv run --frozen python -m app.services.orchestration.reserve_resources._usage
