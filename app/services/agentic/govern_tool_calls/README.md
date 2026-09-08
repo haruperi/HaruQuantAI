@@ -1,0 +1,3 @@
+# FEAT-AGT-GOVERN_TOOL_CALLS
+
+Provides `agentic.tool-governance@1`. Broker credentials, executable order authority, Risk approval, kill-switch clearing, deployment, unrestricted shell, and receiver bypass/authority are structurally unregistrable. Leases bind principal/role/account/run/request hash/receiver generation/environment/cost/expiry/nonce. Invocation rechecks current session, role/mandate, Agentic readiness, receiver generation and resource admission immediately before calling the receiver. Unknown receiver effects reconcile by the original idempotency key. Results are bounded, schema/trust-scoped, secret-key filtered and conservatively cost-checked. Human actions bind exact object/action/expiry/nonce.
