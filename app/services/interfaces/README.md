@@ -121,7 +121,7 @@ Feature owners are independent and physically removable. The selected package is
 
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| [`FEAT-IFACE-SERVE_API_EVENTS`](#feat-iface-serve-api-events) | Serve compatible API envelopes and resumable events | `app/services/interfaces/serve_api_events/` | U0 | 3 | 2 | NOT_REVALIDATED |
+| [`FEAT-IFACE-SERVE_API_EVENTS`](#feat-iface-serve-api-events) | Serve compatible API envelopes and resumable events | `app/services/interfaces/serve_api_events/` | U0 | 3 | 2 | COMPLETE |
 | [`FEAT-IFACE-OPERATE_IDENTITY`](#feat-iface-operate-identity) | Translate identity and session operations | `app/services/interfaces/operate_identity/` | U0 | 2 | 2 | NOT_REVALIDATED |
 | [`FEAT-IFACE-OPERATE_SETTINGS`](#feat-iface-operate-settings) | Translate system settings and diagnostics | `app/services/interfaces/operate_settings/` | U1 | 2 | 2 | NOT_REVALIDATED |
 | [`FEAT-IFACE-OBSERVE_MARKET_REFERENCE`](#feat-iface-observe-market-reference) | Expose Data Manager and reference operations | `app/services/interfaces/observe_market_reference/` | U1 | 2 | 2 | NOT_REVALIDATED |
@@ -232,7 +232,7 @@ Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expe
 
 > **Feature ID:** `FEAT-IFACE-SERVE_API_EVENTS`
 > **Domain:** `interfaces`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — implementation and verification evidence complete.
 > **Selected owner:** `app/services/interfaces/serve_api_events/`
 > **First release milestone:** `U0`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -303,9 +303,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-IFACE-SERVE_API_EVENTS-001` | Version and validate the existing API envelope, request/trace/idempotency metadata, side-effect classification and bounded errors. | `AT-IFACE-SERVE_API_EVENTS-001` | Wire compatibility goldens pass; a long command returns its actual owner job reference, not fabricated completion. |
-| PENDING | `FR-TRC-IFACE-SERVE_API_EVENTS-002` | Stream monotonic bounded owner events with heartbeat, replay cursor, deduplication/gap/expiry/resync and abort cleanup. | `AT-IFACE-SERVE_API_EVENTS-002` | Disconnect/reconnect yields no duplicated command or missed terminal outcome; expired cursors force a snapshot. |
-| PENDING | `FR-TRC-IFACE-SERVE_API_EVENTS-003` | Apply cookie/session/CSRF transport, bounded query pages and artifact download validation without owning domain data. | `AT-IFACE-SERVE_API_EVENTS-003` | Unauthorized/CSRF-invalid writes and unsafe downloads fail before receiver invocation; no SQL/file parser is present. |
+| COMPLETE | `FR-TRC-IFACE-SERVE_API_EVENTS-001` | Version and validate the existing API envelope, request/trace/idempotency metadata, side-effect classification and bounded errors. | `AT-IFACE-SERVE_API_EVENTS-001` | Wire compatibility goldens pass; a long command returns its actual owner job reference, not fabricated completion. |
+| COMPLETE | `FR-TRC-IFACE-SERVE_API_EVENTS-002` | Stream monotonic bounded owner events with heartbeat, replay cursor, deduplication/gap/expiry/resync and abort cleanup. | `AT-IFACE-SERVE_API_EVENTS-002` | Disconnect/reconnect yields no duplicated command or missed terminal outcome; expired cursors force a snapshot. |
+| COMPLETE | `FR-TRC-IFACE-SERVE_API_EVENTS-003` | Apply cookie/session/CSRF transport, bounded query pages and artifact download validation without owning domain data. | `AT-IFACE-SERVE_API_EVENTS-003` | Unauthorized/CSRF-invalid writes and unsafe downloads fail before receiver invocation; no SQL/file parser is present. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -313,8 +313,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-IFACE-SERVE_API_EVENTS-001` | Heavy CPU/serialization/export work is delegated as admitted jobs; transport keeps bounded pages/events and remains responsive. | `ATN-IFACE-SERVE_API_EVENTS-001` | BM-APP-01 control/metadata p95 ≤250 ms and p99 ≤1 s; long commands return an owner job handle and no event-loop CPU blockage. |
-| PENDING | `NFR-TRC-IFACE-SERVE_API_EVENTS-002` | Provider loss or scope revocation returns CAPABILITY_UNAVAILABLE/typed denial without selecting a substitute. | `ATN-IFACE-SERVE_API_EVENTS-002` | Remove each operation owner in turn; only its operations degrade and no unauthorized receiver gets invoked. |
+| COMPLETE | `NFR-TRC-IFACE-SERVE_API_EVENTS-001` | Heavy CPU/serialization/export work is delegated as admitted jobs; transport keeps bounded pages/events and remains responsive. | `ATN-IFACE-SERVE_API_EVENTS-001` | BM-APP-01 control/metadata p95 ≤250 ms and p99 ≤1 s; long commands return an owner job handle and no event-loop CPU blockage. |
+| COMPLETE | `NFR-TRC-IFACE-SERVE_API_EVENTS-002` | Provider loss or scope revocation returns CAPABILITY_UNAVAILABLE/typed denial without selecting a substitute. | `ATN-IFACE-SERVE_API_EVENTS-002` | Remove each operation owner in turn; only its operations degrade and no unauthorized receiver gets invoked. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -324,15 +324,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/interfaces/serve_api_events/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/interfaces/serve_api_events/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/interfaces/serve_api_events/test_traceability.py` | COMPLETE: test_trc_iface_serve_api_events_001..003 passing. |
+| Every ATN ID in this card | `tests/services/interfaces/serve_api_events/test_lifecycle.py` | COMPLETE: test_trc_iface_serve_api_events_nfr_001..002 passing. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json` | COMPLETE: contract, provider, composition, interfaces, end_to_end pass; ui waived. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Required `_usage.py` command - executed:**
 
 ```powershell
 uv run --frozen python -m app.services.interfaces.serve_api_events._usage

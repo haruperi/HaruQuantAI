@@ -4,9 +4,9 @@
     "total_frs": 575,
     "total_local_nfrs": 276,
     "disposition_counts": {
-      "ADAPT": 55,
+      "ADAPT": 50,
       "IMPLEMENT": 647,
-      "PROVED_COMPLETE": 29,
+      "PROVED_COMPLETE": 34,
       "VERIFY": 120
     }
   },
@@ -176,7 +176,7 @@
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "task_id": "1.08",
       "text": "Version and validate the existing API envelope, request/trace/idempotency metadata, side-effect classification and bounded errors.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json"
     },
     {
@@ -184,7 +184,7 @@
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "task_id": "1.08",
       "text": "Stream monotonic bounded owner events with heartbeat, replay cursor, deduplication/gap/expiry/resync and abort cleanup.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json"
     },
     {
@@ -192,7 +192,7 @@
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "task_id": "1.08",
       "text": "Apply cookie/session/CSRF transport, bounded query pages and artifact download validation without owning domain data.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json"
     },
     {
@@ -4682,7 +4682,7 @@
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "task_id": "1.08",
       "text": "Heavy CPU/serialization/export work is delegated as admitted jobs; transport keeps bounded pages/events and remains responsive.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json"
     },
     {
@@ -4690,7 +4690,7 @@
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "task_id": "1.08",
       "text": "Provider loss or scope revocation returns CAPABILITY_UNAVAILABLE/typed denial without selecting a substitute.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json"
     },
     {

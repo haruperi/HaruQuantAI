@@ -66,6 +66,11 @@ def translate_capability_unavailable(
     Returns:
         Structured CAPABILITY_UNAVAILABLE failure envelope.
     """
+    cap_id = (
+        error.capability.identifier
+        if hasattr(error.capability, "identifier")
+        else str(error.capability)
+    )
     return InterfaceFailure(
         request_id=str(uuid7()),
         code="CAPABILITY_UNAVAILABLE",
@@ -75,10 +80,10 @@ def translate_capability_unavailable(
             status=503,
             code="CAPABILITY_UNAVAILABLE",
             detail=(
-                f"Capability '{error.capability}' has no active provider; "
+                f"Capability '{cap_id}' has no active provider; "
                 "the request was not executed."
             ),
-            capability_key=error.capability,
+            capability_key=cap_id,
         ),
     )
 

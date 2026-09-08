@@ -620,9 +620,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-08"></a>
 
-### - [ ] Task 1.08 — FEAT-IFACE-SERVE_API_EVENTS — Serve compatible API envelopes and resumable events
+### - [x] Task 1.08 — FEAT-IFACE-SERVE_API_EVENTS — Serve compatible API envelopes and resumable events
 
-**Status:** `PARTIAL` · **Domain:** Interfaces · **Owner specification:** `app/services/interfaces/README.md` · **Register first slice:** U0.
+**Status:** `ACCEPTED` · **Domain:** Interfaces · **Owner specification:** `app/services/interfaces/README.md` · **Register first slice:** U0.
 
 **Order prerequisites:** 1.04.
 
@@ -672,7 +672,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `fix(interfaces): complete FEAT-IFACE-SERVE_API_EVENTS`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260908-173000-v3-phases-1-16-1.08-serve-api-events` — reconciled owner, contracts, tests, usage recipe, and evidence manifest.
 
 ---
 

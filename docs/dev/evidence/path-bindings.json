@@ -144,7 +144,10 @@
         "tests/services/interfaces/serve_api_events/test_traceability.py",
         "tests/services/interfaces/serve_api_events/test_lifecycle.py"
       ],
-      "existing_test_targets": [],
+      "existing_test_targets": [
+        "tests/services/interfaces/serve_api_events/test_traceability.py",
+        "tests/services/interfaces/serve_api_events/test_lifecycle.py"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json"
     },
     {

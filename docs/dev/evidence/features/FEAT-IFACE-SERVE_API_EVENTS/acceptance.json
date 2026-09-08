@@ -1,0 +1,115 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
+  "task_id": "1.08",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/interfaces/README.md",
+  "baseline_commit": "9416209d094f2d362db974bb8c18a55dd44d688f",
+  "acceptance_commit": "task-closeout:20260908-173000-v3-phases-1-16-1.08-serve-api-events",
+  "requirements": [
+    {
+      "id": "FR-TRC-IFACE-SERVE_API_EVENTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_traceability.py::test_trc_iface_serve_api_events_001"
+    },
+    {
+      "id": "FR-TRC-IFACE-SERVE_API_EVENTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_traceability.py::test_trc_iface_serve_api_events_002"
+    },
+    {
+      "id": "FR-TRC-IFACE-SERVE_API_EVENTS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_traceability.py::test_trc_iface_serve_api_events_003"
+    },
+    {
+      "id": "NFR-TRC-IFACE-SERVE_API_EVENTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_lifecycle.py::test_trc_iface_serve_api_events_nfr_001"
+    },
+    {
+      "id": "NFR-TRC-IFACE-SERVE_API_EVENTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_lifecycle.py::test_trc_iface_serve_api_events_nfr_002"
+    },
+    {
+      "id": "AT-IFACE-SERVE_API_EVENTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_traceability.py::test_trc_iface_serve_api_events_001"
+    },
+    {
+      "id": "AT-IFACE-SERVE_API_EVENTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_traceability.py::test_trc_iface_serve_api_events_002"
+    },
+    {
+      "id": "AT-IFACE-SERVE_API_EVENTS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_traceability.py::test_trc_iface_serve_api_events_003"
+    },
+    {
+      "id": "ATN-IFACE-SERVE_API_EVENTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_lifecycle.py::test_trc_iface_serve_api_events_nfr_001"
+    },
+    {
+      "id": "ATN-IFACE-SERVE_API_EVENTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/interfaces/serve_api_events/test_lifecycle.py::test_trc_iface_serve_api_events_nfr_002"
+    }
+  ],
+  "catalogue_entries": [
+    "Versioned OpenAPI 3.1.0 manifest with capability-negotiated route endpoints",
+    "Idempotent mutation deduplication cache with session-scoped idempotency keys",
+    "Asynchronous long-running command job tracking with progress and state machine",
+    "Monotonic sequence-ordered SSE stream with ring-buffer retention and replay cursor",
+    "Expired event cursor eviction guard forcing clean client snapshot resynchronization",
+    "Atomic resource concurrency version token verification preventing lost updates",
+    "Strict artifact download path traversal sanitization and extension allowlisting",
+    "Fail-closed typed error translation mapping internal exceptions to standard ProblemDetails"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/interfaces/models.py, errors.py, and error_codes.py verified with type-safe envelopes and problem details."
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "ServeApiEventsTransport and ASGI interface provider passing unit and traceability tests."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "ServeApiEventsFeature mount and lifecycle disposal integrated via FeatureContext."
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "Full HTTP, SSE, ASGI, and security envelope routes validated in tests/services/interfaces/serve_api_events/."
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-IFACE-SERVE_API_EVENTS is an interfaces layer network and transport feature with no direct UI presentation widgets."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/interfaces/serve_api_events/_usage.py executed with exit code 0 covering all 4 operational phases."
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run pytest tests/services/interfaces/serve_api_events/ -o addopts=\"\"",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python -m app.services.interfaces.serve_api_events._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy app/services/interfaces/serve_api_events/ tests/services/interfaces/serve_api_events/",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All 3 FRs, 2 local NFRs, traceability test suites, offline usage recipe, mypy, and ruff checks pass."
+  }
+}

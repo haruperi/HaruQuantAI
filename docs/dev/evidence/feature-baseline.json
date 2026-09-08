@@ -119,16 +119,16 @@
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "title": "Serve compatible API envelopes and resumable events",
       "domain": "Interfaces",
-      "status": "PARTIAL",
-      "disposition": "ADAPT",
+      "status": "COMPLETE",
+      "disposition": "PROVED_COMPLETE",
       "first_slice": "U0",
       "owner_specification": "app/services/interfaces/README.md",
       "owner_path": "app/services/interfaces/serve_api_events",
       "owner_path_exists": true,
       "entry_point_registered": true,
-      "accepted_commit": null,
+      "accepted_commit": "task-closeout:20260908-173000-v3-phases-1-16-1.08-serve-api-events",
       "evidence_path": "docs/dev/evidence/features/FEAT-IFACE-SERVE_API_EVENTS/acceptance.json",
-      "remaining_obligation": "Complete the exact plan card and acceptance evidence."
+      "remaining_obligation": null
     },
     {
       "task_id": "1.09",

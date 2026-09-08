@@ -103,7 +103,7 @@
       "feature_id": "FEAT-IFACE-SERVE_API_EVENTS",
       "task_id": "1.08",
       "usage_target": "app/services/interfaces/serve_api_events/_usage.py",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "uv run --frozen python -m app.services.interfaces.serve_api_events._usage",
       "test_targets": [
         "tests/services/interfaces/serve_api_events/test_traceability.py",
