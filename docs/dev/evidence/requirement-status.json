@@ -4,9 +4,9 @@
     "total_frs": 575,
     "total_local_nfrs": 276,
     "disposition_counts": {
-      "ADAPT": 50,
+      "ADAPT": 43,
       "IMPLEMENT": 647,
-      "PROVED_COMPLETE": 34,
+      "PROVED_COMPLETE": 41,
       "VERIFY": 120
     }
   },
@@ -224,7 +224,7 @@
       "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
       "task_id": "1.10",
       "text": "Create and resolve opaque secret references only for an authorized selected adapter generation and purpose.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json"
     },
     {
@@ -232,7 +232,7 @@
       "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
       "task_id": "1.10",
       "text": "Validate loopback/nonlocal host access configuration and require authenticated policy before exposing remote access.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json"
     },
     {
@@ -240,7 +240,7 @@
       "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
       "task_id": "1.10",
       "text": "Rotate/revoke a secret reference without rewriting historic provenance or enabling silent provider fallback.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json"
     },
     {
@@ -4706,7 +4706,7 @@
       "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
       "task_id": "1.10",
       "text": "Removing FEAT-WS-SECURE_LOCAL_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json"
     },
     {

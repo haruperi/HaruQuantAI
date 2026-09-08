@@ -61,7 +61,7 @@
       "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
       "task_id": "1.05",
       "usage_target": "app/services/plugins/declare_manifests/_usage.py",
-      "usage_status": "VERIFIED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "uv run --frozen python -m app.services.plugins.declare_manifests._usage",
       "test_targets": [
         "tests/services/plugins/declare_manifests/test_traceability.py",
@@ -75,8 +75,8 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
       "usage_target": "app/ui/src/widgets/collection-grid/_usage.tsx",
-      "usage_status": "CURRENT",
-      "executable_recipe": "npm --prefix app/ui run usage -- src/widgets/collection-grid/_usage.tsx",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/collection-grid/__tests__/traceability.test.tsx",
       "test_targets": [
         "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx"
@@ -89,8 +89,8 @@
       "feature_id": "FEAT-UI-REVIEW_DRAFTS",
       "task_id": "1.07",
       "usage_target": "app/ui/src/widgets/draft-review/_usage.tsx",
-      "usage_status": "CURRENT",
-      "executable_recipe": "npm --prefix app/ui run usage -- src/widgets/draft-review/_usage.tsx",
+      "usage_status": "RUNNABLE",
+      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/draft-review/__tests__/traceability.test.tsx",
       "test_targets": [
         "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx"
@@ -131,7 +131,7 @@
       "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
       "task_id": "1.10",
       "usage_target": "app/services/workspace/secure_local_access/_usage.py",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "uv run --frozen python -m app.services.workspace.secure_local_access._usage",
       "test_targets": [
         "tests/services/workspace/secure_local_access/test_traceability.py",

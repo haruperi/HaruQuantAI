@@ -356,6 +356,114 @@ class DiagnosticBundleError(WorkspaceError):
         super().__init__(message, error_code=error_code)
 
 
+class SecretResolutionDeniedError(WorkspaceError):
+    """Raised when unauthorized caller or mismatched purpose resolves a secret."""
+
+    def __init__(
+        self,
+        message: str = "Secret resolution denied",
+        reason: str | None = None,
+        secret_id: str | None = None,
+        caller_role: str | None = None,
+        allowed_roles: tuple[str, ...] | None = None,
+        allowed_adapter_generation: str | None = None,
+        provided_adapter_generation: str | None = None,
+        allowed_purpose: str | None = None,
+        provided_purpose: str | None = None,
+    ) -> None:
+        """Initialize the secret resolution denied error.
+
+        Args:
+            message: Error description.
+            reason: Optional failure reason detail.
+            secret_id: Optional identifier of the secret reference.
+            caller_role: Optional caller role that attempted resolution.
+            allowed_roles: Optional tuple of roles authorized to resolve.
+            allowed_adapter_generation: Expected adapter generation.
+            provided_adapter_generation: Provided adapter generation.
+            allowed_purpose: Expected purpose.
+            provided_purpose: Provided purpose.
+        """
+        self.secret_id = secret_id
+        self.reason = reason
+        self.caller_role = caller_role
+        self.allowed_roles = allowed_roles
+        self.allowed_adapter_generation = allowed_adapter_generation
+        self.provided_adapter_generation = provided_adapter_generation
+        self.allowed_purpose = allowed_purpose
+        self.provided_purpose = provided_purpose
+        detail = f": {reason}" if reason else ""
+        super().__init__(f"{message}{detail}", error_code="SECRET_RESOLUTION_DENIED")
+
+
+class SecretNotFoundError(WorkspaceError):
+    """Raised when a requested secret reference is not found."""
+
+    def __init__(
+        self,
+        secret_id: str | None = None,
+        name: str | None = None,
+        workspace_id: str | None = None,
+        message: str = "Secret reference not found",
+    ) -> None:
+        """Initialize the secret not found error.
+
+        Args:
+            secret_id: Optional identifier of the secret.
+            name: Optional name of the secret.
+            workspace_id: Optional identifier of the workspace.
+            message: Error description.
+        """
+        self.secret_id = secret_id
+        self.name = name
+        self.workspace_id = workspace_id
+        detail = f" (id={secret_id}, name={name})" if secret_id or name else ""
+        super().__init__(f"{message}{detail}", error_code="SECRET_NOT_FOUND")
+
+
+class SecretRevokedError(WorkspaceError):
+    """Raised when attempting to resolve a revoked secret reference."""
+
+    def __init__(
+        self,
+        secret_id: str | None = None,
+        workspace_id: str | None = None,
+        revocation_reason: str | None = None,
+        message: str = "Secret reference has been revoked and cannot be resolved",
+    ) -> None:
+        """Initialize the secret revoked error.
+
+        Args:
+            secret_id: Optional identifier of the revoked secret.
+            workspace_id: Optional identifier of the workspace.
+            revocation_reason: Optional reason for revocation.
+            message: Error description.
+        """
+        self.secret_id = secret_id
+        self.workspace_id = workspace_id
+        self.revocation_reason = revocation_reason
+        detail = f" (id={secret_id})" if secret_id else ""
+        super().__init__(f"{message}{detail}", error_code="SECRET_REVOKED")
+
+
+class InvalidHostBindingError(WorkspaceError):
+    """Raised when an unauthenticated non-loopback host binding is configured."""
+
+    def __init__(
+        self,
+        host: str,
+        message: str = "Non-loopback host binding requires authenticated remote policy",
+    ) -> None:
+        """Initialize the invalid host binding error.
+
+        Args:
+            host: The invalid or unauthenticated host binding.
+            message: Error description.
+        """
+        self.host = host
+        super().__init__(f"{message}: {host}", error_code="INVALID_HOST_BINDING")
+
+
 # Closed workspace failure-code union from the ratified v1 operation rules.
 # ACCOUNT_REGISTRATION_FAILED covers username/password policy violations and
 # duplicate registrations; ACCOUNT_AUTHENTICATION_FAILED covers login,

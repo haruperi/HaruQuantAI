@@ -55,6 +55,7 @@ from app.contracts.workspace.errors import (
 from app.contracts.workspace.models import (
     HealthStatus,
     LocalSession,
+    SecretRef,
     SystemHealth,
     SystemReadiness,
     WorkspaceRef,
@@ -69,7 +70,16 @@ from app.services.workspace.local_access_health.config import (
 )
 
 if TYPE_CHECKING:
-    from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
+    from app.contracts.workspace.manage_workspaces import (
+        ManageWorkspacesCapability,
+    )
+    from app.contracts.workspace.secure_local_access import (
+        ResolvedSecret,
+        SecretCreateRequest,
+        SecretResolveRequest,
+        SecretRevokeRequest,
+        SecretRotateRequest,
+    )
 
 BUILD_VERSION = "0.1.0"
 
@@ -505,6 +515,42 @@ class LocalAccessHealthService(SecureLocalAccessCapability):
             manage_workspaces=self._manage_workspaces,
             configure_runtime=self._configure_runtime,
         )
+
+    @override
+    def create_secret_reference(
+        self,
+        request: SecretCreateRequest,
+    ) -> SecretRef:
+        """Reject unsupported secret management in legacy service."""
+        del request
+        raise NotImplementedError("LocalAccessHealthService does not manage secrets")
+
+    @override
+    def resolve_secret_reference(
+        self,
+        request: SecretResolveRequest,
+    ) -> ResolvedSecret:
+        """Reject unsupported secret resolution in legacy service."""
+        del request
+        raise NotImplementedError("LocalAccessHealthService does not manage secrets")
+
+    @override
+    def rotate_secret_reference(
+        self,
+        request: SecretRotateRequest,
+    ) -> SecretRef:
+        """Reject unsupported secret rotation in legacy service."""
+        del request
+        raise NotImplementedError("LocalAccessHealthService does not manage secrets")
+
+    @override
+    def revoke_secret_reference(
+        self,
+        request: SecretRevokeRequest,
+    ) -> None:
+        """Reject unsupported secret revocation in legacy service."""
+        del request
+        raise NotImplementedError("LocalAccessHealthService does not manage secrets")
 
 
 def _create_harness_workspace(root: Path) -> WorkspaceRef:

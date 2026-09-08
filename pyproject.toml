@@ -72,6 +72,7 @@ workspace-manage-workspaces = "app.services.workspace.manage_workspaces.feature:
 workspace-execute-persistence = "app.services.workspace.execute_persistence.feature:feature"
 workspace-manage-watchlists = "app.services.workspace.manage_watchlists.feature:feature"
 workspace-administer-settings = "app.services.workspace.administer_settings.feature:feature"
+workspace-secure-local-access = "app.services.workspace.secure_local_access.feature:feature"
 interfaces-serve-api-events = "app.services.interfaces.serve_api_events.feature:feature"
 interfaces-observe-market-data = "app.services.interfaces.observe_market_data.feature:feature"
 interfaces-observe-market-catalogue = "app.services.interfaces.observe_market_catalogue.feature:feature"
@@ -339,6 +340,7 @@ exclude = [
     '(^|/)(\.dev|build|dist)(/|$)',
     '(^|/)(generated|vendor|migrations)(/|$)',
     '(^|/)tests/.*/providers(/|$)',
+    '(^|/)\.agents/worktrees(/|$)',
 ]
 
 warn_unused_configs = false

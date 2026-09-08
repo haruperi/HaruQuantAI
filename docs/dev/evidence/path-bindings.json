@@ -83,14 +83,17 @@
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
       "owner_path": "app/services/plugins/declare_manifests",
-      "owner_path_status": "RECONCILED",
+      "owner_path_status": "EXISTING",
       "contract_target": "app/contracts/plugins/declare_manifests.py",
-      "contract_status": "RECONCILED",
+      "contract_status": "EXISTING",
       "test_targets": [
         "tests/services/plugins/declare_manifests/test_traceability.py",
         "tests/services/plugins/declare_manifests/test_lifecycle.py"
       ],
-      "existing_test_targets": [],
+      "existing_test_targets": [
+        "tests/services/plugins/declare_manifests/test_traceability.py",
+        "tests/services/plugins/declare_manifests/test_lifecycle.py"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json"
     },
     {
@@ -99,9 +102,9 @@
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
       "owner_path": "app/ui/src/widgets/collection-grid",
-      "owner_path_status": "CURRENT",
+      "owner_path_status": "EXISTING",
       "contract_target": "app/ui/src/widgets/collection-grid/contracts.ts",
-      "contract_status": "CURRENT",
+      "contract_status": "EXISTING",
       "test_targets": [
         "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx"
@@ -118,9 +121,9 @@
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
       "owner_path": "app/ui/src/widgets/draft-review",
-      "owner_path_status": "CURRENT",
+      "owner_path_status": "EXISTING",
       "contract_target": "app/ui/src/widgets/draft-review/contracts.ts",
-      "contract_status": "CURRENT",
+      "contract_status": "EXISTING",
       "test_targets": [
         "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx"
@@ -175,14 +178,17 @@
       "domain": "Workspace",
       "canonical_spec": "app/services/workspace/README.md",
       "owner_path": "app/services/workspace/secure_local_access",
-      "owner_path_status": "PLANNED",
+      "owner_path_status": "EXISTING",
       "contract_target": "app/contracts/workspace/secure_local_access.py",
-      "contract_status": "PLANNED",
+      "contract_status": "EXISTING",
       "test_targets": [
         "tests/services/workspace/secure_local_access/test_traceability.py",
         "tests/services/workspace/secure_local_access/test_lifecycle.py"
       ],
-      "existing_test_targets": [],
+      "existing_test_targets": [
+        "tests/services/workspace/secure_local_access/test_traceability.py",
+        "tests/services/workspace/secure_local_access/test_lifecycle.py"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-SECURE_LOCAL_ACCESS/acceptance.json"
     },
     {

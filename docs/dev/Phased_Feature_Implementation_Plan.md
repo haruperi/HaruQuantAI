@@ -734,9 +734,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-10"></a>
 
-### - [ ] Task 1.10 — FEAT-WS-SECURE_LOCAL_ACCESS — Resolve secrets and protect host access
+### - [x] Task 1.10 — FEAT-WS-SECURE_LOCAL_ACCESS — Resolve secrets and protect host access
 
-**Status:** `PARTIAL` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
+**Status:** `ACCEPTED` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U0.
 
 **Order prerequisites:** 1.04.
 
@@ -784,7 +784,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `fix(workspace): complete FEAT-WS-SECURE_LOCAL_ACCESS`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260908-182500-v3-phases-1-16-1.10-secure-local-access` · reconciled owner, contracts, tests, usage recipe, and evidence manifest.
 
 ---
 

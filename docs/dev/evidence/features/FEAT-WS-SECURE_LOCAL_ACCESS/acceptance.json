@@ -1,0 +1,113 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-WS-SECURE_LOCAL_ACCESS",
+  "task_id": "1.10",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/workspace/README.md",
+  "baseline_commit": "5a1d37cde2d36057bacdf0838d30105aaf2f3a81",
+  "acceptance_commit": "task-closeout:20260908-182500-v3-phases-1-16-1.10-secure-local-access",
+  "requirements": [
+    {
+      "id": "FR-TRC-WS-SECURE_LOCAL_ACCESS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_traceability.py::test_trc_secure_local_access_001"
+    },
+    {
+      "id": "FR-TRC-WS-SECURE_LOCAL_ACCESS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_traceability.py::test_trc_secure_local_access_002"
+    },
+    {
+      "id": "FR-TRC-WS-SECURE_LOCAL_ACCESS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_traceability.py::test_trc_secure_local_access_003"
+    },
+    {
+      "id": "NFR-TRC-WS-SECURE_LOCAL_ACCESS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_lifecycle.py::test_trc_secure_local_access_nfr_001"
+    },
+    {
+      "id": "AT-WS-SECURE_LOCAL_ACCESS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_traceability.py::test_trc_secure_local_access_001"
+    },
+    {
+      "id": "AT-WS-SECURE_LOCAL_ACCESS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_traceability.py::test_trc_secure_local_access_002"
+    },
+    {
+      "id": "AT-WS-SECURE_LOCAL_ACCESS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_traceability.py::test_trc_secure_local_access_003"
+    },
+    {
+      "id": "ATN-WS-SECURE_LOCAL_ACCESS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/secure_local_access/test_lifecycle.py::test_trc_secure_local_access_nfr_001"
+    },
+    { "id": "NFR-R-002", "status": "PASS", "evidence_target": "Idempotent mutation and expected-version concurrency" },
+    { "id": "NFR-R-003", "status": "PASS", "evidence_target": "Degrade only affected consumers on capability withdrawal" },
+    { "id": "NFR-S-001", "status": "PASS", "evidence_target": "Least privilege, loopback enforcement, and caller role gating" },
+    { "id": "NFR-S-002", "status": "PASS", "evidence_target": "Strict request and configuration validation bounds" },
+    { "id": "NFR-S-003", "status": "PASS", "evidence_target": "Plaintext secret containment within adapter boundary" },
+    { "id": "NFR-S-004", "status": "PASS", "evidence_target": "Secrets redacted from readiness reports, logs, and public DTOs" },
+    { "id": "NFR-S-005", "status": "PASS", "evidence_target": "Audit and revocation tracking for all secret mutations" },
+    { "id": "NFR-S-006", "status": "PASS", "evidence_target": "Authorized scope and generation binding for secret resolution" },
+    { "id": "NFR-TRC-SHARED-BOUNDARIES", "status": "PASS", "evidence_target": "Zeroizable memory storage, isolated service, and pure capability contracts" },
+    { "id": "NFR-TRC-SHARED-CONFIG", "status": "PASS", "evidence_target": "Strict configuration parser rejecting unknown keys and bounds" },
+    { "id": "NFR-TRC-SHARED-EVIDENCE", "status": "PASS", "evidence_target": "Named AT/ATN test suite and reproducible _usage scenario" },
+    { "id": "NFR-TRC-SHARED-INTEGRITY", "status": "PASS", "evidence_target": "Phase 0 validation, constant-time comparison, and contract checks" },
+    { "id": "NFR-TRC-SHARED-STORED-IDENTITY", "status": "PASS", "evidence_target": "Opaque SecretRef identity persistence and generation provenance" }
+  ],
+  "catalogue_entries": [
+    "CAT-INTERACTIONS-17-1-003 - Remote access",
+    "CAT-SETTINGS-008 - Remote access"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/workspace/secure_local_access.py and typed errors in app/contracts/workspace/errors.py"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/secure_local_access/test_traceability.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/secure_local_access/test_lifecycle.py"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Secure local access provides backend secrets and host protection; interfaces integration occurs in Task 1.08/1.09"
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Plaintext secrets are never exposed to UI; UI consumes session access via FEAT-UI-SESSION_ACCESS"
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/workspace/secure_local_access/_usage.py"
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run --frozen pytest --no-cov tests/services/workspace/secure_local_access",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python -m app.services.workspace.secure_local_access._usage",
+      "exit_code": 0
+    },
+    { "command": "uv run --frozen ruff check app/services/workspace/secure_local_access tests/services/workspace/secure_local_access", "exit_code": 0 },
+    { "command": "uv run --frozen ruff format --check app/services/workspace/secure_local_access tests/services/workspace/secure_local_access", "exit_code": 0 },
+    { "command": "uv run --frozen mypy app/services/workspace/secure_local_access app/contracts/workspace/secure_local_access.py tests/services/workspace/secure_local_access", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_phase0.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_feature_docs.py", "exit_code": 0 }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All 3 FRs and 1 local NFR verified passing with full traceability evidence, constant-time validation, and scope zeroization."
+  }
+}

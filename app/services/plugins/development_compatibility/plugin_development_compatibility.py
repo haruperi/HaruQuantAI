@@ -81,6 +81,7 @@ from app.services.plugins.development_compatibility.config import (
 )
 
 if TYPE_CHECKING:
+    from app.contracts.plugins.models import PluginManifestPreview
     from app.contracts.plugins.ports import (
         DeclareManifestsCapability,
         RegisterContributionsCapability,
@@ -586,6 +587,11 @@ class _ReferenceManifestAdapter:
     ) -> str:
         """Reject unsupported use outside local package validation."""
         del manifest, file_hashes
+        raise NotImplementedError("Usage adapter supports validate_package only")
+
+    def preview_manifest(self, manifest: PluginManifest) -> PluginManifestPreview:
+        """Reject unsupported use outside local package validation."""
+        del manifest
         raise NotImplementedError("Usage adapter supports validate_package only")
 
 
