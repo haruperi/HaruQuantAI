@@ -1297,7 +1297,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-VIEW_COLLE
 
 > **Feature ID:** `FEAT-UI-REVIEW_DRAFTS`
 > **Domain:** `ui`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — ratified V3 owner implemented, verified, and accepted.
 > **Selected owner:** `app/ui/src/widgets/draft-review/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -1364,9 +1364,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-REVIEW_DRAFTS-001` | Provide one accessible overlay foundation with focus trap/restore, labelled title/description, escape/scroll policy and restrained announcements. | `AT-UI-REVIEW_DRAFTS-001` | Keyboard/screen-reader fixtures reach confirm/cancel and restore focus; nested-modal traps are replaced with drawer/route/back navigation. |
-| PENDING | `FR-TRC-UI-REVIEW_DRAFTS-002` | Preserve typed dirty draft state and show both client hints and authoritative field/summary errors. | `AT-UI-REVIEW_DRAFTS-002` | Cancelling a harmless chooser discards no unrelated draft; abandoning a destructive/long form warns on unsaved changes. |
-| PENDING | `FR-TRC-UI-REVIEW_DRAFTS-003` | Bind confirmation/review to exact object, count, dependencies, reversibility, retained state, candidate hash and expected revision. | `AT-UI-REVIEW_DRAFTS-003` | A changed scope/hash invalidates the review; model prose cannot manufacture a clickable server action. |
+| COMPLETE | `FR-TRC-UI-REVIEW_DRAFTS-001` | Provide one accessible overlay foundation with focus trap/restore, labelled title/description, escape/scroll policy and restrained announcements. | `AT-UI-REVIEW_DRAFTS-001` | Keyboard/screen-reader fixtures reach confirm/cancel and restore focus; nested-modal traps are replaced with drawer/route/back navigation. |
+| COMPLETE | `FR-TRC-UI-REVIEW_DRAFTS-002` | Preserve typed dirty draft state and show both client hints and authoritative field/summary errors. | `AT-UI-REVIEW_DRAFTS-002` | Cancelling a harmless chooser discards no unrelated draft; abandoning a destructive/long form warns on unsaved changes. |
+| COMPLETE | `FR-TRC-UI-REVIEW_DRAFTS-003` | Bind confirmation/review to exact object, count, dependencies, reversibility, retained state, candidate hash and expected revision. | `AT-UI-REVIEW_DRAFTS-003` | A changed scope/hash invalidates the review; model prose cannot manufacture a clickable server action. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1374,7 +1374,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-REVIEW_DRAFTS-001` | Removing FEAT-UI-REVIEW_DRAFTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-REVIEW_DRAFTS-001` | Disable and physically remove draft-review; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| COMPLETE | `NFR-TRC-UI-REVIEW_DRAFTS-001` | Removing FEAT-UI-REVIEW_DRAFTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-REVIEW_DRAFTS-001` | Disable and physically remove draft-review; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -1384,9 +1384,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/ui/widgets/draft-review/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/ui/widgets/draft-review/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx` | PASS: verified via Vitest. |
+| Every ATN ID in this card | `app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx` | PASS: verified via Vitest. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json` | ACCEPTED: all applicable stages verified. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 

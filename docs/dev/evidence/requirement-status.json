@@ -5,8 +5,8 @@
     "total_local_nfrs": 276,
     "disposition_counts": {
       "ADAPT": 55,
-      "IMPLEMENT": 651,
-      "PROVED_COMPLETE": 25,
+      "IMPLEMENT": 647,
+      "PROVED_COMPLETE": 29,
       "VERIFY": 120
     }
   },
@@ -152,7 +152,7 @@
       "feature_id": "FEAT-UI-REVIEW_DRAFTS",
       "task_id": "1.07",
       "text": "Provide one accessible overlay foundation with focus trap/restore, labelled title/description, escape/scroll policy and restrained announcements.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json"
     },
     {
@@ -160,7 +160,7 @@
       "feature_id": "FEAT-UI-REVIEW_DRAFTS",
       "task_id": "1.07",
       "text": "Preserve typed dirty draft state and show both client hints and authoritative field/summary errors.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json"
     },
     {
@@ -168,7 +168,7 @@
       "feature_id": "FEAT-UI-REVIEW_DRAFTS",
       "task_id": "1.07",
       "text": "Bind confirmation/review to exact object, count, dependencies, reversibility, retained state, candidate hash and expected revision.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json"
     },
     {
@@ -4674,7 +4674,7 @@
       "feature_id": "FEAT-UI-REVIEW_DRAFTS",
       "task_id": "1.07",
       "text": "Removing FEAT-UI-REVIEW_DRAFTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json"
     },
     {

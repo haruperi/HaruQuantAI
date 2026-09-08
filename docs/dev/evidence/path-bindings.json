@@ -118,14 +118,17 @@
       "domain": "UI",
       "canonical_spec": "app/ui/README.md",
       "owner_path": "app/ui/src/widgets/draft-review",
-      "owner_path_status": "PLANNED",
+      "owner_path_status": "CURRENT",
       "contract_target": "app/ui/src/widgets/draft-review/contracts.ts",
-      "contract_status": "PLANNED",
+      "contract_status": "CURRENT",
       "test_targets": [
         "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx"
       ],
-      "existing_test_targets": [],
+      "existing_test_targets": [
+        "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx",
+        "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx"
+      ],
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json"
     },
     {

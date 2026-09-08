@@ -1,0 +1,104 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-REVIEW_DRAFTS",
+  "task_id": "1.07",
+  "status": "ACCEPTED",
+  "owner_specification": "app/ui/README.md",
+  "baseline_commit": "e1bb3a525d80b7e428eeb318f780e816a75f284a",
+  "acceptance_commit": "task-closeout:20260908-142500-v3-phases-1-16-1.07-review-drafts",
+  "requirements": [
+    {
+      "id": "FR-TRC-UI-REVIEW_DRAFTS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx::AT-UI-REVIEW_DRAFTS-001"
+    },
+    {
+      "id": "FR-TRC-UI-REVIEW_DRAFTS-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx::AT-UI-REVIEW_DRAFTS-002"
+    },
+    {
+      "id": "FR-TRC-UI-REVIEW_DRAFTS-003",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx::AT-UI-REVIEW_DRAFTS-003"
+    },
+    {
+      "id": "NFR-TRC-UI-REVIEW_DRAFTS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx::ATN-UI-REVIEW_DRAFTS-001"
+    },
+    {
+      "id": "AT-UI-REVIEW_DRAFTS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx::AT-UI-REVIEW_DRAFTS-001"
+    },
+    {
+      "id": "AT-UI-REVIEW_DRAFTS-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx::AT-UI-REVIEW_DRAFTS-002"
+    },
+    {
+      "id": "AT-UI-REVIEW_DRAFTS-003",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/traceability.test.tsx::AT-UI-REVIEW_DRAFTS-003"
+    },
+    {
+      "id": "ATN-UI-REVIEW_DRAFTS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/draft-review/__tests__/lifecycle.test.tsx::ATN-UI-REVIEW_DRAFTS-001"
+    }
+  ],
+  "catalogue_entries": [
+    "Accessible overlay foundation with focus trap/restore and escape policy",
+    "Nested modal prevention through sequential drawer and sub-route navigation",
+    "Typed dirty draft state preservation and field diff comparisons",
+    "Unsaved changes guard prompting on form abandonment",
+    "Consequential action review bound to exact object, count, dependencies, and reversibility",
+    "Candidate hash and revision concurrency invalidation guards",
+    "Model prose guard blocking unverified LLM text from triggering executions"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/ui/src/widgets/draft-review/contracts.ts and traceability tests"
+    },
+    "provider": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-UI-REVIEW_DRAFTS is a presentation and review overlay capability and declares no backend provider."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "OverlayFoundation, DraftReview, and DraftReviewFeature lifecycle integration"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "This feature provides presentation-only overlay rendering and owns no backend network Interfaces route."
+    },
+    "ui": {
+      "status": "PASS",
+      "evidence": "Vitest test suites traceability.test.tsx and lifecycle.test.tsx passed (13/13 tests), TypeScript typecheck passed with zero errors."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/ui/src/widgets/draft-review/_usage.tsx standalone recipe passed with focus trap, dirty draft diffs, and hash invalidation."
+    }
+  },
+  "commands": [
+    {
+      "command": "npm --prefix app/ui test -- src/widgets/draft-review/__tests__/traceability.test.tsx src/widgets/draft-review/__tests__/lifecycle.test.tsx",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run usage -- src/widgets/draft-review/_usage.tsx",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run typecheck",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All requirements, tests, usage recipe, typecheck, and lifecycle verifications pass."
+  }
+}

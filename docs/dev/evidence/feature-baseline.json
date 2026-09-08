@@ -103,16 +103,16 @@
       "feature_id": "FEAT-UI-REVIEW_DRAFTS",
       "title": "Review typed edits and consequential action scope",
       "domain": "UI",
-      "status": "NOT_STARTED_IN_TARGET",
-      "disposition": "IMPLEMENT",
+      "status": "COMPLETE",
+      "disposition": "PROVED_COMPLETE",
       "first_slice": "U1",
       "owner_specification": "app/ui/README.md",
       "owner_path": "app/ui/src/widgets/draft-review",
-      "owner_path_exists": false,
+      "owner_path_exists": true,
       "entry_point_registered": false,
-      "accepted_commit": null,
+      "accepted_commit": "task-closeout:20260908-142500-v3-phases-1-16-1.07-review-drafts",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-REVIEW_DRAFTS/acceptance.json",
-      "remaining_obligation": "Complete the exact plan card and acceptance evidence."
+      "remaining_obligation": null
     },
     {
       "task_id": "1.08",

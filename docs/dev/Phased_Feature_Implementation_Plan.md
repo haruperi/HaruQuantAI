@@ -564,9 +564,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-07"></a>
 
-### - [ ] Task 1.07 — FEAT-UI-REVIEW_DRAFTS — Review typed edits and consequential action scope
+### - [x] Task 1.07 — FEAT-UI-REVIEW_DRAFTS — Review typed edits and consequential action scope
 
-**Status:** `NOT_STARTED_IN_TARGET` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
+**Status:** `ACCEPTED` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** 1.01.
 
@@ -614,7 +614,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(ui): complete FEAT-UI-REVIEW_DRAFTS`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260908-142500-v3-phases-1-16-1.07-review-drafts` — reconciled owner, contracts, tests, usage recipe, and evidence manifest.
 
 ---
 
