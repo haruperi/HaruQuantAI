@@ -75,8 +75,8 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
       "usage_target": "app/ui/src/widgets/collection-grid/_usage.tsx",
-      "usage_status": "PLANNED",
-      "executable_recipe": "npm --prefix app/ui run test -- src/widgets/collection-grid/__tests__/traceability.test.tsx",
+      "usage_status": "CURRENT",
+      "executable_recipe": "npm --prefix app/ui run usage -- src/widgets/collection-grid/_usage.tsx",
       "test_targets": [
         "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx",
         "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx"

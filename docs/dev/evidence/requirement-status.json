@@ -5,8 +5,8 @@
     "total_local_nfrs": 276,
     "disposition_counts": {
       "ADAPT": 55,
-      "IMPLEMENT": 656,
-      "PROVED_COMPLETE": 20,
+      "IMPLEMENT": 651,
+      "PROVED_COMPLETE": 25,
       "VERIFY": 120
     }
   },
@@ -128,7 +128,7 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
       "text": "Render stable-ID typed columns with server-side cursor sorting/filtering, pin/reorder/resize/hide/group and explicit null/undefined states.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json"
     },
     {
@@ -136,7 +136,7 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
       "text": "Support single/range/toggle/select-all-except snapshot selection, context menus, keyboard focus and query-backed bulk previews.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json"
     },
     {
@@ -144,7 +144,7 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
       "text": "Deliver loading/empty/partial/stale/error/denied states and bounded update coalescing for every CAT-GRIDS family.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json"
     },
     {
@@ -4658,7 +4658,7 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
       "text": "The grid holds only the virtualized window and bounded selection/query metadata.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json"
     },
     {
@@ -4666,7 +4666,7 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "task_id": "1.06",
       "text": "Unmount cancels all timers/listeners/observers/queries and releases workers/buffers.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json"
     },
     {

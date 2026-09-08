@@ -1186,7 +1186,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-DATA_MANAG
 
 > **Feature ID:** `FEAT-UI-VIEW_COLLECTIONS`
 > **Domain:** `ui`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — ratified V3 owner implemented, verified, and accepted.
 > **Selected owner:** `app/ui/src/widgets/collection-grid/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -1255,9 +1255,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-VIEW_COLLECTIONS-001` | Render stable-ID typed columns with server-side cursor sorting/filtering, pin/reorder/resize/hide/group and explicit null/undefined states. | `AT-UI-VIEW_COLLECTIONS-001` | Numeric/date/null sorts preserve owner semantics; unknown/missing plugin columns have a recoverable unavailable state. |
-| PENDING | `FR-TRC-UI-VIEW_COLLECTIONS-002` | Support single/range/toggle/select-all-except snapshot selection, context menus, keyboard focus and query-backed bulk previews. | `AT-UI-VIEW_COLLECTIONS-002` | Selecting 1M logical rows retains a bounded token/window, not a million browser objects. |
-| PENDING | `FR-TRC-UI-VIEW_COLLECTIONS-003` | Deliver loading/empty/partial/stale/error/denied states and bounded update coalescing for every CAT-GRIDS family. | `AT-UI-VIEW_COLLECTIONS-003` | First useful page p95 ≤1 s, indexed filter p95 ≤750 ms, typical scrolling 55+ FPS and ≤10 visual batches/s on the pinned fixture/hardware. |
+| COMPLETE | `FR-TRC-UI-VIEW_COLLECTIONS-001` | Render stable-ID typed columns with server-side cursor sorting/filtering, pin/reorder/resize/hide/group and explicit null/undefined states. | `AT-UI-VIEW_COLLECTIONS-001` | Numeric/date/null sorts preserve owner semantics; unknown/missing plugin columns have a recoverable unavailable state. |
+| COMPLETE | `FR-TRC-UI-VIEW_COLLECTIONS-002` | Support single/range/toggle/select-all-except snapshot selection, context menus, keyboard focus and query-backed bulk previews. | `AT-UI-VIEW_COLLECTIONS-002` | Selecting 1M logical rows retains a bounded token/window, not a million browser objects. |
+| COMPLETE | `FR-TRC-UI-VIEW_COLLECTIONS-003` | Deliver loading/empty/partial/stale/error/denied states and bounded update coalescing for every CAT-GRIDS family. | `AT-UI-VIEW_COLLECTIONS-003` | First useful page p95 ≤1 s, indexed filter p95 ≤750 ms, typical scrolling 55+ FPS and ≤10 visual batches/s on the pinned fixture/hardware. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -1265,8 +1265,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-VIEW_COLLECTIONS-001` | The grid holds only the virtualized window and bounded selection/query metadata. | `ATN-UI-VIEW_COLLECTIONS-001` | 10k/100k/1M logical-row fixtures prove resident-row/DOM/memory bounds and selection correctness during churn. |
-| PENDING | `NFR-TRC-UI-VIEW_COLLECTIONS-002` | Unmount cancels all timers/listeners/observers/queries and releases workers/buffers. | `ATN-UI-VIEW_COLLECTIONS-002` | Repeated mount/unmount plus heap/native/browser profiles show no continuing growth beyond declared caches. |
+| COMPLETE | `NFR-TRC-UI-VIEW_COLLECTIONS-001` | The grid holds only the virtualized window and bounded selection/query metadata. | `ATN-UI-VIEW_COLLECTIONS-001` | 10k/100k/1M logical-row fixtures prove resident-row/DOM/memory bounds and selection correctness during churn. |
+| COMPLETE | `NFR-TRC-UI-VIEW_COLLECTIONS-002` | Unmount cancels all timers/listeners/observers/queries and releases workers/buffers. | `ATN-UI-VIEW_COLLECTIONS-002` | Repeated mount/unmount plus heap/native/browser profiles show no continuing growth beyond declared caches. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -1276,9 +1276,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/ui/widgets/collection-grid/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/ui/widgets/collection-grid/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx` | PASS: verified via Vitest. |
+| Every ATN ID in this card | `app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx` | PASS: verified via Vitest. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json` | ACCEPTED: all applicable stages verified. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 

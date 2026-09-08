@@ -1,0 +1,114 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
+  "task_id": "1.06",
+  "status": "ACCEPTED",
+  "owner_specification": "app/ui/README.md",
+  "baseline_commit": "143b33841644823b7d365b50dfdfe6620de24e97",
+  "acceptance_commit": "task-closeout:20260908-140000-v3-phases-1-16-1.06-view-collections",
+  "requirements": [
+    {
+      "id": "FR-TRC-UI-VIEW_COLLECTIONS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx::AT-UI-VIEW_COLLECTIONS-001"
+    },
+    {
+      "id": "FR-TRC-UI-VIEW_COLLECTIONS-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx::AT-UI-VIEW_COLLECTIONS-002"
+    },
+    {
+      "id": "FR-TRC-UI-VIEW_COLLECTIONS-003",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx::AT-UI-VIEW_COLLECTIONS-003"
+    },
+    {
+      "id": "NFR-TRC-UI-VIEW_COLLECTIONS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx::ATN-UI-VIEW_COLLECTIONS-001"
+    },
+    {
+      "id": "NFR-TRC-UI-VIEW_COLLECTIONS-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx::ATN-UI-VIEW_COLLECTIONS-002"
+    },
+    {
+      "id": "AT-UI-VIEW_COLLECTIONS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx::AT-UI-VIEW_COLLECTIONS-001"
+    },
+    {
+      "id": "AT-UI-VIEW_COLLECTIONS-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx::AT-UI-VIEW_COLLECTIONS-002"
+    },
+    {
+      "id": "AT-UI-VIEW_COLLECTIONS-003",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/traceability.test.tsx::AT-UI-VIEW_COLLECTIONS-003"
+    },
+    {
+      "id": "ATN-UI-VIEW_COLLECTIONS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx::ATN-UI-VIEW_COLLECTIONS-001"
+    },
+    {
+      "id": "ATN-UI-VIEW_COLLECTIONS-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/widgets/collection-grid/__tests__/lifecycle.test.tsx::ATN-UI-VIEW_COLLECTIONS-002"
+    }
+  ],
+  "catalogue_entries": [
+    "Accessible virtualized tabular collection view",
+    "Server-side cursor sorting and filtering",
+    "Bounded snapshot selection tokens for large datasets",
+    "Interactive column pinning, reordering, resizing, and hiding",
+    "Explicit null and undefined presentation states",
+    "Recoverable unavailable state for missing extension/plugin columns",
+    "Bounded update coalescing for streaming churn"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/ui/src/widgets/collection-grid/contracts.ts and traceability tests"
+    },
+    "provider": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-UI-VIEW_COLLECTIONS is a presentation-only virtualized grid view over large typed collections and declares no backend provider."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "CollectionGrid component and feature adapter integrated into workspace view"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "This feature provides presentation-only collection rendering and owns no backend network Interfaces route."
+    },
+    "ui": {
+      "status": "PASS",
+      "evidence": "Vitest test suites traceability.test.tsx and lifecycle.test.tsx passed (25/25 tests), TypeScript typecheck passed with zero errors."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/ui/src/widgets/collection-grid/_usage.tsx standalone recipe passed with 1M rows virtualization and O(1) selection token."
+    }
+  },
+  "commands": [
+    {
+      "command": "npm --prefix app/ui test -- src/widgets/collection-grid/__tests__/traceability.test.tsx src/widgets/collection-grid/__tests__/lifecycle.test.tsx",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run usage -- src/widgets/collection-grid/_usage.tsx",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix app/ui run typecheck",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All requirements, tests, usage recipe, typecheck, and lifecycle verifications pass."
+  }
+}

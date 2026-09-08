@@ -87,16 +87,16 @@
       "feature_id": "FEAT-UI-VIEW_COLLECTIONS",
       "title": "Navigate large typed collections accessibly",
       "domain": "UI",
-      "status": "NOT_STARTED_IN_TARGET",
-      "disposition": "IMPLEMENT",
+      "status": "COMPLETE",
+      "disposition": "PROVED_COMPLETE",
       "first_slice": "U1",
       "owner_specification": "app/ui/README.md",
       "owner_path": "app/ui/src/widgets/collection-grid",
-      "owner_path_exists": false,
+      "owner_path_exists": true,
       "entry_point_registered": false,
-      "accepted_commit": null,
+      "accepted_commit": "task-closeout:20260908-140000-v3-phases-1-16-1.06-view-collections",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-VIEW_COLLECTIONS/acceptance.json",
-      "remaining_obligation": "Complete the exact plan card and acceptance evidence."
+      "remaining_obligation": null
     },
     {
       "task_id": "1.07",
