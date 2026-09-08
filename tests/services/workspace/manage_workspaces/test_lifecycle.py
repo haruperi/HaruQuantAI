@@ -51,7 +51,7 @@ async def test_trc_manage_workspaces_nfr_001(tmp_path: Path) -> None:
 
     await scope.close()
     assert registry.resolve(MANAGE_WORKSPACES_CAPABILITY) is None
-    assert (workspace.root_path / "metadata" / "workspace.db").is_file()
+    assert (workspace.root_path / "database" / "haruquantai.db").is_file()
     assert not (workspace.root_path / ".workspace.lock").exists()
     await scope.close()
     assert scope.active_effect_count == 0

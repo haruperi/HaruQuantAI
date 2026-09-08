@@ -238,6 +238,27 @@ def fr_ws_verify_local_session(
     return session
 
 
+def _resolve_db(root_path: Path) -> Path:
+    """Resolve the canonical workspace database path.
+
+    Args:
+        root_path: Path to workspace root or database.
+
+    Returns:
+        Canonical database path.
+    """
+    if root_path.suffix == ".db":
+        return root_path
+    central_db = root_path / "database" / "haruquantai.db"
+    if central_db.exists():
+        return central_db
+    if (root_path / "haruquantai.db").exists():
+        return root_path / "haruquantai.db"
+    if (root_path / "data" / "database" / "haruquantai.db").exists():
+        return root_path / "data" / "database" / "haruquantai.db"
+    return central_db
+
+
 def fr_ws_report_system_readiness(
     *,
     workspace: Path | WorkspaceRef | None = None,
@@ -287,7 +308,7 @@ def fr_ws_report_system_readiness(
             if isinstance(workspace, WorkspaceRef)
             else Path(workspace).resolve()
         )
-        db_path = ws_path / "metadata" / "workspace.db"
+        db_path = _resolve_db(ws_path)
         if not ws_path.is_dir() or not db_path.is_file():
             reasons.append(
                 "WORKSPACE_UNINITIALIZED: Target workspace directory or database"
@@ -495,9 +516,9 @@ def _create_harness_workspace(root: Path) -> WorkspaceRef:
     Returns:
         WorkspaceRef for the created workspace.
     """
-    meta_dir = root / "metadata"
-    meta_dir.mkdir(parents=True, exist_ok=True)
-    db_path = meta_dir / "workspace.db"
+    db_dir = root / "database"
+    db_dir.mkdir(parents=True, exist_ok=True)
+    db_path = db_dir / "haruquantai.db"
     conn = sqlite3.connect(str(db_path))
     try:
         conn.executescript(

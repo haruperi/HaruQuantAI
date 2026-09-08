@@ -58,7 +58,7 @@ async def test_trc_execute_persistence_nfr_001(tmp_path: Path) -> None:
     assert isinstance(service, ExecutePersistenceService)
 
     workspace = tmp_path / "lifecycle_ws"
-    (workspace / "metadata").mkdir(parents=True)
+    (workspace / "database").mkdir(parents=True)
     service.register_namespace(
         NamespaceRegistration(
             namespace="audit",
@@ -82,7 +82,9 @@ async def test_trc_execute_persistence_nfr_001(tmp_path: Path) -> None:
     assert registry.resolve(PERSISTENCE_CAPABILITY) is None
 
     # Underlying SQLite database file and records remain intact
-    db_file = workspace / "haruquantai.db"
+    db_file = workspace / "database" / "haruquantai.db"
+    if not db_file.exists():
+        db_file = workspace / "haruquantai.db"
     assert db_file.is_file()
 
     reader = ExecutePersistenceService()

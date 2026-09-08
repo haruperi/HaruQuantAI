@@ -156,7 +156,7 @@ def test_trc_manage_workspaces_003(tmp_path: Path) -> None:
     committed = workspace / "artifacts" / "objects" / "committed.bin"
     committed.write_bytes(b"committed")
     committed_hash = service.catalogue_artifact(opened.workspace, committed)
-    connection = sqlite3.connect(workspace / "metadata" / "workspace.db")
+    connection = sqlite3.connect(workspace / "database" / "haruquantai.db")
     try:
         with connection:
             connection.executemany(
@@ -193,7 +193,7 @@ def test_trc_manage_workspaces_003(tmp_path: Path) -> None:
     assert committed.exists()
     assert any("orphan custody retained:after" in item for item in summary.findings)
 
-    connection = sqlite3.connect(workspace / "metadata" / "workspace.db")
+    connection = sqlite3.connect(workspace / "database" / "haruquantai.db")
     try:
         committed_rows = connection.execute(
             "SELECT content_hash, relative_path FROM artifacts WHERE is_committed = 1"

@@ -263,7 +263,7 @@ def test_settings_table_persisted(
 ) -> None:
     """Verify settings versions persist in the workspace metadata database."""
     service.configure_workspace(workspace_root, _valid_settings())
-    db_path = workspace_root / "metadata" / "workspace.db"
+    db_path = workspace_root / "database" / "haruquantai.db"
     conn = sqlite3.connect(str(db_path))
     try:
         cursor = conn.cursor()

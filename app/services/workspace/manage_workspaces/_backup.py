@@ -71,6 +71,27 @@ def _assert_regular_within(path: Path, root: Path) -> Path:
     return resolved
 
 
+def _resolve_db(root: Path) -> Path:
+    """Return the canonical database path for the workspace.
+
+    Args:
+        root: Workspace root directory or database path.
+
+    Returns:
+        Canonical database path.
+    """
+    if root.suffix == ".db":
+        return root
+    central_db = root / "database" / "haruquantai.db"
+    if central_db.exists():
+        return central_db
+    if (root / "haruquantai.db").exists():
+        return root / "haruquantai.db"
+    if (root / "data" / "database" / "haruquantai.db").exists():
+        return root / "data" / "database" / "haruquantai.db"
+    return central_db
+
+
 def create_backup(  # noqa: C901, PLR0915 - one atomic staged publication.
     *,
     root: Path,
@@ -99,10 +120,10 @@ def create_backup(  # noqa: C901, PLR0915 - one atomic staged publication.
         raise WorkspaceStorageError("Backup destination identity collision")
     staging.mkdir()
     try:
-        metadata = staging / "metadata"
-        metadata.mkdir()
-        source_db = root / "metadata" / "workspace.db"
-        target_db = metadata / "workspace.db"
+        database_dir = staging / "database"
+        database_dir.mkdir(parents=True, exist_ok=True)
+        source_db = _resolve_db(root)
+        target_db = database_dir / "haruquantai.db"
         source_connection = sqlite3.connect(
             str(source_db), timeout=config.busy_timeout_seconds
         )
@@ -114,7 +135,7 @@ def create_backup(  # noqa: C901, PLR0915 - one atomic staged publication.
             source_connection.close()
 
         sources: list[tuple[str, Path, str | None, int | None]] = [
-            ("metadata/workspace.db", target_db, None, None)
+            ("database/haruquantai.db", target_db, None, None)
         ]
         for artifact_hash, artifact_path, artifact_size in artifacts:
             safe = _safe_relative_path(artifact_path)
@@ -285,7 +306,7 @@ def restore_backup(  # noqa: C901, PLR0912, PLR0915 - staged validation pipeline
             records[relative] = (expected_hash, expected_size)
         if total_bytes != document.get("total_bytes"):
             raise WorkspaceCorruptionError("Backup manifest total_bytes mismatch")
-        db_path = staging / "metadata" / "workspace.db"
+        db_path = _resolve_db(staging)
         if not db_path.is_file():
             raise WorkspaceCorruptionError("Restored workspace database is missing")
         connection = sqlite3.connect(str(db_path))

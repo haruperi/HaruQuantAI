@@ -21,7 +21,7 @@ from app.services.workspace.diagnostic_bundle.diagnostic_bundle import (
 def _setup_test_workspace(root: Path) -> WorkspaceRef:
     """Create a fully-formed workspace directory and database for tests."""
     for sub in (
-        "metadata",
+        "database",
         "logs",
         "staging",
         "cache",
@@ -30,7 +30,7 @@ def _setup_test_workspace(root: Path) -> WorkspaceRef:
     ):
         (root / sub).mkdir(parents=True, exist_ok=True)
 
-    db_path = root / "metadata" / "workspace.db"
+    db_path = root / "database" / "haruquantai.db"
     conn = sqlite3.connect(str(db_path))
     try:
         conn.executescript(
@@ -149,10 +149,10 @@ def test_diagnostic_bundle_missing_workspace(tmp_path: Path) -> None:
 def test_diagnostic_bundle_corrupt_database(tmp_path: Path) -> None:
     """Verify integrity findings when database is invalid."""
     ws_root = tmp_path / "ws_corrupt"
-    for sub in ("metadata", "logs", "staging", "cache", "artifacts/objects"):
+    for sub in ("database", "logs", "staging", "cache", "artifacts/objects"):
         (ws_root / sub).mkdir(parents=True, exist_ok=True)
 
-    db_path = ws_root / "metadata" / "workspace.db"
+    db_path = ws_root / "database" / "haruquantai.db"
     db_path.write_text("not a valid sqlite file", encoding="utf-8")
 
     bundle = fr_ws_build_diagnostic_bundle(workspace=ws_root)

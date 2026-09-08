@@ -65,7 +65,7 @@ from app.services.workspace.manage_workspaces._persistence import (
 from app.services.workspace.manage_workspaces.config import ManageWorkspacesConfig
 
 SUBDIRECTORIES: tuple[str, ...] = (
-    "metadata",
+    "database",
     "artifacts/objects",
     "staging",
     "logs",
@@ -89,8 +89,17 @@ def _age_seconds(timestamp: str) -> float:
 
 
 def _db_path(root: Path) -> Path:
-    """Return the workspace metadata database path."""
-    return root / "metadata" / "workspace.db"
+    """Return the canonical database path for the workspace."""
+    if root.suffix == ".db":
+        return root
+    central_db = root / "database" / "haruquantai.db"
+    if central_db.exists():
+        return central_db
+    if (root / "haruquantai.db").exists():
+        return root / "haruquantai.db"
+    if (root / "data" / "database" / "haruquantai.db").exists():
+        return root / "data" / "database" / "haruquantai.db"
+    return central_db
 
 
 def _fingerprint(request: ManageWorkspacesRequest) -> str:

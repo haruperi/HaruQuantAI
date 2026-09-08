@@ -133,4 +133,4 @@ async def test_runtime_configuration_degradation(tmp_path: Path) -> None:
     # to None: defaults stay readable, changes and guarded admission degrade,
     # and the domain (lifecycle feature) continues loading.
     assert registry.resolve(CONFIGURE_RUNTIME_CAPABILITY) is None
-    assert (ws_root / "metadata" / "workspace.db").exists()
+    assert (ws_root / "database" / "haruquantai.db").exists()

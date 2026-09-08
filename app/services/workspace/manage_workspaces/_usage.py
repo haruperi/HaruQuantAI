@@ -132,7 +132,7 @@ def _run_usage_example() -> None:  # noqa: C901, PLR0915 - executable FR walkthr
         staged.write_bytes(b"staged")
         orphan = workspace / "artifacts" / "objects" / "orphan.bin"
         orphan.write_bytes(b"orphan")
-        connection = sqlite3.connect(workspace / "metadata" / "workspace.db")
+        connection = sqlite3.connect(workspace / "database" / "haruquantai.db")
         try:
             with connection:
                 connection.executemany(

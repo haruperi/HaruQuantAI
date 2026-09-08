@@ -36,7 +36,7 @@ def _run_usage_example() -> None:  # noqa: C901, PLR0915 - executable FR walkthr
     """
     with tempfile.TemporaryDirectory() as tmp_dir:
         workspace_root = Path(tmp_dir) / "demo_workspace"
-        (workspace_root / "metadata").mkdir(parents=True, exist_ok=True)
+        (workspace_root / "database").mkdir(parents=True, exist_ok=True)
         service = ExecutePersistenceService()
 
         print("[1/4] Registering namespaces and executing migrations...")

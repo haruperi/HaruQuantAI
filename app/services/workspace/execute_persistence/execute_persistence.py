@@ -168,7 +168,11 @@ def _db_path(workspace_path: Path) -> Path:
     central_db = workspace_path / "database" / "haruquantai.db"
     if central_db.exists():
         return central_db
-    return workspace_path / "haruquantai.db"
+    if (workspace_path / "haruquantai.db").exists():
+        return workspace_path / "haruquantai.db"
+    if (workspace_path / "data" / "database" / "haruquantai.db").exists():
+        return workspace_path / "data" / "database" / "haruquantai.db"
+    return central_db
 
 
 class ExecutePersistenceService:

@@ -36,9 +36,9 @@ def _create_fixture_workspace(root: Path) -> None:
     Args:
         root: Workspace root directory to create.
     """
-    for sub in ("metadata", "artifacts/objects", "staging", "logs", "cache"):
+    for sub in ("database", "artifacts/objects", "staging", "logs", "cache"):
         (root / sub).mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(str(root / "metadata" / "workspace.db"))
+    conn = sqlite3.connect(str(root / "database" / "haruquantai.db"))
     try:
         conn.executescript(
             """
@@ -257,7 +257,7 @@ def _run_central_settings_scenario(temp_dir: Path) -> None:
         temp_dir: Temporary directory for testing database.
     """
     print("Scenario 5: Central Database Settings Store")
-    db_file = temp_dir / "usage_settings.db"
+    db_file = temp_dir / "haruquantai.db"
     init_central_database(db_file)
     app_name = get_setting("system.app_name", db_path=db_file)
     print(f"  Read default app name: {app_name}")

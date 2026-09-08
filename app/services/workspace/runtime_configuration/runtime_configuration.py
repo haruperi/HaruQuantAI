@@ -156,6 +156,27 @@ def _resolve_root(workspace: Path | WorkspaceRef) -> Path:
     return root.resolve()
 
 
+def _resolve_db(root_path: Path) -> Path:
+    """Resolve the canonical workspace database path.
+
+    Args:
+        root_path: Path to workspace root or database.
+
+    Returns:
+        Canonical database path.
+    """
+    if root_path.suffix == ".db":
+        return root_path
+    central_db = root_path / "database" / "haruquantai.db"
+    if central_db.exists():
+        return central_db
+    if (root_path / "haruquantai.db").exists():
+        return root_path / "haruquantai.db"
+    if (root_path / "data" / "database" / "haruquantai.db").exists():
+        return root_path / "data" / "database" / "haruquantai.db"
+    return central_db
+
+
 _IANA_AREAS = frozenset(
     {
         "Africa",
@@ -299,7 +320,7 @@ def fr_ws_configure_workspace(
         raise SettingsValidationError(field_errors)
 
     root_path = _resolve_root(workspace)
-    db_path = root_path / "metadata" / "workspace.db"
+    db_path = _resolve_db(root_path)
     if not db_path.exists():
         raise WorkspaceNotFoundError(str(root_path))
 
@@ -358,7 +379,7 @@ def fr_ws_get_workspace_settings(
         WorkspaceNotFoundError: If the workspace database is missing.
     """
     root_path = _resolve_root(workspace)
-    db_path = root_path / "metadata" / "workspace.db"
+    db_path = _resolve_db(root_path)
     if not db_path.exists():
         raise WorkspaceNotFoundError(str(root_path))
 

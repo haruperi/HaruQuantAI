@@ -192,11 +192,11 @@ def test_ws_report_system_readiness(
     assert secret_session.token not in reasons_dump
 
     # 6. Database error handling
-    # Corrupt the metadata database to verify failure isolation
+    # Corrupt the database to verify failure isolation
     corrupt_ws = workspace_root.parent / "corrupt_ws"
-    corrupt_meta = corrupt_ws / "metadata"
-    corrupt_meta.mkdir(parents=True, exist_ok=True)
-    (corrupt_meta / "workspace.db").write_text("not a valid sqlite database")
+    corrupt_db_dir = corrupt_ws / "database"
+    corrupt_db_dir.mkdir(parents=True, exist_ok=True)
+    (corrupt_db_dir / "haruquantai.db").write_text("not a valid sqlite database")
 
     corrupt_status = service.report_system_readiness(workspace=corrupt_ws)
     assert corrupt_status.ready is False

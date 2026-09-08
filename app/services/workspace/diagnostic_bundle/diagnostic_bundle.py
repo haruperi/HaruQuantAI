@@ -252,6 +252,27 @@ def _read_recent_jobs(conn: sqlite3.Connection) -> list[dict[str, object]]:
     return job_states
 
 
+def _resolve_db(root_path: Path) -> Path:
+    """Resolve the canonical workspace database path.
+
+    Args:
+        root_path: Path to workspace root or database.
+
+    Returns:
+        Canonical database path.
+    """
+    if root_path.suffix == ".db":
+        return root_path
+    central_db = root_path / "database" / "haruquantai.db"
+    if central_db.exists():
+        return central_db
+    if (root_path / "haruquantai.db").exists():
+        return root_path / "haruquantai.db"
+    if (root_path / "data" / "database" / "haruquantai.db").exists():
+        return root_path / "data" / "database" / "haruquantai.db"
+    return central_db
+
+
 def _inspect_workspace_db(
     ws_root: Path,
 ) -> tuple[int | None, str | None, list[dict[str, object]], list[str]]:
@@ -263,9 +284,9 @@ def _inspect_workspace_db(
     Returns:
         Tuple of (schema_version, workspace_id, job_states, integrity_findings).
     """
-    db_path = ws_root / "metadata" / "workspace.db"
+    db_path = _resolve_db(ws_root)
     if not db_path.is_file():
-        return None, None, [], ["DATABASE_FILE_MISSING: metadata/workspace.db"]
+        return None, None, [], ["DATABASE_FILE_MISSING: database/haruquantai.db"]
 
     findings: list[str] = []
     schema_version: int | None = None
@@ -505,7 +526,7 @@ def _inspect_workspace(
     integrity_findings: list[str] = []
     redaction_count = 0
 
-    for sub in ("metadata", "logs", "staging", "cache", "artifacts/objects"):
+    for sub in ("database", "logs", "staging", "cache", "artifacts/objects"):
         if not (ws_root / sub).exists():
             integrity_findings.append(f"MISSING_DIRECTORY: {sub}")
 
@@ -721,7 +742,7 @@ def _create_harness_workspace(root: Path) -> WorkspaceRef:
         WorkspaceRef for the created workspace.
     """
     for sub in (
-        "metadata",
+        "database",
         "logs",
         "staging",
         "cache",
@@ -730,7 +751,7 @@ def _create_harness_workspace(root: Path) -> WorkspaceRef:
     ):
         (root / sub).mkdir(parents=True, exist_ok=True)
 
-    db_path = root / "metadata" / "workspace.db"
+    db_path = root / "database" / "haruquantai.db"
     conn = sqlite3.connect(str(db_path))
     try:
         conn.executescript(

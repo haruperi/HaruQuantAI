@@ -38,10 +38,10 @@ closed. Manifest and configuration key parity is tested.
 ## Persistence and safety
 
 The feature-local `_persistence.py` is the documented bootstrap owner for
-`metadata/workspace.db`; SQLite connections never escape it. Schema version 2
+`database/haruquantai.db`; SQLite connections never escape it. Schema version 2
 retains the version-1 checksum and adds account scope, immutable artifact paths,
 publication recovery records, request/audit metadata, and ordered migration
-checksums. The filesystem layout is `metadata/`, `artifacts/objects/`, `staging/`,
+checksums. The filesystem layout is `database/`, `artifacts/objects/`, `staging/`,
 `logs/`, `cache/`, `exports/`, and `backups/`.
 
 Backup manifests cover the consistent SQLite snapshot and every catalogued

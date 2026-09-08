@@ -581,7 +581,7 @@ Verify accounts, principals and sessions. Deliver the bounded behaviors in the F
 
 | Binding state | Setting / limit source | Type / default | Required | Validation / ownership |
 | --- | --- | --- | --- | --- |
-| VERIFIED | `database_path` compatibility key | `str` or `Path`; `<repo>/data/workspaces/local` | No | Must name a workspace root or its canonical `metadata/workspace.db`; unknown keys and other filenames fail closed. |
+| VERIFIED | `database_path` compatibility key | `str` or `Path`; `<repo>/data/database/haruquantai.db` | No | Must name a database directory or its canonical `database/haruquantai.db`; unknown keys and other filenames fail closed. |
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 

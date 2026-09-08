@@ -63,7 +63,7 @@ async def test_manage_workspaces_workflow(tmp_path: Path) -> None:
     # 3. FR-WS-INITIALIZE_WORKSPACE: Atomically initialize
     ref = workspace_service.initialize_workspace(ws_root, name="Lifecycle Test WS")
     assert ref.status == WorkspaceStatus.READY
-    assert (ws_root / "metadata" / "workspace.db").exists()
+    assert (ws_root / "database" / "haruquantai.db").exists()
 
     # 4. FR-WS-MIGRATE_WORKSPACE_SCHEMA: Transactional migrations
     ver = workspace_service.migrate_workspace_schema(ref)
@@ -76,7 +76,7 @@ async def test_manage_workspaces_workflow(tmp_path: Path) -> None:
     # 6. FR-WS-RECOVER_WORKSPACE_STATE: Recover staged artifacts
     staged_file = ws_root / "staging" / "test_uncommitted.tmp"
     staged_file.write_text("in-flight work", encoding="utf-8")
-    connection = sqlite3.connect(ws_root / "metadata" / "workspace.db")
+    connection = sqlite3.connect(ws_root / "database" / "haruquantai.db")
     try:
         with connection:
             connection.execute(
@@ -117,7 +117,7 @@ async def test_manage_workspaces_workflow(tmp_path: Path) -> None:
     )
     restored = workspace_service.restore_workspace(restore_plan)
     assert restored.workspace_id == ref.workspace_id
-    assert (restore_root / "metadata" / "workspace.db").exists()
+    assert (restore_root / "database" / "haruquantai.db").exists()
     assert (restore_root / "artifacts" / "objects" / "sample_series.parquet").exists()
 
     # 10. Clean scope teardown
