@@ -83,9 +83,9 @@
       "domain": "Plugins",
       "canonical_spec": "app/services/plugins/README.md",
       "owner_path": "app/services/plugins/declare_manifests",
-      "owner_path_status": "PLANNED",
+      "owner_path_status": "RECONCILED",
       "contract_target": "app/contracts/plugins/declare_manifests.py",
-      "contract_status": "PLANNED",
+      "contract_status": "RECONCILED",
       "test_targets": [
         "tests/services/plugins/declare_manifests/test_traceability.py",
         "tests/services/plugins/declare_manifests/test_lifecycle.py"

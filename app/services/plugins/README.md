@@ -43,7 +43,7 @@ Domain business policy, live deployment authority, unrestricted host execution, 
 
 | Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
 | --- | --- | --- | --- | --- |
-| DOCUMENTARY_BOUND | `plugins.declare-manifests@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/declare_manifests.py`](../../contracts/plugins/declare_manifests.py) | 1 | Inspect and validate extension manifests |
+| VERIFIED | `plugins.declare-manifests@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/declare_manifests.py`](../../contracts/plugins/declare_manifests.py) | 1 | Inspect and validate extension manifests |
 | DOCUMENTARY_BOUND | `plugins.register-contributions@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/register_contributions.py`](../../contracts/plugins/register_contributions.py) | 1 | Register and dispose exact extension contributions |
 | DOCUMENTARY_BOUND | `plugins.sandbox-permissions@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/sandbox_permissions.py`](../../contracts/plugins/sandbox_permissions.py) | 1 | Attest bounded plugin permissions and sandbox leases |
 | DOCUMENTARY_BOUND | `plugins.isolate-analysis@1` | Selected public operation/DTO surface; exact existing symbols are inventoried in the Phase 0 contract-binding projection.<br>[`app/contracts/plugins/isolate_analysis.py`](../../contracts/plugins/isolate_analysis.py) | 1 | Build and test untrusted code in isolation |
@@ -111,7 +111,7 @@ Feature owners are independent and physically removable. The selected package is
 
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| [`FEAT-PLUG-DECLARE_MANIFESTS`](#feat-plug-declare-manifests) | Inspect and validate extension manifests | `app/services/plugins/declare_manifests/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-PLUG-DECLARE_MANIFESTS`](#feat-plug-declare-manifests) | Inspect and validate extension manifests | `app/services/plugins/declare_manifests/` | U1 | 2 | 1 | VERIFIED |
 | [`FEAT-PLUG-REGISTER_CONTRIBUTIONS`](#feat-plug-register-contributions) | Register and dispose exact extension contributions | `app/services/plugins/register_contributions/` | U1 | 2 | 1 | NOT_REVALIDATED |
 | [`FEAT-PLUG-SANDBOX_PERMISSIONS`](#feat-plug-sandbox-permissions) | Attest bounded plugin permissions and sandbox leases | `app/services/plugins/sandbox_permissions/` | U9 | 2 | 1 | NOT_REVALIDATED |
 | [`FEAT-PLUG-ISOLATE_ANALYSIS`](#feat-plug-isolate-analysis) | Build and test untrusted code in isolation | `app/services/plugins/isolate_analysis/` | U9 | 3 | 1 | NOT_REVALIDATED |
@@ -194,7 +194,7 @@ Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expe
 
 > **Feature ID:** `FEAT-PLUG-DECLARE_MANIFESTS`
 > **Domain:** `plugins`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `COMPLETE` — implemented and verified with 88.98% coverage and passing offline usage demonstration.
 > **Selected owner:** `app/services/plugins/declare_manifests/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -265,8 +265,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-PLUG-DECLARE_MANIFESTS-001` | Validate extension identity/version, contributions, dependencies, compatible contracts, resources/hashes, permission/egress/resource requests and migration declarations. | `AT-PLUG-DECLARE_MANIFESTS-001` | Unknown/overbroad permissions or incompatible majors fail before activation; manifest inspection executes no package code. |
-| PENDING | `FR-TRC-PLUG-DECLARE_MANIFESTS-002` | Return a bounded compatibility/permission/ownership preview with exact versioned metadata. | `AT-PLUG-DECLARE_MANIFESTS-002` | A display name cannot grant authority or replace another contribution identity. |
+| VERIFIED | `FR-TRC-PLUG-DECLARE_MANIFESTS-001` | Validate extension identity/version, contributions, dependencies, compatible contracts, resources/hashes, permission/egress/resource requests and migration declarations. | `AT-PLUG-DECLARE_MANIFESTS-001` | Unknown/overbroad permissions or incompatible majors fail before activation; manifest inspection executes no package code. |
+| VERIFIED | `FR-TRC-PLUG-DECLARE_MANIFESTS-002` | Return a bounded compatibility/permission/ownership preview with exact versioned metadata. | `AT-PLUG-DECLARE_MANIFESTS-002` | A display name cannot grant authority or replace another contribution identity. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -274,7 +274,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-PLUG-DECLARE_MANIFESTS-001` | Removing FEAT-PLUG-DECLARE_MANIFESTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-PLUG-DECLARE_MANIFESTS-001` | Disable and physically remove declare_manifests; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| VERIFIED | `NFR-TRC-PLUG-DECLARE_MANIFESTS-001` | Removing FEAT-PLUG-DECLARE_MANIFESTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-PLUG-DECLARE_MANIFESTS-001` | Disable and physically remove declare_manifests; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -284,15 +284,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/services/plugins/declare_manifests/test_traceability.py` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/services/plugins/declare_manifests/test_lifecycle.py` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `tests/services/plugins/declare_manifests/test_traceability.py` | VERIFIED: exact named tests bind all acceptance oracles. |
+| Every ATN ID in this card | `tests/services/plugins/declare_manifests/test_lifecycle.py` | VERIFIED: withdrawal, unrelated capability survival, and scoped cleanup. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json` | VERIFIED for contract/provider/composition/end-to-end; UI is genuinely inapplicable to this backend capability. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Required `_usage.py` command - planned, not executed:**
+**Verified `_usage.py` command:**
 
 ```powershell
 uv run --frozen python -m app.services.plugins.declare_manifests._usage

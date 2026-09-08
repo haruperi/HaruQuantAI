@@ -18,6 +18,9 @@ from app.contracts.plugins.models import (
 from app.services.plugins.contributions.plugin_contributions import (
     RegisterContributionsService,
 )
+from app.services.plugins.declare_manifests.declare_manifests import (
+    DeclareManifestsService,
+)
 from app.services.plugins.development_compatibility.config import (
     DevelopmentCompatibilityConfig,
 )
@@ -28,7 +31,6 @@ from app.services.plugins.development_compatibility.plugin_development_compatibi
     fr_plug_declare_plugin_compatibility,
     fr_plug_validate_plugin_packages,
 )
-from app.services.plugins.manifests.plugin_manifests import DeclareManifestsService
 from scripts.architecture_check import check_directory
 
 

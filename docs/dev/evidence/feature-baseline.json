@@ -71,16 +71,16 @@
       "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
       "title": "Inspect and validate extension manifests",
       "domain": "Plugins",
-      "status": "PARTIAL",
-      "disposition": "ADAPT",
+      "status": "COMPLETE",
+      "disposition": "PROVED_COMPLETE",
       "first_slice": "U1",
       "owner_specification": "app/services/plugins/README.md",
       "owner_path": "app/services/plugins/declare_manifests",
-      "owner_path_exists": false,
-      "entry_point_registered": false,
-      "accepted_commit": null,
+      "owner_path_exists": true,
+      "entry_point_registered": true,
+      "accepted_commit": "task-closeout:20260908-133000-v3-phases-1-16-1.05-declare-manifests",
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json",
-      "remaining_obligation": "Complete the exact plan card and acceptance evidence."
+      "remaining_obligation": null
     },
     {
       "task_id": "1.06",

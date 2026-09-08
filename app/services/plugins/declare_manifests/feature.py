@@ -5,16 +5,18 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 
 from app.contracts.plugins.capabilities import DECLARE_MANIFESTS_CAPABILITY
-from app.services.plugins.manifests.config import PluginManifestsConfig
-from app.services.plugins.manifests.manifest import SPEC
-from app.services.plugins.manifests.plugin_manifests import DeclareManifestsService
+from app.services.plugins.declare_manifests.config import PluginManifestsConfig
+from app.services.plugins.declare_manifests.declare_manifests import (
+    DeclareManifestsService,
+)
+from app.services.plugins.declare_manifests.manifest import SPEC
 
 if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
     from app.kernel.feature import FeatureSpec
 
 
-class PluginManifestsFeature:
+class DeclareManifestsFeature:
     """Composable feature package providing plugin manifest and package validation."""
 
     def __init__(self, spec: FeatureSpec = SPEC) -> None:
@@ -48,10 +50,10 @@ class PluginManifestsFeature:
         context.provide(DECLARE_MANIFESTS_CAPABILITY, self._service)
 
 
-def feature() -> PluginManifestsFeature:
+def feature() -> DeclareManifestsFeature:
     """Factory function for discovery via entry points.
 
     Returns:
-        New PluginManifestsFeature instance.
+        New DeclareManifestsFeature instance.
     """
-    return PluginManifestsFeature()
+    return DeclareManifestsFeature()

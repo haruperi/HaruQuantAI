@@ -452,9 +452,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-05"></a>
 
-### - [ ] Task 1.05 — FEAT-PLUG-DECLARE_MANIFESTS — Inspect and validate extension manifests
+### - [x] Task 1.05 — FEAT-PLUG-DECLARE_MANIFESTS — Inspect and validate extension manifests
 
-**Status:** `PARTIAL` · **Domain:** Plugins · **Owner specification:** `app/services/plugins/README.md` · **Register first slice:** U1.
+**Status:** `COMPLETE` · **Domain:** Plugins · **Owner specification:** `app/services/plugins/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** Phase 0 entry gate; no feature-task predecessor.
 
@@ -500,7 +500,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `fix(plugins): complete FEAT-PLUG-DECLARE_MANIFESTS`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260908-133000-v3-phases-1-16-1.05-declare-manifests` — reconciled owner, contracts, tests, usage recipe, and evidence manifest.
 
 ---
 

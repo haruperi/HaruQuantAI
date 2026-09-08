@@ -19,6 +19,7 @@ if TYPE_CHECKING:
         ManageLifecycleSuccess,
         PluginContributionDescriptor,
         PluginManifest,
+        PluginManifestPreview,
         PluginPackageValidation,
         PluginType,
         RenderResultPanelsRequest,
@@ -84,6 +85,17 @@ class DeclareManifestsCapability(Protocol):
 
         Returns:
             Hexadecimal SHA-256 string representing the canonical package hash.
+        """
+        ...
+
+    def preview_manifest(self, manifest: PluginManifest) -> PluginManifestPreview:
+        """Generate a bounded compatibility, permission, and ownership preview.
+
+        Args:
+            manifest: Validated plugin manifest.
+
+        Returns:
+            PluginManifestPreview with exact versioned metadata.
         """
         ...
 

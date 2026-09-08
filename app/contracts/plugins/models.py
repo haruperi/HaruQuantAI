@@ -67,6 +67,25 @@ class PluginFileEntry:
 
 
 @dataclass(frozen=True, slots=True)
+class PluginDependency:
+    """Declared dependency of a plugin on another plugin or capability."""
+
+    id: str
+    version_range: str = ">=1.0.0"
+    optional: bool = False
+
+
+@dataclass(frozen=True, slots=True)
+class PluginMigrationDeclaration:
+    """Declared schema or state migration for a plugin."""
+
+    from_version: str
+    to_version: str
+    description: str = ""
+    step: int = 1
+
+
+@dataclass(frozen=True, slots=True)
 class PluginManifest:
     """Authoritative manifest declaring plugin metadata and capabilities."""
 
@@ -81,6 +100,25 @@ class PluginManifest:
     resources: PluginResourceLimits = field(default_factory=PluginResourceLimits)
     sha256_by_file: dict[str, str] = field(default_factory=dict)
     signature: str | None = None
+    contributions: tuple[PluginContributionDescriptor, ...] = ()
+    dependencies: tuple[PluginDependency, ...] = ()
+    compatible_contracts: tuple[str, ...] = ()
+    migrations: tuple[PluginMigrationDeclaration, ...] = ()
+
+
+@dataclass(frozen=True, slots=True)
+class PluginManifestPreview:
+    """Bounded preview of compatibility, permissions, and owned contributions."""
+
+    plugin_id: str
+    version: str
+    api_range: str
+    is_compatible: bool
+    compatibility_details: str
+    granted_permissions: PluginPermission
+    owned_contribution_ids: tuple[str, ...]
+    declared_contributions: tuple[PluginContributionDescriptor, ...] = ()
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)

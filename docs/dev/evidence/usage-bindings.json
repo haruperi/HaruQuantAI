@@ -61,7 +61,7 @@
       "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
       "task_id": "1.05",
       "usage_target": "app/services/plugins/declare_manifests/_usage.py",
-      "usage_status": "PLANNED",
+      "usage_status": "VERIFIED",
       "executable_recipe": "uv run --frozen python -m app.services.plugins.declare_manifests._usage",
       "test_targets": [
         "tests/services/plugins/declare_manifests/test_traceability.py",

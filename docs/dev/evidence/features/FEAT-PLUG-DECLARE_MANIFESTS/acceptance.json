@@ -1,0 +1,104 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
+  "task_id": "1.05",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/plugins/README.md",
+  "baseline_commit": "0e1d6eb7b690ea394c6f5d9a6dbb137a0200721c",
+  "acceptance_commit": "task-closeout:20260908-133000-v3-phases-1-16-1.05-declare-manifests",
+  "requirements": [
+    {
+      "id": "FR-TRC-PLUG-DECLARE_MANIFESTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/declare_manifests/test_traceability.py::test_trc_declare_manifests_001_valid_manifest_and_contributions"
+    },
+    {
+      "id": "FR-TRC-PLUG-DECLARE_MANIFESTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/declare_manifests/test_traceability.py::test_trc_declare_manifests_002_bounded_preview_and_display_name_independence"
+    },
+    {
+      "id": "NFR-TRC-PLUG-DECLARE_MANIFESTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/declare_manifests/test_lifecycle.py::test_trc_declare_manifests_nfr_001_lifecycle_and_withdrawal"
+    },
+    {
+      "id": "AT-PLUG-DECLARE_MANIFESTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/declare_manifests/test_traceability.py::test_trc_declare_manifests_001_overbroad_permissions_and_incompatible_majors"
+    },
+    {
+      "id": "AT-PLUG-DECLARE_MANIFESTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/declare_manifests/test_traceability.py::test_trc_declare_manifests_002_bounded_preview_and_display_name_independence"
+    },
+    {
+      "id": "ATN-PLUG-DECLARE_MANIFESTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/plugins/declare_manifests/test_lifecycle.py::test_trc_declare_manifests_nfr_001_lifecycle_and_withdrawal"
+    }
+  ],
+  "catalogue_entries": [
+    "Extension manifest validation",
+    "Zip-slip safe archive inspection",
+    "Bounded capability and permission preview",
+    "Display name authority decoupling",
+    "Scoped capability withdrawal on physical removal"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/plugins/declare_manifests.py, app/contracts/plugins/models.py, app/contracts/plugins/ports.py"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "app/services/plugins/declare_manifests/declare_manifests.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "app/services/plugins/declare_manifests/feature.py with entry point plugins-declare-manifests"
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "Public contracts exported via app.contracts.plugins.declare_manifests"
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-PLUG-DECLARE_MANIFESTS is a backend plugin manifest inspection engine with no UI widget obligations"
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/plugins/declare_manifests/_usage.py demonstrating 5/5 validation, security, preview, and lifecycle scenarios"
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run pytest tests/services/plugins/declare_manifests -o \"addopts=--cov=app.services.plugins.declare_manifests --cov-fail-under=80\"",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run pytest tests/services/plugins/contributions tests/services/plugins/development_compatibility tests/services/plugins/lifecycle --no-cov",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run python -m app.services.plugins.declare_manifests._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff check app/services/plugins/declare_manifests app/contracts/plugins tests/services/plugins/declare_manifests",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff format --check app/services/plugins/declare_manifests app/contracts/plugins tests/services/plugins/declare_manifests",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run mypy app/services/plugins/declare_manifests app/contracts/plugins/declare_manifests.py",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "All requirements, tests, usage recipe, ruff, format, and mypy verifications pass."
+  }
+}

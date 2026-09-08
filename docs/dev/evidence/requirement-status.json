@@ -112,7 +112,7 @@
       "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
       "task_id": "1.05",
       "text": "Validate extension identity/version, contributions, dependencies, compatible contracts, resources/hashes, permission/egress/resource requests and migration declarations.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json"
     },
     {
@@ -120,7 +120,7 @@
       "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
       "task_id": "1.05",
       "text": "Return a bounded compatibility/permission/ownership preview with exact versioned metadata.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json"
     },
     {
@@ -4650,7 +4650,7 @@
       "feature_id": "FEAT-PLUG-DECLARE_MANIFESTS",
       "task_id": "1.05",
       "text": "Removing FEAT-PLUG-DECLARE_MANIFESTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-PLUG-DECLARE_MANIFESTS/acceptance.json"
     },
     {

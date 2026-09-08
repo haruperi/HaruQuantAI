@@ -15,12 +15,14 @@ from app.kernel.scope import FeatureScope
 from app.services.plugins.contributions.plugin_contributions import (
     RegisterContributionsService,
 )
+from app.services.plugins.declare_manifests.declare_manifests import (
+    DeclareManifestsService,
+)
 from app.services.plugins.development_compatibility.feature import (
     DevelopmentCompatibilityFeature,
     feature,
 )
 from app.services.plugins.development_compatibility.manifest import SPEC
-from app.services.plugins.manifests.plugin_manifests import DeclareManifestsService
 
 
 def test_feature_factory_and_spec() -> None:

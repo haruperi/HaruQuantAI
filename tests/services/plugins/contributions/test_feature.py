@@ -17,7 +17,9 @@ from app.services.plugins.contributions.feature import (
     feature,
 )
 from app.services.plugins.contributions.manifest import SPEC
-from app.services.plugins.manifests.plugin_manifests import DeclareManifestsService
+from app.services.plugins.declare_manifests.declare_manifests import (
+    DeclareManifestsService,
+)
 
 if TYPE_CHECKING:
     from app.kernel.capability import CapabilityKey
