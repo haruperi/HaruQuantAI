@@ -613,6 +613,11 @@ class _ReferenceContributionsAdapter:
         del plugin_id
         raise NotImplementedError("Usage adapter does not register contributions")
 
+    def dispose_generation(self, plugin_id: str, generation: int) -> int:
+        """Reject unsupported generation disposal in the fixture-free example."""
+        del plugin_id, generation
+        raise NotImplementedError("Usage adapter does not register contributions")
+
     def get_contributions(
         self, plugin_type: PluginType | None = None
     ) -> tuple[PluginContributionDescriptor, ...]:
