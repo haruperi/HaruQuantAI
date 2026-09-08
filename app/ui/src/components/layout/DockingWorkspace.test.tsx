@@ -318,37 +318,7 @@ describe("FR-UI-006/008 widget header drag handle and expansion control", () => 
     expect(document.querySelector(".widget-header-expand-btn")).toHaveAttribute("aria-label", "Expand widget");
   });
 
-  it("groups sibling workspace widgets into native tabs before expansion", () => {
-    const workspace = workspaceWith(
-      [
-        widget({ id: "a", type: "markets", title: "Markets" }),
-        widget({ id: "b", type: "chart", title: "EURUSD Chart" }),
-        widget({ id: "c", type: "positions", title: "Positions" }),
-      ],
-      dockFor(["a", "b", "c"]),
-    );
-    act(() => {
-      useWorkspaceStore.setState((state) => ({
-        workspaces: [...state.workspaces, workspace],
-        activeWorkspaceId: workspace.id,
-      }));
-    });
-    render(<DockingWorkspace workspace={workspace} />);
-
-    const targetGroup = fakeApi.getPanel("a")?.api.group;
-    fireEvent.click(document.querySelector(".widget-header-expand-btn") as HTMLButtonElement);
-
-    expect(fakeApi.getPanel("b")?.api.moveTo).toHaveBeenCalledWith({
-      group: targetGroup,
-      skipSetActive: true,
-    });
-    expect(fakeApi.getPanel("c")?.api.moveTo).toHaveBeenCalledWith({
-      group: targetGroup,
-      skipSetActive: true,
-    });
-  });
-
-  it("keeps Dockview native maximize for docked groups", () => {
+  it("keeps Dockview native maximize and exitMaximized for docked groups", () => {
     const workspace = workspaceWith(
       [widget({ id: "a", type: "markets", title: "Markets" })],
       dockFor(["a"]),
@@ -365,8 +335,14 @@ describe("FR-UI-006/008 widget header drag handle and expansion control", () => 
     panel.api.location = { type: "grid" };
     document.querySelector(".dv-resize-container")?.classList.remove("dv-resize-container");
 
-    fireEvent.click(document.querySelector(".widget-header-expand-btn") as HTMLButtonElement);
+    const expandBtn = document.querySelector(".widget-header-expand-btn") as HTMLButtonElement;
+    fireEvent.click(expandBtn);
     expect(panel.api.maximize).toHaveBeenCalledTimes(1);
+    expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === workspace.id)?.expandedWidgetId).toBe("a");
+
+    fireEvent.click(expandBtn);
+    expect(panel.api.exitMaximized).toHaveBeenCalledTimes(1);
+    expect(useWorkspaceStore.getState().workspaces.find((w) => w.id === workspace.id)?.expandedWidgetId).toBeNull();
   });
 });
 

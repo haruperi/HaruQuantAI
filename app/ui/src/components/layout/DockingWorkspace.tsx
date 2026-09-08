@@ -6,8 +6,8 @@
  * Hosts a Dockview docking layout for one workspace, mirroring the CME Group
  * Simulator's workspace behaviour: fluid pixel-level splitters between regions,
  * tab dragging that docks into groups or splits regions at edges, automatic
- * refill of vacated regions, workspace-wide tab grouping on maximize
- * (double-click a tab), and Alt+Arrow keyboard panel moves. The store's widget list is the panel
+ * refill of vacated regions, per-group maximize (double-click a tab), and
+ * Alt+Arrow keyboard panel moves. The store's widget list is the panel
  * registry; the serialized layout tree persists through the store and is
  * rebuilt deterministically for legacy grid layouts and template presets.
  * Cross-window popout is intentionally unsupported; in-workspace floating,
@@ -76,24 +76,7 @@ const DockWidgetTab: React.FC<IDockviewPanelHeaderProps> = (props) => {
 
   const handleExpand = (e: React.MouseEvent) => {
     e.stopPropagation();
-    const floatingContainer = e.currentTarget.closest('.dv-resize-container');
-
-    if (!isExpanded) {
-      // Maximizing is a workspace-wide focus mode. Consolidate every local
-      // panel into the selected panel's group so Dockview supplies one native,
-      // keyboard-accessible tab bar instead of hiding sibling widgets behind
-      // the expanded floating container. Cross-window popouts are disabled by
-      // the workspace feature configuration and never advertised here.
-      for (const panel of props.containerApi.panels) {
-        if (
-          panel.id !== props.api.id &&
-          panel.api.group !== props.api.group &&
-          panel.api.location.type !== 'popout'
-        ) {
-          panel.api.moveTo({ group: props.api.group, skipSetActive: true });
-        }
-      }
-    }
+    const floatingContainer = tabRef.current?.closest('.dv-resize-container');
 
     if (!floatingContainer) {
       if (isExpanded && props.api.isMaximized()) props.api.exitMaximized();
@@ -146,6 +129,11 @@ export const DockingWorkspace: React.FC<{ workspace: Workspace }> = ({ workspace
       const api = apiRef.current;
       const ws = workspaceRef.current;
       if (!api || !ws) return;
+      const activeWs = useWorkspaceStore
+        .getState()
+        .workspaces.find((w) => String(w.id) === String(ws.id));
+      if (activeWs?.expandedWidgetId) return;
+
       try {
         setWorkspaceDockLayout(ws.id, api.toJSON());
       } catch {
