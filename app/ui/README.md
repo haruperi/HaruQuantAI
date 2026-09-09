@@ -164,7 +164,7 @@ Feature owners are independent and physically removable. The selected package is
 | [`FEAT-UI-TYPED_BACKEND`](#feat-ui-typed-backend) | Call the typed backend and resume observation | `app/ui/src/clients/` | U1 | 2 | 1 | PROVED_COMPLETE |
 | [`FEAT-UI-SESSION_CONTEXT`](#feat-ui-session-context) | Capture current authorized widget context | `app/ui/src/context/` | U2 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-UI-WORKSPACE_NAVIGATION`](#feat-ui-workspace-navigation) | Navigate capabilities and explain workspace controls | `app/ui/src/components/layout/` | U1 | 3 | 1 | NOT_REVALIDATED |
-| [`FEAT-UI-SESSION_ACCESS`](#feat-ui-session-access) | Present session access and scope changes | `app/ui/src/app/` | U1 | 2 | 1 | NOT_REVALIDATED |
+| [`FEAT-UI-SESSION_ACCESS`](#feat-ui-session-access) | Present session access and scope changes | `app/ui/src/app/` | U1 | 2 | 1 | PROVED_COMPLETE |
 | [`FEAT-UI-SYSTEM_SETTINGS`](#feat-ui-system-settings) | Review effective settings and safe configuration changes | `app/ui/src/widgets/system-settings/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-UI-DATA_MANAGER`](#feat-ui-data-manager) | Operate the Data Manager workspace | `app/ui/src/components/workflow/` | U1 | 3 | 1 | NOT_REVALIDATED |
 | [`FEAT-UI-VIEW_COLLECTIONS`](#feat-ui-view-collections) | Navigate large typed collections accessibly | `app/ui/src/widgets/collection-grid/` | U1 | 3 | 2 | NOT_REVALIDATED |
@@ -859,7 +859,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-UI-WORKSPACE_
 
 > **Feature ID:** `FEAT-UI-SESSION_ACCESS`
 > **Domain:** `ui`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Implemented — terminal evidence ready for final review` — verified scope gating, typed access states, account-scope invalidation, exact removal, focused usage, typecheck, and production-build evidence are recorded in `docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json`; the independent Reviewer remains the final commit-gate authority.
 > **Selected owner:** `app/ui/src/app/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -877,7 +877,7 @@ Present session access and scope changes. Present and interact with authoritativ
 
 **Optional / operation-gated capabilities:** the complete scoped provider table in the [source feature card](../../docs/dev/Feature_Requirement_Traceability_Register.md#feat-ui-session-access) is normative. Declare each applicable key separately from required startup dependencies. Absence must affect only the operations requiring it, with the exact recorded denial/unavailable behavior.
 
-**Public contract target:** [`app/ui/src/app/contracts.ts`](src/app/contracts.ts). **Literal protocol/DTO/operation symbols:** the selected target, operation scope, request/result union and typed failure semantics in this card are frozen; exact existing symbols are inventoried in `docs/dev/evidence/contract-bindings.json`, and a planned contract retains this binding without claiming runtime certification.
+**Public contract:** [`app/ui/src/app/contracts.ts`](src/app/contracts.ts) exports `SessionAccessState`, `VerifiedSessionScope`, `SessionScopeSnapshot`, and `SessionScopeView`. `SessionAccessBoundary` consumes the public auth projection; `SessionAccessLifecycle` owns generation, abort, clear-on-release projection reset, pending async cleanup, stale fencing, and disposal. Account-bound consumers pass the exposed signal through the typed client and register their presentation cleanup; these are presentation contracts only and do not duplicate the server identity wire schema.
 
 **Input boundary:** validated typed operation data, current authenticated scope where applicable, and immutable owner references; numerical operations accept validated bounded buffers. **Output boundary:** the owned FRs and acceptance oracles below. Preserve typed invalid, denied, unavailable, stale/conflict, partial, cancelled and failed outcomes wherever the selected contract defines them; do not create a second generic error vocabulary.
 
@@ -889,6 +889,8 @@ Present session access and scope changes. Present and interact with authoritativ
 | NORMATIVE | Operation parameters, immutable profile references and policy limits in the FRs below | Use the selected request/profile schema; no implicit coercion or default substitution. | All prerequisites of the selected operation. | Do not confuse a request parameter, historical profile value or user-visible setting with a new feature config key. |
 | NORMATIVE | Resource, security, retention and version requirements in local/shared NFRs | Finite admitted values; stricter applicable owner policy wins. | Before the affected operation. | Pin effective values/revisions in evidence; never alter a historical run by editing current settings. |
 
+No feature configuration keys are accepted. Projection registration keys are internal, non-secret identifiers limited to 128 safe characters, and one scope admits at most 128 registered projection clearers. These are implementation safety bounds, not operator policy.
+
 #### Runtime Effects & Scope Disposal
 
 | Effect | Owner | Disposal mechanism |
@@ -897,7 +899,7 @@ Present session access and scope changes. Present and interact with authoritativ
 | Requests, streams, timers, listeners and workers | FEAT-UI-SESSION_ACCESS | Abort/unsubscribe/cancel and await where applicable on unmount or scope change. |
 | Viewport, selection, DOM/GPU/decoding buffers | FEAT-UI-SESSION_ACCESS | Release buffers/observers; remove stale context contributions; restore valid focus. |
 
-Teardown is idempotent. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
+Teardown is idempotent. A consumer release initiates its clearer exactly once, and a scope transition awaits pending asynchronous clearers before publishing the replacement scope. Boundary-owned disposal tolerates React Strict Mode effect replay while true unmount still withdraws the lifecycle. Failed mount unwinds partial effects. Dependency replacement/removal must not leave stale registrations, jobs, subscriptions, source buffers or credential references usable by the removed scope.
 
 #### Persistent State Ownership
 
@@ -915,7 +917,7 @@ Teardown is idempotent. Failed mount unwinds partial effects. Dependency replace
 | --- | --- | --- |
 | README.md | Owning workflow, scope, usage and evidence mirror | Documentation only. |
 | manifest.ts | Typed feature/contribution identity, provides/requires/optional and disposer ownership | Existing typed registration contract; no second registry. |
-| config.ts | Strict contribution configuration and migrations | Reconcile actual current symbols before editing. |
+| config.ts | No file: this feature declares no configuration keys or migrations. | `SESSION_ACCESS_MANIFEST.configKeys` is empty. |
 | index.ts | Public contribution exports | Do not expose private backend objects. |
 | Focused lifecycle/render and component modules | Bounded interaction, rendering, subscription and cleanup | Preserve current owner and component names; no backend logic. |
 | contracts.ts | Selected local view/contribution boundary | Consumes authoritative generated wire DTOs; not a second wire-schema owner. |
@@ -926,8 +928,8 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-UI-SESSION_ACCESS-001` | Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change. | `AT-UI-SESSION_ACCESS-001` | Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. |
-| PENDING | `FR-TRC-UI-SESSION_ACCESS-002` | Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework. | `AT-UI-SESSION_ACCESS-002` | A browser toggle cannot authorize a server request; no replacement SPA/authentication system is introduced. |
+| PROVED_COMPLETE | `FR-TRC-UI-SESSION_ACCESS-001` | Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change. | `AT-UI-SESSION_ACCESS-001` | Cross-account cached selections and requests are cleared/aborted; unauthorized content is not briefly displayed. |
+| PROVED_COMPLETE | `FR-TRC-UI-SESSION_ACCESS-002` | Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework. | `AT-UI-SESSION_ACCESS-002` | A browser toggle cannot authorize a server request; no replacement SPA/authentication system is introduced. |
 
 **Implementing-symbol and side-effect binding:** the focused UI interaction/lifecycle modules above implement presentation behavior only. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -935,7 +937,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-UI-SESSION_ACCESS-001` | Removing FEAT-UI-SESSION_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-SESSION_ACCESS-001` | Disable and physically remove app; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| PROVED_COMPLETE | `NFR-TRC-UI-SESSION_ACCESS-001` | Removing FEAT-UI-SESSION_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-UI-SESSION_ACCESS-001` | Disable and physically remove app; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 
@@ -945,15 +947,15 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Acceptance family | Intended test owner | Required evidence state |
 | --- | --- | --- |
-| Every AT ID in this card | `tests/ui/app/traceability.test.ts` | PENDING: bind an actual named test and assertion to each oracle. |
-| Every ATN ID in this card | `tests/ui/app/lifecycle.test.ts` | PENDING: lifecycle/resource/numerical evidence as applicable. |
-| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/SQX/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json` | All six stages NOT_REVALIDATED; justify each genuinely inapplicable stage. |
+| Every AT ID in this card | `app/ui/src/app/__tests__/traceability.test.tsx` | PROVED_COMPLETE: `test_trc_present_session_access_001` and `test_trc_present_session_access_002` bind both oracles. |
+| Every ATN ID in this card | `app/ui/src/app/__tests__/lifecycle.test.tsx` | PROVED_COMPLETE: `test_trc_present_session_access_nfr_001` binds exact withdrawal, cleanup, abort, unavailable, and retained-state behavior. |
+| Contract → provider → composition → Interfaces → UI → end-to-end | `docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json` | Contract, composition, Interfaces, and UI evidence pass; backend-provider ownership and real-provider phase E2E are explicitly scoped to their owning features/tasks. |
 
 Intended test paths may be mapped to a compatible current test owner; they are not assertions of existing files. Full oracle coverage, shared requirements, catalogue entries, original source mappings and actual-provider operation qualification must be included in the final acceptance record. A contract fixture cannot certify actual provider integration.
 
 #### Feature Usage Examples
 
-**Interactive scenario:** open an authenticated workspace, add or reach this feature through its actual registered contribution, and exercise the useful action described in the first FR. Verify the first acceptance oracle against a real owner response; then exercise an unavailable/denied or invalid-input case and the removal/cleanup oracle. Use every additional FR as a named scenario in the owning workflow README. Browser state must not manufacture the owner outcome. Record interaction assertions, accessible focus/error behavior and cleanup evidence; screenshots alone do not pass this scenario.
+**Interactive scenario:** enter through the existing `/login` route, wait for `/api/v1/auth/me` to return a non-empty principal/account/workspace scope, and observe that the workspace mounts only after that scope generation is current. An account-bound consumer passes `SessionScopeView.signal` into the existing typed client and registers its projection disposer. Change account or log out: the old tree disappears immediately, its signal aborts, registered selections clear exactly once, asynchronous cleanup settles before the replacement scope mounts, and a late old-generation completion is rejected. Repeat under React Strict Mode and with unauthenticated, authorization-denied, expired-prior-session, and identity-provider-unavailable outcomes; each has a distinct labelled state and none mounts protected content. Existing arbitrary widget controllers are not claimed as retrofitted by this feature; consumers must adopt the public scope contract when they own account-bound work. Withdrawing `ui.access-gate@1` leaves unrelated capability/source objects intact and returns typed `DEPENDENCY_UNAVAILABLE` without fallback. The bounded offline executable mirror is `npm --prefix app/ui run usage -- src/app/_usage.tsx`; real-provider browser qualification remains the Phase 1.30 checkpoint.
 
 #### Removal Behaviour
 

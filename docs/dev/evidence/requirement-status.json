@@ -4,9 +4,9 @@
     "total_frs": 575,
     "total_local_nfrs": 276,
     "disposition_counts": {
-      "ADAPT": 40,
-      "IMPLEMENT": 641,
-      "PROVED_COMPLETE": 58,
+      "ADAPT": 37,
+      "IMPLEMENT": 636,
+      "PROVED_COMPLETE": 66,
       "VERIFY": 112
     }
   },
@@ -336,7 +336,7 @@
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
       "text": "Validate immutable mandate identity/integrity, effective interval, objectives, enabled roles/features, environment/account/asset scope and finite budgets.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
@@ -344,7 +344,7 @@
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
       "text": "Reject any Agentic grant of broker credentials, order construction, Risk approval, kill-switch clearing, deployment or receiver authority.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
@@ -352,7 +352,7 @@
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
       "text": "Publish unavailable/refusal when mandate validity or scope cannot be proven.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
@@ -360,7 +360,7 @@
       "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
       "text": "Load verified identity/scope before presenting protected workspace resources and clear stale projections on logout/account change.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json"
     },
     {
@@ -368,7 +368,7 @@
       "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
       "text": "Represent unauthenticated, unauthorized, expired and unavailable states separately and route through the existing application framework.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json"
     },
     {
@@ -4762,7 +4762,7 @@
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
       "text": "All direct tool/model/receiver work obeys the feature’s exact configuration, mandate, current readiness/generation and unspent parent budgets.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
@@ -4770,7 +4770,7 @@
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
       "text": "Prove exact scope cleanup, strict contract/config compatibility and executable offline usage without paid providers or live credentials.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-AGT-ENFORCE_MANDATE/acceptance.json"
     },
     {
@@ -4778,7 +4778,7 @@
       "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
       "text": "Removing FEAT-UI-SESSION_ACCESS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "ADAPT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-UI-SESSION_ACCESS/acceptance.json"
     },
     {

@@ -170,7 +170,7 @@ describe("AuthProvider — FR-UI-006", () => {
     expect(screen.getByTestId("username").textContent).toBe("alice");
   });
 
-  it("expiredSessionRedirects: a 401 probe clears identity → unauthenticated", async () => {
+  it("expiredSessionRedirects: a prior identity plus 401 projects expired", async () => {
     window.sessionStorage.setItem(
       "hq:identity",
       JSON.stringify({
@@ -186,10 +186,71 @@ describe("AuthProvider — FR-UI-006", () => {
       </AuthProvider>
     );
     await waitFor(() => {
-      expect(screen.getByTestId("state").textContent).toBe("unauthenticated");
+      expect(screen.getByTestId("state").textContent).toBe("expired");
     });
     expect(screen.getByTestId("username").textContent).toBe("");
     expect(window.sessionStorage.getItem("hq:identity")).toBeNull();
+  });
+
+  it("a first visit without a session projects unauthenticated", async () => {
+    installFetch(unauthorizedIdentity);
+    render(
+      <AuthProvider>
+        <AuthStateView />
+      </AuthProvider>
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId("state").textContent).toBe("unauthenticated");
+    });
+  });
+
+  it.each([
+    ["AUTHORIZATION_DENIED", "unauthorized"],
+    ["UPSTREAM_UNAVAILABLE", "unavailable"],
+  ])("maps %s to %s without a protected principal", async (code, expected) => {
+    installFetch(() =>
+      new Response(
+        JSON.stringify({
+          status: "error",
+          message: "identity unavailable",
+          data: null,
+          error: {
+            code,
+            message: "identity unavailable",
+            details: {},
+            request_id: "req_test",
+            trace_id: null,
+            retryable: false,
+          },
+          metadata: {
+            contract_version: "v1",
+            schema_id: "api.metadata.v1",
+            request_id: "req_test",
+            route: "/api/v1/auth/me",
+            operation: "api.auth.me",
+            trace_id: null,
+            side_effect: "read",
+            duration_ms: 1,
+            timestamp: "2026-08-03T12:00:00Z",
+            stale: false,
+            stale_reason: null,
+            next_cursor: null,
+            page_size: null,
+            idempotency_replayed: false,
+          },
+        }),
+        { status: code === "AUTHORIZATION_DENIED" ? 403 : 503 },
+      ),
+    );
+    render(
+      <AuthProvider>
+        <AuthStateView />
+      </AuthProvider>,
+    );
+    await waitFor(() => {
+      expect(screen.getByTestId("state").textContent).toBe(expected);
+    });
+    expect(screen.getByTestId("username").textContent).toBe("");
   });
 
   it("loginStoresIdentity: login persists identity and authenticates", async () => {

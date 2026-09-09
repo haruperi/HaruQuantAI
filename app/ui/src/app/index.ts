@@ -12,5 +12,27 @@ export type { AuthenticationPageProps } from "./authentication-page";
 export { ProtectedLayout } from "./protected-layout";
 export type { ProtectedLayoutProps } from "./protected-layout";
 
+export {
+  SessionAccessBoundary,
+  deriveSessionAccess,
+  useSessionScope,
+} from "./session-access";
+export type { SessionAccessBoundaryProps } from "./session-access";
+export { SessionAccessLifecycle, sessionScopeKey } from "./lifecycle";
+export {
+  SessionAccessCapabilityRegistry,
+  SessionAccessFeature,
+} from "./feature";
+export {
+  SESSION_ACCESS_CAPABILITY,
+  SESSION_ACCESS_MANIFEST,
+} from "./manifest";
+export type {
+  SessionAccessState,
+  SessionScopeSnapshot,
+  SessionScopeView,
+  VerifiedSessionScope,
+} from "./contracts";
+
 export { WorkflowPage } from "./workflow-page";
 export type { WorkflowPageProps } from "./workflow-page";

@@ -1,0 +1,100 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-SESSION_ACCESS",
+  "task_id": "1.16",
+  "status": "ACCEPTED",
+  "owner_specification": "app/ui/README.md",
+  "baseline_commit": "e16979c14f7e2968864da564e304f7d8f6c29bca",
+  "acceptance_commit": "task-closeout:20260908-175504-814467-complete-selected-implementation-entries-1.16-session-access",
+  "requirements": [
+    {
+      "id": "FR-TRC-UI-SESSION_ACCESS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/app/__tests__/traceability.test.tsx::test_trc_present_session_access_001"
+    },
+    {
+      "id": "FR-TRC-UI-SESSION_ACCESS-002",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/app/__tests__/traceability.test.tsx::test_trc_present_session_access_002"
+    },
+    {
+      "id": "NFR-TRC-UI-SESSION_ACCESS-001",
+      "status": "PASS",
+      "evidence_target": "app/ui/src/app/__tests__/lifecycle.test.tsx::test_trc_present_session_access_nfr_001"
+    },
+    { "id": "NFR-A-001", "status": "PASS", "evidence_target": "Feature-local contract, manifest, lifecycle, registration, tests, and owner documentation" },
+    { "id": "NFR-A-002", "status": "PASS", "evidence_target": "Exact ui.access-gate@1 registration with no import-time side effects" },
+    { "id": "NFR-A-003", "status": "PASS", "evidence_target": "Server identity remains authoritative; local contracts are presentation-only" },
+    { "id": "NFR-A-004", "status": "PASS", "evidence_target": "SessionAccessLifecycle owns abort, clear-on-release reset, pending cleanup, generation, and disposal" },
+    { "id": "NFR-A-005", "status": "PASS", "evidence_target": "Public typed backend/auth boundaries consumed; no backend feature implementation import" },
+    { "id": "NFR-A-006", "status": "PASS", "evidence_target": "Focused removable feature files and exact-withdrawal evidence" },
+    { "id": "NFR-P-002", "status": "PASS", "evidence_target": "At most 128 bounded projection registrations with 128-character safe keys" },
+    { "id": "NFR-P-003", "status": "PASS", "evidence_target": "One current generation/signal and no duplicate projection registration" },
+    { "id": "NFR-P-005", "status": "PASS", "evidence_target": "Focused Vitest, TypeScript typecheck, and Next production build" },
+    { "id": "NFR-P-013", "status": "PASS", "evidence_target": "Scope changes abort instead of retrying account-bound work" },
+    { "id": "NFR-R-002", "status": "PASS", "evidence_target": "Separate recovering, unauthenticated, unauthorized, expired, unavailable, and authorized outcomes" },
+    { "id": "NFR-R-003", "status": "PASS", "evidence_target": "Generation fencing rejects late old-scope completions" },
+    { "id": "NFR-R-005", "status": "PASS", "evidence_target": "Idempotent projection release, Strict Mode-safe boundary unmount, feature withdrawal, and lifecycle disposal" },
+    { "id": "NFR-S-001", "status": "PASS", "evidence_target": "Protected children require non-empty server-derived principal/account/workspace scope" },
+    { "id": "NFR-S-002", "status": "PASS", "evidence_target": "Existing HttpOnly cookie and typed client CSRF boundaries retained" },
+    { "id": "NFR-S-003", "status": "PASS", "evidence_target": "Projection keys reject unbounded or payload-shaped values" },
+    { "id": "NFR-S-004", "status": "PASS", "evidence_target": "No credential/token persistence or source-object deletion introduced" },
+    { "id": "NFR-S-005", "status": "PASS", "evidence_target": "Incomplete/expired/unknown scope fails closed without mounting protected content" },
+    { "id": "NFR-S-006", "status": "PASS", "evidence_target": "Offline secret-safe usage output and production build" },
+    { "id": "NFR-TRC-SHARED-BOUNDARIES", "status": "PASS", "evidence_target": "Manifest, contracts, lifecycle, UI bridge, and owner registry agree" },
+    { "id": "NFR-TRC-SHARED-CONFIG", "status": "PASS", "evidence_target": "Manifest and README declare no feature configuration keys" },
+    { "id": "NFR-TRC-SHARED-EVIDENCE", "status": "PASS", "evidence_target": "Named AT/ATN tests, offline usage, and acceptance manifest" },
+    { "id": "NFR-TRC-SHARED-INTEGRITY", "status": "PASS", "evidence_target": "Typed scope validation, exact generation identity, and repository validation commands" },
+    { "id": "NFR-TRC-SHARED-STORED-IDENTITY", "status": "PASS", "evidence_target": "Stable principal/account/workspace scope identity; stale generation cannot become current" }
+  ],
+  "catalogue_entries": [
+    "ui.access-gate@1 exact removable contribution",
+    "Recovering, authorized, unauthenticated, unauthorized, expired, and unavailable presentation states",
+    "Verified principal/account/workspace scope generation",
+    "Bounded projection reset, abort signal, stale completion fence, and exact withdrawal"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/ui/src/app/contracts.ts plus strict scope/state traceability tests"
+    },
+    "provider": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "FEAT-UI-SESSION_ACCESS owns presentation only; identity provider behavior is owned and accepted by FEAT-IFACE-OPERATE_IDENTITY."
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "ProtectedLayout composes SessionAccessBoundary with the existing router/AppShell; exact registry withdrawal retains unrelated entries."
+    },
+    "interfaces": {
+      "status": "PASS",
+      "evidence": "The existing typed /api/v1/auth/me client consumes stable authentication, authorization, dependency, and upstream failure codes from the accepted identity/API boundary."
+    },
+    "ui": {
+      "status": "PASS",
+      "evidence": "Four focused Vitest files passed 22 tests, including mounted typed-client cancellation and Strict Mode replay; offline usage, TypeScript typecheck, and Next production build passed."
+    },
+    "end_to_end": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "This Task proves deterministic component/browser-DOM behavior without external credentials; real-provider Phase 1 authentication/browser qualification remains Task 1.30."
+    }
+  },
+  "commands": [
+    { "command": "uv run --frozen python scripts/generate_phase0_evidence.py --write", "exit_code": 0 },
+    {
+      "command": "npm --prefix app/ui test -- --run src/app/__tests__/traceability.test.tsx src/app/__tests__/lifecycle.test.tsx src/app/protected-layout.test.tsx src/context/auth.test.tsx",
+      "exit_code": 0
+    },
+    { "command": "npm --prefix app/ui run usage -- src/app/_usage.tsx", "exit_code": 0 },
+    { "command": "npm --prefix app/ui run typecheck", "exit_code": 0 },
+    { "command": "npm --prefix app/ui run build", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_phase0.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/validate_feature_docs.py", "exit_code": 0 },
+    { "command": "uv run --frozen python scripts/architecture_check.py", "exit_code": 0 },
+    { "command": "git diff --check -- . ':(exclude).agents/task/**'", "exit_code": 0 }
+  ],
+  "review": {
+    "reviewer_verdict": "PENDING",
+    "reviewer_notes": "Executor evidence is terminal but untrusted until independent Review 1. No future approval is claimed."
+  }
+}

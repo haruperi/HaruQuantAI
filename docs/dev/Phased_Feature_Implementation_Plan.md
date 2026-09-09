@@ -1074,9 +1074,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-16"></a>
 
-### - [ ] Task 1.16 — FEAT-UI-SESSION_ACCESS — Present session access and scope changes
+### - [x] Task 1.16 — FEAT-UI-SESSION_ACCESS — Present session access and scope changes
 
-**Status:** `PARTIAL` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
+**Status:** `PROVED_COMPLETE` · **Domain:** UI · **Owner specification:** `app/ui/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** 1.02, 1.13.
 
@@ -1122,7 +1122,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `fix(ui): complete FEAT-UI-SESSION_ACCESS`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260908-175504-814467-complete-selected-implementation-entries-1.16-session-access` · verified-scope access boundary, distinct fail-closed states, mounted typed-client cancellation, awaited projection cleanup, Strict Mode-safe disposal, exact removal, tests, usage, and evidence manifest.
 
 ---
 
