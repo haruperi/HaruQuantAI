@@ -1,0 +1,14 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-RUN_MONITOR",
+  "task_id": "1.29",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id": "FR-TRC-UI-RUN_MONITOR-001", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-UI-RUN_MONITOR-002", "status": "IMPLEMENTED_WITH_OWNER_ADAPTER"},
+    {"id": "NFR-TRC-UI-RUN_MONITOR-001", "status": "IMPLEMENTED"},
+    {"id": "NFR-TRC-UI-RUN_MONITOR-002", "status": "IMPLEMENTED"}
+  ],
+  "notes": "The widget fails visibly closed without interfaces.operate-jobs@1. It bounds rows, keeps unknown progress indeterminate, and keeps domain outcome/control acknowledgement distinct. Browser/SSE E2E remains pending.",
+  "review": {"reviewer_verdict": "PENDING"}
+}
