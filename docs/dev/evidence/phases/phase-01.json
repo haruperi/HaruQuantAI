@@ -1,0 +1,38 @@
+{
+  "phase": "01",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "checkpoint_owner": "FEAT-UI-DEBUG_CONSOLE",
+  "feature_commits": {
+    "1.15": "d82655cd9024f792824d18972a8f12d79b847cf0",
+    "1.16": "b5ac9fea79e1a365f3444ef6e2f5f2020d744b95",
+    "1.17": "144c6debd03a846abfb93e7189cb15dc09821b5c",
+    "1.18": "399f4d5dc11c895c70fd005ddaf07c9ddbcfa822",
+    "1.19": "9fe3d36388b1f2a23fc5f7c0b3c2de4a51ffe20b",
+    "1.20": "37025ab0c8ea5eb33ccbc8fd84736a8338e49c85",
+    "1.21": "461e95326b47a850b58f5061e04df48e311687d4",
+    "1.22": "08e4b13bd68ccd404a1b07365afb6810671b7949",
+    "1.23": "968bf635faa4fd5519744a75a8082a40944f41dd",
+    "1.24": "8a0ccaf586a587f48e28fa7716bd1095d92c73d7",
+    "1.25": "e2fd71dd41ee884bb3e24277c2cfd2885e6464cd",
+    "1.26": "afe02b0406bc09db61e227414827df5a9e11bed1",
+    "1.27": "0c4c76cd44466e9f3398dbd35f81185c8a3c77e1",
+    "1.28": "56935e4f860cd67cd523e1aca30333f2415cd0e8",
+    "1.29": "02fbdeaf0c38e00015709c5db4f4fca910495a84",
+    "1.30": null
+  },
+  "checkpoint_spec": "tests/ui/e2e/research/phase_01.spec.ts",
+  "required_flow": [
+    "sign in",
+    "open real workspace",
+    "change versioned setting",
+    "submit bounded demo job",
+    "observe and cancel in Jobs",
+    "inspect redacted diagnostics",
+    "reopen layout and prove retained owner state"
+  ],
+  "execution": {
+    "status": "PENDING",
+    "reason": "Repository connector can write/read GitHub but does not execute the local browser/runtime benchmark suite. No E2E pass is claimed."
+  },
+  "review": {"reviewer_verdict": "PENDING"}
+}

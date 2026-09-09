@@ -1,0 +1,14 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-DEBUG_CONSOLE",
+  "task_id": "1.30",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id": "FR-TRC-UI-DEBUG_CONSOLE-001", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-UI-DEBUG_CONSOLE-002", "status": "IMPLEMENTED"},
+    {"id": "NFR-TRC-UI-DEBUG_CONSOLE-001", "status": "IMPLEMENTED"},
+    {"id": "NFR-TRC-UI-DEBUG_CONSOLE-002", "status": "IMPLEMENTED"}
+  ],
+  "notes": "Clear is local display state only; retained audit deletion is not exposed. React text rendering keeps attacker-controlled markup inert. Browser accessibility/lifecycle execution remains pending.",
+  "review": {"reviewer_verdict": "PENDING"}
+}
