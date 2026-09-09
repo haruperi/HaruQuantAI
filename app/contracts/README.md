@@ -314,7 +314,7 @@ The following inventory is machine-readable acceptance data. Defined contracts d
 
 **Public records:** `WorkspaceRef`, `WorkspaceVersion`, `WorkspaceConfiguration`, `RuntimeConfiguration`, `StorageGuardPolicy`, `WorkspaceWriterLease`, `WorkspaceWriterFence`, `WorkspaceBackupManifest`, `WorkspaceRestorePlan`, `SecretRef`, `PrincipalRef`, `LocalSession`, `SystemHealth`, `SystemReadiness`, `DiagnosticBundleRef`, `DiagnosticBundleManifest`, `WorkerCapabilityDescriptor`, `WorkerRegistration`, `WorkerLease`, `WorkerTaskEnvelope`, `ArtifactManifest`, `HostedWorkspaceContext`, `WorkspaceAuthorizationDecision`, `WatchlistItemRecord`, `WatchlistRecord`, `ManageWatchlistsRequest`, and `ManageWatchlistsSuccess`.
 
-**Capability bundles (10):** `ManageWorkspacesCapability` (implemented), `PersistenceCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, `HostWorkspacesCapability`, `ManageWatchlistsCapability`, `ManageAccountsCapability`, and `AdministerSettingsCapability`.
+**Capability bundles (11):** `ManageWorkspacesCapability` (implemented), `PersistenceCapability` (implemented), `ConfigureRuntimeCapability` (implemented), `SecureLocalAccessCapability` (implemented), `BuildDiagnosticsCapability` (implemented), `DistributeWorkersCapability`, `HostWorkspacesCapability`, `ManageWatchlistsCapability`, `ManageAccountsCapability`, `AdministerSettingsCapability`, and `ManageArtifactsCapability` (implemented).
 
 ### 4.2 `app/contracts/catalogue/`
 

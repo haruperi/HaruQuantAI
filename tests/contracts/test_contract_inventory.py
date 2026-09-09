@@ -64,7 +64,7 @@ EXPECTED_RECORD_COUNTS: dict[str, int] = {
 
 # Expected "**Capability bundles (N):**" counts per README sections 4.1-4.15.
 EXPECTED_CAPABILITY_COUNTS: dict[str, int] = {
-    "workspace": 10,
+    "workspace": 11,
     "catalogue": 7,
     "data": 16,
     "strategy": 13,
