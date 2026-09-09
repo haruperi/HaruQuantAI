@@ -10,9 +10,11 @@ from pathlib import Path
 from typing import Any
 
 from runtime_policy import RuntimePolicy, scope_fingerprint
+from task_packet import TaskPacketError, build_task_packet, write_task_packet
 from workflow_engine import TASK_REQUIRED, router
 from workflow_protocol import (
     ROLE_INTRINSIC_PATHS,
+    SCHEMA_VERSION,
     SLUG_RE,
     OrchestratorError,
     ScopeMutationError,
@@ -93,6 +95,8 @@ def create_task_state(
         "blockers": [],
         "history": [],
         "next_agent": None,
+        "prompt_schema_version": SCHEMA_VERSION,
+        "direct_correction_rounds": 0,
         "session_generation": "normal",
         "recovery_generation": 0,
     }
@@ -126,8 +130,51 @@ def prepare_task_run(
         state["approval_policy"] = policy.approval_policy
         state["effective_max_iterations"] = policy.max_iterations
         state["scope_fingerprint"] = scope_fingerprint(task)
+    _attach_task_packet(cfg, state)
     _save_state(cfg, state)
     return state
+
+
+def _attach_task_packet(cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    """Generate and attach the source-pinned packet for one Task run."""
+    try:
+        packet = build_task_packet(
+            Path(cfg["repo"]),
+            state["task"],
+            baseline=str(state["baseline"]),
+        )
+    except TaskPacketError as exc:
+        packet = {
+            "schema_version": 1,
+            "packet_kind": "haruquant-task-packet",
+            "task": state["task"],
+            "commit_message": f"task: complete {state['task']['task_id']}",
+            "identity": {
+                "task_id": state["task"].get("implementation_entry", ""),
+                "feature_id": state["task"]["task_id"],
+                "baseline_commit": state["baseline"],
+            },
+            "source_locations": [],
+            "requirements": [],
+            "local_nfrs": [],
+            "shared_nfrs": [],
+            "catalogue_obligations": [],
+            "authorized_write_paths": [],
+            "risk": {"tier": "CRITICAL", "reasons": ["packet input failure"]},
+            "unresolved_decisions": [str(exc)],
+            "planner_required": True,
+            "status": "BLOCKED",
+        }
+    packet_path = Path(cfg["runs_dir"]) / state["run_id"] / "task-packet.json"
+    packet_sha = write_task_packet(packet_path, packet)
+    state["task_packet_path"] = str(packet_path)
+    state["task_packet_sha256"] = packet_sha
+    state["task_packet_status"] = packet["status"]
+    state["risk_tier"] = packet["risk"]["tier"]
+    state["planner_required"] = bool(packet["planner_required"])
+    state["packet_write_paths"] = list(packet["authorized_write_paths"])
+    state["packet_unresolved_decisions"] = list(packet["unresolved_decisions"])
+    state["commit_message"] = str(packet["commit_message"])
 
 
 def prepare_lane_task_run(
@@ -183,6 +230,7 @@ def prepare_lane_task_run(
             "scope_fingerprint": scope_fingerprint(task),
         }
     )
+    _attach_task_packet(cfg, state)
     _save_state(cfg, state)
     return state
 
@@ -589,7 +637,7 @@ def materialize_executor_handoff_correction(
         cfg["transitions"], "ORCHESTRATOR", "EXECUTOR_HANDOFF_CORRECTION"
     )
     metadata = {
-        "prompt_schema_version": 1,
+        "prompt_schema_version": SCHEMA_VERSION,
         "run_id": state["run_id"],
         "task_id": state["task"]["task_id"],
         "iteration": state["iteration"],
@@ -699,7 +747,7 @@ def materialize_reviewer_handoff_correction(
         cfg["transitions"], "ORCHESTRATOR", "REVIEWER_HANDOFF_CORRECTION"
     )
     metadata = {
-        "prompt_schema_version": 1,
+        "prompt_schema_version": SCHEMA_VERSION,
         "run_id": state["run_id"],
         "task_id": state["task"]["task_id"],
         "iteration": state["iteration"],

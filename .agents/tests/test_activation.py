@@ -43,6 +43,11 @@ def _activation_fixture(tmp_path: Path) -> tuple[dict[str, Any], dict[str, Any]]
         (source_root / "docs/templates/prompt/planner.md").read_text(encoding="utf-8"),
         encoding="utf-8",
     )
+    executor_template = tmp_path / "docs/templates/prompt/executor.md"
+    executor_template.write_text(
+        (source_root / "docs/templates/prompt/executor.md").read_text(encoding="utf-8"),
+        encoding="utf-8",
+    )
 
     _git(tmp_path, "init", "-b", "main")
     _git(tmp_path, "config", "user.email", "test@example.invalid")
@@ -63,7 +68,7 @@ def _activation_fixture(tmp_path: Path) -> tuple[dict[str, Any], dict[str, Any]]
             "reviewer": tmp_path / ".agents/task/reviewer.md",
         },
         "next_agent": tmp_path / ".agents/task/next-agent.md",
-        "templates": {"planner": planner_template},
+        "templates": {"planner": planner_template, "executor": executor_template},
         "runs_dir": tmp_path / ".agents/runs",
     }
     baseline = orchestrator._entry_gate(cfg)
@@ -109,6 +114,32 @@ def test_activation_creates_branch_then_planner_artifact(tmp_path: Path) -> None
     assert artifact.metadata["requires_owner_gate"] is False
     assert state["phase"] == "planner"
     assert state["next_agent"]["prompt_sha256"] == orchestrator._sha_text(artifact.raw)
+
+
+def test_executor_ready_packet_skips_exploratory_planner(tmp_path: Path) -> None:
+    """A complete non-critical packet routes through the existing owner gate."""
+    cfg, state = _activation_fixture(tmp_path)
+    packet_path = tmp_path / ".agents/runs/activation-test/task-packet.json"
+    state.update(
+        {
+            "task_packet_path": str(packet_path),
+            "task_packet_sha256": "a" * 64,
+            "task_packet_status": "EXECUTOR_READY",
+            "packet_write_paths": ["demo.txt"],
+            "planner_required": False,
+            "risk_tier": "STANDARD",
+        }
+    )
+
+    orchestrator._activate_task(cfg, state)
+
+    artifact = orchestrator.parse_next_agent(cfg["next_agent"])
+    assert artifact.metadata["target_role"] == "EXECUTOR"
+    assert artifact.metadata["handoff"] == "PACKET_READY"
+    assert artifact.metadata["requires_owner_gate"] is True
+    assert artifact.metadata["owner_gate"] == "APPROVED: EXECUTE"
+    assert artifact.metadata["allowed_write_paths"] == ["demo.txt"]
+    assert state["phase"] == "approve"
 
 
 def test_activation_fails_before_branch_creation_for_empty_component(

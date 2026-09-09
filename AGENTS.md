@@ -30,9 +30,16 @@
 
 ## 2. Atomic Task workflow
 
-The atomic development workflow is **Planner → Executor → Reviewer**. `.agents/protocol.toml` is the machine-readable Task transition contract. Canonical role prompts live in `docs/templates/prompt/`; `.agents/task/next-agent.md` is the complete instantiated prompt for the next reasoning role.
+The atomic development workflow is risk-tiered above a shared
+**Executor → Reviewer** acceptance core. A deterministic, source-pinned Task
+packet routes executor-ready Routine/Standard work directly to the execution
+owner gate; Critical or unresolved work first receives targeted Planner
+analysis. `.agents/protocol.toml` is the machine-readable transition contract.
+Detailed operating procedure belongs in `.agents/PROCEDURE.md` and must not be
+loaded when the current packet and role contract already provide the applicable
+instructions.
 
-A **Task** is the smallest coherent implementation unit that should receive its own planning, implementation, independent review, branch and Git commit. Planner phases/tasks are subdivisions inside one Task; they are not separate workflow runs.
+A **Task** is the smallest coherent implementation unit that should receive its own prepared authority packet, implementation, independent review, branch and Git commit. Targeted planning is required when risk or unresolved decisions demand it. Planner phases/tasks are subdivisions inside one Task; they are not separate workflow runs.
 
 **Role-invocation invariant:** no Planner, Executor, or Reviewer invocation may occur unless its complete prompt already exists in `.agents/task/next-agent.md` and has passed protocol validation. This includes the initial Planner invocation after task activation and every same-role resumed iteration.
 
@@ -69,7 +76,10 @@ The orchestrator is not a reasoning role. It may only perform deterministic life
 - Every new Task begins from a clean `main` entry gate and recorded baseline HEAD.
 - Registered features use `feature/<feature-id>-<slug>`; other Tasks use `task/<task-id>-<slug>`. Names are lowercase filesystem-safe refs and must pass `git check-ref-format --branch`.
 - During `ORCHESTRATOR / TASK_ACTIVATED`, the orchestrator derives, validates, creates, and switches to exactly one Task branch from the recorded baseline.
-- After branch creation, the orchestrator instantiates the canonical Planner prompt into `.agents/task/next-agent.md`, validates the full `TASK_ACTIVATED -> PLANNER` artifact, and only then may Planner run.
+- After branch creation, the orchestrator generates and fingerprints the Task
+  packet. `EXECUTOR_READY` Routine/Standard packets instantiate Executor and
+  pause at `APPROVED: EXECUTE`; Critical, incomplete, ambiguous or stale packets
+  instantiate Planner through `TASK_ACTIVATED -> PLANNER`.
 - Planner verifies but never creates or switches the Task branch.
 - Planner, Executor, and Reviewer work sequentially on that branch until authorized close-out.
 - `main` remains clean and unchanged throughout planning/execution/review.
@@ -82,16 +92,16 @@ ORCHESTRATOR READY / TASK NONE
   → Task specification prepared
   → ORCHESTRATOR: TASK_ACTIVATED
   → Task branch creation
-  → Planner Dry Run N
+  → prepared-packet gate OR targeted Planner Dry Run N
   → PENDING_APPROVAL
   → execute gate: exact owner message or frozen run preauthorization
   → Executor Report N
   → READY_FOR_REVIEW
+  → controller integration gate and exact-input validation receipt
   → Reviewer Review N
   → PENDING_COMMIT
   → commit gate: exact owner message or frozen run preauthorization
-  → controller integration gate against accepted main and frozen reviewed state
-  → Reviewer close-out
+  → deterministic Controller close-out
   → ACCEPTED
   → ORCHESTRATOR READY / TASK NONE
 ```
@@ -99,7 +109,13 @@ ORCHESTRATOR READY / TASK NONE
 Correction paths:
 
 - Executor `BLOCKED` → next Planner dry run in the same Planner role conversation for this Task run.
-- Reviewer `CHANGES_REQUESTED` → next Planner dry run in the same Planner role conversation for this Task run.
+- Reviewer `IMPLEMENTATION_FIX` → Executor correction → Reviewer, for at most
+  two unchanged-scope rounds; exhaustion returns to targeted Planner analysis.
+- Reviewer/Executor `DESIGN_CHANGE` → targeted Planner analysis.
+- `ADMINISTRATIVE_RETRY` and `ENVIRONMENT_FAILURE` preserve the candidate and
+  allow at most one identical controller retry. They never authorize source,
+  policy, secret-baseline, commit or merge changes.
+- Legacy `CHANGES_REQUESTED` artifacts return to Planner only for compatibility.
 - Owner rejection of execution or commit gate → next Planner dry run with the owner direction.
 - Planner `BLOCKED` → owner resolves the documented cause; Planner resumes its same role conversation with a fresh canonical prompt.
 - Planner blocker resolution replaces the stale retry artifact with a fresh canonical `ORCHESTRATOR / BLOCKER_RESOLVED → PLANNER` prompt fingerprinted against the resolved repository state.
@@ -107,11 +123,18 @@ Correction paths:
 
 In `approval_policy = "interactive"`, execution authorization is valid only when the entire trimmed owner message is exactly `APPROVED: EXECUTE`, and commit authorization is valid only when it is exactly `APPROVED: COMMIT`. In `approval_policy = "unattended"`, those same protocol gates may instead be satisfied by `RUN_PREAUTHORIZATION` frozen from schema-v3/v4 `.agents/run-config.toml` at run activation. Execute requires `allow_execute`; close-out requires both `allow_local_commit` and `allow_local_merge`. A preauthorization record must state its true source plus the frozen policy and scope SHA-256 values and must never claim that a human sent an approval message.
 
-After either valid execute-gate source, the orchestrator may append only the deterministic factual gate record to Planner journal. The approved plan SHA-256 is computed from exact pre-gate Planner bytes and independently verified before Executor/Reviewer invocation.
+After either valid execute-gate source, the Controller records a truthful
+authorization bound to either the approved pre-gate Planner bytes or the exact
+executor-ready packet. It appends to Planner journal only for Planner-owned
+authority; packet-owned authorization is stored in ignored run state and never
+manufactures Planner evidence.
 
 ### 2.5 `next-agent.md` as role boundary
 
-Every reasoning-role prompt begins with TOML front matter using prompt schema version 1 and records run/task/iteration, source/target role, handoff, branch, baseline, source HEAD, canonical template path, and owner-gate requirement.
+Every new reasoning-role prompt uses schema version 2 and records
+run/task/iteration, source/target role, handoff, branch, baseline, source HEAD,
+canonical template, gate requirement and packet/risk identity when applicable.
+Schema version 1 is read-only compatibility for already-frozen runs.
 
 The orchestrator validates transition/template, schema, branch/baseline/HEAD, protected incoming-role sentinels, unfilled placeholders, prompt/template hashes and complete working-tree fingerprint. Outgoing roles may populate Task-specific facts but may not weaken the incoming role's canonical role, authority, methodology, quality criteria, or handoff contract.
 
@@ -120,7 +143,8 @@ The orchestrator validates transition/template, schema, branch/baseline/HEAD, pr
 - **Planner → Executor:** approved scope, exact path authority, implementation order, requirements, validation, rollback, risks.
 - **Executor → Reviewer:** changed paths, requirements claimed complete, commands/tests reported, limitations, deviations, assumptions, risks, labeled `UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED`.
 - **Executor → Planner (`BLOCKED`):** blocker, evidence, partial-work state, affected paths, safe retained work/rollback, exact decision required.
-- **Reviewer → Planner:** failed requirement/gate, independent evidence, required correction, valid retained work, scope needing reconsideration.
+- **Reviewer → Executor (`IMPLEMENTATION_FIX`):** exact failed expectation, independent evidence, unchanged approved scope, valid retained work and bounded correction count.
+- **Reviewer → Planner (`DESIGN_CHANGE`):** failed requirement/gate, independent evidence, required design decision, valid retained work and scope needing reconsideration.
 
 ### 2.7 Canonical professional role contracts
 
@@ -131,42 +155,34 @@ The orchestrator validates transition/template, schema, branch/baseline/HEAD, pr
 | `PLANNER` | Principal Software Architect and Implementation Planner | `docs/templates/prompt/planner.md` |
 | `EXECUTOR` | Senior Software Implementation Engineer | `docs/templates/prompt/executor.md` |
 | `REVIEWER` | Principal Software Verification and Code Review Engineer | `docs/templates/prompt/reviewer.md` |
-| `REVIEWER` close-out | Release Integrity and Change-Control Engineer | `docs/templates/prompt/reviewer-closeout.md` |
+| Controller close-out | Deterministic non-reasoning contract | `docs/templates/prompt/reviewer-closeout.md` |
 
 ### 2.8 Role Session Continuity
 
-**Cross-role isolation and same-role continuity are independent properties.** Every Task run owns one logical conversation for Planner, one for Executor, and one for Reviewer. Repeated iterations resume that same-role conversation; Reviewer close-out continues the same Reviewer conversation. A new Task run starts new role conversations.
+**Cross-role isolation and same-role continuity are independent properties.** Every Task run owns one logical conversation for each reasoning role it actually invokes. Repeated iterations resume that same-role conversation. Close-out is deterministic Controller work and has no role conversation. A new Task run starts new role conversations.
 
 ```text
 Planner 1 → Planner 2 → Planner 3
 Executor 1 → Executor 2 → Executor 3
-Reviewer 1 → Reviewer 2 → Reviewer 3 → Reviewer close-out
+Reviewer 1 → Reviewer 2 → Reviewer 3 → Controller close-out
 
 Planner session ≠ Executor session ≠ Reviewer session
 ```
 
 Session history is context only. Authority order remains repository evidence and deterministic Python workflow state, then the current validated `next-agent.md` role/Task contract.
 
-Mode semantics:
-
-- `solo`: the current IDE chat performs deterministic Controller duties and adopts Planner, Executor and Reviewer sequentially from each validated `next-agent.md`; it invokes no subagent or reasoning-role CLI session. Role boundaries remain explicit, but cross-role isolation is soft.
-- `solo-headless`: the deterministic Controller invokes one configured native CLI identity and one shared native conversation sequentially across Planner, Executor and Reviewer; cross-role isolation is soft.
-- `delegate`: the current IDE chat remains Controller and invokes one distinct inspectable app-native role agent for Planner, Executor and Reviewer per Task run. Later same-role iterations and Reviewer close-out resume the exact stored app-agent handle.
-- `delegate-headless`: the deterministic Controller invokes one configured CLI vendor with a distinct persistent native session per role per Task run; later same-role iterations resume that session.
-- `delegate-multi`: each CLI role may use a separately configured vendor/model and each turn may launch a fresh OS process, but it resumes the exact stored native conversation ID for that role under `.agents/runs/<task-run-id>/role-sessions.json`. Returned identity mismatch fails closed.
-- `manual`: operator keeps Orchestrator, Planner, Executor, Reviewer chats for the Task and returns to the same role chat on later iterations; close-out uses the existing Reviewer chat.
-
-Schema-v3 `.agents/run-config.toml` is authoritative for mode, headless role identities, approval policy, iteration limit, unattended local permissions and recovery policy. All six modes support interactive or frozen unattended gate authorization; unattended mode changes gate authorization only and does not change the selected role transport. All modes use the Task/Goal CLI for deterministic state transitions. IDE-native `solo` and `delegate` pause at a validated role boundary for this chat to perform or delegate the role; `solo-headless`, `delegate-headless` and `delegate-multi` invoke CLI sessions; `manual` waits for operator-managed role chats. Automatic Sol/high recovery-session generation remains headless-only. Schema-v2 names remain resume-compatible and map as `solo → solo-headless`, `delegate → delegate-headless`, and `multi-delegate → delegate-multi` without changing frozen schema-v2 fingerprints. Missing-schema legacy configuration is compatibility-only and does not enable unattended execution.
-
-Unattended runs remain finite. If the normal iteration limit is exceeded and recovery is enabled, the controller may create exactly one fresh recovery session generation for Planner/Executor/Reviewer using `codex/gpt-5.6-sol/high` and allow exactly one additional correction iteration. Exhaustion after that generation is terminal `MAX_ITERATIONS`. Recovery sessions never replace the configured parent identities and are never reused by the next Task or Goal child.
-
-Schema-v4 is the canonical extension of schema-v3 and adds only the optional
-parallel Goal policy. Schema-v2/v3 inputs retain their existing sequential
-semantics and fingerprints.
+`.agents/run-config.toml` freezes role transport, identities, approval policy,
+iteration bounds, local permissions, recovery, and optional parallel-Goal
+policy. Transport never changes role authority or owner gates. Same-role
+iterations resume their Task-local identity; identities never cross roles or
+Task runs; deterministic close-out has no role identity. Unattended runs remain
+finite and may use only the configured single bounded recovery generation.
+Schema-v2/v3 compatibility and the complete mode-specific procedure live in
+`.agents/PROCEDURE.md`; `.agents/protocol.toml` remains machine-authoritative.
 
 ### 2.9 Deterministic Goal supervision
 
-A **Goal** is a supervisory implementation objective containing multiple independently reviewable/committable Tasks. Goal orchestration extends the workflow **above** the atomic Task workflow; it does not modify or duplicate the Planner → Executor → Reviewer state machine.
+A **Goal** is a supervisory implementation objective containing multiple independently reviewable/committable Tasks. Goal orchestration extends the workflow **above** the risk-tiered atomic Task workflow; it does not modify or duplicate its packet, reasoning-role, receipt, or close-out state machine.
 
 Architecture:
 
@@ -175,60 +191,34 @@ Goal Controller
     ↓ creates/selects one child Task
 Task Orchestrator
     ↓
-Planner → Executor → Reviewer
+Prepared packet → optional Planner → Executor → Reviewer → Controller close-out
     ↓
 Task ACCEPTED
     ↓
 Goal Controller → next child
 ```
 
-Rules:
+The Goal Controller is deterministic and owns only frozen child selection/order,
+child Task identities, progress, and terminal reconciliation. It performs no
+reasoning, owns no Goal branch/commit, and grants no new authorization. Every
+child retains the full Task protocol, starts from accepted `main`, and produces
+its own reviewed implementation and merge commits. Corrections never advance
+Goal progress; failed/cancelled children block rather than being skipped or
+rolled back automatically.
 
-- Goal Controller and Task Orchestrator are two deterministic state-machine layers in one orchestration system, not separate AI agents.
-- Goal Controller owns selection, frozen child order, child Task run identity, progress/checkpointing and Goal terminal state only.
-- Goal Controller never performs Planner/Executor/Reviewer reasoning and never directly invokes role-session transport.
-- `.agents/goal.toml` is runtime Goal input; `.agents/goals/<goal-run-id>/state.json` is runtime Goal state. Goal runtime state stores child Task run IDs but no Planner/Executor/Reviewer session IDs.
-- Supported v1 Goal selection is explicit tracker entries, one numbered phase/prefix, or all open tracker entries. Selection is resolved and frozen at Goal activation; later tracker edits never silently expand active Goal scope.
-- Sequential Goals retain exactly one active child. An explicitly configured schema-v4 parallel Goal may own at most three active draft children, one per isolated lane worktree. Parallel children retain the ordinary Task protocol, independent run/session/journal state and exact owner gates; only draft work overlaps in time and acceptance remains serialized.
-- Every child Task begins from a recorded clean accepted `main`, owns its own Task branch, Task run ID, P/E/R role-session set, owner gates, review, exactly one Task implementation commit, and one explicit merge commit on `main`. A parallel draft whose baseline becomes stale must be archived and refreshed onto latest accepted `main`; overlapping or deferred paths return to Planner, and every refresh requires a fresh independent review before commit authorization.
-- Same-role session continuity is bounded to a child Task. Child N+1 always starts a fresh Planner/Executor/Reviewer conversation set. In `solo`, that logical boundary is also a physical IDE chat boundary guarded by a persisted handoff claim.
-- A Goal has no Goal branch and no Goal commit. Its durable implementation history is the ordered set of accepted child Task implementation commits and their explicit merge commits on `main`.
-- Goals add no authorization token. `APPROVED: EXECUTE` and `APPROVED: COMMIT` remain the only gate labels and always apply to the active child Task; each may be satisfied by its configured interactive or frozen unattended source.
-- Task correction loops do not advance Goal progress. Planner external `BLOCKED` pauses the active child/Goal until that same child is resumed.
-- `stop_on_blocked=false` is valid only with frozen unattended runtime policy. It never skips a child: the controller gives the same Planner conversation one bounded retry to resolve non-critical ambiguity through explicit, reversible, repository-grounded assumptions. It never permits assumptions about owner authorization, credentials, external facts, live-action safety, destructive authority, security policy, acceptance evidence, or scope expansion; protected/external blockers still pause the child.
-- Every child under that policy must carry an `Assumptions for Human Review` section through Planner, Executor and independent Reviewer evidence. The accepted Reviewer section is archived with a SHA-256 in the Goal assumption ledger, including an explicit `NONE` result when no assumption was used.
-- After child `ACCEPTED`, Goal Controller must verify clean `main`, zero-byte active Task workspace, child-run identity and completion of the frozen implementation tracker entry before starting the next child.
-- Child cancellation, max iterations, preparation failure or acceptance reconciliation failure blocks the Goal. Previously accepted child commits remain on `main`; Goal supervision never auto-rolls them back.
-- Goal becomes `ACCEPTED` only when every frozen child is accepted, every selected tracker entry is complete, `main` is clean, and no Task is active.
-
-Parallel Goal extension:
-
-- Parallelism is opt-in and orthogonal to role transport. Schema-v2/v3 policies and Goals without `parallelism = 3` retain sequential behavior.
-- The only standard lanes are `codex`, `gemini`, and `zcode`. Each lane uses a controller-owned worktree under `.agents/worktrees/<goal-run-id>/<lane>` and its own `.agents/task/`, runs, logs, lock and role-session evidence.
-- The controller derives readiness from the frozen SHA-256 of `docs/dev/evidence/dependency-schedule.json` `schedule_constraints`. Every predecessor must be accepted on `main`; manifest drift fails closed.
-- Planner may run before path leasing. Before an execute gate is applied, the controller atomically leases every exact non-deferred write path. A collision blocks that child without granting execution. Deferred shared paths are forbidden to the draft Executor and are reconciled only after serialized refresh.
-- A passed draft review is `DRAFT_REVIEWED`, not acceptance evidence and not commit authority. Reviewed drafts retain their leases while queued.
-- Exactly one integration transaction may run. It archives and hashes the reviewed draft, compares its paths with upstream changes, and recreates the Task directly above latest accepted `main`. It never rebases, cherry-picks, or resolves semantic conflicts mechanically. Overlap or deferred work returns the same Task to Planner; an exact disjoint replay still requires a fresh Reviewer decision.
-- Interactive approval is lane-scoped by the validated command/worktree context. If more than one lane is active, omission of lane identity fails before applying `APPROVED: EXECUTE` or `APPROVED: COMMIT`; one token never authorizes multiple children.
-- Lane cleanup removes only clean controller-owned worktrees. Dirty, blocked, cancelled, unarchived or unmerged work is preserved. No force removal or force branch deletion is implied.
-
-Transport symmetry:
-
-- `solo`: one IDE chat per Goal child Task. That child chat performs Controller + Planner + Executor + Reviewer sequentially. After an accepted non-final child, the Goal checkpoints `NEXT_CHILD_CHAT_REQUIRED`; `/new` is the preferred desktop action and app-native task creation is the fallback. The fresh chat must claim the exact persisted handoff before the next child is prepared.
-- `solo-headless`: fresh shared native session per child.
-- `delegate`: fresh inspectable app-native P/E/R agent set per child; same-role handle continuity only inside a child.
-- `delegate-headless`: fresh same-vendor CLI P/E/R session set per child.
-- `delegate-multi`: fresh Task run ID and multi-vendor session ledger per child.
-- `manual`: same Goal Orchestrator chat across the Goal, but a new dedicated Planner/Executor/Reviewer chat set per child; reuse those chats only within that child.
-
-`CONTINUE: GOAL` may be used only as chat transport/resume after a child has validly reached `ACCEPTED`; it grants no authority.
+Sequential Goals have one active child. Explicit schema-v4 parallel Goals may
+have at most three isolated draft lanes, but exact-path leases, accepted
+predecessors, current-main refresh, fresh final review, lane-scoped gates, and
+serialized integration remain mandatory. A draft review is not acceptance or
+commit authority. Dirty or unresolved lanes are preserved, never force-cleaned.
+Complete Goal selection, assumption, lane, transport, refresh, reconciliation,
+and chat-handoff rules live in `.agents/GOALS.md` and `.agents/PROCEDURE.md`.
 
 ### 2.10 Quick-Fix mode
 
-`quick-fix` is an explicit versioned, interactive, chat-direct exception for an
-owner who does not want to activate the atomic Task workflow. Its name does not
-limit task size: broad or multi-file work is permitted when the approved dry run
-fully scopes it. It cannot run or become a Goal child.
+`quick-fix` is an explicit versioned, interactive, chat-direct exception outside
+Task/Goal state. Its name does not limit size, but the approved dry run must
+fully scope the work. It cannot become a Goal child.
 
 ```text
 clean main → comprehensive Dry Run in the current chat
@@ -236,31 +226,13 @@ clean main → comprehensive Dry Run in the current chat
            → direct implementation and validation on main
 ```
 
-- When `.agents/run-config.toml` selects `mode = "quick-fix"` and
-  `approval_policy = "interactive"`, do not create/activate `.agents/task.toml`,
-  call Task/Goal activation, create or switch a branch, instantiate role prompts,
-  write `.agents/task/*`, create run/session state, or adopt protocol
-  Planner/Executor/Reviewer roles.
-- Before implementation, inspect repository truth and present a full
-  comprehensive Dry Run in the current chat. It must state the task and
-  requirements, files read, exact files to create/edit/delete and order,
-  contracts/dependencies, blockers/risks/trade-offs, inclusions/exclusions,
-  exact validation, and safe path-specific rollback.
-- Stop after the Dry Run. Execution is authorized only when the entire trimmed
-  next owner message is exactly `APPROVED: EXECUTE`. Any other response is
-  feedback or rejection and requires a revised Dry Run before another gate.
-- After authorization, implement the approved scope directly on a clean `main`
-  regardless of task size. Preserve unrelated user changes, modify only the
-  approved scope, run change-scoped validation, and report actual results.
-- Quick-Fix has no independent Reviewer, commit gate, automatic commit, merge,
-  push, Task archive, or automatic rollback. The validated diff remains
-  uncommitted on `main` unless the owner separately authorizes another Git action.
-- Quick-Fix changes only workflow ceremony. It never grants credentials,
-  external/live-action authority, destructive authority, secret access, scope
-  expansion, or permission to weaken security, quality, architecture, evidence,
-  and acceptance requirements.
-- The deterministic Task and Goal APIs fail closed before mutation while
-  Quick-Fix is selected and direct the operator back to this chat-only procedure.
+It requires clean `main`, a comprehensive current-chat Dry Run, and the exact
+next owner message `APPROVED: EXECUTE`. It creates no Task/Goal/run/role state,
+branch, Reviewer, commit gate, commit, merge, push, archive, or automatic
+rollback. It changes ceremony only: scope, security, quality, architecture,
+evidence, external/live/destructive authority, and separate Git authorization
+remain unchanged. The full required Dry Run fields and operating procedure live
+in `.agents/PROCEDURE.md`; Task/Goal APIs fail closed while Quick-Fix is selected.
 
 Normal Task branch, Reviewer, commit, and no-ff merge rules remain unchanged for
 every non-Quick-Fix mode.
@@ -322,9 +294,17 @@ every non-Quick-Fix mode.
 
 ### Change-scoped testing
 
-During implementation/review, derive the affected set from `git diff --name-only`, staged diff, and untracked paths. Map changed production code to owning and affected contract/consumer/architecture tests.
+During implementation/review, derive the affected set from `git diff --name-only`, staged diff, and untracked paths. Map changed production code to owning and affected contract/consumer/architecture tests. The Controller runs the selected integration candidate once before Reviewer and records full logs plus a source-bound receipt. Reviewer verifies that receipt and runs only additional adversarial checks selected through independent judgment; identical receipted commands are not repeated.
 
-Run bounded tests explicitly, e.g. `uv run pytest --no-cov <selected paths>`. Never run bare/unfiltered pytest or coverage iteratively. Before authorized Task close-out, the controller runs `scripts/ci_check.py --profile integration` against the accepted-main baseline and exact frozen reviewed candidate. Python-changing candidates retain comprehensive coverage; UI candidates retain typecheck, tests and production build. CI repeats candidate-appropriate qualification under the stable `acceptance` status after an independently authorized push.
+Run bounded tests explicitly, e.g. `uv run pytest --no-cov <selected paths>`.
+Never run bare/unfiltered pytest or coverage iteratively. After Executor freezes a
+candidate and before Reviewer starts, the Controller runs
+`scripts/ci_check.py --profile integration` once against accepted main, stores
+full ignored logs and binds a receipt to relevant inputs. Python-changing
+candidates retain comprehensive coverage; UI candidates retain typecheck, tests
+and production build. Unchanged receipts are reused at commit authorization.
+CI repeats candidate-appropriate qualification under the stable `acceptance`
+status after an independently authorized push.
 
 Local Task acceptance is local-first: `ACCEPTED` proves the controller-gated local candidate and exact merge lineage. It does not authorize or claim a push, pull-request merge, remote check result or branch-protection state. Remote publishing and repository administration require separate explicit authority.
 
@@ -361,9 +341,13 @@ Planner identifies documentation impact; Executor applies only approved document
 ## 7. Git authority summary
 
 - Goal Controller: no Goal branch, no Goal commit, no direct product mutation; it may prepare runtime Goal/child Task state and invoke the existing Task API sequentially or through explicitly enabled parallel draft lanes.
-- Task Orchestrator: deterministic clean-main entry gate + one Task-branch creation/switch during `TASK_ACTIVATED`; no reasoning conclusions, ordinary commits, merge, or push.
+- Task Orchestrator: deterministic clean-main entry gate, packet generation/risk
+  routing, one Task-branch creation/switch, validation receipts, and authorized
+  deterministic commit/no-ff merge/cleanup. It makes no review conclusions and
+  never pushes.
 - Planner: no branch creation/switch and no commits/merge/push.
 - Executor: no branch creation/switch, commits/merge/push.
-- Reviewer: one authorized local Task implementation commit + one explicit `git merge --no-ff` commit on `main` + safe merged-branch deletion only after the `APPROVED: COMMIT` gate is satisfied. The merge commit's first parent must be the recorded `main` baseline and its second parent the exact Task commit.
+- Reviewer: no commit, merge, push or branch mutation; it authors the independent review conclusion and selected adversarial-check evidence only.
+- Task Controller: after the `APPROVED: COMMIT` gate, verifies the exact-input receipt and reviewed candidate, stages only packet-authorized paths, creates one local Task implementation commit plus one explicit `git merge --no-ff` commit on `main`, and safely deletes the merged branch. The merge commit's first parent must be the recorded `main` baseline and its second parent the exact Task commit.
 - Normal workflow never authorizes push, force-push, pull, fetch, rebase, reset, clean, amend, force deletion, merge-conflict resolution, or destructive abandonment without separate explicit owner authorization.
 - The `APPROVED: EXECUTE` gate authorizes only the latest dry run of the active child Task. Neither interactive approval nor run preauthorization permits unrelated findings/refactors/dependency upgrades/history rewrites/live or external actions, push, destructive operations, or the rest of a Goal.

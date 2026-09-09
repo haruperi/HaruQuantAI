@@ -154,6 +154,28 @@ def test_report_records_candidate_commands_and_results(
     assert payload["results"][0]["exit_code"] == 0
 
 
+def test_runner_writes_hash_bound_full_log(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Controller mode stores complete command output outside the report."""
+    step = ci_check._step(
+        "log-test",
+        "Log test",
+        "python",
+        "-c",
+        "print('complete output')",
+    )
+
+    result = ci_check.run_command(step, log_dir=tmp_path)
+
+    assert result.exit_code == 0
+    assert result.log_path is not None
+    assert (
+        Path(result.log_path).read_text(encoding="utf-8").startswith("complete output")
+    )
+    assert result.log_sha256 is not None
+
+
 def test_execution_stops_at_first_failure(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

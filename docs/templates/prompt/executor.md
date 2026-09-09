@@ -24,6 +24,9 @@ Owner execution notes: `{{owner_execution_notes}}`
 Implementation tracker: `{{implementation_file}}` entry `{{implementation_entry}}`
 Approved plan hash: `{{approved_plan_hash}}`
 Main baseline commit: `{{baseline_commit}}`
+Prepared Task packet: `{{task_packet_path}}`
+Packet SHA-256/status: `{{task_packet_sha256}}` / `{{task_packet_status}}`
+Conservative risk tier: `{{risk_tier}}`
 Parallel lane, when applicable: `{{lane}}`
 Deferred integration paths: `{{deferred_integration_paths}}`
 
@@ -47,13 +50,19 @@ obligations as pending serialized reconciliation; do not claim them complete.
 After appending the report, compute the SHA-256 of the entire Executor journal in that state and pass that exact value into the Reviewer prompt's `executor_report_hash` field.
 
 If all work succeeds, write a complete standalone Reviewer prompt to `.agents/task/next-agent.md` using `docs/templates/prompt/reviewer.md`.
-If blocked, write a complete standalone Planner prompt to `.agents/task/next-agent.md` using `docs/templates/prompt/planner.md`.
+If a new design, contract, requirement interpretation, security decision or
+scope decision is required, write a complete standalone Planner prompt to
+`.agents/task/next-agent.md` using `docs/templates/prompt/planner.md` and use
+`DESIGN_CHANGE`. Preserve `BLOCKED` for a protected external blocker.
 
 ## 4. Specification
 
 On success the next-agent front matter keeps iteration `{{iteration}}` and must identify `source_role="EXECUTOR"`, `target_role="REVIEWER"`, `handoff="READY_FOR_REVIEW"`, `template_path="docs/templates/prompt/reviewer.md"`, `requires_owner_gate=false`, and an empty `owner_gate`.
 
 On blocker the next Planner prompt uses iteration **{{iteration}} + 1**, identifies `source_role="EXECUTOR"`, `target_role="PLANNER"`, `handoff="BLOCKED"`, `template_path="docs/templates/prompt/planner.md"`, `requires_owner_gate=false`, and leaves `owner_gate` empty.
+
+The `DESIGN_CHANGE` handoff uses the same next-iteration Planner metadata but
+records `handoff="DESIGN_CHANGE"`.
 
 The structured facts for Reviewer must include changed paths, requirements claimed complete, commands/tests reported, known limitations, deviations, unverified assumptions, and risks. Label that section exactly:
 `UPSTREAM CLAIMS — UNTRUSTED UNTIL INDEPENDENTLY VERIFIED`.
@@ -106,6 +115,14 @@ Blocked:
 STOPPED : EXECUTOR
 ACTIVATING : PLANNER
 HANDOFF : BLOCKED
+```
+
+Design decision required:
+
+```text
+STOPPED : EXECUTOR
+ACTIVATING : PLANNER
+HANDOFF : DESIGN_CHANGE
 ```
 
 ## 9. Examples

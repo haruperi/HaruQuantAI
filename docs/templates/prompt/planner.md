@@ -26,6 +26,9 @@ Explicit exclusions: `{{exclusions}}`
 Iteration: `{{iteration}}`
 Task branch: `{{branch}}`
 Main baseline commit: `{{baseline_commit}}`
+Prepared Task packet: `{{task_packet_path}}`
+Packet SHA-256/status: `{{task_packet_sha256}}` / `{{task_packet_status}}`
+Conservative risk tier: `{{risk_tier}}`
 Parallel lane, when applicable: `{{lane}}`
 Integration baseline, when refreshed: `{{integration_baseline}}`
 Implementation tracker: `{{implementation_file}}` entry `{{implementation_entry}}`

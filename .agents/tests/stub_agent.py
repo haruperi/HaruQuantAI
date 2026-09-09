@@ -75,7 +75,7 @@ def _meta(
         allowed = f"allowed_write_paths = [{rendered}]\n"
     return (
         "+++\n"
-        "prompt_schema_version = 1\n"
+        "prompt_schema_version = 2\n"
         f'run_id = "{run_id}"\n'
         f'task_id = "{task_id}"\n'
         f"iteration = {iteration}\n"
@@ -157,8 +157,7 @@ def _closeout_body(iteration: int) -> str:
     return f"""# PROMPT
 
 ## 1. Role
-Act as the **HaruQuantAI Release Integrity and Change-Control Engineer**.
-This prompt defines your complete **close-out-specific role contract**.
+This artifact defines the complete **controller close-out contract**.
 
 ## 2. Context
 Review number: `{iteration}`
@@ -167,7 +166,7 @@ Review number: `{iteration}`
 Perform the explicit no-fast-forward merge after exact authorization.
 
 ## 8. Output Format
-HANDOFF : ACCEPTED
+HANDOFF : PENDING_COMMIT
 """
 
 
@@ -292,12 +291,12 @@ def _reviewer(repo: Path, iteration: int, incoming: dict[str, Any]) -> None:
     _append(
         journal,
         f"\n## Review {iteration}\nIndependent verification passed.\n"
-        "STOPPED : REVIEWER\nACTIVATING : REVIEWER\nHANDOFF : PENDING_COMMIT\n",
+        "STOPPED : REVIEWER\nACTIVATING : CONTROLLER\nHANDOFF : PENDING_COMMIT\n",
     )
     _write_next(
         repo,
         source="REVIEWER",
-        target="REVIEWER",
+        target="CONTROLLER",
         handoff="PENDING_COMMIT",
         iteration=iteration,
         template="docs/templates/prompt/reviewer-closeout.md",

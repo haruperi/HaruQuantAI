@@ -7,9 +7,9 @@
 
 # Agent Workflow — Complete Operational Procedures
 
-HaruQuantAI has one atomic Planner → Executor → Reviewer Task workflow and one deterministic Goal supervisor above it. Six normal transport modes share those semantics. `quick-fix` is the explicit chat-direct exception outside those state machines.
+HaruQuantAI has one risk-tiered atomic Task workflow and one deterministic Goal supervisor above it. Routine/Standard executor-ready packets may omit exploratory Planner work; Critical or unresolved work retains Planner → Executor → Reviewer. Six normal transport modes share those semantics. `quick-fix` is the explicit chat-direct exception outside those state machines.
 
-A Task run owns one logical Planner, Executor and Reviewer continuity boundary. IDE `solo` carries those role contexts sequentially in the same child Task chat; the other modes reuse their same-role agent/session/chat within the Task. For a `solo` Goal, every next child starts in a fresh physical IDE chat as well as fresh role continuity.
+A Task run owns at most one logical Planner, Executor and Reviewer continuity boundary. IDE `solo` carries the required role contexts sequentially in the same child Task chat; the other modes reuse their same-role agent/session/chat within the Task. Deterministic close-out is not a reasoning-role turn. For a `solo` Goal, every next child starts in a fresh physical IDE chat as well as fresh role continuity.
 
 The only owner authorization messages are:
 
@@ -115,7 +115,7 @@ TASK : NONE
 AWAITING : TASK_SPEC
 ```
 
-## Step 2 — Activate Task and Planner
+## Step 2 — Activate Task and route its prepared packet
 
 ```text
 Activate and run the task defined in .agents/task.toml.
@@ -126,16 +126,17 @@ Treat .agents/task.toml as authoritative runtime task input.
 1. validate the clean-main entry gate;
 2. record the main baseline commit;
 3. derive/create/switch to the deterministic task branch;
-4. instantiate the canonical Planner contract into .agents/task/next-agent.md;
-5. validate ORCHESTRATOR / TASK_ACTIVATED -> PLANNER;
-6. activate Planner using the exact complete next-agent.md.
+4. generate and source-validate the compact task packet;
+5. classify risk conservatively and verify that requirements, contracts, predecessors, paths, validation, and unresolved decisions are complete;
+6. for Critical/unresolved work, instantiate and validate the Planner contract;
+7. for Routine/Standard executor-ready work, instantiate and validate ORCHESTRATOR / PACKET_READY -> EXECUTOR and pause at the ordinary execute gate.
 
-Planner must not recreate or switch the task branch.
+Planner, when required, must not recreate or switch the task branch.
 Continue until the selected approval policy requires external action or the Task reaches a role boundary.
 Do not execute implementation without either the exact interactive owner gate or valid frozen RUN_PREAUTHORIZATION.
 ```
 
-Expected gate:
+Expected gate, from Planner or an executor-ready packet:
 
 ```text
 STOPPED : PLANNER
@@ -162,11 +163,11 @@ Owner direction:
 <describe exactly what must change in the dry run>
 ```
 
-A correction gets a fresh current Planner prompt but resumes the same Planner conversation for this Task run.
+A rejected initial gate returns to Planner. A Reviewer-classified implementation correction instead receives a fresh Executor correction prompt and resumes the same Executor conversation.
 
 ### Execution gate — unattended
 
-When `allow_execute=true`, run/resume without `--approved`. The controller verifies the frozen policy and Task-scope fingerprints, records `RUN_PREAUTHORIZATION`, independently hashes the exact approved Planner bytes, and routes to Executor without waiting for an owner message.
+When `allow_execute=true`, run/resume without `--approved`. The controller verifies the frozen policy and Task-scope fingerprints, records `RUN_PREAUTHORIZATION`, independently hashes the exact approved Planner bytes or executor-ready packet, and routes to Executor without waiting for an owner message.
 
 When `allow_execute=false`, the controller stays at `PENDING_APPROVAL`. After the owner sends exact `APPROVED: EXECUTE`, relay it with `resume --approved`; a rejection still uses `resume --reject-feedback "..."`.
 
@@ -183,7 +184,7 @@ Resolution evidence:
 
 The old pending prompt is stale. Orchestrator creates a fresh `BLOCKER_RESOLVED` Planner prompt and resumes the same Planner conversation. Resolution is not execution approval.
 
-Executor `BLOCKED` and Reviewer `CHANGES_REQUESTED` automatically return to the same Planner conversation with a fresh current prompt.
+Executor/Reviewer `DESIGN_CHANGE`, legacy Reviewer `CHANGES_REQUESTED`, and genuine external/design blockers return to the same Planner conversation with a fresh current prompt. Reviewer `IMPLEMENTATION_FIX` returns directly to Executor for no more than two correction rounds before Planner escalation. An allowlisted unchanged-input administrative/environment operation may be retried once without a reasoning invocation; persistent failure stops with evidence.
 
 ## Step 5 — Executor → Reviewer
 
@@ -207,13 +208,14 @@ This only resumes transport. Delegate activates/resumes its dedicated Reviewer h
 
 Every Review N performs:
 
-1. Stage A — independent reconstruction from current repository/task evidence before upstream journals.
-2. Stage B — independent tests/quality/architecture/usage verification.
+1. Stage A — Critical work receives independent reconstruction; Routine/Standard work receives packet-indexed independent source/oracle inspection.
+2. Stage B — verify the controller-produced exact-input integration receipt and run selected adversarial checks rather than repeating the identical comprehensive profile.
 3. Stage C — only then reconcile Planner/Executor journals and hashes.
 
 Outcomes:
 
-- `CHANGES_REQUESTED` → Planner Dry Run N+1 in the same Planner conversation.
+- `IMPLEMENTATION_FIX` → Executor correction using the exact failed expectation, for at most two rounds.
+- `DESIGN_CHANGE` or legacy `CHANGES_REQUESTED` → Planner Dry Run N+1 in the same Planner conversation.
 - `PENDING_COMMIT` → owner commit gate.
 
 ## Step 7 — Commit and merge gate
@@ -237,18 +239,18 @@ Owner direction:
 
 ### Commit gate — unattended
 
-When both `allow_local_commit=true` and `allow_local_merge=true`, run/resume without `--approved-commit`. The controller records `RUN_PREAUTHORIZATION` and routes the existing Reviewer conversation to close-out automatically.
+When both `allow_local_commit=true` and `allow_local_merge=true`, run/resume without `--approved-commit`. The controller records `RUN_PREAUTHORIZATION` and proceeds to deterministic close-out without another reasoning-role invocation.
 
 If either permission is false, the controller stays at `PENDING_COMMIT`. After the owner sends exact `APPROVED: COMMIT`, relay it with `resume --approved-commit`; a rejection still uses `resume --reject-commit-feedback "..."`.
 
-## Step 8 — Reviewer close-out
+## Step 8 — Deterministic controller close-out
 
-After valid interactive or unattended commit authorization, the controller first runs the DT-02 integration profile against accepted `main` and the exact frozen reviewed worktree. It rejects stale identity, changed reviewed bytes, missing results, skipped prerequisites and nonzero exits. Only a passed report advances to close-out.
+The controller ran the DT-02 integration profile once after successful Executor work and before Reviewer activation. It recorded a trusted exact-input receipt containing candidate/base identity, policy, input manifest, command results, durations and complete-log hashes. At commit authorization it verifies that receipt and rejects stale identity, changed product bytes, changed inputs, missing results, skipped prerequisites, edited records and nonzero exits.
 
-Close-out then continues the same Reviewer conversation. It re-verifies reviewed identity and the controller-recorded report hash, confirms archived evidence, runs only applicable check-only commit hooks, stages only approved implementation paths, creates exactly one Task implementation commit, clears coordination files only after commit success, verifies Task branch/main/lineage/path authority, creates an explicit `git merge --no-ff` commit on `main`, verifies that the merge parents are the recorded baseline and exact Task commit, safely deletes the merged Task branch and marks `ACCEPTED`. It does not repeat the comprehensive integration profiles.
+The controller then confirms archived evidence, stages only task-packet-approved implementation paths, creates exactly one Task implementation commit using the packet commit message, clears coordination files only after commit success, verifies Task branch/main/lineage/path authority, creates an explicit `git merge --no-ff` commit on `main`, verifies that the merge parents are the recorded baseline and exact Task commit, safely deletes the merged Task branch and marks `ACCEPTED`. It does not repeat the comprehensive integration profiles or invoke an LLM.
 
 ```text
-STOPPED : REVIEWER
+STOPPED : CONTROLLER
 ACTIVATING : NONE
 HANDOFF : ACCEPTED
 ```
@@ -282,15 +284,15 @@ uv run .agents/orchestrator.py resume --approved-commit
 uv run .agents/orchestrator.py resume --reject-commit-feedback "..."
 ```
 
-Each role turn may be a fresh OS process, but `.agents/session_runner.py` resumes the exact stored native role conversation for the Task run. Reviewer close-out reuses the Reviewer session.
+Each reasoning-role turn may be a fresh OS process, but `.agents/session_runner.py` resumes the exact stored native role conversation for the Task run. Deterministic close-out has no role session.
 
 ## Unattended process-backed procedure
 
 1. Configure one of the three headless modes with `approval_policy = "unattended"`.
 2. Set `allow_execute=true`, `allow_local_commit=true`, and `allow_local_merge=true` for a fully unattended local Task lifecycle.
 3. Run `doctor`, then `start`. Do not pass `--approved` or `--approved-commit`; the controller satisfies enabled gates from the frozen policy.
-4. The process-backed controller invokes Planner, validates its handoff, records execute preauthorization, invokes Executor, invokes Reviewer, records commit/merge preauthorization, and resumes the same Reviewer session for close-out.
-5. Correction loops reuse the exact stored role session: Executor `BLOCKED` or Reviewer `CHANGES_REQUESTED` returns to Planner, then repeats the automatically authorized execute gate.
+4. The process-backed controller invokes Planner only when risk/unresolved decisions require it, records execute preauthorization, invokes Executor, produces the integration receipt, invokes Reviewer, records commit/merge preauthorization, and performs deterministic close-out.
+5. Correction loops reuse the exact stored role session: Reviewer `IMPLEMENTATION_FIX` returns directly to Executor for at most two rounds; design changes and legacy `CHANGES_REQUESTED` return to Planner and repeat the automatically authorized execute gate.
 6. A Planner external blocker still pauses. Resume only after supplying real resolution evidence with `--resolve-planner-blocker`.
 7. If a required unattended permission is false, the run pauses at that gate. Supply the matching flag only after the owner has sent the exact interactive authorization.
 8. If `max_iterations` is exceeded and recovery was explicitly enabled, one fresh `codex/gpt-5.6-sol/high` recovery generation receives exactly one additional correction iteration. A second exhaustion is terminal `MAX_ITERATIONS`.
@@ -314,7 +316,7 @@ For one Task maintain four chats:
 1. Orchestrator.
 2. Planner.
 3. Executor.
-4. Reviewer, also used for close-out.
+4. Reviewer.
 
 On first use of a role, open its dedicated chat and paste the entire exact current `.agents/task/next-agent.md`. On later iterations return to that same role chat.
 
@@ -324,7 +326,7 @@ Manual mode changes who transports prompts, not how gates are authorized:
 
 - With `approval_policy = "interactive"`, the Orchestrator chat waits for exact `APPROVED: EXECUTE` and `APPROVED: COMMIT` before preparing the next role transport.
 - With `approval_policy = "unattended"` and `allow_execute=true`, the Orchestrator records `RUN_PREAUTHORIZATION` immediately after validating Planner `PENDING_APPROVAL` and prepares the Executor transport without requesting owner approval.
-- With `approval_policy = "unattended"` and both local close-out permissions true, the Orchestrator records `RUN_PREAUTHORIZATION` after Reviewer `PENDING_COMMIT` and prepares Reviewer close-out without requesting owner approval.
+- With `approval_policy = "unattended"` and both local close-out permissions true, the Orchestrator records `RUN_PREAUTHORIZATION` after Reviewer `PENDING_COMMIT` and performs deterministic close-out without requesting owner approval.
 - The operator must still move each complete `next-agent.md` prompt to the correct dedicated role chat and report role completion. Unattended authorization does not make `manual` process-backed or allow the Orchestrator to perform a reasoning role.
 - Any disabled required permission falls back to the corresponding exact owner gate. Blockers, corrections, and protected actions never become implicitly authorized.
 
@@ -357,17 +359,17 @@ PROMPT : .agents/task/next-agent.md
 ACTION : OPEN_DEDICATED_PLANNER_CHAT
 ```
 
-After each role finishes, return to Orchestrator and report that invocation finished so it can validate journals/next-agent and route the Task. Rejections and blocker corrections return to existing role chats. At commit approval the close-out instruction must be:
+After each role finishes, return to Orchestrator and report that invocation finished so it can validate journals/next-agent and route the Task. Rejections and design blockers return to the Planner chat; bounded implementation corrections return to the Executor chat. At commit approval no role transport is required: the Orchestrator verifies the receipt and performs deterministic close-out.
 
 ```text
-ORCHESTRATOR : READY_FOR_TRANSPORT
-TARGET_ROLE : REVIEWER
+ORCHESTRATOR : READY_FOR_CLOSEOUT
+TARGET_ROLE : CONTROLLER
 HANDOFF : PENDING_COMMIT
 PROMPT : .agents/task/next-agent.md
-ACTION : RETURN_TO_REVIEWER_CHAT
+ACTION : VERIFY_RECEIPT_AND_CLOSE_OUT
 ```
 
-Do not open a separate close-out chat.
+Do not open or resume a reasoning-role chat for close-out.
 
 ## Manual unattended sequence
 
@@ -377,10 +379,9 @@ For a fully preauthorized manual Task:
 2. Planner returns `PENDING_APPROVAL`; Orchestrator validates it and automatically records execute preauthorization.
 3. Orchestrator prepares Executor prompt; operator runs it in the dedicated Executor chat.
 4. Orchestrator prepares Reviewer prompt; operator runs it in the dedicated Reviewer chat.
-5. Reviewer `CHANGES_REQUESTED` returns to the existing Planner chat and repeats the sequence without a human execute approval when `allow_execute=true`.
+5. Reviewer `IMPLEMENTATION_FIX` returns directly to the existing Executor chat for at most two rounds; `DESIGN_CHANGE` or legacy `CHANGES_REQUESTED` returns to Planner.
 6. Reviewer `PENDING_COMMIT` is automatically authorized only when both local close-out permissions are true.
-7. Orchestrator prepares close-out prompt; operator returns to the existing Reviewer chat.
-8. Reviewer performs the implementation commit, explicit no-fast-forward merge, cleanup, and terminal verification.
+7. Orchestrator verifies the exact-input receipt and performs the authorized implementation commit, explicit no-fast-forward merge, cleanup, and terminal verification.
 
 ---
 
@@ -416,8 +417,9 @@ Run `goal-start`. The Goal Controller:
 3. records Goal scope and runtime-policy SHA-256 values;
 4. generates `.agents/task.toml` for the first frozen entry;
 5. creates a unique child Task run and branch from the current clean accepted `main`;
-6. prepares and validates the initial Planner prompt;
-7. hands control to the selected role transport.
+6. generates and validates the task packet and conservative risk route;
+7. prepares Planner for Critical/unresolved work or the execute gate for an executor-ready Routine/Standard packet;
+8. hands control to the selected role transport or gate.
 
 ### Step 3 — Run the active child through the ordinary Task protocol
 
@@ -445,14 +447,14 @@ If an unattended permission required by the current gate is false, the child sta
 
 ### Step 5 — Handle correction and blocker paths
 
-- Executor `BLOCKED`, Reviewer `CHANGES_REQUESTED`, or owner rejection returns to the same child Planner conversation with a fresh validated Planner prompt. Goal progress does not advance.
+- Reviewer `IMPLEMENTATION_FIX` returns directly to the same child Executor conversation for at most two rounds. `DESIGN_CHANGE`, legacy `CHANGES_REQUESTED`, Executor design blockers, or owner rejection returns to the same child Planner conversation with a fresh validated Planner prompt. Goal progress does not advance.
 - Planner external `BLOCKED` pauses the active child and Goal until real resolution evidence is supplied.
 - With frozen unattended policy and `stop_on_blocked=false`, the controller gives the same Planner conversation one bounded retry for an explicit, reversible, repository-grounded assumption. It never skips the child or assumes protected authority, credentials, external facts, destructive safety, acceptance evidence, or scope expansion.
 - Cancellation, terminal max iterations, preparation failure, or acceptance-reconciliation failure blocks the Goal. Previously accepted children remain merged on `main`.
 
 ### Step 6 — Accept and reconcile one child
 
-After valid commit authorization, the existing Reviewer conversation performs close-out. Before Goal progress advances, the Goal Controller verifies:
+After valid commit authorization, the deterministic Task Controller verifies the receipt and performs close-out without a reasoning-role invocation. Before Goal progress advances, the Goal Controller verifies:
 
 1. the child Task reached `ACCEPTED`;
 2. exactly one implementation commit and the explicit merge commit were produced;
@@ -494,8 +496,8 @@ Then:
 
 1. Run `goal-start` without any approval flags.
 2. Complete or invoke each prepared role according to the selected mode. Unattended policy automates gates, not role transport.
-3. After every Planner `PENDING_APPROVAL`, the controller records execute preauthorization and proceeds to Executor.
-4. After every accepted Reviewer result reaches `PENDING_COMMIT`, the controller records commit/merge preauthorization and reuses that Reviewer conversation for close-out.
+3. After every Planner `PENDING_APPROVAL`, or an executor-ready packet gate, the controller records execute preauthorization and proceeds to Executor.
+4. After every accepted Reviewer result reaches `PENDING_COMMIT`, the controller records commit/merge preauthorization and performs deterministic close-out.
 5. After verified child acceptance, transition to the next child using the mode-specific Step 7 procedure.
 6. Repeat until `GOAL_ACCEPTED` or a real blocker/terminal condition is reported.
 

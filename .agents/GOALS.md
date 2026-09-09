@@ -110,7 +110,7 @@ Goal
   → GOAL ACCEPTED
 ```
 
-Task correction loops stay inside the current child. Executor `BLOCKED`, Reviewer `CHANGES_REQUESTED`, owner rejection and later Dry Run/Report/Review iterations do not advance Goal progress. Planner `BLOCKED` receives at most one automatic assumption retry when the frozen unattended Goal permits it; a repeated or protected/external blocker pauses the active child until the existing child is resumed.
+Task correction loops stay inside the current child. Reviewer `IMPLEMENTATION_FIX` returns directly to the same Executor conversation for at most two rounds; `DESIGN_CHANGE`, legacy `CHANGES_REQUESTED`, Executor design blockers, owner rejection and later Dry Run/Report/Review iterations do not advance Goal progress. Planner `BLOCKED` receives at most one automatic assumption retry when the frozen unattended Goal permits it; a repeated or protected/external blocker pauses the active child until the existing child is resumed.
 
 A child cancellation, maximum-iteration terminal state, tracker/branch reconciliation failure, or inability to prepare the frozen next child blocks the Goal. Already accepted child commits remain on `main`; Goal supervision never rolls them back automatically.
 

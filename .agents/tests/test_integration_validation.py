@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -35,6 +36,10 @@ def _write_report(
 ) -> None:
     """Write a synthetic diagnostic report at the controller-selected path."""
     report = Path(command[command.index("--report") + 1])
+    log_dir = Path(command[command.index("--log-dir") + 1])
+    log_dir.mkdir(parents=True, exist_ok=True)
+    log = log_dir / "python-coverage.log"
+    log.write_text("passed\n", encoding="utf-8")
     report.write_text(
         json.dumps(
             {
@@ -66,6 +71,8 @@ def _write_report(
                             "working_directory": ".",
                             "duration_seconds": 1.0,
                             "exit_code": 0,
+                            "log_path": str(log),
+                            "log_sha256": hashlib.sha256(log.read_bytes()).hexdigest(),
                         }
                     ]
                     if complete
@@ -101,6 +108,34 @@ def test_local_gate_records_exact_successful_candidate(
     assert evidence["reviewed_worktree_sha256"] == state["reviewed_worktree_hash"]
     assert evidence["selected_families"] == ["python"]
     assert len(evidence["report_sha256"]) == 64
+    assert len(evidence["receipt_sha256"]) == 64
+
+
+def test_receipt_survives_reasoning_handoff_without_command_rerun(
+    orc: ModuleType,
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Reviewer journal bytes do not invalidate unchanged product evidence."""
+    workflow = _workflow()
+    state["reviewed_head"] = state["baseline"]
+    state["reviewed_candidate_hash"] = workflow.candidate_fingerprint(cfg["repo"])
+    calls = 0
+
+    def execute(command: list[str], _repo: Path) -> int:
+        nonlocal calls
+        calls += 1
+        _write_report(command, base=state["baseline"], head=state["reviewed_head"])
+        return 0
+
+    monkeypatch.setattr(workflow, "_execute_integration_command", execute)
+    state["integration_validation"] = workflow._run_local_integration_gate(cfg, state)
+    cfg["journals"]["reviewer"].write_text("reviewed\n", encoding="utf-8")
+
+    workflow._ensure_local_integration_gate_unchanged(state, cfg["repo"])
+
+    assert calls == 1
 
 
 def test_failed_command_cannot_satisfy_local_gate(
@@ -180,7 +215,7 @@ def test_gate_rejects_validation_that_mutates_reviewed_worktree(
 
     monkeypatch.setattr(workflow, "_execute_integration_command", execute)
 
-    with pytest.raises(orc.OrchestratorError, match="changed reviewed worktree"):
+    with pytest.raises(orc.OrchestratorError, match="changed reviewed candidate"):
         workflow._run_local_integration_gate(cfg, state)
 
 

@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import shutil
@@ -57,6 +58,8 @@ class StepResult:
     working_directory: str
     duration_seconds: float
     exit_code: int
+    log_path: str | None = None
+    log_sha256: str | None = None
 
 
 def _step(
@@ -359,11 +362,12 @@ def build_steps(decision: RoutingDecision) -> tuple[ValidationStep, ...]:
     return tuple(unique)
 
 
-def run_command(step: ValidationStep) -> StepResult:
+def run_command(step: ValidationStep, *, log_dir: Path | None = None) -> StepResult:
     """Execute one validation command and return measured evidence.
 
     Args:
         step: Validation step to execute.
+        log_dir: Optional controller-selected directory for complete output.
 
     Returns:
         Measured command result.
@@ -378,10 +382,25 @@ def run_command(step: ValidationStep) -> StepResult:
     result = subprocess.run(
         command,
         cwd=step.working_directory,
-        capture_output=False,
+        capture_output=log_dir is not None,
         check=False,
     )
     elapsed = time.perf_counter() - started
+    log_path: str | None = None
+    log_sha256: str | None = None
+    if log_dir is not None:
+        log_dir.mkdir(parents=True, exist_ok=True)
+        output = b"".join(
+            value or b""
+            for value in (result.stdout, b"\n--- STDERR ---\n", result.stderr)
+        )
+        path = log_dir / f"{step.step_id}.log"
+        path.write_bytes(output)
+        log_path = str(path)
+        log_sha256 = hashlib.sha256(output).hexdigest()
+        tail = output[-4000:].decode("utf-8", errors="replace").strip()
+        if tail:
+            print(tail)
     status = "SUCCESS" if result.returncode == 0 else "FAILURE"
     print(f"\n[{status}] {step.name}: {elapsed:.2f}s (exit {result.returncode})\n")
     return StepResult(
@@ -391,6 +410,8 @@ def run_command(step: ValidationStep) -> StepResult:
         working_directory=str(step.working_directory),
         duration_seconds=round(elapsed, 6),
         exit_code=result.returncode,
+        log_path=log_path,
+        log_sha256=log_sha256,
     )
 
 
@@ -499,6 +520,11 @@ def _parser() -> argparse.ArgumentParser:
         type=Path,
         help="Write a diagnostic JSON report (not a reusable receipt).",
     )
+    parser.add_argument(
+        "--log-dir",
+        type=Path,
+        help="Store complete per-step logs outside the conversation.",
+    )
     return parser
 
 
@@ -539,7 +565,11 @@ def main(arguments: Sequence[str] | None = None) -> int:
 
     results: list[StepResult] = []
     for step in steps:
-        result = run_command(step)
+        result = (
+            run_command(step, log_dir=options.log_dir)
+            if options.log_dir is not None
+            else run_command(step)
+        )
         results.append(result)
         if result.exit_code != 0:
             break

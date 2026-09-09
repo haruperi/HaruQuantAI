@@ -37,12 +37,14 @@ from parallel_goal_engine import (
 from path_leases import release_leases
 from runtime_policy import RuntimePolicy, scope_fingerprint
 from task_api import (
+    _attach_task_packet,
     apply_planner_blocker_resolution,
     prepare_lane_task_run,
     prepare_task_run,
     resume_task_run,
 )
 from workflow_protocol import (
+    SCHEMA_VERSION,
     OrchestratorError,
     _git_ok,
     _render_next_agent,
@@ -1194,6 +1196,7 @@ def integrate_parallel_draft(
         "archive_sha256": evidence["archive_sha256"],
         **refresh,
     }
+    _attach_task_packet(lane_cfg, child)
     if requires_replan:
         child["iteration"] = int(child["iteration"]) + 1
         child["integration_refreshed"] = False
@@ -1241,7 +1244,7 @@ def integrate_parallel_draft(
         lane_cfg["templates"]["reviewer"], _build_fields(child, lane_cfg)
     )
     metadata = {
-        "prompt_schema_version": 1,
+        "prompt_schema_version": SCHEMA_VERSION,
         "run_id": child["run_id"],
         "task_id": child["task"]["task_id"],
         "iteration": child["iteration"],

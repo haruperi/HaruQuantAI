@@ -10,8 +10,20 @@ from pathlib import Path
 from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from deterministic_closeout import perform_deterministic_closeout
+from failure_routing import (
+    FailureClass,
+    route_failure,
+    run_bounded_environment_operation,
+)
 from ide_transport import IDE_MODES, finish_ide_role, prepare_ide_role
 from runtime_policy import RuntimePolicy
+from validation_receipts import (
+    ValidationReceiptError,
+    candidate_fingerprint,
+    create_validation_receipt,
+    verify_validation_receipt,
+)
 from workflow_protocol import (
     ALL_COORDINATION_PATHS,
     OrchestratorError,
@@ -24,8 +36,6 @@ from workflow_protocol import (
     _validate_activating,
     _verify_approval_chain,
     _worktree_fingerprint,
-    latest_handoff_block,
-    parse_handoff_block,
     validate_next_agent,
 )
 from workflow_runtime import (
@@ -38,6 +48,35 @@ from workflow_runtime import (
     _save_state,
     _write_orchestrator_planner_prompt,
 )
+
+
+def _verify_execution_authority(cfg: dict[str, Any], state: dict[str, Any]) -> None:
+    """Verify the frozen Planner or prepared-packet authorization chain."""
+    if state.get("authority_kind") == "TASK_PACKET":
+        packet_path = Path(str(state.get("task_packet_path", "")))
+        record_path = Path(str(state.get("execute_authorization_path", "")))
+        if not packet_path.is_file() or _sha_file(packet_path) != state.get(
+            "approved_authority_hash"
+        ):
+            raise OrchestratorError("Prepared Task packet is missing or changed.")
+        if not record_path.is_file() or _sha_file(record_path) != state.get(
+            "execute_authorization_sha256"
+        ):
+            raise OrchestratorError(
+                "Prepared execution authorization is missing or changed."
+            )
+        return
+    _verify_approval_chain(
+        journal=cfg["journals"]["planner"],
+        iteration=state.get("approval_iteration", state["iteration"]),
+        task_id=state["task"]["task_id"],
+        baseline=state.get("planning_baseline", state["baseline"]),
+        branch=state.get("planning_branch", state["branch"]),
+        approved_plan_hash=state.get("approved_plan_hash", ""),
+        authorization_source=state.get("execute_authorization_source", "OWNER_MESSAGE"),
+        runtime_policy_fingerprint=state.get("runtime_policy_fingerprint", ""),
+        scope_fingerprint=state.get("scope_fingerprint", ""),
+    )
 
 
 def _handle_task_activation(cfg: dict[str, Any], state: dict[str, Any]) -> None:
@@ -130,18 +169,7 @@ def _handle_approval(
 
 def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     print(f"\n=== EXECUTOR — Report {state['iteration']} ===")
-    # Verify approval chain before invoking Executor
-    _verify_approval_chain(
-        journal=cfg["journals"]["planner"],
-        iteration=state["iteration"],
-        task_id=state["task"]["task_id"],
-        baseline=state.get("planning_baseline", state["baseline"]),
-        branch=state.get("planning_branch", state["branch"]),
-        approved_plan_hash=state.get("approved_plan_hash", ""),
-        authorization_source=state.get("execute_authorization_source", "OWNER_MESSAGE"),
-        runtime_policy_fingerprint=state.get("runtime_policy_fingerprint", ""),
-        scope_fingerprint=state.get("scope_fingerprint", ""),
-    )
+    _verify_execution_authority(cfg, state)
     correction = state.get("executor_handoff_correction")
     try:
         stdout, log = _invoke_pending(cfg, state, "EXECUTOR")
@@ -161,38 +189,46 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         state["approved_write_paths"] = correction["approved_write_paths"]
         state.pop("executor_handoff_correction", None)
     success_handoff = "READY_FOR_REVIEW"
-    blocked_handoff = "BLOCKED"
+    blocked_handoffs = {"BLOCKED", "DESIGN_CHANGE"}
     block = _resolve_handoff(
         cfg["journals"]["executor"],
         stdout,
         "EXECUTOR",
-        {success_handoff, blocked_handoff},
+        {success_handoff, *blocked_handoffs},
     )
     _validate_activating(
         block, _transition_for(cfg["transitions"], "EXECUTOR", block["handoff"])
     )
     state["executor_report_hash"] = _sha_file(cfg["journals"]["executor"])
     _record(state, "executor", handoff=block["handoff"], log=str(log))
-    if block["handoff"] == blocked_handoff:
+    if block["handoff"] in blocked_handoffs:
         blocked_iteration = state["iteration"]
         state.setdefault("blockers", []).append(
             {"iteration": blocked_iteration, "raised_by": "EXECUTOR", "status": "OPEN"}
         )
         state["iteration"] = blocked_iteration + 1
         validate_next_agent(
-            cfg, state, expected_source="EXECUTOR", expected_handoff=blocked_handoff
+            cfg,
+            state,
+            expected_source="EXECUTOR",
+            expected_handoff=block["handoff"],
         )
         state["correction_context"] = (
-            "This is a blocker-resolution dry run. Plan only the minimum "
+            "Executor identified a design or authority decision. Plan only the "
+            "minimum change needed to resolve it; preserve valid retained work."
+            if block["handoff"] == "DESIGN_CHANGE"
+            else "This is a blocker-resolution dry run. Plan only the minimum "
             "authority/scope needed to resolve the recorded Executor blocker; "
-            "suspend the remaining original scope until that resolution is "
-            "reviewed."
+            "suspend the remaining original scope until that resolution is reviewed."
         )
         state["phase"] = "planner"
     else:
         validate_next_agent(
             cfg, state, expected_source="EXECUTOR", expected_handoff="READY_FOR_REVIEW"
         )
+        state["reviewed_head"] = _git_ok(cfg["repo"], "rev-parse", "HEAD")
+        state["reviewed_candidate_hash"] = candidate_fingerprint(Path(cfg["repo"]))
+        state["integration_validation"] = _run_local_integration_gate(cfg, state)
         state["phase"] = "reviewer"
     finish_ide_role(state)
     _save_state(cfg, state)
@@ -200,44 +236,67 @@ def _handle_executor(cfg: dict[str, Any], state: dict[str, Any]) -> None:
 
 def _handle_reviewer(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     print(f"\n=== REVIEWER — Review {state['iteration']} ===")
-    # Verify approval chain before Reviewer (same chain Executor used)
-    _verify_approval_chain(
-        journal=cfg["journals"]["planner"],
-        iteration=state["iteration"],
-        task_id=state["task"]["task_id"],
-        baseline=state.get("planning_baseline", state["baseline"]),
-        branch=state.get("planning_branch", state["branch"]),
-        approved_plan_hash=state.get("approved_plan_hash", ""),
-        authorization_source=state.get("execute_authorization_source", "OWNER_MESSAGE"),
-        runtime_policy_fingerprint=state.get("runtime_policy_fingerprint", ""),
-        scope_fingerprint=state.get("scope_fingerprint", ""),
-    )
+    _verify_execution_authority(cfg, state)
     stdout, log = _invoke_pending(cfg, state, "REVIEWER")
     block = _resolve_handoff(
         cfg["journals"]["reviewer"],
         stdout,
         "REVIEWER",
-        {"CHANGES_REQUESTED", "PENDING_COMMIT"},
+        {
+            "CHANGES_REQUESTED",
+            "IMPLEMENTATION_FIX",
+            "DESIGN_CHANGE",
+            "PENDING_COMMIT",
+        },
     )
     _validate_activating(
         block, _transition_for(cfg["transitions"], "REVIEWER", block["handoff"])
     )
     _record(state, "reviewer", handoff=block["handoff"], log=str(log))
-    if block["handoff"] == "CHANGES_REQUESTED":
+    if block["handoff"] == "IMPLEMENTATION_FIX":
+        used = int(state.get("direct_correction_rounds", 0))
+        route = route_failure(FailureClass.IMPLEMENTATION_FIX, direct_corrections=used)
+        state["iteration"] += 1
+        if route.target == "EXECUTOR":
+            state["direct_correction_rounds"] = used + 1
+            validate_next_agent(
+                cfg,
+                state,
+                expected_source="REVIEWER",
+                expected_handoff="IMPLEMENTATION_FIX",
+            )
+            state["phase"] = "executor"
+        else:
+            state["correction_context"] = (
+                "Two bounded direct implementation corrections were exhausted. "
+                "Perform targeted planning for the unresolved Reviewer findings."
+            )
+            _write_orchestrator_planner_prompt(cfg, state, "CORRECTION_LIMIT_REACHED")
+            state["phase"] = "planner"
+    elif block["handoff"] in {"CHANGES_REQUESTED", "DESIGN_CHANGE"}:
         state["iteration"] += 1
         validate_next_agent(
-            cfg, state, expected_source="REVIEWER", expected_handoff="CHANGES_REQUESTED"
+            cfg,
+            state,
+            expected_source="REVIEWER",
+            expected_handoff=block["handoff"],
         )
         state["correction_context"] = (
-            "Reviewer requested changes. Produce the next complete dry run "
-            "addressing every review finding while preserving valid retained "
-            "work and the original task scope."
+            "Reviewer identified a design, contract, authority or scope decision. "
+            "Produce targeted planning that addresses every finding and preserves "
+            "valid retained work."
         )
         state["phase"] = "planner"
     else:
         validate_next_agent(
             cfg, state, expected_source="REVIEWER", expected_handoff="PENDING_COMMIT"
         )
+        if candidate_fingerprint(Path(cfg["repo"])) != state.get(
+            "reviewed_candidate_hash"
+        ):
+            raise OrchestratorError(
+                "Product candidate changed during independent review."
+            )
         state["reviewed_head"] = _git_ok(cfg["repo"], "rev-parse", "HEAD")
         state["reviewed_worktree_hash"] = _worktree_fingerprint(cfg["repo"])
         if state.get("parallel_draft") and not state.get("integration_refreshed"):
@@ -277,7 +336,12 @@ def _handle_commit_gate(
         rejection=rejection,
     )
     if decision:
-        validation = _run_local_integration_gate(cfg, state)
+        validation = state.get("integration_validation")
+        if not isinstance(validation, dict):
+            state["reviewed_candidate_hash"] = candidate_fingerprint(Path(cfg["repo"]))
+            validation = _run_local_integration_gate(cfg, state)
+            state["integration_validation"] = validation
+        _ensure_local_integration_gate_unchanged(state, Path(cfg["repo"]))
         state["commit_authorized"] = True
         state["commit_authorization_source"] = source
         state["integration_validation"] = validation
@@ -307,10 +371,8 @@ def _handle_commit_gate(
 
 def _execute_integration_command(command: list[str], repo: Path) -> int:
     """Execute the controller-owned integration command and return its status."""
-    result = subprocess.run(
-        command,
-        cwd=repo,
-        check=False,
+    result = run_bounded_environment_operation(
+        lambda: subprocess.run(command, cwd=repo, check=False)
     )
     return result.returncode
 
@@ -392,7 +454,9 @@ def _run_local_integration_gate(
     primary_repo = Path(state.get("primary_repo_path", repo))
     baseline = state.get("integration_baseline") or state["baseline"]
     reviewed_head = state["reviewed_head"]
-    reviewed_hash = state["reviewed_worktree_hash"]
+    reviewed_hash = state.get(
+        "reviewed_candidate_hash", state.get("reviewed_worktree_hash")
+    )
     current_main = _git_ok(primary_repo, "rev-parse", cfg["main_branch"])
     if current_main != baseline:
         raise OrchestratorError(
@@ -400,8 +464,8 @@ def _run_local_integration_gate(
         )
     if _git_ok(repo, "rev-parse", "HEAD") != reviewed_head:
         raise OrchestratorError("Reviewed HEAD changed before local integration.")
-    if _worktree_fingerprint(repo) != reviewed_hash:
-        raise OrchestratorError("Reviewed worktree changed before local integration.")
+    if candidate_fingerprint(repo) != reviewed_hash:
+        raise OrchestratorError("Reviewed candidate changed before local integration.")
 
     report_path = (
         Path(cfg["logs_dir"]) / state["run_id"] / "integration" / "local-gate.json"
@@ -423,6 +487,8 @@ def _run_local_integration_gate(
         "--reviewed-worktree",
         "--report",
         str(report_path),
+        "--log-dir",
+        str(report_path.parent / "steps"),
     ]
     exit_code = _execute_integration_command(command, repo)
     if exit_code != 0:
@@ -436,9 +502,23 @@ def _run_local_integration_gate(
     )
     if _git_ok(repo, "rev-parse", "HEAD") != reviewed_head:
         raise OrchestratorError("Integration checks changed the reviewed HEAD.")
-    if _worktree_fingerprint(repo) != reviewed_hash:
-        raise OrchestratorError("Integration checks changed reviewed worktree bytes.")
+    if candidate_fingerprint(repo) != reviewed_hash:
+        raise OrchestratorError("Integration checks changed reviewed candidate bytes.")
     decision = payload["decision"]
+    receipt_path = report_path.with_name("local-gate-receipt.json")
+    authority_hash = str(
+        state.get("approved_authority_hash", state.get("approved_plan_hash", ""))
+    )
+    try:
+        receipt_sha = create_validation_receipt(
+            repo=repo,
+            diagnostic_path=report_path,
+            receipt_path=receipt_path,
+            worktree_sha256=reviewed_hash,
+            authority_sha256=authority_hash,
+        )
+    except ValidationReceiptError as exc:
+        raise OrchestratorError(str(exc)) from exc
     return {
         "status": "PASSED",
         "base_commit": baseline,
@@ -447,6 +527,9 @@ def _run_local_integration_gate(
         "selected_families": decision["selected_families"],
         "report_path": str(report_path),
         "report_sha256": _sha_file(report_path),
+        "receipt_path": str(receipt_path),
+        "receipt_sha256": receipt_sha,
+        "authority_sha256": authority_hash,
     }
 
 
@@ -457,8 +540,11 @@ def _ensure_local_integration_gate_unchanged(state: dict[str, Any], repo: Path) 
         raise OrchestratorError("Close-out has no passed local integration gate.")
     if evidence.get("reviewed_head") != state.get("reviewed_head"):
         raise OrchestratorError("Close-out integration evidence has a stale HEAD.")
-    if evidence.get("reviewed_worktree_sha256") != state.get("reviewed_worktree_hash"):
-        raise OrchestratorError("Close-out integration evidence has a stale worktree.")
+    candidate_hash = state.get(
+        "reviewed_candidate_hash", state.get("reviewed_worktree_hash")
+    )
+    if evidence.get("reviewed_worktree_sha256") != candidate_hash:
+        raise OrchestratorError("Close-out integration evidence has a stale candidate.")
     report_path = Path(str(evidence.get("report_path", "")))
     if not report_path.is_file() or _sha_file(report_path) != evidence.get(
         "report_sha256"
@@ -466,10 +552,22 @@ def _ensure_local_integration_gate_unchanged(state: dict[str, Any], repo: Path) 
         raise OrchestratorError("Close-out integration report is missing or changed.")
     if _git_ok(repo, "rev-parse", "HEAD") != state.get("reviewed_head"):
         raise OrchestratorError("HEAD changed after local integration validation.")
-    if _worktree_fingerprint(repo) != state.get("reviewed_worktree_hash"):
-        raise OrchestratorError(
-            "Working tree changed after local integration validation."
+    if candidate_fingerprint(repo) != candidate_hash:
+        raise OrchestratorError("Candidate changed after local integration validation.")
+    try:
+        verify_validation_receipt(
+            repo=repo,
+            receipt_path=Path(str(evidence.get("receipt_path", ""))),
+            expected_receipt_sha256=str(evidence.get("receipt_sha256", "")),
+            expected_worktree_sha256=str(candidate_hash or ""),
+            expected_authority_sha256=str(
+                state.get(
+                    "approved_authority_hash", state.get("approved_plan_hash", "")
+                )
+            ),
         )
+    except ValidationReceiptError as exc:
+        raise OrchestratorError(str(exc)) from exc
 
 
 def _archive_closeout_evidence(cfg: dict[str, Any], state: dict[str, Any]) -> Path:
@@ -586,37 +684,16 @@ def _verify_closeout_lineage(
 
 
 def _handle_closeout(cfg: dict[str, Any], state: dict[str, Any]) -> bool:
-    print(f"\n=== REVIEWER — authorized close-out for Review {state['iteration']} ===")
+    print(f"\n=== CONTROLLER: deterministic close-out {state['iteration']} ===")
     _ensure_local_integration_gate_unchanged(state, Path(cfg["repo"]))
-    if not state.get("ide_closeout_evidence_archived"):
-        _archive_closeout_evidence(cfg, state)
-    stdout, log = _invoke_pending(cfg, state, "REVIEWER", authorized_closeout=True)
-    block = parse_handoff_block(stdout.splitlines()) or latest_handoff_block(
-        cfg["journals"]["reviewer"]
-    )
-    if not block or block["stopped"] != "REVIEWER":
-        msg = "Reviewer close-out produced no valid final handoff."
-        raise OrchestratorError(msg)
-    _record(state, "closeout", handoff=block["handoff"], log=str(log))
-    if block["handoff"] == "CHANGES_REQUESTED":
-        state["iteration"] += 1
-        validate_next_agent(
-            cfg, state, expected_source="REVIEWER", expected_handoff="CHANGES_REQUESTED"
-        )
-        state["phase"] = "planner"
-        finish_ide_role(state)
-        state.pop("ide_closeout_evidence_archived", None)
-        _save_state(cfg, state)
-        return True
-    if block["handoff"] != "ACCEPTED" or block["activating"] != "NONE":
-        msg = f"Unexpected close-out handoff: {block}"
-        raise OrchestratorError(msg)
+    _archive_closeout_evidence(cfg, state)
+    result = perform_deterministic_closeout(cfg, state)
+    state["closeout_receipt"] = result
+    _record(state, "closeout", handoff="ACCEPTED", **result)
     _verify_closeout_lineage(cfg, state)
     state["status"] = "ACCEPTED"
     state["phase"] = "done"
     state["next_agent"] = None
-    finish_ide_role(state)
-    state.pop("ide_closeout_evidence_archived", None)
     _save_state(cfg, state)
     print("[ok] workflow completed and active-task workspace is empty")
     return False
@@ -675,9 +752,8 @@ def router(  # noqa: PLR0911
             "planner",
             "executor",
             "reviewer",
-            "closeout",
         }:
-            role = "REVIEWER" if phase == "closeout" else phase.upper()
+            role = phase.upper()
             pending_invocation = state.get("ide_role_invocation")
             if pending_invocation is None:
                 if role_complete:
@@ -685,15 +761,10 @@ def router(  # noqa: PLR0911
                         "--role-complete was supplied before an IDE role was prepared."
                     )
                     raise OrchestratorError(msg)
-                if phase == "closeout":
-                    _archive_closeout_evidence(cfg, state)
-                    state["ide_closeout_evidence_archived"] = True
-                    _save_state(cfg, state)
                 prepare_ide_role(
                     cfg,
                     state,
                     role,
-                    authorized_closeout=phase == "closeout",
                 )
                 return state
             if not role_complete:
@@ -716,14 +787,11 @@ def router(  # noqa: PLR0911
                 _handle_executor(cfg, state)
             elif phase == "reviewer":
                 _handle_reviewer(cfg, state)
-            elif not _handle_closeout(cfg, state):
-                break
             cfg.pop("_ide_role_completion", None)
         elif cfg.get("mode") == "manual" and phase in {
             "planner",
             "executor",
             "reviewer",
-            "closeout",
         }:
             print(
                 f"Manual mode is waiting for the dedicated {phase.upper()} chat to "

@@ -1,4 +1,4 @@
-prompt_schema_version = 1
+prompt_schema_version = 2
 
 [task_workspace]
 planner_journal = ".agents/task/planner.md"
@@ -19,7 +19,7 @@ quick-fix = "chat-only-dry-run-and-direct-main-no-task-activation"
 scope = "workflow-run"
 same_role_resume = true
 new_run_new_sessions = true
-reviewer_closeout_reuses_reviewer = true
+reviewer_closeout_reuses_reviewer = false
 session_context_is_authority = false
 recovery_uses_fresh_generation = true
 recovery_generation_limit = 1
@@ -29,6 +29,13 @@ source_role = "ORCHESTRATOR"
 handoff = "TASK_ACTIVATED"
 target_role = "PLANNER"
 target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "PACKET_READY"
+target_role = "EXECUTOR"
+gate = "APPROVED: EXECUTE"
+target_template = "docs/templates/prompt/executor.md"
 
 [[transitions]]
 source_role = "PLANNER"
@@ -56,6 +63,12 @@ target_role = "PLANNER"
 target_template = "docs/templates/prompt/planner.md"
 
 [[transitions]]
+source_role = "EXECUTOR"
+handoff = "DESIGN_CHANGE"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
 source_role = "REVIEWER"
 handoff = "CHANGES_REQUESTED"
 target_role = "PLANNER"
@@ -63,8 +76,20 @@ target_template = "docs/templates/prompt/planner.md"
 
 [[transitions]]
 source_role = "REVIEWER"
+handoff = "IMPLEMENTATION_FIX"
+target_role = "EXECUTOR"
+target_template = "docs/templates/prompt/executor-correction.md"
+
+[[transitions]]
+source_role = "REVIEWER"
+handoff = "DESIGN_CHANGE"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "REVIEWER"
 handoff = "PENDING_COMMIT"
-target_role = "REVIEWER"
+target_role = "CONTROLLER"
 gate = "APPROVED: COMMIT"
 target_template = "docs/templates/prompt/reviewer-closeout.md"
 
@@ -106,6 +131,12 @@ target_template = "docs/templates/prompt/planner.md"
 [[transitions]]
 source_role = "ORCHESTRATOR"
 handoff = "SCOPE_BLOCKED"
+target_role = "PLANNER"
+target_template = "docs/templates/prompt/planner.md"
+
+[[transitions]]
+source_role = "ORCHESTRATOR"
+handoff = "CORRECTION_LIMIT_REACHED"
 target_role = "PLANNER"
 target_template = "docs/templates/prompt/planner.md"
 

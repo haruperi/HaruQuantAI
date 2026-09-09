@@ -1,6 +1,6 @@
 # `.agents` — Artifact-Driven Task and Goal Workflow
 
-HaruQuantAI implements one atomic Planner → Executor → Reviewer **Task workflow** and a deterministic **Goal supervisor**. Goals remain sequential by default and may explicitly opt into three governed parallel draft lanes. Repository state and deterministic controller state are authoritative; conversation history is context only.
+HaruQuantAI implements one risk-tiered atomic **Task workflow** and a deterministic **Goal supervisor**. Routine and Standard work may route from a validated prepared task packet directly to Executor; Critical or unresolved work retains Planner → Executor → Reviewer. Goals remain sequential by default and may explicitly opt into three governed parallel draft lanes. Repository state and deterministic controller state are authoritative; conversation history is context only.
 
 ## Atomic Task workspace
 
@@ -42,7 +42,7 @@ See `.agents/GOALS.md` for the complete Goal contract.
 
 - No reasoning role may run unless its complete current prompt exists in `.agents/task/next-agent.md` and passes protocol validation.
 - Cross-role isolation and same-role continuity coexist inside one Task run.
-- One Task run owns one logical Planner conversation, one Executor conversation and one Reviewer conversation; later iterations resume the same role conversation.
+- One Task run owns at most one logical Planner conversation, one Executor conversation and one Reviewer conversation; later iterations resume the same role conversation. Prepared Routine/Standard work may not invoke Planner.
 - **A new Goal child is a new Task run and therefore gets a new P/E/R conversation set.** Goal state stores no role-session IDs.
 - A Goal has no Goal branch, no Goal commit and no additional authorization gate.
 - Only one Goal child may be active at a time.
@@ -77,7 +77,7 @@ Schema-v2/v3 configurations remain resume-compatible with their existing sequent
 - Planner — **Principal Software Architect and Implementation Planner**: `docs/templates/prompt/planner.md`
 - Executor — **Senior Software Implementation Engineer**: `docs/templates/prompt/executor.md`
 - Reviewer — **Principal Software Verification and Code Review Engineer**: `docs/templates/prompt/reviewer.md`
-- Reviewer close-out — **Release Integrity and Change-Control Engineer**: `docs/templates/prompt/reviewer-closeout.md`
+- Deterministic controller close-out contract: `docs/templates/prompt/reviewer-closeout.md`
 
 ## Task transport persistence
 
@@ -89,7 +89,7 @@ Headless modes route turns through `.agents/session_runner.py`. Native CLI IDs l
 
 They are runtime-only and never enter `next-agent.md`. Codex, AGY and supported Cline native exact-ID resume paths fail closed on identity mismatch. Implicit latest-session heuristics are not used.
 
-IDE `delegate` records opaque app-agent handles separately at `.agents/runs/<task-run-id>/app-agent-handles.json`. One handle is bound to each role, may not cross roles or Task runs, and must be reused for later same-role iterations and Reviewer close-out. IDE `solo` has no role-session ledger because each child chat performs all roles inline. Goal state checkpoints the between-child chat handoff, not an app conversation ID.
+IDE `delegate` records opaque app-agent handles separately at `.agents/runs/<task-run-id>/app-agent-handles.json`. One handle is bound to each reasoning role, may not cross roles or Task runs, and must be reused for later same-role iterations. Deterministic close-out invokes no role agent. IDE `solo` has no role-session ledger because each child chat performs all required reasoning roles inline. Goal state checkpoints the between-child chat handoff, not an app conversation ID.
 
 ## Goal state
 
@@ -117,6 +117,10 @@ An unattended Goal may set `stop_on_blocked=false` (or use `make_goal.py --conti
 - `.agents/GOALS.md` — Goal supervision contract.
 - `.agents/PROCEDURE.md` — operator procedures and chat/manual transport text.
 - `.agents/task_api.py` — reusable entry point into the unchanged Task engine.
+- `.agents/task_packet.py` — deterministic authority extraction, source fingerprinting and risk classification.
+- `.agents/failure_routing.py` — bounded correction, design-escalation and administrative/environment routing.
+- `.agents/validation_receipts.py` — exact-input integration receipt production and verification.
+- `.agents/deterministic_closeout.py` — authorized staging, commit, no-ff merge and cleanup without an LLM turn.
 - `.agents/goal_engine.py` — deterministic multi-Task supervisor.
 - `.agents/make_task.py` — canonical one-entry Task spec builder.
 - `.agents/make_goal.py` — Goal spec generator.

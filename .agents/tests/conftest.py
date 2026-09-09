@@ -61,7 +61,13 @@ def scaffold_repo(tmp_path: Path) -> Path:
     (tmp_path / "docs" / "templates" / "prompt").mkdir(parents=True)
     for name in ("planner.md", "executor.md", "reviewer.md", "next-agent.md"):
         (tmp_path / ".agents" / "task" / name).write_bytes(b"")
-    for tpl in ("planner.md", "executor.md", "reviewer.md", "reviewer-closeout.md"):
+    for tpl in (
+        "planner.md",
+        "executor.md",
+        "executor-correction.md",
+        "reviewer.md",
+        "reviewer-closeout.md",
+    ):
         dst = tmp_path / "docs" / "templates" / "prompt" / tpl
         dst.write_text(
             (_REPO_ROOT / "docs" / "templates" / "prompt" / tpl).read_text(
@@ -96,6 +102,11 @@ def build_cfg(orc: ModuleType, repo: Path) -> dict[str, Any]:
         "templates": {
             "planner": repo / "docs" / "templates" / "prompt" / "planner.md",
             "executor": repo / "docs" / "templates" / "prompt" / "executor.md",
+            "executor_correction": repo
+            / "docs"
+            / "templates"
+            / "prompt"
+            / "executor-correction.md",
             "reviewer": repo / "docs" / "templates" / "prompt" / "reviewer.md",
         },
         "runs_dir": repo / ".agents" / "runs",

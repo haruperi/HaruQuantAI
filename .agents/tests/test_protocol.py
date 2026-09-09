@@ -43,10 +43,29 @@ def test_protocol_contains_owner_gates() -> None:
     commit = orchestrator._transition_for(transitions, "REVIEWER", "PENDING_COMMIT")
     assert execute.gate == "APPROVED: EXECUTE"
     assert commit.gate == "APPROVED: COMMIT"
+    assert commit.target_role == "CONTROLLER"
     gates = [item.gate for item in transitions if item.gate]
-    assert gates.count("APPROVED: EXECUTE") == 1
+    assert gates.count("APPROVED: EXECUTE") == 2
     assert gates.count("APPROVED: COMMIT") == 1
     assert "CONTINUE: REVIEWER" not in protocol_path.read_text(encoding="utf-8")
+
+
+def test_protocol_has_prepared_and_direct_correction_routes() -> None:
+    """Packets and implementation fixes bypass exploratory replanning safely."""
+    protocol_path = Path(__file__).resolve().parents[1] / "protocol.toml"
+    _, transitions = orchestrator._parse_protocol(protocol_path)
+
+    prepared = orchestrator._transition_for(transitions, "ORCHESTRATOR", "PACKET_READY")
+    correction = orchestrator._transition_for(
+        transitions, "REVIEWER", "IMPLEMENTATION_FIX"
+    )
+    design = orchestrator._transition_for(transitions, "REVIEWER", "DESIGN_CHANGE")
+
+    assert prepared.target_role == "EXECUTOR"
+    assert prepared.gate == "APPROVED: EXECUTE"
+    assert correction.target_role == "EXECUTOR"
+    assert correction.gate is None
+    assert design.target_role == "PLANNER"
 
 
 def test_protocol_excludes_chat_direct_quick_fix_transitions() -> None:

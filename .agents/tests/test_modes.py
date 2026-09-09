@@ -195,7 +195,7 @@ def test_procedure_transport_language_is_current(orc: ModuleType) -> None:
     assert "CONTINUE: GOAL" in procedure
     assert "transport/resume" in procedure
     assert "same Planner conversation" in procedure
-    assert "same Reviewer conversation" in procedure
+    assert "Deterministic close-out has no role session" in procedure
     assert "new dedicated Planner/Executor/Reviewer chat set" in procedure
     assert "The only owner authorization messages are:" in procedure
 
@@ -206,7 +206,7 @@ def test_protocol_declares_same_role_continuity(orc: ModuleType) -> None:
     assert policy["scope"] == "workflow-run"
     assert policy["same_role_resume"] is True
     assert policy["new_run_new_sessions"] is True
-    assert policy["reviewer_closeout_reuses_reviewer"] is True
+    assert policy["reviewer_closeout_reuses_reviewer"] is False
     assert policy["session_context_is_authority"] is False
 
 

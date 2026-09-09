@@ -25,7 +25,8 @@ from runtime_policy import load_runtime_policy
 
 AGENTS_DIR = Path(__file__).resolve().parent
 REPO_ROOT = AGENTS_DIR.parent
-SCHEMA_VERSION = 1
+SCHEMA_VERSION = 2
+SUPPORTED_PROMPT_SCHEMAS = frozenset({1, SCHEMA_VERSION})
 BLOCK_FIELD_COUNT = 3
 SLUG_RE = re.compile(r"^[a-z0-9][a-z0-9._-]*$")
 PLACEHOLDER_RE = re.compile(r"\{\{\w+\}\}")
@@ -70,9 +71,8 @@ PROTECTED_SENTINELS = {
         "Stage C — Dry-run, report, and code reconciliation",
     ),
     "REVIEWER_CLOSEOUT": (
-        "Act as the **HaruQuantAI Release Integrity and Change-Control Engineer**",
-        "This prompt defines your complete **close-out-specific role contract**.",
-        "HANDOFF : ACCEPTED",
+        "This artifact defines the complete **controller close-out contract**.",
+        "HANDOFF : PENDING_COMMIT",
         "explicit no-fast-forward merge",
     ),
 }
@@ -229,6 +229,7 @@ def assemble_config(repo_override: str | None = None) -> dict[str, Any]:
     templates = {
         "planner": repo / "docs/templates/prompt/planner.md",
         "executor": repo / "docs/templates/prompt/executor.md",
+        "executor_correction": repo / "docs/templates/prompt/executor-correction.md",
         "reviewer": repo / "docs/templates/prompt/reviewer.md",
         "reviewer_closeout": repo / "docs/templates/prompt/reviewer-closeout.md",
         "default": repo / "docs/templates/prompt/default.md",
@@ -312,6 +313,10 @@ def _render_next_agent(metadata: dict[str, Any], body: str) -> str:
         "owner_gate",
         "allowed_write_paths",
         "deferred_integration_paths",
+        "task_packet_path",
+        "task_packet_sha256",
+        "risk_tier",
+        "authority_kind",
     ]
     lines = ["+++"]
     for key in ordered:
@@ -355,7 +360,7 @@ def parse_next_agent(path: Path) -> NextAgentArtifact:
     missing = sorted(REQUIRED_NEXT_META - metadata.keys())
     if missing:
         raise OrchestratorError(f"next-agent.md metadata missing fields: {missing}")
-    if int(metadata["prompt_schema_version"]) != SCHEMA_VERSION:
+    if int(metadata["prompt_schema_version"]) not in SUPPORTED_PROMPT_SCHEMAS:
         raise OrchestratorError("next-agent.md prompt schema version is unsupported.")
     if PLACEHOLDER_RE.search(body):
         raise OrchestratorError("next-agent.md contains unfilled {{placeholders}}.")
@@ -363,7 +368,7 @@ def parse_next_agent(path: Path) -> NextAgentArtifact:
 
 
 def _template_key(target_role: str, template_path: str) -> str:
-    if target_role == "REVIEWER" and template_path.endswith("reviewer-closeout.md"):
+    if template_path.endswith("reviewer-closeout.md"):
         return "REVIEWER_CLOSEOUT"
     return target_role
 
@@ -419,6 +424,28 @@ def validate_next_agent(
         if journal_paths != metadata_paths:
             raise OrchestratorError(
                 "Planner journal path authority differs from next-agent metadata."
+            )
+    if (
+        expected_source.upper() == "ORCHESTRATOR"
+        and expected_handoff.upper() == "PACKET_READY"
+    ):
+        packet_path = Path(str(meta.get("task_packet_path", "")))
+        if not packet_path.is_absolute():
+            packet_path = cfg["repo"] / packet_path
+        expected_packet = Path(str(state.get("task_packet_path", "")))
+        if packet_path.resolve() != expected_packet.resolve():
+            raise OrchestratorError("Prepared prompt points to the wrong Task packet.")
+        if meta.get("task_packet_sha256") != state.get("task_packet_sha256"):
+            raise OrchestratorError("Prepared prompt has a stale Task packet hash.")
+        raw_paths = meta.get("allowed_write_paths")
+        if not isinstance(raw_paths, list):
+            raise OrchestratorError("Prepared packet requires allowed_write_paths.")
+        packet_paths = _normalize_path_list(
+            [str(item) for item in state.get("packet_write_paths", [])]
+        )
+        if _normalize_path_list([str(item) for item in raw_paths]) != packet_paths:
+            raise OrchestratorError(
+                "Prepared prompt path authority differs from packet."
             )
     if str(meta["branch"]) != str(state.get("branch") or meta["branch"]):
         raise OrchestratorError("next-agent branch does not match active run state.")

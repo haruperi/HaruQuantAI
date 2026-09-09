@@ -34,6 +34,7 @@ except ImportError:
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ide_transport import *
 from runtime_policy import RuntimePolicy, load_runtime_policy, scope_fingerprint
+from task_packet import TaskPacketError, validate_task_packet
 from workflow_protocol import (
     SCHEMA_VERSION,
     OrchestratorError,
@@ -489,6 +490,11 @@ def _build_fields(state: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
         "approved_plan_hash": state.get(
             "approved_plan_hash", "(recorded after owner gate)"
         ),
+        "approved_authority_hash": state.get(
+            "approved_authority_hash",
+            state.get("approved_plan_hash", "(recorded after owner gate)"),
+        ),
+        "direct_correction_rounds": state.get("direct_correction_rounds", 0),
         "executor_report_hash": state.get(
             "executor_report_hash", "(not available yet)"
         ),
@@ -507,6 +513,10 @@ def _build_fields(state: dict[str, Any], cfg: dict[str, Any]) -> dict[str, Any]:
             "runtime_policy_fingerprint", "(legacy interactive run)"
         ),
         "scope_fingerprint": state.get("scope_fingerprint", "(legacy Task run)"),
+        "task_packet_path": state.get("task_packet_path", "NONE"),
+        "task_packet_sha256": state.get("task_packet_sha256", "NONE"),
+        "task_packet_status": state.get("task_packet_status", "LEGACY"),
+        "risk_tier": state.get("risk_tier", "CRITICAL"),
     }
 
 
@@ -562,8 +572,11 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         _record(state, "task_branch_created", branch=branch)
         _save_state(cfg, state)
 
-    activation = "TASK_ACTIVATED"
-    template_key = "planner"
+    prepared = state.get("task_packet_status") == "EXECUTOR_READY" and not state.get(
+        "planner_required", True
+    )
+    activation = "PACKET_READY" if prepared else "TASK_ACTIVATED"
+    template_key = "executor" if prepared else "planner"
     body = compose_prompt(cfg["templates"][template_key], _build_fields(state, cfg))
     transition = _transition_for(cfg["transitions"], "ORCHESTRATOR", activation)
     metadata = {
@@ -572,16 +585,26 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         "task_id": state["task"]["task_id"],
         "iteration": state["iteration"],
         "source_role": "ORCHESTRATOR",
-        "target_role": "PLANNER",
+        "target_role": "EXECUTOR" if prepared else "PLANNER",
         "handoff": activation,
         "branch": branch,
         "baseline_commit": baseline,
         "source_head": _git_ok(repo, "rev-parse", "HEAD"),
         "template_path": transition.target_template
         or str(cfg["templates"][template_key].relative_to(repo)).replace("\\", "/"),
-        "requires_owner_gate": False,
-        "owner_gate": "",
+        "requires_owner_gate": prepared,
+        "owner_gate": "APPROVED: EXECUTE" if prepared else "",
     }
+    if prepared:
+        metadata.update(
+            {
+                "allowed_write_paths": state["packet_write_paths"],
+                "task_packet_path": state["task_packet_path"],
+                "task_packet_sha256": state["task_packet_sha256"],
+                "risk_tier": state["risk_tier"],
+                "authority_kind": "TASK_PACKET",
+            }
+        )
     cfg["next_agent"].write_text(_render_next_agent(metadata, body), encoding="utf-8")
     validate_next_agent(
         cfg,
@@ -589,7 +612,7 @@ def _activate_task(cfg: dict[str, Any], state: dict[str, Any]) -> None:
         expected_source="ORCHESTRATOR",
         expected_handoff=activation,
     )
-    state["phase"] = "planner"
+    state["phase"] = "approve" if prepared else "planner"
     _record(state, "task_activation", handoff=activation, branch=branch)
     _save_state(cfg, state)
 
@@ -601,6 +624,57 @@ def _append_gate_authorization(
     source: str,
 ) -> None:
     journal: Path = cfg["journals"]["planner"]
+    packet_authority = state.get(
+        "task_packet_status"
+    ) == "EXECUTOR_READY" and not state.get("plan_hash")
+    if packet_authority:
+        packet_path = Path(str(state["task_packet_path"]))
+        try:
+            packet = validate_task_packet(
+                packet_path,
+                Path(cfg["repo"]),
+                baseline=str(state["baseline"]),
+            )
+        except TaskPacketError as exc:
+            raise OrchestratorError(str(exc)) from exc
+        authority_hash = str(state["task_packet_sha256"])
+        if _sha_file(packet_path) != authority_hash:
+            raise OrchestratorError("Task packet changed before execution approval.")
+        approved_write_paths = _normalize_path_list(
+            [str(path) for path in packet["authorized_write_paths"]]
+        )
+        state["approved_write_paths"] = approved_write_paths
+        state["deferred_integration_paths"] = []
+        record = {
+            "gate": "APPROVED: EXECUTE",
+            "authorization_source": source,
+            "authority_kind": "TASK_PACKET",
+            "authority_sha256": authority_hash,
+            "task_id": state["task"]["task_id"],
+            "iteration": state["iteration"],
+            "baseline": state["baseline"],
+            "branch": state["branch"],
+            "approved_write_paths": approved_write_paths,
+            "runtime_policy_sha256": state.get("runtime_policy_fingerprint"),
+            "scope_sha256": state.get("scope_fingerprint"),
+        }
+        record_path = (
+            Path(cfg["runs_dir"]) / state["run_id"] / "execute-authorization.json"
+        )
+        record_path.parent.mkdir(parents=True, exist_ok=True)
+        record_path.write_text(
+            json.dumps(record, indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+        state["execute_authorization_path"] = str(record_path)
+        state["execute_authorization_sha256"] = _sha_file(record_path)
+        state["approved_authority_hash"] = authority_hash
+        state["approval_iteration"] = state["iteration"]
+        state["direct_correction_rounds"] = 0
+        state["execute_authorization_source"] = source
+        state["authority_kind"] = "TASK_PACKET"
+        return
     plan_hash = state["plan_hash"]
     # Extract approved_write_paths from Planner's next-agent metadata
     next_agent_path = cfg["next_agent"]
@@ -650,7 +724,11 @@ def _append_gate_authorization(
     with journal.open("a", encoding="utf-8") as handle:
         handle.write(block)
     state["approved_plan_hash"] = plan_hash
+    state["approved_authority_hash"] = plan_hash
+    state["approval_iteration"] = state["iteration"]
+    state["direct_correction_rounds"] = 0
     state["execute_authorization_source"] = source
+    state["authority_kind"] = "PLANNER_DRY_RUN"
 
 
 def _write_orchestrator_planner_prompt(

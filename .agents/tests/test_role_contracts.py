@@ -8,7 +8,6 @@ ROLE_TITLES = {
     "planner": "HaruQuantAI Principal Software Architect and Implementation Planner",
     "executor": "HaruQuantAI Senior Software Implementation Engineer",
     "reviewer": "HaruQuantAI Principal Software Verification and Code Review Engineer",
-    "reviewer_closeout": "HaruQuantAI Release Integrity and Change-Control Engineer",
 }
 
 
@@ -48,7 +47,7 @@ def test_templates_require_output_discovery_and_check_only_freeze(
     assert "generate_phase0_evidence.py --list-outputs" in planner
     assert "include every output" in planner
     assert "validation is check-only" in executor
-    assert "Every close-out validation command must be check-only" in closeout
-    assert "Do not repeat the comprehensive integration profiles" in closeout
-    assert "controller-recorded integration report hash" in closeout
-    assert "CHANGES_REQUESTED" in closeout
+    assert "controller close-out contract" in closeout
+    assert "does not repeat already receipted validation" in closeout
+    assert "ACTIVATING : CONTROLLER" in closeout
+    assert "must never launch or resume" in closeout

@@ -1,7 +1,7 @@
 # HaruQuantAI V3 — Development Throughput Remediation Plan
 
 **Date:** 9 September 2026
-**Status:** ACTIVE — DT-01 and DT-02 are implemented; DT-03 local enforcement and checked-in CI definition are implemented, while remote publication and repository protection remain pending explicit owner authorization.
+**Status:** ACTIVE — DT-01 through DT-06 are implemented locally. Change Set B awaits its authorized commit; the mandatory post-DT-06 representative-feature pilot is next. DT-03 remote publication and repository protection remain pending explicit owner authorization.
 **Repository baseline checked:** `a32a46ad5c3407bdb7b68bf8dc270d327b6e7625` on remote `main`.
 **Repository location:** `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`
 **Basis:** The three supplied agent analyses, supplemented by targeted read-only repository checks and official tool documentation. Source references appear in §12.
@@ -46,7 +46,7 @@ Use Agent 1's useful suggestions about hooks, batching and automation; retain Ag
 
 ## 3. Rollout structure
 
-These are **eleven top-level work orders within four remediation change sets**. Until an explicitly reviewed workflow amendment replaces the current atomic Task contract, each independently reviewable work order must follow the workflow required by `AGENTS.md`. In particular, DT-01, DT-02 and DT-03 are three separate Tasks; their different responsibilities, write paths, validation and rollback boundaries must not be combined into one Change Set A implementation Task. Workflow/approval changes themselves receive strong review.
+These are **eleven top-level work orders within four remediation change sets**. Until an explicitly reviewed workflow amendment replaces the current atomic Task contract, each independently reviewable work order follows the workflow required by `AGENTS.md`. DT-01, DT-02 and DT-03 were delivered separately. The owner subsequently authorized DT-04, DT-05 and DT-06 as one Change Set B delivery, while requiring their internal checkpoints to remain ordered and measurable. Workflow/approval changes themselves receive strong review.
 
 | Change set | Work orders | Exit condition |
 |---|---|---|
@@ -67,9 +67,9 @@ POST-DT-06 PILOT → DT-09 → DT-10 (optional batching/parallelism path)
 POST-DT-06 PILOT → DT-11         (strategy-ready milestone path)
 ```
 
-The owner authorized DT-02A and DT-02B as one combined DT-02 delivery on 9 September 2026. Implementation still establishes and measures the DT-02A fast default before enabling DT-02B routing so the incremental benefit remains observable. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer later automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
+The owner authorized DT-02A and DT-02B as one combined DT-02 delivery and DT-04 through DT-06 as one combined Change Set B delivery on 9 September 2026. Implementation still establishes and measures each internal checkpoint before enabling the next so the incremental behavior remains observable. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer later automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
 
-Implementation record: DT-01 was committed as `5faf73fe`; combined DT-02A/DT-02B was committed as `6420d7e8`. DT-03 selects the local-first acceptance model defined below. A local Task may become `ACCEPTED` only after controller-enforced integration validation of its frozen reviewed state and exact merge lineage. Publishing remains separately authorized, and the remote `acceptance` result confirms rather than retroactively grants local Task acceptance.
+Implementation record: DT-01 was committed as `5faf73fe`; combined DT-02A/DT-02B was committed as `6420d7e8`; DT-03 was committed as `311e6dce`. DT-03 selects the local-first acceptance model defined below. A local Task may become `ACCEPTED` only after controller-enforced integration validation of its frozen reviewed state and exact merge lineage. Publishing remains separately authorized, and the remote `acceptance` result confirms rather than retroactively grants local Task acceptance.
 
 ## 4. Change set A — Stop avoidable waiting
 
@@ -282,6 +282,13 @@ Move deterministic path checks, formatting verification, receipt validation, aut
 Retain the existing self-reference avoidance: committed evidence pins the tested tree/parent and report hashes; final accepted commit is written in close-out evidence after creation. Do not manufacture an empty implementation commit to record its own hash. [R7]
 
 **Acceptance:** Valid same-input results can be reused across a handoff; changing an input rejects them; forged/edited records are not accepted; a reviewer-selected new check runs; close-out needs no LLM invocation when no engineering decision remains; actual byte drift still blocks acceptance.
+
+### Change Set B implementation record — 9 September 2026
+
+- **DT-04:** The controller now distinguishes `IMPLEMENTATION_FIX`, `DESIGN_CHANGE`, `ADMINISTRATIVE_RETRY`, and `ENVIRONMENT_FAILURE`. Unchanged-scope Reviewer findings return directly to Executor for no more than two rounds; design changes and exhausted corrections return to Planner; unchanged-input administrative/environment work receives at most one retry. Allowlisted administrative paths exclude production, contracts, policies, journals, and the secret baseline. A one-correction path uses five reasoning turns (`P/E/R/E/R`) instead of the former six (`P/E/R/P/E/R`), a 16.7% reduction; two corrections use seven instead of nine, a 22.2% reduction. No elapsed-time or allowance saving is claimed before the pilot.
+- **DT-05:** Task activation now generates a schema-v1 runtime packet and validates every recorded source hash. An executor-ready Routine/Standard packet may proceed to the existing execute gate without Planner; Critical, blocked, ambiguous, or stale packets retain Planner. The real Task 1.18 packet was generated in 26.6 ms and was 20,454 JSON bytes. It conservatively classified `FEAT-ORCH-MANAGE_JOBS` as Critical, retained four FRs, one local NFR, 39 shared NFRs, ten pinned source locations, fourteen authorized write paths, its declared commit message, and zero invented resolutions. Root `AGENTS.md` was reduced from 33,708 to 26,289 measured characters (22.0%) by retaining binding invariants there and routing operational detail to `.agents/PROCEDURE.md` and `.agents/GOALS.md`.
+- **DT-06:** The integration runner stores complete command logs outside prompts and issues a controller-owned exact-input receipt. Product-byte, authority, policy/config/test/lock, diagnostic, result, or log drift invalidates reuse. Reviewer uses the receipt plus selected adversarial checks; the comprehensive integration profile is not repeated merely because review began. Authorized close-out is deterministic controller code that restricts staging to packet paths, creates the declared Task commit and explicit no-ff merge, verifies lineage, clears coordination only after commit success, and invokes no reasoning role. Receipt tests prove same-candidate handoff reuse and reject altered inputs/logs/records; close-out tests prove exact-path commit/merge/cleanup and fail before staging on an unauthorized path.
+- **Regression checkpoint:** The workflow/controller and `ci_check` regression suite passed 259 tests after the final documentation-contract correction. The orchestrator self-test also passed end to end. This is implementation evidence, not the post-DT-06 product-throughput pilot and not proof of a universal feature-time reduction.
 
 ### Post-DT-06 pilot and continuation gate
 
@@ -521,13 +528,15 @@ There is no universal feature-time promise. After the pilot, forecast the remain
 
 ## 11. Implementation handoff
 
-Use the following Task descriptions sequentially within the existing authorized workflow. These texts are work orders, not execution or remote-write approval. Do not combine them into one Task before an accepted workflow amendment permits such packaging:
+Use the following Task descriptions within the authorized workflow. These texts are work orders, not execution or remote-write approval. The recorded owner exceptions combined DT-02A/DT-02B and DT-04/DT-05/DT-06 while preserving their ordered internal checkpoints; no other work orders are implicitly combined:
 
 > **DT-01:** Implement DT-01 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`. Preserve HaruQuantAI V3 architecture, active/user work, secret detection, reviewed-byte identity and product behavior. Reproduce and repair only the evidenced mechanical close-out failures, publish generated-output discovery before execution, and ensure legitimate schema-validated Git identities do not require per-feature shared secret-baseline edits. Run focused controller/Git/security regressions and report actual timings and rollback.
 
 > **DT-02:** After DT-01 is accepted, implement DT-02A and DT-02B of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as one owner-authorized change set. Make ordinary pytest fast, retain explicit comprehensive coverage, add conservative validation profiles and straightforward UI/Python/workflow routing, measure the DT-02A checkpoint, then add candidate/dependency-aware routing with exact Git identities and fail-closed unknown scope.
 
 > **DT-03:** After the combined DT-02 is accepted, implement the local integration-protection portion of DT-03 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as a separate Task. Prove the replacement gate before relaxing broad pre-push hooks. Treat CI status, branch protection, publishing and remote acceptance as a separately authorized repository-administration step. Keep owner approvals, coverage, UI validation, provider-matrix evidence and stale-candidate rejection.
+
+> **Change Set B (DT-04/DT-05/DT-06):** Implement the three work orders as one owner-authorized change while preserving their internal order: first measure bounded classified failure routing, then generate and validate risk-tiered prepared packets, and finally reuse controller-produced exact-input validation receipts and replace reasoning-role close-out with deterministic controller mechanics. Keep independent engineering review, exact owner gates, fail-closed source/path/candidate identity, comprehensive integration acceptance, and Critical-task planning/adversarial review.
 
 Proceed to B after the three Change Set A Tasks are accepted. Run the mandatory three-feature checkpoint after DT-06. C and the DT-09/DT-10 portions of D are incremental extensions, not prerequisites for collecting the first gains. DT-11 may proceed after that checkpoint to prioritize the strategy-ready outcome.
 

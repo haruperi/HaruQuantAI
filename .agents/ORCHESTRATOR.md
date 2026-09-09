@@ -25,17 +25,21 @@ You — this chat — orchestrate HaruQuantAI Task and Goal workflows defined by
 ```text
 ORCHESTRATOR READY / TASK NONE
   → TASK_ACTIVATED
-  → task branch + validated Planner contract
-  → Planner P
+  → task branch + validated task packet
+  → Critical/unresolved: Planner P
+  → Routine/Standard executor-ready: owner execute gate
   → Executor E
+  → controller integration validation + exact-input receipt
   → Reviewer R
-  → correction loops reuse P/E/R
-  → Reviewer R close-out
+  → implementation fixes return directly to Executor (maximum two)
+  → design changes return to Planner
+  → owner commit gate
+  → deterministic controller close-out
   → ACCEPTED
   → ORCHESTRATOR READY / TASK NONE
 ```
 
-`TASK_ACTIVATED` passes clean `main`, records baseline, creates the deterministic task branch, instantiates the Planner contract and validates it. Planner never creates or switches the branch.
+`TASK_ACTIVATED` passes clean `main`, records baseline, creates the deterministic task branch, generates and validates the prepared task packet, and chooses the conservative risk route. Planner is instantiated for Critical or unresolved work. An executor-ready Routine/Standard packet proceeds to the ordinary owner execute gate without exploratory planning. Planner never creates or switches the branch.
 
 ## 3. Goal lifecycle
 
@@ -71,7 +75,7 @@ After an accepted non-final Goal child, the controller persists `NEXT_CHILD_CHAT
 
 ## 5. IDE DELEGATE
 
-The current IDE chat remains Controller and invokes one inspectable app-native agent for each role using the exact prepared `next-agent.md`. The returned opaque handle is bound to that role and Task run; later same-role iterations and Reviewer close-out resume it. For a Goal, each child receives a **new** P/E/R agent set. Never share a role handle across roles or Goal children.
+The current IDE chat remains Controller and invokes one inspectable app-native agent for each required reasoning role using the exact prepared `next-agent.md`. The returned opaque handle is bound to that role and Task run; later same-role iterations resume it. Deterministic close-out invokes no role agent. For a Goal, each child receives a **new** required-role agent set. Never share a role handle across roles or Goal children.
 
 ## 6. HEADLESS MODES
 
@@ -91,20 +95,25 @@ The schema-v4 runtime policy and frozen Task/Goal scope are hashed into run stat
 
 For one standalone Task keep four chats: Orchestrator, Planner, Executor, Reviewer. Reuse the P/E/R chats only inside that Task.
 
-For a Goal, keep the Goal Orchestrator chat for the whole Goal, but create a **new** dedicated Planner/Executor/Reviewer chat set for every child. Within each child, later iterations return to that child's existing role chat. Reviewer close-out uses that child's existing Reviewer chat.
+For a Goal, keep the Goal Orchestrator chat for the whole Goal, but create a **new** dedicated chat for every required reasoning role in each child. Within each child, later iterations return to that child's existing role chat. Deterministic close-out stays in the Orchestrator and needs no role chat.
 
 ## 8. Task routing table
 
 | Latest source/handoff | Next action |
 | --- | --- |
-| `ORCHESTRATOR / TASK_ACTIVATED` | Planner contract |
+| `ORCHESTRATOR / TASK_ACTIVATED` | Generate/validate task packet and classify risk |
+| `ORCHESTRATOR / PACKET_READY` | Routine/Standard owner execution gate; Critical/unresolved routes to Planner |
 | `PLANNER / PENDING_APPROVAL` | owner execution gate |
 | `PLANNER / BLOCKED` | resolve external cause; resume same Planner conversation |
 | `EXECUTOR / READY_FOR_REVIEW` | Reviewer contract |
-| `EXECUTOR / BLOCKED` | Planner correction contract |
-| `REVIEWER / CHANGES_REQUESTED` | Planner correction contract |
+| `EXECUTOR / DESIGN_CHANGE` | Planner correction contract |
+| `EXECUTOR / BLOCKED` | classify; design/external blockers route to Planner or stop |
+| `REVIEWER / IMPLEMENTATION_FIX` | Executor correction contract; Planner after two direct rounds |
+| `REVIEWER / DESIGN_CHANGE` | Planner correction contract |
+| `REVIEWER / CHANGES_REQUESTED` | legacy compatibility route to Planner |
 | `REVIEWER / PENDING_COMMIT` | owner commit gate |
-| `REVIEWER / ACCEPTED` | Task terminal; Goal may reconcile/advance |
+| `CONTROLLER / PENDING_COMMIT` | verify receipt and perform deterministic close-out |
+| `CONTROLLER / ACCEPTED` | Task terminal; Goal may reconcile/advance |
 
 ## 9. Goal routing table
 

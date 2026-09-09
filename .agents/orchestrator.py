@@ -736,7 +736,7 @@ def _doctor_protocol(cfg: dict[str, Any]) -> bool:
         "scope": "workflow-run",
         "same_role_resume": True,
         "new_run_new_sessions": True,
-        "reviewer_closeout_reuses_reviewer": True,
+        "reviewer_closeout_reuses_reviewer": False,
         "session_context_is_authority": False,
     }
     for key, expected in required_policy.items():
@@ -871,7 +871,14 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
     (tmp / "scripts").mkdir(parents=True)
     for name in ("planner.md", "executor.md", "reviewer.md", "next-agent.md"):
         (tmp / ".agents/task" / name).write_bytes(b"")
-    for key in ("planner", "executor", "reviewer", "reviewer_closeout", "default"):
+    for key in (
+        "planner",
+        "executor",
+        "executor_correction",
+        "reviewer",
+        "reviewer_closeout",
+        "default",
+    ):
         source = source_cfg["templates"][key]
         target_name = (
             "reviewer-closeout.md" if key == "reviewer_closeout" else source.name
@@ -896,6 +903,7 @@ parser.add_argument("--base")
 parser.add_argument("--head")
 parser.add_argument("--reviewed-worktree", action="store_true")
 parser.add_argument("--report", type=Path, required=True)
+parser.add_argument("--log-dir", type=Path, required=True)
 args = parser.parse_args()
 
 def resolve(revision):
@@ -909,6 +917,11 @@ step = {
     "command": ["self-test"],
     "working_directory": ".",
 }
+args.log_dir.mkdir(parents=True, exist_ok=True)
+log_path = args.log_dir / "self-test.log"
+log_path.write_text("passed\\n", encoding="utf-8")
+import hashlib
+log_sha256 = hashlib.sha256(log_path.read_bytes()).hexdigest()
 payload = {
     "schema_version": 1,
     "report_kind": "diagnostic-not-reusable-validation-receipt",
@@ -922,7 +935,13 @@ payload = {
         },
     },
     "steps": [step],
-    "results": [{**step, "duration_seconds": 0.0, "exit_code": 0}],
+    "results": [{
+        **step,
+        "duration_seconds": 0.0,
+        "exit_code": 0,
+        "log_path": str(log_path),
+        "log_sha256": log_sha256,
+    }],
 }
 args.report.parent.mkdir(parents=True, exist_ok=True)
 args.report.write_text(json.dumps(payload), encoding="utf-8")
@@ -991,6 +1010,7 @@ args.report.write_text(json.dumps(payload), encoding="utf-8")
         "templates": {
             "planner": tmp / "docs/templates/prompt/planner.md",
             "executor": tmp / "docs/templates/prompt/executor.md",
+            "executor_correction": tmp / "docs/templates/prompt/executor-correction.md",
             "reviewer": tmp / "docs/templates/prompt/reviewer.md",
             "reviewer_closeout": tmp / "docs/templates/prompt/reviewer-closeout.md",
             "default": tmp / "docs/templates/prompt/default.md",
@@ -1031,6 +1051,7 @@ def cmd_self_test(_args: argparse.Namespace) -> int:
         state["runtime_policy_fingerprint"] = policy.fingerprint
         state["scope_fingerprint"] = scope_fingerprint(state["task"])
         state["effective_max_iterations"] = policy.max_iterations
+        state["commit_message"] = "feat(test): complete FEAT-DEMO"
         result = resume_task_run(cfg, state)
         checks: dict[str, bool] = {
             "status accepted": result.get("status") == "ACCEPTED",
