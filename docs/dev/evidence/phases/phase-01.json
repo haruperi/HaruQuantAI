@@ -18,8 +18,13 @@
     "1.27": "0c4c76cd44466e9f3398dbd35f81185c8a3c77e1",
     "1.28": "56935e4f860cd67cd523e1aca30333f2415cd0e8",
     "1.29": "02fbdeaf0c38e00015709c5db4f4fca910495a84",
-    "1.30": null
+    "1.30": "ebc44b10a6e447290fc2ccc760431050b9dd7f59"
   },
+  "integration_commits": [
+    "dc3e7094c949bed3f49221965cdacf46fe34e4f1",
+    "e4f3cc891f7820880f3445097e06a21139e87ffc",
+    "8042f19f9282513e659db8a5f084fc618a44aff8"
+  ],
   "checkpoint_spec": "tests/ui/e2e/research/phase_01.spec.ts",
   "required_flow": [
     "sign in",
@@ -32,7 +37,10 @@
   ],
   "execution": {
     "status": "PENDING",
-    "reason": "Repository connector can write/read GitHub but does not execute the local browser/runtime benchmark suite. No E2E pass is claimed."
+    "reason": "Repository connector can write/read GitHub but does not execute the local Windows/browser/runtime benchmark suite. No pytest, Ruff, mypy, UI build, Playwright, coverage, cancellation-latency, or BM-APP-01 pass is claimed here."
   },
-  "review": {"reviewer_verdict": "PENDING"}
+  "review": {
+    "reviewer_verdict": "PENDING",
+    "notes": "Implementation and canonical discovery/registry wiring are present. Independent execution and review remain required before Phase 1 may be marked ACCEPTED."
+  }
 }
