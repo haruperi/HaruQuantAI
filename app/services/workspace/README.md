@@ -106,7 +106,7 @@ Feature owners are independent and physically removable. The selected package is
 | --- | --- | --- | --- | --- | --- | --- |
 | [`FEAT-WS-MANAGE_WORKSPACES`](#feat-ws-manage-workspaces) | Open, recover and back up a workspace | `app/services/workspace/manage_workspaces/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-EXECUTE_PERSISTENCE`](#feat-ws-execute-persistence) | Execute bounded feature-owned transactions | `app/services/workspace/execute_persistence/` | U0 | 3 | 1 | VERIFIED |
-| [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Publish and retain immutable artifact bytes | `app/services/workspace/manage_artifacts/` | U1 | 3 | 1 | NOT_REVALIDATED |
+| [`FEAT-WS-MANAGE_ARTIFACTS`](#feat-ws-manage-artifacts) | Publish and retain immutable artifact bytes | `app/services/workspace/manage_artifacts/` | U1 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-MANAGE_ACCOUNTS`](#feat-ws-manage-accounts) | Verify accounts, principals and sessions | `app/services/workspace/manage_accounts/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-SECURE_LOCAL_ACCESS`](#feat-ws-secure-local-access) | Resolve secrets and protect host access | `app/services/workspace/secure_local_access/` | U0 | 3 | 1 | VERIFIED |
 | [`FEAT-WS-ADMINISTER_SETTINGS`](#feat-ws-administer-settings) | Version user-visible system settings | `app/services/workspace/administer_settings/` | U1 | 3 | 1 | VERIFIED |
@@ -437,7 +437,7 @@ Disable and physically remove the actual reconciled owner of `FEAT-WS-EXECUTE_PE
 
 > **Feature ID:** `FEAT-WS-MANAGE_ARTIFACTS`
 > **Domain:** `workspace`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Implemented and verified` — terminal Executor evidence recorded; independent Reviewer authority remains pending.
 > **Selected owner:** `app/services/workspace/manage_artifacts/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -508,9 +508,9 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Responsibility / required behavior | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `FR-TRC-WS-MANAGE_ARTIFACTS-001` | Stage, flush and validate byte count/schema declaration/content hash before atomic publication; issue a custody receipt. | `AT-WS-MANAGE_ARTIFACTS-001` | A bad hash or truncated write yields no published artifact reference; retry of the same publication is idempotent. |
-| PENDING | `FR-TRC-WS-MANAGE_ARTIFACTS-002` | Resolve authorized artifact IDs and bounded download grants; reject host paths, cross-account access and expired grants. | `AT-WS-MANAGE_ARTIFACTS-002` | Traversal/UNC/drive paths and a grant for another principal fail; valid downloads match the immutable checksum. |
-| PENDING | `FR-TRC-WS-MANAGE_ARTIFACTS-003` | Retain referenced artifacts and legal holds; clean eligible staging/orphans through admitted maintenance with an audit receipt. | `AT-WS-MANAGE_ARTIFACTS-003` | Deleting a databank membership leaves its referenced strategy/result bytes intact; expired unreferenced staging is removed and recorded. |
+| VERIFIED | `FR-TRC-WS-MANAGE_ARTIFACTS-001` | Stage, flush and validate byte count/schema declaration/content hash before atomic publication; issue a custody receipt. | `AT-WS-MANAGE_ARTIFACTS-001` | A bad hash or truncated write yields no published artifact reference; retry of the same publication is idempotent. |
+| VERIFIED | `FR-TRC-WS-MANAGE_ARTIFACTS-002` | Resolve authorized artifact IDs and bounded download grants; reject host paths, cross-account access and expired grants. | `AT-WS-MANAGE_ARTIFACTS-002` | Traversal/UNC/drive paths and a grant for another principal fail; valid downloads match the immutable checksum. |
+| VERIFIED | `FR-TRC-WS-MANAGE_ARTIFACTS-003` | Retain referenced artifacts and legal holds; clean eligible staging/orphans through admitted maintenance with an audit receipt. | `AT-WS-MANAGE_ARTIFACTS-003` | Deleting a databank membership leaves its referenced strategy/result bytes intact; expired unreferenced staging is removed and recorded. |
 
 **Implementing-symbol and side-effect binding:** bind each requirement to the actual operation in the selected public contract and its focused implementation module before acceptance. For each FR, the acceptance receipt records actual symbol, side effects, typed error/exception branch, usage scenario and test location. Do not replace a specified typed failure with a guessed `ValueError`, or treat its absence from this summary as success.
 
@@ -518,7 +518,7 @@ These are documentary ownership targets, not a claim that files or symbols alrea
 
 | Status | Requirement ID | Quality / removal constraint | Acceptance ID | Expected result |
 | --- | --- | --- | --- | --- |
-| PENDING | `NFR-TRC-WS-MANAGE_ARTIFACTS-001` | Removing FEAT-WS-MANAGE_ARTIFACTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_ARTIFACTS-001` | Disable and physically remove manage_artifacts; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
+| VERIFIED | `NFR-TRC-WS-MANAGE_ARTIFACTS-001` | Removing FEAT-WS-MANAGE_ARTIFACTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider. | `ATN-WS-MANAGE_ARTIFACTS-001` | Disable and physically remove manage_artifacts; its operation is unavailable, unrelated capabilities remain usable, and retained source objects are unchanged. |
 
 #### Applicable Shared NFRs, Catalogue and Source Bindings
 

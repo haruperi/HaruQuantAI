@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from app.contracts.workspace.administer_settings import (
         AdministerSettingsCapability,
     )
+    from app.contracts.workspace.artifacts import ManageArtifactsCapability
     from app.contracts.workspace.manage_accounts import ManageAccountsCapability
     from app.contracts.workspace.manage_workspaces import ManageWorkspacesCapability
     from app.contracts.workspace.persistence import PersistenceCapability
@@ -27,6 +28,11 @@ MANAGE_WORKSPACES_CAPABILITY: CapabilityKey[ManageWorkspacesCapability] = Capabi
 
 PERSISTENCE_CAPABILITY: CapabilityKey[PersistenceCapability] = CapabilityKey(
     name="workspace.persistence",
+    major=1,
+)
+
+MANAGE_ARTIFACTS_CAPABILITY: CapabilityKey[ManageArtifactsCapability] = CapabilityKey(
+    name="workspace.artifacts",
     major=1,
 )
 
