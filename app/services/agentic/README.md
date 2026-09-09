@@ -43,7 +43,7 @@ Broker credentials, order construction, Risk approval, kill-switch clearing, liv
 
 | Evidence | Capability | Protocol / DTO / contract target | Major | Purpose |
 | --- | --- | --- | --- | --- |
-| DOCUMENTARY_BOUND | `agentic.mandate@1` | `enforce_mandate(request)`<br>[`app/contracts/agentic/mandate.py`](../../contracts/agentic/mandate.py) | 1 | Mandate Enforcement |
+| ACCEPTED | `agentic.mandate@1` | `enforce_mandate(request)`<br>[`app/contracts/agentic/mandate.py`](../../contracts/agentic/mandate.py) | 1 | Mandate Enforcement |
 | DOCUMENTARY_BOUND | `agentic.operations@1` | `operate_agentic_runs(request)`<br>[`app/contracts/agentic/operations.py`](../../contracts/agentic/operations.py) | 1 | Operations, Incidents and Replay Validation |
 | DOCUMENTARY_BOUND | `agentic.roles@1` | `manage_role_contributions(request)`<br>[`app/contracts/agentic/roles.py`](../../contracts/agentic/roles.py) | 1 | Role Contribution Registry |
 | DOCUMENTARY_BOUND | `agentic.tool-governance@1` | `govern_tool_calls(request)`<br>[`app/contracts/agentic/tool_governance.py`](../../contracts/agentic/tool_governance.py) | 1 | Tool Governance and Human Actions |
@@ -107,7 +107,7 @@ Immutable mandates and pinned policy references; run/checkpoint/claim/lease/huma
 
 | Evidence | Owning feature | Partition / ownership class | Driver binding | Retention / read boundary |
 | --- | --- | --- | --- | --- |
-| PHASE0_BOUND | [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
+| PHASE0_BOUND | [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | None | No private durable namespace | Stateless mandate verification; no feature-owned SQL tables. |
 | PHASE0_BOUND | [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
 | PHASE0_BOUND | [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
 | PHASE0_BOUND | [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls) | Feature-owned semantic state | Existing declared driver; no new database selected. | Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition. |
@@ -157,7 +157,7 @@ Feature owners are independent and physically removable. The selected package is
 
 | Feature | Delivered value | Selected owner package | First U gate | FRs | Local NFRs | Evidence |
 | --- | --- | --- | --- | --- | --- | --- |
-| [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | Mandate Enforcement | `app/services/agentic/enforce_mandate/` | U1 | 3 | 2 | NOT_REVALIDATED |
+| [`FEAT-AGT-ENFORCE_MANDATE`](#feat-agt-enforce-mandate) | Mandate Enforcement | `app/services/agentic/enforce_mandate/` | U1 | 3 | 2 | ACCEPTED |
 | [`FEAT-AGT-OPERATE_RUNS`](#feat-agt-operate-runs) | Operations, Incidents and Replay Validation | `app/services/agentic/operate_runs/` | U1 | 4 | 2 | NOT_REVALIDATED |
 | [`FEAT-AGT-REGISTER_ROLES`](#feat-agt-register-roles) | Role Contribution Registry | `app/services/agentic/register_roles/` | U1 | 3 | 2 | NOT_REVALIDATED |
 | [`FEAT-AGT-GOVERN_TOOL_CALLS`](#feat-agt-govern-tool-calls) | Tool Governance and Human Actions | `app/services/agentic/govern_tool_calls/` | U1 | 5 | 2 | NOT_REVALIDATED |
@@ -432,7 +432,7 @@ Each card is one permanent feature/task slot. Its owned FRs, local NFRs and expe
 
 > **Feature ID:** `FEAT-AGT-ENFORCE_MANDATE`
 > **Domain:** `agentic`
-> **Status:** `Partial` — target documented; full-scope implementation evidence **NOT_REVALIDATED**.
+> **Status:** `Complete` — implementation verified; evidence recorded in acceptance manifest.
 > **Selected owner:** `app/services/agentic/enforce_mandate/`
 > **First release milestone:** `U1`; execution order remains in the [Phased Feature Implementation Plan](../../../docs/dev/Phased_Feature_Implementation_Plan.md).
 
@@ -476,13 +476,13 @@ Teardown is idempotent. Failed mount unwinds partial effects. Dependency replace
 
 #### Persistent State Ownership
 
-**Ownership class:** Feature-owned semantic state.
+**Ownership class:** None.
 
-**Records:** Only records/artifact references required by the functional requirements below; Immutable mandates and pinned policy references; run/checkpoint/claim/lease/human-action state; append-only audit/incident and outcome records; profile eligibility; scoped memory; proposal and staging receipts. Conversations remain Workspace-owned.
+**Records:** Stateless authority evaluation; no private durable namespace. Immutable outputs use workflow artifact operations/calling owner and Workspace custody.
 
-**Retention and deletion:** Retain committed evidence across deactivate/reactivate; purge only through explicit authorization, dependency/reference checks and recorded disposition.
+**Retention and deletion:** Pure capability provider; unmounting or removing leaves no retained durable state.
 
-**Namespace / schema / driver binding:** Literal namespace, existing schema version, migrations and driver binding must be reconciled with the current feature manifest. No table ownership is transferred to Workspace merely because it executes persistence. A missing literal binding is an explicit §6 precondition, not permission to choose a schema version or table name during execution.
+**Namespace / schema / driver binding:** `FeatureSpec.state = None`; no database tables or migrations owned.
 
 #### Feature Package Structure & Files
 
@@ -494,7 +494,7 @@ Teardown is idempotent. Failed mount unwinds partial effects. Dependency replace
 | config.py | Strict typed configuration with unknown-key validation | Compatible FeatureConfig.from_dict() binding; no invented accepted keys. |
 | feature.py | Scoped mount adapter and zero-argument factory | create_feature(); mount through FeatureContext/FeatureScope. |
 | enforce_mandate.py | Focused production domain-logic module | enforce_mandate. |
-| _persistence.py | Optional owner of all feature-local database operations when durable state is required | Declared storage operations through public Workspace persistence contracts; no raw connection, policy, authorization or orchestration. |
+| _persistence.py | Omitted (stateless feature; no database operations) | Not implemented. |
 | _usage.py | Required bounded offline usage scenarios and executable __main__ harness | _run_usage_example(); scenarios map to every applicable FR without owning business logic. |
 
 These are documentary ownership targets, not a claim that files or symbols already exist. Reconcile a compatible existing filename/symbol once in the feature’s path-binding receipt rather than creating duplicate logic. Public contract files remain outside the removable backend owner.

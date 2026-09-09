@@ -1016,9 +1016,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-15"></a>
 
-### - [ ] Task 1.15 — FEAT-AGT-ENFORCE_MANDATE — Mandate Enforcement
+### - [x] Task 1.15 — FEAT-AGT-ENFORCE_MANDATE — Mandate Enforcement
 
-**Status:** `NOT_STARTED_IN_TARGET` · **Domain:** Agentic · **Owner specification:** `app/services/agentic/README.md` · **Register first slice:** U1.
+**Status:** `ACCEPTED` · **Domain:** Agentic · **Owner specification:** `app/services/agentic/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** 1.04, 1.11.
 
@@ -1068,7 +1068,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(agentic): complete FEAT-AGT-ENFORCE_MANDATE`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260908-175504-814467-complete-selected-implementation-entries-1.15-enforce-mandate` · stateless fail-closed mandate enforcement capability, contracts, tests, usage recipe, and evidence manifest.
 
 ---
 

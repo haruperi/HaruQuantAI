@@ -1,0 +1,115 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
+  "task_id": "1.15",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/agentic/README.md",
+  "baseline_commit": "d583e4c99204c3510f6363ad8e5154af01b1096f",
+  "acceptance_commit": "task-closeout:20260908-175504-814467-complete-selected-implementation-entries-1.15-enforce-mandate",
+  "requirements": [
+    {
+      "id": "FR-AGT-VALIDATE_MANDATE",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_traceability.py::test_trc_mandate_001_validation_and_tamper"
+    },
+    {
+      "id": "FR-AGT-ENFORCE_AUTHORITY_BOUNDARY",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_traceability.py::test_trc_mandate_002_prohibited_authorities"
+    },
+    {
+      "id": "FR-AGT-FAIL_CLOSED_ON_MANDATE",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_traceability.py::test_trc_mandate_003_missing_configuration_and_isolation"
+    },
+    {
+      "id": "NFR-TRC-AGT-ENFORCE_MANDATE-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_lifecycle.py::test_trc_lifecycle_001_budget_exhaustion_and_narrowing"
+    },
+    {
+      "id": "NFR-TRC-AGT-ENFORCE_MANDATE-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_lifecycle.py::test_trc_lifecycle_002_100_mount_unmount_cycles"
+    },
+    {
+      "id": "AT-AGT-ENFORCE_MANDATE-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_traceability.py::test_trc_mandate_001_narrowest_rule_wins"
+    },
+    {
+      "id": "AT-AGT-ENFORCE_MANDATE-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_traceability.py::test_trc_mandate_002_prohibited_authorities"
+    },
+    {
+      "id": "AT-AGT-ENFORCE_MANDATE-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_traceability.py::test_trc_mandate_003_missing_configuration_and_isolation"
+    },
+    {
+      "id": "ATN-AGT-ENFORCE_MANDATE-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_lifecycle.py::test_trc_lifecycle_001_expired_at_retry_and_freshness"
+    },
+    {
+      "id": "ATN-AGT-ENFORCE_MANDATE-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/agentic/enforce_mandate/test_lifecycle.py::test_trc_lifecycle_002_100_mount_unmount_cycles"
+    }
+  ],
+  "catalogue_entries": [
+    "Validation of immutable FirmMandate integrity, time bounds, and budget envelopes",
+    "Pointwise set-intersection scope narrowing against mandate and system settings",
+    "Fail-closed authority boundary preventing Agentic grants of prohibited operational authorities",
+    "Public capability agentic.mandate@1"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/agentic/mandate.py, capabilities.py"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "tests/services/agentic/enforce_mandate/test_traceability.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "tests/services/agentic/enforce_mandate/test_lifecycle.py"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Internal backend mandate enforcement capability consumed by Agentic operations"
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Mandate enforcement backend provider without direct UI component"
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/agentic/enforce_mandate/_usage.py"
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run --frozen pytest tests/services/agentic/enforce_mandate -v -o addopts=\"\"",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python -m app.services.agentic.enforce_mandate._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen ruff check app/contracts/agentic app/services/agentic tests/services/agentic",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen mypy app/contracts/agentic app/services/agentic/enforce_mandate tests/services/agentic/enforce_mandate",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "ACCEPTED",
+    "reviewer_notes": "Stateless fail-closed mandate enforcement verified with 100 mount/unmount cycles, deterministic digest validation, temporal checks, system narrowing, and zero prohibited receiver invocations."
+  }
+}
