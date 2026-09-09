@@ -40,6 +40,14 @@ When Additional context contains `Goal unattended assumption policy:`, make one 
 
 Produce the next complete numbered dry run and the complete prompt for the next role.
 
+Before freezing path authority, identify every deterministic generator applicable
+to the planned source changes. Use its non-mutating output-inventory interface
+when available. For Phase 0 evidence, run
+`uv run --locked python scripts/generate_phase0_evidence.py --list-outputs`.
+Record the complete applicable inventory in the dry run and include every output
+the Executor may write in `ALLOWED_WRITE_PATHS`; do not wait for execution or
+close-out to discover generated paths.
+
 Before planning, verify that the repository is already on the task branch supplied above, that the branch still points to the recorded baseline before task work, and that the incoming `next-agent.md` metadata matches the active task. Branch creation and switching are orchestration responsibilities, not Planner responsibilities.
 
 Success looks like:

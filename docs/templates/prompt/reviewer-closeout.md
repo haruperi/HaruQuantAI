@@ -29,6 +29,12 @@ The orchestrator has validly satisfied the `APPROVED: COMMIT` gate from either t
 
 This is a continuation of the same Reviewer role session that produced the accepted review. Re-verify branch, HEAD, review number, baseline, diff/path inventory, and clean unchanged `main` preconditions. The orchestrator has already archived immutable close-out evidence. Read the archived state and append a deterministic commit-authorization record that names the actual `OWNER_MESSAGE` or `RUN_PREAUTHORIZATION` source and, for preauthorization, its policy/scope hashes. If unchanged, run final gates, stage only approved implementation paths, and create the one authorized local Task implementation commit. Only after that commit succeeds, empty all four `.agents/task/` coordination files, verify the Task branch is clean, verify unchanged `main`, and run `git merge --no-ff <task-branch> -m "merge(<task-id>): accept reviewed task"`. Verify that the resulting merge commit has exactly two parents, with the recorded baseline as first parent and the exact Task commit as second parent; verify the Task commit is an ancestor, the merge tree equals the Task tree, and the approved changed-path set is exact. Then safely delete the merged branch with `git branch -d`.
 
+Every close-out validation command must be check-only. Do not run a formatter,
+generator, autofix or hook configuration that can repair the reviewed candidate.
+If a required gate changes any reviewed or coordination byte, stop close-out and
+return the Task through `CHANGES_REQUESTED`; never stage the mutation as though it
+were independently reviewed.
+
 For a refreshed parallel lane, create the Task commit in the lane, empty its
 coordination files, merge from the primary repository named above while holding
 the serialized integration authority, then detach the clean lane at the merge

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+import subprocess
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -136,3 +137,51 @@ def test_stale_canonical_template_rejected(
     )
     with pytest.raises(orc.OrchestratorError, match="Canonical template changed"):
         orc._invoke_pending(cfg, state, "PLANNER")
+
+
+def test_staging_or_normalizing_coordination_bytes_changes_fingerprint(
+    orc: ModuleType,
+    repo: Path,
+) -> None:
+    """CRLF staging cannot preserve an approval fingerprint silently."""
+    attributes = repo / ".gitattributes"
+    attributes.write_text(".agents/task/*.md text eol=lf\n", encoding="utf-8")
+    subprocess.run(["git", "config", "core.autocrlf", "true"], cwd=repo, check=True)
+    subprocess.run(["git", "add", ".gitattributes"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "commit", "--no-verify", "-m", "attributes"],
+        cwd=repo,
+        check=True,
+        capture_output=True,
+    )
+    planner = repo / ".agents/task/planner.md"
+    planner.write_bytes(b"approved\r\n")
+    before_stage = orc._worktree_fingerprint(repo)
+
+    subprocess.run(["git", "add", ".agents/task/planner.md"], cwd=repo, check=True)
+    after_stage = orc._worktree_fingerprint(repo)
+
+    assert after_stage != before_stage
+    assert (
+        subprocess.run(
+            ["git", "show", ":.agents/task/planner.md"],
+            cwd=repo,
+            check=True,
+            capture_output=True,
+        ).stdout
+        == b"approved\n"
+    )
+
+
+def test_product_change_invalidates_validated_role_artifact(
+    orc: ModuleType,
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+    repo: Path,
+) -> None:
+    """A product mutation after prompt validation fails before role execution."""
+    orc._activate_task(cfg, state)
+    (repo / "product.py").write_text("changed = True\n", encoding="utf-8")
+
+    with pytest.raises(orc.OrchestratorError, match="Working tree changed"):
+        orc._ensure_pending_artifact_unchanged(cfg, state)

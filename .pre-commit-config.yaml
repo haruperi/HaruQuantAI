@@ -44,14 +44,14 @@ repos:
     hooks:
       - id: ruff-check
         name: Ruff lint
-        entry: uv run --locked ruff check --fix --force-exclude
+        entry: uv run --locked ruff check --force-exclude
         language: system
         types_or: [python, pyi]
         stages: [pre-commit]
 
       - id: ruff-format
         name: Ruff format
-        entry: uv run --locked ruff format
+        entry: uv run --locked ruff format --check
         language: system
         types_or: [python, pyi]
         stages: [pre-commit]
@@ -89,12 +89,11 @@ repos:
         stages: [pre-push]
 
   # Secret detection runs after formatting so it scans the exact final bytes.
-  - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.5.0
+  - repo: local
     hooks:
       - id: detect-secrets
-        args:
-          - "--baseline"
-          - ".github/.secrets.baseline"
+        name: Detect secrets without mutating the tracked baseline
+        entry: uv run --locked python scripts/detect_secrets_filters.py --baseline .github/.secrets.baseline
+        language: system
         exclude: \.secrets\.baseline$
         stages: [pre-commit]

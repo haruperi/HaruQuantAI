@@ -159,3 +159,26 @@ def test_failed_closeout_before_commit_preserves_journals(
     for journal in cfg["journals"].values():
         assert journal.read_text(encoding="utf-8") == "evidence\n"
     assert cfg["next_agent"].read_text(encoding="utf-8") == "closeout prompt\n"
+
+
+def test_closeout_rejects_tree_that_differs_from_reviewed_task(
+    orc: ModuleType, cfg: dict[str, Any], repo: Path
+) -> None:
+    """A post-review mutation cannot be absorbed into accepted merge history."""
+    baseline = _git(repo, "rev-parse", "HEAD")
+    _git(repo, "switch", "-c", "task/test-closeout")
+    (repo / "demo.txt").write_text("approved\n", encoding="utf-8")
+    _git(repo, "add", "demo.txt")
+    _git(repo, "commit", "--no-verify", "-m", "one task commit")
+    task_commit = _git(repo, "rev-parse", "HEAD")
+    _git(repo, "switch", "main")
+    _git(repo, "merge", "--no-commit", "--no-ff", "task/test-closeout")
+    (repo / "demo.txt").write_text("mutated\n", encoding="utf-8")
+    _git(repo, "add", "demo.txt")
+    _git(repo, "commit", "--no-verify", "-m", "merge with unreviewed mutation")
+    _git(repo, "branch", "-d", "task/test-closeout")
+
+    state = _closeout_state(repo, baseline)
+    assert _git(repo, "rev-parse", "HEAD^2") == task_commit
+    with pytest.raises(orc.OrchestratorError, match="merge tree differs"):
+        orc._verify_closeout_lineage(cfg, state)

@@ -18,6 +18,19 @@ PLAN_PATH = REPO / "docs/dev/Phased_Feature_Implementation_Plan.md"
 REGISTER_PATH = REPO / "docs/dev/Feature_Requirement_Traceability_Register.md"
 EVIDENCE_DIR = REPO / "docs/dev/evidence"
 SOURCE_DIR = EVIDENCE_DIR / "source"
+GENERATED_OUTPUT_PATHS = (
+    "docs/dev/evidence/baseline-manifest.json",
+    "docs/dev/evidence/source/traceability-register.json",
+    "docs/dev/evidence/source/dependency-graph.json",
+    "docs/dev/evidence/feature-baseline.json",
+    "docs/dev/evidence/path-bindings.json",
+    "docs/dev/evidence/usage-bindings.json",
+    "docs/dev/evidence/requirement-status.json",
+    "docs/dev/evidence/contract-bindings.json",
+    "docs/dev/evidence/dependency-schedule.json",
+    "docs/dev/evidence/operation-readiness.json",
+    "docs/dev/evidence/phase-ui-acceptance-matrix.json",
+)
 
 TASK_RE = re.compile(
     r"^### - \[(?P<mark>[ xX])\] Task (?P<task>\d+\.\d+) \u2014 "
@@ -698,6 +711,15 @@ def _render(payload: dict[str, Any]) -> str:
     return json.dumps(payload, indent=2, ensure_ascii=False) + "\n"
 
 
+def generated_output_paths() -> tuple[Path, ...]:
+    """Return the generator's complete ordered output inventory.
+
+    Returns:
+        Repository-rooted paths in their stable publication order.
+    """
+    return tuple(REPO / path for path in GENERATED_OUTPUT_PATHS)
+
+
 def main() -> int:
     """Write or verify generated evidence.
 
@@ -708,11 +730,24 @@ def main() -> int:
     mode = parser.add_mutually_exclusive_group(required=True)
     mode.add_argument("--write", action="store_true", help="write generated evidence")
     mode.add_argument("--check", action="store_true", help="fail on generated drift")
+    mode.add_argument(
+        "--list-outputs",
+        action="store_true",
+        help="list every repository-relative output without generating it",
+    )
     args = parser.parse_args()
+    if args.list_outputs:
+        for output_path in GENERATED_OUTPUT_PATHS:
+            print(output_path)
+        return 0
     try:
         payloads = build_payloads()
     except (OSError, KeyError, TypeError, subprocess.CalledProcessError) as error:
         print(f"[FAIL] unable to generate Phase 0 evidence: {error}")
+        return 1
+    expected_outputs = set(generated_output_paths())
+    if set(payloads) != expected_outputs:
+        print("[FAIL] generated Phase 0 output inventory differs from build output")
         return 1
     drift: list[str] = []
     for path, payload in payloads.items():

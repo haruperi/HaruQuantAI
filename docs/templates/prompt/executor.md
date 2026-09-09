@@ -35,6 +35,12 @@ Deferred integration paths: `{{deferred_integration_paths}}`
 
 Verify the authorization source, baseline/branch/path inventory, frozen policy/scope fingerprints when present, and gate hash of the exact Planner-journal bytes preceding the current gate record. Do not hash the entire post-authorization journal. Read the approved plan and routed authorities, implement only that scope, run only its change-scoped validation, and append `Report {{iteration}}` to `.agents/task/executor.md`.
 
+Run approved mutating generators, formatters and autofixes before freezing the
+candidate and appending the terminal Executor report. After that report is
+written, validation is check-only: do not invoke a command or hook that can
+rewrite product, evidence or coordination bytes. Any required later mutation
+invalidates the candidate and requires the appropriate correction path.
+
 For a parallel draft, do not modify a deferred integration path. Report those
 obligations as pending serialized reconciliation; do not claim them complete.
 

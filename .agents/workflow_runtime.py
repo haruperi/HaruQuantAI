@@ -351,6 +351,55 @@ def _record(state: dict[str, Any], phase: str, **extra: Any) -> None:
     state.setdefault("history", []).append(entry)
 
 
+def _repository_divergence(repo: Path, branch: str) -> dict[str, str | int | None]:
+    """Return local branch/upstream identity and divergence without fetching.
+
+    Args:
+        repo: Repository to inspect.
+        branch: Local branch whose configured upstream should be compared.
+
+    Returns:
+        Snapshot containing local and upstream identities plus ahead/behind counts.
+        Upstream fields are ``None`` when the branch has no usable local upstream.
+    """
+    head = _git_ok(repo, "rev-parse", branch)
+    upstream_result = _git(
+        repo,
+        "rev-parse",
+        "--abbrev-ref",
+        f"{branch}@{{upstream}}",
+    )
+    if upstream_result.returncode != 0:
+        return {
+            "branch": branch,
+            "head": head,
+            "upstream": None,
+            "upstream_head": None,
+            "ahead": None,
+            "behind": None,
+        }
+    upstream = upstream_result.stdout.strip()
+    upstream_head = _git_ok(repo, "rev-parse", upstream)
+    counts = _git_ok(
+        repo,
+        "rev-list",
+        "--left-right",
+        "--count",
+        f"{upstream}...{branch}",
+    ).split()
+    if len(counts) != 2:
+        raise OrchestratorError("Unable to determine local branch divergence.")
+    behind, ahead = (int(value) for value in counts)
+    return {
+        "branch": branch,
+        "head": head,
+        "upstream": upstream,
+        "upstream_head": upstream_head,
+        "ahead": ahead,
+        "behind": behind,
+    }
+
+
 def _entry_gate(cfg: dict[str, Any]) -> str:
     repo: Path = cfg["repo"]
     if not (repo / ".git").exists():
@@ -369,7 +418,23 @@ def _entry_gate(cfg: dict[str, Any]) -> str:
             raise OrchestratorError(f"Missing active-task file: {path}")
         if path.stat().st_size != 0:
             raise OrchestratorError(f"Active-task file is not empty: {path}")
-    return str(_git_ok(repo, "rev-parse", "HEAD"))
+    divergence = _repository_divergence(repo, branch)
+    if divergence["upstream"] is None:
+        print(
+            "[info] repository baseline: "
+            f"branch={branch} head={divergence['head']} upstream=UNAVAILABLE "
+            "ahead=UNKNOWN behind=UNKNOWN local_refs_only=true"
+        )
+    else:
+        print(
+            "[info] repository baseline: "
+            f"branch={branch} head={divergence['head']} "
+            f"upstream={divergence['upstream']} "
+            f"upstream_head={divergence['upstream_head']} "
+            f"ahead={divergence['ahead']} behind={divergence['behind']} "
+            "local_refs_only=true"
+        )
+    return str(divergence["head"])
 
 
 def _branch_component(value: str) -> str:

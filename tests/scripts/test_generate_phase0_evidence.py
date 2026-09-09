@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import sys
 from pathlib import Path
 
 import pytest
@@ -158,3 +159,33 @@ def test_plan_parser_accepts_commit_and_closeout_receipt_references() -> None:
         "task-closeout:run-1.01"
     )
     assert generator.ACCEPTANCE_REF_RE.fullmatch("a" * 40)
+
+
+def test_generated_output_inventory_matches_build_payloads() -> None:
+    """Published output discovery is complete, ordered, and normalized."""
+    inventory = generator.generated_output_paths()
+
+    assert inventory == tuple(
+        generator.REPO / path for path in generator.GENERATED_OUTPUT_PATHS
+    )
+    assert set(inventory) == set(generator.build_payloads())
+    assert all("\\" not in path for path in generator.GENERATED_OUTPUT_PATHS)
+    assert len(inventory) == 11
+
+
+def test_list_outputs_does_not_build_or_write(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+) -> None:
+    """Output discovery is usable before generation and has no side effects."""
+    monkeypatch.setattr(
+        generator,
+        "build_payloads",
+        lambda: pytest.fail("--list-outputs must not build payloads"),
+    )
+    monkeypatch.setattr(sys, "argv", ["generate_phase0_evidence.py", "--list-outputs"])
+
+    assert generator.main() == 0
+    assert capsys.readouterr().out.splitlines() == list(
+        generator.GENERATED_OUTPUT_PATHS
+    )

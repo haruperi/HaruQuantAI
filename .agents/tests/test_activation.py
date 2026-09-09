@@ -133,6 +133,47 @@ def test_non_feature_tasks_use_task_prefix() -> None:
     assert branch == "task/docs-42-workflow"
 
 
+def test_repository_divergence_uses_local_refs_without_fetch(tmp_path: Path) -> None:
+    """Entry inspection reports configured local upstream divergence exactly."""
+    cfg, _ = _activation_fixture(tmp_path)
+    runtime = sys.modules[orchestrator._entry_gate.__module__]
+    baseline = _git(tmp_path, "rev-parse", "HEAD")
+    _git(tmp_path, "remote", "add", "origin", ".")
+    _git(tmp_path, "update-ref", "refs/remotes/origin/main", baseline)
+    _git(tmp_path, "branch", "--set-upstream-to=origin/main", "main")
+
+    initial = runtime._repository_divergence(tmp_path, cfg["main_branch"])
+    assert initial == {
+        "branch": "main",
+        "head": baseline,
+        "upstream": "origin/main",
+        "upstream_head": baseline,
+        "ahead": 0,
+        "behind": 0,
+    }
+
+    (tmp_path / "local.txt").write_text("local\n", encoding="utf-8")
+    _git(tmp_path, "add", "local.txt")
+    _git(tmp_path, "commit", "--no-verify", "-m", "local")
+    advanced = runtime._repository_divergence(tmp_path, cfg["main_branch"])
+    assert advanced["ahead"] == 1
+    assert advanced["behind"] == 0
+    assert advanced["upstream_head"] == baseline
+
+
+def test_repository_divergence_reports_missing_upstream(tmp_path: Path) -> None:
+    """A repository without upstream remains inspectable and does not fetch."""
+    cfg, _ = _activation_fixture(tmp_path)
+    runtime = sys.modules[orchestrator._entry_gate.__module__]
+
+    result = runtime._repository_divergence(tmp_path, cfg["main_branch"])
+
+    assert result["head"] == _git(tmp_path, "rev-parse", "HEAD")
+    assert result["upstream"] is None
+    assert result["ahead"] is None
+    assert result["behind"] is None
+
+
 def test_initial_planner_mutation_fails_before_invocation(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
