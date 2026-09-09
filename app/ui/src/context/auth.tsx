@@ -50,8 +50,14 @@ export interface AuthPrincipal {
   readonly runtime_profile?: string;
 }
 
-/** Authentication state machine. */
-export type AuthState = "loading" | "authenticated" | "unauthenticated";
+/** Authentication state machine projected from authoritative server outcomes. */
+export type AuthState =
+  | "loading"
+  | "authenticated"
+  | "unauthenticated"
+  | "unauthorized"
+  | "expired"
+  | "unavailable";
 
 /** Shape of the value exposed by the auth context. */
 export interface AuthContextValue {
@@ -95,6 +101,31 @@ function clearStoredIdentity(): void {
   }
 }
 
+/** Whether this browser previously held a server-issued display projection. */
+function hasStoredIdentity(): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.sessionStorage.getItem(IDENTITY_STORAGE_KEY) !== null;
+  } catch {
+    return false;
+  }
+}
+
+/** Map a typed identity failure to a fail-closed presentation state. */
+function failureState(cause: unknown, hadIdentity: boolean): AuthState {
+  if (!(cause instanceof ApiClientError)) return "unavailable";
+  if (
+    cause.code === "AUTHORIZATION_DENIED" ||
+    cause.code === "AUTHORIZATION_FAILED"
+  ) {
+    return "unauthorized";
+  }
+  if (cause.code === "AUTHENTICATION_REQUIRED" || cause.status === 401) {
+    return hadIdentity ? "expired" : "unauthenticated";
+  }
+  return "unavailable";
+}
+
 /**
  * Authentication provider.
  *
@@ -115,6 +146,7 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
     let cancelled = false;
 
     async function recover(): Promise<void> {
+      const hadIdentity = hasStoredIdentity();
       try {
         // `GET /api/v1/auth/me` returns the server-side identity when the
         // cookie session is valid, and a 401 error envelope when not.
@@ -123,7 +155,13 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
         if (response.status === "error") {
           throw new ApiClientError({
             message: response.error.message,
-            status: 401,
+            status:
+              response.error.code === "AUTHORIZATION_DENIED" ||
+              response.error.code === "AUTHORIZATION_FAILED"
+                ? 403
+                : response.error.code === "AUTHENTICATION_REQUIRED"
+                  ? 401
+                  : 0,
             code: response.error.code,
             requestId: response.error.request_id,
             traceId: response.error.trace_id,
@@ -147,13 +185,15 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
         useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(next.runtime_profile);
       } catch (cause) {
         if (cancelled || !mounted.current) return;
-        // 401 => session expired/revoked. Any other failure is surfaced but
-        // defaults to unauthenticated (fail-closed for protected layouts).
+        // Preserve typed identity failure semantics for the access gate.
         clearStoredIdentity();
         setPrincipal(null);
-        setState("unauthenticated");
+        setState(failureState(cause, hadIdentity));
         useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(undefined);
-        if (cause instanceof ApiClientError && cause.code !== "AUTHENTICATION_REQUIRED") {
+        if (
+          cause instanceof ApiClientError &&
+          cause.code !== "AUTHENTICATION_REQUIRED"
+        ) {
           setError(cause.message);
         } else {
           setError(null);
@@ -227,11 +267,16 @@ export function AuthProvider({ children }: PropsWithChildren): ReactNode {
   );
 
   const logout = useCallback(async (): Promise<void> => {
+    // Hide the old protected tree before waiting for the revocation round trip.
+    clearStoredIdentity();
+    setPrincipal(null);
+    setState("unauthenticated");
+    setError(null);
+    useWorkspaceStore.getState().setAccountModeFromRuntimeProfile(undefined);
     try {
       await apiClients.auth.logout();
     } finally {
-      // Whether or not the server confirmed, clear local identity and mark
-      // unauthenticated so protected layouts redirect.
+      // Whether or not the server confirmed, local access remains withdrawn.
       clearStoredIdentity();
       setPrincipal(null);
       setState("unauthenticated");

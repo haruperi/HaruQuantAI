@@ -201,7 +201,7 @@
       "feature_id": "FEAT-AGT-ENFORCE_MANDATE",
       "task_id": "1.15",
       "usage_target": "app/services/agentic/enforce_mandate/_usage.py",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "uv run --frozen python -m app.services.agentic.enforce_mandate._usage",
       "test_targets": [
         "tests/services/agentic/enforce_mandate/test_traceability.py",
@@ -215,7 +215,7 @@
       "feature_id": "FEAT-UI-SESSION_ACCESS",
       "task_id": "1.16",
       "usage_target": "app/ui/src/app/_usage.tsx",
-      "usage_status": "PLANNED",
+      "usage_status": "RUNNABLE",
       "executable_recipe": "npm --prefix app/ui run test -- src/app/__tests__/traceability.test.tsx",
       "test_targets": [
         "app/ui/src/app/__tests__/traceability.test.tsx",
