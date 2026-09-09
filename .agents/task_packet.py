@@ -12,6 +12,14 @@ from pathlib import Path
 from typing import Any, Final
 
 PACKET_SCHEMA_VERSION: Final[int] = 1
+CURRENT_PROJECTION_PATHS: Final[tuple[str, ...]] = (
+    "docs/dev/Phased_Feature_Implementation_Plan.md",
+    "docs/dev/evidence/feature-baseline.json",
+    "docs/dev/evidence/path-bindings.json",
+    "docs/dev/evidence/usage-bindings.json",
+    "docs/dev/evidence/requirement-status.json",
+    "docs/dev/evidence/contract-bindings.json",
+)
 EVIDENCE_SOURCES: Final[tuple[str, ...]] = (
     "docs/dev/evidence/feature-baseline.json",
     "docs/dev/evidence/contract-bindings.json",
@@ -103,10 +111,29 @@ def classify_risk(
     Returns:
         Deterministic risk tier and matching reasons.
     """
-    corpus = " ".join(
-        [str(value) for value in task.values()]
-        + [json.dumps(record, sort_keys=True) for record in records]
-    ).lower()
+
+    def text_values(value: Any) -> list[str]:
+        if isinstance(value, dict):
+            return [text for item in value.values() for text in text_values(item)]
+        if isinstance(value, list | tuple | set):
+            return [text for item in value for text in text_values(item)]
+        return [value] if isinstance(value, str) else []
+
+    semantic_record_values: list[str] = []
+    for record in records:
+        semantic_record_values.extend(
+            text_values(
+                {
+                    "title": record.get("title"),
+                    "domain": record.get("domain"),
+                    "state_ownership": record.get("state_ownership"),
+                    "operation_scope": record.get("operation_scope"),
+                    "requirements": record.get("requirements", []),
+                    "operation_gates": record.get("operation_gates", []),
+                }
+            )
+        )
+    corpus = " ".join(text_values(task) + semantic_record_values).lower()
     critical = tuple(term for term in CRITICAL_TERMS if term in corpus)
     if critical:
         return RiskClassification(
@@ -133,6 +160,75 @@ def _existing_owner_files(repo: Path, owner_path: str) -> list[str]:
     return sorted(
         path.relative_to(repo).as_posix() for path in root.rglob("*") if path.is_file()
     )
+
+
+def _authoring_route(
+    *,
+    repo: Path,
+    task: dict[str, Any],
+    owner_path: str,
+    contract_target: str,
+    contract: dict[str, Any] | None,
+    classification: RiskClassification,
+) -> dict[str, Any]:
+    """Choose a conservative implementation-authoring route.
+
+    Args:
+        repo: Repository root.
+        task: Frozen Task specification.
+        owner_path: Canonical feature owner path.
+        contract_target: Canonical public-contract target.
+        contract: Feature contract binding, when present.
+        classification: Conservative workflow risk classification.
+
+    Returns:
+        Auditable route and optional scaffolding command.
+    """
+    if owner_path and (repo / owner_path).is_dir():
+        route = "REUSE_EXISTING_FIRST"
+        reason = "The canonical V3 owner path already exists."
+    elif str(task.get("task_kind", "feature")).lower() != "feature":
+        route = "NO_AUTOMATIC_SCAFFOLD"
+        reason = "Only registered backend features are scaffold candidates."
+    elif classification.tier is RiskTier.CRITICAL:
+        route = "NO_AUTOMATIC_SCAFFOLD"
+        reason = "Critical behavior requires explicit design and implementation."
+    elif not owner_path.startswith("app/services/"):
+        route = "NO_AUTOMATIC_SCAFFOLD"
+        reason = "The first scaffold shape is backend-service-only."
+    elif not contract_target or (repo / contract_target).exists():
+        route = "IMPLEMENT_MISSING"
+        reason = (
+            "An absent dedicated contract target is required for this first "
+            "deterministic scaffold shape."
+        )
+    elif not contract or not contract.get("primary_capability"):
+        route = "IMPLEMENT_MISSING"
+        reason = "Contract authority is incomplete for deterministic scaffolding."
+    elif (
+        not str(contract.get("state_ownership", "")).strip().lower().startswith("none")
+    ):
+        route = "NO_AUTOMATIC_SCAFFOLD"
+        reason = "The declared state ownership is not explicitly stateless."
+    else:
+        route = "SCAFFOLD_STATELESS_BACKEND"
+        reason = "Missing Standard backend owner matches the proven stateless shape."
+    command = None
+    if route == "SCAFFOLD_STATELESS_BACKEND":
+        command = (
+            "uv run python scripts/scaffold_stateless_feature.py "
+            "--task-packet <task-packet.json> --preview"
+        )
+    return {
+        "route": route,
+        "reason": reason,
+        "scaffold_command": command,
+        "template_reference": (
+            "FEAT-PLUG-DECLARE_MANIFESTS"
+            if route == "SCAFFOLD_STATELESS_BACKEND"
+            else None
+        ),
+    }
 
 
 def _source_record(repo: Path, relative: str, selector: str) -> dict[str, str]:
@@ -279,7 +375,8 @@ def build_task_packet(
         provider_record = baseline_features.get(provider)
         accepted = bool(
             provider_record
-            and provider_record.get("status") in {"ACCEPTED", "COMPLETE"}
+            and provider_record.get("status")
+            in {"ACCEPTED", "COMPLETE", "PROVED_COMPLETE"}
             and provider_record.get("accepted_commit")
         )
         predecessor_evidence.append(
@@ -340,6 +437,47 @@ def build_task_packet(
         blockers.append("no exact write-path authority could be derived")
 
     classification = classify_risk(task, feature_records)
+    authoring = _authoring_route(
+        repo=repo,
+        task=task,
+        owner_path=owner_path,
+        contract_target=str((path_binding or {}).get("contract_target", "")),
+        contract=contract,
+        classification=classification,
+    )
+    if authoring["route"] == "SCAFFOLD_STATELESS_BACKEND":
+        write_paths.update(
+            f"{owner_path}/{name}"
+            for name in (
+                "__init__.py",
+                "README.md",
+                "config.py",
+                "manifest.py",
+                "feature.py",
+                "_usage.py",
+            )
+        )
+    compatible_example = _compatible_example(
+        feature_id, feature_baseline, sources[EVIDENCE_SOURCES[0]]
+    )
+    if authoring["route"] == "SCAFFOLD_STATELESS_BACKEND":
+        reference = _one(
+            list(sources[EVIDENCE_SOURCES[0]].get("features", [])),
+            "feature_id",
+            "FEAT-PLUG-DECLARE_MANIFESTS",
+        )
+        if reference is None or reference.get("status") not in {
+            "COMPLETE",
+            "ACCEPTED",
+            "PROVED_COMPLETE",
+        }:
+            blockers.append("stateless scaffold reference is not accepted")
+        else:
+            compatible_example = {
+                "feature_id": reference["feature_id"],
+                "owner_path": reference["owner_path"],
+                "accepted_commit": reference["accepted_commit"],
+            }
     planner_required = classification.tier is RiskTier.CRITICAL or bool(blockers)
     status = (
         "BLOCKED"
@@ -390,11 +528,22 @@ def build_task_packet(
                 ),
             },
         },
-        "compatible_example": _compatible_example(
-            feature_id, feature_baseline, sources[EVIDENCE_SOURCES[0]]
-        ),
+        "compatible_example": compatible_example,
         "reuse_decision": "REFERENCE_ONLY",
         "authorized_write_paths": sorted(write_paths),
+        "controller_projection_paths": sorted(
+            {
+                *CURRENT_PROJECTION_PATHS,
+                str((path_binding or {}).get("evidence_path", "")),
+            }
+            - {""}
+        ),
+        "serialized_integration_write_paths": (
+            ["pyproject.toml"]
+            if authoring["route"] == "SCAFFOLD_STATELESS_BACKEND"
+            else []
+        ),
+        "authoring": authoring,
         "validation": {
             "test_targets": list((path_binding or {}).get("test_targets", [])),
             "usage_recipe": (usage or {}).get("executable_recipe"),

@@ -43,6 +43,7 @@ from workflow_protocol import (
     _git_ok,
     _normalize_path_list,
     _render_next_agent,
+    _sha_file,
     _transition_for,
     capture_repository_snapshot,
     compose_prompt,

@@ -11,6 +11,11 @@ from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from deterministic_closeout import perform_deterministic_closeout
+from evidence_projection import (
+    EvidenceProjectionError,
+    apply_reviewed_projection,
+    verify_reviewed_projection,
+)
 from failure_routing import (
     FailureClass,
     route_failure,
@@ -298,8 +303,8 @@ def _handle_reviewer(cfg: dict[str, Any], state: dict[str, Any]) -> None:
                 "Product candidate changed during independent review."
             )
         state["reviewed_head"] = _git_ok(cfg["repo"], "rev-parse", "HEAD")
-        state["reviewed_worktree_hash"] = _worktree_fingerprint(cfg["repo"])
         if state.get("parallel_draft") and not state.get("integration_refreshed"):
+            state["reviewed_worktree_hash"] = _worktree_fingerprint(cfg["repo"])
             state["draft_review"] = {
                 "iteration": state["iteration"],
                 "baseline": state["baseline"],
@@ -309,9 +314,25 @@ def _handle_reviewer(cfg: dict[str, Any], state: dict[str, Any]) -> None:
             }
             state["phase"] = "draft_reviewed"
         else:
+            try:
+                state["evidence_projection"] = apply_reviewed_projection(cfg, state)
+            except EvidenceProjectionError as exc:
+                raise OrchestratorError(str(exc)) from exc
+            _freeze_post_projection_candidate(cfg, state)
             state["phase"] = "commit_gate"
     finish_ide_role(state)
     _save_state(cfg, state)
+
+
+def _freeze_post_projection_candidate(
+    cfg: dict[str, Any], state: dict[str, Any]
+) -> None:
+    """Bind the pending commit gate to deterministic post-review output bytes."""
+    pending = state.get("next_agent")
+    if not isinstance(pending, dict):
+        raise OrchestratorError("Projection has no validated pending gate artifact.")
+    state["reviewed_worktree_hash"] = _worktree_fingerprint(cfg["repo"])
+    pending["worktree_sha256"] = state["reviewed_worktree_hash"]
 
 
 def _handle_commit_gate(
@@ -552,22 +573,32 @@ def _ensure_local_integration_gate_unchanged(state: dict[str, Any], repo: Path) 
         raise OrchestratorError("Close-out integration report is missing or changed.")
     if _git_ok(repo, "rev-parse", "HEAD") != state.get("reviewed_head"):
         raise OrchestratorError("HEAD changed after local integration validation.")
-    if candidate_fingerprint(repo) != candidate_hash:
-        raise OrchestratorError("Candidate changed after local integration validation.")
-    try:
-        verify_validation_receipt(
-            repo=repo,
-            receipt_path=Path(str(evidence.get("receipt_path", ""))),
-            expected_receipt_sha256=str(evidence.get("receipt_sha256", "")),
-            expected_worktree_sha256=str(candidate_hash or ""),
-            expected_authority_sha256=str(
-                state.get(
-                    "approved_authority_hash", state.get("approved_plan_hash", "")
-                )
-            ),
-        )
-    except ValidationReceiptError as exc:
-        raise OrchestratorError(str(exc)) from exc
+    projection = state.get("evidence_projection")
+    if projection is not None:
+        try:
+            verify_reviewed_projection(repo=repo, state=state)
+        except EvidenceProjectionError as exc:
+            raise OrchestratorError(str(exc)) from exc
+    else:
+        if candidate_fingerprint(repo) != candidate_hash:
+            raise OrchestratorError(
+                "Candidate changed after local integration validation."
+            )
+        try:
+            verify_validation_receipt(
+                repo=repo,
+                receipt_path=Path(str(evidence.get("receipt_path", ""))),
+                expected_receipt_sha256=str(evidence.get("receipt_sha256", "")),
+                expected_worktree_sha256=str(candidate_hash or ""),
+                expected_authority_sha256=str(
+                    state.get(
+                        "approved_authority_hash",
+                        state.get("approved_plan_hash", ""),
+                    )
+                ),
+            )
+        except ValidationReceiptError as exc:
+            raise OrchestratorError(str(exc)) from exc
 
 
 def _archive_closeout_evidence(cfg: dict[str, Any], state: dict[str, Any]) -> Path:

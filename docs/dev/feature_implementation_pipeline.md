@@ -839,7 +839,40 @@ Use `uv run ruff format .` and `uv run ruff check --fix .` only when intentional
 uv run python scripts/ci_check.py
 ```
 
-Do not invoke this command during feature implementation or iterative verification. The pre-commit hook runs the complete Pytest coverage gate for applicable code/test/configuration commits, and automated CI/release verification may invoke the repository gate. The gate runs Ruff format checking, Ruff linting, strict mypy, repository-owned AST architecture checks, feature-documentation validation, and pytest with branch coverage and an 80 percent project floor. Coverage is final integration evidence, not a substitute for lifecycle, failure, dependency, replacement, durability, or removal assertions.
+Do not invoke this command during feature implementation or iterative verification. Pre-commit remains a fast changed-file hygiene/lint/format/secret boundary, while pre-push runs the affected validation profile. The Controller's frozen integration candidate and automated CI/release qualification invoke the applicable comprehensive gate. That gate runs Ruff format checking, Ruff linting, strict mypy, repository-owned AST architecture checks, feature-documentation validation, and pytest with branch coverage and an 80 percent project floor. Coverage is final integration evidence, not a substitute for lifecycle, failure, dependency, replacement, durability, or removal assertions.
+
+### 10.4 Deterministic authoring and evidence projection
+
+The source-pinned Task packet declares one authoring route. `REUSE_EXISTING_FIRST`
+requires preservation or bounded adaptation of correct current V3 behavior.
+`SCAFFOLD_STATELESS_BACKEND` permits only the reviewed template under
+`docs/templates/feature/stateless_backend/`; `IMPLEMENT_MISSING` requires normal
+bounded implementation; `NO_AUTOMATIC_SCAFFOLD` forbids generation. The first
+scaffold shape applies only to a missing Standard backend owner with a missing
+dedicated contract target. It does not apply to UI, Critical, stateful,
+persistence, provider, authorization, numerical, or ambiguous work.
+
+Preview the eligible structural shell with:
+
+```powershell
+uv run python scripts/scaffold_stateless_feature.py --task-packet <packet.json> --preview
+```
+
+The generator refuses overwrites and emits incomplete, fail-closed feature,
+usage, and acceptance drafts. It proposes registration; only a serialized
+integrator with packet authority may apply the shared `pyproject.toml` change.
+Owner-specific behavior and assertions remain mandatory. Common one-provider
+stateless factory, mount, and withdrawal behavior may use the shared conformance
+harness under `tests/conformance/`.
+
+After Reviewer `PENDING_COMMIT`, the Controller finalizes exact feature-local and
+current aggregate evidence through `scripts/project_feature_evidence.py`. The
+operation requires explicit passing requirement mappings and the source-bound
+validation receipt, preserves pinned Phase-0 source snapshots, and writes a
+derived pre/post-candidate receipt. It never scans names to infer completion.
+Parallel workers provide feature-local drafts; only serialized integration writes
+shared aggregate projections. Repeating `--check-all` after application must
+report no drift.
 
 ## 11. Definition of Done
 

@@ -80,6 +80,11 @@ The orchestrator is not a reasoning role. It may only perform deterministic life
   packet. `EXECUTOR_READY` Routine/Standard packets instantiate Executor and
   pause at `APPROVED: EXECUTE`; Critical, incomplete, ambiguous or stale packets
   instantiate Planner through `TASK_ACTIVATED -> PLANNER`.
+- The packet declares one authoring route: reuse an existing V3 owner first,
+  use the single stateless-backend scaffold only when its exact eligibility and
+  write paths are present, implement missing behavior manually, or forbid
+  automatic scaffolding. A scaffold is incomplete structure and never proof of
+  implementation, passing requirements, executable usage, or acceptance.
 - Planner verifies but never creates or switches the Task branch.
 - Planner, Executor, and Reviewer work sequentially on that branch until authorized close-out.
 - `main` remains clean and unchanged throughout planning/execution/review.
@@ -303,6 +308,14 @@ candidate and before Reviewer starts, the Controller runs
 full ignored logs and binds a receipt to relevant inputs. Python-changing
 candidates retain comprehensive coverage; UI candidates retain typecheck, tests
 and production build. Unchanged receipts are reused at commit authorization.
+After a registered feature reaches Reviewer `PENDING_COMMIT`, the Controller may
+project only packet-declared current evidence outputs. It requires the exact
+passing validation receipt and explicit requirement-to-evidence mappings,
+preserves pinned Phase-0 snapshots, records a derived pre/post-candidate receipt,
+and never infers completion from file or test names. This deterministic
+evidence-only mutation does not rerun unchanged product validation; any missing,
+failed, stale, edited, or unauthorized input/output fails closed. Parallel draft
+workers never write shared aggregate ledgers; only serialized integration does.
 CI repeats candidate-appropriate qualification under the stable `acceptance`
 status after an independently authorized push.
 

@@ -160,6 +160,14 @@ def _attach_task_packet(cfg: dict[str, Any], state: dict[str, Any]) -> None:
             "shared_nfrs": [],
             "catalogue_obligations": [],
             "authorized_write_paths": [],
+            "controller_projection_paths": [],
+            "serialized_integration_write_paths": [],
+            "authoring": {
+                "route": "NO_AUTOMATIC_SCAFFOLD",
+                "reason": "Packet input failure.",
+                "scaffold_command": None,
+                "template_reference": None,
+            },
             "risk": {"tier": "CRITICAL", "reasons": ["packet input failure"]},
             "unresolved_decisions": [str(exc)],
             "planner_required": True,
@@ -173,6 +181,11 @@ def _attach_task_packet(cfg: dict[str, Any], state: dict[str, Any]) -> None:
     state["risk_tier"] = packet["risk"]["tier"]
     state["planner_required"] = bool(packet["planner_required"])
     state["packet_write_paths"] = list(packet["authorized_write_paths"])
+    state["controller_projection_paths"] = list(packet["controller_projection_paths"])
+    state["serialized_integration_write_paths"] = list(
+        packet["serialized_integration_write_paths"]
+    )
+    state["authoring_route"] = str(packet["authoring"]["route"])
     state["packet_unresolved_decisions"] = list(packet["unresolved_decisions"])
     state["commit_message"] = str(packet["commit_message"])
 

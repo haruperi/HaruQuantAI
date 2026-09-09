@@ -1,0 +1,17 @@
+{
+  "$$schema": "../../evidence-schema.json",
+  "feature_id": "${feature_id}",
+  "task_id": "${task_id}",
+  "status": "IN_PROGRESS",
+  "owner_specification": "${owner_specification}",
+  "baseline_commit": "${baseline_commit}",
+  "acceptance_commit": "task-closeout:pending-${task_slug}",
+  "requirements": ${requirements_json},
+  "catalogue_entries": [],
+  "stages": ${stages_json},
+  "commands": [],
+  "review": {
+    "reviewer_verdict": "PENDING",
+    "reviewer_notes": "Generated structure only; behavior and review are incomplete."
+  }
+}

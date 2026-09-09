@@ -30,6 +30,13 @@ Conservative risk tier: `{{risk_tier}}`
 Parallel lane, when applicable: `{{lane}}`
 Deferred integration paths: `{{deferred_integration_paths}}`
 
+Before authoring greenfield structure, follow the packet's `authoring.route`.
+`REUSE_EXISTING_FIRST` requires inspection and reuse of correct V3 behavior;
+`SCAFFOLD_STATELESS_BACKEND` permits only the explicit previewed stateless
+scaffolder; `IMPLEMENT_MISSING` requires bounded manual implementation; and
+`NO_AUTOMATIC_SCAFFOLD` forbids automatic scaffolding. A scaffold is incomplete
+structure, never acceptance evidence.
+
 ### Structured Handoff Facts
 
 {{handoff_facts}}

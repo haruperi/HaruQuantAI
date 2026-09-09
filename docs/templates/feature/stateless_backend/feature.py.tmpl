@@ -1,0 +1,48 @@
+"""Incomplete lifecycle shell for ${title}."""
+
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from ${owner_module}.config import ${config_class}
+from ${owner_module}.manifest import SPEC
+
+if TYPE_CHECKING:
+    from app.kernel.context import FeatureContext
+    from app.kernel.feature import FeatureSpec
+
+
+class ${feature_class}:
+    """Feature shell that fails closed until real behavior is implemented."""
+
+    def __init__(self, spec: FeatureSpec = SPEC) -> None:
+        """Initialize the incomplete feature shell.
+
+        Args:
+            spec: Immutable feature specification.
+        """
+        self.spec = spec
+
+    async def mount(self, context: FeatureContext, config: object) -> None:
+        """Refuse activation until the feature contract is implemented.
+
+        Args:
+            context: Scoped feature context reserved for future registration.
+            config: Candidate strict configuration.
+
+        Raises:
+            NotImplementedError: Always, because generated structure is incomplete.
+        """
+        raw = config if isinstance(config, dict) else {}
+        ${config_class}.from_dict(raw)
+        del context
+        raise NotImplementedError("${feature_id} generated shell is incomplete")
+
+
+def feature() -> ${feature_class}:
+    """Create an explicitly incomplete feature instance.
+
+    Returns:
+        New incomplete feature shell.
+    """
+    return ${feature_class}()

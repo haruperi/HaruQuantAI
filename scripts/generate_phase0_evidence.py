@@ -31,6 +31,13 @@ GENERATED_OUTPUT_PATHS = (
     "docs/dev/evidence/operation-readiness.json",
     "docs/dev/evidence/phase-ui-acceptance-matrix.json",
 )
+PINNED_OUTPUT_PATHS = frozenset(
+    {
+        "docs/dev/evidence/baseline-manifest.json",
+        "docs/dev/evidence/source/traceability-register.json",
+        "docs/dev/evidence/source/dependency-graph.json",
+    }
+)
 
 TASK_RE = re.compile(
     r"^### - \[(?P<mark>[ xX])\] Task (?P<task>\d+\.\d+) \u2014 "
@@ -366,14 +373,18 @@ def _phase_matrix(tasks: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return matrix
 
 
-def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
+def build_payloads(  # noqa: PLR0915
+    *,
+    plan_text: str | None = None,
+    register_text: str | None = None,
+) -> dict[Path, dict[str, Any]]:
     """Build every generated Phase 0 JSON payload.
 
     Returns:
         Mapping from evidence path to its canonical JSON payload.
     """
-    plan_text = PLAN_PATH.read_text(encoding="utf-8")
-    register_text = REGISTER_PATH.read_text(encoding="utf-8")
+    plan_text = plan_text or PLAN_PATH.read_text(encoding="utf-8")
+    register_text = register_text or REGISTER_PATH.read_text(encoding="utf-8")
     tasks = parse_plan(plan_text)
     baseline_plan_path = PLAN_PATH.relative_to(REPO).as_posix()
     baseline_plan_bytes = _git_bytes("show", f"{BASELINE_HEAD}:{baseline_plan_path}")
@@ -501,6 +512,8 @@ def build_payloads() -> dict[Path, dict[str, Any]]:  # noqa: PLR0915
         )
         disposition = {
             "COMPLETE": "PROVED_COMPLETE",
+            "ACCEPTED": "PROVED_COMPLETE",
+            "PROVED_COMPLETE": "PROVED_COMPLETE",
             "EXISTING_UNVERIFIED": "VERIFY",
             "PARTIAL": "ADAPT",
             "NOT_STARTED_IN_TARGET": "IMPLEMENT",
@@ -720,7 +733,7 @@ def generated_output_paths() -> tuple[Path, ...]:
     return tuple(REPO / path for path in GENERATED_OUTPUT_PATHS)
 
 
-def main() -> int:
+def main() -> int:  # noqa: C901
     """Write or verify generated evidence.
 
     Returns:
@@ -751,13 +764,20 @@ def main() -> int:
         return 1
     drift: list[str] = []
     for path, payload in payloads.items():
+        relative = path.relative_to(REPO).as_posix()
+        if relative in PINNED_OUTPUT_PATHS:
+            if not path.is_file():
+                drift.append(relative)
+            else:
+                print(f"[PINNED] {relative}")
+            continue
         rendered = _render(payload)
         if args.write:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(rendered, encoding="utf-8")
-            print(f"[WRITE] {path.relative_to(REPO)}")
+            print(f"[WRITE] {relative}")
         elif not path.is_file() or path.read_text(encoding="utf-8") != rendered:
-            drift.append(path.relative_to(REPO).as_posix())
+            drift.append(relative)
     if drift:
         print("[FAIL] generated Phase 0 evidence drift:")
         for drift_path in drift:

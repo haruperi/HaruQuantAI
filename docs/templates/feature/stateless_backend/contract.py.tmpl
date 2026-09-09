@@ -1,0 +1,18 @@
+"""Incomplete public contract placeholder for ${title}."""
+
+from __future__ import annotations
+
+from typing import Protocol, runtime_checkable
+
+from app.kernel.capability import CapabilityKey
+
+
+@runtime_checkable
+class ${capability_class}(Protocol):
+    """Marker protocol whose real public operations remain to be implemented."""
+
+
+${capability_constant}: CapabilityKey[${capability_class}] = CapabilityKey(
+    name="${capability_name}",
+    major=${capability_major},
+)

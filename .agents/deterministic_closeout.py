@@ -66,6 +66,11 @@ def _write_final_receipt(
         "validation_receipt_sha256": state.get("integration_validation", {}).get(
             "receipt_sha256"
         ),
+        "evidence_projection_receipt_sha256": (
+            state.get("evidence_projection", {}).get("receipt_sha256")
+            if isinstance(state.get("evidence_projection"), dict)
+            else None
+        ),
         "approved_write_paths": state.get("approved_write_paths", []),
         "non_self_referential": True,
     }

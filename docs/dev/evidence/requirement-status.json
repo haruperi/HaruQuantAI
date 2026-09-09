@@ -5,8 +5,8 @@
     "total_local_nfrs": 276,
     "disposition_counts": {
       "ADAPT": 37,
-      "IMPLEMENT": 636,
-      "PROVED_COMPLETE": 66,
+      "IMPLEMENT": 632,
+      "PROVED_COMPLETE": 70,
       "VERIFY": 112
     }
   },
@@ -376,7 +376,7 @@
       "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
       "task_id": "1.17",
       "text": "Stage, flush and validate byte count/schema declaration/content hash before atomic publication; issue a custody receipt.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json"
     },
     {
@@ -384,7 +384,7 @@
       "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
       "task_id": "1.17",
       "text": "Resolve authorized artifact IDs and bounded download grants; reject host paths, cross-account access and expired grants.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json"
     },
     {
@@ -392,7 +392,7 @@
       "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
       "task_id": "1.17",
       "text": "Retain referenced artifacts and legal holds; clean eligible staging/orphans through admitted maintenance with an audit receipt.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json"
     },
     {
@@ -4786,7 +4786,7 @@
       "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
       "task_id": "1.17",
       "text": "Removing FEAT-WS-MANAGE_ARTIFACTS withdraws only its declared contribution; no dependent operation may silently select a substitute provider.",
-      "disposition": "IMPLEMENT",
+      "disposition": "PROVED_COMPLETE",
       "evidence_path": "docs/dev/evidence/features/FEAT-WS-MANAGE_ARTIFACTS/acceptance.json"
     },
     {

@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "template_kind": "haruquant-stateless-backend-shell",
+  "reference_feature": "FEAT-PLUG-DECLARE_MANIFESTS",
+  "files": [
+    "README.md",
+    "config.py",
+    "manifest.py",
+    "feature.py",
+    "_usage.py"
+  ],
+  "empty_files": ["__init__.py"],
+  "contract_template": "contract.py.tmpl",
+  "acceptance_template": "acceptance.json.tmpl"
+}

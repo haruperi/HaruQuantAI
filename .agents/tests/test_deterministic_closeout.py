@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import subprocess
 import sys
 from pathlib import Path
@@ -42,6 +43,7 @@ def _state(repo: Path, baseline: str) -> dict[str, Any]:
         "approved_authority_hash": "authority",
         "commit_message": "feat(test): complete FEAT-DEMO",
         "integration_validation": {"receipt_sha256": "validation"},
+        "evidence_projection": {"receipt_sha256": "projection"},
     }
 
 
@@ -61,6 +63,8 @@ def test_closeout_commits_merges_and_clears_without_agent(
     assert _git(repo, "status", "--porcelain") == ""
     assert not _git(repo, "branch", "--list", state["branch"])
     assert Path(result["receipt_path"]).is_file()
+    receipt = json.loads(Path(result["receipt_path"]).read_text(encoding="utf-8"))
+    assert receipt["evidence_projection_receipt_sha256"] == "projection"
     assert all(path.stat().st_size == 0 for path in cfg["journals"].values())
 
 

@@ -138,6 +138,24 @@ def test_receipt_survives_reasoning_handoff_without_command_rerun(
     assert calls == 1
 
 
+def test_post_projection_bytes_replace_pending_worktree_fingerprint(
+    orc: ModuleType,
+    cfg: dict[str, Any],
+    state: dict[str, Any],
+) -> None:
+    """The commit gate freezes deterministic projection bytes, not stale draft bytes."""
+    workflow = _workflow()
+    state["next_agent"] = {"worktree_sha256": "pre-projection"}
+    (cfg["repo"] / "projected.json").write_text("{}\n", encoding="utf-8")
+
+    workflow._freeze_post_projection_candidate(cfg, state)
+
+    assert state["reviewed_worktree_hash"] == workflow._worktree_fingerprint(
+        cfg["repo"]
+    )
+    assert state["next_agent"]["worktree_sha256"] == state["reviewed_worktree_hash"]
+
+
 def test_failed_command_cannot_satisfy_local_gate(
     orc: ModuleType,
     cfg: dict[str, Any],

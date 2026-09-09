@@ -1,7 +1,7 @@
 # HaruQuantAI V3 — Development Throughput Remediation Plan
 
 **Date:** 9 September 2026
-**Status:** ACTIVE — DT-01 through DT-06 are implemented locally. Change Set B awaits its authorized commit; the mandatory post-DT-06 representative-feature pilot is next. DT-03 remote publication and repository protection remain pending explicit owner authorization.
+**Status:** ACTIVE — DT-01 through DT-06 are committed. Owner-authorized Change Set C (DT-07 and DT-08) is implemented and locally validated but not yet committed. The post-DT-06 representative-feature pilot remains incomplete and must not be reported as satisfied by remediation self-tests. DT-03 remote publication and repository protection remain pending explicit owner authorization.
 **Repository baseline checked:** `a32a46ad5c3407bdb7b68bf8dc270d327b6e7625` on remote `main`.
 **Repository location:** `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`
 **Basis:** The three supplied agent analyses, supplemented by targeted read-only repository checks and official tool documentation. Source references appear in §12.
@@ -67,9 +67,9 @@ POST-DT-06 PILOT → DT-09 → DT-10 (optional batching/parallelism path)
 POST-DT-06 PILOT → DT-11         (strategy-ready milestone path)
 ```
 
-The owner authorized DT-02A and DT-02B as one combined DT-02 delivery and DT-04 through DT-06 as one combined Change Set B delivery on 9 September 2026. Implementation still establishes and measures each internal checkpoint before enabling the next so the incremental behavior remains observable. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer later automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
+The owner authorized DT-02A and DT-02B as one combined DT-02 delivery, DT-04 through DT-06 as one combined Change Set B delivery, and DT-07 with DT-08 as one combined Change Set C delivery on 9 September 2026. The owner explicitly advanced Change Set C before the post-DT-06 product-feature pilot; this changes delivery order only and does not waive or satisfy that pilot. Implementation still establishes and measures each internal checkpoint before enabling the next so incremental behavior remains observable. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer later automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
 
-Implementation record: DT-01 was committed as `5faf73fe`; combined DT-02A/DT-02B was committed as `6420d7e8`; DT-03 was committed as `311e6dce`. DT-03 selects the local-first acceptance model defined below. A local Task may become `ACCEPTED` only after controller-enforced integration validation of its frozen reviewed state and exact merge lineage. Publishing remains separately authorized, and the remote `acceptance` result confirms rather than retroactively grants local Task acceptance.
+Implementation record: DT-01 was committed as `5faf73fe`; combined DT-02A/DT-02B was committed as `6420d7e8`; DT-03 was committed as `311e6dce`; combined DT-04/DT-05/DT-06 was committed as `82661187`. DT-03 selects the local-first acceptance model defined below. A local Task may become `ACCEPTED` only after controller-enforced integration validation of its frozen reviewed state and exact merge lineage. Publishing remains separately authorized, and the remote `acceptance` result confirms rather than retroactively grants local Task acceptance.
 
 ## 4. Change set A — Stop avoidable waiting
 
@@ -322,6 +322,8 @@ Only the integrator writes shared aggregate ledgers during parallel work. Worker
 
 **Acceptance:** A repeated run changes no bytes; missing/failed evidence prevents completion; historical Phase 0 snapshots remain unchanged; an unavailable real provider remains unqualified; a changed binding cannot silently orphan a requirement; generated-path inventory is complete.
 
+**Implementation checkpoint (9 September 2026):** `scripts/project_feature_evidence.py` now owns only the five live aggregate projections and exact reviewed feature/tracker finalization; `scripts/generate_phase0_evidence.py` preserves the three pinned Phase-0 outputs in write mode. The controller projects only after a real Reviewer `PENDING_COMMIT` and a source-bound passing validation receipt, records a derived pre/post-candidate receipt, extends authority only with packet-declared projection paths, and reuses the parent product validation rather than rerunning it for deterministic bookkeeping. Failed or missing requirement evidence, a stale Reviewer handoff, output-scope expansion, edited derived bytes, or a changed parent receipt fails closed. The DT-07 focused checkpoint passed **23 tests in 18.50 seconds (19.09 seconds wall clock)**; live projection `--apply --current-only` followed by `--check-all` changed no further bytes, and the Phase-0 generator check passed while preserving pinned snapshots.
+
 ### DT-08 — Reuse code, scaffold structural files and share conformance tests
 
 **Primary paths:** canonical feature templates under `docs/templates/`, a small proposed scaffolding command under `scripts/`, existing feature tests/conformance infrastructure and usage examples.
@@ -339,6 +341,8 @@ Before greenfield implementation, make a bounded reuse decision: retain correct 
 For numerical tests, specify small independent golden values and boundary/causality cases; do not calculate expected values by reusing the same algorithm under test. For UI, preserve interaction/lifecycle tests rather than maximizing brittle snapshots.
 
 **Acceptance:** Generated structure conforms to existing contracts; rerunning cannot overwrite work; incomplete behavior cannot gain a completed status; injected lifecycle/resource defects fail the shared harness; feature-specific invariants remain covered. Expand to stateful/UI shapes only after the first shape proves useful.
+
+**Implementation checkpoint (9 September 2026):** Compact Task packets now select exactly one of `REUSE_EXISTING_FIRST`, `SCAFFOLD_STATELESS_BACKEND`, `IMPLEMENT_MISSING`, or `NO_AUTOMATIC_SCAFFOLD`. Automatic scaffolding is restricted to a missing Standard backend owner with a missing dedicated contract target; existing V3 owners route to reuse, while Critical, UI, stateful/provider-marked, ambiguous, and existing-contract work cannot use this first shell. `scripts/scaffold_stateless_feature.py` previews or atomically creates the approved stateless structure, refuses every overwrite, emits only an explicit entry-point proposal unless serialized integrator authority is present, and generates `IN_PROGRESS`/`FAIL` evidence plus fail-closed feature and usage behavior. The structural shape references accepted `FEAT-PLUG-DECLARE_MANIFESTS` without copying its business defaults or logic. Shared stateless factory/mount/withdrawal conformance now covers its generic lifecycle while feature-specific protocol, configuration, security, retained-file, and package assertions remain owned by the feature. An injected cleanup leak fails the shared harness. The final DT-08 focused checkpoint passed **10 tests in 0.39 seconds (1.00 second wall clock)**. The final broader workflow regression passed **251 tests in 188.82 seconds**; that duration is recorded as qualification cost, not an inner-loop target.
 
 ## 7. Change set D — Increase delivery throughput
 

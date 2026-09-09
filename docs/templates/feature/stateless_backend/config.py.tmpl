@@ -1,0 +1,28 @@
+"""Strict empty configuration boundary for the incomplete ${title} shell."""
+
+from __future__ import annotations
+
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass(frozen=True, slots=True)
+class ${config_class}:
+    """Configuration with no invented keys or business defaults."""
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any] | None) -> ${config_class}:
+        """Reject every undeclared setting while the contract is incomplete.
+
+        Args:
+            data: Candidate configuration.
+
+        Returns:
+            Empty strict configuration.
+
+        Raises:
+            ValueError: If any unapproved key is supplied.
+        """
+        if data:
+            raise ValueError("${feature_id} has no approved configuration keys")
+        return cls()

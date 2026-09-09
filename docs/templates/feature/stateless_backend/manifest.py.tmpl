@@ -1,0 +1,15 @@
+"""Incomplete feature specification for ${title}."""
+
+from ${contract_module} import ${capability_constant}
+from app.kernel.feature import FeatureSpec
+
+SPEC: FeatureSpec = FeatureSpec(
+    feature_id="${feature_id}",
+    domain="${domain}",
+    provides=frozenset({${capability_constant}}),
+    requires=frozenset(),
+    optional=frozenset(),
+    conflicts=frozenset(),
+    description="Incomplete generated shell; business behavior is not implemented.",
+    config_keys=frozenset(),
+)

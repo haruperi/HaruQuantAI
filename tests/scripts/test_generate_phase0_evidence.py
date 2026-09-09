@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import copy
+import json
 import sys
 from pathlib import Path
 
@@ -189,3 +190,27 @@ def test_list_outputs_does_not_build_or_write(
     assert capsys.readouterr().out.splitlines() == list(
         generator.GENERATED_OUTPUT_PATHS
     )
+
+
+def test_write_mode_preserves_pinned_phase0_snapshots(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    """Live regeneration never overwrites historical Phase-0 source bytes."""
+    pinned_relative = next(iter(generator.PINNED_OUTPUT_PATHS))
+    pinned = tmp_path / pinned_relative
+    current_relative = "docs/dev/evidence/feature-baseline.json"
+    current = tmp_path / current_relative
+    pinned.parent.mkdir(parents=True)
+    pinned.write_text('{"historical": true}\n', encoding="utf-8")
+    payloads = {
+        pinned: {"invented": "replacement"},
+        current: {"current": True},
+    }
+    monkeypatch.setattr(generator, "REPO", tmp_path)
+    monkeypatch.setattr(generator, "build_payloads", lambda: payloads)
+    monkeypatch.setattr(generator, "generated_output_paths", lambda: tuple(payloads))
+    monkeypatch.setattr(sys, "argv", ["generate_phase0_evidence.py", "--write"])
+
+    assert generator.main() == 0
+    assert pinned.read_text(encoding="utf-8") == '{"historical": true}\n'
+    assert json.loads(current.read_text(encoding="utf-8")) == {"current": True}
