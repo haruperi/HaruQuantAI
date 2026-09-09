@@ -7,26 +7,74 @@ on:
     branches: [ main, master ]
 
 jobs:
-  quality-gates:
+  acceptance:
+    name: acceptance
     runs-on: windows-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Install uv
         uses: astral-sh/setup-uv@v8.1.0
         with:
           enable-cache: true
-          version: "latest"
+          version: "0.12.3"
 
       - name: Set up Python
         run: uv python install
 
-      - name: Install dependencies
-        run: uv sync --all-extras --dev
+      - name: Install locked Python dependencies
+        run: uv sync --locked --all-extras --dev
 
-      - name: Run CI quality gates
-        run: uv run python scripts/ci_check.py
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: app/ui/package-lock.json
 
-      - name: Run provider config disable matrix
-        run: uv run pytest tests/removability/test_config_disable_matrix.py -q
+      - name: Install locked UI dependencies
+        working-directory: app/ui
+        run: npm ci
+
+      - name: Resolve candidate identity
+        id: candidate
+        shell: pwsh
+        run: |
+          $head = "${{ github.sha }}"
+          if ("${{ github.event_name }}" -eq "pull_request") {
+            $base = "${{ github.event.pull_request.base.sha }}"
+          } else {
+            $base = "${{ github.event.before }}"
+          }
+          if ($base -match '^0+$') {
+            $base = ""
+          }
+          "base=$base" >> $env:GITHUB_OUTPUT
+          "head=$head" >> $env:GITHUB_OUTPUT
+
+      - name: Run candidate integration acceptance
+        if: steps.candidate.outputs.base != ''
+        run: >-
+          uv run --locked python scripts/ci_check.py
+          --profile integration
+          --base "${{ steps.candidate.outputs.base }}"
+          --head "${{ steps.candidate.outputs.head }}"
+          --report .dev/ci-acceptance.json
+
+      - name: Run conservative initial-push acceptance
+        if: steps.candidate.outputs.base == ''
+        run: >-
+          uv run --locked python scripts/ci_check.py
+          --profile full
+          --report .dev/ci-acceptance.json
+
+      - name: Upload acceptance report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: acceptance-report
+          path: .dev/ci-acceptance.json
+          if-no-files-found: ignore

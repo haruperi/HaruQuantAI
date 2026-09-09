@@ -868,6 +868,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
     (tmp / ".agents/task").mkdir(parents=True)
     (tmp / ".agents/tests").mkdir(parents=True)
     (tmp / "docs/templates/prompt").mkdir(parents=True)
+    (tmp / "scripts").mkdir(parents=True)
     for name in ("planner.md", "executor.md", "reviewer.md", "next-agent.md"):
         (tmp / ".agents/task" / name).write_bytes(b"")
     for key in ("planner", "executor", "reviewer", "reviewer_closeout", "default"):
@@ -882,6 +883,52 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         source_cfg["protocol_path"].read_text(encoding="utf-8"), encoding="utf-8"
     )
     (tmp / "AGENTS.md").write_text("# self-test AGENTS\n", encoding="utf-8")
+    (tmp / "scripts/ci_check.py").write_text(
+        """\
+import argparse
+import json
+import subprocess
+from pathlib import Path
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--profile")
+parser.add_argument("--base")
+parser.add_argument("--head")
+parser.add_argument("--reviewed-worktree", action="store_true")
+parser.add_argument("--report", type=Path, required=True)
+args = parser.parse_args()
+
+def resolve(revision):
+    return subprocess.check_output(
+        ["git", "rev-parse", f"{revision}^{{commit}}"], text=True
+    ).strip()
+
+step = {
+    "step_id": "self-test",
+    "name": "self-test integration",
+    "command": ["self-test"],
+    "working_directory": ".",
+}
+payload = {
+    "schema_version": 1,
+    "report_kind": "diagnostic-not-reusable-validation-receipt",
+    "explain_only": False,
+    "decision": {
+        "requested_profile": args.profile,
+        "selected_families": ["python"],
+        "candidate": {
+            "base_commit": resolve(args.base),
+            "head_commit": resolve(args.head),
+        },
+    },
+    "steps": [step],
+    "results": [{**step, "duration_seconds": 0.0, "exit_code": 0}],
+}
+args.report.parent.mkdir(parents=True, exist_ok=True)
+args.report.write_text(json.dumps(payload), encoding="utf-8")
+""",
+        encoding="utf-8",
+    )
     (tmp / ".gitignore").write_text(".agents/logs/\n.agents/runs/\n", encoding="utf-8")
     (tmp / "demo.txt").write_text("baseline\n", encoding="utf-8")
     _git_ok(tmp, "init", "-b", "main")
@@ -953,6 +1000,7 @@ def _init_self_test_repo(tmp: Path, source_cfg: dict[str, Any]) -> dict[str, Any
         "roles": roles,
         "mode": "delegate-multi",
         "runtime_policy": runtime_policy,
+        "integration_command_prefix": [sys.executable],
     }
 
 

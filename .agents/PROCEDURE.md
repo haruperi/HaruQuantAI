@@ -243,7 +243,9 @@ If either permission is false, the controller stays at `PENDING_COMMIT`. After t
 
 ## Step 8 — Reviewer close-out
 
-After valid interactive or unattended commit authorization, close-out continues the same Reviewer conversation. It re-verifies reviewed identity, confirms archived evidence, runs final gates, stages only approved implementation paths, creates exactly one Task implementation commit, clears coordination files only after commit success, verifies Task branch/main/lineage/path authority, creates an explicit `git merge --no-ff` commit on `main`, verifies that the merge parents are the recorded baseline and exact Task commit, safely deletes the merged Task branch and marks `ACCEPTED`.
+After valid interactive or unattended commit authorization, the controller first runs the DT-02 integration profile against accepted `main` and the exact frozen reviewed worktree. It rejects stale identity, changed reviewed bytes, missing results, skipped prerequisites and nonzero exits. Only a passed report advances to close-out.
+
+Close-out then continues the same Reviewer conversation. It re-verifies reviewed identity and the controller-recorded report hash, confirms archived evidence, runs only applicable check-only commit hooks, stages only approved implementation paths, creates exactly one Task implementation commit, clears coordination files only after commit success, verifies Task branch/main/lineage/path authority, creates an explicit `git merge --no-ff` commit on `main`, verifies that the merge parents are the recorded baseline and exact Task commit, safely deletes the merged Task branch and marks `ACCEPTED`. It does not repeat the comprehensive integration profiles.
 
 ```text
 STOPPED : REVIEWER
@@ -622,18 +624,20 @@ With the default `stop_on_blocked=true`, a child Planner `BLOCKED` pauses Goal p
 
 ```bash
 uv run .agents/orchestrator.py doctor
-uv run --frozen pytest --no-cov .agents/tests
+uv run --locked pytest --no-cov .agents/tests
 uv run .agents/orchestrator.py self-test
-uv run --frozen ruff format --check .agents
-uv run --frozen ruff check .agents
-uv run --frozen mypy
+uv run --locked ruff format --check .agents
+uv run --locked ruff check .agents
+uv run --locked mypy
+uv run --locked python scripts/ci_check.py --profile affected
+uv run --locked python scripts/ci_check.py --profile full
 ```
 
 Goal-focused checks:
 
 ```bash
-uv run --frozen pytest --no-cov .agents/tests/test_goals.py
-uv run --frozen pytest --no-cov .agents/tests/test_goal_integration.py
+uv run --locked pytest --no-cov .agents/tests/test_goals.py
+uv run --locked pytest --no-cov .agents/tests/test_goal_integration.py
 ```
 
 Native session resumption is never replaced by transcript replay or implicit latest-session heuristics. Goal supervision never stores or reuses child role-session IDs.

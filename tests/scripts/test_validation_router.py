@@ -235,6 +235,83 @@ def test_dirty_materialized_integration_candidate_is_rejected(
         )
 
 
+def test_reviewed_worktree_integration_routes_frozen_local_candidate(
+    repository: tuple[Path, str],
+) -> None:
+    """Controller-frozen local changes receive integration-level validation."""
+    repo, baseline = repository
+    _write(repo, "app/ui/src/widgets/orders/OrderTicket.tsx")
+    _write(repo, "app/ui/src/widgets/orders/OrderTicket.test.tsx")
+
+    decision = validation_router.route_validation(
+        repo,
+        profile="integration",
+        base_ref=baseline,
+        head_ref="HEAD",
+        reviewed_worktree=True,
+    )
+
+    assert decision.families == ("ui",)
+    assert decision.candidate.base_commit == baseline
+    assert decision.candidate.head_commit == baseline
+    assert decision.candidate.local_paths == (
+        "app/ui/src/widgets/orders/OrderTicket.test.tsx",
+        "app/ui/src/widgets/orders/OrderTicket.tsx",
+    )
+
+
+def test_reviewed_worktree_excludes_controller_coordination_paths(
+    repository: tuple[Path, str],
+) -> None:
+    """Task journals do not force workflow validation for every product change."""
+    repo, baseline = repository
+    _write(repo, ".agents/task/planner.md", "active plan\n")
+    _write(repo, "app/services/data/ingest/service.py")
+
+    decision = validation_router.route_validation(
+        repo,
+        profile="integration",
+        base_ref=baseline,
+        head_ref="HEAD",
+        reviewed_worktree=True,
+    )
+
+    assert decision.families == ("python",)
+    assert ".agents/task/planner.md" not in decision.changed_paths
+    assert ".agents/task/planner.md" not in decision.candidate.local_paths
+
+
+@pytest.mark.parametrize("profile", ["affected", "python", "ui", "workflow", "full"])
+def test_reviewed_worktree_mode_is_integration_only(
+    repository: tuple[Path, str], profile: str
+) -> None:
+    """No other public profile can weaken reviewed-worktree semantics."""
+    repo, baseline = repository
+
+    with pytest.raises(validation_router.RoutingError, match="only for integration"):
+        validation_router.route_validation(
+            repo,
+            profile=profile,
+            base_ref=baseline,
+            head_ref="HEAD",
+            reviewed_worktree=True,
+        )
+
+
+def test_reviewed_worktree_mode_requires_exact_candidate_identity(
+    repository: tuple[Path, str],
+) -> None:
+    """A local reviewed candidate cannot omit its base or head identity."""
+    repo, _ = repository
+
+    with pytest.raises(validation_router.RoutingError, match="explicit"):
+        validation_router.route_validation(
+            repo,
+            profile="integration",
+            reviewed_worktree=True,
+        )
+
+
 def test_missing_integration_identity_widens_to_full(
     repository: tuple[Path, str],
 ) -> None:

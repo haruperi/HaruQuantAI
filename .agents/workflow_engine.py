@@ -7,7 +7,7 @@ import json
 import subprocess
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from ide_transport import IDE_MODES, finish_ide_role, prepare_ide_role
@@ -277,14 +277,17 @@ def _handle_commit_gate(
         rejection=rejection,
     )
     if decision:
+        validation = _run_local_integration_gate(cfg, state)
         state["commit_authorized"] = True
         state["commit_authorization_source"] = source
+        state["integration_validation"] = validation
         state["phase"] = "closeout"
         _record(
             state,
             "commit_authorization",
             handoff="APPROVED_COMMIT",
             source=source,
+            integration_report_sha256=validation["report_sha256"],
             runtime_policy_sha256=state.get("runtime_policy_fingerprint"),
             scope_sha256=state.get("scope_fingerprint"),
         )
@@ -300,6 +303,173 @@ def _handle_commit_gate(
         state["phase"] = "planner"
         _record(state, "commit_rejection", handoff="COMMIT_REJECTED")
     _save_state(cfg, state)
+
+
+def _execute_integration_command(command: list[str], repo: Path) -> int:
+    """Execute the controller-owned integration command and return its status."""
+    result = subprocess.run(
+        command,
+        cwd=repo,
+        check=False,
+    )
+    return result.returncode
+
+
+def _validate_integration_report(
+    report_path: Path,
+    *,
+    expected_base: str,
+    expected_head: str,
+) -> dict[str, Any]:
+    """Validate a complete successful local integration report.
+
+    Args:
+        report_path: Controller-selected report path.
+        expected_base: Exact accepted-main commit used as the integration base.
+        expected_head: Exact reviewed branch HEAD.
+
+    Returns:
+        Parsed validated report.
+
+    Raises:
+        OrchestratorError: If the report is missing, malformed, incomplete, stale,
+            or contains a failed prerequisite.
+    """
+    if not report_path.is_file():
+        raise OrchestratorError("Local integration gate produced no report.")
+    try:
+        payload = json.loads(report_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise OrchestratorError("Local integration gate report is invalid.") from exc
+    if payload.get("schema_version") != 1:
+        raise OrchestratorError("Local integration gate report schema is invalid.")
+    if payload.get("report_kind") != "diagnostic-not-reusable-validation-receipt":
+        raise OrchestratorError("Local integration gate report kind is invalid.")
+    if payload.get("explain_only") is not False:
+        raise OrchestratorError("Explain-only output cannot satisfy integration.")
+    decision = payload.get("decision")
+    if not isinstance(decision, dict):
+        raise OrchestratorError("Local integration report has no routing decision.")
+    candidate = decision.get("candidate")
+    if not isinstance(candidate, dict):
+        raise OrchestratorError("Local integration report has no candidate identity.")
+    if decision.get("requested_profile") != "integration":
+        raise OrchestratorError("Local gate did not execute the integration profile.")
+    if candidate.get("base_commit") != expected_base:
+        raise OrchestratorError("Local integration report has a stale base commit.")
+    if candidate.get("head_commit") != expected_head:
+        raise OrchestratorError("Local integration report has a stale reviewed HEAD.")
+    families = decision.get("selected_families")
+    if not isinstance(families, list) or not families:
+        raise OrchestratorError(
+            "Local integration report selected no validation family."
+        )
+    steps = payload.get("steps")
+    results = payload.get("results")
+    if not isinstance(steps, list) or not steps:
+        raise OrchestratorError("Local integration report planned no checks.")
+    if not isinstance(results, list) or len(results) != len(steps):
+        raise OrchestratorError(
+            "Local integration report is missing or skipped required checks."
+        )
+    for step, result in zip(steps, results, strict=True):
+        if not isinstance(step, dict) or not isinstance(result, dict):
+            raise OrchestratorError("Local integration report entries are malformed.")
+        if step.get("step_id") != result.get("step_id"):
+            raise OrchestratorError("Local integration result order is inconsistent.")
+        if result.get("exit_code") != 0:
+            raise OrchestratorError(
+                f"Local integration prerequisite failed: {step.get('step_id')}"
+            )
+    return cast("dict[str, Any]", payload)
+
+
+def _run_local_integration_gate(
+    cfg: dict[str, Any], state: dict[str, Any]
+) -> dict[str, Any]:
+    """Run integration validation against the exact frozen reviewed worktree."""
+    repo = Path(cfg["repo"])
+    primary_repo = Path(state.get("primary_repo_path", repo))
+    baseline = state.get("integration_baseline") or state["baseline"]
+    reviewed_head = state["reviewed_head"]
+    reviewed_hash = state["reviewed_worktree_hash"]
+    current_main = _git_ok(primary_repo, "rev-parse", cfg["main_branch"])
+    if current_main != baseline:
+        raise OrchestratorError(
+            "Accepted main changed before local integration validation."
+        )
+    if _git_ok(repo, "rev-parse", "HEAD") != reviewed_head:
+        raise OrchestratorError("Reviewed HEAD changed before local integration.")
+    if _worktree_fingerprint(repo) != reviewed_hash:
+        raise OrchestratorError("Reviewed worktree changed before local integration.")
+
+    report_path = (
+        Path(cfg["logs_dir"]) / state["run_id"] / "integration" / "local-gate.json"
+    )
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.unlink(missing_ok=True)
+    command_prefix = cfg.get(
+        "integration_command_prefix", ["uv", "run", "--locked", "python"]
+    )
+    command = [
+        *command_prefix,
+        "scripts/ci_check.py",
+        "--profile",
+        "integration",
+        "--base",
+        baseline,
+        "--head",
+        reviewed_head,
+        "--reviewed-worktree",
+        "--report",
+        str(report_path),
+    ]
+    exit_code = _execute_integration_command(command, repo)
+    if exit_code != 0:
+        raise OrchestratorError(
+            f"Local integration gate failed with exit code {exit_code}."
+        )
+    payload = _validate_integration_report(
+        report_path,
+        expected_base=baseline,
+        expected_head=reviewed_head,
+    )
+    if _git_ok(repo, "rev-parse", "HEAD") != reviewed_head:
+        raise OrchestratorError("Integration checks changed the reviewed HEAD.")
+    if _worktree_fingerprint(repo) != reviewed_hash:
+        raise OrchestratorError("Integration checks changed reviewed worktree bytes.")
+    decision = payload["decision"]
+    return {
+        "status": "PASSED",
+        "base_commit": baseline,
+        "reviewed_head": reviewed_head,
+        "reviewed_worktree_sha256": reviewed_hash,
+        "selected_families": decision["selected_families"],
+        "report_path": str(report_path),
+        "report_sha256": _sha_file(report_path),
+    }
+
+
+def _ensure_local_integration_gate_unchanged(state: dict[str, Any], repo: Path) -> None:
+    """Require unchanged successful integration evidence before close-out."""
+    evidence = state.get("integration_validation")
+    if not isinstance(evidence, dict) or evidence.get("status") != "PASSED":
+        raise OrchestratorError("Close-out has no passed local integration gate.")
+    if evidence.get("reviewed_head") != state.get("reviewed_head"):
+        raise OrchestratorError("Close-out integration evidence has a stale HEAD.")
+    if evidence.get("reviewed_worktree_sha256") != state.get("reviewed_worktree_hash"):
+        raise OrchestratorError("Close-out integration evidence has a stale worktree.")
+    report_path = Path(str(evidence.get("report_path", "")))
+    if not report_path.is_file() or _sha_file(report_path) != evidence.get(
+        "report_sha256"
+    ):
+        raise OrchestratorError("Close-out integration report is missing or changed.")
+    if _git_ok(repo, "rev-parse", "HEAD") != state.get("reviewed_head"):
+        raise OrchestratorError("HEAD changed after local integration validation.")
+    if _worktree_fingerprint(repo) != state.get("reviewed_worktree_hash"):
+        raise OrchestratorError(
+            "Working tree changed after local integration validation."
+        )
 
 
 def _archive_closeout_evidence(cfg: dict[str, Any], state: dict[str, Any]) -> Path:
@@ -417,6 +587,7 @@ def _verify_closeout_lineage(
 
 def _handle_closeout(cfg: dict[str, Any], state: dict[str, Any]) -> bool:
     print(f"\n=== REVIEWER — authorized close-out for Review {state['iteration']} ===")
+    _ensure_local_integration_gate_unchanged(state, Path(cfg["repo"]))
     if not state.get("ide_closeout_evidence_archived"):
         _archive_closeout_evidence(cfg, state)
     stdout, log = _invoke_pending(cfg, state, "REVIEWER", authorized_closeout=True)

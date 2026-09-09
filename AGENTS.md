@@ -90,6 +90,7 @@ ORCHESTRATOR READY / TASK NONE
   → Reviewer Review N
   → PENDING_COMMIT
   → commit gate: exact owner message or frozen run preauthorization
+  → controller integration gate against accepted main and frozen reviewed state
   → Reviewer close-out
   → ACCEPTED
   → ORCHESTRATOR READY / TASK NONE
@@ -271,8 +272,10 @@ every non-Quick-Fix mode.
   and the repository Ruff configuration.
 - **Formatting.** Use 4-space indentation and `ruff format` (double quotes and
   magic trailing commas apply). The pre-commit order is repository hygiene and
-  syntax checks, Ruff fix, Ruff format, then secret detection. Pre-push runs
-  strict mypy, the complete pytest coverage gate, and applicable workflow checks.
+  syntax checks, Ruff check, Ruff format check, then secret detection. Pre-push
+  runs affected-scope validation for the outgoing local delta. It does not run
+  the complete repository suite for every push; comprehensive qualification is
+  enforced at the local integration-candidate gate and by CI `acceptance`.
 - **Typing and documentation.** Add explicit type hints to every signature and
   run the configured strict mypy checks. Every module, public class, public
   function, and non-obvious private function has a properly fitted Google-style
@@ -321,7 +324,9 @@ every non-Quick-Fix mode.
 
 During implementation/review, derive the affected set from `git diff --name-only`, staged diff, and untracked paths. Map changed production code to owning and affected contract/consumer/architecture tests.
 
-Run bounded tests explicitly, e.g. `uv run pytest --no-cov <selected paths>`. Never run bare/unfiltered pytest or coverage iteratively. Coverage and complete suite are final integration evidence through configured pre-commit/CI gates.
+Run bounded tests explicitly, e.g. `uv run pytest --no-cov <selected paths>`. Never run bare/unfiltered pytest or coverage iteratively. Before authorized Task close-out, the controller runs `scripts/ci_check.py --profile integration` against the accepted-main baseline and exact frozen reviewed candidate. Python-changing candidates retain comprehensive coverage; UI candidates retain typecheck, tests and production build. CI repeats candidate-appropriate qualification under the stable `acceptance` status after an independently authorized push.
+
+Local Task acceptance is local-first: `ACCEPTED` proves the controller-gated local candidate and exact merge lineage. It does not authorize or claim a push, pull-request merge, remote check result or branch-protection state. Remote publishing and repository administration require separate explicit authority.
 
 Safe read/verification commands include `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, bounded pytest, Ruff, and mypy. Destructive commands and live external actions require explicit applicable authorization.
 

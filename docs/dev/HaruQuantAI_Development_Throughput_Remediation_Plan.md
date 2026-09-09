@@ -1,7 +1,7 @@
 # HaruQuantAI V3 — Development Throughput Remediation Plan
 
 **Date:** 9 September 2026
-**Status:** PROPOSED — implementation and configuration changes have not been performed.
+**Status:** ACTIVE — DT-01 and DT-02 are implemented; DT-03 local enforcement and checked-in CI definition are implemented, while remote publication and repository protection remain pending explicit owner authorization.
 **Repository baseline checked:** `a32a46ad5c3407bdb7b68bf8dc270d327b6e7625` on remote `main`.
 **Repository location:** `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`
 **Basis:** The three supplied agent analyses, supplemented by targeted read-only repository checks and official tool documentation. Source references appear in §12.
@@ -68,6 +68,8 @@ POST-DT-06 PILOT → DT-11         (strategy-ready milestone path)
 ```
 
 The owner authorized DT-02A and DT-02B as one combined DT-02 delivery on 9 September 2026. Implementation still establishes and measures the DT-02A fast default before enabling DT-02B routing so the incremental benefit remains observable. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer later automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
+
+Implementation record: DT-01 was committed as `5faf73fe`; combined DT-02A/DT-02B was committed as `6420d7e8`. DT-03 selects the local-first acceptance model defined below. A local Task may become `ACCEPTED` only after controller-enforced integration validation of its frozen reviewed state and exact merge lineage. Publishing remains separately authorized, and the remote `acceptance` result confirms rather than retroactively grants local Task acceptance.
 
 ## 4. Change set A — Stop avoidable waiting
 
@@ -173,6 +175,8 @@ Deduplicate identical command invocations within a profile combination. Remove t
 ### DT-03 — Establish local acceptance protection, then add remote enforcement
 
 **Primary paths:** `.github/workflows/ci.yml`, `.pre-commit-config.yaml`, `scripts/ci_check.py`, `.agents/` close-out/integration behavior, `AGENTS.md`, `.agents/PROCEDURE.md`, and repository protection settings.
+
+**Governing model selected:** local-first acceptance with remote confirmation. The checked-in controller gate is authoritative for local Task acceptance. The CI job named `acceptance` qualifies an explicitly published candidate. Local commit/merge permissions never authorize a push, pull-request merge, branch-protection mutation or other remote administration. Until those remote settings are separately authorized, configured and verified, the local gate remains mandatory and the plan must report remote enforcement as pending.
 
 **Target flow**
 

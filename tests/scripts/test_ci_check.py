@@ -191,3 +191,62 @@ def test_routing_failure_returns_configuration_error(
     )
 
     assert ci_check.main(["--profile", "integration"]) == 2
+
+
+def test_reviewed_worktree_flag_is_forwarded_to_router(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """The controller-only candidate mode reaches deterministic routing."""
+    seen: dict[str, object] = {}
+    decision = _decision("ui", requested="integration")
+
+    def route(*_args: object, **kwargs: object) -> RoutingDecision:
+        seen.update(kwargs)
+        return decision
+
+    monkeypatch.setattr(ci_check, "route_validation", route)
+    monkeypatch.setattr(ci_check, "build_steps", lambda _decision: ())
+
+    assert (
+        ci_check.main(
+            [
+                "--profile",
+                "integration",
+                "--base",
+                "main",
+                "--head",
+                "HEAD",
+                "--reviewed-worktree",
+            ]
+        )
+        == 0
+    )
+    assert seen["reviewed_worktree"] is True
+
+
+def test_pre_push_uses_affected_validation_without_inline_coverage() -> None:
+    """Routine pushes no longer embed the former broad validation commands."""
+    config = (ci_check.REPO / ".pre-commit-config.yaml").read_text("utf-8")
+    pre_push = config[config.index("- id: affected-validation") :]
+
+    assert "--profile affected --base origin/main --head HEAD" in pre_push
+    assert "--cov=app" not in pre_push
+    assert "--cov-report=html" not in pre_push
+    assert "- id: workflow-tests" not in pre_push
+    assert "- id: workflow-self-test" not in pre_push
+    assert "\\.github/workflows/" in pre_push
+    assert "\\.pre-commit-config\\.yaml$" in pre_push
+
+
+def test_ci_defines_locked_stable_acceptance_status() -> None:
+    """Remote qualification exposes one stable lock-preserving job name."""
+    workflow = (ci_check.REPO / ".github/workflows/ci.yml").read_text("utf-8")
+
+    assert "  acceptance:\n" in workflow
+    assert "    name: acceptance\n" in workflow
+    assert "fetch-depth: 0" in workflow
+    assert "uv sync --locked --all-extras --dev" in workflow
+    assert "working-directory: app/ui\n        run: npm ci" in workflow
+    assert "--profile integration" in workflow
+    assert "--profile full" in workflow
+    assert "test_config_disable_matrix.py" not in workflow

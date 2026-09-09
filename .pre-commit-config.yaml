@@ -56,36 +56,12 @@ repos:
         types_or: [python, pyi]
         stages: [pre-commit]
 
-      - id: mypy
-        name: mypy
-        entry: uv run --locked mypy
+      - id: affected-validation
+        name: Affected pre-push validation
+        entry: uv run --locked python scripts/ci_check.py --profile affected --base origin/main --head HEAD
         language: system
         pass_filenames: false
-        files: ^(app/|tests/|\.agents/|pyproject\.toml$|uv\.lock$)
-        stages: [pre-push]
-
-      - id: pytest
-        name: pytest
-        entry: uv run --locked pytest --cov=app --cov-report=term-missing --cov-report=html --cov-fail-under=80
-        language: system
-        pass_filenames: false
-        files: ^(app/|tests/|pyproject\.toml$|uv\.lock$)
-        stages: [pre-push]
-
-      - id: workflow-tests
-        name: Workflow controller tests
-        entry: uv run --locked pytest --no-cov .agents/tests
-        language: system
-        pass_filenames: false
-        files: ^(\.agents/|AGENTS\.md$|docs/templates/prompt/)
-        stages: [pre-push]
-
-      - id: workflow-self-test
-        name: Workflow controller self-test
-        entry: uv run --locked python .agents/orchestrator.py self-test
-        language: system
-        pass_filenames: false
-        files: ^(\.agents/|AGENTS\.md$|docs/templates/prompt/)
+        files: ^(app/|tests/|scripts/|\.agents/|\.github/workflows/|docs/templates/prompt/|AGENTS\.md$|\.pre-commit-config\.yaml$|pyproject\.toml$|uv\.lock$)
         stages: [pre-push]
 
   # Secret detection runs after formatting so it scans the exact final bytes.

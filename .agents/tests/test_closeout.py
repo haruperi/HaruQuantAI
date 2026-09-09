@@ -153,6 +153,11 @@ def test_failed_closeout_before_commit_preserves_journals(
     def fail_gate(*_args: Any, **_kwargs: Any) -> None:
         raise orc.OrchestratorError("simulated final gate failure")
 
+    monkeypatch.setitem(
+        orc._handle_closeout.__globals__,
+        "_ensure_local_integration_gate_unchanged",
+        lambda *_args: None,
+    )
     monkeypatch.setitem(orc._handle_closeout.__globals__, "_invoke_pending", fail_gate)
     with pytest.raises(orc.OrchestratorError, match="final gate failure"):
         orc._handle_closeout(cfg, state)

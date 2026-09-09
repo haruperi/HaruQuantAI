@@ -4,7 +4,7 @@
 from __future__ import annotations
 
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from typing import Final
 
@@ -17,6 +17,14 @@ PUBLIC_PROFILES: Final[tuple[str, ...]] = (
     "full",
 )
 FULL_FAMILIES: Final[tuple[str, ...]] = ("python", "ui", "workflow")
+TRANSIENT_REVIEW_PATHS: Final[frozenset[str]] = frozenset(
+    {
+        ".agents/task/planner.md",
+        ".agents/task/executor.md",
+        ".agents/task/reviewer.md",
+        ".agents/task/next-agent.md",
+    }
+)
 SERVICE_PATH_PARTS: Final[int] = 4
 UI_GROUP_PATH_PARTS: Final[int] = 3
 UI_ROOT_PATH_PARTS: Final[int] = 2
@@ -316,6 +324,36 @@ def _classify(path: str) -> str:
     return "unknown"
 
 
+def _without_transient_review_paths(candidate: CandidateChanges) -> CandidateChanges:
+    """Remove controller coordination files from a reviewed product candidate.
+
+    The controller separately fingerprints and protects these files. They are not
+    implementation impact and must not make every feature select workflow tests.
+
+    Returns:
+        Candidate containing only implementation-relevant paths.
+    """
+    return replace(
+        candidate,
+        paths=tuple(
+            path for path in candidate.paths if path not in TRANSIENT_REVIEW_PATHS
+        ),
+        deleted_paths=tuple(
+            path
+            for path in candidate.deleted_paths
+            if path not in TRANSIENT_REVIEW_PATHS
+        ),
+        renamed_paths=tuple(
+            pair
+            for pair in candidate.renamed_paths
+            if not set(pair) & TRANSIENT_REVIEW_PATHS
+        ),
+        local_paths=tuple(
+            path for path in candidate.local_paths if path not in TRANSIENT_REVIEW_PATHS
+        ),
+    )
+
+
 def _existing(repo: Path, candidates: set[str]) -> tuple[str, ...]:
     """Return sorted candidate paths that currently exist."""
     return tuple(sorted(path for path in candidates if (repo / path).exists()))
@@ -507,6 +545,7 @@ def route_validation(
     profile: str,
     base_ref: str | None = None,
     head_ref: str | None = None,
+    reviewed_worktree: bool = False,
 ) -> RoutingDecision:
     """Build a conservative routing decision for one requested profile.
 
@@ -515,6 +554,8 @@ def route_validation(
         profile: Public validation profile.
         base_ref: Optional integration base revision.
         head_ref: Optional candidate revision.
+        reviewed_worktree: Include local changes in an integration candidate that
+            has already been frozen by the workflow controller.
 
     Returns:
         Complete routing decision.
@@ -525,13 +566,28 @@ def route_validation(
     if profile not in PUBLIC_PROFILES:
         message = f"Unknown validation profile: {profile}"
         raise RoutingError(message)
+    if reviewed_worktree and profile != "integration":
+        raise RoutingError(
+            "Reviewed-worktree routing is valid only for integration validation."
+        )
+    if reviewed_worktree and (base_ref is None or head_ref is None):
+        raise RoutingError(
+            "Reviewed-worktree integration requires explicit --base and --head."
+        )
     candidate = discover_changes(
         repo,
         base_ref=base_ref,
         head_ref=head_ref,
-        include_local=profile != "integration",
+        include_local=profile != "integration" or reviewed_worktree,
     )
-    if profile == "integration" and base_ref is not None and candidate.is_dirty:
+    if reviewed_worktree:
+        candidate = _without_transient_review_paths(candidate)
+    if (
+        profile == "integration"
+        and base_ref is not None
+        and candidate.is_dirty
+        and not reviewed_worktree
+    ):
         raise RoutingError(
             "Integration validation requires a clean materialized candidate."
         )

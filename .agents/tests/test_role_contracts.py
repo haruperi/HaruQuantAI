@@ -49,4 +49,6 @@ def test_templates_require_output_discovery_and_check_only_freeze(
     assert "include every output" in planner
     assert "validation is check-only" in executor
     assert "Every close-out validation command must be check-only" in closeout
+    assert "Do not repeat the comprehensive integration profiles" in closeout
+    assert "controller-recorded integration report hash" in closeout
     assert "CHANGES_REQUESTED" in closeout

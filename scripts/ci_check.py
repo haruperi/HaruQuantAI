@@ -482,6 +482,14 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--base", help="Integration base Git revision.")
     parser.add_argument("--head", help="Candidate Git revision.")
     parser.add_argument(
+        "--reviewed-worktree",
+        action="store_true",
+        help=(
+            "Include the controller-frozen reviewed worktree in an integration "
+            "candidate. Valid only with --profile integration, --base and --head."
+        ),
+    )
+    parser.add_argument(
         "--explain",
         action="store_true",
         help="Print routing and commands without executing them.",
@@ -510,6 +518,7 @@ def main(arguments: Sequence[str] | None = None) -> int:
             profile=options.profile,
             base_ref=options.base,
             head_ref=options.head,
+            reviewed_worktree=options.reviewed_worktree,
         )
         steps = build_steps(decision)
     except RoutingError as exc:
