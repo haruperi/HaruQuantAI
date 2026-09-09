@@ -1,0 +1,14 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-WORKSPACE_NAVIGATION",
+  "task_id": "1.27",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id": "FR-TRC-UI-WORKSPACE_NAVIGATION-001", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-UI-WORKSPACE_NAVIGATION-002", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-UI-WORKSPACE_NAVIGATION-003", "status": "IMPLEMENTED"},
+    {"id": "NFR-TRC-UI-WORKSPACE_NAVIGATION-001", "status": "IMPLEMENTED"}
+  ],
+  "notes": "Existing Sidebar already derives navigation from the sole widget registry and supports compact/expanded navigation. Task 1.27 adds capability-aware availability/reason projection and standard keyboard/focus helpers without creating a second navigation registry.",
+  "review": {"reviewer_verdict": "PENDING"}
+}
