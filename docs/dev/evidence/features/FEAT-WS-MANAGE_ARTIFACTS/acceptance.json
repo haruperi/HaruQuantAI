@@ -1,0 +1,122 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-WS-MANAGE_ARTIFACTS",
+  "task_id": "1.17",
+  "status": "ACCEPTED",
+  "owner_specification": "app/services/workspace/README.md",
+  "baseline_commit": "6c53f233b9f2717733df7cb229b4fdda97967747",
+  "acceptance_commit": "task-closeout:20260909-065302-manage-artifacts",
+  "requirements": [
+    {
+      "id": "FR-TRC-WS-MANAGE_ARTIFACTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_traceability.py::test_at_ws_manage_artifacts_001_publication_validation_and_idempotency"
+    },
+    {
+      "id": "FR-TRC-WS-MANAGE_ARTIFACTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_traceability.py::test_at_ws_manage_artifacts_002_download_authorization"
+    },
+    {
+      "id": "FR-TRC-WS-MANAGE_ARTIFACTS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_traceability.py::test_at_ws_manage_artifacts_003_retention_and_admitted_cleanup"
+    },
+    {
+      "id": "NFR-TRC-WS-MANAGE_ARTIFACTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_lifecycle.py::test_trc_ws_manage_artifacts_nfr_001_removal_and_retention"
+    },
+    {
+      "id": "AT-WS-MANAGE_ARTIFACTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_traceability.py::test_at_ws_manage_artifacts_001_publication_validation_and_idempotency"
+    },
+    {
+      "id": "AT-WS-MANAGE_ARTIFACTS-002",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_traceability.py::test_at_ws_manage_artifacts_002_download_authorization"
+    },
+    {
+      "id": "AT-WS-MANAGE_ARTIFACTS-003",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_traceability.py::test_at_ws_manage_artifacts_003_retention_and_admitted_cleanup"
+    },
+    {
+      "id": "ATN-WS-MANAGE_ARTIFACTS-001",
+      "status": "PASS",
+      "evidence_target": "tests/services/workspace/manage_artifacts/test_lifecycle.py::test_trc_ws_manage_artifacts_nfr_001_removal_and_retention"
+    }
+  ],
+  "catalogue_entries": [
+    "Staged, flushed, hash-verified atomic publication and custody receipt issuance",
+    "Authorized artifact ID resolution and bounded download grants",
+    "Immutable artifact byte retention under semantic references and legal holds",
+    "Admitted custody reconciliation and orphan staging cleanup with audit receipt",
+    "Public capability workspace.artifacts@1"
+  ],
+  "stages": {
+    "contract": {
+      "status": "PASS",
+      "evidence": "app/contracts/workspace/artifacts.py, capabilities.py"
+    },
+    "provider": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/manage_artifacts/test_traceability.py"
+    },
+    "composition": {
+      "status": "PASS",
+      "evidence": "tests/services/workspace/manage_artifacts/test_lifecycle.py"
+    },
+    "interfaces": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Internal Workspace artifact custody capability; no Interfaces adapter is in scope for Task 1.17."
+    },
+    "ui": {
+      "status": "NOT_APPLICABLE",
+      "evidence": "Backend artifact custody provider without direct UI presentation in this task."
+    },
+    "end_to_end": {
+      "status": "PASS",
+      "evidence": "app/services/workspace/manage_artifacts/_usage.py"
+    }
+  },
+  "commands": [
+    {
+      "command": "uv run --frozen pytest --no-cov tests/services/workspace/manage_artifacts",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python -m app.services.workspace.manage_artifacts._usage",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen ruff check app/contracts/workspace/artifacts.py app/contracts/workspace/capabilities.py app/services/workspace/manage_artifacts tests/services/workspace/manage_artifacts",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen ruff format --check app/contracts/workspace/artifacts.py app/contracts/workspace/capabilities.py app/services/workspace/manage_artifacts tests/services/workspace/manage_artifacts",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen mypy app/contracts/workspace/artifacts.py app/contracts/workspace/capabilities.py app/services/workspace/manage_artifacts tests/services/workspace/manage_artifacts",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/generate_contracts.py --check",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/validate_phase0.py",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run --frozen python scripts/validate_feature_docs.py",
+      "exit_code": 0
+    }
+  ],
+  "review": {
+    "reviewer_verdict": "PENDING",
+    "reviewer_notes": "Implementation and change-scoped validation completed by Executor; independent Reviewer verification pending."
+  }
+}

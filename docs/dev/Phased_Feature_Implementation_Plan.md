@@ -1128,9 +1128,9 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 <a id="task-1-17"></a>
 
-### - [ ] Task 1.17 — FEAT-WS-MANAGE_ARTIFACTS — Publish and retain immutable artifact bytes
+### - [x] Task 1.17 — FEAT-WS-MANAGE_ARTIFACTS — Publish and retain immutable artifact bytes
 
-**Status:** `NOT_STARTED_IN_TARGET` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U1.
+**Status:** `PROVED_COMPLETE` · **Domain:** Workspace · **Owner specification:** `app/services/workspace/README.md` · **Register first slice:** U1.
 
 **Order prerequisites:** 1.09, 1.14.
 
@@ -1178,7 +1178,7 @@ Applicable shared NFRs, original source refinements and catalogue obligations ar
 
 **Commit message:** `feat(workspace): complete FEAT-WS-MANAGE_ARTIFACTS`
 
-**Accepted commit:** Not recorded — this is a plan. A Phase 0 proof of existing completion may bind an earlier acceptance commit instead of forcing new production code.
+**Accepted commit:** `task-closeout:20260909-065302-manage-artifacts` · verified-scope artifact publication, bounded download authorization, retention under legal hold and references, orphan cleanup, tests, usage, and evidence manifest.
 
 ---
 
