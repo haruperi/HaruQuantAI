@@ -3,7 +3,7 @@
 **Date:** 9 September 2026
 **Status:** PROPOSED — implementation and configuration changes have not been performed.
 **Repository baseline checked:** `a32a46ad5c3407bdb7b68bf8dc270d327b6e7625` on remote `main`.
-**Suggested repository location:** `docs/dev/Development_Throughput_Remediation_Plan.md`
+**Repository location:** `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`
 **Basis:** The three supplied agent analyses, supplemented by targeted read-only repository checks and official tool documentation. Source references appear in §12.
 
 ## 1. Decision and objective
@@ -46,30 +46,29 @@ Use Agent 1's useful suggestions about hooks, batching and automation; retain Ag
 
 ## 3. Rollout structure
 
-These are **ten work orders within four remediation change sets**, not ten mandatory fresh Planner → Executor → Reviewer rituals. Apply current authorization rules until an explicitly reviewed workflow amendment replaces them. Workflow/approval changes themselves receive strong review.
+These are **eleven top-level work orders within four remediation change sets**. Until an explicitly reviewed workflow amendment replaces the current atomic Task contract, each independently reviewable work order must follow the workflow required by `AGENTS.md`. In particular, DT-01, DT-02 and DT-03 are three separate Tasks; their different responsibilities, write paths, validation and rollback boundaries must not be combined into one Change Set A implementation Task. Workflow/approval changes themselves receive strong review.
 
 | Change set | Work orders | Exit condition |
 |---|---|---|
-| A — Stop avoidable waiting | DT-01 through DT-03 | Mechanical regressions covered; fast test defaults; verified integration protection before hook relaxation. |
+| A — Stop avoidable waiting | DT-01 through DT-03 | Mechanical regressions covered; fast test defaults; verified local integration protection before hook relaxation; remote enforcement handled separately. |
 | B — Stop repeated reasoning | DT-04 through DT-06 | Risk-tiered packets, bounded direct corrections, trustworthy validation records and deterministic close-out. |
 | C — Stop repetitive authoring | DT-07 and DT-08 | Evidence projection and one useful scaffolding/conformance path demonstrated without false acceptance. |
-| D — Increase delivery throughput | DT-09 and DT-10 | Small batches and bounded parallel lanes validated using accepted outcomes. |
+| D — Increase useful delivery throughput | DT-09 through DT-11 | Conservative batching and bounded parallel lanes validated using accepted outcomes; a strategy-ready milestone is frozen and measured separately from full V3 completion. |
 
 Implement A before spending effort on a universal scaffolder or parallel scheduling improvements. Production development can resume on the improved path after A and B; completing every optional automation is not a new prerequisite for working on strategies.
 
 ### Dependency order
 
 ```text
-DT-01 → DT-02 → DT-03
-                    ↓
-                  DT-04 → DT-05 → DT-06
-                                     ↓
-                                   DT-07 → DT-08
-                                     ↓
-                                   DT-09 → DT-10
+DT-01 → DT-02A → DT-03 → DT-04 → DT-05 → DT-06 → POST-DT-06 PILOT
+          └──→ DT-02B (optional after DT-02A measurement)
+
+POST-DT-06 PILOT → DT-07 → DT-08 (optional evidence/scaffolding path)
+POST-DT-06 PILOT → DT-09 → DT-10 (optional batching/parallelism path)
+POST-DT-06 PILOT → DT-11         (strategy-ready milestone path)
 ```
 
-DT-08 is not a prerequisite for DT-09. Defer expanding scaffolding when its measured benefit is weak. All change sets must preserve previously passing safeguards.
+DT-02A supplies the immediate validation-speed change. DT-02B is an advanced routing increment and may be deferred when DT-02A already meets the measured feedback budget. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
 
 ## 4. Change set A — Stop avoidable waiting
 
@@ -82,15 +81,16 @@ DT-08 is not a prerequisite for DT-09. Defer expanding scaffolding when its meas
 1. Record local HEAD, upstream HEAD, ahead/behind state, active workflow state, dirty paths, Python/Node versions and actual hook configuration. The checked repository targets Python 3.14; do not substitute older project-memory settings. Preserve active work and user changes. No reset, automatic stash, force-push or recreation of an active task.
 2. Extract available stage/command timings from Task 1.16 and other existing accepted-run records. Record unknown values as unknown; do not rerun historical product tasks merely to manufacture a baseline.
 3. Reproduce the reported administrative problems with small controller/Git fixtures: legitimate commit-hash secret-scanner findings, omitted generated paths, staged/unstaged normalization and approval fingerprint drift.
-4. Resolve a verified scanner false positive through the narrow existing baseline/audit mechanism. Do not exclude the evidence directory, disable a detector globally, or allow every 40-character hexadecimal value everywhere. Keep ordinary new-secret detection effective.
+4. Resolve a verified scanner false positive without requiring every feature Task to edit `.github/.secrets.baseline`. Prefer a schema-aware, field-specific treatment for `baseline_commit` combined with deterministic verification that the value resolves to a real repository commit. An equivalent design is acceptable only when it avoids per-feature shared-baseline churn and retains the same narrow security boundary. Do not exclude the evidence directory, disable a detector globally, or allow every 40-character hexadecimal value everywhere. Keep ordinary new-secret detection effective.
 5. Define UTF-8/LF writing for coordination documents and deterministic JSON. Add attributes for the precise relevant paths, starting with `.agents/task/*.md` and `.agents/*.toml`; do not renormalize the entire repository. Normalize an inactive/new document before approval, not by silently changing approved bytes afterward.
 6. Run mutating formatting and generation **before** freezing the reviewed candidate. After approval, use check-only validation. A product edit or unexplained byte change still invalidates the appropriate approval; retry logic must not simply ignore mismatches.
 7. Make the generator's complete output inventory available before execution, so known generated paths are not discovered as unauthorized writes during close-out.
 
 **Acceptance**
 
-- A legitimate recorded Git hash can complete normal close-out without disabling secret scanning.
+- A legitimate schema-valid `baseline_commit` that resolves to a repository commit can complete normal close-out without disabling secret scanning and without a per-feature `.github/.secrets.baseline` modification.
 - Synthetic secret-detection regression cases remain detectable; no actual credential is used as a fixture.
+- An arbitrary hexadecimal value in any unapproved field remains subject to secret detection.
 - A Windows-style staged/unstaged normalization fixture cannot silently change the approved tree.
 - Changing product code after approval still blocks acceptance.
 - Known generated outputs are listed before the executor starts.
@@ -101,6 +101,10 @@ DT-08 is not a prerequisite for DT-09. Defer expanding scaffolding when its meas
 ### DT-02 — Make normal validation fast and comprehensive validation explicit
 
 **Primary paths:** `pyproject.toml`, `scripts/ci_check.py`, tests for the validation router. Add at most one small routing helper if needed; retain `ci_check.py` as the public entry point.
+
+DT-02 is delivered in two separately reviewable stages. DT-02A is the minimum immediate speed improvement and must remain small. DT-02B adds advanced impact routing only after DT-02A has been measured. If DT-02A already meets the feedback target, DT-02B may be deferred rather than becoming new mandatory infrastructure.
+
+#### DT-02A — Fast defaults and explicit validation profiles
 
 **Actions**
 
@@ -126,7 +130,11 @@ Introduce these **proposed** profiles; they are new interfaces to implement, not
 | `integration` | Select the necessary comprehensive profiles for the candidate against its integration base. |
 | `full` | All applicable profiles, including workflow and UI; conservative default when no profile is supplied. |
 
-For `affected` and `integration`, implement `--base`, `--head`, `--explain` and `--report`. The two refs must resolve to commits. `--explain` outputs selected commands and routing reasons without executing them. Existing no-argument invocation remains conservative.
+In DT-02A, implement the explicit profiles with straightforward conservative UI, Python, workflow, documentation and mixed-scope routing. Existing no-argument invocation remains conservative. A simple path-to-profile mapping is sufficient for this stage; unknown, shared or mixed scope widens to `full`.
+
+#### DT-02B — Advanced candidate and dependency-aware routing
+
+After measuring DT-02A, add `--base`, `--head`, `--explain` and `--report` only when their expected benefit justifies the added implementation and maintenance cost. The two refs must resolve to commits. `--explain` outputs selected commands and routing reasons without executing them.
 
 Use the merge-base-to-candidate delta for committed changes, including deletions, renames and both names of renamed paths. During local development, union staged, unstaged and relevant untracked paths. For integration acceptance, require a clean materialized candidate and include changes introduced while combining it with the current base. A missing base, unknown path, incomplete ownership mapping or inconclusive dependency relationship widens validation rather than returning a misleading empty selection.
 
@@ -148,16 +156,22 @@ Use locked dependencies for the runner and all nested commands. `uv run --locked
 
 Deduplicate identical command invocations within a profile combination. Remove the standalone provider-disable matrix invocation only after confirming it is collected and covered in the relevant comprehensive run; otherwise keep one explicit `--no-cov` invocation. Do not accidentally drop the matrix.
 
-**Acceptance**
+**DT-02A acceptance**
 
 - Focused default pytest produces no coverage report and does not alter coverage artifacts.
 - Comprehensive Python validation retains the coverage floor and fails on test failure or inadequate required coverage.
-- Explain-mode routing tests cover UI-only, Python-only, contracts, root fixtures, lock changes, workflow changes, mixed changes, deleted/renamed files, untracked files and unknown scope.
 - UI-only routing selects no unrelated Python test/mypy run; unknown impact never silently selects nothing.
 - The full profile executes every required family once, including UI and workflow checks.
 - Dependency files are unchanged by validation.
 
-### DT-03 — Establish acceptance protection, then relax local hooks
+**DT-02B acceptance**
+
+- Explain-mode routing tests cover UI-only, Python-only, contracts, root fixtures, lock changes, workflow changes, mixed changes, deleted/renamed files, untracked files and unknown scope.
+- Candidate selection uses the exact resolved base/head identities and invalidates stale results.
+- Public-contract and dependency-aware routing includes known consumers without pretending to be a complete whole-program dependency engine.
+- Measurement shows that DT-02B improves accepted throughput or diagnostic clarity enough to justify retaining it; otherwise DT-02A remains the supported path.
+
+### DT-03 — Establish local acceptance protection, then add remote enforcement
 
 **Primary paths:** `.github/workflows/ci.yml`, `.pre-commit-config.yaml`, `scripts/ci_check.py`, `.agents/` close-out/integration behavior, `AGENTS.md`, `.agents/PROCEDURE.md`, and repository protection settings.
 
@@ -174,24 +188,27 @@ Task/batch candidate branch
 
 **Actions**
 
-1. Make CI use the integration profile and locked environments. Add UI dependency installation and existing `typecheck`, `test` and `build` scripts. Use the repository's package lock; do not update packages as part of CI setup.
+1. Establish one local integration-candidate gate using the DT-02 profiles and locked environments. It must evaluate every profile required by the classifier, including the applicable UI `typecheck`, `test` and `build` commands, and fail on a missing, failed or unexpectedly skipped prerequisite. Use the repository's package lock; do not update packages as part of validation setup.
 2. Keep applicable real-provider/browser checks at their existing required phase/operation gates. Mocked Vitest success is not browser or provider qualification.
-3. Add one stable final status named `acceptance`. It must always run, evaluate every profile required by the classifier, and fail on a missing, failed or unexpectedly skipped prerequisite. Workflow-level path filtering must not prevent this required status from reporting. [W3]
-4. Repair actual baseline failures exposed by these checks, in bounded changes. Do not change floors, blanket-ignore errors or declare the baseline green because selected checks passed.
-5. Configure and verify required checks/PR protection before removing local comprehensive protection. Repository-administration changes require the owner's explicit authority. An unavailable permission is a deployment blocker, not permission to assume protection exists.
-6. Amend the controller so a local commit or local merge is not advertised as final accepted integration before the required gate passes. Preserve `APPROVED: EXECUTE` and `APPROVED: COMMIT`, or the existing legitimately frozen equivalents. Existing local commit/merge permissions do **not** authorize publishing or remote merging; add any required remote-action permission explicitly, default off.
-7. Once the replacement gate is proven, keep pre-commit formatting, lint, hygiene and secret detection. Replace the broad pre-push full-suite hooks with lightweight scope/consistency checks. Focused behavioral tests run during execution; comprehensive suites run at integration, not on every push. A candidate push is submission for validation, not certification of completion.
-8. The early rollout retains one deliberate full local integration gate until remote enforcement is operational. Do not remove the old protection first and leave a gap.
+3. Repair actual baseline failures exposed by the local checks in bounded changes. Do not change floors, blanket-ignore errors or declare the baseline green because selected checks passed.
+4. Prove that the local integration-candidate gate rejects a deliberately failing or stale candidate. This local replacement permits the first hook-speed improvements without waiting for repository-administration work.
+5. Once the local replacement gate is proven, keep pre-commit formatting, lint, hygiene and secret detection. Replace the broad pre-push full-suite hooks with lightweight scope/consistency checks. Focused behavioral tests run during execution; comprehensive suites run at the local integration-candidate boundary rather than on every push.
+6. As a separate repository-administration step within DT-03, make CI invoke the same integration profiles and install the locked UI dependencies needed for the existing UI commands.
+7. Add one stable final remote status named `acceptance`; it must always report and must reject missing, failed or unexpectedly skipped prerequisite profiles. Workflow-level path filtering must not prevent this required status from reporting. [W3]
+8. Configure and verify required checks/PR protection only with the owner's explicit repository-administration authority. An unavailable permission is a remote-enforcement blocker, not permission to assume protection exists and not a blocker to retaining the proven local integration gate.
+9. Amend acceptance semantics only after choosing and documenting the governing model: local-first acceptance with remote confirmation, or PR-first acceptance enforced remotely. Preserve `APPROVED: EXECUTE` and `APPROVED: COMMIT`, or the existing legitimately frozen equivalents. Existing local commit/merge permissions do **not** authorize publishing or remote merging; any remote-action permission must be explicit and default off.
+10. Never remove the existing broad protection before the local replacement is operational. After remote enforcement is proven, measure whether the local comprehensive gate can be reduced further without creating an acceptance gap.
 
 **Acceptance**
 
-- A deliberately failing candidate cannot be accepted or merged through the governed path.
+- A deliberately failing candidate cannot be accepted or merged through the selected governed path.
 - A newly pushed untested candidate is not marked complete.
 - A UI-only candidate runs UI validation without unrelated Python coverage.
 - A Python-changing batch receives comprehensive Python coverage before acceptance.
-- A stale successful check does not approve a different candidate/base combination.
+- A stale local or remote successful check does not approve a different candidate/base combination.
 - Fast local checks preserve secret detection and do not start full pytest or HTML coverage.
 - Remote-action authorization cannot be inferred from local-only permission.
+- The first local speed gains do not depend on GitHub-administration access; when remote enforcement is unavailable, the proven local integration gate remains authoritative under the documented local-first model.
 
 **Rollback:** Keep or restore the conservative local integration gate until remote enforcement is healthy. Never solve a broken CI migration with routine `--no-verify` or administrative bypass.
 
@@ -237,7 +254,7 @@ Extraction is deterministic where sources are structured. Engineering choices ar
 |---|---|---|
 | Routine | Nonsemantic prose, an isolated presentation adjustment, deterministic mechanical generation | Prepared packet → Executor → focused independent review. No fresh exploratory planning when nothing needs deciding. |
 | Standard | A well-specified bounded service or UI interaction using stable contracts | Prepared packet → Executor → independent review; Planner only for an unresolved decision. |
-| Critical | Authorization/session scope, trading/risk, numerical correctness, persistence/recovery, resource ownership/concurrency, security-sensitive providers, destructive actions, workflow approval/validation policy | Targeted explicit planning/risk analysis → Executor → stronger independent/adversarial review. |
+| Critical | Authorization/session scope, cross-account or cross-workspace operations, trading/risk, numerical correctness, persistence/recovery, resource ownership/concurrency, external providers and network integrations, destructive actions, workflow approval/validation policy | Targeted explicit planning/risk analysis → Executor → stronger independent/adversarial review. |
 
 Risk follows behavior, not file type or change size. A manifest that changes mandatory dependencies is not low-risk metadata; a session-access widget is not merely presentation; a shared DTO changes a contract. Ambiguous classification selects the stronger tier.
 
@@ -263,6 +280,20 @@ Retain the existing self-reference avoidance: committed evidence pins the tested
 
 **Acceptance:** Valid same-input results can be reused across a handoff; changing an input rejects them; forged/edited records are not accepted; a reviewer-selected new check runs; close-out needs no LLM invocation when no engineering decision remains; actual byte drift still blocks acceptance.
 
+### Post-DT-06 pilot and continuation gate
+
+Before implementing optional evidence/scaffolding/batching/parallelism work, exercise the remediated A+B path on three newly accepted representative features:
+
+1. one UI interaction or presentation feature;
+2. one ordinary stateless service feature;
+3. one critical stateful, security-sensitive, concurrency or numerical feature.
+
+Task 1.18 (`FEAT-ORCH-MANAGE_JOBS`) may serve only as the critical stateful/concurrency sample. Its persistent shared jobs and attempts, restart survival, authoritative lifecycle and resource-coordination behavior classify it as Critical under DT-05. It must not be treated as the routine Quick-Fix/direct-execution benchmark or used to justify weakening the critical workflow.
+
+Compare each feature only with reasonably similar historical work. Record planning, execution, validation, review, close-out, correction causes, accepted outcome and available allowance observations. Decide explicitly whether DT-07 through DT-10 are justified, need revision or should be deferred. DT-11 may proceed from this checkpoint because it defines the product milestone needed to return attention to strategy development.
+
+**Acceptance:** The three features are genuinely accepted rather than replayed historical work; administrative replanning is zero for repaired cases; no required safeguard or evidence mapping is lost; and the continuation decision cites measured results instead of assumed speedups. The ten-feature sample in DT-10 remains a later confirmation sample, not the first effectiveness measurement.
+
 ## 6. Change set C — Stop repetitive authoring
 
 ### DT-07 — Project evidence deterministically without inventing completion
@@ -287,6 +318,8 @@ Only the integrator writes shared aggregate ledgers during parallel work. Worker
 
 Start with **one** recurring stateless backend feature shape based on a compatible accepted V3 implementation. Generate only the agreed structural shell: README, immutable manifest, strict configuration, lifecycle entry point, necessary contract placeholders, offline `_usage.py` shell and registration/evidence draft. Do not automatically invent business defaults, durable state or authorization policy.
 
+Generate or propose the exact `pyproject.toml` feature entry-point registration when the feature shape requires one. Because `pyproject.toml` is a shared composition file, only the serialized integrator may apply that change during parallel delivery; draft workers record the required entry without concurrently editing the shared file.
+
 Scaffolding must refuse overwrites and never mark a feature accepted. A generated shell is explicitly incomplete until real behavior, examples and acceptance assertions exist. Do not create passing placeholder tests or conceal missing implementations with `pass`, permissive mocks or “not applicable”.
 
 Parameterize common manifest/configuration, mount/unmount, failure cleanup, provider removal/replacement and physical-removal checks using the existing harnesses. Keep owner-specific behavioral tests, especially session cleanup, cancellation, persistence, numerical causality and fail-closed behavior. Test count is determined by obligations—not a universal cap.
@@ -299,21 +332,23 @@ For numerical tests, specify small independent golden values and boundary/causal
 
 ## 7. Change set D — Increase delivery throughput
 
-### DT-09 — Batch coherent delivery without merging feature ownership
+### DT-09 — Experiment with conservative batching without merging feature ownership
 
 **Primary paths:** execution-policy sections of `docs/dev/Phased_Feature_Implementation_Plan.md`, `AGENTS.md`, `.agents/GOALS.md`, goal/integration controllers and tests. Preserve feature cards and requirements.
 
-Begin with batches of **two or three** routine/standard features with stable contracts and a coherent integration boundary. Do not batch authorization, resource accounting, persistence recovery or other critical features merely because they are adjacent in the plan.
+The initial DT-09 implementation batches only preparation, reusable context, integration validation and operator pushes for **two or three** routine/standard features with stable contracts and a coherent integration boundary. It does not batch their implementation authority or acceptance. Do not batch authorization, resource accounting, persistence recovery or other critical features merely because they are adjacent in the plan.
 
-Each feature retains its own folder, identity, requirement mapping, tests and acceptance record. Preparation, branch setup, reviewer setup and integration validation can be shared. Preserve feature-level commits where practical; any final deterministic aggregate-evidence commit is bookkeeping, not an additional feature implementation. Record both constituent commits and the tested batch/integration identity.
+Each feature retains its own folder, identity, requirement mapping, Task branch, review, tests, acceptance record, exactly one implementation commit and its required merge record. Preparation, reusable task-packet inputs, broader integration validation and pushes may be grouped where the current protocol permits. Any final deterministic aggregate-evidence commit must be separately authorized bookkeeping and must not masquerade as a feature implementation. Record every constituent commit and the tested batch/integration identity.
 
-Amend the current rule requiring a new branch/review/acceptance cycle and clean accepted `main` before every child. Within a batch, an internal predecessor may be used only after its implementation and provider/contract tests pass; that is provisional candidate evidence, not acceptance on `main`. Across concurrent batches, required predecessors remain accepted and contract-stable. If this bounded provisional rule cannot be implemented safely, select independent batch members instead.
+Do not amend the current clean-accepted-`main`, one-child-Task, branch, review, implementation-commit or acceptance rules in the initial experiment. Required predecessors remain accepted and contract-stable. Select batch members whose shared preparation or validation work can be reused without consuming an unaccepted internal predecessor.
 
-The final combined candidate is reviewed and qualified before **any** constituent feature is marked accepted. The integrator owns shared entry-point edits, shared READMEs, contract aggregation and evidence projections. Scope cannot grow just to fill a batch. Failed integration keeps the batch pending; do not relabel draft members as complete.
+A later provisional multi-feature candidate mode may be considered only as a separate versioned protocol proposal after DT-09 measurement. That proposal must independently specify authorization, path ownership, predecessor semantics, failure isolation, per-feature commits, evidence and rollback. It is not implicitly authorized by this plan.
+
+Each constituent feature is reviewed and accepted through the current Task protocol. The grouped integration candidate then qualifies the combined accepted set before push or the next declared integration boundary. Shared aggregate evidence remains single-writer and deterministic. Scope cannot grow merely to fill a batch. A failed grouped integration gate blocks the batch action and creates a bounded correction obligation; it does not erase truthful prior Task evidence or relabel an unaccepted feature as complete.
 
 Keep all 205 feature identities and registered scope. Do not rewrite the master plan into 30 giant untraceable tickets. Annotate a strategy-ready scheduling priority within the existing dependency graph, without deleting prerequisites or claiming the remaining platform is complete. The aim is earlier useful strategy work while the full roadmap remains intact.
 
-**Acceptance:** Two/three features share one integration cycle; their evidence remains individually traceable; failure blocks batch acceptance; required edges are preserved; shared files have one writer; already correct behavior is not rewritten just to create a new acceptance commit.
+**Acceptance:** Two/three features share reusable preparation and one broader integration/push cycle while retaining separate Task branches, reviews, implementation commits and acceptance records; integration failure blocks the grouped action; required edges are preserved; shared files have one writer; already correct behavior is not rewritten merely to create another acceptance commit.
 
 ### DT-10 — Benchmark bounded parallelism and adopt the measured path
 
@@ -326,6 +361,8 @@ On integration, refresh against the current base, regenerate shared projections,
 Budget machine resources across **all** lanes, test workers and UI builds. Do not multiply three agents by unrestricted `pytest -n auto` and assume more processes imply more throughput. Keep small focused suites serial when worker startup costs more than it saves.
 
 Profile representative suites with whole-command timing and pytest durations. Benchmark one, two and four workers only on parallel-safe selections. Use isolated temporary databases, ports and filesystem paths; keep unsafe tests serial until corrected. `worksteal` balances uneven durations; `xdist_group` placement requires the appropriate `loadgroup` scheduling mode and is not automatic isolation. [W2, W5]
+
+After profiling and verifying resource isolation, evaluate domain-based CI shards behind the single required aggregate `acceptance` status from DT-03. The aggregate must fail when any required shard is missing, cancelled, skipped unexpectedly or failed. Retain a serial or broader fallback for tests whose cross-domain dependencies make safe sharding inconclusive.
 
 Use the first ten **accepted** pilot features, spanning UI interaction, ordinary service behavior and a critical stateful/security/numerical case. Compare within risk/complexity classes, not by treating every feature as identical. Do not retest an already accepted critical implementation as a made-up “new feature” just to fill the sample.
 
@@ -346,6 +383,7 @@ Use nonoverlapping stage durations for totals; nested subprocess timings are dia
 
 | Measure | Target / adoption rule |
 |---|---|
+| Warm targeted feature feedback | p95 at or below 30 seconds for an ordinary unit/component selection, excluding dependency installation and full builds. Profile and classify slower selections rather than hiding them behind a universal target. |
 | Warm ordinary pre-commit | p95 at or below 20 seconds. |
 | Warm ordinary pre-push | p95 at or below 60 seconds; no hidden comprehensive suite. |
 | Administrative failure causing full product replanning | Zero after known cases are repaired. |
@@ -357,6 +395,40 @@ Use nonoverlapping stage durations for totals; nested subprocess timings are dia
 Measure model choices only after the process changes. Compare allowance per accepted change, first-pass correctness and correction loops at the same risk tier; no model or effort setting is prescribed from unsupported names/performance claims.
 
 **Adoption:** Keep improvements that increase accepted throughput without weakening evidence. Disable a slower/flakier parallel configuration rather than discarding the product architecture. Do not build a dashboard to answer what a small run-summary report can show.
+
+### DT-11 — Freeze and deliver the strategy-ready milestone
+
+**Primary paths:** `docs/dev/Phased_Feature_Implementation_Plan.md`, `docs/dev/evidence/dependency-schedule.json`, applicable owning READMEs, Goal selection/runtime inputs and a bounded milestone evidence record. Preserve the complete 205-feature roadmap and all existing feature identities.
+
+Define the first useful strategy-development outcome as this reproducible vertical slice:
+
+```text
+Load historical data
+  → define a strategy
+  → run a deterministic backtest with explicit execution assumptions
+  → inspect trades and performance
+  → save and reproduce the experiment
+```
+
+Use the following as a candidate capability checklist, not as a second feature registry or a predetermined implementation list:
+
+- local historical-data ingestion and retained bar/feed access;
+- only the indicators required by the selected first strategy, rather than a mandatory generic indicator catalogue;
+- strategy definition covering entry, exit and risk rules;
+- deterministic bar or tick backtesting with documented execution assumptions;
+- an inspectable trade ledger, P&L, drawdown and core performance metrics;
+- a minimal results/equity inspection UI; and
+- saved experiment identity and reproducible replay.
+
+The derived dependency closure and owning contracts determine the actual participating features and operations. Omit a checklist item only when the frozen milestone contract proves it unnecessary; do not add unrelated indicators or platform extensions merely because they appear in this illustrative list.
+
+Derive the smallest valid dependency closure from the frozen dependency schedule and owning contracts. Classify every required feature as already accepted, remaining implementation, operation-gated qualification or externally blocked. Freeze an explicit Goal selection for only the remaining necessary entries; do not delete prerequisites, weaken capability edges, expand the selection silently or mark unrelated V3 features complete.
+
+State the milestone's exact inputs, supported offline/provider assumptions, expected outputs, deterministic replay identity, UI or public usage path, failure behavior and acceptance commands. Separate the desired four-to-eight-hour timebox from the evidence: estimate only after the closure and prepared task packets reveal the actual remaining scope. If the closure cannot fit the timebox, report the smallest honest runnable subset and the missing obligations rather than redefining V3 completion.
+
+**Acceptance:** One bounded workflow loads retained historical data, executes a saved strategy through a deterministic backtest, exposes inspectable trades and performance, and reproduces the same experiment under its documented identity and assumptions. Every participating requirement and feature remains traceable; all deferred V3 work remains visibly open; no mocked or component-only evidence is claimed as real-provider qualification.
+
+**Rollback:** Remove only the milestone annotation/Goal selection when its dependency derivation is wrong. Do not revert accepted product features or rewrite the master feature registry.
 
 ## 8. Testing cadence after remediation
 
@@ -374,18 +446,25 @@ A later dedicated test session expands stress, robustness and system scenarios. 
 
 These commands use existing tools/scripts unless explicitly labeled proposed. They have not been run on the user's machine as part of preparing this plan. Substitute only paths resolved in the relevant packet.
 
-### Local non-destructive preflight
+### Local preflight and authorized remote refresh
 
 ```powershell
 git status --short --branch
 git rev-parse HEAD
 git config --show-origin --get core.hooksPath
 git config --show-origin --get core.autocrlf
-git fetch origin
 git rev-list --left-right --count HEAD...origin/main
 ```
 
-A missing Git configuration key normally reports no configured value; that alone is not a workflow failure. `fetch` updates remote-tracking refs, not local product files. Do not follow this sequence with automatic reset/rebase/stash.
+A missing Git configuration key normally reports no configured value; that alone is not a workflow failure. The divergence command uses the currently available remote-tracking ref and must report when its freshness is unknown.
+
+When a current remote ref is required, only an authorized operator/controller outside an active Planner, Executor or Reviewer invocation may run:
+
+```powershell
+git fetch origin
+```
+
+`fetch` does not modify product files, but it performs network I/O and mutates remote-tracking refs. It is therefore not a reasoning-role read-only command or implicit permission for reset, rebase, merge, stash or push.
 
 ### Focused Python validation and deliberate profiling
 
@@ -439,11 +518,15 @@ There is no universal feature-time promise. After the pilot, forecast the remain
 
 ## 11. Implementation handoff
 
-Use the following task description within the existing authorized workflow. This text is a work order, not an execution or remote-write approval:
+Use the following Task descriptions sequentially within the existing authorized workflow. These texts are work orders, not execution or remote-write approval. Do not combine them into one Task before an accepted workflow amendment permits such packaging:
 
-> Implement Change Set A (DT-01 through DT-03) of `docs/dev/Development_Throughput_Remediation_Plan.md`. Preserve HaruQuantAI V3 architecture and registered feature scope. Inspect the current local state and rebind the recorded baseline before editing. Preserve active/user work. Repair only evidenced mechanical workflow failures, make pytest coverage explicit, extend the existing validation entry point with conservative profiles, and establish a verified integration gate before relaxing broad pre-push checks. Keep secret scanning, owner approvals, reviewed-tree identity and required coverage. Include UI validation and provider-matrix coverage without duplication. Do not enable Quick-Fix for all features, remove behavioral/lifecycle tests, build a new orchestrator, change trading behavior, or implement later change sets opportunistically. Run focused tooling regressions and one comprehensive candidate gate. Report changed paths, measured commands, remaining blockers and rollback. Publishing, merging, and repository settings changes require explicit applicable authorization.
+> **DT-01:** Implement DT-01 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`. Preserve HaruQuantAI V3 architecture, active/user work, secret detection, reviewed-byte identity and product behavior. Reproduce and repair only the evidenced mechanical close-out failures, publish generated-output discovery before execution, and ensure legitimate schema-validated Git identities do not require per-feature shared secret-baseline edits. Run focused controller/Git/security regressions and report actual timings and rollback.
 
-Proceed to B after A is accepted. C and D are incremental extensions, not prerequisites for collecting the first gains.
+> **DT-02:** After DT-01 is accepted, implement DT-02A of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as a separate Task. Make ordinary pytest fast, retain explicit comprehensive coverage, add conservative validation profiles and straightforward UI/Python/workflow routing, and keep unknown scope fail-closed. Measure DT-02A before separately authorizing DT-02B advanced impact routing.
+
+> **DT-03:** After DT-02A is accepted, implement the local integration-protection portion of DT-03 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as a separate Task. Prove the replacement gate before relaxing broad pre-push hooks. Treat CI status, branch protection, publishing and remote acceptance as a separately authorized repository-administration step. Keep owner approvals, coverage, UI validation, provider-matrix evidence and stale-candidate rejection.
+
+Proceed to B after the three Change Set A Tasks are accepted. Run the mandatory three-feature checkpoint after DT-06. C and the DT-09/DT-10 portions of D are incremental extensions, not prerequisites for collecting the first gains. DT-11 may proceed after that checkpoint to prioritize the strategy-ready outcome.
 
 ## 12. Sources and audit boundaries
 
