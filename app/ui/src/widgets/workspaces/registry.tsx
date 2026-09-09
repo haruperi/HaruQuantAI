@@ -1,16 +1,11 @@
 "use client";
 
-/**
- * Sole lazy widget registry for FEAT-UI-COMPOSE_WORKSPACE.
- *
- * Availability is intentionally separate from feature acceptance. Existing
- * pre-V3 manifests remain visible as legacy, unqualified provenance; ratified
- * later V3 owners remain planned and unqualified until their own Task closes.
- */
+/** Sole lazy widget registry for FEAT-UI-COMPOSE_WORKSPACE. */
 
 import React, { lazy, useEffect } from "react";
 
 import type { WidgetManifest } from "../../types/widget-manifest";
+import { DEBUG_CONSOLE_MANIFEST } from "../debug-console/manifest";
 import { INSTRUMENT_PANELS_MANIFEST } from "../instrument-panels/manifest";
 import { MARKET_HOURS_MANIFEST } from "../market-hours/manifest";
 import { MARKET_TICKS_MANIFEST } from "../market-ticks/manifest";
@@ -18,12 +13,12 @@ import { MARKETS_MANIFEST } from "../markets/manifest";
 import { NEWS_MANIFEST } from "../news/manifest";
 import { POSITIONS_MANIFEST } from "../positions/manifest";
 import { PRICE_LADDER_MANIFEST } from "../price-ladder/manifest";
+import { RUN_MONITOR_MANIFEST } from "../run-monitor/manifest";
 import { TRADE_LOG_MANIFEST } from "../trade-log/manifest";
 import { TRADE_PLAN_MANIFEST } from "../trade-plan/manifest";
 import { TRADING_MANIFEST } from "../trading/manifest";
 import { WATCHLISTS_MANIFEST } from "../watchlists/manifest";
 
-/** Minimal safe widget view passed to lazy render adapters. */
 export interface RegistryWidget {
   readonly id: string;
   readonly type: string;
@@ -37,7 +32,6 @@ export interface RegisteredWidgetProps {
   readonly widget: RegistryWidget;
 }
 
-/** Navigation data owned by the workspace catalogue. */
 export interface WidgetNavigation {
   readonly domain: string;
   readonly label: string;
@@ -46,14 +40,16 @@ export interface WidgetNavigation {
   readonly icon: string;
 }
 
-/** Explicitly non-acceptance provenance for an available component. */
 export interface WidgetQualification {
-  readonly kind: "legacy-manifest" | "legacy-feature-id" | "legacy-surface" | "planned-feature";
+  readonly kind:
+    | "legacy-manifest"
+    | "legacy-feature-id"
+    | "legacy-surface"
+    | "planned-feature";
   readonly ownerId: string;
   readonly status: "UNQUALIFIED";
 }
 
-/** Truthful catalogue descriptor; no undeclared effects or capabilities are synthesized. */
 export interface WorkspaceWidgetDescriptor {
   readonly widgetType: string;
   readonly title: string;
@@ -66,7 +62,9 @@ export interface WorkspaceWidgetDescriptor {
 export interface WorkspaceWidgetRegistration {
   readonly manifest: WorkspaceWidgetDescriptor;
   readonly navigation: WidgetNavigation;
-  readonly load: () => Promise<{ default: React.ComponentType<RegisteredWidgetProps> }>;
+  readonly load: () => Promise<{
+    default: React.ComponentType<RegisteredWidgetProps>;
+  }>;
   readonly migrateConfig: (value: unknown) => unknown;
   readonly createScope: () => () => void;
 }
@@ -111,160 +109,399 @@ function registration(
   };
 }
 
-const legacyManifest = (manifest: WidgetManifest): RegistrationSeed["provenance"] => ({
+const legacyManifest = (
+  manifest: WidgetManifest,
+): RegistrationSeed["provenance"] => ({
   kind: "legacy-manifest",
   ownerId: manifest.featureId,
 });
 
-const legacyFeature = (ownerId: string): RegistrationSeed["provenance"] => ({
+const legacyFeature = (
+  ownerId: string,
+): RegistrationSeed["provenance"] => ({
   kind: "legacy-feature-id",
   ownerId,
 });
 
-const plannedFeature = (ownerId: string): RegistrationSeed["provenance"] => ({
+const plannedFeature = (
+  ownerId: string,
+): RegistrationSeed["provenance"] => ({
   kind: "planned-feature",
   ownerId,
 });
 
 const seeds = {
   markets: {
-    provenance: legacyManifest(MARKETS_MANIFEST), declaredManifest: MARKETS_MANIFEST,
-    domain: "data", label: "Markets", title: "Markets", icon: "globe",
-    load: async () => { const loaded = await import("../markets"); return { default: () => <loaded.MarketsFeature /> }; },
+    provenance: legacyManifest(MARKETS_MANIFEST),
+    declaredManifest: MARKETS_MANIFEST,
+    domain: "data",
+    label: "Markets",
+    title: "Markets",
+    icon: "globe",
+    load: async () => {
+      const loaded = await import("../markets");
+      return { default: () => <loaded.MarketsFeature /> };
+    },
   },
   marketTicks: {
-    provenance: legacyManifest(MARKET_TICKS_MANIFEST), declaredManifest: MARKET_TICKS_MANIFEST,
-    domain: "data", label: "Market Ticks", title: "Market Ticks", icon: "activity",
-    load: async () => { const loaded = await import("../market-ticks"); return { default: () => <loaded.MarketTicksFeature /> }; },
+    provenance: legacyManifest(MARKET_TICKS_MANIFEST),
+    declaredManifest: MARKET_TICKS_MANIFEST,
+    domain: "data",
+    label: "Market Ticks",
+    title: "Market Ticks",
+    icon: "activity",
+    load: async () => {
+      const loaded = await import("../market-ticks");
+      return { default: () => <loaded.MarketTicksFeature /> };
+    },
   },
   watchlist: {
-    provenance: legacyManifest(WATCHLISTS_MANIFEST), declaredManifest: WATCHLISTS_MANIFEST,
-    domain: "data", label: "Watchlists", title: "Watchlists", icon: "bookmark",
-    load: async () => { const loaded = await import("../watchlists"); return { default: () => <loaded.WatchlistsFeature /> }; },
+    provenance: legacyManifest(WATCHLISTS_MANIFEST),
+    declaredManifest: WATCHLISTS_MANIFEST,
+    domain: "data",
+    label: "Watchlists",
+    title: "Watchlists",
+    icon: "bookmark",
+    load: async () => {
+      const loaded = await import("../watchlists");
+      return { default: () => <loaded.WatchlistsFeature /> };
+    },
   },
   chart: {
     provenance: plannedFeature("FEAT-UI-MARKET_CHARTS"),
-    domain: "indicators", label: "Chart", title: "EURUSD Chart", symbol: "EURUSD", icon: "line-chart",
-    load: async () => { const loaded = await import("../chart"); return { default: ({ widget }: RegisteredWidgetProps) => <loaded.ChartWidget symbol={widget.symbol || "EURUSD"} widgetId={widget.id} /> }; },
+    domain: "indicators",
+    label: "Chart",
+    title: "EURUSD Chart",
+    symbol: "EURUSD",
+    icon: "line-chart",
+    load: async () => {
+      const loaded = await import("../chart");
+      return {
+        default: ({ widget }: RegisteredWidgetProps) => (
+          <loaded.ChartWidget
+            symbol={widget.symbol || "EURUSD"}
+            widgetId={widget.id}
+          />
+        ),
+      };
+    },
   },
   priceLadder: {
-    provenance: legacyManifest(PRICE_LADDER_MANIFEST), declaredManifest: PRICE_LADDER_MANIFEST,
-    domain: "indicators", label: "Price Ladder", title: "ESU6 DOM", icon: "align-justify",
-    load: async () => { const loaded = await import("../price-ladder"); return { default: ({ widget }: RegisteredWidgetProps) => <loaded.PriceLadderFeature config={{ defaultSymbol: widget.symbol || "EURUSD", accountId: widget.accountId }} /> }; },
+    provenance: legacyManifest(PRICE_LADDER_MANIFEST),
+    declaredManifest: PRICE_LADDER_MANIFEST,
+    domain: "indicators",
+    label: "Price Ladder",
+    title: "ESU6 DOM",
+    icon: "align-justify",
+    load: async () => {
+      const loaded = await import("../price-ladder");
+      return {
+        default: ({ widget }: RegisteredWidgetProps) => (
+          <loaded.PriceLadderFeature
+            config={{
+              defaultSymbol: widget.symbol || "EURUSD",
+              accountId: widget.accountId,
+            }}
+          />
+        ),
+      };
+    },
   },
   optionsGrid: {
-    provenance: legacyManifest(INSTRUMENT_PANELS_MANIFEST), declaredManifest: INSTRUMENT_PANELS_MANIFEST,
-    domain: "indicators", label: "Options Grid", title: "Options Grid", icon: "layers",
-    load: async () => { const loaded = await import("../instrument-panels"); return { default: ({ widget }: RegisteredWidgetProps) => <loaded.InstrumentPanelsFeature symbol={widget.symbol || "ESU5"} /> }; },
+    provenance: legacyManifest(INSTRUMENT_PANELS_MANIFEST),
+    declaredManifest: INSTRUMENT_PANELS_MANIFEST,
+    domain: "indicators",
+    label: "Options Grid",
+    title: "Options Grid",
+    icon: "layers",
+    load: async () => {
+      const loaded = await import("../instrument-panels");
+      return {
+        default: ({ widget }: RegisteredWidgetProps) => (
+          <loaded.InstrumentPanelsFeature symbol={widget.symbol || "ESU5"} />
+        ),
+      };
+    },
   },
   positions: {
-    provenance: legacyManifest(POSITIONS_MANIFEST), declaredManifest: POSITIONS_MANIFEST,
-    domain: "trading", label: "Positions & Orders", title: "Positions & Orders", icon: "list-ordered",
-    load: async () => { const loaded = await import("../positions"); return { default: () => <loaded.PositionsFeature /> }; },
+    provenance: legacyManifest(POSITIONS_MANIFEST),
+    declaredManifest: POSITIONS_MANIFEST,
+    domain: "trading",
+    label: "Positions & Orders",
+    title: "Positions & Orders",
+    icon: "list-ordered",
+    load: async () => {
+      const loaded = await import("../positions");
+      return { default: () => <loaded.PositionsFeature /> };
+    },
   },
   tradeLog: {
-    provenance: legacyManifest(TRADE_LOG_MANIFEST), declaredManifest: TRADE_LOG_MANIFEST,
-    domain: "trading", label: "Trade Log", title: "Trade Log", icon: "history",
-    load: async () => { const loaded = await import("../trade-log"); return { default: () => <loaded.TradeLogFeature /> }; },
+    provenance: legacyManifest(TRADE_LOG_MANIFEST),
+    declaredManifest: TRADE_LOG_MANIFEST,
+    domain: "trading",
+    label: "Trade Log",
+    title: "Trade Log",
+    icon: "history",
+    load: async () => {
+      const loaded = await import("../trade-log");
+      return { default: () => <loaded.TradeLogFeature /> };
+    },
   },
   tradePlan: {
-    provenance: legacyManifest(TRADE_PLAN_MANIFEST), declaredManifest: TRADE_PLAN_MANIFEST,
-    domain: "resources", label: "Trade Plan", title: "My Trade Plan", icon: "file-spreadsheet",
-    load: async () => { const loaded = await import("../trade-plan"); return { default: () => <loaded.TradePlanFeature /> }; },
+    provenance: legacyManifest(TRADE_PLAN_MANIFEST),
+    declaredManifest: TRADE_PLAN_MANIFEST,
+    domain: "resources",
+    label: "Trade Plan",
+    title: "My Trade Plan",
+    icon: "file-spreadsheet",
+    load: async () => {
+      const loaded = await import("../trade-plan");
+      return { default: () => <loaded.TradePlanFeature /> };
+    },
   },
   education: {
     provenance: legacyFeature("FEAT-UI-11"),
-    domain: "resources", label: "Education", title: "Education Resources", icon: "graduation-cap",
-    load: async () => { const loaded = await import("../training-ux"); return { default: () => <loaded.EducationWidget /> }; },
+    domain: "resources",
+    label: "Education",
+    title: "Education Resources",
+    icon: "graduation-cap",
+    load: async () => {
+      const loaded = await import("../training-ux");
+      return { default: () => <loaded.EducationWidget /> };
+    },
   },
   challenges: {
     provenance: legacyFeature("FEAT-UI-12"),
-    domain: "resources", label: "Challenges", title: "Challenges Dashboard", icon: "compass",
-    load: async () => { const loaded = await import("../training-ux"); return { default: () => <loaded.ChallengesWidget /> }; },
+    domain: "resources",
+    label: "Challenges",
+    title: "Challenges Dashboard",
+    icon: "compass",
+    load: async () => {
+      const loaded = await import("../training-ux");
+      return { default: () => <loaded.ChallengesWidget /> };
+    },
   },
   dashboard: {
     provenance: plannedFeature("FEAT-UI-WORKSPACE_NAVIGATION"),
-    domain: "resources", label: "Dashboard", title: "Dashboard", icon: "layout-dashboard",
-    load: async () => { const loaded = await import("../../components/workflow/dashboard"); return { default: () => <loaded.DashboardView /> }; },
+    domain: "resources",
+    label: "Dashboard",
+    title: "Dashboard",
+    icon: "layout-dashboard",
+    load: async () => {
+      const loaded = await import("../../components/workflow/dashboard");
+      return { default: () => <loaded.DashboardView /> };
+    },
+  },
+  runMonitor: {
+    provenance: plannedFeature("FEAT-UI-RUN_MONITOR"),
+    declaredManifest: RUN_MONITOR_MANIFEST,
+    domain: "resources",
+    label: "Jobs",
+    title: "Jobs",
+    icon: "activity",
+    load: async () => {
+      const loaded = await import("../run-monitor");
+      return { default: () => <loaded.RunMonitorFeature /> };
+    },
+  },
+  debugConsole: {
+    provenance: plannedFeature("FEAT-UI-DEBUG_CONSOLE"),
+    declaredManifest: DEBUG_CONSOLE_MANIFEST,
+    domain: "resources",
+    label: "Debug Console",
+    title: "Debug Console",
+    icon: "align-justify",
+    load: async () => {
+      const loaded = await import("../debug-console");
+      return { default: () => <loaded.DebugConsoleFeature /> };
+    },
   },
   data: {
     provenance: plannedFeature("FEAT-UI-DATA_MANAGER"),
-    domain: "data", label: "Data Explorer", title: "Data Explorer", icon: "database",
-    load: async () => { const loaded = await import("../../components/workflow/data"); return { default: () => <loaded.DataWorkspace /> }; },
+    domain: "data",
+    label: "Data Explorer",
+    title: "Data Explorer",
+    icon: "database",
+    load: async () => {
+      const loaded = await import("../../components/workflow/data");
+      return { default: () => <loaded.DataWorkspace /> };
+    },
   },
   strategies: {
     provenance: plannedFeature("FEAT-UI-STRATEGY_STUDIO"),
-    domain: "strategy", label: "Strategies", title: "Strategies", icon: "file-spreadsheet",
-    load: async () => { const loaded = await import("../../components/workflow/strategies"); return { default: () => <loaded.StrategyWorkspace /> }; },
+    domain: "strategy",
+    label: "Strategies",
+    title: "Strategies",
+    icon: "file-spreadsheet",
+    load: async () => {
+      const loaded = await import("../../components/workflow/strategies");
+      return { default: () => <loaded.StrategyWorkspace /> };
+    },
   },
   research: {
     provenance: plannedFeature("FEAT-UI-EXECUTE_ORDERS"),
-    domain: "research", label: "Edge Lab", title: "Edge Lab", icon: "flask-conical",
-    load: async () => { const loaded = await import("../research"); return { default: () => <loaded.ResearchDashboard /> }; },
+    domain: "research",
+    label: "Edge Lab",
+    title: "Edge Lab",
+    icon: "flask-conical",
+    load: async () => {
+      const loaded = await import("../research");
+      return { default: () => <loaded.ResearchDashboard /> };
+    },
   },
   optimization: {
     provenance: plannedFeature("FEAT-UI-PARAMETER_OPTIMIZER"),
-    domain: "optimization", label: "Optimization", title: "Optimization", icon: "sliders",
-    load: async () => { const loaded = await import("../../components/workflow/optimization"); return { default: () => <loaded.OptimizationView /> }; },
+    domain: "optimization",
+    label: "Optimization",
+    title: "Optimization",
+    icon: "sliders",
+    load: async () => {
+      const loaded = await import("../../components/workflow/optimization");
+      return { default: () => <loaded.OptimizationView /> };
+    },
   },
   portfolio: {
     provenance: plannedFeature("FEAT-UI-PORTFOLIO_COMPOSER"),
-    domain: "portfolio", label: "Portfolio", title: "Portfolio", icon: "pie-chart",
-    load: async () => { const loaded = await import("../../components/workflow/portfolio"); return { default: () => <loaded.PortfolioView /> }; },
+    domain: "portfolio",
+    label: "Portfolio",
+    title: "Portfolio",
+    icon: "pie-chart",
+    load: async () => {
+      const loaded = await import("../../components/workflow/portfolio");
+      return { default: () => <loaded.PortfolioView /> };
+    },
   },
   agentic: {
     provenance: plannedFeature("FEAT-UI-AGENTIC_RUN_INSPECTOR"),
-    domain: "agentic", label: "Agentic Operator", title: "Agentic Operator", icon: "bot",
-    load: async () => { const loaded = await import("../../components/workflow/agentic"); return { default: () => <loaded.AgenticView /> }; },
+    domain: "agentic",
+    label: "Agentic Operator",
+    title: "Agentic Operator",
+    icon: "bot",
+    load: async () => {
+      const loaded = await import("../../components/workflow/agentic");
+      return { default: () => <loaded.AgenticView /> };
+    },
   },
   simulator: {
     provenance: plannedFeature("FEAT-UI-RUN_BACKTEST"),
-    domain: "simulation", label: "Simulator", title: "Simulator", icon: "history",
-    load: async () => { const loaded = await import("../simulator"); return { default: () => <loaded.SimulationHome /> }; },
+    domain: "simulation",
+    label: "Simulator",
+    title: "Simulator",
+    icon: "history",
+    load: async () => {
+      const loaded = await import("../simulator");
+      return { default: () => <loaded.SimulationHome /> };
+    },
   },
   risk: {
-    provenance: { kind: "legacy-surface", ownerId: "components/workflow/risk" },
-    domain: "risk", label: "Risk Governance", title: "Risk", icon: "alert-triangle",
-    load: async () => { const loaded = await import("../../components/workflow/risk"); return { default: () => <loaded.RiskView /> }; },
+    provenance: {
+      kind: "legacy-surface",
+      ownerId: "components/workflow/risk",
+    },
+    domain: "risk",
+    label: "Risk Governance",
+    title: "Risk",
+    icon: "alert-triangle",
+    load: async () => {
+      const loaded = await import("../../components/workflow/risk");
+      return { default: () => <loaded.RiskView /> };
+    },
   },
   trading: {
-    provenance: legacyManifest(TRADING_MANIFEST), declaredManifest: TRADING_MANIFEST,
-    domain: "trading", label: "Trading Cockpit", title: "Trading", icon: "trending-up",
-    load: async () => { const loaded = await import("../trading"); return { default: ({ widget }: RegisteredWidgetProps) => <loaded.TradingFeature config={{ defaultSymbol: widget.symbol || "EURUSD", accountId: widget.accountId }} /> }; },
+    provenance: legacyManifest(TRADING_MANIFEST),
+    declaredManifest: TRADING_MANIFEST,
+    domain: "trading",
+    label: "Trading Cockpit",
+    title: "Trading",
+    icon: "trending-up",
+    load: async () => {
+      const loaded = await import("../trading");
+      return {
+        default: ({ widget }: RegisteredWidgetProps) => (
+          <loaded.TradingFeature
+            config={{
+              defaultSymbol: widget.symbol || "EURUSD",
+              accountId: widget.accountId,
+            }}
+          />
+        ),
+      };
+    },
   },
   sessions: {
     provenance: legacyFeature("FEAT-UI-26"),
-    domain: "trading", label: "Trading Sessions", title: "Trading Sessions", icon: "clock",
-    load: async () => { const loaded = await import("../session-registry"); return { default: () => <loaded.SessionRegistryWidget /> }; },
+    domain: "trading",
+    label: "Trading Sessions",
+    title: "Trading Sessions",
+    icon: "clock",
+    load: async () => {
+      const loaded = await import("../session-registry");
+      return { default: () => <loaded.SessionRegistryWidget /> };
+    },
   },
   indicators: {
     provenance: plannedFeature("FEAT-UI-INDICATOR_TESTER"),
-    domain: "indicators", label: "Indicators Studio", title: "Indicators", icon: "trending-up",
-    load: async () => { const loaded = await import("../../components/workflow/indicators"); return { default: () => <loaded.IndicatorWorkspace /> }; },
+    domain: "indicators",
+    label: "Indicators Studio",
+    title: "Indicators",
+    icon: "trending-up",
+    load: async () => {
+      const loaded = await import("../../components/workflow/indicators");
+      return { default: () => <loaded.IndicatorWorkspace /> };
+    },
   },
   news: {
-    provenance: legacyManifest(NEWS_MANIFEST), declaredManifest: NEWS_MANIFEST,
-    domain: "data", label: "News", title: "News", icon: "newspaper",
-    load: async () => { const loaded = await import("../news"); return { default: () => <loaded.NewsFeature /> }; },
+    provenance: legacyManifest(NEWS_MANIFEST),
+    declaredManifest: NEWS_MANIFEST,
+    domain: "data",
+    label: "News",
+    title: "News",
+    icon: "newspaper",
+    load: async () => {
+      const loaded = await import("../news");
+      return { default: () => <loaded.NewsFeature /> };
+    },
   },
   "market-hours": {
-    provenance: legacyManifest(MARKET_HOURS_MANIFEST), declaredManifest: MARKET_HOURS_MANIFEST,
-    domain: "data", label: "Market Hours", title: "Market Hours", icon: "clock",
-    load: async () => { const loaded = await import("../market-hours"); return { default: () => <loaded.MarketHoursFeature /> }; },
+    provenance: legacyManifest(MARKET_HOURS_MANIFEST),
+    declaredManifest: MARKET_HOURS_MANIFEST,
+    domain: "data",
+    label: "Market Hours",
+    title: "Market Hours",
+    icon: "clock",
+    load: async () => {
+      const loaded = await import("../market-hours");
+      return { default: () => <loaded.MarketHoursFeature /> };
+    },
   },
   analytics: {
     provenance: plannedFeature("FEAT-UI-RESEARCH_WORKBENCH"),
-    domain: "analytics", label: "Analytics", title: "Analytics", icon: "bar-chart-2",
-    load: async () => { const loaded = await import("../analytics"); return { default: ({ widget }: RegisteredWidgetProps) => <loaded.AnalyticsWorkspace runId={widget.runId} /> }; },
+    domain: "analytics",
+    label: "Analytics",
+    title: "Analytics",
+    icon: "bar-chart-2",
+    load: async () => {
+      const loaded = await import("../analytics");
+      return {
+        default: ({ widget }: RegisteredWidgetProps) => (
+          <loaded.AnalyticsWorkspace runId={widget.runId} />
+        ),
+      };
+    },
   },
 } as const satisfies Record<string, RegistrationSeed>;
 
 export type WidgetType = keyof typeof seeds;
 
-export const WIDGET_TYPES = Object.freeze(Object.keys(seeds)) as readonly WidgetType[];
+export const WIDGET_TYPES = Object.freeze(
+  Object.keys(seeds),
+) as readonly WidgetType[];
 
 const registrations = new Map<WidgetType, WorkspaceWidgetRegistration>(
-  WIDGET_TYPES.map((widgetType) => [widgetType, registration(widgetType, seeds[widgetType])]),
+  WIDGET_TYPES.map((widgetType) => [
+    widgetType,
+    registration(widgetType, seeds[widgetType]),
+  ]),
 );
 
 const lazyComponents = new WeakMap<
@@ -282,19 +519,16 @@ function lazyComponent(
   return created;
 }
 
-/** Return whether a value names an available registered widget contribution. */
 export function isWidgetType(value: unknown): value is WidgetType {
   return typeof value === "string" && registrations.has(value as WidgetType);
 }
 
-/** Return the sole registered descriptor for a widget type. */
 export function getWidgetRegistration(
   widgetType: string,
 ): WorkspaceWidgetRegistration | undefined {
   return registrations.get(widgetType as WidgetType);
 }
 
-/** Snapshot the current catalogue for navigation and template validation. */
 export function listWidgetRegistrations(): readonly WorkspaceWidgetRegistration[] {
   return WIDGET_TYPES.flatMap((widgetType) => {
     const value = registrations.get(widgetType);
@@ -302,7 +536,6 @@ export function listWidgetRegistrations(): readonly WorkspaceWidgetRegistration[
   });
 }
 
-/** Install one contribution and return its exact idempotent unregister disposer. */
 export function registerWidget(
   widgetType: WidgetType,
   value: WorkspaceWidgetRegistration,
@@ -319,7 +552,6 @@ export function registerWidget(
   };
 }
 
-/** Withdraw one contribution and return an idempotent exact restore disposer. */
 export function withdrawWidget(widgetType: WidgetType): () => void {
   const prior = registrations.get(widgetType);
   registrations.delete(widgetType);
@@ -333,12 +565,14 @@ export function withdrawWidget(widgetType: WidgetType): () => void {
   };
 }
 
-/** Render a registered widget with scoped cleanup and explicit unavailable state. */
 export function RegisteredWidgetContent({
   widget,
 }: RegisteredWidgetProps): React.JSX.Element {
   const value = getWidgetRegistration(widget.type);
-  useEffect(() => (value === undefined ? undefined : value.createScope()), [value]);
+  useEffect(
+    () => (value === undefined ? undefined : value.createScope()),
+    [value],
+  );
 
   if (value === undefined) {
     return (
@@ -355,7 +589,9 @@ export function RegisteredWidgetContent({
 
   const Component = lazyComponent(value);
   return (
-    <React.Suspense fallback={<p role="status">Loading {value.manifest.title}…</p>}>
+    <React.Suspense
+      fallback={<p role="status">Loading {value.manifest.title}…</p>}
+    >
       <Component widget={widget} />
     </React.Suspense>
   );
