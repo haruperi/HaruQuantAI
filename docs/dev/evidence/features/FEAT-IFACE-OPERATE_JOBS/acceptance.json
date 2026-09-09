@@ -1,0 +1,14 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-IFACE-OPERATE_JOBS",
+  "task_id": "1.26",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id": "FR-TRC-IFACE-OPERATE_JOBS-001", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-IFACE-OPERATE_JOBS-002", "status": "IMPLEMENTED"},
+    {"id": "NFR-TRC-IFACE-OPERATE_JOBS-001", "status": "PENDING_BENCHMARK"},
+    {"id": "NFR-TRC-IFACE-OPERATE_JOBS-002", "status": "IMPLEMENTED"}
+  ],
+  "notes": "Phase-1 remote-worker registration/heartbeat/quarantine operations are intentionally not qualified; no future remote-worker authority is fabricated.",
+  "review": {"reviewer_verdict": "PENDING"}
+}
