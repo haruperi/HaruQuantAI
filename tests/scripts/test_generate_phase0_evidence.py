@@ -53,6 +53,7 @@ def test_dependency_edges_are_complete_and_ordered() -> None:
             "consumer_task": "1.04",
         }
     ]
+    assert schedule["delivery_priorities"][0]["milestone_id"] == "STRATEGY-READY"
 
 
 def test_generated_inventory_matches_ratified_counts() -> None:
@@ -75,6 +76,15 @@ def test_generated_inventory_matches_ratified_counts() -> None:
         generator.LEGACY_UNATTESTED_PLAN_SHA256
     )
     assert manifest["status_distribution"]["COMPLETE"] == 2
+
+
+def test_strategy_ready_projection_is_separately_generated() -> None:
+    """Phase evidence generation keeps the milestone closure current."""
+    from scripts import derive_strategy_ready_milestone
+
+    evidence, goal = derive_strategy_ready_milestone.derive()
+    assert evidence["closure_count"] == 58
+    assert "GOAL-STRATEGY-READY" in goal
 
 
 def test_live_completion_does_not_mutate_baseline_manifest(
@@ -172,6 +182,10 @@ def test_generated_output_inventory_matches_build_payloads() -> None:
     assert set(inventory) == set(generator.build_payloads())
     assert all("\\" not in path for path in generator.GENERATED_OUTPUT_PATHS)
     assert len(inventory) == 11
+    assert generator.AUXILIARY_GENERATED_OUTPUT_PATHS == (
+        "docs/dev/evidence/milestones/strategy-ready.json",
+        "docs/dev/goals/strategy-ready.toml",
+    )
 
 
 def test_list_outputs_does_not_build_or_write(
@@ -187,9 +201,10 @@ def test_list_outputs_does_not_build_or_write(
     monkeypatch.setattr(sys, "argv", ["generate_phase0_evidence.py", "--list-outputs"])
 
     assert generator.main() == 0
-    assert capsys.readouterr().out.splitlines() == list(
-        generator.GENERATED_OUTPUT_PATHS
-    )
+    assert capsys.readouterr().out.splitlines() == [
+        *generator.GENERATED_OUTPUT_PATHS,
+        *generator.AUXILIARY_GENERATED_OUTPUT_PATHS,
+    ]
 
 
 def test_write_mode_preserves_pinned_phase0_snapshots(

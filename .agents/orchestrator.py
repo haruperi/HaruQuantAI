@@ -700,7 +700,7 @@ def cmd_goal_integrate(args: argparse.Namespace) -> int:
 
 
 def cmd_goal_migrate_parallel(args: argparse.Namespace) -> int:
-    """Explicitly migrate an inactive sequential Goal to three lanes."""
+    """Explicitly migrate an inactive sequential Goal to configured lanes."""
     cfg = assemble_config(args.repo)
     lock = WorkflowLock(cfg["repo"])
     lock.acquire()

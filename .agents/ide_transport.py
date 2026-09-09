@@ -156,6 +156,7 @@ def prepare_ide_role(
         "snapshot": capture_repository_snapshot(repo),
         "prompt_sha256": pending["prompt_sha256"],
         "authorized_closeout": authorized_closeout,
+        "prepared_at": dt.datetime.now(tz=dt.UTC).isoformat(),
     }
     _record_event(
         state,
@@ -255,6 +256,15 @@ def complete_ide_role(
         "STOPPED : REVIEWER\nACTIVATING : NONE\nHANDOFF : ACCEPTED\n"
         if authorized_closeout
         else ""
+    )
+    prepared_at = dt.datetime.fromisoformat(str(invocation["prepared_at"]))
+    _record_event(
+        state,
+        "ide_role_completed",
+        role=role.upper(),
+        duration_seconds=max(
+            0.0, (dt.datetime.now(tz=dt.UTC) - prepared_at).total_seconds()
+        ),
     )
     return stdout, log
 

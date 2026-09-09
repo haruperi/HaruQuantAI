@@ -63,3 +63,15 @@ def test_parallel_operation_requires_explicit_lane(tmp_path: Path) -> None:
     )
     with pytest.raises(parallel.ParallelGoalError, match="--lane"):
         parallel.require_lane(state, None)
+
+
+def test_two_lane_state_uses_only_requested_lanes(tmp_path: Path) -> None:
+    parallel = _load()
+    schedule = tmp_path / "schedule.json"
+    _schedule(schedule)
+    state = parallel.create_parallel_state(
+        {"active_child": None}, lanes=["codex", "gemini"], schedule_path=schedule
+    )
+    assert state["parallelism"] == 2
+    assert state["lane_names"] == ["codex", "gemini"]
+    assert parallel.is_parallel_state(state)

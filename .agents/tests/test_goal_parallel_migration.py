@@ -31,6 +31,29 @@ dependency_schedule = "docs/dev/evidence/dependency-schedule.json"
     assert spec["lane_names"] == ["codex", "gemini", "zcode"]
 
 
+def test_two_lane_goal_spec_is_explicit(orc: ModuleType, tmp_path: Path) -> None:
+    del orc
+    goal_file = tmp_path / "goal.toml"
+    goal_file.write_text(
+        """goal_id = "G"
+goal_slug = "g"
+goal_name = "G"
+goal_request = "G"
+implementation_file = "tracker.md"
+selection_type = "entries"
+entries = ["1.08"]
+parallelism = 2
+lane_names = ["codex", "gemini"]
+dependency_schedule = "docs/dev/evidence/dependency-schedule.json"
+""",
+        encoding="utf-8",
+    )
+    goal = __import__("goal_engine")
+    spec = goal.load_goal_spec(goal_file)
+    assert spec["parallelism"] == 2
+    assert spec["lane_names"] == ["codex", "gemini"]
+
+
 def test_parallel_state_discards_sequential_child_chat_handoff(
     tmp_path: Path,
 ) -> None:

@@ -326,6 +326,27 @@ def test_make_goal_can_render_unattended_assumption_retry(orc: ModuleType) -> No
     assert tomllib.loads(make_goal._render(spec))["stop_on_blocked"] is False
 
 
+def test_make_goal_renders_delivery_batches(orc: ModuleType) -> None:
+    make_goal = _load_make_goal(orc)
+    args = argparse.Namespace(
+        entries=["4.1", "4.3"],
+        phase=None,
+        all_open=False,
+        goal_name=None,
+        goal_id=None,
+        goal_slug=None,
+        goal_request=None,
+        file="tracker.md",
+        listed_order=True,
+        child_additional_context=None,
+        continue_on_blocked=False,
+        parallelism=1,
+        delivery_batch=[["4.1", "4.3"]],
+    )
+    rendered = tomllib.loads(make_goal._render(make_goal._build_spec(args)))
+    assert rendered["delivery_batches"] == [["4.1", "4.3"]]
+
+
 def test_goal_state_never_contains_role_session_ids(
     orc: ModuleType, tmp_path: Path
 ) -> None:

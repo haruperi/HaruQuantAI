@@ -12,6 +12,41 @@ from typing import Any
 import pytest
 
 
+def test_failed_delivery_batch_gate_preserves_accepted_children(
+    orc: ModuleType,
+    cfg: dict[str, Any],
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A grouped-gate failure blocks action without erasing child truth."""
+    goal = __import__("goal_engine")
+    children = [
+        {"entry": "1.01", "feature_id": "FEAT-A", "status": "ACCEPTED"},
+        {"entry": "1.02", "feature_id": "FEAT-B", "status": "ACCEPTED"},
+    ]
+    state = {
+        "goal_run_id": "goal",
+        "children": children,
+        "delivery_batches": [
+            {
+                "batch_id": "batch",
+                "entries": ["1.01", "1.02"],
+                "feature_ids": ["FEAT-A", "FEAT-B"],
+                "status": "PREPARED",
+            }
+        ],
+        "history": [],
+    }
+
+    def fail(*_args: object, **_kwargs: object) -> None:
+        raise goal.DeliveryBatchError("gate failed")
+
+    monkeypatch.setattr(goal, "run_combined_gate", fail)
+    with pytest.raises(goal.OrchestratorError, match="gate failed"):
+        goal._qualify_ready_batches(cfg, state, "candidate")
+    assert state["children"] == children
+    assert state["delivery_batches"][0]["status"] == "BLOCKED"
+
+
 def _load_goal_engine(orc: ModuleType) -> ModuleType:
     path = orc.AGENTS_DIR / "goal_engine.py"
     spec = importlib.util.spec_from_file_location("hq_goal_engine_integration", path)

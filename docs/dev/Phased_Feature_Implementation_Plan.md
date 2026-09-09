@@ -105,6 +105,17 @@ The full `scripts/ci_check.py` / coverage gate runs only at the approved pre-com
 
 The last feature task in each phase owns the cross-feature browser checkpoint for that phase. Every preceding task still has its own acceptance tests, usage and commit. The phase checkpoint adds integration evidence, not another task or another product owner. Later providers also own the regression evidence that activates previously unavailable paths in existing widgets/gateways. The semantic owner of a calculation or workflow never changes merely because another task runs its integration suite.
 
+### 2.5 Strategy-ready scheduling priority
+
+`STRATEGY-READY` is a scheduling annotation, not a second feature registry and
+not full V3 completion. Its frozen seeds are Tasks 2.19, 3.14, 4.20, 4.23,
+4.24, and 4.25. The deterministic closure and status classification live in
+`docs/dev/evidence/milestones/strategy-ready.json`; the dormant remaining-work
+selection lives in `docs/dev/goals/strategy-ready.toml`. Generation fails when
+the dependency schedule, source contract, closure, or Goal selection drifts.
+All unrelated V3 entries remain open and retain their original identity, scope,
+requirements, and dependencies.
+
 ## 3. Phase overview
 
 

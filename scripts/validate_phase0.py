@@ -13,6 +13,7 @@ from typing import Any
 import pyarrow.parquet as pq
 
 from scripts import (
+    derive_strategy_ready_milestone,
     generate_phase0_evidence,
 )
 
@@ -504,6 +505,18 @@ def validate() -> list[str]:  # noqa: C901, PLR0912, PLR0915
         errors.append("Phase 0 exit review still cites obsolete root tracker.md")
     if "RATIFIED_READY_FOR_PHASE_1" not in exit_review:
         errors.append("Phase 0 exit review is not ratified")
+    try:
+        milestone, goal = derive_strategy_ready_milestone.derive()
+        expected = json.dumps(milestone, indent=2, sort_keys=True) + "\n"
+        if (
+            derive_strategy_ready_milestone.EVIDENCE.read_text(encoding="utf-8")
+            != expected
+        ):
+            errors.append("strategy-ready milestone evidence is stale")
+        if derive_strategy_ready_milestone.GOAL.read_text(encoding="utf-8") != goal:
+            errors.append("strategy-ready dormant Goal selection is stale")
+    except (OSError, TypeError, ValueError, json.JSONDecodeError) as error:
+        errors.append(f"strategy-ready milestone validation failed: {error}")
     return errors
 
 

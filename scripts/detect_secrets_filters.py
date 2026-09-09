@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import contextlib
+import hashlib
 import io
 import re
 import shutil
@@ -25,6 +26,15 @@ _BASELINE_COMMIT_LINE_RE = re.compile(
 _THROUGHPUT_COMMIT_LINE_RE = re.compile(
     r'^\s*"(?:head|upstream_head)"\s*:\s*"(?P<commit>[a-f0-9]{40})"\s*,?\s*$'
 )
+_STRATEGY_READY_PATH = "docs/dev/evidence/milestones/strategy-ready.json"
+_STRATEGY_READY_DIGEST_LINE_RE = re.compile(
+    r'^\s*"(?P<field>dependency_schedule_sha256|source_sha256)"\s*:\s*'
+    r'"(?P<digest>[a-f0-9]{64})"\s*,?\s*$'
+)
+_STRATEGY_READY_DIGEST_SOURCES = {
+    "dependency_schedule_sha256": "docs/dev/evidence/dependency-schedule.json",
+    "source_sha256": "docs/dev/milestones/strategy-ready.json",
+}
 
 
 def _repository_relative_path(filename: str) -> str | None:
@@ -66,6 +76,18 @@ def _is_repository_commit(object_id: str) -> bool:
     return result.returncode == 0
 
 
+def _is_current_strategy_ready_digest(field: str, digest: str) -> bool:
+    """Return whether a milestone digest matches its exact generated source."""
+    relative_source = _STRATEGY_READY_DIGEST_SOURCES.get(field)
+    if relative_source is None:
+        return False
+    try:
+        source_bytes = (REPO / relative_source).read_bytes()
+    except OSError:
+        return False
+    return hashlib.sha256(source_bytes).hexdigest() == digest
+
+
 def is_valid_repository_commit_evidence(
     filename: str,
     line: str,
@@ -89,6 +111,13 @@ def is_valid_repository_commit_evidence(
         match = _BASELINE_COMMIT_LINE_RE.fullmatch(line)
     elif relative_path == "docs/dev/evidence/development-throughput-baseline.json":
         match = _THROUGHPUT_COMMIT_LINE_RE.fullmatch(line)
+    elif relative_path == _STRATEGY_READY_PATH:
+        digest_match = _STRATEGY_READY_DIGEST_LINE_RE.fullmatch(line)
+        if digest_match is None or digest_match.group("digest") != secret:
+            return False
+        return _is_current_strategy_ready_digest(
+            digest_match.group("field"), digest_match.group("digest")
+        )
     else:
         return False
     if match is None or match.group("commit") != secret:

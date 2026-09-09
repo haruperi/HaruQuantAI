@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "milestone_id": "STRATEGY-READY",
+  "name": "Strategy-ready reproducible research slice",
+  "seed_tasks": ["2.19", "3.14", "4.20", "4.23", "4.24", "4.25"],
+  "expected_closure_count": 58,
+  "inputs": [
+    "offline retained historical bars with explicit instrument, venue, interval and time range",
+    "an immutable saved strategy revision containing entry, exit and risk rules",
+    "documented deterministic execution and cost assumptions"
+  ],
+  "outputs": [
+    "saved reproducible experiment identity",
+    "inspectable trade ledger, P&L, drawdown and core performance metrics",
+    "minimal backtest result, trade-list and equity-chart UI"
+  ],
+  "replay_contract": "The same retained-data identity, strategy revision and execution assumptions reproduce the same backtest identity and deterministic outputs.",
+  "failure_contract": "Missing, stale, unauthorized or non-reproducible inputs fail closed without claiming a completed experiment.",
+  "public_path": "Historical-data import -> immutable strategy revision -> backtest configuration -> result overview -> trade list -> equity chart.",
+  "offline_assumptions": [
+    "No live broker, credential or real-provider qualification is required for the first offline milestone.",
+    "Mocked or component-only evidence never proves real-provider behavior."
+  ],
+  "acceptance_commands": [
+    "uv run --locked python scripts/derive_strategy_ready_milestone.py --check",
+    "uv run --locked python scripts/validate_phase0.py",
+    "uv run --locked python scripts/ci_check.py --profile full"
+  ],
+  "delivery_status": "DORMANT_PENDING_POST_DT06_PILOT_AND_ACTIVE_GOAL_COMPLETION",
+  "timebox_policy": "The desired four-to-eight-hour timebox is not evidence of feasibility. Re-estimate from prepared packets for the remaining closure; never redefine V3 completion to fit it."
+}

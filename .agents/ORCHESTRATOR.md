@@ -1,6 +1,7 @@
 # Chat Orchestrator Playbook
 
-Schema-v4 adds optional three-lane Goal supervision. The primary checkout is
+Schema-v4 adds optional two/three-lane Goal supervision. Two lanes are the
+initial benchmark setting; three are an explicit measured alternative. The primary checkout is
 the single writer for Goal state, readiness, path leases, and the integration
 lock. Lane worktrees own child Task journals, prompts, run state, and role
 transport. Existing sequential Task and Goal routing remains the default.

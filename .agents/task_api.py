@@ -232,6 +232,7 @@ def prepare_lane_task_run(
         {
             "branch": branch,
             "lane": lane,
+            "parallelism": policy.parallel.max_lanes,
             "parallel_draft": True,
             "planning_baseline": baseline,
             "integration_baseline": None,

@@ -21,11 +21,15 @@ execution_order = "tracker"
 skip_completed = true
 stop_on_blocked = true
 
-# Optional only with schema-v4 [parallel].enabled = true. Leaving parallelism
-# at one preserves the existing sequential Goal workflow.
+# Optional only with schema-v4 [parallel].enabled = true. Start with two lanes;
+# three lanes is an explicit measured alternative. One preserves sequential mode.
 parallelism = 1
 lane_names = []
 dependency_schedule = "docs/dev/evidence/dependency-schedule.json"
+
+# Optional DT-09 grouping. Members still receive independent Task workflows,
+# implementation commits, merge commits and acceptance evidence.
+# delivery_batches = [["7.1", "7.2"], ["7.3", "7.4", "7.5"]]
 
 # Unattended-only alternative: one bounded, audited assumption retry per child.
 # This never skips children or overrides protected/external blockers.

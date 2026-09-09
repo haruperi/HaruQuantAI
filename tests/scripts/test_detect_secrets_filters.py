@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import shutil
 import subprocess
 from pathlib import Path
@@ -150,6 +151,43 @@ def test_throughput_snapshot_filters_only_named_real_commit_fields(
     )
     assert not detect_secrets_filters.is_valid_repository_commit_evidence(
         str(path), f'    "opaque_digest": "{commit}",', commit
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "relative_source"),
+    [
+        (
+            "dependency_schedule_sha256",
+            "docs/dev/evidence/dependency-schedule.json",
+        ),
+        ("source_sha256", "docs/dev/milestones/strategy-ready.json"),
+    ],
+)
+def test_strategy_ready_filters_only_current_source_digests(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+    relative_source: str,
+) -> None:
+    """Generated milestone hashes are allowed only when their source matches."""
+    monkeypatch.setattr(detect_secrets_filters, "REPO", tmp_path)
+    source = tmp_path / relative_source
+    source.parent.mkdir(parents=True, exist_ok=True)
+    source.write_text("canonical source\n", encoding="utf-8")
+    digest = hashlib.sha256(source.read_bytes()).hexdigest()
+    evidence = tmp_path / "docs/dev/evidence/milestones/strategy-ready.json"
+    evidence.parent.mkdir(parents=True, exist_ok=True)
+    line = f'  "{field}": "{digest}",'
+
+    assert detect_secrets_filters.is_valid_repository_commit_evidence(
+        str(evidence), line, digest
+    )
+    assert not detect_secrets_filters.is_valid_repository_commit_evidence(
+        str(evidence), line, "0" * 64
+    )
+    assert not detect_secrets_filters.is_valid_repository_commit_evidence(
+        str(evidence), f'  "other_sha256": "{digest}",', digest
     )
 
 

@@ -968,10 +968,25 @@ For D-UI, replace the six Python package items above with `README.md`, `manifest
 ## 12. Change workflow
 
 An explicitly configured schema-v4 parallel Goal may perform planning,
-implementation, and draft review in three isolated worktrees. Exact
+implementation, and draft review in two or three isolated worktrees. Start with
+two for the benchmark; three is a separately measured alternative. Exact
 non-deferred paths are leased before execution. Draft review is not acceptance:
 integration is serialized, refreshed onto latest accepted `main`, and reviewed
 again before the ordinary commit gate. Sequential workflows remain the default.
+
+DT-09 delivery batches do not combine feature ownership or Task authority. An
+explicit group of two or three Routine/Standard children may reuse preparation
+context and share one comprehensive integration gate only after every member has
+its own accepted Task and merge commit. Critical packets, stale authority,
+exclusive-path collisions, and internal unaccepted predecessors are rejected.
+The resulting record is `PUSH_READY`; the controller never performs a remote
+push without separate authority.
+
+Accepted Task runs emit `throughput-summary.json` with nonoverlapping role-stage
+durations, command time, integration wait, corrections, acceptance outcome and
+nullable usage/allowance observations. A ten-result comparison may recommend
+`KEEP_SEQUENTIAL`, `ADOPT_2`, or `ADOPT_3`; fewer results are explicitly
+insufficient evidence.
 
 For every new, migrated, or changed feature:
 

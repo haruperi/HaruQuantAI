@@ -74,6 +74,7 @@ def test_quick_fix_configuration_is_forced_interactive(
     output = tmp_path / "run-config.toml"
     selections = iter((f"{module.MODES[-1][0]} — {module.MODES[-1][1]}",))
     monkeypatch.setattr(module, "RUN_CONFIG", output)
+
     monkeypatch.setattr(module, "_pick", lambda *_args, **_kwargs: next(selections))
     monkeypatch.setattr(module, "_ask", lambda _prompt: "2")
     assert module.main() == 0
@@ -124,7 +125,13 @@ def test_non_headless_modes_render_unattended_gate_permissions(
     )
     questions: list[str] = []
     monkeypatch.setattr(module, "RUN_CONFIG", output)
-    monkeypatch.setattr(module, "_pick", lambda *_args, **_kwargs: next(selections))
+
+    def pick(prompt: str, *_args: object, **_kwargs: object) -> str:
+        if prompt == "Maximum governed lanes":
+            return "2"
+        return next(selections)
+
+    monkeypatch.setattr(module, "_pick", pick)
     monkeypatch.setattr(module, "_ask", lambda _prompt: "5")
 
     def allow(question: str, *, default: bool = False) -> bool:
@@ -147,7 +154,7 @@ def test_non_headless_modes_render_unattended_gate_permissions(
         "Preauthorize plan execution?",
         "Preauthorize local Task commit?",
         "Preauthorize local no-ff merge?",
-        "Enable governed three-worktree parallel Goals?",
+        "Enable governed parallel Goals?",
     ]
 
 

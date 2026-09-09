@@ -1,6 +1,6 @@
 # `.agents` — Artifact-Driven Task and Goal Workflow
 
-HaruQuantAI implements one risk-tiered atomic **Task workflow** and a deterministic **Goal supervisor**. Routine and Standard work may route from a validated prepared task packet directly to Executor; Critical or unresolved work retains Planner → Executor → Reviewer. Goals remain sequential by default and may explicitly opt into three governed parallel draft lanes. Repository state and deterministic controller state are authoritative; conversation history is context only.
+HaruQuantAI implements one risk-tiered atomic **Task workflow** and a deterministic **Goal supervisor**. Routine and Standard work may route from a validated prepared task packet directly to Executor; Critical or unresolved work retains Planner → Executor → Reviewer. Goals remain sequential by default and may explicitly opt into two or three governed parallel draft lanes. Repository state and deterministic controller state are authoritative; conversation history is context only.
 
 ## Atomic Task workspace
 
@@ -169,11 +169,22 @@ uv run .agents/orchestrator.py resume --role-complete --app-agent-id <opaque-id>
 ## Optional schema-v4 parallel Goals
 
 Goals remain sequential unless both runtime policy and the Goal opt in. With
-`[parallel].enabled = true` and `parallelism = 3`, the primary checkout owns
+`[parallel].enabled = true` and `parallelism = 2` or `3`, the primary checkout owns
 readiness, leases, and serialized integration while `codex`, `gemini`, and
 `zcode` worktrees own independent child Task artifacts. Lane actions use
 `--lane <name>`. A draft review is not commit authority: every draft is
 refreshed onto latest accepted `main` and independently reviewed again.
+
+Generate a two-lane candidate with `make_goal.py --parallelism 2`. Add one or
+more `--delivery-batch <task-a> <task-b> [task-c]` groups only for prevalidated
+Routine/Standard members. Inspect the latest ten accepted summaries with:
+
+```bash
+uv run .agents/throughput.py --report .agents/runs/throughput-report.json
+uv run python scripts/benchmark_pytest_workers.py <explicit-safe-tests> --report <report.json>
+```
+
+Neither command changes the tracked runtime policy or adopts a lane count.
 
 ## Goal quick start
 

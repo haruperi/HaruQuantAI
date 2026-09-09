@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import time
 from pathlib import Path
 from typing import Any, cast
 
@@ -23,6 +24,7 @@ from failure_routing import (
 )
 from ide_transport import IDE_MODES, finish_ide_role, prepare_ide_role
 from runtime_policy import RuntimePolicy
+from throughput import build_task_summary, write_summary
 from validation_receipts import (
     ValidationReceiptError,
     candidate_fingerprint,
@@ -716,15 +718,31 @@ def _verify_closeout_lineage(
 
 def _handle_closeout(cfg: dict[str, Any], state: dict[str, Any]) -> bool:
     print(f"\n=== CONTROLLER: deterministic close-out {state['iteration']} ===")
+    closeout_started = time.perf_counter()
     _ensure_local_integration_gate_unchanged(state, Path(cfg["repo"]))
     _archive_closeout_evidence(cfg, state)
     result = perform_deterministic_closeout(cfg, state)
     state["closeout_receipt"] = result
-    _record(state, "closeout", handoff="ACCEPTED", **result)
+    _record(
+        state,
+        "closeout",
+        handoff="ACCEPTED",
+        duration_seconds=time.perf_counter() - closeout_started,
+        **result,
+    )
     _verify_closeout_lineage(cfg, state)
     state["status"] = "ACCEPTED"
     state["phase"] = "done"
     state["next_agent"] = None
+    state["accepted_head"] = result["merge_commit"]
+    _record(state, "done", handoff="ACCEPTED")
+    summary_path = (
+        Path(cfg["runs_dir"]) / str(state["run_id"]) / "throughput-summary.json"
+    )
+    state["throughput_summary"] = {
+        "path": str(summary_path),
+        "sha256": write_summary(summary_path, build_task_summary(state)),
+    }
     _save_state(cfg, state)
     print("[ok] workflow completed and active-task workspace is empty")
     return False

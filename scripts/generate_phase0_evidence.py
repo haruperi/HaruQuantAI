@@ -31,6 +31,10 @@ GENERATED_OUTPUT_PATHS = (
     "docs/dev/evidence/operation-readiness.json",
     "docs/dev/evidence/phase-ui-acceptance-matrix.json",
 )
+AUXILIARY_GENERATED_OUTPUT_PATHS = (
+    "docs/dev/evidence/milestones/strategy-ready.json",
+    "docs/dev/goals/strategy-ready.toml",
+)
 PINNED_OUTPUT_PATHS = frozenset(
     {
         "docs/dev/evidence/baseline-manifest.json",
@@ -689,6 +693,14 @@ def build_payloads(  # noqa: PLR0915
         },
         EVIDENCE_DIR / "dependency-schedule.json": {
             "manifest_version": "2.0",
+            "delivery_priorities": [
+                {
+                    "milestone_id": "STRATEGY-READY",
+                    "authority": "docs/dev/milestones/strategy-ready.json",
+                    "policy": "dependency-closure-only; full V3 scope remains open",
+                    "seed_tasks": ["2.19", "3.14", "4.20", "4.23", "4.24", "4.25"],
+                }
+            ],
             "dag_properties": {
                 "is_acyclic": True,
                 "total_nodes": len(baseline_tasks),
@@ -733,7 +745,7 @@ def generated_output_paths() -> tuple[Path, ...]:
     return tuple(REPO / path for path in GENERATED_OUTPUT_PATHS)
 
 
-def main() -> int:  # noqa: C901
+def main() -> int:  # noqa: C901, PLR0912
     """Write or verify generated evidence.
 
     Returns:
@@ -750,7 +762,7 @@ def main() -> int:  # noqa: C901
     )
     args = parser.parse_args()
     if args.list_outputs:
-        for output_path in GENERATED_OUTPUT_PATHS:
+        for output_path in (*GENERATED_OUTPUT_PATHS, *AUXILIARY_GENERATED_OUTPUT_PATHS):
             print(output_path)
         return 0
     try:
@@ -783,6 +795,16 @@ def main() -> int:  # noqa: C901
         for drift_path in drift:
             print(f"  - {drift_path}")
         return 1
+    from scripts import derive_strategy_ready_milestone
+
+    if derive_strategy_ready_milestone.REPO.resolve() == REPO.resolve():
+        strategy_args = [sys.executable, str(derive_strategy_ready_milestone.__file__)]
+        if args.check:
+            strategy_args.append("--check")
+        milestone = subprocess.run(strategy_args, cwd=REPO, check=False)
+        if milestone.returncode != 0:
+            print("[FAIL] strategy-ready milestone projection is stale")
+            return 1
     print(f"[OK] {len(payloads)} generated Phase 0 evidence files are current")
     return 0
 

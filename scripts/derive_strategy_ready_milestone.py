@@ -1,0 +1,190 @@
+#!/usr/bin/env python3
+"""Derive and validate the frozen strategy-ready dependency closure."""
+
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+from pathlib import Path
+from typing import Any
+
+REPO = Path(__file__).resolve().parent.parent
+SOURCE = REPO / "docs/dev/milestones/strategy-ready.json"
+SCHEDULE = REPO / "docs/dev/evidence/dependency-schedule.json"
+BASELINE = REPO / "docs/dev/evidence/feature-baseline.json"
+OPERATIONS = REPO / "docs/dev/evidence/operation-readiness.json"
+USAGE = REPO / "docs/dev/evidence/usage-bindings.json"
+EVIDENCE = REPO / "docs/dev/evidence/milestones/strategy-ready.json"
+GOAL = REPO / "docs/dev/goals/strategy-ready.toml"
+
+
+class MilestoneError(RuntimeError):
+    """Raised when frozen milestone authority or its dependency graph drifts."""
+
+
+def _load(path: Path) -> dict[str, Any]:
+    value = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(value, dict):
+        message = f"Expected JSON object: {path}"
+        raise MilestoneError(message)
+    return value
+
+
+def derive() -> tuple[dict[str, Any], str]:
+    """Return the exact milestone evidence and dormant Goal TOML.
+
+    Returns:
+        Derived evidence and rendered dormant Goal specification.
+
+    Raises:
+        MilestoneError: If the frozen authority or dependency closure drifted.
+    """
+    source, schedule, baseline = _load(SOURCE), _load(SCHEDULE), _load(BASELINE)
+    predecessors: dict[str, set[str]] = {}
+    for phase in schedule.get("phases", []):
+        for task in phase.get("tasks", []):
+            predecessors[str(task)] = set()
+    for edge in schedule.get("schedule_constraints", []):
+        predecessors.setdefault(str(edge["task"]), set()).add(str(edge["predecessor"]))
+    closure = set(map(str, source["seed_tasks"]))
+    pending = list(closure)
+    while pending:
+        task = pending.pop()
+        if task not in predecessors:
+            message = f"Milestone task is absent from dependency schedule: {task}"
+            raise MilestoneError(message)
+        for predecessor in predecessors[task]:
+            if predecessor not in closure:
+                closure.add(predecessor)
+                pending.append(predecessor)
+    ordered = [
+        str(task)
+        for phase in schedule.get("phases", [])
+        for task in phase.get("tasks", [])
+        if str(task) in closure
+    ]
+    if len(ordered) != int(source["expected_closure_count"]):
+        message = (
+            "Strategy-ready closure drifted: expected "
+            f"{source['expected_closure_count']}, got {len(ordered)}."
+        )
+        raise MilestoneError(message)
+    records = {str(item["task_id"]): item for item in baseline.get("features", [])}
+    if set(ordered) - set(records):
+        raise MilestoneError(
+            "Strategy-ready closure contains tasks absent from feature baseline."
+        )
+    accepted_status = {"ACCEPTED", "COMPLETE", "PROVED_COMPLETE"}
+    accepted = [
+        task
+        for task in ordered
+        if records[task].get("status") in accepted_status
+        and records[task].get("accepted_commit")
+    ]
+    remaining = [task for task in ordered if task not in set(accepted)]
+    operation_tasks = {
+        str(edge.get("consumer_task"))
+        for edge in _load(OPERATIONS).get("edges", [])
+        if edge.get("consumer_task")
+    }
+    usage_by_feature = {
+        str(item.get("feature_id")): item for item in _load(USAGE).get("bindings", [])
+    }
+    externally_blocked = [
+        task
+        for task in ordered
+        if usage_by_feature.get(str(records[task].get("feature_id")), {}).get(
+            "external_credentials_required"
+        )
+        is True
+    ]
+    evidence = {
+        "schema_version": 1,
+        "milestone_id": source["milestone_id"],
+        "source_sha256": hashlib.sha256(SOURCE.read_bytes()).hexdigest(),
+        "dependency_schedule_sha256": hashlib.sha256(SCHEDULE.read_bytes()).hexdigest(),
+        "seed_tasks": source["seed_tasks"],
+        "closure": ordered,
+        "closure_count": len(ordered),
+        "accepted": accepted,
+        "accepted_count": len(accepted),
+        "remaining_implementation": remaining,
+        "remaining_count": len(remaining),
+        "operation_gated": [task for task in ordered if task in operation_tasks],
+        "externally_blocked": externally_blocked,
+        "contract": {
+            key: source[key]
+            for key in (
+                "inputs",
+                "outputs",
+                "replay_contract",
+                "failure_contract",
+                "public_path",
+                "offline_assumptions",
+                "acceptance_commands",
+            )
+        },
+        "delivery_status": source["delivery_status"],
+        "timebox_policy": source["timebox_policy"],
+        "full_v3_scope_preserved": True,
+    }
+    entries = ", ".join(json.dumps(task) for task in remaining)
+    goal = "\n".join(
+        [
+            "# Generated by scripts/derive_strategy_ready_milestone.py; dormant",
+            "# until explicitly activated.",
+            'goal_id = "GOAL-STRATEGY-READY"',
+            'goal_slug = "strategy-ready"',
+            'goal_name = "Deliver the strategy-ready reproducible research slice"',
+            'goal_request = "Implement the frozen remaining dependency closure '
+            'without claiming full V3 completion."',
+            'implementation_file = "docs/dev/Phased_Feature_Implementation_Plan.md"',
+            'selection_type = "entries"',
+            f"entries = [{entries}]",
+            'execution_order = "listed"',
+            "skip_completed = true",
+            "stop_on_blocked = true",
+            "parallelism = 1",
+            "",
+        ]
+    )
+    return evidence, goal
+
+
+def _canonical(value: dict[str, Any]) -> str:
+    return json.dumps(value, indent=2, sort_keys=True) + "\n"
+
+
+def main() -> int:
+    """Generate outputs or check them byte-for-byte.
+
+    Returns:
+        Zero when outputs are generated or current.
+
+    Raises:
+        MilestoneError: If check mode detects stale outputs.
+    """
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args()
+    evidence, goal = derive()
+    expected = {EVIDENCE: _canonical(evidence), GOAL: goal}
+    if args.check:
+        stale = [
+            str(path.relative_to(REPO))
+            for path, raw in expected.items()
+            if not path.is_file() or path.read_text(encoding="utf-8") != raw
+        ]
+        if stale:
+            message = f"Generated strategy-ready outputs are stale: {stale}"
+            raise MilestoneError(message)
+        return 0
+    for path, raw in expected.items():
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(raw, encoding="utf-8", newline="\n")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Opt-in three-lane Goal scheduling above the sequential Task engine."""
+"""Opt-in two/three-lane Goal scheduling above the sequential Task engine."""
 
 from __future__ import annotations
 
@@ -86,14 +86,16 @@ def create_parallel_state(
 ) -> dict[str, Any]:
     """Upgrade a newly created Goal state to opt-in parallel state."""
     normalized = validate_lanes(lanes)
-    if len(normalized) != 3:
-        raise ParallelGoalError("Parallel Goals require exactly three lanes.")
+    if len(normalized) not in {2, 3}:
+        raise ParallelGoalError("Parallel Goals require exactly two or three lanes.")
+    if tuple(normalized) != DEFAULT_LANES[: len(normalized)]:
+        raise ParallelGoalError("Parallel Goals require the canonical ordered lanes.")
     _predecessors, schedule_hash = load_schedule(schedule_path)
     state = dict(base_state)
     state.update(
         {
             "goal_state_schema_version": PARALLEL_STATE_SCHEMA_VERSION,
-            "parallelism": 3,
+            "parallelism": len(normalized),
             "lane_names": list(normalized),
             "dependency_schedule": str(schedule_path),
             "dependency_schedule_sha256": schedule_hash,
@@ -205,4 +207,4 @@ def release_child(state: dict[str, Any], *, lane: str, accepted: bool) -> None:
 
 def is_parallel_state(state: dict[str, Any]) -> bool:
     """Return whether a Goal state explicitly selects parallel supervision."""
-    return int(state.get("parallelism", 1)) == 3
+    return int(state.get("parallelism", 1)) in {2, 3}

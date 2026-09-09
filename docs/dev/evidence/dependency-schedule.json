@@ -1,5 +1,20 @@
 {
   "manifest_version": "2.0",
+  "delivery_priorities": [
+    {
+      "milestone_id": "STRATEGY-READY",
+      "authority": "docs/dev/milestones/strategy-ready.json",
+      "policy": "dependency-closure-only; full V3 scope remains open",
+      "seed_tasks": [
+        "2.19",
+        "3.14",
+        "4.20",
+        "4.23",
+        "4.24",
+        "4.25"
+      ]
+    }
+  ],
   "dag_properties": {
     "is_acyclic": true,
     "total_nodes": 205,

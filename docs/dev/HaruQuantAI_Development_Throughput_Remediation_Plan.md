@@ -364,6 +364,18 @@ Keep all 205 feature identities and registered scope. Do not rewrite the master 
 
 **Acceptance:** Two/three features share reusable preparation and one broader integration/push cycle while retaining separate Task branches, reviews, implementation commits and acceptance records; integration failure blocks the grouped action; required edges are preserved; shared files have one writer; already correct behavior is not rewritten merely to create another acceptance commit.
 
+**Implementation checkpoint (9 September 2026):** `delivery_batches` now freezes
+explicit two/three-member Routine/Standard groups from source-pinned Task
+packets. Preparation rejects Critical or blocked packets, baseline drift,
+duplicate identities, exclusive-path collisions, and an unaccepted predecessor
+inside the same group. Each child still traverses the ordinary Task protocol and
+records its task/merge commits. After the last member is independently accepted,
+the Goal controller runs one exact full integration profile and emits a
+`PUSH_READY` batch record; failure blocks the grouped action without undoing
+accepted children, and no remote push is performed. Deterministic tests prove
+these mechanics. The required live two/three-feature product pilot remains
+pending and is not claimed by this checkpoint.
+
 ### DT-10 — Benchmark bounded parallelism and adopt the measured path
 
 **Primary paths:** existing opt-in parallel/goal/integration-queue behavior, local run configuration, existing run summaries; no new orchestration engine.
@@ -410,6 +422,19 @@ Measure model choices only after the process changes. Compare allowance per acce
 
 **Adoption:** Keep improvements that increase accepted throughput without weakening evidence. Disable a slower/flakier parallel configuration rather than discarding the product architecture. Do not build a dashboard to answer what a small run-summary report can show.
 
+**Implementation checkpoint (9 September 2026):** Schema-v4 policy, Goal
+generation, state, migration, status, worktree creation, leasing and serialized
+integration now accept either two or three canonical lanes while retaining a
+maximum of three. Configuration recommends two first; the tracked runtime
+configuration remains disabled and unchanged. Accepted Task runs emit canonical
+throughput summaries with nonoverlapping measured role/close-out durations,
+command and wait fields, correction evidence, acceptance result, and nullable
+usage/allowance observations. `scripts/benchmark_pytest_workers.py` benchmarks
+only explicit parallel-safe selections at 1/2/4 workers with `worksteal` for
+parallel cases. Adoption remains `INSUFFICIENT_EVIDENCE` until ten comparable
+accepted results exist, and any escaped regression forces `KEEP_SEQUENTIAL`.
+CI sharding remains deferred.
+
 ### DT-11 — Freeze and deliver the strategy-ready milestone
 
 **Primary paths:** `docs/dev/Phased_Feature_Implementation_Plan.md`, `docs/dev/evidence/dependency-schedule.json`, applicable owning READMEs, Goal selection/runtime inputs and a bounded milestone evidence record. Preserve the complete 205-feature roadmap and all existing feature identities.
@@ -443,6 +468,16 @@ State the milestone's exact inputs, supported offline/provider assumptions, expe
 **Acceptance:** One bounded workflow loads retained historical data, executes a saved strategy through a deterministic backtest, exposes inspectable trades and performance, and reproduces the same experiment under its documented identity and assumptions. Every participating requirement and feature remains traceable; all deferred V3 work remains visibly open; no mocked or component-only evidence is claimed as real-provider qualification.
 
 **Rollback:** Remove only the milestone annotation/Goal selection when its dependency derivation is wrong. Do not revert accepted product features or rewrite the master feature registry.
+
+**Implementation checkpoint (9 September 2026):** The frozen six seed Tasks now
+derive through the canonical schedule to **58** Tasks: **13 accepted** and **45
+remaining**. The generated evidence separately identifies operation-gated and
+externally blocked members, pins source/schedule hashes, and states offline
+inputs, outputs, replay identity, failure behavior, public/UI path, and exact
+qualification commands. The generated 45-entry Goal is dormant pending the
+post-DT-06 product pilot and completion or resolution of the existing active
+Goal. No Task was activated, no open V3 entry was closed, and the desired
+four-to-eight-hour timebox is explicitly not treated as feasibility evidence.
 
 ## 8. Testing cadence after remediation
 

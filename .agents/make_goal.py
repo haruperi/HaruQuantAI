@@ -60,8 +60,8 @@ def _build_spec(args: argparse.Namespace) -> dict[str, Any]:
         "stop_on_blocked": not bool(getattr(args, "continue_on_blocked", False)),
         "parallelism": int(getattr(args, "parallelism", 1)),
     }
-    if spec["parallelism"] == 3:
-        spec["lane_names"] = ["codex", "gemini", "zcode"]
+    if spec["parallelism"] in {2, 3}:
+        spec["lane_names"] = ["codex", "gemini", "zcode"][: spec["parallelism"]]
         spec["dependency_schedule"] = str(args.dependency_schedule)
     if args.child_additional_context is not None:
         child_context = args.child_additional_context
@@ -70,6 +70,9 @@ def _build_spec(args: argparse.Namespace) -> dict[str, Any]:
                 "child_additional_context must be a non-blank string when supplied."
             )
         spec["child_additional_context"] = child_context
+    delivery_batches = getattr(args, "delivery_batch", None)
+    if delivery_batches:
+        spec["delivery_batches"] = [list(values) for values in delivery_batches]
     if selection_type == "entries":
         spec["entries"] = selection_value
     elif selection_type == "phase":
@@ -104,11 +107,17 @@ def _render(spec: dict[str, Any]) -> str:
             + ("true" if bool(spec["stop_on_blocked"]) else "false"),
         ]
     )
-    if int(spec.get("parallelism", 1)) == 3:
+    if spec.get("delivery_batches"):
+        groups = ", ".join(
+            "[" + ", ".join(_q(str(value)) for value in group) + "]"
+            for group in spec["delivery_batches"]
+        )
+        lines.append(f"delivery_batches = [{groups}]")
+    if int(spec.get("parallelism", 1)) in {2, 3}:
         lanes = ", ".join(_q(str(value)) for value in spec["lane_names"])
         lines.extend(
             [
-                "parallelism = 3",
+                f"parallelism = {spec['parallelism']}",
                 f"lane_names = [{lanes}]",
                 f"dependency_schedule = {_q(str(spec['dependency_schedule']))}",
             ]
@@ -128,9 +137,9 @@ def main() -> int:
     parser.add_argument(
         "--parallelism",
         type=int,
-        choices=(1, 3),
+        choices=(1, 2, 3),
         default=1,
-        help="Use one sequential child or three governed worktree lanes.",
+        help="Use one sequential child or two/three governed worktree lanes.",
     )
     parser.add_argument(
         "--dependency-schedule",
@@ -150,6 +159,13 @@ def main() -> int:
         "--listed-order",
         action="store_true",
         help="Preserve explicit --entries order instead of tracker order.",
+    )
+    parser.add_argument(
+        "--delivery-batch",
+        action="append",
+        nargs="+",
+        metavar="TASK",
+        help="Group preparation and the final integration gate for two/three Tasks.",
     )
     parser.add_argument(
         "--continue-on-blocked",

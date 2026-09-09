@@ -37,6 +37,7 @@ SUPPORTED_APPROVAL_POLICIES = frozenset({"interactive", "unattended"})
 SUPPORTED_VENDORS = frozenset({"codex", "agy", "cline", "zai"})
 SUPPORTED_EFFORTS = frozenset({"low", "medium", "high", "xhigh", "max"})
 ROLE_NAMES = ("planner", "executor", "reviewer")
+PARALLEL_LANES = ("codex", "gemini", "zcode")
 
 
 class RuntimePolicyError(RuntimeError):
@@ -373,15 +374,15 @@ def _parse_versioned(raw: dict[str, Any], schema_version: int) -> RuntimePolicy:
             raise RuntimePolicyError("parallel must be a TOML table.")
         parallel_section = cast("dict[str, Any]", parallel_raw)
         parallel_enabled = _require_bool(parallel_section, "enabled")
-        max_lanes = parallel_section.get("max_lanes", 3 if parallel_enabled else 1)
+        max_lanes = parallel_section.get("max_lanes", 2 if parallel_enabled else 1)
         lane_values = parallel_section.get(
-            "lane_names", ["codex", "gemini", "zcode"] if parallel_enabled else []
+            "lane_names", ["codex", "gemini"] if parallel_enabled else []
         )
         if not isinstance(max_lanes, int) or isinstance(max_lanes, bool):
             raise RuntimePolicyError("parallel.max_lanes must be an integer.")
-        if max_lanes not in ({3} if parallel_enabled else {1}):
+        if max_lanes not in ({2, 3} if parallel_enabled else {1}):
             raise RuntimePolicyError(
-                "Parallel execution requires exactly three lanes when enabled."
+                "Parallel execution requires two or three lanes when enabled."
             )
         if not isinstance(lane_values, list) or not all(
             isinstance(item, str) for item in lane_values
@@ -389,14 +390,16 @@ def _parse_versioned(raw: dict[str, Any], schema_version: int) -> RuntimePolicy:
             raise RuntimePolicyError("parallel.lane_names must be a string array.")
         lane_names = tuple(item.strip().lower() for item in lane_values)
         if parallel_enabled and (
-            len(lane_names) != 3
-            or len(set(lane_names)) != 3
+            len(lane_names) != max_lanes
+            or len(set(lane_names)) != max_lanes
+            or lane_names != PARALLEL_LANES[:max_lanes]
             or any(
                 not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", lane) for lane in lane_names
             )
         ):
             raise RuntimePolicyError(
-                "Parallel execution requires three unique filesystem-safe lane names."
+                "Parallel execution requires the canonical ordered prefix of "
+                "codex, gemini, and zcode."
             )
         if not parallel_enabled and lane_names:
             raise RuntimePolicyError("Disabled parallel policy cannot declare lanes.")

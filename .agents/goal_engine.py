@@ -14,6 +14,13 @@ from pathlib import Path
 from typing import Any, cast
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+from delivery_batch import (
+    DeliveryBatchError,
+    prepare_batch,
+    qualify_batch,
+    run_combined_gate,
+    write_batch,
+)
 from integration_queue import (
     IntegrationError,
     IntegrationLock,
@@ -43,6 +50,7 @@ from task_api import (
     prepare_task_run,
     resume_task_run,
 )
+from task_packet import build_task_packet
 from workflow_protocol import (
     SCHEMA_VERSION,
     OrchestratorError,
@@ -154,19 +162,43 @@ def load_goal_spec(path: Path) -> dict[str, Any]:
             raise OrchestratorError(
                 "child_additional_context must be a non-blank string when supplied."
             )
+    delivery_batches = raw.get("delivery_batches", [])
+    if not isinstance(delivery_batches, list):
+        raise OrchestratorError("delivery_batches must be an array of Task arrays.")
+    seen_batch_entries: set[str] = set()
+    normalized_batches: list[list[str]] = []
+    for batch in delivery_batches:
+        if (
+            not isinstance(batch, list)
+            or len(batch) not in {2, 3}
+            or not all(isinstance(value, str) and value.strip() for value in batch)
+        ):
+            raise OrchestratorError(
+                "Each delivery batch must contain exactly two or three Task ids."
+            )
+        normalized = [value.strip() for value in batch]
+        duplicates = seen_batch_entries.intersection(normalized)
+        if duplicates or len(set(normalized)) != len(normalized):
+            raise OrchestratorError(
+                f"Delivery batch entries must be unique: {sorted(duplicates)}"
+            )
+        seen_batch_entries.update(normalized)
+        normalized_batches.append(normalized)
+    raw["delivery_batches"] = normalized_batches
     parallelism = raw.get("parallelism", 1)
     if not isinstance(parallelism, int) or isinstance(parallelism, bool):
         raise OrchestratorError("parallelism must be an integer.")
-    if parallelism not in {1, 3}:
-        raise OrchestratorError("parallelism must be either 1 or 3.")
+    if parallelism not in {1, 2, 3}:
+        raise OrchestratorError("parallelism must be 1, 2, or 3.")
     raw["parallelism"] = parallelism
-    if parallelism == 3:
-        lanes = raw.get("lane_names", list(DEFAULT_LANES))
+    if parallelism in {2, 3}:
+        lanes = raw.get("lane_names", list(DEFAULT_LANES[:parallelism]))
         if not isinstance(lanes, list) or not all(isinstance(v, str) for v in lanes):
             raise OrchestratorError("lane_names must be a string array.")
-        if tuple(value.strip().lower() for value in lanes) != DEFAULT_LANES:
+        expected_lanes = DEFAULT_LANES[:parallelism]
+        if tuple(value.strip().lower() for value in lanes) != expected_lanes:
             raise OrchestratorError(
-                "Parallel Goal lanes must be codex, gemini, and zcode in that order."
+                "Parallel Goal lanes must use the canonical ordered lane prefix."
             )
         schedule = str(
             raw.get(
@@ -179,7 +211,7 @@ def load_goal_spec(path: Path) -> dict[str, Any]:
             raise OrchestratorError(
                 "dependency_schedule must be a safe repository-relative path."
             )
-        raw["lane_names"] = list(DEFAULT_LANES)
+        raw["lane_names"] = list(expected_lanes)
         raw["dependency_schedule"] = schedule
     return raw
 
@@ -343,6 +375,15 @@ def create_goal_state(cfg: dict[str, Any], spec: dict[str, Any]) -> dict[str, An
         )
     tracker = _tracker_path(cast("Path", cfg["repo"]), spec)
     resolved = resolve_goal_entries(spec, parse_entries(tracker))
+    batch_entries = {
+        entry
+        for batch in cast("list[list[str]]", spec.get("delivery_batches", []))
+        for entry in batch
+    }
+    if not batch_entries.issubset(set(resolved)):
+        raise OrchestratorError(
+            "Every delivery-batch member must be in the frozen executable Goal scope."
+        )
     stamp = dt.datetime.now(tz=dt.UTC).strftime("%Y%m%d-%H%M%S-%f")
     frozen_scope = {"spec": spec, "resolved_entries": resolved}
     state: dict[str, Any] = {
@@ -370,12 +411,40 @@ def create_goal_state(cfg: dict[str, Any], spec: dict[str, Any]) -> dict[str, An
         "goal_scope": frozen_scope,
         "scope_fingerprint": scope_fingerprint(frozen_scope),
     }
+    if spec.get("delivery_batches"):
+        repo = cast("Path", cfg["repo"])
+        baseline = _git_ok(repo, "rev-parse", "HEAD")
+        tracker_entries = parse_entries(tracker)
+        prepared_batches: list[dict[str, Any]] = []
+        for index, entries in enumerate(
+            cast("list[list[str]]", spec["delivery_batches"]), start=1
+        ):
+            packets: list[dict[str, Any]] = []
+            for entry_id in entries:
+                body, _label, _previews = build_task_spec(
+                    entry_id,
+                    tracker_entries[entry_id],
+                    str(spec["implementation_file"]),
+                )
+                task = {key: str(value) for key, value in tomllib.loads(body).items()}
+                packets.append(build_task_packet(repo, task, baseline=baseline))
+            try:
+                prepared = prepare_batch(
+                    batch_id=f"{state['goal_run_id']}-batch-{index}",
+                    baseline=baseline,
+                    packets=packets,
+                )
+            except DeliveryBatchError as exc:
+                raise OrchestratorError(str(exc)) from exc
+            prepared["entries"] = list(entries)
+            prepared_batches.append(prepared)
+        state["delivery_batches"] = prepared_batches
     if isinstance(policy, RuntimePolicy):
         state["runtime_policy_fingerprint"] = policy.fingerprint
         state["runtime_policy_schema_version"] = policy.schema_version
         state["runtime_mode"] = policy.effective_mode
         state["approval_policy"] = policy.approval_policy
-    if int(spec.get("parallelism", 1)) == 3:
+    if int(spec.get("parallelism", 1)) in {2, 3}:
         if (
             not isinstance(policy, RuntimePolicy)
             or policy.schema_version < 4
@@ -595,6 +664,21 @@ def _record_child_assumption_review(
         state.setdefault("assumption_ledger", []).append(review)
 
 
+def _child_throughput(child: dict[str, Any]) -> dict[str, Any] | None:
+    """Load one immutable accepted-child throughput summary when available."""
+    record = child.get("throughput_summary")
+    if not isinstance(record, dict):
+        return None
+    path = Path(str(record.get("path", "")))
+    if not path.is_file():
+        return None
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except OSError, json.JSONDecodeError:
+        return None
+    return cast("dict[str, Any]", value) if isinstance(value, dict) else None
+
+
 def _accept_child(
     cfg: dict[str, Any], state: dict[str, Any], child: dict[str, Any]
 ) -> None:
@@ -604,15 +688,21 @@ def _accept_child(
     _verify_child_acceptance(cfg, state, child, entry_id)
     _record_child_assumption_review(cfg, state, child, entry_id)
     accepted_head = _git_ok(cast("Path", cfg["repo"]), "rev-parse", "HEAD")
+    closeout = child.get("closeout_receipt")
+    closeout = closeout if isinstance(closeout, dict) else {}
     state.setdefault("children", []).append(
         {
             "entry": entry_id,
+            "feature_id": str(child["task"]["task_id"]),
             "task_run_id": str(child["run_id"]),
             "task_id": str(child["task"]["task_id"]),
             "status": "ACCEPTED",
             "baseline": str(child["baseline"]),
             "accepted_head": accepted_head,
             "commit": accepted_head,
+            "task_commit": closeout.get("task_commit"),
+            "merge_commit": closeout.get("merge_commit", accepted_head),
+            "throughput": _child_throughput(child),
             "started_at": active.get("started_at"),
             "accepted_at": dt.datetime.now(tz=dt.UTC).isoformat(timespec="seconds"),
         }
@@ -630,7 +720,60 @@ def _accept_child(
         task_run_id=child["run_id"],
         commit=accepted_head,
     )
+    _qualify_ready_batches(cfg, state, accepted_head)
     save_goal_state(cfg, state)
+
+
+def _qualify_ready_batches(
+    cfg: dict[str, Any], state: dict[str, Any], accepted_head: str
+) -> None:
+    """Qualify each delivery batch whose independent children are accepted."""
+    for batch in cast("list[dict[str, Any]]", state.get("delivery_batches", [])):
+        if batch.get("status") != "PREPARED":
+            continue
+        expected_entries = [str(value) for value in batch.get("entries", [])]
+        children = [
+            value
+            for expected in expected_entries
+            for value in cast("list[dict[str, Any]]", state["children"])
+            if value.get("entry") == expected
+        ]
+        if len(children) != len(expected_entries):
+            continue
+        output = (
+            _goals_dir(cfg)
+            / str(state["goal_run_id"])
+            / "batches"
+            / str(batch["batch_id"])
+        )
+        try:
+            report, elapsed = run_combined_gate(
+                cast("Path", cfg["repo"]), batch, output_dir=output
+            )
+            qualified = qualify_batch(
+                batch,
+                accepted_children=children,
+                candidate=accepted_head,
+                validation_receipt=report,
+            )
+        except DeliveryBatchError as exc:
+            batch["status"] = "BLOCKED"
+            batch["failure"] = str(exc)
+            raise OrchestratorError(str(exc)) from exc
+        qualified["command_wall_time"] = elapsed
+        qualified["record_sha256"] = write_batch(
+            output / "delivery-batch.json", qualified
+        )
+        batch.clear()
+        batch.update(qualified)
+        _goal_record(
+            state,
+            "DELIVERY_BATCH_PUSH_READY",
+            batch_id=batch["batch_id"],
+            feature_ids=batch["feature_ids"],
+            candidate=accepted_head,
+            push_performed=False,
+        )
 
 
 def _require_solo_child_chat(
@@ -960,7 +1103,7 @@ def _finalize_parallel_goal(  # noqa: PLR0911
         state,
         "GOAL_ACCEPTED",
         completed=len(cast("list[Any]", state["completed_entries"])),
-        parallelism=3,
+        parallelism=int(state.get("parallelism", 1)),
     )
     save_goal_state(cfg, state)
     return state
@@ -1049,6 +1192,8 @@ def _advance_parallel_goal(
     if child.get("phase") == "draft_reviewed":
         lane_state["phase"] = "DRAFT_REVIEWED"
         lane_state["draft_review"] = child.get("draft_review")
+        child["integration_queued_at"] = dt.datetime.now(tz=dt.UTC).isoformat()
+        _save_state(lane_cfg, child)
         try:
             enqueue_reviewed_draft(state, lane=selected_lane)
         except ParallelGoalError as exc:
@@ -1066,15 +1211,21 @@ def _advance_parallel_goal(
                 entry=entry_id,
             )
         accepted_head = _git_ok(cast("Path", cfg["repo"]), "rev-parse", "HEAD")
+        closeout = child.get("closeout_receipt")
+        closeout = closeout if isinstance(closeout, dict) else {}
         state.setdefault("children", []).append(
             {
                 "entry": entry_id,
+                "feature_id": str(child["task"]["task_id"]),
                 "task_run_id": child["run_id"],
                 "task_id": child["task"]["task_id"],
                 "lane": selected_lane,
                 "status": "ACCEPTED",
                 "baseline": child.get("integration_baseline", child["baseline"]),
                 "accepted_head": accepted_head,
+                "task_commit": closeout.get("task_commit"),
+                "merge_commit": closeout.get("merge_commit", accepted_head),
+                "throughput": _child_throughput(child),
             }
         )
         state.setdefault("completed_entries", []).append(entry_id)
@@ -1099,6 +1250,16 @@ def _advance_parallel_goal(
             task_run_id=child["run_id"],
             commit=accepted_head,
         )
+        try:
+            _qualify_ready_batches(cfg, state, accepted_head)
+        except OrchestratorError as exc:
+            return _block_goal(
+                cfg,
+                state,
+                "DELIVERY_BATCH_INTEGRATION_FAILED",
+                entry=entry_id,
+                detail=str(exc),
+            )
     save_goal_state(cfg, state)
     return _dispatch_parallel_children(cfg, state)
 
@@ -1135,6 +1296,14 @@ def integrate_parallel_draft(
     lane_cfg = _parallel_lane_cfg(cfg, state, lane)
     lane_repo = cast("Path", lane_cfg["repo"])
     child = _load_state(lane_cfg, str(lane_state["run_id"]))
+    queued_at = child.get("integration_queued_at")
+    if isinstance(queued_at, str):
+        child["integration_wait_seconds"] = max(
+            0.0,
+            (
+                dt.datetime.now(tz=dt.UTC) - dt.datetime.fromisoformat(queued_at)
+            ).total_seconds(),
+        )
     draft = cast("dict[str, Any]", child.get("draft_review") or {})
     if child.get("phase") != "draft_reviewed" or not draft:
         raise OrchestratorError("Lane Task state lacks reviewed-draft evidence.")
@@ -1580,7 +1749,7 @@ def start_goal(
 def migrate_goal_to_parallel(
     cfg: dict[str, Any], state: dict[str, Any]
 ) -> dict[str, Any]:
-    """Explicitly migrate one inactive sequential Goal to three-lane state."""
+    """Explicitly migrate one inactive sequential Goal to configured parallel state."""
     if is_parallel_state(state):
         raise OrchestratorError("Goal is already parallel.")
     if state.get("status") != "RUNNING" or state.get("active_child") is not None:
@@ -1645,7 +1814,7 @@ def migrate_goal_to_parallel(
     )
     migrated["worktrees"] = {lane: record.to_dict() for lane, record in records.items()}
     after_payload = {
-        "parallelism": 3,
+        "parallelism": policy.parallel.max_lanes,
         "completed_entries": completed,
         "remaining_entries": migrated["remaining_entries"],
         "baseline": baseline,
@@ -1696,7 +1865,7 @@ def format_goal_status(state: dict[str, Any]) -> str:
             f"GOAL_ID : {state.get('goal_id', '')}",
             f"GOAL_RUN_ID : {state.get('goal_run_id', '')}",
             f"PROGRESS : {len(completed)} / {len(resolved)}",
-            "MODE : PARALLEL-3",
+            f"MODE : PARALLEL-{state.get('parallelism')}",
         ]
         for lane in [str(value) for value in state.get("lane_names", [])]:
             child = active_lanes.get(lane)

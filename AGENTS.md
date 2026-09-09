@@ -211,13 +211,24 @@ its own reviewed implementation and merge commits. Corrections never advance
 Goal progress; failed/cancelled children block rather than being skipped or
 rolled back automatically.
 
-Sequential Goals have one active child. Explicit schema-v4 parallel Goals may
-have at most three isolated draft lanes, but exact-path leases, accepted
+Sequential Goals have one active child. Explicit schema-v4 parallel Goals use
+two or three isolated draft lanes (two first for benchmarking), but exact-path leases, accepted
 predecessors, current-main refresh, fresh final review, lane-scoped gates, and
 serialized integration remain mandatory. A draft review is not acceptance or
 commit authority. Dirty or unresolved lanes are preserved, never force-cleaned.
 Complete Goal selection, assumption, lane, transport, refresh, reconciliation,
 and chat-handoff rules live in `.agents/GOALS.md` and `.agents/PROCEDURE.md`.
+
+DT-09 delivery batches group only preparation, reusable packet context, one
+post-acceptance integration gate, and the eventual operator push for two or
+three Routine/Standard Tasks. Every member retains its Task branch, independent
+review, evidence, implementation commit, merge commit, and acceptance. Critical
+work, unstable packets, path collisions, and internal unaccepted predecessors
+fail closed. Scope never grows merely to fill a batch.
+
+Every accepted Task writes a bounded throughput summary. Lane adoption requires
+ten comparable accepted results and no escaped regression or reopen; unavailable
+provider usage and allowance observations remain null rather than inferred.
 
 ### 2.10 Quick-Fix mode
 

@@ -15,6 +15,12 @@ def test_phase0_evidence_is_internally_consistent() -> None:
     assert validate_phase0.validate() == []
 
 
+def test_strategy_ready_projection_is_part_of_phase_validation() -> None:
+    """The frozen milestone cannot silently drift from its schedule."""
+    errors = validate_phase0.validate()
+    assert not [error for error in errors if "strategy-ready" in error]
+
+
 def _task(task_id: str, feature_id: str, *, complete: bool) -> dict[str, object]:
     """Build one minimal parsed-task fixture."""
     return {"task_id": task_id, "feature_id": feature_id, "complete": complete}

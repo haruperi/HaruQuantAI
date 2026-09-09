@@ -894,12 +894,19 @@ def _invoke_pending(
     # Capture pre-invocation snapshot
     snapshot_before = capture_repository_snapshot(cfg["repo"])
     # Run the agent
+    role_started = time.perf_counter()
     result = run_agent(
         cfg,
         role,
         artifact.raw,
         f"{state['run_id']}-{role.lower()}-{state['iteration']}",
         generation=str(state.get("session_generation", "normal")),
+    )
+    _record(
+        state,
+        "headless_role_completed",
+        role=role.upper(),
+        duration_seconds=time.perf_counter() - role_started,
     )
     if authorized_closeout:
         return result

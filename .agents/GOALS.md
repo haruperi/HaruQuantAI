@@ -5,13 +5,20 @@ A HaruQuantAI **Goal** is a deterministic supervisory objective that executes mu
 ## Optional schema-v4 parallel execution
 
 With `[parallel].enabled = true` in schema-v4 runtime policy and
-`parallelism = 3` in the Goal, the controller creates `codex`, `gemini`, and
-`zcode` worktrees. Readiness comes from the frozen dependency schedule and
+`parallelism = 2` or `3` in the Goal, the controller creates the corresponding
+ordered prefix of the `codex`, `gemini`, and `zcode` worktrees. Readiness comes from the frozen dependency schedule and
 exact paths are leased before each Executor runs. Drafts may overlap through
 review, but one integration queue refreshes them onto latest accepted `main`.
 Overlap or deferred semantic work returns to Planner, and every refresh needs
 a new independent review before the ordinary commit gate. Without this exact
-opt-in, the sequential lifecycle below is unchanged.
+opt-in, the sequential lifecycle below is unchanged. Two lanes are the initial
+benchmark; three lanes require a separate measured comparison.
+
+An optional `delivery_batches` Goal field groups two or three Routine/Standard
+children for preparation and one comprehensive post-acceptance integration
+gate. Each member still completes its own Task branch, review, implementation
+commit, merge commit and acceptance record. A failed combined gate blocks the
+grouped push boundary without undoing truthful accepted child evidence.
 
 ## Architecture
 

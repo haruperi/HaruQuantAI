@@ -1,6 +1,7 @@
 <!-- markdownlint-disable-file MD013 MD024 MD025 MD060 -->
 
-> Schema-v4 parallel Goals are opt-in. Generate one with `--parallelism 3` and
+> Schema-v4 parallel Goals are opt-in. Start with `--parallelism 2`; use
+> `--parallelism 3` only as an explicit measured alternative, and
 > target every gate or role completion with `--lane codex`, `--lane gemini`, or
 > `--lane zcode`. Each agent consumes the prompt in its own worktree. Draft
 > review is followed by serialized baseline refresh and a fresh final review.
