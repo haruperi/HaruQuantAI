@@ -1,7 +1,7 @@
 # HaruQuantAI V3 — Development Throughput Remediation Plan
 
 **Date:** 9 September 2026
-**Status:** ACTIVE — DT-01 through DT-06 are committed. Owner-authorized Change Set C (DT-07 and DT-08) is implemented and locally validated but not yet committed. The post-DT-06 representative-feature pilot remains incomplete and must not be reported as satisfied by remediation self-tests. DT-03 remote publication and repository protection remain pending explicit owner authorization.
+**Status:** ACTIVE — IMPLEMENTATION DEPLOYED; EFFECTIVENESS NOT YET DEMONSTRATED. DT-01 through DT-11 are committed through `d64ea9a3`. Sections 8 through 10 are being finalized in the current uncommitted documentation/testing-policy change. The post-DT-06 representative-feature pilot is 0/3, no canonical DT-10 accepted-run summaries currently exist, the five live aggregate evidence projections report drift, and DT-03 remote publication/repository protection remain pending explicit owner authorization. Remediation self-tests do not satisfy those outstanding outcomes.
 **Repository baseline checked:** `a32a46ad5c3407bdb7b68bf8dc270d327b6e7625` on remote `main`.
 **Repository location:** `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`
 **Basis:** The three supplied agent analyses, supplemented by targeted read-only repository checks and official tool documentation. Source references appear in §12.
@@ -69,7 +69,7 @@ POST-DT-06 PILOT → DT-11         (strategy-ready milestone path)
 
 The owner authorized DT-02A and DT-02B as one combined DT-02 delivery, DT-04 through DT-06 as one combined Change Set B delivery, and DT-07 with DT-08 as one combined Change Set C delivery on 9 September 2026. The owner explicitly advanced Change Set C before the post-DT-06 product-feature pilot; this changes delivery order only and does not waive or satisfy that pilot. Implementation still establishes and measures each internal checkpoint before enabling the next so incremental behavior remains observable. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer later automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
 
-Implementation record: DT-01 was committed as `5faf73fe`; combined DT-02A/DT-02B was committed as `6420d7e8`; DT-03 was committed as `311e6dce`; combined DT-04/DT-05/DT-06 was committed as `82661187`. DT-03 selects the local-first acceptance model defined below. A local Task may become `ACCEPTED` only after controller-enforced integration validation of its frozen reviewed state and exact merge lineage. Publishing remains separately authorized, and the remote `acceptance` result confirms rather than retroactively grants local Task acceptance.
+Implementation record: DT-01 was committed as `5faf73fe`; combined DT-02A/DT-02B was committed as `6420d7e8`; DT-03 was committed as `311e6dce`; combined DT-04/DT-05/DT-06 was committed as `82661187`; combined DT-07/DT-08 was committed as `a2575997`; and combined DT-09/DT-10/DT-11 was committed as `d64ea9a3`. DT-03 selects the local-first acceptance model defined below. A local Task may become `ACCEPTED` only after controller-enforced integration validation of its frozen reviewed state and exact merge lineage. Publishing remains separately authorized, and the remote `acceptance` result confirms rather than retroactively grants local Task acceptance.
 
 ## 4. Change set A — Stop avoidable waiting
 
@@ -486,19 +486,39 @@ four-to-eight-hour timebox is explicitly not treated as feasibility evidence.
 | Editing | Behavior-specific tests, relevant consumers, small failure/golden/lifecycle cases | Full coverage, full UI build after each edit, unrelated workflow tests. |
 | Pre-commit | Formatting, lint, hygiene and secret detection | Full pytest/mypy or full app build. |
 | Pre-push | Lightweight submission/scope consistency checks | Automatic comprehensive coverage on each eligible path. |
-| Candidate/batch acceptance | Independent review; comprehensive profiles selected conservatively; applicable owner/phase checks; required status before merge | Repeating an identical gate merely because another role starts. |
-| Full regression/phase/release | Entire applicable suite, coverage, browser/cross-domain and required real-provider/performance/fault qualification | Claiming mocked component tests certify live/provider behavior. |
+| Candidate acceptance | One source-bound integration profile before Reviewer; independent review plus selected adversarial checks; unchanged receipt reused through commit authorization | Repeating an identical gate merely because another role starts. |
+| Batch boundary | Each child accepted independently, then one combined full gate before the grouped push or next declared integration boundary | Treating one batch gate as shared implementation, review or acceptance authority. |
+| Remote CI | Candidate-appropriate integration/full qualification under the stable `acceptance` status after an authorized push | Claiming local acceptance proves remote status or branch protection. |
+| Full regression/phase/release | Full code suite and coverage plus applicable browser/cross-domain and required real-provider/performance/fault/removal qualification at their explicit gates | Claiming mocked component tests certify live/provider behavior. |
 
-A later dedicated test session expands stress, robustness and system scenarios. It is not the first time core behavior receives assertions. Preserve mandated lifecycle/removal evidence through shared harnesses instead of deleting it. Faster execution and less repetitive test authoring are separate optimizations.
+A later dedicated test session expands stress, robustness and system scenarios. It is not the first time core behavior receives assertions. Preserve mandated lifecycle/removal evidence through shared harnesses instead of deleting it. Faster execution and less repetitive test authoring are separate optimizations. Parallel pytest remains serial by default until an explicit parallel-safe selection is benchmarked at one, two and four workers; unmeasured `-n auto` is not part of the standard cadence.
+
+**Implementation checkpoint (9 September 2026):** The cadence is now encoded in
+`AGENTS.md` and the feature pipeline, while regression tests lock its executable
+boundaries. Ordinary pytest has no implicit coverage; pre-commit contains only
+hygiene/format/lint/secret checks; pre-push calls the candidate-aware `affected`
+profile; the Controller runs one source-bound integration gate before Reviewer;
+CI exposes stable `acceptance`; and deliberate full qualification retains Python
+coverage, UI build/tests and workflow checks. DT-09 batch qualification remains
+post-child-acceptance and pre-push. Browser, provider, performance, fault and
+physical-removal claims remain separate explicit phase/operation evidence.
 
 ## 9. Concrete command reference
 
-These commands use existing tools/scripts unless explicitly labeled proposed. They have not been run on the user's machine as part of preparing this plan. Substitute only paths resolved in the relevant packet.
+These commands match the checked-in interfaces at the 9 September 2026
+implementation checkpoint. They are operating examples, not authorization for
+execution, Git mutation, network access, credentials, live-provider activity or
+destructive work. Substitute only exact revisions and paths resolved from the
+active Task packet and repository state. A command that writes an ignored report
+is still a local mutation; a command that prepares runtime input does not activate
+or authorize a Task or Goal.
 
 ### Local preflight and authorized remote refresh
 
 ```powershell
 git status --short --branch
+git diff --name-only
+git diff --cached --name-only
 git rev-parse HEAD
 git config --show-origin --get core.hooksPath
 git config --show-origin --get core.autocrlf
@@ -518,17 +538,26 @@ git fetch origin
 ### Focused Python validation and deliberate profiling
 
 ```powershell
-# Current configuration: retain --no-cov until DT-02 is deployed.
+# Focused development: explicit scope and no coverage instrumentation.
 uv run --locked pytest --no-cov <resolved-test-path> -q
 
-# Deliberate baseline profiling, not the per-feature default.
-uv run --locked pytest --no-cov --durations=30 --durations-min=0.1
+# Deliberate slow-test profiling still requires an explicit bounded selection.
+uv run --locked pytest --no-cov <resolved-test-path> --durations=30 --durations-min=0.1
+
+# Benchmark only a selection already judged parallel-safe; writes an ignored report.
+uv run --locked python scripts/benchmark_pytest_workers.py <resolved-test-path> --repeat 3 --report .dev/pytest-worker-benchmark.json
+
+# Run only the measured bounded winner; keep shared-resource tests serial.
+uv run --locked pytest --no-cov -n <measured-2-or-4> --dist=worksteal <resolved-test-path>
 
 # Comprehensive coverage at its designated gate.
 uv run --locked pytest --cov=app --cov-report=term-missing --cov-fail-under=80
 ```
 
-The comprehensive command shown will still inherit HTML reporting until default addopts are changed. Do not pass a focused subset to this global-coverage command and interpret the result as whole-application qualification.
+Ordinary pytest no longer inherits coverage or HTML generation. The explicit
+comprehensive command retains the project coverage floor without producing an
+HTML report. Do not pass a focused subset to this global-coverage command and
+interpret the result as whole-application qualification.
 
 ### Existing UI scripts
 
@@ -541,73 +570,539 @@ npm run typecheck
 # Full UI validation/build only at the appropriate broader boundary.
 npm run test
 npm run build
+# Local-ASGI browser journey only at an applicable browser/phase gate.
+npm run e2e
 Pop-Location
 ```
 
-In automation, check and propagate each native process exit code; PowerShell does not make a failed native command halt a whole script automatically. A validator running npm from Python must resolve the platform-appropriate executable and use the UI working directory. Do not reinstall npm dependencies after every source edit.
+The current Playwright configuration uses the repository's local ASGI harness;
+it is browser evidence, not external broker/provider qualification. In
+automation, check and propagate every native process exit code because
+PowerShell does not make a failed native command halt an entire script
+automatically. A Python validator invoking npm must resolve the
+platform-appropriate executable and use the UI working directory. Do not
+reinstall npm dependencies after every source edit.
 
-### Proposed validation interface—implement before using
+### Validation interface
 
 ```powershell
-uv run --locked python scripts/ci_check.py --profile integration --base origin/main --head HEAD --explain
+# Read-only route explanation for the outgoing local delta.
+uv run --locked python scripts/ci_check.py --profile affected --base origin/main --head HEAD --explain
+
+# Ordinary pre-push-equivalent affected validation.
 uv run --locked python scripts/ci_check.py --profile affected --base origin/main --head HEAD
-uv run --locked python scripts/ci_check.py --profile integration --base origin/main --head HEAD
+
+# Clean materialized candidate integration.
+uv run --locked python scripts/ci_check.py --profile integration --base <accepted-main-commit> --head <candidate-commit>
+
+# Controller-owned frozen dirty-worktree integration.
+uv run --locked python scripts/ci_check.py --profile integration --base <accepted-main-commit> --head <source-head> --reviewed-worktree
+
+# Deliberate full code qualification.
 uv run --locked python scripts/ci_check.py --profile full
+
+# Optional diagnostic report and complete ignored logs; not a reusable receipt.
+uv run --locked python scripts/ci_check.py --profile affected --base origin/main --head HEAD --report .dev/validation-report.json --log-dir .dev/validation-logs
 ```
 
-These proposed flags do not exist in the inspected `ci_check.py`. Missing/unknown scope must fail or widen conservatively, never silently certify an empty test selection.
+These profiles are implemented. Missing or unknown scope fails or widens
+conservatively and never silently certifies an empty test selection. The
+`integration` invocation for a frozen dirty worktree is Controller-owned and
+adds `--reviewed-worktree`; manual editing uses explicit focused commands rather
+than manufacturing reusable acceptance evidence. A `--report` file is a
+diagnostic observation; only the Controller creates and verifies a source-bound
+reusable validation receipt.
+
+### Hook verification
+
+```powershell
+# Operates on the applicable staged files using the pre-commit boundary.
+uv run --locked pre-commit run --hook-stage pre-commit
+
+# Runs the configured candidate-aware affected pre-push boundary.
+uv run --locked pre-commit run --hook-stage pre-push
+```
+
+Do not add `--no-verify` to the normal development reference. A bypass requires
+an explicit exceptional decision and equivalent protection; it is not the
+solution to slow validation.
+
+### Task and Goal inspection or preparation
+
+```powershell
+# Read-only tracker and controller health/status inspection.
+uv run --locked python .agents/make_task.py --list
+uv run --locked python .agents/orchestrator.py doctor
+uv run --locked python .agents/orchestrator.py goal-status
+
+# Runtime-input generation: writes .agents/task.toml but does not activate it.
+uv run --locked python .agents/make_task.py <task-id>
+
+# Runtime-input generation: writes .agents/goal.toml but does not activate it.
+uv run --locked python .agents/make_goal.py --entries <task-id-a> <task-id-b> --parallelism 1
+uv run --locked python .agents/make_goal.py --entries <task-id-a> <task-id-b> --parallelism 2
+
+# Conservative DT-09 preparation/integration grouping; each child remains independent.
+uv run --locked python .agents/make_goal.py --entries <task-id-a> <task-id-b> --parallelism 1 --delivery-batch <task-id-a> <task-id-b>
+```
+
+Goal preparation with `--parallelism 3` is also supported, but two lanes are the
+first measured trial. Generating Task/Goal input does not satisfy execute or
+commit gates. Activation, resume, integration, cancellation and recovery use the
+validated orchestrator state machine and their applicable owner authority; they
+are intentionally not reduced to copy-paste shortcuts here.
+
+### Deterministic remediation utilities
+
+```powershell
+# Safe evidence output discovery and current-projection drift check.
+uv run --locked python scripts/project_feature_evidence.py --list-outputs
+uv run --locked python scripts/project_feature_evidence.py --check-all
+
+# Preview only; actual scaffold application requires packet and write authority.
+uv run --locked python scripts/scaffold_stateless_feature.py --task-packet <task-packet.json> --preview
+
+# Verify the frozen strategy-ready closure and generated Goal without activation.
+uv run --locked python scripts/derive_strategy_ready_milestone.py --check
+
+# Write a compact ignored throughput/adoption report from accepted run summaries.
+uv run --locked python .agents/throughput.py --runs-dir .agents/runs --limit 10 --report .dev/throughput-report.json
+```
+
+Evidence/scaffold `--apply`, serialized registration, and generated Task/Goal
+activation are mutating governed operations. Do not substitute their preview or
+drift-check commands for reviewed requirement evidence.
+
+### Explicit phase or operation qualification
+
+```powershell
+# Browser journey against the repository's bounded local ASGI harness.
+Push-Location app/ui
+npm run e2e
+Pop-Location
+
+# Physical provider-removal/reinstall qualification; run only at its governed gate.
+uv run --locked python scripts/architecture/provider_deletion_matrix.py --all --reinstall --report .dev/provider-removability.json
+```
+
+These commands are intentionally outside ordinary editing and pre-push. External
+provider qualification requires its own verified environment, credentials and
+authority; neither the local Playwright harness nor the physical package-removal
+matrix proves a live broker workflow.
+
+**Implementation checkpoint (9 September 2026):** Every referenced CLI shape was
+verified against its checked-in `--help` interface. The strategy-ready generated
+closure and feature-documentation checks passed. No Task/Goal generation or
+activation, evidence/scaffold application, hook, validation suite, browser,
+provider, Git or network mutation was performed for this documentation update.
+An additional read-only `project_feature_evidence.py --check-all` diagnostic
+reported drift in the five live aggregate projections while Git reported no
+content change for those files. This bounded task did not overwrite them without
+the required reviewed projection request; the discrepancy remains visible for
+separate diagnosis or the next authorized acceptance projection.
 
 ## 10. Exit criteria for the remediation
 
-The remediation is successful when routine changes no longer perform whole-repository tests on every push; the same validation is not repeated solely for handoff; known administrative failures do not cause product replanning; the standard path does not perform fresh exploratory planning for a fully bound packet; and shared bookkeeping is generated from real evidence.
+Implementation, effectiveness and optional adoption are different closure claims.
+Passing workflow self-tests proves mechanism behavior; it does not prove that a
+new product feature was delivered faster. The document uses these states:
 
-At the same time, a failing, unreviewed, unauthorized, stale or unqualified candidate must still be rejected. Representative features must show improved accepted throughput and honest usage measurements. Keeping the full scope means no feature is relabeled complete merely to meet a schedule.
+| State | Meaning |
+|---|---|
+| `VERIFIED_IMPLEMENTATION` | Checked-in behavior is covered by deterministic regression or repository evidence. |
+| `PENDING_PRODUCT_PILOT` | The mechanism exists, but a genuinely new accepted product feature has not yet supplied the required outcome evidence. |
+| `PENDING_ADOPTION_SAMPLE` | The mechanism remains disabled or provisional until the required comparable accepted outcomes exist. |
+| `PENDING_EXTERNAL_ADMINISTRATION` | Completion requires separately authorized remote configuration or another external-state change. |
+| `EVIDENCE_DRIFT` | A deterministic check reports disagreement that must be diagnosed without silently overwriting evidence. |
+| `DEFERRED_BY_OWNER` | An optional intervention was explicitly declined or postponed without being represented as adopted. |
+| `COMPLETE` | Every mandatory local and measured-effectiveness criterion below is satisfied; external claims are made only when separately verified. |
 
-There is no universal feature-time promise. After the pilot, forecast the remaining work by observed risk/complexity classes, dependency bottlenecks, effective concurrency and integration costs that do not overlap. Do not extrapolate from one 70-minute feature, from a three-worker theoretical maximum, or from generated line counts.
+### 10.1 Current exit matrix
+
+| Criterion | Required evidence | Current state |
+|---|---|---|
+| Ordinary pytest has no implicit coverage or HTML generation. | Pytest configuration plus runner regression. | `VERIFIED_IMPLEMENTATION` |
+| Pre-commit excludes full pytest, project-wide mypy and UI builds. | Hook configuration plus cadence regression. | `VERIFIED_IMPLEMENTATION` |
+| Pre-push uses candidate-aware affected validation and widens unknown scope. | Hook, router and runner regressions. | `VERIFIED_IMPLEMENTATION` |
+| One source-bound integration run can survive a role handoff without an identical rerun. | Receipt reuse, input-drift and forged-record regressions. | `VERIFIED_IMPLEMENTATION`; product pilot remains pending. |
+| Known administrative corrections avoid unnecessary Planner reconstruction. | Classified bounded retry regressions plus measured product runs. | `PENDING_PRODUCT_PILOT` |
+| A fully bound Routine/Standard packet can avoid fresh exploratory planning while Critical or ambiguous work retains it. | Packet/risk/stale-source regressions plus measured product runs. | `PENDING_PRODUCT_PILOT` |
+| Failing, unreviewed, unauthorized, stale or unqualified candidates fail closed. | Controller, authority, receipt, projection and close-out regressions. | `VERIFIED_IMPLEMENTATION` |
+| Shared bookkeeping is projected only from reviewed acceptance evidence and is idempotent. | Projection regressions and a clean live `--check-all`. | `EVIDENCE_DRIFT`: five live aggregate projections currently disagree with derived bytes. |
+| Existing feature identities, requirements and open V3 scope remain truthful. | Plan, dependency schedule and evidence validators. | `VERIFIED_IMPLEMENTATION` |
+| Three representative post-DT-06 features demonstrate the remediated path. | One new UI, one ordinary service and one Critical accepted run with complete timings/corrections. | `PENDING_PRODUCT_PILOT` — 0/3. |
+| DT-10 produces an evidence-based lane decision. | Ten comparable accepted summaries spanning UI, ordinary service and Critical work, including sequential and parallel evidence. | `PENDING_ADOPTION_SAMPLE` — zero canonical summaries currently present. |
+| Remote CI enforcement or branch protection is claimed only after inspection. | Current remote settings and required-status evidence. | `PENDING_EXTERNAL_ADMINISTRATION` |
+| Strategy-ready delivery is scheduled from its frozen truthful closure. | Valid generated milestone plus satisfied activation prerequisites. | Defined and verified, but dormant. |
+
+The current overall verdict is:
+
+```text
+IMPLEMENTATION DEPLOYED — EFFECTIVENESS NOT YET DEMONSTRATED
+```
+
+This is not `COMPLETE`, and it is not evidence of a universal five-to-fifteen
+minute feature rate, an allowance reduction, or completion of V3 within eight
+hours.
+
+### 10.2 Mandatory completion gate
+
+Mark the remediation `COMPLETE` only when all of the following are true:
+
+1. The five-projection discrepancy is resolved by a reviewed projection or is
+   proven and repaired as a validator defect; no evidence is overwritten merely
+   to make the check green.
+2. Three genuinely new representative product features are independently
+   accepted through the remediated path: one UI interaction/presentation
+   feature, one ordinary stateless service feature, and one Critical stateful,
+   security, concurrency or numerical feature.
+3. Those runs record nonoverlapping planning, execution, review and close-out
+   durations, command time, integration wait, correction causes, acceptance
+   outcome and available usage/allowance observations.
+4. Administrative replanning is zero for the repaired mechanical cases, and no
+   required test, coverage floor, review, requirement mapping, authorization or
+   feature scope is lost.
+5. Each throughput comparison uses reasonably similar historical scope and
+   records limitations rather than converting an allowance percentage into a
+   token count.
+6. DT-10 is closed either by the required ten-result decision (`ADOPT_2`,
+   `ADOPT_3`, or `KEEP_SEQUENTIAL`) or by an explicit owner decision to defer
+   optional parallel adoption while parallelism remains disabled. An
+   `INSUFFICIENT_EVIDENCE` result is not an adoption decision.
+7. Any statement that remote CI or branch protection enforces acceptance is
+   backed by a separately authorized inspection of the actual remote state.
+
+Local remediation completion does not require changing remote administration,
+but it must continue to label remote enforcement pending. Conversely, remote CI
+success does not replace the local product pilot or retroactively grant local
+Task acceptance.
+
+### 10.3 Forecasting after measurement
+
+Forecast remaining work only from accepted outcomes grouped into UI interaction,
+ordinary service and Critical risk/complexity classes. Use observed distributions
+rather than one headline average. Keep reasoning-stage elapsed time, command wall
+time and integration wait nonoverlapping; account for dependency critical paths,
+effective measured concurrency and serialized integration. Allowance percentages
+remain observations when other concurrent usage is unknown.
+
+Do not extrapolate from Task 1.16 alone, a theoretical three-worker maximum,
+generated line counts, or a prototype video. If the sample does not support a
+stable estimate, report the uncertainty and continue measuring instead of
+inventing a completion date.
+
+### 10.4 Ordered closure actions
+
+1. Diagnose the five live-projection discrepancies without applying unreviewed
+   evidence changes.
+2. Run and accept the three representative post-DT-06 product features.
+3. Record the continuation decision for evidence generation, scaffolding,
+   batching and parallelism from those measured outcomes.
+4. Accumulate the DT-10 ten-result sample only if parallel evaluation remains
+   worthwhile; otherwise record `DEFERRED_BY_OWNER` and keep it disabled.
+5. Activate the dormant strategy-ready Goal only after its documented pilot and
+   active-Goal prerequisites are satisfied.
+6. Inspect or change remote publication/branch protection only under separate
+   owner authorization.
 
 ## 11. Implementation handoff
 
-Use the following Task descriptions within the authorized workflow. These texts are work orders, not execution or remote-write approval. The recorded owner exceptions combined DT-02A/DT-02B and DT-04/DT-05/DT-06 while preserving their ordered internal checkpoints; no other work orders are implicitly combined:
+The remediation mechanisms are implemented. This section hands off the remaining
+operational proof, adoption and closure work; it does not authorize the completed
+DT work orders to be rerun.
 
-> **DT-01:** Implement DT-01 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`. Preserve HaruQuantAI V3 architecture, active/user work, secret detection, reviewed-byte identity and product behavior. Reproduce and repair only the evidenced mechanical close-out failures, publish generated-output discovery before execution, and ensure legitimate schema-validated Git identities do not require per-feature shared secret-baseline edits. Run focused controller/Git/security regressions and report actual timings and rollback.
+### 11.1 Implemented baseline
 
-> **DT-02:** After DT-01 is accepted, implement DT-02A and DT-02B of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as one owner-authorized change set. Make ordinary pytest fast, retain explicit comprehensive coverage, add conservative validation profiles and straightforward UI/Python/workflow routing, measure the DT-02A checkpoint, then add candidate/dependency-aware routing with exact Git identities and fail-closed unknown scope.
+| Scope | Accepted commit |
+|---|---|
+| DT-01 | `5faf73fe` |
+| DT-02A and DT-02B | `6420d7e8` |
+| DT-03 | `311e6dce` |
+| DT-04, DT-05 and DT-06 | `82661187` |
+| DT-07 and DT-08 | `a2575997` |
+| DT-09, DT-10 and DT-11 | `d64ea9a3` |
 
-> **DT-03:** After the combined DT-02 is accepted, implement the local integration-protection portion of DT-03 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as a separate Task. Prove the replacement gate before relaxing broad pre-push hooks. Treat CI status, branch protection, publishing and remote acceptance as a separately authorized repository-administration step. Keep owner approvals, coverage, UI validation, provider-matrix evidence and stale-candidate rejection.
+These commits establish implementation evidence only. They do not satisfy the
+post-DT-06 product pilot, the optional DT-10 adoption sample, remote
+administration or the complete remediation exit gate by themselves.
 
-> **Change Set B (DT-04/DT-05/DT-06):** Implement the three work orders as one owner-authorized change while preserving their internal order: first measure bounded classified failure routing, then generate and validate risk-tiered prepared packets, and finally reuse controller-produced exact-input validation receipts and replace reasoning-role close-out with deterministic controller mechanics. Keep independent engineering review, exact owner gates, fail-closed source/path/candidate identity, comprehensive integration acceptance, and Critical-task planning/adversarial review.
+### 11.2 Authority and sequencing
 
-Proceed to B after the three Change Set A Tasks are accepted. Run the mandatory three-feature checkpoint after DT-06. C and the DT-09/DT-10 portions of D are incremental extensions, not prerequisites for collecting the first gains. DT-11 may proceed after that checkpoint to prioritize the strategy-ready outcome.
+The handoffs below are bounded work specifications, not execute, commit, merge,
+push, Goal-activation, remote-administration, credential, destructive-operation
+or live-provider authorization. Each handoff must use the applicable repository
+workflow, exact owner gates, current repository truth and a fresh source-bound
+packet. Preserve unrelated user work and never manufacture acceptance, timing,
+coverage, remote-enforcement or allowance evidence.
+
+Run the mandatory work in this order:
+
+1. Reconcile current evidence and Goal state.
+2. Deliver and accept the three representative product-pilot features.
+3. Evaluate the measured pilot and record the continuation decisions.
+4. Close or explicitly defer the optional DT-10 parallel-adoption decision.
+5. Activate the strategy-ready Goal only when its prerequisites are true.
+6. Perform remote administration only under separate owner authority.
+7. Apply the Section 10 completion gate.
+
+### 11.3 Preliminary reconciliation handoff
+
+> **Evidence and Goal reconciliation:** Diagnose the five aggregate evidence
+> projections currently reported by `project_feature_evidence.py --check-all`
+> without applying generated output first. Determine whether each difference is
+> caused by stale accepted evidence, a projection defect, serialization or line
+> endings, or genuine source drift. Separately reconcile the running Goal whose
+> persisted handoff still selects Task 1.17 even though the implementation
+> tracker marks Task 1.17 `PROVED_COMPLETE`. Do not overwrite evidence, edit Goal
+> runtime state, skip a child or activate another Goal during diagnosis. Present
+> exact findings and a path-bounded correction plan for independent approval and
+> review. After an authorized correction, require an idempotent clean
+> `--check-all`, consistent tracker/Goal state and preserved accepted history.
+
+Evidence correction and Goal-state correction may share one investigation, but
+they remain distinct mutations and must each have explicit path authority. A
+clean generated diff is not proof that the underlying accepted feature evidence
+is valid.
+
+### 11.4 Three-feature product-pilot handoffs
+
+Select genuinely new work after prerequisite and packet validation. Do not
+retroactively count a remediation-framework change or an already accepted
+feature as a pilot result.
+
+> **UI pilot:** Deliver one bounded UI interaction or presentation feature
+> through the remediated path. Generate a fresh packet, confirm Routine,
+> Standard or Critical classification from actual scope, exercise the changed
+> interaction and affected consumers, retain applicable accessibility and
+> authorization behavior, independently review it and record complete
+> nonoverlapping stage timings and correction causes.
+
+> **Ordinary-service pilot:** Deliver one bounded ordinary stateless service
+> feature through the remediated path. Use a source-bound packet and the
+> scaffolder only if its eligibility checks pass. Prove its public happy path and
+> critical unavailable or fail-closed behavior with focused tests, validate
+> affected contracts and consumers, independently review it and record complete
+> nonoverlapping stage timings and correction causes.
+
+> **Critical pilot:** Deliver one stateful, security, authorization, concurrency
+> or numerical feature through the Critical route. Retain substantive planning,
+> adversarial independent review, failure-path testing and comprehensive
+> integration acceptance. Task 1.18, `FEAT-ORCH-MANAGE_JOBS`, is a candidate
+> because it owns persistent job identity, atomic acceptance, idempotency and
+> recovery semantics; use it only if a fresh validated packet confirms its
+> readiness and classification.
+
+For every pilot, record planning, execution, review and close-out durations;
+command wall time; integration wait; correction category; acceptance outcome;
+and any available usage or allowance observation. Do not double-count
+overlapping time or translate an allowance percentage into a token count.
+Required tests, the coverage floor, independent review, requirement mapping,
+authorization and complete feature scope remain intact.
+
+### 11.5 Pilot evaluation and continuation handoff
+
+> **Evaluate the post-DT-06 pilot:** Compare each accepted pilot with reasonably
+> similar historical work in the same risk/complexity class. Report time spent
+> on engineering reasoning, command execution, integration waiting and
+> administrative correction separately. Confirm whether the repaired mechanical
+> cases caused zero administrative replanning and whether any defect or required
+> evidence escaped the faster path. Record explicit continuation, revision or
+> suspension decisions for prepared packets, deterministic evidence projection,
+> eligible stateless scaffolding and coherent delivery batching.
+
+Three results are a checkpoint, not a statistically stable universal feature
+rate. Preserve uncertainty and continue class-based measurement when the sample
+does not support a forecast.
+
+### 11.6 DT-10 parallel-adoption handoff
+
+Parallel execution remains disabled until this handoff produces sufficient
+accepted evidence or the owner explicitly defers it.
+
+> **Evaluate bounded parallel adoption:** Accumulate ten canonical comparable
+> accepted-run summaries spanning UI, ordinary-service and Critical work and
+> including relevant sequential and bounded parallel observations. Benchmark
+> accepted features per wall-clock hour, correction/replay rate, integration
+> wait, collision/staleness rate and allowance observations. Produce exactly one
+> supported decision: `ADOPT_2`, `ADOPT_3` or `KEEP_SEQUENTIAL`. If the owner
+> declines the optional sample, record `DEFERRED_BY_OWNER` and keep parallelism
+> disabled. `INSUFFICIENT_EVIDENCE` is a valid interim finding but is not an
+> adoption decision.
+
+The first parallel trial uses two lanes. Three lanes require additional measured
+benefit and must retain disjoint leases, fresh review after refresh and serialized
+acceptance.
+
+### 11.7 Strategy-ready Goal handoff
+
+> **Prepare the strategy-ready delivery Goal:** Verify the frozen milestone and
+> generated Goal definition, complete the mandatory product pilot, and reconcile
+> any existing active Goal before preparation or activation. Activate the Goal
+> only through the deterministic Goal workflow and applicable owner authority.
+> Preserve dependency order, independent child acceptance and every remaining V3
+> feature outside the milestone as truthful deferred scope rather than marking it
+> complete.
+
+The generated strategy-ready artifact is a scheduling input, not proof of
+implemented strategy capability and not permission to supersede an active Goal.
+
+### 11.8 Remote-administration handoff
+
+> **Verify remote enforcement:** Under separate owner authorization, refresh and
+> inspect current remote state, CI status, branch protection and required checks.
+> Repair or enable remote acceptance enforcement only through the repository
+> administration surface and verify the result from the remote system. Do not
+> infer protection from local tests, a checked-in CI file or a stale
+> remote-tracking ref. Fetch, push and branch-protection changes remain separate
+> operations with their own authority.
+
+### 11.9 Final remediation closure handoff
+
+> **Close the remediation:** Re-evaluate every item in the Section 10 exit matrix
+> from current repository, accepted-run and authorized remote evidence. Mark the
+> remediation `COMPLETE` only when every mandatory local and measured-
+> effectiveness criterion is satisfied and every external claim is independently
+> verified. Otherwise retain the precise pending, drift, deferred or external-
+> administration state and name the next bounded action.
+
+Closure updates documentation truth only after the underlying evidence exists;
+editing the status label is never a substitute for that evidence.
 
 ## 12. Sources and audit boundaries
 
-### Supplied analysis
+This section distinguishes historical diagnosis, accepted implementation,
+working-tree validation and still-unproved outcomes. A source can support only
+the class of claim assigned to it.
 
-**[S1]** `Pasted markdown(8).md`, supplied in this conversation: original performance complaint and the three agent analyses. Agent 1 and Agent 2 report local inspection; Agent 3 reports remote inspection. Their quoted local timing and defect findings are preserved as reported evidence, not represented as newly measured here.
+### 12.1 Evidence classes
 
-### Repository sources
+| Class | Meaning and boundary |
+|---|---|
+| Supplied analysis | User-provided reports retained as diagnostic context; not independently reproduced unless separately stated. |
+| Diagnostic baseline | Repository or remote state observed before remediation; not evidence of current behavior. |
+| Accepted implementation | Behavior and regression evidence contained in an identified Git commit; not proof of later product throughput. |
+| Working-tree validation | Commands executed against exact local bytes that are not yet represented by a final documentation commit. |
+| Runtime observation | Local ignored controller or report state that can become stale and is not permanent product truth. |
+| Remote observation | External state valid only for the inspected repository and time; it requires refresh before a current claim. |
+| Operating hypothesis | A target or forecast that requires representative accepted product outcomes before adoption. |
 
-All repository files below were read at commit `a32a46ad5c3407bdb7b68bf8dc270d327b6e7625`, except the live branch metadata check. Public citation base:
+### 12.2 Supplied analysis
+
+**[S1]** `Pasted markdown(8).md`, supplied in this conversation, contains the
+original performance complaint and three agent analyses. The reported Task 1.16
+duration, allowance change, five iterations, defect findings and approximate
+time allocation came from those reports. They were not independently
+reconstructed here from a complete monotonic timing trace and are not canonical
+throughput measurements.
+
+### 12.3 Original diagnostic baseline
+
+The following references describe the pre-remediation repository at commit
+`a32a46ad5c3407bdb7b68bf8dc270d327b6e7625`, except R9. They remain historical
+evidence for why the work was proposed and must not be read as descriptions of
+the implemented DT-01 through DT-11 behavior.
+
+Historical citation base:
 
 ```text
 https://github.com/haruperi/HaruQuantAI/blob/a32a46ad5c3407bdb7b68bf8dc270d327b6e7625/
 ```
 
-| Reference | Repository path / relevant section |
+| Reference | Historical repository path / observation |
 |---|---|
-| R1 | `.pre-commit-config.yaml`: pre-commit/pre-push stages, broad trigger regexes, secret baseline. |
-| R2 | `pyproject.toml`: pytest defaults, branch coverage and 80% floor, mypy scope/cache, Python 3.14 and installed development dependencies. |
-| R3 | `scripts/ci_check.py`: serial command list, unconditional workflow checks, nested uv invocation and elapsed timing. |
-| R4 | `.github/workflows/ci.yml`: Windows runner, Python gates, separate provider-disable matrix, absence of npm checks. |
-| R5 | `app/ui/package.json`: typecheck, Vitest, build and Playwright scripts. |
-| R6 | `AGENTS.md`, §§1–2.7: authority, architectural boundaries, donor policy, task state machine, exact owner gates and role contracts. |
-| R7 | `docs/dev/Phased_Feature_Implementation_Plan.md`, §§1–2.4: complete scope, sequencing, evidence, DOD-F and self-referential-hash avoidance. |
-| R8 | `scripts/generate_phase0_evidence.py`, inspected opening/parsing section: existing deterministic generator and pinned source constants. |
-| R9 | GitHub branch response for `main`, read 9 September 2026: baseline SHA; `protected: false`; required-check enforcement off. |
+| R1 | `.pre-commit-config.yaml`: original pre-commit/pre-push stages, broad trigger regexes and secret baseline. |
+| R2 | `pyproject.toml`: original implicit pytest coverage/HTML defaults, branch coverage and 80% floor, mypy scope/cache and installed development dependencies. |
+| R3 | `scripts/ci_check.py`: original serial complete command list, unconditional workflow checks and nested uv invocation. |
+| R4 | `.github/workflows/ci.yml`: original Windows runner, Python gates, separate provider-disable matrix and absence of npm checks. |
+| R5 | `app/ui/package.json`: available typecheck, Vitest, build and Playwright scripts. |
+| R6 | `AGENTS.md`, §§1–2.7 at the baseline: authority, architectural boundaries, donor policy, Task state machine, exact owner gates and role contracts. |
+| R7 | `docs/dev/Phased_Feature_Implementation_Plan.md`, §§1–2.4 at the baseline: complete scope, sequencing, evidence, DOD-F and self-referential-hash avoidance. |
+| R8 | `scripts/generate_phase0_evidence.py` at the baseline: existing deterministic evidence parsing and pinned historical references. |
+| R9 | GitHub branch response for `main`, read 9 September 2026: the response reported `protected: false` and required-check enforcement off. |
 
-The `.agents/` directory listing confirmed existing controller/goal/integration infrastructure. Fetching a root `.gitattributes` at the baseline returned Not Found; the targeted attributes file is therefore a proposed addition. This was not a complete code or runtime audit. No production implementation, test suite, local ignored runtime log, or local performance experiment was executed here. Existing CI success/failure must be re-established during rollout; a historical failed run is not automatically today's failure.
+The original inspection confirmed controller, Goal and integration infrastructure
+but was not a complete product/runtime audit. The R9 remote observation is
+historical: neither it nor a checked-in CI file establishes current remote
+enforcement. A fresh remote claim requires separately authorized inspection.
 
-### Official tool documentation checked
+### 12.4 Accepted remediation implementation
+
+| Reference | Commit | Implemented scope and principal evidence |
+|---|---|---|
+| I1 | `5faf73fe` | DT-01: deterministic generated-output discovery, coordination-byte normalization, bounded Git-identity secret filtering and focused workflow/security regressions. |
+| I2 | `6420d7e8` | DT-02A/DT-02B: fast ordinary pytest defaults, explicit validation profiles, candidate/dependency-aware routing and runner/router regressions. |
+| I3 | `311e6dce` | DT-03: source-bound local integration acceptance, affected pre-push routing, UI CI qualification and removability gates. |
+| I4 | `82661187` | DT-04/DT-05/DT-06: classified correction routing, risk-tiered task packets, reusable exact-input validation receipts and deterministic close-out. |
+| I5 | `a2575997` | DT-07/DT-08: deterministic evidence projection, guarded stateless-feature scaffolding, shared conformance support and associated regressions. |
+| I6 | `d64ea9a3` | DT-09/DT-10/DT-11: conservative delivery batches, bounded parallel-policy support, canonical throughput summaries and generated strategy-ready closure. |
+
+These commits prove that the mechanisms and their deterministic regressions were
+implemented. They do not prove a universal time reduction, a quota reduction,
+parallel benefit, strategy readiness of unimplemented product behavior or
+remediation effectiveness in new feature delivery.
+
+### 12.5 Post-implementation working-tree validation
+
+The documentation-completion working tree was based on
+`d64ea9a3ac9e9054cdef04bf32ba5a70e2fd161a`. The following commands or gates were
+executed during Sections 8–11 work:
+
+| Reference | Validation result |
+|---|---|
+| V1 | Focused remediation regression selection: 42 tests passed. |
+| V2 | `scripts/ci_check.py --profile full`: 2,408 Python tests with the project coverage floor, 837 UI tests plus production build, and 268 workflow tests plus workflow self-test passed. |
+| V3 | `scripts/validate_feature_docs.py`: all 47 feature READMEs matched runtime truth. |
+| V4 | `scripts/derive_strategy_ready_milestone.py --check`: generated strategy-ready closure check passed. |
+| V5 | Section 9 command interfaces were checked against their implemented `--help` surfaces without activating a Task/Goal or applying evidence/scaffolding. |
+| V6 | Section 11 implementation commit references resolved and its obsolete future-work instructions were absent. |
+
+The complete validation emitted existing Python `ResourceWarning` and React
+warning output. Those warnings were observed but were outside the approved
+documentation/cadence scope and are not represented as fixed. V1–V6 are
+working-tree/session evidence until a later commit records the changed document
+bytes; this document deliberately does not attempt to predict its own commit
+hash.
+
+### 12.6 Outstanding time-bound observations
+
+At the 9 September 2026 documentation checkpoint:
+
+- `project_feature_evidence.py --check-all` reported byte drift in
+  `contract-bindings.json`, `feature-baseline.json`, `path-bindings.json`,
+  `requirement-status.json` and `usage-bindings.json`. The diagnostic did not
+  apply generated replacements.
+- The ignored Goal runtime reported `RUNNING` and retained a handoff to Task
+  1.17 while the implementation tracker marked Task 1.17 `PROVED_COMPLETE`.
+  This requires reconciliation, not manual state rewriting.
+- The representative post-DT-06 product pilot remained 0/3.
+- No canonical ten-result DT-10 adoption sample was present.
+- Parallel execution remained disabled.
+- Current remote CI and branch-protection enforcement remained unverified.
+
+These are diagnostic observations, not durable feature status. Recheck their
+exact source state before using them to authorize or close later work.
+
+### 12.7 Generated, runtime and acceptance evidence boundaries
+
+- Reviewed feature acceptance manifests and their source-bound evidence are the
+  inputs to shared aggregate projections. A projection cannot override its
+  authoritative inputs merely because generation is deterministic.
+- Matching generated bytes prove reproducibility of the projection, not product
+  correctness or satisfaction of an unverified requirement.
+- `.agents/runs/`, `.agents/goals/`, task packets, validation receipts and
+  ignored reports are runtime artifacts. Their validity depends on exact run,
+  source, candidate, configuration and environment identity.
+- Runtime observations must be reconciled before promotion into durable
+  documentation. Copying ignored state into a tracked file is not reconciliation.
+- A command result, report or receipt supplies evidence only for its declared
+  inputs and never grants execute, commit, merge, push or acceptance authority.
+- Historical accepted evidence is not rewritten to make a current projection
+  green; repairs preserve provenance and receive their own review.
+
+### 12.8 External tool documentation
+
+These sources informed the implementation design. They explain upstream tool
+semantics but are not HaruQuantAI acceptance evidence:
 
 ```text
 [W1] pytest-cov configuration
@@ -629,4 +1124,27 @@ https://docs.pytest.org/en/stable/how-to/usage.html
 https://pre-commit.com/
 ```
 
-The recommendations, work-order identifiers, profiles, routing taxonomy, operating targets and rollout design are the proposed synthesis in this document, not claims that those interfaces already exist.
+### 12.9 Claims not established by this remediation
+
+The evidence above does not establish:
+
+- A universal five-to-fifteen-minute feature rate or an 80% allowance reduction.
+- Completion of all V3 scope in four or eight hours.
+- A conversion from displayed allowance percentage to model token usage.
+- Production readiness of features still open in the implementation tracker.
+- Live-trading safety, profitability, broker fills or provider qualification.
+- Current remote branch protection or required-status enforcement.
+- A throughput benefit from two or three parallel lanes.
+- Strategy-ready product behavior solely because its dependency closure was
+  generated.
+- Complete remediation effectiveness before the Section 10 product-pilot and
+  adoption decisions are satisfied.
+
+### 12.10 Self-reference and future audit updates
+
+This document does not embed the hash of a future commit containing its own
+changed bytes. Git history or a later evidence record may identify that commit
+after it exists. Future audit updates must retain historical observations as
+historical, append or supersede them with dated source identities, record the
+exact commands and limitations, and never rewrite an earlier hypothesis as
+though it had already been measured.

@@ -330,6 +330,36 @@ workers never write shared aggregate ledgers; only serialized integration does.
 CI repeats candidate-appropriate qualification under the stable `acceptance`
 status after an independently authorized push.
 
+### Testing cadence boundaries
+
+- **Editing:** Run behavior-specific owner and affected-consumer tests with
+  explicit paths and no coverage. Keep the smallest meaningful happy-path,
+  failure/golden, authorization, numerical, lifecycle and removal assertions
+  required by the owning feature. A later robustness session supplements these
+  tests; it never becomes the first source of executable core-behavior evidence.
+- **Pre-commit:** Run changed-file formatting, lint, repository hygiene and
+  secret detection only. Do not run full pytest, project-wide mypy, UI builds or
+  coverage at this boundary.
+- **Pre-push:** Run the candidate-aware `affected` profile. Missing, mixed or
+  uncertain impact widens conservatively; ordinary known changes do not trigger
+  an unconditional full repository suite.
+- **Candidate acceptance:** The Controller runs the source-bound `integration`
+  profile once before Reviewer activation. Reviewers reuse an unchanged valid
+  receipt and add only independently selected adversarial checks. Each Task is
+  accepted independently. A declared DT-09 delivery batch runs one combined
+  full gate only after its children are accepted and before its push or next
+  declared integration boundary.
+- **Remote, phase and release qualification:** CI `acceptance` verifies the
+  pushed candidate. Full regression retains coverage and every applicable
+  product/UI/workflow family. Browser, real-provider, performance, fault and
+  physical-removal checks remain explicit phase/operation gates and must not be
+  inferred from mocked unit or component results.
+
+Do not use unbounded or unmeasured `pytest -n auto`. Benchmark only an explicit
+parallel-safe selection at one, two and four workers; adopt a bounded worker
+count only when the recorded result improves that selection without isolation
+failures.
+
 Local Task acceptance is local-first: `ACCEPTED` proves the controller-gated local candidate and exact merge lineage. It does not authorize or claim a push, pull-request merge, remote check result or branch-protection state. Remote publishing and repository administration require separate explicit authority.
 
 Safe read/verification commands include `pwd`, `ls`, `cat`, `grep`, `git status`, `git diff`, bounded pytest, Ruff, and mypy. Destructive commands and live external actions require explicit applicable authorization.

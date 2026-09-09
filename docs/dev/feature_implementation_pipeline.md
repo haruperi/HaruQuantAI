@@ -802,33 +802,40 @@ git diff --cached --name-only
 git status --short
 
 # One feature
-uv run pytest --no-cov tests/services/<domain>/<feature_slug>/
+uv run --locked pytest --no-cov tests/services/<domain>/<feature_slug>/
 
 # Explicit affected files or suites
-uv run pytest --no-cov <affected_test_path> [<affected_test_path> ...]
+uv run --locked pytest --no-cov <affected_test_path> [<affected_test_path> ...]
 
 # Tests affected by changed executed lines, only with an existing valid cache
-uv run pytest --no-cov --testmon
+uv run --locked pytest --no-cov --testmon
 
 # Previous failures only, or failures first, within a bounded selection
-uv run pytest --no-cov --lf <affected_test_path>
-uv run pytest --no-cov --ff <affected_test_path>
+uv run --locked pytest --no-cov --lf <affected_test_path>
+uv run --locked pytest --no-cov --ff <affected_test_path>
 
-# Parallel execution of the bounded selection
-uv run pytest --no-cov -n auto <affected_test_path> [<affected_test_path> ...]
+# Deliberately benchmark an explicitly parallel-safe selection at 1/2/4 workers
+uv run --locked python scripts/benchmark_pytest_workers.py <affected_test_path> [<affected_test_path> ...] --repeat 3 --report .dev/pytest-worker-benchmark.json
+
+# Use only a measured bounded result; keep unsafe/shared-resource tests serial
+uv run --locked pytest --no-cov -n <measured-2-or-4> --dist=worksteal <affected_test_path> [<affected_test_path> ...]
 ```
 
-Never run bare `pytest`, an unfiltered `uv run pytest`, `scripts/ci_check.py`, or coverage during implementation. `pytest-testmon` is an optional selection aid, not permission for a first-run/full-suite fallback. `pytest-testmon` and `pytest-xdist` are project development dependencies; timing depends on machine, cache state, and selected tests.
+Never run bare `pytest`, an unfiltered `uv run pytest`, `scripts/ci_check.py`,
+coverage, or unmeasured `pytest -n auto` during implementation. `pytest-testmon`
+is an optional selection aid, not permission for a first-run/full-suite fallback.
+`pytest-testmon` and `pytest-xdist` are project development dependencies; timing
+depends on machine, cache state, isolation and selected tests.
 
 ### 10.2 Individual verification commands
 
 ```powershell
-uv run ruff format --check .
-uv run ruff check .
-uv run mypy
-uv run python scripts/architecture_check.py
-uv run python scripts/validate_feature_docs.py
-uv run pytest --no-cov <affected_test_path> [<affected_test_path> ...]
+uv run --locked ruff format --check .
+uv run --locked ruff check .
+uv run --locked mypy
+uv run --locked python scripts/architecture_check.py
+uv run --locked python scripts/validate_feature_docs.py
+uv run --locked pytest --no-cov <affected_test_path> [<affected_test_path> ...]
 ```
 
 Use `uv run ruff format .` and `uv run ruff check --fix .` only when intentionally applying formatting or safe lint repairs. They are mutating repair commands, not proof that the tree was already clean.
@@ -836,10 +843,32 @@ Use `uv run ruff format .` and `uv run ruff check --fix .` only when intentional
 ### 10.3 Complete repository gate
 
 ```powershell
-uv run python scripts/ci_check.py
+uv run --locked python scripts/ci_check.py --profile affected --base origin/main --head HEAD
+
+# Controller-owned frozen candidate gate; do not repeat after role handoff
+uv run --locked python scripts/ci_check.py --profile integration --base <accepted-main> --head HEAD --reviewed-worktree
+
+# Deliberate complete regression/phase/release code gate
+uv run --locked python scripts/ci_check.py --profile full
 ```
 
-Do not invoke this command during feature implementation or iterative verification. Pre-commit remains a fast changed-file hygiene/lint/format/secret boundary, while pre-push runs the affected validation profile. The Controller's frozen integration candidate and automated CI/release qualification invoke the applicable comprehensive gate. That gate runs Ruff format checking, Ruff linting, strict mypy, repository-owned AST architecture checks, feature-documentation validation, and pytest with branch coverage and an 80 percent project floor. Coverage is final integration evidence, not a substitute for lifecycle, failure, dependency, replacement, durability, or removal assertions.
+Do not invoke integration or full profiles during feature implementation or
+iterative verification. Pre-commit remains a fast changed-file
+hygiene/lint/format/secret boundary, while pre-push runs the affected validation
+profile. The Controller owns the frozen local integration invocation and its
+source-bound receipt. CI repeats candidate-appropriate qualification under the
+stable `acceptance` status after an authorized push. A DT-09 batch runs its one
+combined full gate only after every child is independently accepted and before
+the grouped push or next declared integration boundary.
+
+The comprehensive code gate runs Ruff formatting and linting, strict mypy,
+repository-owned architecture and documentation checks, pytest with branch
+coverage and an 80 percent project floor, UI typecheck/tests/build, and workflow
+tests/self-test. Applicable Playwright, real-provider, performance, fault and
+physical-removal qualification remains at its explicit phase or operation gate;
+the full code profile does not manufacture credentials or relabel mocked tests
+as provider evidence. Coverage is not a substitute for lifecycle, failure,
+dependency, replacement, durability or removal assertions.
 
 ### 10.4 Deterministic authoring and evidence projection
 

@@ -15,14 +15,16 @@ from scripts import ci_check
 def _decision(
     *families: str,
     requested: str = "full",
+    python_test_paths: tuple[str, ...] = (),
+    ui_test_paths: tuple[str, ...] = (),
 ) -> RoutingDecision:
     """Build a bounded routing decision for runner tests."""
     return RoutingDecision(
         requested_profile=requested,
         families=families,
         changed_paths=("scripts/ci_check.py",),
-        python_test_paths=(),
-        ui_test_paths=(),
+        python_test_paths=python_test_paths,
+        ui_test_paths=ui_test_paths,
         reasons=("test decision",),
         widened_to_full=False,
         candidate=CandidateChanges(
@@ -76,6 +78,41 @@ def test_comprehensive_python_coverage_is_explicit_without_html() -> None:
     assert "--cov-fail-under=80" in coverage.arguments
     assert "--cov-report=term-missing" in coverage.arguments
     assert "--cov-report=html" not in coverage.arguments
+
+
+def test_affected_python_is_path_bounded_without_coverage() -> None:
+    """The Python editing/push path runs selected tests without coverage."""
+    selected = "tests/services/workspace/manage_artifacts"
+    steps = ci_check.build_steps(
+        _decision(
+            "python-affected",
+            requested="affected",
+            python_test_paths=(selected,),
+        )
+    )
+    ids = [step.step_id for step in steps]
+    pytest_step = next(step for step in steps if step.step_id == "affected-pytest")
+
+    assert "python-coverage" not in ids
+    assert pytest_step.arguments == ("pytest", "--no-cov", selected)
+
+
+def test_affected_ui_is_path_bounded_without_production_build() -> None:
+    """The UI editing/push path runs selected tests but not a full build."""
+    selected = "src/widgets/workspaces/store.test.ts"
+    steps = ci_check.build_steps(
+        _decision(
+            "ui-affected",
+            requested="affected",
+            ui_test_paths=(selected,),
+        )
+    )
+    ids = [step.step_id for step in steps]
+    test_step = next(step for step in steps if step.step_id == "affected-ui-test")
+
+    assert ids == ["ui-typecheck", "affected-ui-test"]
+    assert "ui-build" not in ids
+    assert test_step.arguments[-1] == selected
 
 
 def test_python_commands_use_locked_environment() -> None:
@@ -249,8 +286,12 @@ def test_reviewed_worktree_flag_is_forwarded_to_router(
 def test_pre_push_uses_affected_validation_without_inline_coverage() -> None:
     """Routine pushes no longer embed the former broad validation commands."""
     config = (ci_check.REPO / ".pre-commit-config.yaml").read_text("utf-8")
+    pre_commit = config[: config.index("- id: affected-validation")]
     pre_push = config[config.index("- id: affected-validation") :]
 
+    assert "pytest" not in pre_commit
+    assert "mypy" not in pre_commit
+    assert "npm run build" not in pre_commit
     assert "--profile affected --base origin/main --head HEAD" in pre_push
     assert "--cov=app" not in pre_push
     assert "--cov-report=html" not in pre_push
