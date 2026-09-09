@@ -1,0 +1,14 @@
+{
+  "$schema": "../../evidence-schema.json",
+  "feature_id": "FEAT-UI-SYSTEM_SETTINGS",
+  "task_id": "1.28",
+  "status": "IMPLEMENTED_UNVERIFIED",
+  "requirements": [
+    {"id": "FR-TRC-UI-SYSTEM_SETTINGS-001", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-UI-SYSTEM_SETTINGS-002", "status": "IMPLEMENTED"},
+    {"id": "FR-TRC-UI-SYSTEM_SETTINGS-003", "status": "IMPLEMENTED_WITH_OPERATION_GATES"},
+    {"id": "NFR-TRC-UI-SYSTEM_SETTINGS-001", "status": "IMPLEMENTED"}
+  ],
+  "notes": "Widget now requires interfaces.operate-settings@1, preserves expected-revision conflicts, protects dirty drafts, shows deterministic diffs, keeps credentials write-only, and leaves SMTP/remote/MCP unavailable until qualified typed providers exist.",
+  "review": {"reviewer_verdict": "PENDING"}
+}
