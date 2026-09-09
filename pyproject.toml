@@ -264,10 +264,6 @@ filterwarnings = [
 ]
 addopts = [
     "-o", "cache_dir=.dev/.pytest_cache",
-    "--cov=app",
-    "--cov-report=term-missing",
-    "--cov-report=html",
-    "--cov-fail-under=80",
     "--import-mode=importlib",
     "-ra",
     "--strict-markers",

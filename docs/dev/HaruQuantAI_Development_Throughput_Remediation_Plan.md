@@ -60,15 +60,14 @@ Implement A before spending effort on a universal scaffolder or parallel schedul
 ### Dependency order
 
 ```text
-DT-01 → DT-02A → DT-03 → DT-04 → DT-05 → DT-06 → POST-DT-06 PILOT
-          └──→ DT-02B (optional after DT-02A measurement)
+DT-01 → DT-02 (combined DT-02A + DT-02B) → DT-03 → DT-04 → DT-05 → DT-06 → POST-DT-06 PILOT
 
 POST-DT-06 PILOT → DT-07 → DT-08 (optional evidence/scaffolding path)
 POST-DT-06 PILOT → DT-09 → DT-10 (optional batching/parallelism path)
 POST-DT-06 PILOT → DT-11         (strategy-ready milestone path)
 ```
 
-DT-02A supplies the immediate validation-speed change. DT-02B is an advanced routing increment and may be deferred when DT-02A already meets the measured feedback budget. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
+The owner authorized DT-02A and DT-02B as one combined DT-02 delivery on 9 September 2026. Implementation still establishes and measures the DT-02A fast default before enabling DT-02B routing so the incremental benefit remains observable. DT-08 is not a prerequisite for DT-09. DT-11 depends on the post-DT-06 pilot, not on completing optional scaffolding or parallelism. Defer later automation whose measured benefit is weak. All change sets must preserve previously passing safeguards.
 
 ## 4. Change set A — Stop avoidable waiting
 
@@ -102,7 +101,7 @@ DT-02A supplies the immediate validation-speed change. DT-02B is an advanced rou
 
 **Primary paths:** `pyproject.toml`, `scripts/ci_check.py`, tests for the validation router. Add at most one small routing helper if needed; retain `ci_check.py` as the public entry point.
 
-DT-02 is delivered in two separately reviewable stages. DT-02A is the minimum immediate speed improvement and must remain small. DT-02B adds advanced impact routing only after DT-02A has been measured. If DT-02A already meets the feedback target, DT-02B may be deferred rather than becoming new mandatory infrastructure.
+DT-02A and DT-02B are delivered as one owner-authorized change set. DT-02A remains the first internal implementation and measurement checkpoint; DT-02B then adds bounded advanced impact routing without a separate commit or approval cycle. The combined delivery does not waive either stage's acceptance criteria.
 
 #### DT-02A — Fast defaults and explicit validation profiles
 
@@ -522,9 +521,9 @@ Use the following Task descriptions sequentially within the existing authorized 
 
 > **DT-01:** Implement DT-01 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md`. Preserve HaruQuantAI V3 architecture, active/user work, secret detection, reviewed-byte identity and product behavior. Reproduce and repair only the evidenced mechanical close-out failures, publish generated-output discovery before execution, and ensure legitimate schema-validated Git identities do not require per-feature shared secret-baseline edits. Run focused controller/Git/security regressions and report actual timings and rollback.
 
-> **DT-02:** After DT-01 is accepted, implement DT-02A of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as a separate Task. Make ordinary pytest fast, retain explicit comprehensive coverage, add conservative validation profiles and straightforward UI/Python/workflow routing, and keep unknown scope fail-closed. Measure DT-02A before separately authorizing DT-02B advanced impact routing.
+> **DT-02:** After DT-01 is accepted, implement DT-02A and DT-02B of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as one owner-authorized change set. Make ordinary pytest fast, retain explicit comprehensive coverage, add conservative validation profiles and straightforward UI/Python/workflow routing, measure the DT-02A checkpoint, then add candidate/dependency-aware routing with exact Git identities and fail-closed unknown scope.
 
-> **DT-03:** After DT-02A is accepted, implement the local integration-protection portion of DT-03 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as a separate Task. Prove the replacement gate before relaxing broad pre-push hooks. Treat CI status, branch protection, publishing and remote acceptance as a separately authorized repository-administration step. Keep owner approvals, coverage, UI validation, provider-matrix evidence and stale-candidate rejection.
+> **DT-03:** After the combined DT-02 is accepted, implement the local integration-protection portion of DT-03 of `docs/dev/HaruQuantAI_Development_Throughput_Remediation_Plan.md` as a separate Task. Prove the replacement gate before relaxing broad pre-push hooks. Treat CI status, branch protection, publishing and remote acceptance as a separately authorized repository-administration step. Keep owner approvals, coverage, UI validation, provider-matrix evidence and stale-candidate rejection.
 
 Proceed to B after the three Change Set A Tasks are accepted. Run the mandatory three-feature checkpoint after DT-06. C and the DT-09/DT-10 portions of D are incremental extensions, not prerequisites for collecting the first gains. DT-11 may proceed after that checkpoint to prioritize the strategy-ready outcome.
 
