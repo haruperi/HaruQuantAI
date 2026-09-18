@@ -1035,7 +1035,7 @@
           "DEC-UI-002"
         ],
         "documentation_targets": [
-          "app/services/ui/README.md"
+          "app/ui/README.md"
         ]
       },
       "validation": {

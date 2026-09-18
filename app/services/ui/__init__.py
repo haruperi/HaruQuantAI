@@ -1,1 +1,0 @@
-"""UI domain service package."""
