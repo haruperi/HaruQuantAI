@@ -1,10 +1,320 @@
-# Python-generated files
+# ============================================================================
+# ProjectTemplate System .gitignore
+# ============================================================================
+
+# ============================================================================
+# Python
+# ============================================================================
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.py[oc]
+*.py[cod]
+*$py.class
+.tmp_pytest_runtime/
+.tmp_pytest_*/
+tests/_tmp_pytest/
+tests/_tmp_pytest_run/
+pytest-cache-files-*/
+
+# C extensions
+*.so
+*.pyd
+
+# C++ build artifacts
+vcpkg_installed/
+CMakeUserPresets.json
+
+# Distribution / packaging
+.Python
+build/
+build_cov/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.testmondata
+nosetests.xml
+coverage.xml
+removability-report.json
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# Translations
+*.mo
+*.pot
+
+# Django / Framework databases
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask
+instance/
+.webassets-cache
+
+# Documentation build
+docs/_build/
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# IPython
+profile_default/
+ipython_config.py
+
+# Python environment and dependency managers
+.python-version
+Pipfile.lock
+poetry.lock
+.pdm.toml
+__pypackages__/
+
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
+# Environments & local development
+.dev/
+.env
+.env.*
+!.env.example
+.venv
+.venv/
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Python development tools
+.spyderproject
+.spyproject
+.ropeproject
+/site
+.mypy_cache/
+.ruff_cache/
+.uv-cache/
+.dmypy.json
+dmypy.json
+.pyre/
+.pytype/
+cython_debug/
+
+# ============================================================================
+# Node / Frontend (when applicable)
+# ============================================================================
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Build and production output
+.next/
+out/
 build/
 dist/
-wheels/
-*.egg-info
+.vercel
 
-# Virtual environments
-.venv
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Browser test output
+test-results/
+playwright-report/
+blob-report/
+.playwright/
+
+# ============================================================================
+# SQLite & Databases
+# ============================================================================
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+
+# Database backup files
+*.bak
+*.bak_*
+
+# ============================================================================
+# Logs
+# ============================================================================
+artifacts/logs/
+logs/
+*.log
+*.log.*
+log_*.txt
+
+# ============================================================================
+# Data Files & Storage
+# ============================================================================
+/data/
+!/data/**/
+!/data/**/*.py
+!/data/**/*.json
+!/data/**/*.md
+!/data/**/*.sql
+/data/cache/
+/data/saved/
+/data/states/
+datasets/
+results/
+exports/
+temp_data/
+tmp/
+cache/
+
+# Binary and tabular data formats
+*.parquet
+*.pq
+*.arrow
+*.dat
+
+# ============================================================================
+# IDE & Editor Files
+# ============================================================================
+# VSCode and Visual Studio
+.vscode/*
+.vs
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# JetBrains IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Sublime Text
+*.sublime-project
+*.sublime-workspace
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+\#*\#
+.\#*
+
+# AI tools & Cursor
+.cursor/
+.history/
+.claude/
+.zcode/
+.aider*
+
+# ============================================================================
+# Operating System Files
+# ============================================================================
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+*.stackdump
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# Linux
+.directory
+.Trash-*
+
+# ============================================================================
+# Application & Secrets
+# ============================================================================
+# Configuration overrides
+config/local.json
+config/development.json
+config/production.json
+*.local.json
+
+# User-specific settings
+user_settings.json
+.user.ini
+
+# Profiling and benchmarking data
+*.prof
+*.lprof
+profiling_results/
+.benchmarks/
+
+# Backup files
+*.backup
+*.old
+*.orig
+
+# Compressed archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# API keys and secrets
+.secrets
+secrets.json
+api_keys.json
+
+# Large exports
+*.pdf
+
+# Job queue files
+job_queue/
+worker_state/
+
+# INI configuration files (may contain sensitive credentials)
+*.ini
+!alembic.ini
+!mypy.ini
+
+# ============================================================================
+# Agent Orchestrator Worktrees & Logs
+# ============================================================================
+.agents/worktrees/
