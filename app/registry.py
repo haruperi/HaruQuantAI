@@ -19,13 +19,16 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from app.kernel.bootstrapper import FeatureFactory
+from app.services.gateway.api_server import feature as gateway_api_server
 
 # Enumerate all domain feature factory callables here.
 # Features will be topologically sorted by Runtime before startup.
-FEATURES: tuple[FeatureFactory, ...] = ()
+FEATURES: tuple[FeatureFactory, ...] = (gateway_api_server,)
 
 # Named deployment profiles mapping a profile name to its active feature set.
 PROFILES: Mapping[str, frozenset[str]] = {
+    "all": frozenset({"gateway.api_server"}),
+    "api": frozenset({"gateway.api_server"}),
     "default": frozenset(),
 }
 

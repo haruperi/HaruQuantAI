@@ -1,6 +1,6 @@
 # Standards and Principles
 
-**Purpose:** Authoritative contributor and workflow constitution for ProjectTemplate (Generic Modular Monolith Architecture).
+**Purpose:** Authoritative contributor and workflow constitution for HaruQuantAI (Generic Modular Monolith Architecture).
 
 ## 1. Core engineering principles
 

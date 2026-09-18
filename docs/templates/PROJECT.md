@@ -160,9 +160,9 @@ Internal domain workflows belong in the relevant domain `README.md`.
 
 | Status | Meaning |
 |---|---|
-| **Missing** | Not implemented or not verified |
-| **Partial** | Partly implemented or tests are incomplete |
-| **Completed** | Implemented, tested, and verified |
+| **Missing** | Not completed or not verified |
+| **Partial** | Partly completed or tests are incomplete |
+| **Completed** | Completed, tested, and verified |
 
 | Status | Workflow ID | Workflow | Trigger | Domains involved | Final outcome | Integration test |
 |---|---|---|---|---|---|---|

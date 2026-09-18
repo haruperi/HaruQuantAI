@@ -1,4 +1,4 @@
-# ProjectTemplate
+# HaruQuantAI
 
 > **System path:** `.`
 > **Status:** `Completed`
@@ -16,7 +16,7 @@
 
 ### Purpose
 
-ProjectTemplate is a production-grade, business-neutral modular monolith starter. It provides a zero-dependency kernel (`app/kernel/`), pure typed public contracts (`app/contracts/`), single-file feature ownership (`app/services/`), explicit composition (`app/registry.py` and `app/main.py`), and authoritative build/audit pipelines (`docs/dev/`). The system enables engineering teams to rapidly bootstrap and scale maintainable domain-driven applications with mathematical dependency guarantees, structured logging, and automated architectural boundary enforcement.
+HaruQuantAI is a production-grade, business-neutral modular monolith starter. It provides a zero-dependency kernel (`app/kernel/`), pure typed public contracts (`app/contracts/`), single-file feature ownership (`app/services/`), explicit composition (`app/registry.py` and `app/main.py`), and authoritative build/audit pipelines (`docs/dev/`). The system enables engineering teams to rapidly bootstrap and scale maintainable domain-driven applications with mathematical dependency guarantees, structured logging, and automated architectural boundary enforcement.
 
 ### System owns
 
@@ -48,7 +48,7 @@ This diagram shows the complete system and its domains at a glance.
 
 ```mermaid
 flowchart TD
-    SYSTEM[[ProjectTemplate Modular Monolith]]
+    SYSTEM[[HaruQuantAI Modular Monolith]]
 
     SYSTEM --> KERNEL[[Kernel Runtime Primitive]]
     SYSTEM --> REGISTRY[[Registry and Bootstrap]]
@@ -151,9 +151,9 @@ This section documents workflows involving system-wide lifecycle and cross-domai
 
 | Status | Meaning |
 |---|---|
-| **Missing** | Not implemented or not verified |
-| **Partial** | Partly implemented or tests are incomplete |
-| **Completed** | Implemented, tested, and verified |
+| **Missing** | Not completed or not verified |
+| **Partial** | Partly completed or tests are incomplete |
+| **Completed** | Completed, tested, and verified |
 
 | Status | Workflow ID | Workflow | Trigger | Domains involved | Final outcome | Integration test |
 |---|---|---|---|---|---|---|

@@ -1,7 +1,7 @@
 # [Domain Name]
 
 > **Package:** `app/services/[domain]/`
-> **Status:** `[Missing | Partial | Implemented]`
+> **Status:** `[Missing | Partial | Completed]`
 > **Last updated:** `[YYYY-MM-DD]`
 > **Domain ID:** `D-[DOMAIN]`
 
@@ -132,7 +132,7 @@ Copy this card once for each registered feature.
 ### `[feature].py` — `FEAT-[DOMAIN]-[ACTION_OBJECT]`
 
 > **Feature ID:** `FEAT-[DOMAIN]-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Implemented]`
+> **Status:** `[Missing | Partial | Completed]`
 > **Owner module:** `app/services/[domain]/[feature].py`
 
 #### Purpose

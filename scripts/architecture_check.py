@@ -1,4 +1,4 @@
-"""Static AST Architectural Rule Checker for ProjectTemplate.
+"""Static AST Architectural Rule Checker for HaruQuantAI.
 
 Enforces universal modular monolith invariants across app/:
 - ARCH-001-INIT-PURITY: __init__.py files must be docstring-only or empty.

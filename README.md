@@ -37,7 +37,7 @@ Application business features, domain contracts, persistence layers, interfaces,
 This repository is a simplified modular monolith organized around a pure kernel, one runtime composition container, domain contracts, single-file service features, and dedicated domain persistence:
 
 ```text
-ProjectTemplate/
+HaruQuantAI/
 ├── .github/
 │   ├── workflows/             # CI/CD automation workflows
 │   └── .secrets.baseline      # Pinned baseline for detect-secrets
@@ -89,7 +89,7 @@ Project Template uses **[uv](https://github.com/astral-sh/uv)** for fast, determ
 1. **Clone the repository:**
    ```bash
    git clone <repository_url>
-   cd ProjectTemplate
+   cd HaruQuantAI
    ```
 
 2. **Install dependencies and create virtual environment:**

@@ -21,6 +21,7 @@ def main() -> int:
         ],
         ["tests.examples.composition"],
         ["tests.examples.logging_usage"],
+        ["tests.examples.gateway_usage"],
         ["app.main"],
     ]
     for command in commands:
