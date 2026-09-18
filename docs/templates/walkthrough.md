@@ -1,7 +1,7 @@
 # Walkthrough: [Task / Feature Title]
 
-> **Task ID:** `[FEAT-XXX | TASK-XXX]`  
-> **Status:** `[COMPLETED | VERIFIED]`  
+> **Task ID:** `[FEAT-XXX | TASK-XXX]`
+> **Status:** `[COMPLETED | VERIFIED]`
 
 Append follow-up execution/correction iterations to this file.
 

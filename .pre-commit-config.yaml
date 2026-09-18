@@ -1,0 +1,81 @@
+minimum_pre_commit_version: "4.0.0"
+
+default_install_hook_types:
+  - pre-commit
+  - pre-push
+
+exclude: ^\.agents/task/
+
+repos:
+  # Repository hygiene
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        stages: [pre-commit]
+
+      - id: end-of-file-fixer
+        stages: [pre-commit]
+
+      - id: check-yaml
+        stages: [pre-commit]
+
+      - id: check-toml
+        stages: [pre-commit]
+
+      - id: check-json
+        stages: [pre-commit]
+
+      - id: check-merge-conflict
+        stages: [pre-commit]
+
+      - id: check-case-conflict
+        stages: [pre-commit]
+
+      - id: check-added-large-files
+        args: ["--maxkb=25000"]
+        stages: [pre-commit]
+
+      - id: debug-statements
+        stages: [pre-commit]
+
+  # Project development tools
+  - repo: local
+    hooks:
+      - id: ruff-check
+        name: Ruff lint
+        entry: uv run ruff check --force-exclude
+        language: system
+        types_or: [python, pyi]
+        stages: [pre-commit]
+
+      - id: ruff-format
+        name: Ruff format
+        entry: uv run ruff format --check
+        language: system
+        types_or: [python, pyi]
+        stages: [pre-commit]
+
+      - id: architecture-check
+        name: Architectural AST check
+        entry: uv run python scripts/architecture_check.py
+        language: system
+        pass_filenames: false
+        stages: [pre-commit]
+
+      - id: qualification-check
+        name: Authoritative pre-push qualification
+        entry: uv run python scripts/ci_check.py
+        language: system
+        pass_filenames: false
+        stages: [pre-push]
+
+  # Secret detection runs after formatting so it scans the exact final bytes.
+  - repo: local
+    hooks:
+      - id: detect-secrets
+        name: Detect secrets without mutating the tracked baseline
+        entry: uv run python scripts/detect_secrets_filters.py --baseline .github/.secrets.baseline
+        language: system
+        exclude: \.secrets\.baseline$
+        stages: [pre-commit]

@@ -1,9 +1,9 @@
 # Implementation Plan: [Goal / Task / Feature Title]
 
-> **Task ID:** `[FEAT-XXX | TASK-XXX]`  
-> **Iteration:** `[1]`  
-> **Branch:** `[feature/... | task/... | main]`  
-> **Baseline Commit:** `[SHA]`  
+> **Task ID:** `[FEAT-XXX | TASK-XXX]`
+> **Iteration:** `[1]`
+> **Branch:** `[feature/... | task/... | main]`
+> **Baseline Commit:** `[SHA]`
 
 Follow-up work on the same task appends a clearly labelled iteration to this
 file. Do not create a second plan for the same task run.
