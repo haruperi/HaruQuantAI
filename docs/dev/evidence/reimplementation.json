@@ -260,6 +260,23 @@
       "confidence": "confirmed",
       "limitations": []
     },
+    "E-O11": {
+      "title": "Official Quant Data Manager guidance",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/quantdatamanager",
+        "https://strategyquant.com/doc/quantdatamanager/import-history-data-metatrader-4/",
+        "https://strategyquant.com/doc/strategyquant/broker-profiles/",
+        "https://strategyquant.com/doc/cli-command-line/data-manage-data/"
+      ],
+      "scope": "Official overview and narrow guidance for Data Manager imports, broker profiles, and data-management operations.",
+      "confidence": "high",
+      "limitations": [
+        "The pages describe product families and may span more than one SQX build.",
+        "They do not enumerate every build-144.2953 menu item or dialog field."
+      ]
+    },
     "E-T01": {
       "title": "Owner-ratified HaruQuantAI target architecture",
       "kind": "owner_decision",
@@ -1074,6 +1091,1596 @@
         "mock",
         "partial",
         "ui"
+      ]
+    },
+    "SQX144-EV-000009": {
+      "topic": "ui.data_manager.dukascopy_actions",
+      "title": "Dukascopy Data Manager command contract",
+      "question": "Which Dukascopy commands and configuration surfaces are exposed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Dukascopy source exposes actions to add a new symbol, download history for an existing symbol, and open data-usage information; the add and download surfaces cover instrument selection, precision, broker profile or postfix configuration, date range, and overlapping-data handling where applicable.",
+        "confidence": "high",
+        "limitations": [
+          "Static templates establish visible controls but not provider availability, network protocol, server-side validation, or runtime defaults."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/add/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Add-command registration and popup binding."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "809b89b0ee62fd4e419571f46d33c9c3ba497e60ba56fbe3f07f53fab1e8fdb8"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/import/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Existing-symbol download registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0c868c358363ccce254d6fd7c7cbad0c1844632422fb5a8ce15a0799a98152fc"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/disclaimer/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Information/disclaimer command registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1119fd65ea2703e01cd47f97b9ff4c6d1a07d9625ded6978c554a218eec4b0c7"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/add/addPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Add-popup control labels and selection structure."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3eb6ef5a59fe3c616b499047c85cec528a4bc43cbd21339f3261718f7b1a8691"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDukascopy/import/importPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Download-popup date and existing-data controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e1f266122bbea0083309f1f178acfc5a8924a71a5c6a78dec30a920c14a3a23e"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-005"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "data-manager",
+        "dukascopy",
+        "menu",
+        "popup"
+      ]
+    },
+    "SQX144-EV-000010": {
+      "topic": "ui.data_manager.tickdownloader_import",
+      "title": "TickDownloader import command contract",
+      "question": "What does the TickDownloader source command open?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The TickDownloader source exposes one import command whose popup selects local TickDownloader data, presents discovered symbols, accepts an optional data-name postfix, and starts an import.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifacts do not establish filesystem failure behavior, exact supported file variants, or import throughput."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceTD/import/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Import-command registration and popup binding."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5558968e440317dfce4f242d1d0159a7778860e2b021c488e4d18dddfedd87d3"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceTD/import/importPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Folder, discovered-symbol, postfix, validation, and import controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e57f70bc46a3c29c3739c233339b3f2426ea273b02076baa44c10ecf524ea129"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-006"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "data-manager",
+        "import",
+        "tickdownloader"
+      ]
+    },
+    "SQX144-EV-000011": {
+      "topic": "ui.data_manager.file_import_actions",
+      "title": "File-based Data Manager command contract",
+      "question": "Which file-based symbol and import workflows are exposed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The file source exposes separate actions to create a data symbol, import one file, import multiple files, and import an application export; its visible configuration covers instrument identity, timestamp convention, timezone, timeframe, parsing and column mapping, row and column skips, error policy, existing-symbol policy, optional postfix, and optional stock-group creation where applicable.",
+        "confidence": "high",
+        "limitations": [
+          "Static templates do not prove every accepted file encoding, parser edge case, or application-export compatibility."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceFiles/add/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Add-symbol command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "bc552529031cb4ef93bc3d5873c4ab73595f9d5392ae62bb931f57547710b22f"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceFiles/import/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Single-file import command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "d089376f7031ae3923e17110bd5686fd656f8cddae64404955c347df98c2344e"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceFiles/massImport/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Mass-import command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "7d33926fbd6e6cc8039e03a72985e23fe299ede93243161104bfbbee7388e231"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceFiles/appImport/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Application-import command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "876a22c718fcdc41903e574c9bbddbb30eb31420f7f10d5e92c95a05d113de6c"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceFiles/import/importPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Single-file parsing and mapping controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1d4c85703a0d734398e5248e9793e57fa719e8b5b8017d8f95171cc7fca697ba"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceFiles/massImport/massImportPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Batch policy and stock-group controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "da09447bf30eaff0ccfd8f462b424243f30bfe84f50249265504420eb993b5fc"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-007"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "data-manager",
+        "file-import",
+        "mapping",
+        "mass-import"
+      ]
+    },
+    "SQX144-EV-000012": {
+      "topic": "ui.data_manager.sq_equity_actions",
+      "title": "SQ Equity Data Manager command contract",
+      "question": "Which SQ Equity operations and preconditions are exposed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The SQ Equity source exposes a find-data workflow and a separate update action; the add surface searches instruments, displays result metadata, configures the dataset, and requires acknowledgement of data-usage conditions before addition.",
+        "confidence": "high",
+        "limitations": [
+          "The empty update template delegates behavior to its controller, so update progress and failure semantics remain unverified from the static view."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceSQEquityData/add/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Find-data command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1fc216281d1b2eb1f85f67bb6485f286457b747f603c0a2f62e54cf7bae6965b"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceSQEquityData/update/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Update command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4623adbe10442769e9e7c437e4bf4f31f92e4034b480331bba332cb64703c4d9"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceSQEquityData/add/addPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Search, result, configuration, and usage-condition controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a30d878e5579d6e1090086a897f67131a4fcac8e165f89d5183bd29f118eee32"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-008"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "data-manager",
+        "equities",
+        "sq-equity",
+        "usage-conditions"
+      ]
+    },
+    "SQX144-EV-000013": {
+      "topic": "ui.data_manager.sq_futures_actions",
+      "title": "SQ Futures Data Manager command contract",
+      "question": "Which SQ Futures operations and configuration are exposed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The SQ Futures source exposes a find-data workflow and a separate update action; the add surface searches contracts, displays result metadata, configures bar timestamp and timezone handling, and requires acknowledgement of data-usage conditions before addition.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish contract-roll algorithms, exchange-calendar behavior, or update failure recovery."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceSQFuturesData/add/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Find-data command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6aed1672de94aab9855f847ac4311a459b9d94875672d962da93f12e631a1ba2"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceSQFuturesData/update/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Update command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e105420332330e22e50c080c65a86335452e35dfa72689f478fa1c5726e070cc"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceSQFuturesData/add/addPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Search, timestamp, timezone, and usage-condition controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b2df71bac2664854aafd92451aaf7d6d01da3fc1411a36edc0908270f8e0955b"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-009"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "data-manager",
+        "futures",
+        "sq-futures",
+        "usage-conditions"
+      ]
+    },
+    "SQX144-EV-000014": {
+      "topic": "ui.data_manager.darwinex_actions",
+      "title": "Darwinex Data Manager command contract",
+      "question": "Which Darwinex Tick Data commands are active?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Darwinex source exposes actions to add provider symbols, import local Darwinex data, and download additional history for existing symbols; add and import surfaces include symbol discovery, broker-profile or postfix configuration, and explicit instrument identification where needed.",
+        "confidence": "high",
+        "limitations": [
+          "A disclaimer module is installed but its registration is marked unused; this record does not treat that artifact as an active fourth menu command.",
+          "Static artifacts do not establish live provider authentication or download availability."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/add/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Add command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "716f1185430edbe6ba4cbdfe35d59cae5521825c59c7eb130054ae075ce7ed94"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/import/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Folder-import command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "caddec7f79c4eab92f07961740674781772ed3137fcace454efaaa79c3e3856d"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/download/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Existing-symbol download command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4b38f755a05a6fcfd70b5590c4ac8da131f06703fd71a32a483416078bd138c5"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/disclaimer/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Installed disclaimer registration marked unused."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3aa8561df9a430d0e3846f82adb40ae9be273bbfe223bf6c79ef804cde2361b4"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/add/addPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Add-symbol controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a5ab4aa7392ed729149d9e2eb82472b1c21b52a97f39e355df84d98c3d7ec7d8"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceDarwinex/import/importPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Folder import and instrument-identification controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f384e099ea777393c9eae289cd04148c864e0f768f41d9fb6202c3be954a97ad"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-010"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "darwinex",
+        "data-manager",
+        "import",
+        "menu"
+      ]
+    },
+    "SQX144-EV-000015": {
+      "topic": "ui.data_manager.crypto_actions",
+      "title": "Crypto exchange command contract",
+      "question": "Which Crypto exchanges and download workflow are exposed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Crypto source exposes add-symbol choices for Binance spot, Binance Coin-M, Binance USDT-M, Bitfinex, Poloniex, and Coinbase Pro, plus a download-history action for existing Crypto symbols; the add surface configures the selected exchange and symbols, while download accepts a date range.",
+        "confidence": "high",
+        "limitations": [
+          "The static resources establish these six exchange identities but not API versions, authentication, rate limits, symbol availability, or provider uptime."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceCrypto/add/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Six exchange registrations and add popup."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "bbb6e2107d65cfda7418b284074c7d98a807b94f5c7a90d568665a435628ffa9"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceCrypto/import/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Existing-symbol download command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "41ef70315599835325c2ff3c51b2dbc964230e08499f341f9c707250f31c385c"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceCrypto/add/addPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Exchange-specific add controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0be05e643429fa29d17e16df722ccacf0fe5d00cd5c781f2ceb919014076e3cd"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceCrypto/import/importPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Existing-symbol date-range controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "25d334352e58d6a062487d4b8ccf34bfc6eb3eb7def2d3a4fc12dd7e5fb86829"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-011"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "crypto",
+        "data-manager",
+        "exchanges",
+        "nested-menu"
+      ]
+    },
+    "SQX144-EV-000016": {
+      "topic": "ui.data_manager.yahoo_actions",
+      "title": "Yahoo Data Manager command contract",
+      "question": "Which Yahoo symbol operations are exposed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Yahoo source exposes actions to add one or more Yahoo symbols and download additional history for existing symbols; add accepts symbol identifiers and an optional postfix, while download accepts a date range.",
+        "confidence": "high",
+        "limitations": [
+          "Static artifacts do not establish upstream endpoint stability, symbol-resolution rules, data licensing, or failure behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceYahoo/add/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Add-symbol command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2b096ad9c3bbb28c961b40aff63257f06be7b3e15b471a2655851deacf26adec"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceYahoo/download/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Download command."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "7fed4d0b40228f3cdd950afe97c42ee3ebfababb470fca58bf9ef93b000afcb3"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceYahoo/add/addPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Symbol and postfix controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "750a66d6e32474b97e8756dc6f5cffc44d6523c0b5a61cabe9a7c06d3da1173d"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceYahoo/download/downloadPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Existing-symbol date-range controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0fb1c9bbbf41417d4f5d14fc2dac29844a4cbf76c991057ffdcbecbd74f3c805"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-012"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "data-manager",
+        "symbols",
+        "yahoo"
+      ]
+    },
+    "SQX144-EV-000017": {
+      "topic": "ui.data_manager.mt5_import",
+      "title": "MetaTrader 5 import command contract",
+      "question": "Which configuration is exposed by the MT5 import workflow?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The MT5 source exposes one import workflow that selects an installed or portable terminal source, discovers and filters symbols, chooses a date range and Tick or M1 precision, selects a broker profile, accepts an optional postfix, and starts the import.",
+        "confidence": "high",
+        "limitations": [
+          "A browser cannot reproduce native terminal discovery or directory selection; static inspection does not establish terminal-version compatibility or IPC failure behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceMt5Api/import/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "MT5 import registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "be83c1440c68759c7cdc15e56a4bca6b555abfebefbbc3f9b4ee3ee2eb120b2b"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataSourceMt5Api/import/importPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Terminal, symbol, date, precision, profile, and postfix controls."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ab509b08fba2eaf229fd730dcd3903d7f29e8771b46fcec622c14002f0fc534d"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-013"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "data-manager",
+        "import",
+        "mt5"
+      ]
+    },
+    "SQX144-EV-000018": {
+      "topic": "ui.data_manager.context_actions",
+      "title": "Data Manager contextual action contract",
+      "question": "Which actions operate on all or selected datasets?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Data sources workspace exposes Update all, Update selected, Mass delete, Save, and Load actions; selection-scoped actions require selected datasets, deletion distinguishes removing definitions from clearing data, and Save and Load operate on XML dataset definitions.",
+        "confidence": "high",
+        "limitations": [
+          "Static registrations and layout establish entry points and labels but do not establish native persistence transactions, rollback, or every dependency failure."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/SQMANAGER/layout/views/layout.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Data Manager action insertion points and progress region."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "572b45841e98f929e1999a1359e75b02cda1266ffc30b34326db1a8d82c51181"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataManagerActions/updateAll/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Update-all registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "542abb7fc7131d4ff14a572cba19c6dc7942cc7607514c8775d70a6733ebf7bf"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataManagerActions/updateSelected/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Update-selected registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3728bdf149cd50213c6ec348de1e9a6295340fbe7059d48d00429fd7b6019d1b"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataManagerActions/delete/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Mass-delete registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "fc1008d3d8b27d1398e3732d0c7265fc41afcb5cd3146612993a3896be76d30a"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataManagerActions/save/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Save-definitions registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "65e1b5b1430c9813646571e0ead2c6796f7a7a67727b788cf340c10538f644a2"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/plugins/DataManagerActions/load/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Load-definitions registration."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c633a1dcd7174cb4c25b7d149fb0e573d3086f301a94591ec2e361b56ea6fdc1"
+          },
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-O11",
+          "artifact_locator": "https://strategyquant.com/quantdatamanager",
+          "location": {
+            "section": "Quant Data Manager overview",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Public product context for managing, importing, and exporting market data."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "context_only",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-014",
+          "FR-UI-015",
+          "FR-UI-016"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
+        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only provider names, user-visible operations, field roles, and bounded limitations are recorded; no donor source expression or asset is included."
+      },
+      "tags": [
+        "context-actions",
+        "data-manager",
+        "delete",
+        "update",
+        "xml"
+      ]
+    },
+    "SQX144-EV-000019": {
+      "topic": "ui.data_manager.target_safety_and_accessibility",
+      "title": "HaruQuantAI Data sources interaction boundary",
+      "question": "How should HaruQuantAI present the complete Data sources command surface without implying copied implementation or live integration?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Data sources"
+        ],
+        "conditions": [
+          "HaruQuantAI frontend remains a deterministic research simulation"
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "HaruQuantAI shall present each provider and action by its user purpose, keep menus and dialogs keyboard accessible with focus restoration, and identify all provider, update, save, load, and destructive operations as simulations that cannot contact providers, transmit credentials, or mutate native application data.",
+        "confidence": "confirmed",
+        "limitations": [
+          "This is a HaruQuantAI target decision, not an observation about SQX internals or proof of visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/docs/coverage.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Repository-owned Data sources control, transition, verification, and gap contract."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2b3511baf3a88bcabcd85c18899c5ab7d1e40cc4744de337021c881998e85861"
+          },
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-017",
+          "FR-UI-018"
+        ],
+        "decision_ids": [
+          "DEC-UI-002"
+        ],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Run the focused Vitest inventory test and Playwright Data sources scenario, including selection gating, Escape/focus behavior, and provider-domain request monitoring.",
+        "expected_observation": "All named commands are keyboard reachable, focus returns after dialog closure, and the scenario emits no provider-domain request.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "created_at": "2026-09-18T14:00:27Z",
+        "updated_at": "2026-09-18T14:00:27Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned normative behavior only; no donor assets or proprietary source are included."
+      },
+      "tags": [
+        "accessibility",
+        "clean-room",
+        "data-manager",
+        "mock-boundary"
       ]
     }
   }

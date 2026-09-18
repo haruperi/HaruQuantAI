@@ -19,8 +19,8 @@
 5. Edit AlgoWizard rules, add/remove/reorder blocks, save the definition, and open generation/export entry points.
 6. Change portfolio membership and weights; simulation derives a shared-capital series from linked member equity records.
 7. Run a custom project. Enabled tasks execute in order and route the prior output label to the next task.
-8. Data Manager operations show queued/running/completed status. Upload accepts CSV/TSV as the explicit browser-native mock interchange.
+8. In Data Manager > Data sources, each of the nine named providers opens its own action menu. Choosing an action opens a provider-specific configuration, import, download, information, or search dialog; Crypto first opens the six-exchange submenu. SQ Equity and SQ Futures also expose direct updates. Update all runs immediately, while Update selected, Mass delete, and Save require a dataset selection. Mass delete requires a separate dependency warning. Save and Load use browser-safe definition-file simulations. Long-running simulated work moves through `idle → running ↔ paused → completed|cancelled`; no control contacts a provider or changes native reference data.
 
 ## Keyboard behavior
 
-Tab follows DOM order, Enter activates focused controls, Space toggles checks, and Escape closes dialogs. Native select, input and button semantics provide focus and accessibility behavior. Dockview retains keyboard-enabled panel behavior without exposing arbitrary default rearrangement controls.
+Tab follows DOM order, Enter activates focused controls, Space toggles checks, and Escape closes dialogs. Provider controls expose menu state with `aria-haspopup`, `aria-expanded`, and menu roles; nested Crypto exchange choices remain keyboard reachable. Closing a Data Manager dialog restores focus to the provider or contextual action that opened it. Native select, input and button semantics provide focus and accessibility behavior. Dockview retains keyboard-enabled panel behavior without exposing arbitrary default rearrangement controls.

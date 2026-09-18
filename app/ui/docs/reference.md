@@ -1,7 +1,7 @@
 # StrategyQuant X reference audit
 
 Audit date: 2026-09-18
-Reference installation: `C:\SQX_144_2953_win_20260601` (treated as read-only)
+Reference installation: `SQX_REFERENCE_ROOT` (treated as read-only)
 
 ## Evidence reviewed
 
@@ -14,6 +14,7 @@ Representative sources used directly:
 - `internal/web/app/layout/views/header.html` — global settings, language, skin, zoom, help, about, update, reload and exit entry points.
 - `internal/web/BUILDER/layout/views/layout.html`, plus equivalent Retester, Optimizer, Portfolio Master and Task Manager layouts — dashboard above a shared databank.
 - `internal/web/SQMANAGER/layout/views/layout.html` — ribbon groups, batch progress, data tabs and no-data state.
+- `internal/plugins/DataSourceDukascopy`, `DataSourceTD`, `DataSourceFiles`, `DataSourceSQEquityData`, `DataSourceSQFuturesData`, `DataSourceDarwinex`, `DataSourceCrypto`, `DataSourceYahoo`, and `DataSourceMt5Api` — provider registrations, menu commands, and the narrow dialog/controller artifacts needed to define the Data sources command surface.
 - `internal/plugins/ProjectDatabanks/views/databanks.html` — cross-module databank placement.
 - `internal/plugins/SettingsWhatToBuild`, `SettingsGeneticOptions`, `SettingsBlocks`, `SettingsOptimization`, `SettingsCrossChecks`, `SettingsRankings`, and `SettingsAdvancedTM` — project settings.
 - `internal/plugins/Results*` and `internal/extend/Snippets/SQ/{Columns,Stats,TradeAnalysis,MonteCarlo}` — results and measures.
@@ -26,7 +27,7 @@ The installed executable was launched, but the environment's desktop-control bri
 
 ## Inclusion register
 
-Included as functional frontend simulations: application shell, Builder, Improver, Retester, Optimizer, Data Manager, databanks, linked Results, AlgoWizard, Portfolio Master, Portfolio Composer, Custom Projects, Code Editor, SQX Business surfaces, Prop analytics/result-extension identities, global settings, themes, persistence, fixture reset, file-import flow, mock source export, and deterministic job states.
+Included as functional frontend simulations: application shell, Builder, Improver, Retester, Optimizer, Data Manager, databanks, linked Results, AlgoWizard, Portfolio Master, Portfolio Composer, Custom Projects, Code Editor, SQX Business surfaces, Prop analytics/result-extension identities, global settings, themes, persistence, fixture reset, file-import flow, mock source export, and deterministic job states. The Data Manager source surface names every supported provider and operation explicitly; it is a HaruQuantAI requirement derived from narrow behavioral evidence, not a claim of copied implementation or runtime parity.
 
 Included as identifiable configuration surfaces rather than real host integration: provider connections, remote access, MCP, SMTP, external scripts, native compilation, broker/platform export, and worker nodes. These controls save or display mock state and state plainly that no external side effect occurs.
 
