@@ -1,17 +1,304 @@
 [project]
-name = "haruquantai"
+name = "project-template"
 version = "0.1.0"
-description = "Add your description here"
+description = "Business-neutral modular monolith starter"
 readme = "README.md"
 authors = [
-    { name = "Rufaro Haruperi", email = "r.haruperi@hotmail.com" }
+    { name = "ProjectTemplate Contributors" }
 ]
 requires-python = ">=3.14"
 dependencies = []
 
 [project.scripts]
-haruquantai = "haruquantai:main"
+template = "app.main:main"
 
-[build-system]
-requires = ["uv_build>=0.12.13,<0.13.0"]
-build-backend = "uv_build"
+[dependency-groups]
+dev = [
+    "pytest>=8,<10",
+    "pytest-cov>=6,<8",
+    "ruff>=0.11,<1",
+    "mypy>=1.15,<2",
+    "detect-secrets>=1.5.0",
+    "pre-commit>=4.0.0",
+]
+
+# ============================================================================
+# Ruff Configuration (Formatting, Linting, Complexity, Docstrings)
+# ============================================================================
+[tool.ruff]
+target-version = "py314"
+line-length = 88
+src = ["app", "tests", "scripts"]
+extend-exclude = [
+    ".dev",
+    "docs",
+    "htmlcov",
+]
+
+[tool.ruff.format]
+docstring-code-format = true
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
+[tool.ruff.lint]
+preview = true
+explicit-preview-rules = true
+
+select = [
+    "F",     # Pyflakes
+    "E",     # Pycodestyle errors
+    "W",     # Pycodestyle warnings
+    "C90",   # McCabe complexity
+    "I",     # isort
+    "N",     # PEP8 Naming
+    "D",     # Pydocstyle
+    "UP",    # Pyupgrade
+    "YTT",   # Flake8-2020
+    "ASYNC", # Flake8-async
+    "S",     # Flake8-bandit
+    "BLE",   # Flake8-blind-except
+    "FBT",   # Flake8-boolean-trap
+    "B",     # Flake8-bugbear
+    "A",     # Flake8-builtins
+    "COM",   # Flake8-commas
+    "C4",    # Flake8-comprehensions
+    "DTZ",   # Flake8-datetimez
+    "T10",   # Flake8-debugger
+    "EM",    # Flake8-errmsg
+    "EXE",   # Flake8-executable
+    "FA",    # Flake8-future-annotations
+    "ISC",   # Flake8-implicit-str-concat
+    "ICN",   # Flake8-import-conventions
+    "LOG",   # Flake8-logging
+    "G",     # Flake8-logging-format
+    "INP",   # Flake8-no-pep420
+    "PIE",   # Flake8-pie
+    "PYI",   # Flake8-pyi
+    "PT",    # Flake8-pytest-style
+    "Q",     # Flake8-quotes
+    "RSE",   # Flake8-raise
+    "RET",   # Flake8-return
+    "SLF",   # Flake8-self
+    "SLOT",  # Flake8-slots
+    "SIM",   # Flake8-simplify
+    "TID",   # Flake8-tidy-imports
+    "TC",    # Flake8-type-checking
+    "ARG",   # Flake8-unused-arguments
+    "PTH",   # Flake8-use-pathlib
+    "TD",    # Flake8-todos
+    "FIX",   # Flake8-fixme
+    "PGH",   # Pygrep-hooks
+    "PL",    # Pylint
+    "TRY",   # Tryceratops
+    "FLY",   # Flynt
+    "PERF",  # Perflint
+    "FURB",  # Refurb
+    "RUF",   # Ruff-specific rules
+    "ANN",   # Flake8-annotations
+]
+
+ignore = [
+    "FBT001",  # Boolean positional arg in function definition
+    "FBT002",  # Boolean default positional arg
+    "FBT003",  # Boolean positional value in function call
+    "D203",    # One blank line required before class docstring (conflicts with D211)
+    "D212",    # Summary line should be immediately after opening quotes (conflicts with D213)
+    "D400",    # First line should end with a period
+    "D401",    # First line should be in an imperative mood
+    "D415",    # First line should end with a period/question/exclamation
+    "COM812",  # Trailing comma (formatter conflict)
+    "ISC001",  # Implicit string concatenation (formatter conflict)
+    "PLC0415", # Deferred imports allowed for lazy optional loading
+    "PLR0913", # Too many arguments in function definition
+    "TRY003",  # Long exception messages outside exception class
+    "EM101",   # Exception message string literal
+    "EM102",   # Exception message f-string literal
+    "TC001",   # Move app import to TYPE_CHECKING
+    "TC002",   # Move third-party import to TYPE_CHECKING
+    "TC003",   # Move stdlib import to TYPE_CHECKING
+    "UP047",   # PEP 695 generic functions
+    "ANN401",  # Dynamically typed expressions (Any)
+    "TRY300",  # Consider moving statement to an else block
+    "D107",    # Missing docstring in __init__
+]
+
+[tool.ruff.lint.per-file-ignores]
+"app/kernel/**/*.py" = [
+    "C901",
+    "PLR0911",
+    "PLR0912",
+    "PLR0915",
+    "TC001",
+    "EM102",
+    "E501",
+    "FURB",
+    "ANN401",
+    "ARG002",
+    "PLR2004",
+    "BLE001",
+    "TRY",
+    "SIM",
+    "PTH",
+    "SLF001",
+]
+"app/main.py" = [
+    "BLE001",
+    "TRY400",
+]
+"tests/**/*.py" = [
+    "S",
+    "PLR2004",
+    "SLF001",
+    "D",
+    "DOC",
+    "ARG",
+    "PLC0415",
+    "EM",
+    "ANN",
+    "E501",
+    "INP001",
+    "SIM",
+    "TRY",
+    "LOG",
+    "PTH",
+    "PT",
+    "FURB",
+    "PERF",
+    "BLE",
+    "RUF059",
+    "RUF052",
+    "B017",
+]
+"tests/examples/*.py" = [
+    "T201",
+    "D",
+    "DOC",
+    "ANN",
+    "S",
+    "INP001",
+]
+"scripts/*.py" = [
+    "INP001",
+    "D100",
+    "D103",
+    "ANN",
+    "S",
+    "T201",
+    "PLC0415",
+    "BLE001",
+    "C901",
+    "PLR2004",
+    "SIM",
+]
+
+[tool.ruff.lint.mccabe]
+max-complexity = 10
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+# ============================================================================
+# Pytest Configuration
+# ============================================================================
+[tool.pytest.ini_options]
+minversion = "7.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+python_files = [
+    "test_*.py",
+    "*_test.py",
+]
+filterwarnings = [
+    "error",
+]
+addopts = [
+    "--import-mode=importlib",
+    "-ra",
+    "--strict-markers",
+    "--strict-config",
+]
+
+# ============================================================================
+# Coverage Configuration (80% minimum floor)
+# ============================================================================
+[tool.coverage.run]
+source = ["app"]
+branch = true
+omit = [
+    "tests/*",
+]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "\\s*\\.\\.\\.\\s*$",
+]
+
+# ============================================================================
+# Mypy Strict Typing Configuration
+# ============================================================================
+[tool.mypy]
+python_version = "3.14"
+files = ["app", "tests", "scripts"]
+strict = true
+mypy_path = ["."]
+
+warn_unreachable = true
+strict_equality_for_none = true
+
+enable_error_code = [
+    "deprecated",
+    "explicit-override",
+    "ignore-without-code",
+    "mutable-override",
+    "truthy-bool",
+    "truthy-iterable",
+    "unimported-reveal",
+]
+
+pretty = true
+show_error_context = true
+show_error_end = true
+show_error_code_links = true
+
+warn_return_any = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+
+[[tool.mypy.overrides]]
+module = "tests.*"
+check_untyped_defs = true
+disallow_untyped_defs = false
+disable_error_code = ["explicit-override"]
+
+[[tool.mypy.overrides]]
+module = "scripts.*"
+check_untyped_defs = true
+
+# ============================================================================
+# Execution Profile Capability Manifest
+# ============================================================================
+[tool.template.schema]
+version = 1
+description = "Business-neutral runtime profile capability dependency manifest"
+
+[tool.template.profile.default]
+description = "Default startup profile"
+required_capabilities = []
+
+[tool.template.profile.full]
+description = "Full application composition profile activating all domain capabilities"
+required_capabilities = []
