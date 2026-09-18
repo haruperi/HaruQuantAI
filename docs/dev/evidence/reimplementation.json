@@ -1,1 +1,1080 @@
-{}
+{
+  "$schema": "./reimplementation.schema.json",
+  "schema_version": 1,
+  "ledger_id": "haruquantai.sqx.reimplementation",
+  "reference_product": {
+    "name": "StrategyQuant X",
+    "build": "144.2953",
+    "installation_root_variable": "SQX_REFERENCE_ROOT"
+  },
+  "target_project": {
+    "name": "HaruQuantAI",
+    "repository_root_variable": "HARUQUANTAI_ROOT",
+    "authority_files": [
+      "AGENTS.md",
+      "docs/PROJECT.md",
+      "docs/ARCHITECTURE.md",
+      "docs/dev/feature_implementation_pipeline.md",
+      "docs/dev/domain_implementation_audit.md",
+      "app/services/<domain>/README.md"
+    ]
+  },
+  "backfill": {
+    "status": "partial",
+    "catalog_snapshot_commit": "a9722d0",
+    "recorded_at": "2026-09-18T12:39:58Z",
+    "notes": [
+      "The source catalog mirrors the register in docs/PROJECT.md at the recorded commit.",
+      "Seed records cover representative material findings only; absence from this ledger does not mean a behavior was not researched.",
+      "Owning domain READMEs remain authoritative for current feature and requirement status."
+    ]
+  },
+  "source_catalog": {
+    "E-L01": {
+      "title": "Installed plugin inventory",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/plugins"
+      ],
+      "scope": "Static inventory of 193 top-level plugin families and task/settings resources.",
+      "confidence": "high",
+      "limitations": [
+        "Installed presence does not prove that every runtime path is exercised."
+      ]
+    },
+    "E-L02": {
+      "title": "Installed UI, schema, and template resources",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/ctemplate",
+        "internal/web"
+      ],
+      "scope": "Static inspection of UI topology, navigation resources, strategy/block/event schemas, and templates.",
+      "confidence": "high",
+      "limitations": [
+        "Static resources do not establish pixel parity or every runtime transition."
+      ]
+    },
+    "E-L03": {
+      "title": "Bundled task XML examples",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/plugins/Task*/task*.xml"
+      ],
+      "scope": "Task and configuration schemas for build, retest, optimization, routing, filtering, files, notification, and portfolio workflows.",
+      "confidence": "high",
+      "limitations": [
+        "Bundled numeric values are examples and must not be treated as universal defaults."
+      ]
+    },
+    "E-L04": {
+      "title": "Installed libraries and exposed Java snippets",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/extend/Snippets",
+        "internal/libs"
+      ],
+      "scope": "Manifest, package, public-symbol, and targeted behavior inspection reduced to clean-room contracts.",
+      "confidence": "high",
+      "limitations": [
+        "No proprietary source expression may be copied into HaruQuantAI.",
+        "A similarly named class or method is not proof of runtime semantics."
+      ]
+    },
+    "E-L05": {
+      "title": "Shipped runtime configuration",
+      "kind": "local_file",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "StrategyQuantX.config",
+        "sqcli.config"
+      ],
+      "scope": "Static inspection of shipped JVM and application launch options.",
+      "confidence": "high",
+      "limitations": [
+        "Shipped configuration does not prove which options were active in a particular run."
+      ]
+    },
+    "E-L06": {
+      "title": "Bundled extension guide",
+      "kind": "official_pdf",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "Extending_SQX.pdf"
+      ],
+      "scope": "Bundled one-page guide directing extension authors to the online codebase documentation.",
+      "confidence": "confirmed",
+      "limitations": [
+        "The PDF contains no substantive offline API specification."
+      ]
+    },
+    "E-R01": {
+      "title": "HaruQuantAI UI baseline evidence",
+      "kind": "repository",
+      "root": "HARUQUANTAI_ROOT",
+      "locators": [
+        "app/ui/docs/coverage.json",
+        "app/ui/docs/mock-contracts.md",
+        "app/ui/docs/parity.md"
+      ],
+      "scope": "Current repository evidence for implemented mock screens, state contracts, exercised behavior, and explicit UI gaps.",
+      "confidence": "confirmed",
+      "limitations": [
+        "This source describes HaruQuantAI implementation state, not SQX runtime behavior."
+      ]
+    },
+    "E-O01": {
+      "title": "Official program layout",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/program-layout/"
+      ],
+      "scope": "Official screen and workflow topology.",
+      "confidence": "high",
+      "limitations": [
+        "The page may describe more than one SQX build."
+      ]
+    },
+    "E-O02": {
+      "title": "Official programming and indicator guides",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/programming-for-sq/adding-indicators-and-signals/",
+        "https://strategyquant.com/doc/programming-for-sq/introduction-2/"
+      ],
+      "scope": "Official plugin/snippet distinction, internal XML model, templates, update behavior, and indicator examples.",
+      "confidence": "high",
+      "limitations": [
+        "Examples do not establish every extension or indicator edge case."
+      ]
+    },
+    "E-O03": {
+      "title": "Official data and backtest precision guide",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/data/"
+      ],
+      "scope": "Official selected-timeframe, minute, real-tick, spread, and backtest-data behavior.",
+      "confidence": "high",
+      "limitations": [
+        "Exact intrabar and multi-symbol event ordering remains unverified."
+      ]
+    },
+    "E-O04": {
+      "title": "Official cross-check guide",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/cross-checks-automated-strategy-robustness-tests/"
+      ],
+      "scope": "Official ordered robustness funnel, early dismissal, and major cross-check categories.",
+      "confidence": "high",
+      "limitations": [
+        "The page does not establish every stochastic distribution or seed rule."
+      ]
+    },
+    "E-O05": {
+      "title": "Official walk-forward matrix guide",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/walk-forward-matrix/"
+      ],
+      "scope": "Official WFM grid, cells, customizable criteria, and cluster interpretation.",
+      "confidence": "high",
+      "limitations": [
+        "Numeric thresholds shown in examples are not universal defaults."
+      ]
+    },
+    "E-O06": {
+      "title": "Official genetic and ranking guides",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/genetic-options/",
+        "https://strategyquant.com/doc/strategyquant/ranking-options/"
+      ],
+      "scope": "Official genetic-search concepts, fitness, databank capacity, and filtering contexts.",
+      "confidence": "high",
+      "limitations": [
+        "Exact random distributions and tie-breaking behavior require independent fixtures."
+      ]
+    },
+    "E-O07": {
+      "title": "Official databank and similarity-filter guides",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/builder-dismiss-similar-strategies-in-databank/",
+        "https://strategyquant.com/doc/strategyquant/databank/",
+        "https://strategyquant.com/doc/strategyquant/databanks-and-files/"
+      ],
+      "scope": "Official databank interactions, persistence concepts, file behavior, and similar-strategy filtering.",
+      "confidence": "high",
+      "limitations": [
+        "Tie behavior outside the documented comparison needs a fixture."
+      ]
+    },
+    "E-O08": {
+      "title": "Official custom-project concepts",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/custom-projects-main-concepts/"
+      ],
+      "scope": "Official custom-project task and workflow concepts.",
+      "confidence": "high",
+      "limitations": [
+        "Exact conditional-expression and recovery semantics require runtime evidence."
+      ]
+    },
+    "E-O09": {
+      "title": "Official Portfolio Composer guide",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/doc/strategyquant/portfolio-composer/"
+      ],
+      "scope": "Official portfolio composition, weighting, and distinction from Portfolio Master.",
+      "confidence": "high",
+      "limitations": [
+        "Shared-margin, netting, and search tie semantics remain unverified."
+      ]
+    },
+    "E-O10": {
+      "title": "Official download and release context",
+      "kind": "official_web",
+      "root": null,
+      "locators": [
+        "https://strategyquant.com/download",
+        "https://strategyquant.com/whatsnew/"
+      ],
+      "scope": "Official exact build, release date, and build-level feature context.",
+      "confidence": "confirmed",
+      "limitations": []
+    },
+    "E-T01": {
+      "title": "Owner-ratified HaruQuantAI target architecture",
+      "kind": "owner_decision",
+      "root": "HARUQUANTAI_ROOT",
+      "locators": [
+        "docs/ARCHITECTURE.md",
+        "docs/PROJECT.md"
+      ],
+      "scope": "Normative React/FastAPI/Python/SQLite/Parquet target stack and product boundaries.",
+      "confidence": "confirmed",
+      "limitations": [
+        "This source is a target decision, not evidence of SQX implementation behavior."
+      ]
+    }
+  },
+  "records": {
+    "SQX144-EV-000001": {
+      "topic": "workspace.release.build_identity",
+      "title": "Reference build identity and release date",
+      "question": "Which StrategyQuant X build is the clean-room reference target?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Application"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The official download and release pages identify StrategyQuant X build 144.2953 as released on 20 May 2026.",
+        "confidence": "confirmed",
+        "limitations": [
+          "The local installation folder's 20260601 suffix is packaging or installation context, not the upstream release date."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-O10",
+          "artifact_locator": "https://strategyquant.com/download",
+          "location": {
+            "section": "Latest build",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Build number and release date."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-O10",
+          "artifact_locator": "https://strategyquant.com/whatsnew/",
+          "location": {
+            "section": "Build 144",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Build-level release context."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "workspace",
+        "feature_ids": [
+          "FEAT-WORKSPACE-DIAGNOSTICS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/services/workspace/README.md",
+          "docs/PROJECT.md"
+        ]
+      },
+      "validation": {
+        "state": "not_required",
+        "procedure": null,
+        "expected_observation": null,
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Public release metadata only."
+      },
+      "tags": [
+        "build",
+        "release",
+        "version"
+      ]
+    },
+    "SQX144-EV-000002": {
+      "topic": "strategy.export.xml_template_model",
+      "title": "Structured strategy model and target templates",
+      "question": "How does SQX separate its strategy representation from target-platform source export?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard",
+          "Builder",
+          "Code generation"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX represents strategies as structured XML-like data and uses target-specific templates to translate blocks and parameters into exported source.",
+        "confidence": "high",
+        "limitations": [
+          "The evidence establishes the model/template separation but not byte-compatible archive or exporter formatting."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-O02",
+          "artifact_locator": "https://strategyquant.com/doc/programming-for-sq/introduction-2/",
+          "location": {
+            "section": "Plugins, snippets, and code templates",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Official description of snippets, internal representation, and templates."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/AlgoWizard/assets/InitialStrategy.xml",
+          "location": {
+            "section": null,
+            "symbol": "StrategyFile",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": "/StrategyFile/Strategy",
+            "notes": "Observed strategy, money-management, rules/events, variables, and data-binding structure."
+          },
+          "inspection_method": "schema_inspection",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "strategy",
+        "feature_ids": [
+          "FEAT-STRATEGY-MODEL",
+          "FEAT-STRATEGY-EXPORT"
+        ],
+        "requirement_ids": [
+          "FR-STRATEGY-001",
+          "FR-STRATEGY-004"
+        ],
+        "decision_ids": [
+          "DEC-STRATEGY-001"
+        ],
+        "documentation_targets": [
+          "app/services/strategy/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Create an independent minimal typed strategy definition and verify deterministic export through two versioned target templates without embedding executable source in the canonical model.",
+        "expected_observation": "The same canonical definition retains one content identity while producing target-specific source and manifests.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Only structural behavior and element roles are recorded."
+      },
+      "tags": [
+        "export",
+        "strategy-model",
+        "templates",
+        "xml"
+      ]
+    },
+    "SQX144-EV-000003": {
+      "topic": "simulator.precision.price_event_construction",
+      "title": "Backtest price-event precision modes",
+      "question": "How does SQX construct price events for selected-timeframe, minute, and real-tick precision?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Retester"
+        ],
+        "conditions": [
+          "Selected Timeframe, 1 Minute, Real Tick with custom spread, and Real Tick with real spread modes"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX documents four synthetic price events per selected-timeframe bar, four events per minute in minute precision, recorded bid with a derived ask under custom spread, and recorded bid/ask under real-spread tick precision.",
+        "confidence": "high",
+        "limitations": [
+          "Exact intrabar traversal, timestamp tie-breaking, gap handling, and same-bar stop/target resolution are not established."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-O03",
+          "artifact_locator": "https://strategyquant.com/doc/strategyquant/data/",
+          "location": {
+            "section": "Backtest precision",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Selected timeframe, minute, and real-tick mode descriptions."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "simulator",
+        "feature_ids": [
+          "FEAT-SIMULATOR-PRECISION"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [
+          "DEC-SIMULATOR-001",
+          "DEC-SIMULATOR-002"
+        ],
+        "documentation_targets": [
+          "app/services/simulator/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Use bars and tick fixtures with distinct OHLC/bid/ask values to measure event count, value construction, traversal order, timestamp ties, gaps, and same-event protective-order outcomes.",
+        "expected_observation": "Documented mode-level event counts and bid/ask construction match; unresolved ordering is either measured or remains explicitly unverified.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Public behavioral documentation only."
+      },
+      "tags": [
+        "backtest",
+        "bid-ask",
+        "ohlc",
+        "precision",
+        "ticks"
+      ]
+    },
+    "SQX144-EV-000004": {
+      "topic": "robustness.funnel.ordered_cross_checks",
+      "title": "Ordered robustness funnel and early dismissal",
+      "question": "How does SQX order expensive robustness checks and handle failure?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Cross checks"
+        ],
+        "conditions": [
+          "Multiple configured cross-checks"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX runs configured cross-checks as an ordered cost funnel and can dismiss a strategy after a failed mandatory check instead of running later expensive checks.",
+        "confidence": "high",
+        "limitations": [
+          "The exact cancellation boundary and every plugin-specific failure rule remain unverified."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-O04",
+          "artifact_locator": "https://strategyquant.com/doc/strategyquant/cross-checks-automated-strategy-robustness-tests/",
+          "location": {
+            "section": "Cross checks",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Ordered funnel, cost progression, and dismissal behavior."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-L03",
+          "artifact_locator": "internal/plugins/TaskBuild/task_forex.xml",
+          "location": {
+            "section": "CrossChecks",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": "/Task/Settings/CrossChecks",
+            "notes": "Bundled example confirms ordered configurable check definitions and acceptance conditions."
+          },
+          "inspection_method": "schema_inspection",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "robustness",
+        "feature_ids": [
+          "FEAT-ROBUSTNESS-FUNNEL"
+        ],
+        "requirement_ids": [
+          "FR-ROBUSTNESS-001",
+          "SYS-008"
+        ],
+        "decision_ids": [
+          "DEC-ROBUSTNESS-001"
+        ],
+        "documentation_targets": [
+          "app/services/robustness/README.md",
+          "docs/PROJECT.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Configure one cheap passing check, one failing mandatory check, and one expensive later check; record invocation order and skip reason.",
+        "expected_observation": "The failing mandatory check prevents the later check and the verdict retains both the failure and explicit skip reason.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Bundled task values are treated as examples, not defaults."
+      },
+      "tags": [
+        "cross-checks",
+        "early-dismissal",
+        "robustness"
+      ]
+    },
+    "SQX144-EV-000005": {
+      "topic": "robustness.walk_forward.matrix_clusters",
+      "title": "Walk-forward matrix grid and cluster evaluation",
+      "question": "What does SQX's walk-forward matrix evaluate?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Walk-Forward Matrix"
+        ],
+        "conditions": []
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX evaluates walk-forward results across a matrix of run/window configurations and out-of-sample percentages, applies customizable pass criteria, and can evaluate neighborhoods of passing cells.",
+        "confidence": "high",
+        "limitations": [
+          "A 3 by 3 neighborhood with 7 of 9 passing is an official example, not a universal product default.",
+          "Exact cell-boundary and incomplete-window behavior remains unverified."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-O05",
+          "artifact_locator": "https://strategyquant.com/doc/strategyquant/walk-forward-matrix/",
+          "location": {
+            "section": "Walk-Forward Matrix",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Matrix dimensions, criteria, result, and cluster examples."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "robustness",
+        "feature_ids": [
+          "FEAT-ROBUSTNESS-WALKFORWARD"
+        ],
+        "requirement_ids": [
+          "FR-ROBUSTNESS-004"
+        ],
+        "decision_ids": [
+          "DEC-ROBUSTNESS-002"
+        ],
+        "documentation_targets": [
+          "app/services/robustness/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Construct a small matrix with pass/fail cells around threshold boundaries and verify deterministic cell generation and configurable neighborhood evaluation.",
+        "expected_observation": "Matrix and cluster verdicts follow the selected criteria without treating documentation examples as implicit defaults.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000004"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Thresholds are recorded only as examples."
+      },
+      "tags": [
+        "clusters",
+        "out-of-sample",
+        "walk-forward",
+        "wfm"
+      ]
+    },
+    "SQX144-EV-000006": {
+      "topic": "persistence.databank.similarity_filter",
+      "title": "Documented similar-strategy dismissal profile",
+      "question": "How does SQX's documented similar-strategy databank filter identify duplicates?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Databank"
+        ],
+        "conditions": [
+          "Dismiss similar strategies enabled"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The documented SQX similarity profile compares trade count, net profit, and drawdown over the full sample; strategies are similar when all three values are within plus or minus 5 percent, and the higher-fitness strategy is retained.",
+        "confidence": "high",
+        "limitations": [
+          "The rule is a named reference profile, not a required HaruQuantAI default.",
+          "Zero baselines, exact comparison inclusivity, and fitness ties require boundary fixtures."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-O07",
+          "artifact_locator": "https://strategyquant.com/doc/strategyquant/builder-dismiss-similar-strategies-in-databank/",
+          "location": {
+            "section": "Dismiss similar strategies in databank",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Compared metrics, tolerance, sample scope, and retained strategy."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "persistence",
+        "feature_ids": [
+          "FEAT-PERSISTENCE-DATABANKS"
+        ],
+        "requirement_ids": [
+          "FR-PERSISTENCE-003"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/services/persistence/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Evaluate pairs immediately below, at, and above the 5 percent boundary, including zero metrics and equal fitness.",
+        "expected_observation": "All three metrics must satisfy the configured tolerance and the deterministic retention/tie policy is explicit.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Public behavior is represented as a configurable compatibility profile."
+      },
+      "tags": [
+        "databank",
+        "deduplication",
+        "fitness",
+        "similarity"
+      ]
+    },
+    "SQX144-EV-000007": {
+      "topic": "portfolio.composer.weight_recalculation",
+      "title": "Portfolio Composer weight semantics",
+      "question": "How do weight changes affect an SQX Portfolio Composer result?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Portfolio Composer"
+        ],
+        "conditions": [
+          "Member weight changes"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX Portfolio Composer applies member weights by recalculating position sizing and recomputing the portfolio result; this manual composition workflow is distinct from Portfolio Master search.",
+        "confidence": "high",
+        "limitations": [
+          "Exact shared-margin, currency conversion, netting, and simultaneous-event rules remain unverified."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-O09",
+          "artifact_locator": "https://strategyquant.com/doc/strategyquant/portfolio-composer/",
+          "location": {
+            "section": "Portfolio Composer",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Weight changes, position sizing, and product distinction."
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "portfolio",
+        "feature_ids": [
+          "FEAT-PORTFOLIO-COMPOSER",
+          "FEAT-PORTFOLIO-SIMULATION"
+        ],
+        "requirement_ids": [
+          "FR-PORTFOLIO-003"
+        ],
+        "decision_ids": [
+          "DEC-PORTFOLIO-001"
+        ],
+        "documentation_targets": [
+          "app/services/portfolio/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Replay two immutable member results against shared capital, change one member weight, and compare position sizes, account path, lineage, and unchanged member artifacts.",
+        "expected_observation": "A new portfolio result reflects recalculated sizing while source member backtests remain immutable.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Public behavioral documentation only."
+      },
+      "tags": [
+        "portfolio",
+        "position-sizing",
+        "shared-capital",
+        "weights"
+      ]
+    },
+    "SQX144-EV-000008": {
+      "topic": "ui.baseline.mock_research_workstation",
+      "title": "Current HaruQuantAI UI baseline",
+      "question": "Which UI behavior exists in the HaruQuantAI baseline, and what remains mock-only?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI"
+        ],
+        "conditions": [
+          "Repository commit a9722d0"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The HaruQuantAI frontend provides a broad deterministic mock research workstation with shell, Builder and Improver, Optimizer, virtualized databanks, linked results, Data Manager, AlgoWizard, portfolio tools, custom projects, and extension surfaces, while authoritative engines, providers, proprietary formats, native integrations, and live operations remain absent or simulated.",
+        "confidence": "confirmed",
+        "limitations": [
+          "This record establishes HaruQuantAI UI implementation state and gaps, not numerical or pixel parity with SQX.",
+          "Native SQX screenshots were unavailable for visual comparison."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/docs/coverage.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/entries",
+            "xpath": null,
+            "notes": "Per-surface implementation and gap ledger."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/docs/parity.md",
+          "location": {
+            "section": "Completed and exercised / Partial parity",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Verified frontend coverage and precise remaining gaps."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        },
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/docs/mock-contracts.md",
+          "location": {
+            "section": "Mock service contracts",
+            "symbol": "ResearchService",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Deterministic records, mock operations, local persistence, and interrupted-job behavior."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-18"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-SHELL",
+          "FEAT-UI-RESEARCH",
+          "FEAT-UI-RESULTS"
+        ],
+        "requirement_ids": [
+          "SYS-012"
+        ],
+        "decision_ids": [
+          "DEC-UI-002"
+        ],
+        "documentation_targets": [
+          "app/services/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Reconcile coverage.json, parity.md, and mock-contracts.md at the recorded repository commit.",
+        "expected_observation": "The three ledgers consistently describe a deterministic frontend simulator, implemented primary surfaces, and explicit backend/native/live gaps.",
+        "actual_observation": "All three repository files agree on the mock-only boundary and the UI domain remains Partial.",
+        "artifact_paths": [
+          "app/ui/docs/coverage.json",
+          "app/ui/docs/mock-contracts.md",
+          "app/ui/docs/parity.md"
+        ],
+        "executed_at": "2026-09-18T12:39:58Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a9722d0",
+        "created_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-18T12:39:58Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned evidence only."
+      },
+      "tags": [
+        "baseline",
+        "mock",
+        "partial",
+        "ui"
+      ]
+    }
+  }
+}
