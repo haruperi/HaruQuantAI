@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,29 @@ Backend features use the simplified modular-monolith layout:
 app/services/agentic/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- providers.py
+|-- context.py
+|-- tools.py
+|-- approvals.py
+`-- audit.py
 
 app/contracts/agentic.py
-app/services/persistence/agentic.py   # only when the domain persists state
-tests/services/agentic/[feature_1]/
-tests/examples/[domain_number]_agentic.py
+app/services/persistence/agentic.py
+tests/services/agentic/<feature>/
+tests/examples/17_agentic.py
 ```
 
-Each `app/services/agentic/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/agentic.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/agentic.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/agentic.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_agentic.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/agentic.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/17_agentic.py`.
 
 ---
 
@@ -58,134 +53,144 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Real AI/LLM integration.
+Own optional model-provider adapters, bounded tools, context/evidence assembly, structured outputs, budgets, approvals, and auditability while remaining non-authoritative for quantitative and live decisions.
 
 ### Owns
 
-- AI/LLM integrations, prompt engineering pipelines, and LLM provider interfaces.
-- Autonomous quant agents: natural language strategy generation, rule explanation, and automated diagnosis.
-- Agent tools, structured JSON function calling, context assembly, and token budget management.
+- Model profiles, provider-neutral requests/responses, token/cost budgets, cancellation, and redaction.
+- Allowlisted typed tools, evidence/context manifests, structured-output validation, approvals, and audit records.
+- Advisory explanations and proposals that deterministic domains validate.
 
 ### Does not own
 
-- Deterministic backtest matching or verification (delegated to D-SIMULATOR and D-ROBUSTNESS).
-- Core execution authorization or risk enforcement (delegated to D-RISK and D-TRADING).
+- Metric, strategy, simulation, risk, or trading authority.
+- Credential exposure, arbitrary code/shell/database access, or self-granted permissions.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/agentic.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/agentic.py`; private implementation imports are forbidden.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `agentic.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `agentic.providers@1` | `ModelProviderRegistry` | `1` | Model profiles, requests, budgets, and health |
+| Missing | `agentic.context@1` | `ContextAssembler` | `1` | Evidence-bounded context manifests |
+| Missing | `agentic.tools@1` | `AgentToolRegistry` | `1` | Allowlisted typed read/mutation tools |
+| Missing | `agentic.approvals@1` | `ApprovalService` | `1` | Explicit scoped mutation approvals |
+| Missing | `agentic.audit@1` | `AgentAuditService` | `1` | Prompts/evidence/tool/outcome provenance |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although storage mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `agentic.[feature_partition]` | `FEAT-AGENTIC-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `agentic.v1` | `FEAT-AGENTIC-PROVIDERS` and registry peers | `sqlite` | Explicit reference-safe policy | `agentic.providers@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-AGENTIC-[ACTION_OBJECT]` | [Value] | `app/services/agentic/[feature].py` | `agentic.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-AGENTIC-PROVIDERS` | Model profiles, requests, budgets, and health | `app/services/agentic/providers.py` | `agentic.providers@1` | None | Missing |
+| `FEAT-AGENTIC-CONTEXT` | Evidence-bounded context manifests | `app/services/agentic/context.py` | `agentic.context@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-AGENTIC-TOOLS` | Allowlisted typed read/mutation tools | `app/services/agentic/tools.py` | `agentic.tools@1` | `gateway.authorization@1` | Missing |
+| `FEAT-AGENTIC-APPROVALS` | Explicit scoped mutation approvals | `app/services/agentic/approvals.py` | `agentic.approvals@1` | `workspace.jobs@1` | Missing |
+| `FEAT-AGENTIC-AUDIT` | Prompts/evidence/tool/outcome provenance | `app/services/agentic/audit.py` | `agentic.audit@1` | `persistence.artifacts@1` | Missing |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
+required consumers become attributed `BLOCKED`, optional operations return unavailable, and
+retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-AGENTIC-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-AGENTIC-PROPOSE` — Produce and optionally apply a validated proposal
+
+- **Lead owner:** `FEAT-AGENTIC-CONTEXT`
+- **Participants:** Context/evidence, provider, schema validator, tool registry, approval, target capability, audit.
+- **Input boundary:** User goal, allowed sources/tools, privacy class, output schema, token/cost/time budget.
+- **Output boundary:** Cited structured proposal; optional approved tool receipt; complete audit manifest.
+- **Failure boundary:** Missing evidence/schema/budget/approval fails closed; provider text is never directly executed.
+- **Acceptance:** `ATW-AGENTIC-PROPOSE-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-AGENTIC-[ACTION_OBJECT]`
+This representative card applies to every registry entry; exact algorithms and states are in Section 9.
 
-> **Feature ID:** `FEAT-AGENTIC-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/agentic/[feature].py`
+### `providers.py` — `FEAT-AGENTIC-PROVIDERS`
+
+> **Feature ID:** `FEAT-AGENTIC-PROVIDERS`
+> **Status:** `Missing`
+> **Owner module:** `app/services/agentic/providers.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide model profiles, requests, budgets, and health without absorbing another feature's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `agentic.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `agentic.providers@1`
+- **Requires:** None
+- **Optional / operation-gated:** absence is explicit; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Configuration is immutable, typed, versioned, and bounded. Reference sample values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject incompatible versions |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability/contribution | Managed feature scope | Withdraw with scope |
+| Task/subscription/resource | Managed lifecycle API | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence/API protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/agentic.py` or `None`
-- **Namespace:** `agentic.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/agentic.py`
+- **Namespace:** `agentic.v1`
+- **Schema version:** `1` initially; forward migration only
+- **Retention and purge:** explicit and reference-safe; removal never implicitly purges.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/agentic.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_agentic.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `providers.py` | Model profiles, requests, budgets, and health; configuration, service, lifecycle, immutable specification, factory/contribution | `ModelProviderRegistry` |
+| Missing | `context.py` | Evidence-bounded context manifests; configuration, service, lifecycle, immutable specification, factory/contribution | `ContextAssembler` |
+| Missing | `tools.py` | Allowlisted typed read/mutation tools; configuration, service, lifecycle, immutable specification, factory/contribution | `AgentToolRegistry` |
+| Missing | `approvals.py` | Explicit scoped mutation approvals; configuration, service, lifecycle, immutable specification, factory/contribution | `ApprovalService` |
+| Missing | `audit.py` | Prompts/evidence/tool/outcome provenance; configuration, service, lifecycle, immutable specification, factory/contribution | `AgentAuditService` |
+| Missing | `tests/examples/17_agentic.py` | Offline primary-purpose evidence | one named scenario per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-AGENTIC-001` | Outputs validate against a deterministic schema before use. | Malformed-output tests |
+| Missing | `FR-AGENTIC-002` | Tool authority is allowlisted, scoped, expiring, and no broader than user approval. | Policy tests |
+| Missing | `FR-AGENTIC-003` | Quantitative values link to deterministic artifacts/calculators, not model assertion. | Provenance tests |
+| Missing | `FR-AGENTIC-004` | Secrets/private data are minimized and redacted across provider, logs, and audit. | Adversarial privacy tests |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw the capability and managed effects while retaining schema-readable artifacts. Dependent
+operations return attributed unavailable; reinstall requires schema/version compatibility.
 
 ---
 
@@ -194,70 +199,66 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/agentic.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/agentic.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/agentic.py`. | Architecture/schema checks |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-AGENTIC-001` | Agentic output is advisory; deterministic domains and approvals remain authoritative. | Safety | SYS-014 |
+| Open | `DEC-AGENTIC-002` | Providers, models, retention, residency, and budget defaults are unselected. | Integration | Owner decision and provider review |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; installed names and
+sample values are not runtime proof.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/agentic/[feature]/
+tests/services/agentic/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_agentic.py
+tests/examples/17_agentic.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/agentic/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/agentic.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/agentic.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/agentic.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/agentic.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+A model profile declares provider/model/version, endpoint class, data-retention/residency policy, timeouts, retries, context/output limits, cost metadata, and supported structured/tool modes. Context manifests list exact artifact IDs, excerpts/hashes, truncation and retrieval policy. Tools expose typed inputs/outputs, side-effect class, required capability and approval. Read-only is default. Mutations require a displayed diff/summary, target, scope, expiry and idempotency key; live trading is outside agentic authority. Treat model/provider text as untrusted data. No shell, arbitrary SQL, raw filesystem, credential, or dynamic-code tool. Record prompt/template version, evidence IDs, model profile, validated output hash, tool calls, approvals, and outcomes subject to privacy policy.

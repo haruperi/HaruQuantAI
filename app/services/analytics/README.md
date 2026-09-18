@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,29 @@ Backend features use the simplified modular-monolith layout:
 app/services/analytics/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- metrics.py
+|-- equity.py
+|-- trades.py
+|-- periods.py
+`-- reports.py
 
 app/contracts/analytics.py
-app/services/persistence/analytics.py   # only when the domain persists state
-tests/services/analytics/[feature_1]/
-tests/examples/[domain_number]_analytics.py
+app/services/persistence/analytics.py
+tests/services/analytics/<feature>/
+tests/examples/08_analytics.py
 ```
 
-Each `app/services/analytics/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/analytics.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/analytics.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/analytics.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_analytics.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/analytics.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/08_analytics.py`.
 
 ---
 
@@ -58,135 +53,145 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Measuring what happened: one metric registry, equity/drawdown computation, trade analysis, report projections.
+Own the canonical metric registry, trade/equity/drawdown projections, time/side/exit analysis, and provenance-rich reports/exports.
 
 ### Owns
 
-- Central metric registry (Sharpe, Sortino, CAGR, Profit Factor, Win Rate, Expectancy, SQN).
-- Time-series equity curves, underwater drawdown series, and margin utilization analysis.
-- Trade list analytics: trade distribution, holding periods, MAE/MFE statistics.
-- Performance report generation, tear sheets, and visual projection models.
+- Versioned metric definitions with scope, units, denominator, invalid behavior, precision, and direction.
+- Reconciled equity, drawdown, trade, MAE/MFE, and period projections.
+- Reports/exports bound to filters, registry version, source hashes, and warnings.
 
 ### Does not own
 
-- Trade execution or simulation generation (owned by D-TRADING and D-SIMULATOR).
-- Parameter optimization runs or search schedules (owned by D-OPTIMIZATION).
+- Trade/fill mutation, strategy generation, or ranking policy.
+- Portfolio membership or simulation event ordering.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/analytics.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/analytics.py`; counterparty status never authorizes a private import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `analytics.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `analytics.metrics@1` | `MetricRegistry` | `1` | Canonical versioned metric calculation |
+| Missing | `analytics.equity@1` | `EquityAnalysis` | `1` | Equity and drawdown projections |
+| Missing | `analytics.trades@1` | `TradeAnalysis` | `1` | Trade, MAE/MFE, direction, and exit analysis |
+| Missing | `analytics.periods@1` | `PeriodAnalysis` | `1` | Timezone-explicit period aggregation |
+| Missing | `analytics.reports@1` | `ReportService` | `1` | Versioned reports and machine exports |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although database mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `analytics.[feature_partition]` | `FEAT-ANALYTICS-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `analytics.v1` | `FEAT-ANALYTICS-METRICS` and registry peers | `sqlite` | Explicit reference-safe policy | `analytics.metrics@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-ANALYTICS-[ACTION_OBJECT]` | [Value] | `app/services/analytics/[feature].py` | `analytics.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-ANALYTICS-METRICS` | Canonical versioned metric calculation | `app/services/analytics/metrics.py` | `analytics.metrics@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-ANALYTICS-EQUITY` | Equity and drawdown projections | `app/services/analytics/equity.py` | `analytics.equity@1` | `analytics.metrics@1` | Missing |
+| `FEAT-ANALYTICS-TRADES` | Trade, MAE/MFE, direction, and exit analysis | `app/services/analytics/trades.py` | `analytics.trades@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-ANALYTICS-PERIODS` | Timezone-explicit period aggregation | `app/services/analytics/periods.py` | `analytics.periods@1` | `analytics.metrics@1` | Missing |
+| `FEAT-ANALYTICS-REPORTS` | Versioned reports and machine exports | `app/services/analytics/reports.py` | `analytics.reports@1` | `analytics.metrics@1` | Missing |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies point to public contracts, never implementations. Removal withdraws only the named
+capability; required consumers become attributed `BLOCKED`, optional operations return
+unavailable, and retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-ANALYTICS-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-ANALYTICS-PROJECT` — Project one result across synchronized views
+
+- **Lead owner:** `FEAT-ANALYTICS-METRICS`
+- **Participants:** Immutable trade/equity artifacts, registry, filters, and report service.
+- **Input boundary:** Result identity, metric profile/version, sample, direction, currency, timezone, filters.
+- **Output boundary:** Metric set and linked projections with common source identity and provenance.
+- **Failure boundary:** Schema mismatch or undefined metric is typed invalid/not-applicable, never substituted zero.
+- **Acceptance:** `ATW-ANALYTICS-PROJECT-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-ANALYTICS-[ACTION_OBJECT]`
+This representative module card applies to every registry entry; algorithms and state semantics
+are in Section 9.
 
-> **Feature ID:** `FEAT-ANALYTICS-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/analytics/[feature].py`
+### `metrics.py` — `FEAT-ANALYTICS-METRICS`
+
+> **Feature ID:** `FEAT-ANALYTICS-METRICS`
+> **Status:** `Missing`
+> **Owner module:** `app/services/analytics/metrics.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide canonical versioned metric calculation without absorbing another registry entry's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `analytics.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `analytics.metrics@1`
+- **Requires:** `persistence.artifacts@1`
+- **Optional / operation-gated:** absence returns typed unavailable; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Each owner has a slotted immutable `<Feature>Config`; sample reference values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject incompatibility |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability | `FeatureContext.provide(...)` | Withdraw with scope |
+| Managed effects | `FeatureContext` resource/task/subscription APIs | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/analytics.py` or `None`
-- **Namespace:** `analytics.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/analytics.py`
+- **Namespace:** `analytics.v1`
+- **Schema version:** `1` initially; forward migrations only
+- **Retention and purge:** explicit and reference-safe; feature removal never purges state.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/analytics.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_analytics.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `metrics.py` | Canonical versioned metric calculation; config, service, lifecycle, immutable `SPEC`, factory | `MetricRegistry` |
+| Missing | `equity.py` | Equity and drawdown projections; config, service, lifecycle, immutable `SPEC`, factory | `EquityAnalysis` |
+| Missing | `trades.py` | Trade, MAE/MFE, direction, and exit analysis; config, service, lifecycle, immutable `SPEC`, factory | `TradeAnalysis` |
+| Missing | `periods.py` | Timezone-explicit period aggregation; config, service, lifecycle, immutable `SPEC`, factory | `PeriodAnalysis` |
+| Missing | `reports.py` | Versioned reports and machine exports; config, service, lifecycle, immutable `SPEC`, factory | `ReportService` |
+| Missing | `tests/examples/08_analytics.py` | Offline evidence | one `example_<NN>_<feature_slug>()` per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-ANALYTICS-001` | One metric ID/version agrees in API, UI, filter, rank, and report. | Cross-surface golden |
+| Missing | `FR-ANALYTICS-002` | Empty, invalid, undefined, not-applicable, and zero remain distinct. | Edge table |
+| Missing | `FR-ANALYTICS-003` | Equity/drawdown reconcile to the source ledger. | Accounting invariants |
+| Missing | `FR-ANALYTICS-004` | Rounding happens only at registered output unless explicitly profiled. | Neighbor test |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw capability and managed effects; retain schema-readable artifacts. Dependent operations
+return attributed unavailable. Reinstall requires schema/version compatibility.
 
 ---
 
@@ -195,70 +200,66 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/analytics.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/analytics.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/analytics.py`. | Architecture/schema checks |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-ANALYTICS-001` | Reference-compatible and standard profiles are separately named/versioned. | Metrics | Avoid ambiguity |
+| Open | `DEC-ANALYTICS-002` | Sharpe deviation, exposure endpoints, and stability wording require fixtures. | Parity | Hand/reference fixtures |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; filenames and bundled
+sample values are not proof of runtime semantics.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/analytics/[feature]/
+tests/services/analytics/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_analytics.py
+tests/examples/08_analytics.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/analytics/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/analytics.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/analytics.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/analytics.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/analytics.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+Observed E-L04 profiles: expectancy is net profit/trades rounded 2; average trade same ratio rounded 4; profit factor is 0 for no trades and, with zero loss, 0 for zero profit or cap 5; drawdown follows realized equity/peaks; CAGR compounds capital plus realized P/L when valid; Calmar is CAGR/max DD%; return/DD uses 0 for 0/0 and cap 10 for positive profit at zero DD. Stability squares correlation of daily money equity to a first-final line and is negative with negative profit. SQN uses R-multiples and observed formulas split at 100 trades. Exposure counts occupied day buckets. Observed Sharpe seeds weekdays with -0.05/252 and annualizes by sqrt(252); this is a named reference profile. Full precision feeds calculations; presentation rounding does not.

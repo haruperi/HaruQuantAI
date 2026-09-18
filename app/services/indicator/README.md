@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,29 @@ Backend features use the simplified modular-monolith layout:
 app/services/indicator/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- series.py
+|-- averages.py
+|-- volatility.py
+|-- oscillators.py
+`-- custom.py
 
 app/contracts/indicator.py
-app/services/persistence/indicator.py   # only when the domain persists state
-tests/services/indicator/[feature_1]/
-tests/examples/[domain_number]_indicator.py
+app/services/persistence/indicator.py
+tests/services/indicator/<feature>/
+tests/examples/05_indicator.py
 ```
 
-Each `app/services/indicator/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/indicator.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/indicator.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/indicator.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_indicator.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/indicator.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/05_indicator.py`.
 
 ---
 
@@ -58,36 +53,39 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Building blocks, indicators.
+Own deterministic series calculations, reusable calculators, warm-up/validity semantics, caching, block metadata, and custom-indicator contracts.
 
 ### Owns
 
-- Standard technical indicator libraries (moving averages, oscillators, volatility, volume).
-- Custom indicator formulas, building blocks, and composable mathematical primitives.
-- Deterministic series calculations, caching, and stream update pipelines.
+- Typed series/buffer and visibility contracts with batch/incremental equivalence.
+- Indicator parameters, warm-up, missing-value, rounding, caching, and acceleration profiles.
+- Isolated custom-indicator registration and deterministic outputs.
 
 ### Does not own
 
-- Market data ingestion or storage (owned by D-DATA).
-- Trade signals, rule generation, or order triggers (owned by D-STRATEGY).
+- Trading decisions, strategy action trees, or future market visibility.
+- Dataset storage or report metric definitions.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/indicator.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+The public boundary is `app/contracts/indicator.py`. Counterparty status never authorizes a
+private implementation import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `indicator.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `indicator.series@1` | `SeriesEngine` | `1` | Series views, visibility, buffers, and cache identity |
+| Missing | `indicator.averages@1` | `AverageRegistry` | `1` | Moving-average calculators and profiles |
+| Missing | `indicator.volatility@1` | `VolatilityRegistry` | `1` | True range, ATR, and volatility indicators |
+| Missing | `indicator.oscillators@1` | `OscillatorRegistry` | `1` | CCI, RSI, and oscillator indicators |
+| Missing | `indicator.extensions@1` | `IndicatorExtensionRegistry` | `1` | Versioned custom-indicator contract |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+Semantic state remains feature-owned although database mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `indicator.[feature_partition]` | `FEAT-INDICATOR-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `indicator.v1` | `FEAT-INDICATOR-SERIES` and registry peers | `sqlite` | Retain versioned records until explicit policy permits purge | `indicator.series@1` |
 
 ---
 
@@ -95,97 +93,115 @@ domain persistence module. Other domains access it only through public capabilit
 
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-INDICATOR-[ACTION_OBJECT]` | [Value] | `app/services/indicator/[feature].py` | `indicator.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-INDICATOR-SERIES` | Series views, visibility, buffers, and cache identity | `app/services/indicator/series.py` | `indicator.series@1` | `data.datasets@1` | Missing |
+| `FEAT-INDICATOR-AVERAGES` | Moving-average calculators and profiles | `app/services/indicator/averages.py` | `indicator.averages@1` | `indicator.series@1` | Missing |
+| `FEAT-INDICATOR-VOLATILITY` | True range, ATR, and volatility indicators | `app/services/indicator/volatility.py` | `indicator.volatility@1` | `indicator.series@1` | Missing |
+| `FEAT-INDICATOR-OSCILLATORS` | CCI, RSI, and oscillator indicators | `app/services/indicator/oscillators.py` | `indicator.oscillators@1` | `indicator.series@1` | Missing |
+| `FEAT-INDICATOR-EXTENSIONS` | Versioned custom-indicator contract | `app/services/indicator/custom.py` | `indicator.extensions@1` | `indicator.series@1` | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 
 ```mermaid
 flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
+    Consumer["Consuming feature"] --> Contract["Versioned public capability"]
+    Provider["D-INDICATOR feature"] --> Contract
     Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
+    Provider --> Persistence["Domain persistence boundary"]
 ```
 
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Removing one module and registry entry withdraws only its capability. Required consumers become
+attributed `BLOCKED`; operation-gated consumers refuse only the affected operation. Retained
+state is never purged implicitly.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
+### `WF-INDICATOR-CALCULATE` — Calculate a visible indicator series
 
-- **Lead owner:** `FEAT-INDICATOR-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+- **Lead owner:** `FEAT-INDICATOR-SERIES`
+- **Participants:** Dataset capability and selected registered indicator.
+- **Input boundary:** Immutable input identity/view, visible end index, validated parameters, numeric profile.
+- **Output boundary:** Equal-length output buffers with explicit validity/warm-up and provenance.
+- **Failure boundary:** Invalid parameters or future access fail before publication; extension faults are isolated.
+- **Acceptance:** `ATW-INDICATOR-CALCULATE-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
+The following contract applies to every registered feature; domain-specific semantics are in
+Section 9.
 
-### `[feature].py` — `FEAT-INDICATOR-[ACTION_OBJECT]`
+### `series.py` — `FEAT-INDICATOR-SERIES`
 
-> **Feature ID:** `FEAT-INDICATOR-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/indicator/[feature].py`
+> **Feature ID:** `FEAT-INDICATOR-SERIES` (representative registry entry)
+> **Status:** `Missing`
+> **Owner module:** `app/services/indicator/series.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide series views, visibility, buffers, and cache identity. Other registry entries follow the same lifecycle and
+evidence obligations without merging their responsibilities into this module.
 
 #### Capability declarations
 
-- **Provides:** `indicator.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `indicator.series@1`
+- **Requires:** `data.datasets@1`
+- **Optional / operation-gated:** only capabilities explicitly declared by the feature; absence
+  returns a typed unavailable result and does not silently substitute behavior.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Each owner module defines a slotted immutable `<Feature>Config`. No reference sample value is
+promoted to a default without product approval.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject unknown/incompatible versions |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Must be positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject nonpositive/unbounded values |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability publication | `FeatureContext.provide(...)` | Withdrawn with feature scope |
+| Tasks/subscriptions/resources | Managed `FeatureContext` API | Cancel/close in reverse order; failed start unwinds all effects |
+| Durable mutation | Focused persistence protocol | Transaction rollback; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/indicator.py` or `None`
-- **Namespace:** `indicator.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/indicator.py`
+- **Namespace:** `indicator.v1`
+- **Schema version:** `1` initially; forward migrations only
+- **Retention and purge:** retain lineage-bearing records; purge only by explicit, reference-safe policy
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/indicator.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_indicator.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `series.py` | Series views, visibility, buffers, and cache identity; config, service, lifecycle, `SPEC`, factory | `SeriesEngine` |
+| Missing | `averages.py` | Moving-average calculators and profiles; config, service, lifecycle, `SPEC`, factory | `AverageRegistry` |
+| Missing | `volatility.py` | True range, ATR, and volatility indicators; config, service, lifecycle, `SPEC`, factory | `VolatilityRegistry` |
+| Missing | `oscillators.py` | CCI, RSI, and oscillator indicators; config, service, lifecycle, `SPEC`, factory | `OscillatorRegistry` |
+| Missing | `custom.py` | Versioned custom-indicator contract; config, service, lifecycle, `SPEC`, factory | `IndicatorExtensionRegistry` |
+| Missing | `tests/examples/05_indicator.py` | Offline primary-purpose evidence | one `example_<NN>_<feature_slug>()` per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-INDICATOR-001` | Batch, chunked, and incremental outputs agree. | Golden/property tests |
+| Missing | `FR-INDICATOR-002` | Visibility guards prevent future-index reads. | Look-ahead negative test |
+| Missing | `FR-INDICATOR-003` | Scalar and NumPy/Numba profiles match within declared tolerance. | Acceleration equivalence |
+| Missing | `FR-INDICATOR-004` | Rounding feeds comparison only where a named block contract requires it. | Threshold-neighbor test |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Physical removal withdraws the feature's capability and cancels its managed effects. Stored
+artifacts remain readable by schema-aware tooling; operations requiring the missing capability
+return an attributed unavailable result. Reinstall may resume only after schema and version checks.
 
 ---
 
@@ -194,11 +210,11 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/indicator.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/indicator.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/indicator.py`. | Architecture/schema checks |
 
 ---
 
@@ -206,58 +222,53 @@ and physical-removal evidence.]
 
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-INDICATOR-001` | Numba is optional acceleration, never a semantic fork. | Numeric profile | E-T01 |
+| Open | `DEC-INDICATOR-002` | RSI and all moving-average initialization details are unverified. | Parity formulas | Short/constant/impulse golden series |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; a filename, bundled
+sample value, or third-party function name is not proof of runtime semantics.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/indicator/[feature]/
+tests/services/indicator/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_indicator.py
+tests/examples/05_indicator.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/indicator/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/indicator.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/indicator.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/indicator.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/indicator.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+Inputs are immutable oldest-to-newest views; calculation at index i may read only visible values through i. Missing/invalid is not numeric zero. Observed true range is high-low on the first bar, then max(high-low, abs(low-prev close), abs(high-prev close)); observed ATR uses a progressive Wilder-style effective period min(i+1, period). Observed CCI yields zero at bar zero and when mean deviation < 1e-10; otherwise (price-simple mean)/(0.015*mean deviation). The official signal example rounds compared values to four decimals before strict greater-than (E-L04 and the official guide under E-O02). Third-party same-name functions are not parity evidence.

@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,29 @@ Backend features use the simplified modular-monolith layout:
 app/services/portfolio/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- definitions.py
+|-- correlation.py
+|-- composer.py
+|-- search.py
+`-- simulation.py
 
 app/contracts/portfolio.py
-app/services/persistence/portfolio.py   # only when the domain persists state
-tests/services/portfolio/[feature_1]/
-tests/examples/[domain_number]_portfolio.py
+app/services/persistence/portfolio.py
+tests/services/portfolio/<feature>/
+tests/examples/13_portfolio.py
 ```
 
-Each `app/services/portfolio/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/portfolio.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/portfolio.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/portfolio.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_portfolio.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/portfolio.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/13_portfolio.py`.
 
 ---
 
@@ -58,135 +53,144 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Combining strategies: membership, weights, correlation, search, shared capital, portfolio constraints, capital-aware simulation — artifact types (aggregation vs. capital simulation vs. merged executable vs. signal ensemble).
+Own portfolio definitions, immutable strategy-result membership, weights, correlation/overlap analysis, constrained combination search, and shared-capital simulation.
 
 ### Owns
 
-- Portfolio membership, capital allocation models, and asset weighting schemes.
-- Cross-strategy correlation analysis, diversification metrics, and portfolio search.
-- Shared-capital simulation, margin constraints, portfolio-level risk ceilings.
-- Portfolio artifact generation: simple trade aggregation, capital-aware simulation, merged executables, and signal ensembles.
+- Member/result identities, enabled state, weights, groups/sectors, capital/leverage, and constraints.
+- Aligned return/equity inputs, overlap-aware correlation, and diversification diagnostics.
+- Manual composition and searched-portfolio artifacts with shared-capital results.
 
 ### Does not own
 
-- Single-strategy logic or generation (owned by D-STRATEGY).
-- Execution of individual orders (owned by D-TRADING).
+- Individual strategy backtests, metric definitions, or live order routing.
+- Databank membership mechanics or account/broker truth.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/portfolio.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/portfolio.py`; private implementation imports are forbidden.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `portfolio.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `portfolio.definitions@1` | `PortfolioRepository` | `1` | Versioned members, weights, capital, and constraints |
+| Missing | `portfolio.correlation@1` | `CorrelationService` | `1` | Aligned overlap-aware dependence analysis |
+| Missing | `portfolio.composer@1` | `PortfolioComposer` | `1` | Manual weighting and result recomputation |
+| Missing | `portfolio.search@1` | `PortfolioSearch` | `1` | Constrained brute-force/genetic combinations |
+| Missing | `portfolio.simulation@1` | `PortfolioSimulator` | `1` | Shared-capital account replay |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although storage mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `portfolio.[feature_partition]` | `FEAT-PORTFOLIO-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `portfolio.v1` | `FEAT-PORTFOLIO-DEFINITIONS` and registry peers | `sqlite` | Explicit reference-safe policy | `portfolio.definitions@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-PORTFOLIO-[ACTION_OBJECT]` | [Value] | `app/services/portfolio/[feature].py` | `portfolio.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-PORTFOLIO-DEFINITIONS` | Versioned members, weights, capital, and constraints | `app/services/portfolio/definitions.py` | `portfolio.definitions@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-PORTFOLIO-CORRELATION` | Aligned overlap-aware dependence analysis | `app/services/portfolio/correlation.py` | `portfolio.correlation@1` | `analytics.equity@1` | Missing |
+| `FEAT-PORTFOLIO-COMPOSER` | Manual weighting and result recomputation | `app/services/portfolio/composer.py` | `portfolio.composer@1` | `simulator.backtest@1` | Missing |
+| `FEAT-PORTFOLIO-SEARCH` | Constrained brute-force/genetic combinations | `app/services/portfolio/search.py` | `portfolio.search@1` | `portfolio.correlation@1` | Missing |
+| `FEAT-PORTFOLIO-SIMULATION` | Shared-capital account replay | `app/services/portfolio/simulation.py` | `portfolio.simulation@1` | `simulator.account@1` | Missing |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
+required consumers become attributed `BLOCKED`, optional operations return unavailable, and
+retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-PORTFOLIO-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-PORTFOLIO-COMPOSE` — Compose and evaluate a shared-capital portfolio
+
+- **Lead owner:** `FEAT-PORTFOLIO-COMPOSER`
+- **Participants:** Member results, analytics, correlation, constraints, simulation, and artifact store.
+- **Input boundary:** Immutable member result IDs, weights/enabled state, capital, leverage, alignment, and limits.
+- **Output boundary:** Versioned definition/result, correlation evidence, account/equity series, metrics, and constraint diagnostics.
+- **Failure boundary:** Missing/incompatible member scope or invalid weights fail before replay; margin breach is an explicit result.
+- **Acceptance:** `ATW-PORTFOLIO-COMPOSE-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-PORTFOLIO-[ACTION_OBJECT]`
+This representative card applies to every registry entry; exact algorithms and states are in Section 9.
 
-> **Feature ID:** `FEAT-PORTFOLIO-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/portfolio/[feature].py`
+### `definitions.py` — `FEAT-PORTFOLIO-DEFINITIONS`
+
+> **Feature ID:** `FEAT-PORTFOLIO-DEFINITIONS`
+> **Status:** `Missing`
+> **Owner module:** `app/services/portfolio/definitions.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide versioned members, weights, capital, and constraints without absorbing another feature's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `portfolio.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `portfolio.definitions@1`
+- **Requires:** `persistence.artifacts@1`
+- **Optional / operation-gated:** absence is explicit; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Configuration is immutable, typed, versioned, and bounded. Reference sample values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject incompatible versions |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability/contribution | Managed feature scope | Withdraw with scope |
+| Task/subscription/resource | Managed lifecycle API | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence/API protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/portfolio.py` or `None`
-- **Namespace:** `portfolio.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/portfolio.py`
+- **Namespace:** `portfolio.v1`
+- **Schema version:** `1` initially; forward migration only
+- **Retention and purge:** explicit and reference-safe; removal never implicitly purges.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/portfolio.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_portfolio.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `definitions.py` | Versioned members, weights, capital, and constraints; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioRepository` |
+| Missing | `correlation.py` | Aligned overlap-aware dependence analysis; configuration, service, lifecycle, immutable specification, factory/contribution | `CorrelationService` |
+| Missing | `composer.py` | Manual weighting and result recomputation; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioComposer` |
+| Missing | `search.py` | Constrained brute-force/genetic combinations; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioSearch` |
+| Missing | `simulation.py` | Shared-capital account replay; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioSimulator` |
+| Missing | `tests/examples/13_portfolio.py` | Offline primary-purpose evidence | one named scenario per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-PORTFOLIO-001` | Member identity binds result/data/config, not display name. | Identity test |
+| Missing | `FR-PORTFOLIO-002` | Correlation declares return transform, alignment, overlap, missing policy, and minimum samples. | Golden matrix |
+| Missing | `FR-PORTFOLIO-003` | Weight edits create a new result without rewriting member backtests. | Lineage test |
+| Missing | `FR-PORTFOLIO-004` | Search enforces member/group/correlation/capital constraints deterministically. | Search fixtures |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw the capability and managed effects while retaining schema-readable artifacts. Dependent
+operations return attributed unavailable; reinstall requires schema/version compatibility.
 
 ---
 
@@ -195,70 +199,66 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/portfolio.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/portfolio.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/portfolio.py`. | Architecture/schema checks |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-PORTFOLIO-001` | Manual composition and portfolio search are distinct artifact types. | Semantics | E-O09 |
+| Open | `DEC-PORTFOLIO-002` | Reference shared-margin/netting and search tie rules are unverified. | Parity | Hand/reference scenarios |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; installed names and
+sample values are not runtime proof.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/portfolio/[feature]/
+tests/services/portfolio/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_portfolio.py
+tests/examples/13_portfolio.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/portfolio/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/portfolio.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/portfolio.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/portfolio.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/portfolio.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+A member binds strategy and immutable result identities, enabled state, weight, group/sector and optional limits. Correlation inputs declare equity/return transform, resampling timezone/calendar, overlap interval, missing-value policy, minimum samples, and method; insufficient overlap is not zero correlation. Shared-capital replay orders simultaneous member events deterministically and applies explicit currency conversion, leverage, margin, netting/hedging, costs, and liquidation. Official Portfolio Composer changes weights and recomputes position sizing, distinct from Portfolio Master search (E-O09). Bundled automatic-portfolio settings demonstrate member, sector, correlation and metric constraints but their numeric values are examples (E-L03).

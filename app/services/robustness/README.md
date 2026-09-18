@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,29 @@ Backend features use the simplified modular-monolith layout:
 app/services/robustness/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- funnel.py
+|-- retests.py
+|-- monte_carlo.py
+|-- walk_forward_matrix.py
+`-- verdicts.py
 
 app/contracts/robustness.py
-app/services/persistence/robustness.py   # only when the domain persists state
-tests/services/robustness/[feature_1]/
-tests/examples/[domain_number]_robustness.py
+app/services/persistence/robustness.py
+tests/services/robustness/<feature>/
+tests/examples/12_robustness.py
 ```
 
-Each `app/services/robustness/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/robustness.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/robustness.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/robustness.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_robustness.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/robustness.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/12_robustness.py`.
 
 ---
 
@@ -58,135 +53,144 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Deciding what survives: stress scenarios, Monte Carlo, walk-forward, acceptance rules, verdicts.
+Own ordered cross-check funnels, higher-precision/additional-market retests, Monte Carlo perturbations, walk-forward matrix evaluation, acceptance gates, and verdicts.
 
 ### Owns
 
-- Stress testing scenarios: price slippage stress, spread widening, missed trade tests, bar perturbation.
-- Monte Carlo simulations (trade reordering, trade skipping, resampled return analysis).
-- Walk-Forward Matrix (WFM) evaluation, cluster stability checks, and degradation scoring.
-- Systematic acceptance criteria, robustness thresholds, and pass/fail candidate verdicts.
+- Versioned check definitions, ordered execution, early dismissal, and cost estimates.
+- Trade/execution/history/parameter perturbations with named seed streams and distributions.
+- Walk-forward/matrix cells, cluster rules, per-check evidence, and aggregate verdicts.
 
 ### Does not own
 
-- Initial parameter discovery or trial generation (owned by D-OPTIMIZATION).
-- Strategy generation or authoring (owned by D-STRATEGY).
+- Base simulation, optimization trial scheduling, metric formulas, or portfolio construction.
+- Inventing acceptance thresholds from vendor examples.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/robustness.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/robustness.py`; private implementation imports are forbidden.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `robustness.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `robustness.funnel@1` | `CrossCheckFunnel` | `1` | Ordered gated cross-check execution |
+| Missing | `robustness.retests@1` | `RobustnessRetester` | `1` | Precision, market, and timeframe retests |
+| Missing | `robustness.monte_carlo@1` | `MonteCarloService` | `1` | Seeded perturbation scenario distributions |
+| Missing | `robustness.walk_forward_matrix@1` | `WalkForwardMatrixService` | `1` | Walk-forward matrix cells and clusters |
+| Missing | `robustness.verdicts@1` | `RobustnessVerdictService` | `1` | Explainable pass/fail/inconclusive verdicts |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although storage mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `robustness.[feature_partition]` | `FEAT-ROBUSTNESS-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `robustness.v1` | `FEAT-ROBUSTNESS-FUNNEL` and registry peers | `sqlite` | Explicit reference-safe policy | `robustness.funnel@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-ROBUSTNESS-[ACTION_OBJECT]` | [Value] | `app/services/robustness/[feature].py` | `robustness.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-ROBUSTNESS-FUNNEL` | Ordered gated cross-check execution | `app/services/robustness/funnel.py` | `robustness.funnel@1` | `workspace.jobs@1` | Missing |
+| `FEAT-ROBUSTNESS-RETEST` | Precision, market, and timeframe retests | `app/services/robustness/retests.py` | `robustness.retests@1` | `simulator.backtest@1` | Missing |
+| `FEAT-ROBUSTNESS-MONTECARLO` | Seeded perturbation scenario distributions | `app/services/robustness/monte_carlo.py` | `robustness.monte_carlo@1` | `simulator.backtest@1` | Missing |
+| `FEAT-ROBUSTNESS-WALKFORWARD` | Walk-forward matrix cells and clusters | `app/services/robustness/walk_forward_matrix.py` | `robustness.walk_forward_matrix@1` | `optimization.walk_forward@1` | Missing |
+| `FEAT-ROBUSTNESS-VERDICTS` | Explainable pass/fail/inconclusive verdicts | `app/services/robustness/verdicts.py` | `robustness.verdicts@1` | `analytics.metrics@1` | Missing |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
+required consumers become attributed `BLOCKED`, optional operations return unavailable, and
+retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-ROBUSTNESS-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-ROBUSTNESS-FUNNEL` — Execute an ordered robustness funnel
+
+- **Lead owner:** `FEAT-ROBUSTNESS-FUNNEL`
+- **Participants:** Configured checks, simulator, optimizer, metrics, jobs, and artifact store.
+- **Input boundary:** Immutable strategy/base result, ordered checks, scenario counts/seeds, thresholds, and stop policy.
+- **Output boundary:** Per-check results/distributions/reasons plus pass/fail/inconclusive/cancelled aggregate verdict.
+- **Failure boundary:** A mandatory failure skips later expensive checks with reason; cancellation/error never becomes pass.
+- **Acceptance:** `ATW-ROBUSTNESS-FUNNEL-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-ROBUSTNESS-[ACTION_OBJECT]`
+This representative card applies to every registry entry; exact algorithms and states are in Section 9.
 
-> **Feature ID:** `FEAT-ROBUSTNESS-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/robustness/[feature].py`
+### `funnel.py` — `FEAT-ROBUSTNESS-FUNNEL`
+
+> **Feature ID:** `FEAT-ROBUSTNESS-FUNNEL`
+> **Status:** `Missing`
+> **Owner module:** `app/services/robustness/funnel.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide ordered gated cross-check execution without absorbing another feature's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `robustness.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `robustness.funnel@1`
+- **Requires:** `workspace.jobs@1`
+- **Optional / operation-gated:** absence is explicit; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Configuration is immutable, typed, versioned, and bounded. Reference sample values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject incompatible versions |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability/contribution | Managed feature scope | Withdraw with scope |
+| Task/subscription/resource | Managed lifecycle API | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence/API protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/robustness.py` or `None`
-- **Namespace:** `robustness.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/robustness.py`
+- **Namespace:** `robustness.v1`
+- **Schema version:** `1` initially; forward migration only
+- **Retention and purge:** explicit and reference-safe; removal never implicitly purges.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/robustness.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_robustness.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `funnel.py` | Ordered gated cross-check execution; configuration, service, lifecycle, immutable specification, factory/contribution | `CrossCheckFunnel` |
+| Missing | `retests.py` | Precision, market, and timeframe retests; configuration, service, lifecycle, immutable specification, factory/contribution | `RobustnessRetester` |
+| Missing | `monte_carlo.py` | Seeded perturbation scenario distributions; configuration, service, lifecycle, immutable specification, factory/contribution | `MonteCarloService` |
+| Missing | `walk_forward_matrix.py` | Walk-forward matrix cells and clusters; configuration, service, lifecycle, immutable specification, factory/contribution | `WalkForwardMatrixService` |
+| Missing | `verdicts.py` | Explainable pass/fail/inconclusive verdicts; configuration, service, lifecycle, immutable specification, factory/contribution | `RobustnessVerdictService` |
+| Missing | `tests/examples/12_robustness.py` | Offline primary-purpose evidence | one named scenario per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-ROBUSTNESS-001` | Checks run in configured order and early dismissal is recorded. | Funnel integration |
+| Missing | `FR-ROBUSTNESS-002` | Scenario generation is reproducible and each seed/config is retained. | Monte Carlo golden |
+| Missing | `FR-ROBUSTNESS-003` | Acceptance uses named metric versions, quantiles, comparators, and sample scope. | Boundary tests |
+| Missing | `FR-ROBUSTNESS-004` | WFM cluster evaluation is deterministic and example thresholds are not defaults. | Matrix fixtures |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw the capability and managed effects while retaining schema-readable artifacts. Dependent
+operations return attributed unavailable; reinstall requires schema/version compatibility.
 
 ---
 
@@ -195,70 +199,66 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/robustness.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/robustness.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/robustness.py`. | Architecture/schema checks |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-ROBUSTNESS-001` | Verdicts distinguish fail, inconclusive, cancelled, and error. | Truthfulness | E-O04 |
+| Open | `DEC-ROBUSTNESS-002` | Exact random distributions, clipping, and cell-boundary rules are unverified. | Parity | Statistical/reference fixtures |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; installed names and
+sample values are not runtime proof.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/robustness/[feature]/
+tests/services/robustness/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_robustness.py
+tests/examples/12_robustness.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/robustness/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/robustness.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/robustness.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/robustness.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/robustness.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+Official cross-checks form an ordered cost funnel with early dismissal: higher precision, Monte Carlo trade manipulation, additional markets, and Monte Carlo retests are documented categories (E-O04). Local snippets add trade reorder/resample/skip/execution degradation and randomized history/OHLC/minimum distance/slippage/spread/start/parameters (E-L04). Each method defines distribution, bounds, correlation, clipping, seed derivation, scenario count, metric profile and acceptance statistic. WFM spans run/window and OOS-percent cells; cluster examples such as 7 of 9 passing in a 3x3 neighborhood are illustrative, not universal defaults (E-O05). A verdict records all skipped/failed cells and source identities.

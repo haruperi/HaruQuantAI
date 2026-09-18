@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,29 @@ Backend features use the simplified modular-monolith layout:
 app/services/workspace/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- settings.py
+|-- jobs.py
+|-- scheduler.py
+|-- notifications.py
+`-- diagnostics.py
 
 app/contracts/workspace.py
-app/services/persistence/workspace.py   # only when the domain persists state
-tests/services/workspace/[feature_1]/
-tests/examples/[domain_number]_workspace.py
+app/services/persistence/workspace.py
+tests/services/workspace/<feature>/
+tests/examples/01_workspace.py
 ```
 
-Each `app/services/workspace/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/workspace.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/workspace.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/workspace.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_workspace.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/workspace.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/01_workspace.py`.
 
 ---
 
@@ -58,37 +53,39 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Everything mechanical: jobs (lifecycle, pause/resume, recovery), settings, logging, persistence, editions/licensing, notifications.
+Own application settings, durable job lifecycle, scheduling, recovery, logs, notifications, and operational diagnostics.
 
 ### Owns
 
-- Job lifecycle management (scheduling, pausing, resuming, recovering, and cancelling tasks).
-- Application configuration, user settings, and environment profiles.
-- Operational logging, diagnostic audit logs, and system event notifications.
-- Editions, licensing boundaries, and functional feature gating.
+- Typed settings with scope, provenance, and migration.
+- Durable job/attempt state, progress, pause/resume/cancel, and restart recovery.
+- Bounded scheduling, worker supervision, logs, health, and notification dispatch.
 
 ### Does not own
 
-- Trading strategy formulation or execution logic (owned by D-STRATEGY and D-TRADING).
-- Direct market data feeds or broker connectivity (owned by D-DATA and D-BROKERS).
+- Research task meaning or quantitative algorithms.
+- Gateway transport or broker/provider behavior.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/workspace.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+The public boundary is `app/contracts/workspace.py`. Counterparty status never authorizes a
+private implementation import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `workspace.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `workspace.settings@1` | `SettingsService` | `1` | Scoped settings and snapshots |
+| Missing | `workspace.jobs@1` | `JobService` | `1` | Durable job and attempt lifecycle |
+| Missing | `workspace.scheduler@1` | `SchedulerService` | `1` | Bounded dispatch and worker supervision |
+| Missing | `workspace.notifications@1` | `NotificationService` | `1` | Best-effort user notifications |
+| Missing | `workspace.diagnostics@1` | `DiagnosticsService` | `1` | Health, version, and redacted logs |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+Semantic state remains feature-owned although database mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `workspace.[feature_partition]` | `FEAT-WORKSPACE-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `workspace.v1` | `FEAT-WORKSPACE-SETTINGS` and registry peers | `sqlite` | Retain versioned records until explicit policy permits purge | `workspace.settings@1` |
 
 ---
 
@@ -96,97 +93,115 @@ domain persistence module. Other domains access it only through public capabilit
 
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-WORKSPACE-[ACTION_OBJECT]` | [Value] | `app/services/workspace/[feature].py` | `workspace.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-WORKSPACE-SETTINGS` | Scoped settings and snapshots | `app/services/workspace/settings.py` | `workspace.settings@1` | None | Missing |
+| `FEAT-WORKSPACE-JOBS` | Durable job and attempt lifecycle | `app/services/workspace/jobs.py` | `workspace.jobs@1` | `persistence.workspace@1` | Missing |
+| `FEAT-WORKSPACE-SCHEDULER` | Bounded dispatch and worker supervision | `app/services/workspace/scheduler.py` | `workspace.scheduler@1` | `workspace.jobs@1` | Missing |
+| `FEAT-WORKSPACE-NOTIFICATIONS` | Best-effort user notifications | `app/services/workspace/notifications.py` | `workspace.notifications@1` | None | Missing |
+| `FEAT-WORKSPACE-DIAGNOSTICS` | Health, version, and redacted logs | `app/services/workspace/diagnostics.py` | `workspace.diagnostics@1` | None | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 
 ```mermaid
 flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
+    Consumer["Consuming feature"] --> Contract["Versioned public capability"]
+    Provider["D-WORKSPACE feature"] --> Contract
     Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
+    Provider --> Persistence["Domain persistence boundary"]
 ```
 
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Removing one module and registry entry withdraws only its capability. Required consumers become
+attributed `BLOCKED`; operation-gated consumers refuse only the affected operation. Retained
+state is never purged implicitly.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
+### `WF-WORKSPACE-JOB` — Submit, control, and recover a job
 
-- **Lead owner:** `FEAT-WORKSPACE-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+- **Lead owner:** `FEAT-WORKSPACE-JOBS`
+- **Participants:** Scheduler and Persistence capabilities; a domain worker selected by resource class.
+- **Input boundary:** Validated immutable work envelope, limits, priority, code/config hash, and optional seed.
+- **Output boundary:** Job/attempt receipt, ordered progress, truthful terminal result, and artifact references.
+- **Failure boundary:** Invalid transitions conflict; worker loss becomes interrupted; partial output is staged, never successful.
+- **Acceptance:** `ATW-WORKSPACE-JOB-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
+The following contract applies to every registered feature; domain-specific semantics are in
+Section 9.
 
-### `[feature].py` — `FEAT-WORKSPACE-[ACTION_OBJECT]`
+### `settings.py` — `FEAT-WORKSPACE-SETTINGS`
 
-> **Feature ID:** `FEAT-WORKSPACE-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/workspace/[feature].py`
+> **Feature ID:** `FEAT-WORKSPACE-SETTINGS` (representative registry entry)
+> **Status:** `Missing`
+> **Owner module:** `app/services/workspace/settings.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide scoped settings and snapshots. Other registry entries follow the same lifecycle and
+evidence obligations without merging their responsibilities into this module.
 
 #### Capability declarations
 
-- **Provides:** `workspace.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `workspace.settings@1`
+- **Requires:** None
+- **Optional / operation-gated:** only capabilities explicitly declared by the feature; absence
+  returns a typed unavailable result and does not silently substitute behavior.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Each owner module defines a slotted immutable `<Feature>Config`. No reference sample value is
+promoted to a default without product approval.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject unknown/incompatible versions |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Must be positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject nonpositive/unbounded values |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability publication | `FeatureContext.provide(...)` | Withdrawn with feature scope |
+| Tasks/subscriptions/resources | Managed `FeatureContext` API | Cancel/close in reverse order; failed start unwinds all effects |
+| Durable mutation | Focused persistence protocol | Transaction rollback; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/workspace.py` or `None`
-- **Namespace:** `workspace.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/workspace.py`
+- **Namespace:** `workspace.v1`
+- **Schema version:** `1` initially; forward migrations only
+- **Retention and purge:** retain lineage-bearing records; purge only by explicit, reference-safe policy
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/workspace.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_workspace.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `settings.py` | Scoped settings and snapshots; config, service, lifecycle, `SPEC`, factory | `SettingsService` |
+| Missing | `jobs.py` | Durable job and attempt lifecycle; config, service, lifecycle, `SPEC`, factory | `JobService` |
+| Missing | `scheduler.py` | Bounded dispatch and worker supervision; config, service, lifecycle, `SPEC`, factory | `SchedulerService` |
+| Missing | `notifications.py` | Best-effort user notifications; config, service, lifecycle, `SPEC`, factory | `NotificationService` |
+| Missing | `diagnostics.py` | Health, version, and redacted logs; config, service, lifecycle, `SPEC`, factory | `DiagnosticsService` |
+| Missing | `tests/examples/01_workspace.py` | Offline primary-purpose evidence | one `example_<NN>_<feature_slug>()` per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-WORKSPACE-001` | State machine is queued/running/pausing/paused/cancelling/cancelled/succeeded/failed/interrupted with compare-and-swap transitions. | Exhaustive transition test |
+| Missing | `FR-WORKSPACE-002` | Pause/cancel are cooperative and bounded; resume uses a validated checkpoint or a new attempt. | Worker fault fixture |
+| Missing | `FR-WORKSPACE-003` | Restart marks orphan attempts interrupted and never fabricates completion. | Coordinator restart test |
+| Missing | `FR-WORKSPACE-004` | Notification failure cannot change job outcome and all messages are secret-safe. | Failure/redaction tests |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Physical removal withdraws the feature's capability and cancels its managed effects. Stored
+artifacts remain readable by schema-aware tooling; operations requiring the missing capability
+return an attributed unavailable result. Reinstall may resume only after schema and version checks.
 
 ---
 
@@ -195,11 +210,11 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/workspace.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/workspace.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/workspace.py`. | Architecture/schema checks |
 
 ---
 
@@ -207,58 +222,53 @@ and physical-removal evidence.]
 
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-WORKSPACE-001` | Initial coordination uses bounded in-memory queues plus process IPC and a SQLite job ledger. | All jobs | Owner-ratified E-T01 |
+| Open | `DEC-WORKSPACE-002` | Exact reference pause checkpoint granularity is unverified. | Parity profile | Controlled long-task observation |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; a filename, bundled
+sample value, or third-party function name is not proof of runtime semantics.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/workspace/[feature]/
+tests/services/workspace/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_workspace.py
+tests/examples/01_workspace.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/workspace/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/workspace.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/workspace.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/workspace.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/workspace.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+A job freezes operation, validated input identities, owner, priority, resource class, configuration/code versions, and seed. Attempts carry worker identity, progress sequence, heartbeat, checkpoint, and terminal reason. Every transition appends one audit event. Scheduler fairness and concurrency are explicit settings. Settings resolve run > project > workspace > application with provenance; secrets are references, never values. Evidence: official program/task-manager surfaces and exact-version task plugins/XML (E-O01, E-O08, E-L01, E-L03). Bundled task values are examples, not defaults.

@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,30 @@ Backend features use the simplified modular-monolith layout:
 app/services/optimization/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- parameter_spaces.py
+|-- studies.py
+|-- exhaustive.py
+|-- genetic.py
+|-- sequential.py
+`-- walk_forward.py
 
 app/contracts/optimization.py
-app/services/persistence/optimization.py   # only when the domain persists state
-tests/services/optimization/[feature_1]/
-tests/examples/[domain_number]_optimization.py
+app/services/persistence/optimization.py
+tests/services/optimization/<feature>/
+tests/examples/11_optimization.py
 ```
 
-Each `app/services/optimization/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/optimization.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/optimization.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/optimization.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_optimization.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/optimization.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/11_optimization.py`.
 
 ---
 
@@ -58,135 +54,147 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Parameter ranges, trials, best parameter sets, sequential optimization, walk-forward schedules.
+Own typed parameter spaces, deterministic trial schedules, exhaustive/random/genetic search, multi-objective scoring, sequential optimization, and walk-forward schedules.
 
 ### Owns
 
-- Parameter range declarations, grid definitions, and parameter trial generators.
-- Optimization engines: brute-force grid search, random search, and genetic optimization algorithms.
-- Sequential optimization algorithms, walk-forward optimization schedules, and parameter stability analysis.
-- Identification and ranking of optimal parameter sets based on objective fitness functions.
+- Parameter/range/constraint validation and finite combination counting.
+- Study/trial lifecycle, search algorithms, objectives, pruning, checkpoints, and artifacts.
+- Explicit in-sample/out-of-sample window schedules and aggregation inputs.
 
 ### Does not own
 
-- Individual backtest execution (delegated to D-SIMULATOR).
-- Monte Carlo stress analysis or robustness verdicts (owned by D-ROBUSTNESS).
+- Backtest execution, metric formulas, robustness verdicts, or job process supervision.
+- Strategy grammar semantics or portfolio combination search.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/optimization.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/optimization.py`; private implementation imports are forbidden.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `optimization.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `optimization.parameter_spaces@1` | `ParameterSpaceService` | `1` | Typed ranges, constraints, and schedules |
+| Missing | `optimization.studies@1` | `StudyService` | `1` | Studies, trials, objectives, and artifacts |
+| Missing | `optimization.exhaustive@1` | `ExhaustiveOptimizer` | `1` | Deterministic grid enumeration |
+| Missing | `optimization.genetic@1` | `GeneticOptimizer` | `1` | Seeded population search |
+| Missing | `optimization.sequential@1` | `SequentialOptimizer` | `1` | Ordered parameter-stage optimization |
+| Missing | `optimization.walk_forward@1` | `WalkForwardScheduler` | `1` | Versioned IS/OOS schedules |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although storage mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `optimization.[feature_partition]` | `FEAT-OPTIMIZATION-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `optimization.v1` | `FEAT-OPTIMIZATION-SPACES` and registry peers | `sqlite` | Explicit reference-safe policy | `optimization.parameter_spaces@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-OPTIMIZATION-[ACTION_OBJECT]` | [Value] | `app/services/optimization/[feature].py` | `optimization.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-OPTIMIZATION-SPACES` | Typed ranges, constraints, and schedules | `app/services/optimization/parameter_spaces.py` | `optimization.parameter_spaces@1` | `strategy.definitions@1` | Missing |
+| `FEAT-OPTIMIZATION-STUDIES` | Studies, trials, objectives, and artifacts | `app/services/optimization/studies.py` | `optimization.studies@1` | `workspace.jobs@1` | Missing |
+| `FEAT-OPTIMIZATION-EXHAUSTIVE` | Deterministic grid enumeration | `app/services/optimization/exhaustive.py` | `optimization.exhaustive@1` | `simulator.backtest@1` | Missing |
+| `FEAT-OPTIMIZATION-GENETIC` | Seeded population search | `app/services/optimization/genetic.py` | `optimization.genetic@1` | `simulator.backtest@1`, `analytics.metrics@1` | Missing |
+| `FEAT-OPTIMIZATION-SEQUENTIAL` | Ordered parameter-stage optimization | `app/services/optimization/sequential.py` | `optimization.sequential@1` | `optimization.studies@1` | Missing |
+| `FEAT-OPTIMIZATION-WINDOWS` | Versioned IS/OOS schedules | `app/services/optimization/walk_forward.py` | `optimization.walk_forward@1` | `data.datasets@1` | Missing |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
+required consumers become attributed `BLOCKED`, optional operations return unavailable, and
+retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-OPTIMIZATION-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-OPTIMIZATION-STUDY` — Plan and execute a reproducible parameter study
+
+- **Lead owner:** `FEAT-OPTIMIZATION-STUDIES`
+- **Participants:** Parameter space, simulator, metrics, workspace jobs, artifacts, and optional search algorithm.
+- **Input boundary:** Strategy/data/config versions, ranges/constraints, algorithm/seed, objectives, budget, and windows.
+- **Output boundary:** Materialized schedule, immutable trial records, best/Pareto selection, checkpoint, and manifest.
+- **Failure boundary:** Invalid or nonfinite space fails before dispatch; failed/cancelled/pruned trials retain distinct states.
+- **Acceptance:** `ATW-OPTIMIZATION-STUDY-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-OPTIMIZATION-[ACTION_OBJECT]`
+This representative card applies to every registry entry; exact algorithms and states are in Section 9.
 
-> **Feature ID:** `FEAT-OPTIMIZATION-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/optimization/[feature].py`
+### `parameter_spaces.py` — `FEAT-OPTIMIZATION-SPACES`
+
+> **Feature ID:** `FEAT-OPTIMIZATION-SPACES`
+> **Status:** `Missing`
+> **Owner module:** `app/services/optimization/parameter_spaces.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide typed ranges, constraints, and schedules without absorbing another feature's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `optimization.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `optimization.parameter_spaces@1`
+- **Requires:** `strategy.definitions@1`
+- **Optional / operation-gated:** absence is explicit; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Configuration is immutable, typed, versioned, and bounded. Reference sample values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject incompatible versions |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability/contribution | Managed feature scope | Withdraw with scope |
+| Task/subscription/resource | Managed lifecycle API | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence/API protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/optimization.py` or `None`
-- **Namespace:** `optimization.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/optimization.py`
+- **Namespace:** `optimization.v1`
+- **Schema version:** `1` initially; forward migration only
+- **Retention and purge:** explicit and reference-safe; removal never implicitly purges.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/optimization.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_optimization.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `parameter_spaces.py` | Typed ranges, constraints, and schedules; configuration, service, lifecycle, immutable specification, factory/contribution | `ParameterSpaceService` |
+| Missing | `studies.py` | Studies, trials, objectives, and artifacts; configuration, service, lifecycle, immutable specification, factory/contribution | `StudyService` |
+| Missing | `exhaustive.py` | Deterministic grid enumeration; configuration, service, lifecycle, immutable specification, factory/contribution | `ExhaustiveOptimizer` |
+| Missing | `genetic.py` | Seeded population search; configuration, service, lifecycle, immutable specification, factory/contribution | `GeneticOptimizer` |
+| Missing | `sequential.py` | Ordered parameter-stage optimization; configuration, service, lifecycle, immutable specification, factory/contribution | `SequentialOptimizer` |
+| Missing | `walk_forward.py` | Versioned IS/OOS schedules; configuration, service, lifecycle, immutable specification, factory/contribution | `WalkForwardScheduler` |
+| Missing | `tests/examples/11_optimization.py` | Offline primary-purpose evidence | one named scenario per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-OPTIMIZATION-001` | Typed steps and constraints yield deterministic finite schedules/counts. | Boundary/enumeration tests |
+| Missing | `FR-OPTIMIZATION-002` | Identical study inputs and seeds reproduce trial order and selection. | Golden study |
+| Missing | `FR-OPTIMIZATION-003` | Failed/cancelled/pruned trials never become objective winners. | Fault tests |
+| Missing | `FR-OPTIMIZATION-004` | Walk-forward windows expose anchoring, overlap, warm-up, IS/OOS, and aggregation. | Window table tests |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw the capability and managed effects while retaining schema-readable artifacts. Dependent
+operations return attributed unavailable; reinstall requires schema/version compatibility.
 
 ---
 
@@ -195,70 +203,66 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/optimization.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/optimization.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/optimization.py`. | Architecture/schema checks |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-OPTIMIZATION-001` | Worker processes isolate trials; SQLite ledger and artifacts preserve truth. | Runtime | E-T01 |
+| Open | `DEC-OPTIMIZATION-002` | Reference mutation/selection distributions and sequential tie rules are unverified. | Parity | Seeded bounded fixtures |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; installed names and
+sample values are not runtime proof.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/optimization/[feature]/
+tests/services/optimization/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_optimization.py
+tests/examples/11_optimization.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/optimization/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/optimization.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/optimization.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/optimization.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/optimization.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+Ranges declare type, unit, inclusive/exclusive bounds, step or distribution, conditional activation, and constraint predicates. Decimal/integer schedules avoid float accumulation and reject empty/overflowing spaces. A study freezes algorithm/version, ordered objective definitions, ranking direction, constraints, budget, concurrency, seed streams, and evaluator inputs. Genetic options explicitly version population/generation, selection, crossover, mutation, elitism, islands and migration (E-O06); bundled task values are examples only (E-L03). Every trial is queued/running/succeeded/failed/cancelled/pruned with parameters and source result identity. Sequential stages declare parameter order and carry-forward rule. Walk-forward schedules declare anchored/rolling windows, lengths, step, warm-up, overlap, incomplete-window policy, and OOS aggregation.

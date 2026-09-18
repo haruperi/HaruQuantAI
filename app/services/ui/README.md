@@ -1,56 +1,53 @@
 # UI
 
 > **Package:** `app/services/ui/`
-> **Status:** `Missing`
+> **Status:** `Partial`
 > **Last updated:** `2026-09-18`
 > **Domain ID:** `D-UI`
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence. Only the repository-backed frontend foundation is `Partial`; authoritative backend
+integration and the remaining product behavior are not complete.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
-Backend features use the simplified modular-monolith layout:
+The UI keeps the same public-contract and lifecycle boundaries while following its existing
+React/TypeScript structure:
 
 ```text
-app/services/ui/
+app/ui/
 |-- README.md
-|-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- package.json
+|-- src/
+|-- shell.tsx
+|-- screens/
+|-- components/
+|-- stores/
+|-- services/
+`-- docs/
 
 app/contracts/ui.py
-app/services/persistence/ui.py   # only when the domain persists state
-tests/services/ui/[feature_1]/
-tests/examples/[domain_number]_ui.py
+app/services/persistence/ui.py
+tests/services/ui/<feature>/
+tests/examples/16_ui.py
 ```
 
-Each `app/services/ui/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each visual feature is a cohesive component/store/service contribution with typed props, stable
+entity identities, bounded effects, explicit cleanup, and colocated tests. Cross-boundary DTOs,
+errors, events, and capability keys remain in `app/contracts/ui.py`; generated API types may
+mirror but never redefine those semantics.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/ui.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/ui.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_ui.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+The client never executes SQL. Server-owned records are authoritative; local persistence is
+limited to versioned layout, theme, drafts, and bounded view/cache state. Frontend usage evidence
+lives in component/Vitest/Playwright scenarios; Python examples apply only to backend UI
+contributions if any are introduced.
 
 ---
 
@@ -58,134 +55,150 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Compose an accessible workstation from independently owned visual feature contributions..
+Compose the accessible research workstation from domain-owned data and actions while preserving honest mock/live state, stable identity, and responsive long-running workflows.
 
 ### Owns
 
-- Workstation composition contracts and visual integration points.
-- Backend UI layout state, docking definitions, visual contribution contracts, and client settings.
-- User interface shell synchronization with backend services.
+- Navigation, application shell, Dockview workspaces, forms, tables, charts, dialogs, progress, notifications, and accessibility.
+- Typed client adapters, view state, drafts, selection, saved layout, theme, and presentation formatting.
+- Visual contribution points that never absorb quantitative business logic.
 
 ### Does not own
 
-- Single-page client bundle assets (implemented in app/ui/ frontend simulator).
-- Trading or quantitative business logic.
+- Authoritative jobs, strategies, simulations, metrics, persistence, or broker operations.
+- Claimed pixel/native parity without visual reference evidence.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/ui.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/ui.py`; private implementation imports are forbidden.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `ui.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Partial | `ui.shell@1` | `ShellContribution` | `1` | Navigation, project header, theme, settings, notifications |
+| Partial | `ui.research_workspace@1` | `ResearchWorkspace` | `1` | Builder, Improver, Retester, Optimizer and databanks |
+| Partial | `ui.results_workspace@1` | `ResultsWorkspace` | `1` | Linked overview, trades, charts, source, robustness |
+| Partial | `ui.data_manager@1` | `DataManagerView` | `1` | Data source, import, instrument and quality screens |
+| Partial | `ui.algo_wizard@1` | `AlgoWizardView` | `1` | Rule-tree authoring and export surfaces |
+| Partial | `ui.portfolio_workspace@1` | `PortfolioWorkspace` | `1` | Portfolio Master and Composer screens |
+| Partial | `ui.custom_projects@1` | `CustomProjectView` | `1` | Project graph and task-manager screens |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although storage mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `ui.[feature_partition]` | `FEAT-UI-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Partial | `ui.v1` | `FEAT-UI-SHELL` and registry peers | `localStorage mock; target server/SQLite` | Explicit reference-safe policy | `ui.shell@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-UI-[ACTION_OBJECT]` | [Value] | `app/services/ui/[feature].py` | `ui.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-UI-SHELL` | Navigation, project header, theme, settings, notifications | `app/ui/src/shell.tsx` | `ui.shell@1` | `gateway.application@1` | Partial |
+| `FEAT-UI-RESEARCH` | Builder, Improver, Retester, Optimizer and databanks | `app/ui/src/research_workspace.tsx` | `ui.research_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Partial |
+| `FEAT-UI-RESULTS` | Linked overview, trades, charts, source, robustness | `app/ui/src/results_workspace.tsx` | `ui.results_workspace@1` | `analytics.metrics@1` | Partial |
+| `FEAT-UI-DATA` | Data source, import, instrument and quality screens | `app/ui/src/data_manager.tsx` | `ui.data_manager@1` | `data.datasets@1` | Partial |
+| `FEAT-UI-AUTHORING` | Rule-tree authoring and export surfaces | `app/ui/src/algo_wizard.tsx` | `ui.algo_wizard@1` | `strategy.authoring@1` | Partial |
+| `FEAT-UI-PORTFOLIO` | Portfolio Master and Composer screens | `app/ui/src/portfolio_workspace.tsx` | `ui.portfolio_workspace@1` | `portfolio.definitions@1` | Partial |
+| `FEAT-UI-PROJECTS` | Project graph and task-manager screens | `app/ui/src/custom_projects.tsx` | `ui.custom_projects@1` | `research.projects@1` | Partial |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
+required consumers become attributed `BLOCKED`, optional operations return unavailable, and
+retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-UI-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-UI-RESEARCH` — Configure, run, and inspect a research job
+
+- **Lead owner:** `FEAT-UI-RESEARCH`
+- **Participants:** Shell, typed API client, job stream, stable tables, Dockview result panels, charts, notifications.
+- **Input boundary:** Validated draft settings and selected immutable entities.
+- **Output boundary:** Job receipt/progress, synchronized result identity, recoverable view state, accessible status.
+- **Failure boundary:** Validation stays located; disconnect shows stale/reconnect state; server truth wins conflicts; mock operations remain labeled.
+- **Acceptance:** `ATW-UI-RESEARCH-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-UI-[ACTION_OBJECT]`
+This representative card applies to every registry entry; exact algorithms and states are in Section 9.
 
-> **Feature ID:** `FEAT-UI-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/ui/[feature].py`
+### `shell.tsx` — `FEAT-UI-SHELL`
+
+> **Feature ID:** `FEAT-UI-SHELL`
+> **Status:** `Partial`
+> **Owner module:** `app/ui/src/shell.tsx`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide navigation, project header, theme, settings, notifications without absorbing another feature's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `ui.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `ui.shell@1`
+- **Requires:** `gateway.application@1`
+- **Optional / operation-gated:** absence is explicit; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Configuration is immutable, typed, versioned, and bounded. Reference sample values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Partial | `schema_version` | positive integer | `1` | Reject incompatible versions |
+| Partial | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Partial | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability/contribution | Managed feature scope | Withdraw with scope |
+| Task/subscription/resource | Managed lifecycle API | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence/API protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/ui.py` or `None`
-- **Namespace:** `ui.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/ui.py`
+- **Namespace:** `ui.v1`
+- **Schema version:** `1` initially; forward migration only
+- **Retention and purge:** explicit and reference-safe; removal never implicitly purges.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/ui.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_ui.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Partial | `shell.tsx` | Navigation, project header, theme, settings, notifications; configuration, service, lifecycle, immutable specification, factory/contribution | `ShellContribution` |
+| Partial | `research_workspace.tsx` | Builder, Improver, Retester, Optimizer and databanks; configuration, service, lifecycle, immutable specification, factory/contribution | `ResearchWorkspace` |
+| Partial | `results_workspace.tsx` | Linked overview, trades, charts, source, robustness; configuration, service, lifecycle, immutable specification, factory/contribution | `ResultsWorkspace` |
+| Partial | `data_manager.tsx` | Data source, import, instrument and quality screens; configuration, service, lifecycle, immutable specification, factory/contribution | `DataManagerView` |
+| Partial | `algo_wizard.tsx` | Rule-tree authoring and export surfaces; configuration, service, lifecycle, immutable specification, factory/contribution | `AlgoWizardView` |
+| Partial | `portfolio_workspace.tsx` | Portfolio Master and Composer screens; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioWorkspace` |
+| Partial | `custom_projects.tsx` | Project graph and task-manager screens; configuration, service, lifecycle, immutable specification, factory/contribution | `CustomProjectView` |
+| Partial | `tests/examples/16_ui.py` | Offline primary-purpose evidence | one named scenario per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Partial | `FR-UI-001` | Stable IDs preserve selection under sort/filter/virtualization and streamed updates. | Component/E2E tests |
+| Partial | `FR-UI-002` | Every long action has idle/running/paused/cancelling/terminal/error/reconnect states. | State tests |
+| Partial | `FR-UI-003` | Dock layout is schema-versioned, persisted, migratable, and safely resettable. | Layout tests |
+| Partial | `FR-UI-004` | Keyboard, focus, labels, announcements, reduced motion, and non-color status meet WCAG 2.2 AA. | Automated/manual a11y |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw the capability and managed effects while retaining schema-readable artifacts. Dependent
+operations return attributed unavailable; reinstall requires schema/version compatibility.
 
 ---
 
@@ -193,71 +206,65 @@ and physical-removal evidence.]
 
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
-| Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
-| Missing | `ARCH-004` | Public contracts live in `app/contracts/ui.py`. | Import/contract checks |
-| Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/ui.py`. | Architecture and schema checks |
+| Partial | `ARCH-001` | TypeScript remains strict and presentation never redefines domain semantics. | Typecheck and contract tests |
+| Partial | `ARCH-002` | Effects, subscriptions, charts, and streams have explicit cleanup. | Component lifecycle tests |
+| Partial | `ARCH-003` | Server entities use stable IDs through sort/filter/virtualization. | Table/selection tests |
+| Partial | `ARCH-004` | Public backend semantics originate in `app/contracts/ui.py` and generated API schemas. | Contract checks |
+| Partial | `ARCH-005` | Domain calculations do not live in React components or client stores. | Review and boundary tests |
+| Partial | `ARCH-006` | Local persistence is schema-versioned view state, never authoritative business truth. | Migration/corruption tests |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-UI-001` | React/TypeScript/Vite/Tailwind, Dockview, TanStack Table/Virtual, and Lightweight Charts are target stack. | Frontend | E-T01 |
+| Open | `DEC-UI-002` | Pixel parity is unverified because native screenshots were unavailable. | Visual parity | Approved screenshot baselines |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; installed names and
+sample values are not runtime proof.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/ui/[feature]/
-|-- test_config.py
-|-- test_[feature].py
-|-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
-
-tests/examples/[domain_number]_ui.py
+app/ui/src/**/*.test.ts
+app/ui/src/**/*.test.tsx
+app/ui/e2e/
+app/ui/docs/coverage.json
+app/ui/docs/parity.md
+app/ui/docs/mock-contracts.md
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/ui/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/ui.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Typed API contracts and feature contribution boundaries exist.
+- [ ] Rendering and imports have no network, timer, or subscription side effects.
+- [ ] Happy, invalid, empty, loading, error, reconnect, conflict, and cleanup tests pass.
+- [ ] Virtualized selection, linked results, layout migration, and accessibility tests pass.
+- [ ] Playwright flows and approved visual baselines cover every primary surface.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
-2. Update `app/contracts/ui.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/ui.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+1. Update this README and identify the exact feature/requirement scope.
+2. Update `app/contracts/ui.py` and generated client types first when the boundary changes.
+3. Implement one cohesive screen/component/store/service contribution under `app/ui/src`.
+4. Keep server-owned records outside client persistence; version any layout/view-state change.
+5. Update component tests, Playwright flow, and the coverage/parity/mock ledgers.
+6. Verify cleanup, keyboard/focus behavior, removal, and affected screens.
+7. Run frontend checks plus the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+Baseline E-R01 confirms a broad deterministic mock frontend: shell/theme/settings/notifications; Builder/Improver controls and progress; Optimizer; virtualized databanks; linked results with Lightweight Charts; Data Manager; AlgoWizard; portfolio screens; custom projects; extensions; localStorage schema sqx-recreation-v1. It must be described as a research simulator, not engine parity. Partial gaps are authoritative backend/engine integration, dedicated retester controls, specialized robustness/3D/correlation renderers, arbitrary CSV mapping, proprietary formats, Dockview geometry persistence, complete undo/redo, comprehensive Playwright/visual baselines, and all native/provider/compiler/remote/MCP/SMTP/license/live operations. Interrupted mock jobs remain in last persisted state, not silently completed. Server-owned records replace localStorage as truth; client caches/view state remain bounded. Virtual rows and charts must preserve identity and dispose listeners/resources.

@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,31 @@ Backend features use the simplified modular-monolith layout:
 app/services/strategy/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- model.py
+|-- validation.py
+|-- authoring.py
+|-- grammar.py
+|-- generation.py
+|-- evolution.py
+`-- export.py
 
 app/contracts/strategy.py
-app/services/persistence/strategy.py   # only when the domain persists state
-tests/services/strategy/[feature_1]/
-tests/examples/[domain_number]_strategy.py
+app/services/persistence/strategy.py
+tests/services/strategy/<feature>/
+tests/examples/06_strategy.py
 ```
 
-Each `app/services/strategy/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/strategy.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/strategy.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/strategy.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_strategy.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/strategy.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/06_strategy.py`.
 
 ---
 
@@ -58,135 +55,151 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-The canonical trading idea: events, rules, conditions, parameters, templates, generation, evolution, export configuration, visual authoring.
+Own the canonical strategy definition, validation, visual-rule editing, block grammar, candidate generation/evolution, lineage, and offline target export.
 
 ### Owns
 
-- The canonical trading idea definition: events, entry/exit rules, conditions, and parameters.
-- Strategy templates, algorithmic building block assembly, and visual authoring (AlgoWizard).
-- Automated strategy generation, genetic evolution, and mutation pipelines.
-- Code generation and export configurations for external platforms (MT4/5, NinjaTrader, etc.).
+- Typed event-rule-condition-action model, parameters, variables, data bindings, and immutable revisions.
+- Grammar constraints, seeded generation, genetic operators, improvement scope, and candidate lineage.
+- Restricted versioned export templates and target profiles.
 
 ### Does not own
 
-- Backtesting simulation or order fill matching (owned by D-SIMULATOR).
-- Position size calculations or portfolio capital allocation (owned by D-RISK and D-PORTFOLIO).
+- Fill simulation, authoritative result metrics, or broker submission.
+- Indicator formulas or protective-policy calculations.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/strategy.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/strategy.py`; counterparty status never authorizes a private import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `strategy.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `strategy.definitions@1` | `StrategyRepository` | `1` | Canonical strategy artifacts and revisions |
+| Missing | `strategy.validation@1` | `StrategyValidator` | `1` | Schema, tree, parameter, and target validation |
+| Missing | `strategy.authoring@1` | `StrategyAuthoring` | `1` | Atomic rule-tree editing and revision history |
+| Missing | `strategy.grammar@1` | `GrammarService` | `1` | Allowed blocks, weights, limits, and distributions |
+| Missing | `strategy.generation@1` | `StrategyGenerator` | `1` | Seeded candidate generation |
+| Missing | `strategy.evolution@1` | `EvolutionService` | `1` | Typed genetic improvement and lineage |
+| Missing | `strategy.export@1` | `StrategyExporter` | `1` | Validated deterministic source bundles |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although database mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `strategy.[feature_partition]` | `FEAT-STRATEGY-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `strategy.v1` | `FEAT-STRATEGY-MODEL` and registry peers | `sqlite` | Explicit reference-safe policy | `strategy.definitions@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-STRATEGY-[ACTION_OBJECT]` | [Value] | `app/services/strategy/[feature].py` | `strategy.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-STRATEGY-MODEL` | Canonical strategy artifacts and revisions | `app/services/strategy/model.py` | `strategy.definitions@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-STRATEGY-VALIDATION` | Schema, tree, parameter, and target validation | `app/services/strategy/validation.py` | `strategy.validation@1` | `indicator.extensions@1` | Missing |
+| `FEAT-STRATEGY-AUTHORING` | Atomic rule-tree editing and revision history | `app/services/strategy/authoring.py` | `strategy.authoring@1` | `strategy.definitions@1` | Missing |
+| `FEAT-STRATEGY-GRAMMAR` | Allowed blocks, weights, limits, and distributions | `app/services/strategy/grammar.py` | `strategy.grammar@1` | `indicator.extensions@1` | Missing |
+| `FEAT-STRATEGY-GENERATION` | Seeded candidate generation | `app/services/strategy/generation.py` | `strategy.generation@1` | `strategy.grammar@1` | Missing |
+| `FEAT-STRATEGY-EVOLUTION` | Typed genetic improvement and lineage | `app/services/strategy/evolution.py` | `strategy.evolution@1` | `strategy.generation@1` | Missing |
+| `FEAT-STRATEGY-EXPORT` | Validated deterministic source bundles | `app/services/strategy/export.py` | `strategy.export@1` | `strategy.validation@1` | Missing |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies point to public contracts, never implementations. Removal withdraws only the named
+capability; required consumers become attributed `BLOCKED`, optional operations return
+unavailable, and retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-STRATEGY-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-STRATEGY-GENERATE` — Generate and export a validated strategy
+
+- **Lead owner:** `FEAT-STRATEGY-GENERATION`
+- **Participants:** Grammar, validation, evaluator, artifact store, and optional exporter.
+- **Input boundary:** Grammar/version, data bindings, architecture, constraints, budget, and named seed stream.
+- **Output boundary:** Immutable candidates with lineage/rejection reasons and optional hashed export bundle.
+- **Failure boundary:** Invalid trees fail with located diagnostics; exhausted budget is truthful; template faults publish nothing.
+- **Acceptance:** `ATW-STRATEGY-GENERATE-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-STRATEGY-[ACTION_OBJECT]`
+This representative module card applies to every registry entry; algorithms and state semantics
+are in Section 9.
 
-> **Feature ID:** `FEAT-STRATEGY-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/strategy/[feature].py`
+### `model.py` — `FEAT-STRATEGY-MODEL`
+
+> **Feature ID:** `FEAT-STRATEGY-MODEL`
+> **Status:** `Missing`
+> **Owner module:** `app/services/strategy/model.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide canonical strategy artifacts and revisions without absorbing another registry entry's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `strategy.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `strategy.definitions@1`
+- **Requires:** `persistence.artifacts@1`
+- **Optional / operation-gated:** absence returns typed unavailable; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Each owner has a slotted immutable `<Feature>Config`; sample reference values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject incompatibility |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability | `FeatureContext.provide(...)` | Withdraw with scope |
+| Managed effects | `FeatureContext` resource/task/subscription APIs | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/strategy.py` or `None`
-- **Namespace:** `strategy.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/strategy.py`
+- **Namespace:** `strategy.v1`
+- **Schema version:** `1` initially; forward migrations only
+- **Retention and purge:** explicit and reference-safe; feature removal never purges state.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/strategy.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_strategy.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `model.py` | Canonical strategy artifacts and revisions; config, service, lifecycle, immutable `SPEC`, factory | `StrategyRepository` |
+| Missing | `validation.py` | Schema, tree, parameter, and target validation; config, service, lifecycle, immutable `SPEC`, factory | `StrategyValidator` |
+| Missing | `authoring.py` | Atomic rule-tree editing and revision history; config, service, lifecycle, immutable `SPEC`, factory | `StrategyAuthoring` |
+| Missing | `grammar.py` | Allowed blocks, weights, limits, and distributions; config, service, lifecycle, immutable `SPEC`, factory | `GrammarService` |
+| Missing | `generation.py` | Seeded candidate generation; config, service, lifecycle, immutable `SPEC`, factory | `StrategyGenerator` |
+| Missing | `evolution.py` | Typed genetic improvement and lineage; config, service, lifecycle, immutable `SPEC`, factory | `EvolutionService` |
+| Missing | `export.py` | Validated deterministic source bundles; config, service, lifecycle, immutable `SPEC`, factory | `StrategyExporter` |
+| Missing | `tests/examples/06_strategy.py` | Offline evidence | one `example_<NN>_<feature_slug>()` per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-STRATEGY-001` | Canonical serialize/parse round-trips with stable content identity. | Golden fixtures |
+| Missing | `FR-STRATEGY-002` | Identical grammar/config/seed/evaluator results reproduce candidates and lineage. | Determinism test |
+| Missing | `FR-STRATEGY-003` | Genetic operators preserve types, bounds, limits, and lineage. | Property tests |
+| Missing | `FR-STRATEGY-004` | Export is offline, deterministic, path-contained, and manifest-backed. | Golden/security tests |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw capability and managed effects; retain schema-readable artifacts. Dependent operations
+return attributed unavailable. Reinstall requires schema/version compatibility.
 
 ---
 
@@ -195,70 +208,66 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/strategy.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/strategy.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/strategy.py`. | Architecture/schema checks |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-STRATEGY-001` | Canonical definitions are typed data, never executable source strings. | Model | E-O02/E-L02 |
+| Open | `DEC-STRATEGY-002` | All proprietary node semantics, distributions, and archive compatibility are unverified. | Parity | Independent fixtures |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; filenames and bundled
+sample values are not proof of runtime semantics.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/strategy/[feature]/
+tests/services/strategy/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_strategy.py
+tests/examples/06_strategy.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/strategy/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/strategy.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/strategy.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/strategy.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/strategy.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+The model includes schema/version, identity, directions, markets/data bindings, parameters, variables, money-management reference, global protection, ordered event handlers/rules/actions, metadata, and lineage. Local XML shows initialization/bar-update/deinitialization and structured action parameters (E-L02), but vendor syntax is not copied. Validation covers IDs, types, bounds/dependencies, event legality, protection, target support, cycles/depth/count, and data. Generation uses named seed streams. Evolution versions selection, crossover, mutation, elitism, islands, migration, duplicate policy, budget, and stop rules (E-O06). Restricted exports have no file/network/process authority and record strategy/template/profile hashes (E-O02).

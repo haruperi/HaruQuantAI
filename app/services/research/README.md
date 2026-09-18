@@ -7,12 +7,13 @@
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
-and deletion behavior. Update it before changing the affected implementation.
+and deletion behavior. Reference-product evidence is a requirement source, never implementation
+evidence.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
-[Feature Implementation Pipeline](../dev/feature_implementation_pipeline.md) owns the complete
-single-file feature delivery checklist.
+[Feature Implementation Pipeline](../../../docs/dev/feature_implementation_pipeline.md) owns the
+complete single-file feature delivery checklist.
 
 ## Code-aligned implementation convention
 
@@ -22,35 +23,29 @@ Backend features use the simplified modular-monolith layout:
 app/services/research/
 |-- README.md
 |-- __init__.py
-|-- [feature_1].py
-`-- [feature_2].py
+|-- projects.py
+|-- tasks.py
+|-- routing.py
+|-- runs.py
+`-- automation.py
 
 app/contracts/research.py
-app/services/persistence/research.py   # only when the domain persists state
-tests/services/research/[feature_1]/
-tests/examples/[domain_number]_research.py
+app/services/persistence/research.py
+tests/services/research/<feature>/
+tests/examples/14_research.py
 ```
 
-Each `app/services/research/[feature].py` module is one cohesive feature and physical removal unit.
-It follows the pipeline's single-file configuration, service, lifecycle, immutable `SPEC`, factory,
-documentation, and logging standards. Features are registered explicitly in `app/registry.py`; no
-entry-point discovery, directory scanning, YAML manifest, package-local manifest, or import-time
-registration is used.
+Each feature module is one cohesive physical removal unit. It contains typed configuration,
+service behavior, lifecycle wiring, immutable `SPEC`, and a zero-argument factory. Registration
+is explicit in `app/registry.py`; import-time discovery and ambient singletons are forbidden.
+Cross-boundary DTOs, protocols, events, errors, and capability keys live in
+`app/contracts/research.py`. Features resolve dependencies through `FeatureContext` and
+never import sibling implementations.
 
-Cross-boundary DTOs, protocols, events, errors, and capability keys live in the domain's single
-`app/contracts/research.py` module. Feature modules never import sibling implementations. They
-declare exact dependencies and resolve providers through `FeatureContext`.
-
-All schema, parameterized SQL, and transactional database operations for this domain are
-consolidated in `app/services/persistence/research.py`. Feature modules consume focused persistence
-interfaces and never execute ad-hoc SQL or accept unrestricted connections.
-
-Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_research.py`. Examples are realistic, offline, deterministic,
-secret-safe, and directly executable. Production feature modules contain no usage harness.
-
-For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
-replace its explicitly documented widget structure.
+All schema, parameterized SQL, and transactions for this domain live in
+`app/services/persistence/research.py`. A feature may be stateless, but it never accepts an
+unrestricted database connection. Every completed feature contributes a deterministic, offline,
+secret-safe example to `tests/examples/14_research.py`.
 
 ---
 
@@ -58,134 +53,144 @@ replace its explicitly documented widget structure.
 
 ### Purpose
 
-Repeatable research: projects, ordered tasks, routing, jump/wait conditions, run evidence, loops, automated research pipelines.
+Own versioned custom-project task graphs, task definitions, conditional routing, loops/waits, run evidence, automation, checkpoints, and reproducible orchestration.
 
 ### Owns
 
-- Repeatable research project definitions, custom workflow projects, and ordered task graphs.
-- Task routing, conditional branching, jump/wait criteria, and automated pipeline loops.
-- Research execution audit logs, run evidence, provenance tracking, and reproducible experiment manifests.
+- Project/task graph definitions, validation, revisions, enabled order, and typed edges.
+- Task adapters for build/retest/optimize/filter/portfolio/data/files/notify/control operations.
+- Run/task-attempt transitions, routing evaluations, artifact handoffs, and recovery checkpoints.
 
 ### Does not own
 
-- Underlying algorithm implementations (delegated to D-STRATEGY, D-OPTIMIZATION, D-ROBUSTNESS).
-- Low-level background job worker infrastructure (owned by D-WORKSPACE).
+- Job process mechanics, domain algorithm internals, or gateway transport.
+- Implicit external/live authority from a task graph.
 
 ### Shared contracts
 
-The domain's public boundary is `app/contracts/research.py`. A counterparty may be a producer,
-consumer, or observer; that relationship does not authorize a private implementation import.
+
+The public boundary is `app/contracts/research.py`; private implementation imports are forbidden.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `research.[capability-name]@1` | `[ProtocolName]` | `1` | [Purpose] |
+| Missing | `research.projects@1` | `ResearchProjectRepository` | `1` | Versioned project/task graphs |
+| Missing | `research.tasks@1` | `TaskRegistry` | `1` | Typed task definitions and adapters |
+| Missing | `research.routing@1` | `RoutingService` | `1` | Conditions, jumps, waits, loops, and stop/start |
+| Missing | `research.runs@1` | `ResearchRunService` | `1` | Durable project execution and artifact flow |
+| Missing | `research.automation@1` | `ResearchAutomation` | `1` | Bounded schedules and notifications |
 
 ### Persisted-state ownership
 
-Semantic state remains owned by its feature even though database mechanics are consolidated in the
-domain persistence module. Other domains access it only through public capabilities.
+
+Semantic state remains feature-owned although storage mechanics are centralized.
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `research.[feature_partition]` | `FEAT-RESEARCH-[ACTION_OBJECT]` | `sqlite` | `retain` | `[capability]` |
+| Missing | `research.v1` | `FEAT-RESEARCH-PROJECTS` and registry peers | `sqlite` | Explicit reference-safe policy | `research.projects@1` |
 
 ---
 
 ## 2. Feature registry and dependency direction
 
+
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-RESEARCH-[ACTION_OBJECT]` | [Value] | `app/services/research/[feature].py` | `research.[capability]@1` | [Keys or `None`] | Missing |
+| `FEAT-RESEARCH-PROJECTS` | Versioned project/task graphs | `app/services/research/projects.py` | `research.projects@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-RESEARCH-TASKS` | Typed task definitions and adapters | `app/services/research/tasks.py` | `research.tasks@1` | `workspace.jobs@1` | Missing |
+| `FEAT-RESEARCH-ROUTING` | Conditions, jumps, waits, loops, and stop/start | `app/services/research/routing.py` | `research.routing@1` | `analytics.metrics@1` | Missing |
+| `FEAT-RESEARCH-RUNS` | Durable project execution and artifact flow | `app/services/research/runs.py` | `research.runs@1` | `research.projects@1`, `workspace.jobs@1` | Missing |
+| `FEAT-RESEARCH-AUTOMATION` | Bounded schedules and notifications | `app/services/research/automation.py` | `research.automation@1` | `workspace.scheduler@1` | Missing |
 
-Dependencies point to public contracts, never implementation modules:
-
-```mermaid
-flowchart LR
-    Consumer["Consuming feature module"] --> Contract["Versioned public capability"]
-    Provider["Providing feature module"] --> Contract
-    Provider --> Context["FeatureContext-managed effects"]
-    Provider --> Persistence["Dedicated domain persistence, when needed"]
-```
-
-Removal of one feature module and its registry entry withdraws only its capabilities. Required
-consumers become attributed `BLOCKED`; operation-gated consumers refuse or degrade only the named
-operation; unrelated features remain usable. Removal does not implicitly purge retained state.
+Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
+required consumers become attributed `BLOCKED`, optional operations return unavailable, and
+retained state is not purged.
 
 ---
 
 ## 3. Domain workflows
 
-### `[WF-ID]` — [Workflow name]
 
-- **Lead owner:** `FEAT-RESEARCH-[ACTION_OBJECT]`
-- **Participants:** [Feature IDs and public capability handoffs]
-- **Input boundary:** [Validated inputs]
-- **Output boundary:** [Typed result or receipt]
-- **Failure boundary:** [Invalid, unavailable, cancellation, and recovery outcomes]
-- **Acceptance:** `[ATW-ID]`
+### `WF-RESEARCH-RUN` — Execute and recover a custom research project
+
+- **Lead owner:** `FEAT-RESEARCH-RUNS`
+- **Participants:** Project graph, task registry, routing, workspace jobs, domain capabilities, and artifacts.
+- **Input boundary:** Frozen project revision, parameters, inputs, code/config versions, run limits, and approval context.
+- **Output boundary:** Ordered task-attempt evidence, evaluated routes, artifact lineage, checkpoints, and terminal run state.
+- **Failure boundary:** Invalid graph blocks start; task failure follows explicit edge policy; resume uses safe checkpoint or new attempt.
+- **Acceptance:** `ATW-RESEARCH-RUN-001`
 
 ---
 
 ## 4. Feature specifications
 
-Copy this card once for each registered feature.
 
-### `[feature].py` — `FEAT-RESEARCH-[ACTION_OBJECT]`
+This representative card applies to every registry entry; exact algorithms and states are in Section 9.
 
-> **Feature ID:** `FEAT-RESEARCH-[ACTION_OBJECT]`
-> **Status:** `[Missing | Partial | Completed]`
-> **Owner module:** `app/services/research/[feature].py`
+### `projects.py` — `FEAT-RESEARCH-PROJECTS`
+
+> **Feature ID:** `FEAT-RESEARCH-PROJECTS`
+> **Status:** `Missing`
+> **Owner module:** `app/services/research/projects.py`
 
 #### Purpose
 
-[Describe the one cohesive capability and business outcome.]
+Provide versioned project/task graphs without absorbing another feature's responsibility.
 
 #### Capability declarations
 
-- **Provides:** `research.[capability]@1`
-- **Requires:** `[other-domain].[capability]@1` or `None`
-- **Optional / operation-gated:** [Key plus exact absence behavior, or `None`]
+- **Provides:** `research.projects@1`
+- **Requires:** `persistence.artifacts@1`
+- **Optional / operation-gated:** absence is explicit; no silent substitution.
 
 #### Configuration and limits
 
-Configuration is represented by `[Feature]Config` in the owner module.
+Configuration is immutable, typed, versioned, and bounded. Reference sample values are not defaults.
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `[setting]` | `[type]` | `[value]` | [Rule] |
+| Missing | `schema_version` | positive integer | `1` | Reject incompatible versions |
+| Missing | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Missing | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
-| Capability publication | `FeatureContext.provide(...)` | Withdrawn with the feature scope |
-| [Task, subscription, resource] | [Managed context API] | [Exact cancellation/close behavior] |
+| Capability/contribution | Managed feature scope | Withdraw with scope |
+| Task/subscription/resource | Managed lifecycle API | Reverse-order close; failed start unwinds |
+| Durable mutation | Focused persistence/API protocol | Roll back; partial output remains unpublished |
 
 #### Persistent state
 
-- **Domain persistence module:** `app/services/persistence/research.py` or `None`
-- **Namespace:** `research.[feature]` or `None`
-- **Schema version:** `[version]` or `None`
-- **Retention and purge:** [Explicit policy]
+- **Domain persistence module:** `app/services/persistence/research.py`
+- **Namespace:** `research.v1`
+- **Schema version:** `1` initially; forward migration only
+- **Retention and purge:** explicit and reference-safe; removal never implicitly purges.
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
-| Optional | `app/services/persistence/research.py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_research.py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `projects.py` | Versioned project/task graphs; configuration, service, lifecycle, immutable specification, factory/contribution | `ResearchProjectRepository` |
+| Missing | `tasks.py` | Typed task definitions and adapters; configuration, service, lifecycle, immutable specification, factory/contribution | `TaskRegistry` |
+| Missing | `routing.py` | Conditions, jumps, waits, loops, and stop/start; configuration, service, lifecycle, immutable specification, factory/contribution | `RoutingService` |
+| Missing | `runs.py` | Durable project execution and artifact flow; configuration, service, lifecycle, immutable specification, factory/contribution | `ResearchRunService` |
+| Missing | `automation.py` | Bounded schedules and notifications; configuration, service, lifecycle, immutable specification, factory/contribution | `ResearchAutomation` |
+| Missing | `tests/examples/14_research.py` | Offline primary-purpose evidence | one named scenario per completed feature |
 
 #### Functional requirements
 
-| Status | Requirement ID | Observable behavior | Implementing symbol | Side effects | Failure | Evidence |
-| --- | --- | --- | --- | --- | --- | --- |
-| Missing | `FR-[DOM]-[ACTION]` | [Requirement] | `[Feature]Service.[method]` | [None or bounded effect] | [Typed/stable failure] | [Test and example function] |
+| Status | Requirement ID | Observable behavior | Evidence |
+| --- | --- | --- | --- |
+| Missing | `FR-RESEARCH-001` | Graph validation rejects missing capabilities, invalid edges, unsafe cycles, and unbounded loops. | Graph property tests |
+| Missing | `FR-RESEARCH-002` | Every route stores expression version, input metric identities, result, and chosen edge. | Routing golden |
+| Missing | `FR-RESEARCH-003` | Artifact handoffs are immutable and type/schema checked. | Contract tests |
+| Missing | `FR-RESEARCH-004` | Restart/resume never reruns an externally effectful task without idempotency proof. | Fault test |
 
 #### Removal behavior
 
-[Describe capability withdrawal, affected consumer behavior, cleanup, retained state, reinstall,
-and physical-removal evidence.]
+Withdraw the capability and managed effects while retaining schema-readable artifacts. Dependent
+operations return attributed unavailable; reinstall requires schema/version compatibility.
 
 ---
 
@@ -194,70 +199,66 @@ and physical-removal evidence.]
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
 | Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Architecture and lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; services configure no handlers. | Architecture check and logging tests |
+| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
 | Missing | `ARCH-004` | Public contracts live in `app/contracts/research.py`. | Import/contract checks |
 | Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL and schema operations live in `app/services/persistence/research.py`. | Architecture and schema checks |
+| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/research.py`. | Architecture/schema checks |
 
 ---
 
 ## 6. Decisions and open evidence
 
+
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Open | `DEC-[DOM]-001` | [Question] | [Features/operations] | [Evidence or owner decision] |
+| Accepted | `DEC-RESEARCH-001` | Research orchestrates public capabilities and never imports domain implementations. | Boundary | Architecture |
+| Open | `DEC-RESEARCH-002` | Exact reference conditional expression language and wait behavior are unverified. | Parity | Safe black-box fixtures |
 
-Do not invent a contract, provider behavior, schema, result, or readiness claim to close a missing
-evidence row.
+Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; installed names and
+sample values are not runtime proof.
 
 ---
 
 ## 7. Tests and definition of done
 
 ```text
-tests/services/research/[feature]/
+tests/services/research/<feature>/
 |-- test_config.py
-|-- test_[feature].py
+|-- test_<feature>.py
 |-- test_lifecycle.py
-`-- test_persistence.py       # only when applicable
+|-- test_removal.py
+`-- test_persistence.py       # when applicable
 
-tests/examples/[domain_number]_research.py
+tests/examples/14_research.py
 ```
 
-Editing uses explicit, affected paths with `--no-cov`. Candidate integration, review, pre-commit,
-pre-push, and CI cadence follow `AGENTS.md`; this README must not define a competing broad-test loop.
+Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
+`uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature ID and one domain owner.
-- [ ] One cohesive `app/services/research/[feature].py` implementation.
-- [ ] Public contracts in `app/contracts/research.py`.
-- [ ] Exact `FeatureSpec` dependencies and providers.
-- [ ] Explicit `app/registry.py` registration.
-- [ ] Zero sibling-feature imports and zero import-time effects.
-- [ ] Lifecycle-managed tasks, resources, subscriptions, and capability publications.
-- [ ] Domain persistence used for all database operations, when applicable.
-- [ ] Required happy, invalid, unavailable, boundary, lifecycle, persistence, and removal tests.
-- [ ] One passing `example_<NN>_<feature_slug>` function in the consolidated domain example.
-- [ ] Domain README status and evidence mappings reflect observed truth.
-- [ ] Applicable quality and independent-review gates pass.
+- [ ] Stable feature and requirement IDs have one owner.
+- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
+- [ ] Registration is explicit; imports have no runtime effects.
+- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [ ] One offline usage example exists per completed feature.
+- [ ] Domain status reflects repository evidence, not reference-product evidence.
+- [ ] Architecture and full qualification gates pass.
 
 ---
 
 ## 8. Change process
 
-1. Update this domain README and identify the exact feature/FR scope.
+1. Update this README and identify the exact feature/requirement scope.
 2. Update `app/contracts/research.py` first when the public boundary changes.
-3. Update the cohesive feature module and its immutable `SPEC`.
-4. Update `app/services/persistence/research.py` only when database operations change.
-5. Update explicit registration in `app/registry.py` when feature discovery changes.
-6. Update the consolidated domain example function.
-7. Add or update focused owner and affected-consumer tests.
-8. Validate according to `AGENTS.md` and the Feature Implementation Pipeline.
+3. Implement one cohesive owner module and immutable `SPEC`.
+4. Change `app/services/persistence/research.py` only for database mechanics.
+5. Update explicit registry, consolidated examples, and focused tests.
+6. Verify feature removal and affected consumers.
+7. Run the repository-prescribed candidate gate and record actual results.
 
 ---
 
 ## 9. Normative domain specification
 
-Use this section for exact domain-owned algorithms, formulas, constants, fixtures, schemas, state
-machines, parity rules, and failure/recovery behavior that do not belong in `PROJECT.md` or
-`ARCHITECTURE.md`. Every rule maps to one or more Section 4 features/FRs and Section 7 evidence.
+A project is a versioned directed graph; nodes have stable ID/type/config/enabled state/input-output ports/failure policy, and edges may carry typed conditions. Exact-version task XML shows Build, Retest, Optimize, Automatic Retest/Portfolio, Filter, Clear, Create Portfolio, Load/Save, Go To, Wait, Stop/Start, Notification and Update Data shapes (E-L03); these are structural evidence, not defaults. Conditions reference a versioned expression subset and immutable metric/artifact inputs—no eval. Loops require iteration/time budgets. Each transition records evaluated input and edge. File/notification/data/live effects retain their own domain approvals; a graph cannot grant authority.
