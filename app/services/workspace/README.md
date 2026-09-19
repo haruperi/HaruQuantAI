@@ -30,7 +30,6 @@ app/services/workspace/
 |-- diagnostics.py
 |-- remote_workers.py
 |-- resource_governor.py
-|-- workspaces.py
 `-- plugin_host.py
 
 app/contracts/workspace.py
@@ -77,14 +76,13 @@ private implementation import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `workspace.settings@1` | `SettingsService` | `1` | Scoped settings and snapshots |
+| Missing | `workspace.settings@1` | `SettingsService` | `1` | Scoped settings, Pydantic schemas, and SQLite persistence |
 | Missing | `workspace.jobs@1` | `JobService` | `1` | Durable job and attempt lifecycle |
 | Missing | `workspace.scheduler@1` | `SchedulerService` | `1` | Bounded dispatch and worker supervision |
-| Missing | `workspace.notifications@1` | `NotificationService` | `1` | Best-effort user notifications |
-| Missing | `workspace.diagnostics@1` | `DiagnosticsService` | `1` | Health, version, and redacted logs |
-| Missing | `workspace.workers@1` | `RemoteWorkerService` | `1` | Distributed remote worker leasing and reconciliation |
-| Missing | `workspace.resources@1` | `ResourceGovernorService` | `1` | Finite CPU, memory, and thread admission quotas |
-| Missing | `workspace.workspaces@1` | `WorkspaceManagerService` | `1` | Multi-workspace lifecycle, watchlists, and profiles |
+| Missing | `workspace.notifications@1` | `NotificationService` | `1` | Best-effort notifications (email, sound, webhook, pause gate) |
+| Missing | `workspace.diagnostics@1` | `DiagnosticsService` | `1` | Health, version, redacted logs, and benchmark calibration |
+| Missing | `workspace.workers@1` | `RemoteWorkerService` | `1` | Distributed remote worker grid and leasing reconciliation |
+| Missing | `workspace.resources@1` | `ResourceGovernorService` | `1` | CPU profiles, RAM quotas, and 85% memory watchdog |
 | Missing | `workspace.plugins@1` | `PluginHostService` | `1` | Sandboxed execution and registration of custom plugins |
 
 ### Persisted-state ownership
@@ -101,14 +99,13 @@ Semantic state remains feature-owned although database mechanics are centralized
 
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-WORKSPACE-SETTINGS` | Scoped settings and snapshots | `app/services/workspace/settings.py` | `workspace.settings@1` | None | Missing |
+| `FEAT-WORKSPACE-SETTINGS` | Scoped Pydantic settings and snapshots (SQLite + JSON) | `app/services/workspace/settings.py` | `workspace.settings@1` | None | Missing |
 | `FEAT-WORKSPACE-JOBS` | Durable job and attempt lifecycle | `app/services/workspace/jobs.py` | `workspace.jobs@1` | `persistence.workspace@1` | Missing |
 | `FEAT-WORKSPACE-SCHEDULER` | Bounded dispatch and worker supervision | `app/services/workspace/scheduler.py` | `workspace.scheduler@1` | `workspace.jobs@1` | Missing |
-| `FEAT-WORKSPACE-NOTIFICATIONS` | Best-effort user notifications | `app/services/workspace/notifications.py` | `workspace.notifications@1` | None | Missing |
-| `FEAT-WORKSPACE-DIAGNOSTICS` | Health, version, and redacted logs | `app/services/workspace/diagnostics.py` | `workspace.diagnostics@1` | None | Missing |
+| `FEAT-WORKSPACE-NOTIFICATIONS` | Multi-channel notifications (email, sound, webhook, pause) | `app/services/workspace/notifications.py` | `workspace.notifications@1` | None | Missing |
+| `FEAT-WORKSPACE-DIAGNOSTICS` | Health, version, redacted logs, and benchmark calibration | `app/services/workspace/diagnostics.py` | `workspace.diagnostics@1` | None | Missing |
 | `FEAT-WORKSPACE-WORKERS` | Distributed remote worker grid and leasing | `app/services/workspace/remote_workers.py` | `workspace.workers@1` | `workspace.jobs@1` | Missing |
-| `FEAT-WORKSPACE-RESOURCES` | Finite resource admission governor (CPU/RAM) | `app/services/workspace/resource_governor.py` | `workspace.resources@1` | None | Missing |
-| `FEAT-WORKSPACE-WORKSPACES` | Multi-workspace lifecycle and watchlists | `app/services/workspace/workspaces.py` | `workspace.workspaces@1` | `persistence.workspace@1` | Missing |
+| `FEAT-WORKSPACE-RESOURCES` | CPU profiles, RAM quotas, and 85% memory watchdog | `app/services/workspace/resource_governor.py` | `workspace.resources@1` | None | Missing |
 | `FEAT-WORKSPACE-PLUGINS` | Sandboxed plugin and extension host | `app/services/workspace/plugin_host.py` | `workspace.plugins@1` | None | Missing |
 
 Dependencies point to public contracts, never implementation modules:
@@ -196,8 +193,11 @@ promoted to a default without product approval.
 | Missing | `settings.py` | Scoped settings and snapshots; config, service, lifecycle, `SPEC`, factory | `SettingsService` |
 | Missing | `jobs.py` | Durable job and attempt lifecycle; config, service, lifecycle, `SPEC`, factory | `JobService` |
 | Missing | `scheduler.py` | Bounded dispatch and worker supervision; config, service, lifecycle, `SPEC`, factory | `SchedulerService` |
-| Missing | `notifications.py` | Best-effort user notifications; config, service, lifecycle, `SPEC`, factory | `NotificationService` |
-| Missing | `diagnostics.py` | Health, version, and redacted logs; config, service, lifecycle, `SPEC`, factory | `DiagnosticsService` |
+| Missing | `notifications.py` | Multi-channel user notifications and pause gates; config, service, lifecycle, `SPEC`, factory | `NotificationService` |
+| Missing | `diagnostics.py` | Health, version, redacted logs, and benchmark calibration; config, service, lifecycle, `SPEC`, factory | `DiagnosticsService` |
+| Missing | `remote_workers.py` | Distributed remote worker grid and leasing; config, service, lifecycle, `SPEC`, factory | `RemoteWorkerService` |
+| Missing | `resource_governor.py` | CPU profiles, RAM quotas, and 85% memory watchdog; config, service, lifecycle, `SPEC`, factory | `ResourceGovernorService` |
+| Missing | `plugin_host.py` | Sandboxed plugin and extension host; config, service, lifecycle, `SPEC`, factory | `PluginHostService` |
 | Missing | `tests/examples/01_workspace.py` | Offline primary-purpose evidence | one `example_<NN>_<feature_slug>()` per completed feature |
 
 #### Functional requirements
@@ -207,7 +207,10 @@ promoted to a default without product approval.
 | Missing | `FR-WORKSPACE-001` | State machine is queued/running/pausing/paused/cancelling/cancelled/succeeded/failed/interrupted with compare-and-swap transitions. | Exhaustive transition test |
 | Missing | `FR-WORKSPACE-002` | Pause/cancel are cooperative and bounded; resume uses a validated checkpoint or a new attempt. | Worker fault fixture |
 | Missing | `FR-WORKSPACE-003` | Restart marks orphan attempts interrupted and never fabricates completion. | Coordinator restart test |
-| Missing | `FR-WORKSPACE-004` | Notification failure cannot change job outcome and all messages are secret-safe. | Failure/redaction tests |
+| Missing | `FR-WORKSPACE-004` | Notification failure cannot change job outcome and all messages are secret-safe. Supports email, sound alerts, and pause gates. | Failure/redaction tests |
+| Missing | `FR-WORKSPACE-005` | Finite resource governor enforces CPU core profiles (single, reserve UI core, custom, max) and trips an active memory watchdog at 85% RAM to prevent freezing. | Resource limit/watchdog tests |
+| Missing | `FR-WORKSPACE-006` | Diagnostics service executes hardware throughput benchmark computing time-per-tick and calibrating task completion estimates. | Benchmark calibration test |
+| Missing | `FR-WORKSPACE-007` | Settings resolve hierarchically (run > project > application) via typed Pydantic models persisted in SQLite, with JSON preset import/export and zero XML dependency. | Settings hierarchy and format tests |
 
 #### Removal behavior
 
@@ -283,4 +286,4 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 
 ## 9. Normative domain specification
 
-A job freezes operation, validated input identities, owner, priority, resource class, configuration/code versions, and seed. Attempts carry worker identity, progress sequence, heartbeat, checkpoint, and terminal reason. Every transition appends one audit event. Scheduler fairness and concurrency are explicit settings. Settings resolve run > project > workspace > application with provenance; secrets are references, never values. Evidence: official program/task-manager surfaces and exact-version task plugins/XML (E-O01, E-O08, E-L01, E-L03). Bundled task values are examples, not defaults.
+A job freezes operation, validated input identities, owner, priority, resource class, configuration/code versions, and seed. Attempts carry worker identity, progress sequence, heartbeat, checkpoint, and terminal reason. Every transition appends one audit event. Scheduler fairness and concurrency are explicit settings. Settings resolve run > project > application with provenance; secrets are references, never values. Settings models are strongly-typed Pydantic schemas persisted in SQLite WAL metadata (`workspace.v1`) with JSON preset interchange (eliminating legacy Java XML). Resource governance enforces CPU core allocation modes (singleCore, reserve1Core, customCores, maxPerformance) and an 85% RAM memory protection watchdog. Diagnostics include synthetic tick throughput benchmarks (`time_per_tick` calibration). Notifications support email, acoustic/sound alerts, and webhooks with cooperative pause gates. Evidence: official program/performance surfaces, Grid control, and exact-version task plugins (E-O01, E-O08, E-L01, E-L03, E-L05). Bundled task values are examples, not defaults.
