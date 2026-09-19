@@ -26,7 +26,10 @@ app/services/brokers/
 |-- catalog.py
 |-- mt5_adapter.py
 |-- ctrader_adapter.py
-`-- reconciliation.py
+|-- reconciliation.py
+|-- crypto_adapter.py
+|-- isolation_fencing.py
+`-- dukascopy.py
 
 app/contracts/brokers.py
 app/services/persistence/brokers.py
@@ -76,6 +79,9 @@ private implementation import.
 | Missing | `brokers.mt5@1` | `Mt5Adapter` | `1` | MT5 session and translation |
 | Missing | `brokers.ctrader@1` | `CTraderAdapter` | `1` | cTrader session and translation |
 | Missing | `brokers.reconciliation@1` | `BrokerReconciler` | `1` | Order/position/account reconciliation |
+| Missing | `brokers.crypto@1` | `CryptoBrokerService` | `1` | Unified crypto spot and perpetual futures exchange client |
+| Missing | `brokers.fencing@1` | `BrokerFencingService` | `1` | Fail-closed uncertainty and disconnect order fencing |
+| Missing | `brokers.dukascopy@1` | `DukascopyFeedService` | `1` | Direct Dukascopy historical tick and bar feed connector |
 
 ### Persisted-state ownership
 
@@ -95,6 +101,9 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-BROKERS-MT5` | MT5 session and translation | `app/services/brokers/mt5_adapter.py` | `brokers.mt5@1` | `trading.execution_intents@1` | Missing |
 | `FEAT-BROKERS-CTRADER` | cTrader session and translation | `app/services/brokers/ctrader_adapter.py` | `brokers.ctrader@1` | `trading.execution_intents@1` | Missing |
 | `FEAT-BROKERS-RECONCILIATION` | Order/position/account reconciliation | `app/services/brokers/reconciliation.py` | `brokers.reconciliation@1` | `trading.reconciliation@1` | Missing |
+| `FEAT-BROKERS-CRYPTO` | Unified crypto exchange adapter (Binance/CCXT) | `app/services/brokers/crypto_adapter.py` | `brokers.crypto@1` | `trading.execution_intents@1` | Missing |
+| `FEAT-BROKERS-FENCING` | Uncertainty and disconnect fail-closed fencing | `app/services/brokers/isolation_fencing.py` | `brokers.fencing@1` | None | Missing |
+| `FEAT-BROKERS-DUKASCOPY` | Direct Dukascopy historical tick and bar feed | `app/services/brokers/dukascopy.py` | `brokers.dukascopy@1` | None | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 

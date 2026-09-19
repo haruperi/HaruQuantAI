@@ -27,7 +27,10 @@ app/services/simulator/
 |-- precision.py
 |-- matching.py
 |-- costs.py
-`-- account.py
+|-- account.py
+|-- execution_kernel.py
+|-- simulation_cache.py
+`-- execution_calibration.py
 
 app/contracts/simulator.py
 app/services/persistence/simulator.py
@@ -78,6 +81,9 @@ The public boundary is `app/contracts/simulator.py`; counterparty status never a
 | Missing | `simulator.matching@1` | `MatchingEngine` | `1` | Orders, fills, gaps, and ambiguity |
 | Missing | `simulator.costs@1` | `CostModel` | `1` | Spread, slippage, commission, swap, conversion |
 | Missing | `simulator.account@1` | `SimulatedAccount` | `1` | Balance, equity, margin, positions, liquidation |
+| Missing | `simulator.kernel@1` | `ExecutionKernelService` | `1` | High-performance compiled tick backtesting loop |
+| Missing | `simulator.cache@1` | `SimulationCacheService` | `1` | Content-addressed backtest evaluation cache |
+| Missing | `simulator.calibration@1` | `ExecutionCalibrationService` | `1` | Empirical calibration of execution slippage models |
 
 ### Persisted-state ownership
 
@@ -100,6 +106,9 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-SIMULATOR-MATCHING` | Orders, fills, gaps, and ambiguity | `app/services/simulator/matching.py` | `simulator.matching@1` | `trading.execution_intents@1` | Missing |
 | `FEAT-SIMULATOR-COSTS` | Spread, slippage, commission, swap, conversion | `app/services/simulator/costs.py` | `simulator.costs@1` | `data.instruments@1` | Missing |
 | `FEAT-SIMULATOR-ACCOUNT` | Balance, equity, margin, positions, liquidation | `app/services/simulator/account.py` | `simulator.account@1` | `trading.positions@1` | Missing |
+| `FEAT-SIMULATOR-KERNEL` | Accelerated compiled (Numba/vectorized) tick engine | `app/services/simulator/execution_kernel.py` | `simulator.kernel@1` | None | Missing |
+| `FEAT-SIMULATOR-CACHE` | Content-addressed backtest evaluation cache | `app/services/simulator/simulation_cache.py` | `simulator.cache@1` | None | Missing |
+| `FEAT-SIMULATOR-CALIBRATION` | Empirical calibration of slippage and spread models | `app/services/simulator/execution_calibration.py` | `simulator.calibration@1` | `trading.attribution@1` | Missing |
 
 Dependencies point to public contracts, never implementations. Removal withdraws only the named
 capability; required consumers become attributed `BLOCKED`, optional operations return

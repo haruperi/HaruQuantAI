@@ -27,7 +27,11 @@ app/services/indicator/
 |-- averages.py
 |-- volatility.py
 |-- oscillators.py
-`-- custom.py
+|-- custom.py
+|-- market_profiles.py
+|-- regimes.py
+|-- price_patterns.py
+`-- volume_flow.py
 
 app/contracts/indicator.py
 app/services/persistence/indicator.py
@@ -78,6 +82,10 @@ private implementation import.
 | Missing | `indicator.volatility@1` | `VolatilityRegistry` | `1` | True range, ATR, and volatility indicators |
 | Missing | `indicator.oscillators@1` | `OscillatorRegistry` | `1` | CCI, RSI, and oscillator indicators |
 | Missing | `indicator.extensions@1` | `IndicatorExtensionRegistry` | `1` | Versioned custom-indicator contract |
+| Missing | `indicator.profiles@1` | `MarketProfileService` | `1` | Volume Profile, POC, VAH/VAL, and session VWAP |
+| Missing | `indicator.regimes@1` | `RegimeClassificationService` | `1` | Market regime and trend/range classification |
+| Missing | `indicator.patterns@1` | `PricePatternService` | `1` | Price action and candlestick pattern recognition |
+| Missing | `indicator.volume_flow@1` | `VolumeFlowService` | `1` | OBV, MFI, Volume Delta, and flow indicators |
 
 ### Persisted-state ownership
 
@@ -98,6 +106,10 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-INDICATOR-VOLATILITY` | True range, ATR, and volatility indicators | `app/services/indicator/volatility.py` | `indicator.volatility@1` | `indicator.series@1` | Missing |
 | `FEAT-INDICATOR-OSCILLATORS` | CCI, RSI, and oscillator indicators | `app/services/indicator/oscillators.py` | `indicator.oscillators@1` | `indicator.series@1` | Missing |
 | `FEAT-INDICATOR-EXTENSIONS` | Versioned custom-indicator contract | `app/services/indicator/custom.py` | `indicator.extensions@1` | `indicator.series@1` | Missing |
+| `FEAT-INDICATOR-PROFILES` | Volume Profile, POC, VAH/VAL, and session VWAP | `app/services/indicator/market_profiles.py` | `indicator.profiles@1` | `indicator.series@1` | Missing |
+| `FEAT-INDICATOR-REGIMES` | Market regime and trend/range classification | `app/services/indicator/regimes.py` | `indicator.regimes@1` | `indicator.series@1` | Missing |
+| `FEAT-INDICATOR-PATTERNS` | Price action and candlestick pattern recognition | `app/services/indicator/price_patterns.py` | `indicator.patterns@1` | `indicator.series@1` | Missing |
+| `FEAT-INDICATOR-VOLUMEFLOW` | OBV, MFI, Volume Delta, and flow indicators | `app/services/indicator/volume_flow.py` | `indicator.volume_flow@1` | `indicator.series@1` | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 

@@ -27,7 +27,11 @@ app/services/agentic/
 |-- context.py
 |-- tools.py
 |-- approvals.py
-`-- audit.py
+|-- audit.py
+|-- strategy_synthesizer.py
+|-- strategy_critic.py
+|-- research_synthesizer.py
+`-- research_memory.py
 
 app/contracts/agentic.py
 app/services/persistence/agentic.py
@@ -78,6 +82,10 @@ The public boundary is `app/contracts/agentic.py`; private implementation import
 | Missing | `agentic.tools@1` | `AgentToolRegistry` | `1` | Allowlisted typed read/mutation tools |
 | Missing | `agentic.approvals@1` | `ApprovalService` | `1` | Explicit scoped mutation approvals |
 | Missing | `agentic.audit@1` | `AgentAuditService` | `1` | Prompts/evidence/tool/outcome provenance |
+| Missing | `agentic.strategy_synthesizer@1` | `StrategySynthesizerService` | `1` | Natural language to strategy AST grammar translation |
+| Missing | `agentic.strategy_critic@1` | `StrategyCriticService` | `1` | Adversarial multi-agent quantitative strategy critique |
+| Missing | `agentic.reports@1` | `ResearchReportService` | `1` | Automated narrative quant research tear-sheet generation |
+| Missing | `agentic.memory@1` | `AgenticMemoryService` | `1` | Long-term memory of research hypotheses and experiments |
 
 ### Persisted-state ownership
 
@@ -100,6 +108,10 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | `FEAT-AGENTIC-TOOLS` | Allowlisted typed read/mutation tools | `app/services/agentic/tools.py` | `agentic.tools@1` | `gateway.authorization@1` | Missing |
 | `FEAT-AGENTIC-APPROVALS` | Explicit scoped mutation approvals | `app/services/agentic/approvals.py` | `agentic.approvals@1` | `workspace.jobs@1` | Missing |
 | `FEAT-AGENTIC-AUDIT` | Prompts/evidence/tool/outcome provenance | `app/services/agentic/audit.py` | `agentic.audit@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-AGENTIC-SYNTHESIZE` | Natural language to strategy AST grammar synthesizer | `app/services/agentic/strategy_synthesizer.py` | `agentic.strategy_synthesizer@1` | `agentic.tools@1` | Missing |
+| `FEAT-AGENTIC-CRITIC` | Adversarial multi-agent quant critic ("Red Team") | `app/services/agentic/strategy_critic.py` | `agentic.strategy_critic@1` | `agentic.tools@1` | Missing |
+| `FEAT-AGENTIC-REPORTS` | Automated narrative quant research tear-sheet writer | `app/services/agentic/research_synthesizer.py` | `agentic.reports@1` | `analytics.metrics@1` | Missing |
+| `FEAT-AGENTIC-MEMORY` | Long-term memory of hypotheses and research experiments | `app/services/agentic/research_memory.py` | `agentic.memory@1` | `persistence.artifacts@1` | Missing |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and

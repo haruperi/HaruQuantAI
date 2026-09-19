@@ -27,7 +27,15 @@ app/services/research/
 |-- tasks.py
 |-- routing.py
 |-- runs.py
-`-- automation.py
+|-- automation.py
+|-- holdout_governor.py
+|-- alpha_drift_monitor.py
+|-- prepare_neural_datasets.py
+|-- label_neural_data.py
+|-- train_models.py
+|-- validate_models.py
+|-- explain_models.py
+`-- infer_models.py
 
 app/contracts/research.py
 app/services/persistence/research.py
@@ -78,6 +86,14 @@ The public boundary is `app/contracts/research.py`; private implementation impor
 | Missing | `research.routing@1` | `RoutingService` | `1` | Conditions, jumps, waits, loops, and stop/start |
 | Missing | `research.runs@1` | `ResearchRunService` | `1` | Durable project execution and artifact flow |
 | Missing | `research.automation@1` | `ResearchAutomation` | `1` | Bounded schedules and notifications |
+| Missing | `research.holdout@1` | `HoldoutGovernorService` | `1` | Strict sealed out-of-sample holdout reservation gate |
+| Missing | `research.drift@1` | `AlphaDriftService` | `1` | Point-in-time alpha decay and concept drift monitoring |
+| Missing | `research.neural_datasets@1` | `NeuralDatasetService` | `1` | Causal feature normalization and fractional differentiation |
+| Missing | `research.neural_labels@1` | `NeuralLabelService` | `1` | Directional, forward return, and triple-barrier target labels |
+| Missing | `research.train_models@1` | `ModelTrainingService` | `1` | Deterministic seed-locked bounded CPU model training |
+| Missing | `research.validate_models@1` | `ModelValidationService` | `1` | Purged cross-validation, embargoing, and immutable model cards |
+| Missing | `research.explain_models@1` | `ModelExplanationService` | `1` | Feature permutation importance and attribution metrics |
+| Missing | `research.infer_models@1` | `ModelInferenceService` | `1` | Zero-dependency native in-engine model inference |
 
 ### Persisted-state ownership
 
@@ -100,6 +116,14 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | `FEAT-RESEARCH-ROUTING` | Conditions, jumps, waits, loops, and stop/start | `app/services/research/routing.py` | `research.routing@1` | `analytics.metrics@1` | Missing |
 | `FEAT-RESEARCH-RUNS` | Durable project execution and artifact flow | `app/services/research/runs.py` | `research.runs@1` | `research.projects@1`, `workspace.jobs@1` | Missing |
 | `FEAT-RESEARCH-AUTOMATION` | Bounded schedules and notifications | `app/services/research/automation.py` | `research.automation@1` | `workspace.scheduler@1` | Missing |
+| `FEAT-RESEARCH-HOLDOUT` | Strict sealed out-of-sample holdout gate | `app/services/research/holdout_governor.py` | `research.holdout@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-RESEARCH-DRIFT` | Point-in-time alpha decay and concept drift monitor | `app/services/research/alpha_drift_monitor.py` | `research.drift@1` | `analytics.metrics@1` | Missing |
+| `FEAT-RESEARCH-NEURAL-DATASETS` | Causal feature normalization and fractional differentiation | `app/services/research/prepare_neural_datasets.py` | `research.neural_datasets@1` | `data.datasets@1` | Missing |
+| `FEAT-RESEARCH-NEURAL-LABELS` | Directional, forward return, and triple-barrier labeling | `app/services/research/label_neural_data.py` | `research.neural_labels@1` | `data.datasets@1` | Missing |
+| `FEAT-RESEARCH-TRAIN-MODELS` | Deterministic seed-locked CPU model trainer | `app/services/research/train_models.py` | `research.train_models@1` | `workspace.jobs@1` | Missing |
+| `FEAT-RESEARCH-VALIDATE-MODELS` | Purged cross-validation, embargoing, and model cards | `app/services/research/validate_models.py` | `research.validate_models@1` | `analytics.metrics@1` | Missing |
+| `FEAT-RESEARCH-EXPLAIN-MODELS` | Feature permutation importance and attribution | `app/services/research/explain_models.py` | `research.explain_models@1` | `analytics.metrics@1` | Missing |
+| `FEAT-RESEARCH-INFER-MODELS` | Zero-dependency native in-engine model inference | `app/services/research/infer_models.py` | `research.infer_models@1` | `persistence.artifacts@1` | Missing |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and

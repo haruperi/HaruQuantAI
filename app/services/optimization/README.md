@@ -28,7 +28,9 @@ app/services/optimization/
 |-- exhaustive.py
 |-- genetic.py
 |-- sequential.py
-`-- walk_forward.py
+|-- walk_forward.py
+|-- parameter_sensitivity.py
+`-- pareto_optimizer.py
 
 app/contracts/optimization.py
 app/services/persistence/optimization.py
@@ -80,6 +82,8 @@ The public boundary is `app/contracts/optimization.py`; private implementation i
 | Missing | `optimization.genetic@1` | `GeneticOptimizer` | `1` | Seeded population search |
 | Missing | `optimization.sequential@1` | `SequentialOptimizer` | `1` | Ordered parameter-stage optimization |
 | Missing | `optimization.walk_forward@1` | `WalkForwardScheduler` | `1` | Versioned IS/OOS schedules |
+| Missing | `optimization.sensitivity@1` | `ParameterSensitivityService` | `1` | Parameter perturbation, stability curves, and plateau testing |
+| Missing | `optimization.pareto@1` | `ParetoOptimizerService` | `1` | Multi-objective Pareto frontier genetic optimization |
 
 ### Persisted-state ownership
 
@@ -103,6 +107,8 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | `FEAT-OPTIMIZATION-GENETIC` | Seeded population search | `app/services/optimization/genetic.py` | `optimization.genetic@1` | `simulator.backtest@1`, `analytics.metrics@1` | Missing |
 | `FEAT-OPTIMIZATION-SEQUENTIAL` | Ordered parameter-stage optimization | `app/services/optimization/sequential.py` | `optimization.sequential@1` | `optimization.studies@1` | Missing |
 | `FEAT-OPTIMIZATION-WINDOWS` | Versioned IS/OOS schedules | `app/services/optimization/walk_forward.py` | `optimization.walk_forward@1` | `data.datasets@1` | Missing |
+| `FEAT-OPTIMIZATION-SENSITIVITY` | Parameter sensitivity, stability curves, and plateau test | `app/services/optimization/parameter_sensitivity.py` | `optimization.sensitivity@1` | `simulator.backtest@1` | Missing |
+| `FEAT-OPTIMIZATION-PARETO` | Multi-objective Pareto frontier genetic optimization | `app/services/optimization/pareto_optimizer.py` | `optimization.pareto@1` | `optimization.genetic@1` | Missing |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and

@@ -27,7 +27,9 @@ app/services/persistence/
 |-- artifacts.py
 |-- databanks.py
 |-- migrations.py
-`-- retention.py
+|-- retention.py
+|-- parquet_store.py
+`-- snapshots.py
 
 app/contracts/persistence.py
 app/services/persistence/persistence.py
@@ -78,6 +80,8 @@ private implementation import.
 | Missing | `persistence.databanks@1` | `DatabankStore` | `1` | Databanks, memberships, annotations, and ranking |
 | Missing | `persistence.migrations@1` | `MigrationService` | `1` | Forward schema migration and compatibility |
 | Missing | `persistence.retention@1` | `RetentionService` | `1` | Reference-safe retention and purge planning |
+| Missing | `persistence.parquet@1` | `ParquetStoreService` | `1` | Partitioned columnar market data storage engine |
+| Missing | `persistence.snapshots@1` | `SnapshotService` | `1` | Atomic point-in-time database hot snapshots and backups |
 
 ### Persisted-state ownership
 
@@ -98,6 +102,8 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-PERSISTENCE-DATABANKS` | Databanks, memberships, annotations, and ranking | `app/services/persistence/databanks.py` | `persistence.databanks@1` | `persistence.database@1` | Missing |
 | `FEAT-PERSISTENCE-MIGRATIONS` | Forward schema migration and compatibility | `app/services/persistence/migrations.py` | `persistence.migrations@1` | `persistence.database@1` | Missing |
 | `FEAT-PERSISTENCE-RETENTION` | Reference-safe retention and purge planning | `app/services/persistence/retention.py` | `persistence.retention@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-PERSISTENCE-PARQUET` | Partitioned columnar market data store | `app/services/persistence/parquet_store.py` | `persistence.parquet@1` | None | Missing |
+| `FEAT-PERSISTENCE-SNAPSHOTS` | Point-in-time database hot snapshots and backups | `app/services/persistence/snapshots.py` | `persistence.snapshots@1` | `persistence.database@1` | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 

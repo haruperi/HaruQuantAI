@@ -82,6 +82,8 @@ The public boundary is `app/contracts/ui.py`; private implementation imports are
 | Partial | `ui.algo_wizard@1` | `AlgoWizardView` | `1` | Rule-tree authoring and export surfaces |
 | Partial | `ui.portfolio_workspace@1` | `PortfolioWorkspace` | `1` | Portfolio Master and Composer screens |
 | Partial | `ui.custom_projects@1` | `CustomProjectView` | `1` | Project graph and task-manager screens |
+| Missing | `ui.trading_dashboard@1` | `TradingDashboard` | `1` | Live execution, order management, and kill-switch dashboard |
+| Missing | `ui.optimization_surface@1` | `OptimizationSurface` | `1` | Interactive 3D parameter optimization surface visualization |
 
 ### Persisted-state ownership
 
@@ -106,6 +108,8 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | `FEAT-UI-AUTHORING` | Rule-tree authoring and export surfaces | `app/ui/src/algo_wizard.tsx` | `ui.algo_wizard@1` | `strategy.authoring@1` | Partial |
 | `FEAT-UI-PORTFOLIO` | Portfolio Master and Composer screens | `app/ui/src/portfolio_workspace.tsx` | `ui.portfolio_workspace@1` | `portfolio.definitions@1` | Partial |
 | `FEAT-UI-PROJECTS` | Project graph and task-manager screens | `app/ui/src/custom_projects.tsx` | `ui.custom_projects@1` | `research.projects@1` | Partial |
+| `FEAT-UI-TRADING` | Live broker monitoring, open positions, and kill switch UI | `app/ui/src/domains/trading/TradingDashboard.tsx` | `ui.trading_dashboard@1` | `gateway.rest@1` | Missing |
+| `FEAT-UI-3DSURFACE` | Interactive 3D parameter optimization surface viewer | `app/ui/src/domains/optimization/OptimizationSurface.tsx` | `ui.optimization_surface@1` | `gateway.rest@1` | Missing |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and
@@ -311,6 +315,8 @@ app/ui/e2e/
 app/ui/docs/coverage.json
 app/ui/docs/parity.md
 app/ui/docs/mock-contracts.md
+|-- domains/trading/TradingDashboard.tsx
+`-- domains/optimization/OptimizationSurface.tsx
 ```
 
 Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains

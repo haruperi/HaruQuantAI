@@ -27,7 +27,11 @@ app/services/workspace/
 |-- jobs.py
 |-- scheduler.py
 |-- notifications.py
-`-- diagnostics.py
+|-- diagnostics.py
+|-- remote_workers.py
+|-- resource_governor.py
+|-- workspaces.py
+`-- plugin_host.py
 
 app/contracts/workspace.py
 app/services/persistence/workspace.py
@@ -78,6 +82,10 @@ private implementation import.
 | Missing | `workspace.scheduler@1` | `SchedulerService` | `1` | Bounded dispatch and worker supervision |
 | Missing | `workspace.notifications@1` | `NotificationService` | `1` | Best-effort user notifications |
 | Missing | `workspace.diagnostics@1` | `DiagnosticsService` | `1` | Health, version, and redacted logs |
+| Missing | `workspace.workers@1` | `RemoteWorkerService` | `1` | Distributed remote worker leasing and reconciliation |
+| Missing | `workspace.resources@1` | `ResourceGovernorService` | `1` | Finite CPU, memory, and thread admission quotas |
+| Missing | `workspace.workspaces@1` | `WorkspaceManagerService` | `1` | Multi-workspace lifecycle, watchlists, and profiles |
+| Missing | `workspace.plugins@1` | `PluginHostService` | `1` | Sandboxed execution and registration of custom plugins |
 
 ### Persisted-state ownership
 
@@ -98,6 +106,10 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-WORKSPACE-SCHEDULER` | Bounded dispatch and worker supervision | `app/services/workspace/scheduler.py` | `workspace.scheduler@1` | `workspace.jobs@1` | Missing |
 | `FEAT-WORKSPACE-NOTIFICATIONS` | Best-effort user notifications | `app/services/workspace/notifications.py` | `workspace.notifications@1` | None | Missing |
 | `FEAT-WORKSPACE-DIAGNOSTICS` | Health, version, and redacted logs | `app/services/workspace/diagnostics.py` | `workspace.diagnostics@1` | None | Missing |
+| `FEAT-WORKSPACE-WORKERS` | Distributed remote worker grid and leasing | `app/services/workspace/remote_workers.py` | `workspace.workers@1` | `workspace.jobs@1` | Missing |
+| `FEAT-WORKSPACE-RESOURCES` | Finite resource admission governor (CPU/RAM) | `app/services/workspace/resource_governor.py` | `workspace.resources@1` | None | Missing |
+| `FEAT-WORKSPACE-WORKSPACES` | Multi-workspace lifecycle and watchlists | `app/services/workspace/workspaces.py` | `workspace.workspaces@1` | `persistence.workspace@1` | Missing |
+| `FEAT-WORKSPACE-PLUGINS` | Sandboxed plugin and extension host | `app/services/workspace/plugin_host.py` | `workspace.plugins@1` | None | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 

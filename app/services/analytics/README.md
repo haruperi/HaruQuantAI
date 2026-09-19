@@ -27,7 +27,10 @@ app/services/analytics/
 |-- equity.py
 |-- trades.py
 |-- periods.py
-`-- reports.py
+|-- reports.py
+|-- import_ledgers.py
+|-- distributions.py
+`-- compare_results.py
 
 app/contracts/analytics.py
 app/services/persistence/analytics.py
@@ -78,6 +81,9 @@ The public boundary is `app/contracts/analytics.py`; counterparty status never a
 | Missing | `analytics.trades@1` | `TradeAnalysis` | `1` | Trade, MAE/MFE, direction, and exit analysis |
 | Missing | `analytics.periods@1` | `PeriodAnalysis` | `1` | Timezone-explicit period aggregation |
 | Missing | `analytics.reports@1` | `ReportService` | `1` | Versioned reports and machine exports |
+| Missing | `analytics.ledger_import@1` | `LedgerImportService` | `1` | External broker statement (MT4/5, cTrader) parsing and ingestion |
+| Missing | `analytics.distributions@1` | `DistributionAnalysisService` | `1` | VaR, CVaR, skewness, kurtosis, and streak distributions |
+| Missing | `analytics.compare@1` | `ResultComparisonService` | `1` | Multi-strategy comparative overlay curves and radar metrics |
 
 ### Persisted-state ownership
 
@@ -100,6 +106,9 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-ANALYTICS-TRADES` | Trade, MAE/MFE, direction, and exit analysis | `app/services/analytics/trades.py` | `analytics.trades@1` | `persistence.artifacts@1` | Missing |
 | `FEAT-ANALYTICS-PERIODS` | Timezone-explicit period aggregation | `app/services/analytics/periods.py` | `analytics.periods@1` | `analytics.metrics@1` | Missing |
 | `FEAT-ANALYTICS-REPORTS` | Versioned reports and machine exports | `app/services/analytics/reports.py` | `analytics.reports@1` | `analytics.metrics@1` | Missing |
+| `FEAT-ANALYTICS-LEDGERIMPORT` | External broker statement and ledger ingestion | `app/services/analytics/import_ledgers.py` | `analytics.ledger_import@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-ANALYTICS-DISTRIBUTIONS` | VaR, CVaR, skewness, kurtosis, and streak distributions | `app/services/analytics/distributions.py` | `analytics.distributions@1` | `analytics.metrics@1` | Missing |
+| `FEAT-ANALYTICS-COMPARE` | Multi-strategy comparative curves and radar metrics | `app/services/analytics/compare_results.py` | `analytics.compare@1` | `analytics.metrics@1` | Missing |
 
 Dependencies point to public contracts, never implementations. Removal withdraws only the named
 capability; required consumers become attributed `BLOCKED`, optional operations return

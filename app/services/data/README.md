@@ -28,7 +28,11 @@ app/services/data/
 |-- imports.py
 |-- datasets.py
 |-- quality.py
-`-- resampling.py
+|-- resampling.py
+|-- economic_news.py
+|-- currency_converter.py
+|-- universes.py
+`-- synthetic_series.py
 
 app/contracts/data.py
 app/services/persistence/data.py
@@ -80,6 +84,10 @@ private implementation import.
 | Missing | `data.datasets@1` | `DatasetService` | `1` | Immutable normalized dataset versions |
 | Missing | `data.quality@1` | `QualityService` | `1` | Data validation and repair reports |
 | Missing | `data.resampling@1` | `ResamplingService` | `1` | Session-aware deterministic resampling |
+| Missing | `data.economic_news@1` | `EconomicNewsService` | `1` | Economic calendar events and high-impact release filtering |
+| Missing | `data.currency_conversions@1` | `CurrencyConverterService` | `1` | Causal cross-currency triangulation and point-in-time rates |
+| Missing | `data.universes@1` | `UniverseManagerService` | `1` | Dynamic asset basket and constituent index lifecycle |
+| Missing | `data.synthetic@1` | `SyntheticSeriesService` | `1` | Synthetic stress series and scenario path generation |
 
 ### Persisted-state ownership
 
@@ -101,6 +109,10 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-DATA-DATASETS` | Immutable normalized dataset versions | `app/services/data/datasets.py` | `data.datasets@1` | `persistence.artifacts@1` | Missing |
 | `FEAT-DATA-QUALITY` | Data validation and repair reports | `app/services/data/quality.py` | `data.quality@1` | `data.datasets@1` | Missing |
 | `FEAT-DATA-RESAMPLING` | Session-aware deterministic resampling | `app/services/data/resampling.py` | `data.resampling@1` | `data.calendars@1` | Missing |
+| `FEAT-DATA-ECONOMICNEWS` | Economic news calendar and high-impact filter | `app/services/data/economic_news.py` | `data.economic_news@1` | `data.calendars@1` | Missing |
+| `FEAT-DATA-CONVERSIONS` | Causal cross-currency triangulation rates | `app/services/data/currency_converter.py` | `data.currency_conversions@1` | `data.instruments@1` | Missing |
+| `FEAT-DATA-UNIVERSES` | Dynamic asset baskets and universe membership | `app/services/data/universes.py` | `data.universes@1` | `data.instruments@1` | Missing |
+| `FEAT-DATA-SYNTHETIC` | Synthetic stress series and scenario generation | `app/services/data/synthetic_series.py` | `data.synthetic@1` | `data.datasets@1` | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 
