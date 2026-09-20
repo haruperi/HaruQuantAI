@@ -19,8 +19,20 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from app.kernel.bootstrapper import FeatureFactory
+from app.services.brokers.catalog import feature as brokers_catalog
+from app.services.brokers.crypto import feature as brokers_crypto
+from app.services.brokers.ctrader import feature as brokers_ctrader
+from app.services.brokers.darwinex import feature as brokers_darwinex
+from app.services.brokers.dukascopy import feature as brokers_dukascopy
+from app.services.brokers.equity import feature as brokers_equity
+from app.services.brokers.futures import feature as brokers_futures
+from app.services.brokers.isolation_fencing import feature as brokers_fencing
+from app.services.brokers.mt5 import feature as brokers_mt5
+from app.services.brokers.reconciliation import feature as brokers_reconciliation
+from app.services.brokers.yahoo import feature as brokers_yahoo
 from app.services.gateway.api_server import feature as gateway_api_server
 from app.services.persistence.artifacts import feature as persistence_artifacts
+from app.services.persistence.brokers import feature as persistence_brokers
 from app.services.persistence.databanks import feature as persistence_databanks
 from app.services.persistence.database import feature as persistence_database
 from app.services.persistence.migrations import feature as persistence_migrations
@@ -49,6 +61,18 @@ FEATURES: tuple[FeatureFactory, ...] = (
     persistence_retention,
     persistence_databanks,
     persistence_parquet,
+    persistence_brokers,
+    brokers_catalog,
+    brokers_mt5,
+    brokers_ctrader,
+    brokers_dukascopy,
+    brokers_equity,
+    brokers_futures,
+    brokers_darwinex,
+    brokers_crypto,
+    brokers_yahoo,
+    brokers_reconciliation,
+    brokers_fencing,
     workspace_settings,
     workspace_notifications,
     workspace_diagnostics,
@@ -72,6 +96,18 @@ PROFILES: Mapping[str, frozenset[str]] = {
             "persistence.retention",
             "persistence.databanks",
             "persistence.parquet",
+            "persistence.brokers",
+            "brokers.catalog",
+            "brokers.mt5",
+            "brokers.ctrader",
+            "brokers.dukascopy",
+            "brokers.equity",
+            "brokers.futures",
+            "brokers.darwinex",
+            "brokers.crypto",
+            "brokers.yahoo",
+            "brokers.reconciliation",
+            "brokers.fencing",
             "workspace.settings",
             "workspace.notifications",
             "workspace.diagnostics",
@@ -92,6 +128,24 @@ PROFILES: Mapping[str, frozenset[str]] = {
             "persistence.retention",
             "persistence.databanks",
             "persistence.parquet",
+            "persistence.brokers",
+        }
+    ),
+    "brokers": frozenset(
+        {
+            "persistence.database",
+            "persistence.brokers",
+            "brokers.catalog",
+            "brokers.mt5",
+            "brokers.ctrader",
+            "brokers.dukascopy",
+            "brokers.equity",
+            "brokers.futures",
+            "brokers.darwinex",
+            "brokers.crypto",
+            "brokers.yahoo",
+            "brokers.reconciliation",
+            "brokers.fencing",
         }
     ),
     "workspace": frozenset(

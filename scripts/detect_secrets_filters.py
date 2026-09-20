@@ -20,7 +20,10 @@ _ACCEPTANCE_PATH_RE = re.compile(
     r"^docs/dev/evidence/features/FEAT-[A-Z0-9_-]+/acceptance\.json$"
 )
 _BASELINE_COMMIT_LINE_RE = re.compile(
-    r'^\s*"baseline_commit"\s*:\s*"(?P<commit>[a-f0-9]{40})"\s*,?\s*$'
+    r'^\s*"(?:baseline_commit|tested_revision)"\s*:\s*"(?P<commit>[a-f0-9]{40})"\s*,?\s*$'
+)
+_FINGERPRINT_HASH_LINE_RE = re.compile(
+    r'^\s*"(?:owner_module_sha256|public_contract_sha256|domain_readme_sha256)"\s*:\s*"(?P<hash>[a-f0-9]{64})"\s*,?\s*$'
 )
 
 
@@ -67,13 +70,33 @@ def is_valid_repository_commit_evidence(
     return _is_repository_commit(secret)
 
 
+def is_valid_repository_fingerprint_evidence(
+    filename: str,
+    line: str,
+    secret: str,
+) -> bool:
+    """Filter schema-bound file fingerprint SHA256 hashes in acceptance manifests."""
+    relative_path = _repository_relative_path(filename)
+    if relative_path is None:
+        return False
+    if _ACCEPTANCE_PATH_RE.fullmatch(relative_path):
+        match = _FINGERPRINT_HASH_LINE_RE.fullmatch(line)
+    else:
+        return False
+    if match is None or match.group("hash") != secret:
+        return False
+    return True
+
+
 def is_valid_repository_evidence(
     filename: str,
     line: str,
     secret: str,
 ) -> bool:
     """Filter supported schema-bound repository evidence identities."""
-    return is_valid_repository_commit_evidence(filename, line, secret)
+    return is_valid_repository_commit_evidence(
+        filename, line, secret
+    ) or is_valid_repository_fingerprint_evidence(filename, line, secret)
 
 
 def run_secret_scan(filenames: list[str], baseline_path: Path) -> int:

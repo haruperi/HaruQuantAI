@@ -244,6 +244,10 @@ def test_ui_server_spawn_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify --ui handles subprocess creation failure gracefully."""
     mock_create_proc = AsyncMock(side_effect=OSError("Command not found"))
     monkeypatch.setattr(asyncio, "create_subprocess_exec", mock_create_proc)
+    monkeypatch.setattr(
+        "app.services.gateway.api_server.ApiServerService.serve",
+        AsyncMock(return_value=None),
+    )
 
     exit_code = asyncio.run(async_main(["--ui"]))
     assert exit_code == 1
@@ -254,6 +258,10 @@ def test_ui_server_npm_not_found(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
     monkeypatch.setattr(shutil, "which", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        "app.services.gateway.api_server.ApiServerService.serve",
+        AsyncMock(return_value=None),
+    )
     exit_code = asyncio.run(async_main(["--ui"]))
     assert exit_code == 1
 
