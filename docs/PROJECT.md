@@ -56,7 +56,7 @@ stress-tests, combines, and exports rule-based trading strategies with reproduci
 
 | Domain | Owns | Product status |
 | --- | --- | --- |
-| Workspace | Settings, jobs, scheduling, recovery, logs, notifications | Missing |
+| Workspace | Settings, jobs, scheduling, recovery, logs, notifications | Completed |
 | Persistence | SQLite mechanics, artifacts, databanks, memberships, retention | Missing |
 | Brokers | MT5/cTrader connectivity, capability discovery, translation, reconciliation | Missing |
 | Data | Instruments, calendars, ticks/bars, import/providers, quality, datasets | Missing |

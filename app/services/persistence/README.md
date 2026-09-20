@@ -23,6 +23,7 @@ Backend features use the simplified modular-monolith layout:
 app/services/persistence/
 |-- README.md
 |-- __init__.py
+|-- workspace.py
 |-- database.py
 |-- artifacts.py
 |-- databanks.py
@@ -45,7 +46,10 @@ Cross-boundary DTOs, protocols, events, errors, and capability keys live in
 never import sibling implementations.
 
 All schema, parameterized SQL, and transactions for this domain live in
-`app/services/persistence/persistence.py`. A feature may be stateless, but it never accepts an
+`app/services/persistence/persistence.py`. Domain-specific persistence modules
+(such as `app/services/persistence/workspace.py` providing `persistence.workspace@1`)
+encapsulate domain SQL schemas, transactions, atomic CAS transitions, and test isolation
+via `HARUQUANTAI_DB_PATH`. A feature may be stateless, but it never accepts an
 unrestricted database connection. Every completed feature contributes a deterministic, offline,
 secret-safe example to `tests/examples/02_persistence.py`.
 

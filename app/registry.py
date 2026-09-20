@@ -20,15 +20,61 @@ from collections.abc import Mapping, Sequence
 
 from app.kernel.bootstrapper import FeatureFactory
 from app.services.gateway.api_server import feature as gateway_api_server
+from app.services.persistence.workspace import feature as persistence_workspace
+from app.services.workspace.diagnostics import feature as workspace_diagnostics
+from app.services.workspace.jobs import feature as workspace_jobs
+from app.services.workspace.notifications import feature as workspace_notifications
+from app.services.workspace.plugin_host import feature as workspace_plugins
+from app.services.workspace.remote_workers import feature as workspace_workers
+from app.services.workspace.resource_governor import feature as workspace_resources
+from app.services.workspace.scheduler import feature as workspace_scheduler
+from app.services.workspace.settings import feature as workspace_settings
 
 # Enumerate all domain feature factory callables here.
 # Features will be topologically sorted by Runtime before startup.
-FEATURES: tuple[FeatureFactory, ...] = (gateway_api_server,)
+FEATURES: tuple[FeatureFactory, ...] = (
+    gateway_api_server,
+    persistence_workspace,
+    workspace_settings,
+    workspace_notifications,
+    workspace_diagnostics,
+    workspace_resources,
+    workspace_plugins,
+    workspace_jobs,
+    workspace_scheduler,
+    workspace_workers,
+)
 
 # Named deployment profiles mapping a profile name to its active feature set.
 PROFILES: Mapping[str, frozenset[str]] = {
-    "all": frozenset({"gateway.api_server"}),
+    "all": frozenset(
+        {
+            "gateway.api_server",
+            "persistence.workspace",
+            "workspace.settings",
+            "workspace.notifications",
+            "workspace.diagnostics",
+            "workspace.resources",
+            "workspace.plugins",
+            "workspace.jobs",
+            "workspace.scheduler",
+            "workspace.workers",
+        }
+    ),
     "api": frozenset({"gateway.api_server"}),
+    "workspace": frozenset(
+        {
+            "persistence.workspace",
+            "workspace.settings",
+            "workspace.notifications",
+            "workspace.diagnostics",
+            "workspace.resources",
+            "workspace.plugins",
+            "workspace.jobs",
+            "workspace.scheduler",
+            "workspace.workers",
+        }
+    ),
     "default": frozenset(),
 }
 

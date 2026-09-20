@@ -1,0 +1,57 @@
+{
+  "feature_id": "FEAT-WORKSPACE-JOBS",
+  "domain": "D-WORKSPACE",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-WORKSPACE-001",
+    "FR-WORKSPACE-002",
+    "FR-WORKSPACE-003"
+  ],
+  "verified_at_utc": "2026-09-20T09:03:00Z",
+  "owner_module": "app/services/workspace/jobs.py",
+  "public_contract": "app/contracts/workspace.py",
+  "symbols": [
+    "JobService",
+    "JobConfig"
+  ],
+  "capabilities": {
+    "provides": [
+      "workspace.jobs@1"
+    ],
+    "requires": [
+      "persistence.workspace@1"
+    ]
+  },
+  "persistence": {
+    "module": "app/services/persistence/workspace.py",
+    "namespace": "workspace.v1",
+    "tables": [
+      "workspace_jobs",
+      "workspace_job_attempts",
+      "workspace_job_events"
+    ]
+  },
+  "test_target": "tests/services/workspace/test_jobs.py",
+  "usage_example": "tests/examples/01_workspace.py::example_01_workspace_jobs",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/workspace/test_jobs.py",
+    "exit_code": 0
+  },
+  "tested_revision": "663cc6119b5650bd5801410519381f74a442190c",
+  "fingerprints": {
+    "owner_module_sha256": "72679c88cca8c24ad59990cc8f396400f719ce3c291085cce14dfd07fd96e7b2",
+    "public_contract_sha256": "e62f0fb06be32d36f85ad8a303bc9aea53460d5f0f1337eb3792d21047cccad7",
+    "domain_readme_sha256": "880f1c9c5ef97733b1a3edd87a07261c2af9cd91c338abf0330f4220d5291b01"
+  },
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "PASS",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}
