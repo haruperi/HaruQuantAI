@@ -58,6 +58,11 @@ BUILTIN_MIGRATIONS: tuple[tuple[int, str, str], ...] = (
             "ON persistence_artifact_lineage(parent_artifact_id);\n"
         ),
     ),
+    (
+        3,
+        "0003_drop_data_cache_entries",
+        "DROP TABLE IF EXISTS data_cache_entries;\n",
+    ),
 )
 
 

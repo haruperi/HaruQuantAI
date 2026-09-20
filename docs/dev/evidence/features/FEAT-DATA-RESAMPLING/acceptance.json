@@ -1,0 +1,55 @@
+{
+  "feature_id": "FEAT-DATA-RESAMPLING",
+  "domain": "D-DATA",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-DATA-DETERMINISTIC_RESAMPLING",
+    "FR-DATA-TIMEZONE_CLONING"
+  ],
+  "verified_at_utc": "2026-09-20T21:00:00Z",
+  "owner_module": "app/services/data/resampling.py",
+  "public_contract": "app/contracts/data.py",
+  "symbols": [
+    "ResamplingService",
+    "ResamplingConfig",
+    "ResamplingFeature",
+    "BarRecord",
+    "TickRecord"
+  ],
+  "capabilities": {
+    "provides": [
+      "data.resampling@1"
+    ],
+    "requires": []
+  },
+  "persistence": {
+    "module": "app/services/persistence/data.py",
+    "namespace": "data.v1",
+    "tables": [
+      "data_datasets"
+    ]
+  },
+  "test_target": "tests/services/data/test_resampling.py",
+  "usage_example": "tests/examples/04_data.py::example_04_resampling",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/data/test_resampling.py",
+    "exit_code": 0
+  },
+  "tested_revision": "22d171f404802ef2a42b39c4911d3536ba4223e7",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  },
+  "fingerprints": {
+    "owner_module_sha256": "9eb65f3d5242a1e7732d41206031345ca1dc56c6866445371c5fea1db86f7f6a",
+    "public_contract_sha256": "3db2525abfba22b43788d526e37a41e6ed272b6fffb126c6acbe817eee42fe4a",
+    "domain_readme_sha256": "646a7ee763a5d73a253e5c5abd2934b39a745df3e6a7674302cc7647570a7e09"
+  }
+}

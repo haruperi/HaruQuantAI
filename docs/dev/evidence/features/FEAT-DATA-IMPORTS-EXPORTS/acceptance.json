@@ -1,0 +1,58 @@
+{
+  "feature_id": "FEAT-DATA-IMPORTS-EXPORTS",
+  "domain": "D-DATA",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-DATA-IMPORT_DELIMITERS",
+    "FR-DATA-EXPORT_FORMATS"
+  ],
+  "verified_at_utc": "2026-09-20T21:00:00Z",
+  "owner_module": "app/services/data/imports_exports.py",
+  "public_contract": "app/contracts/data.py",
+  "symbols": [
+    "ImportExportService",
+    "ImportExportConfig",
+    "ImportExportFeature",
+    "ImportResult",
+    "ExportResult",
+    "DataFormatSpecification"
+  ],
+  "capabilities": {
+    "provides": [
+      "data.imports_exports@1"
+    ],
+    "requires": [
+      "data.datasets@1"
+    ]
+  },
+  "persistence": {
+    "module": "app/services/persistence/data.py",
+    "namespace": "data.v1",
+    "tables": [
+      "data_datasets"
+    ]
+  },
+  "test_target": "tests/services/data/test_imports_exports.py",
+  "usage_example": "tests/examples/04_data.py::example_04_imports_exports",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/data/test_imports_exports.py tests/services/data/test_mt_exports.py",
+    "exit_code": 0
+  },
+  "tested_revision": "22d171f404802ef2a42b39c4911d3536ba4223e7",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  },
+  "fingerprints": {
+    "owner_module_sha256": "be13da58a029d29409a0fa680872ad4481e81db47b9b8914a98637bbc362b990",
+    "public_contract_sha256": "3db2525abfba22b43788d526e37a41e6ed272b6fffb126c6acbe817eee42fe4a",
+    "domain_readme_sha256": "646a7ee763a5d73a253e5c5abd2934b39a745df3e6a7674302cc7647570a7e09"
+  }
+}

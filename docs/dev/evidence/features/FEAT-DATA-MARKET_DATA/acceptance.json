@@ -1,0 +1,64 @@
+{
+  "feature_id": "FEAT-DATA-MARKET_DATA",
+  "domain": "D-DATA",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-DATA-MARKET_REQUEST",
+    "FR-DATA-CACHE_TRANSPARENCY",
+    "FR-DATA-CONNECTOR_SYNC",
+    "FR-DATA-INGESTION_NORMALIZATION"
+  ],
+  "verified_at_utc": "2026-09-20T21:00:00Z",
+  "owner_module": "app/services/data/market_data.py",
+  "public_contract": "app/contracts/data.py",
+  "symbols": [
+    "MarketDataClient",
+    "SyncConnectorsCapability",
+    "MarketDataConfig",
+    "MarketDataFeature",
+    "MarketDataRequest",
+    "SyncInterval",
+    "SyncReport",
+    "build_market_data_request"
+  ],
+  "capabilities": {
+    "provides": [
+      "data.market_data@1",
+      "data.sync@1"
+    ],
+    "requires": [
+      "data.datasets@1"
+    ]
+  },
+  "persistence": {
+    "module": "app/services/persistence/data.py",
+    "namespace": "data.v1",
+    "tables": [
+      "data_datasets",
+      "data_quality_reports"
+    ]
+  },
+  "test_target": "tests/services/data/test_market_data.py",
+  "usage_example": "tests/examples/04_data.py::example_04_market_data",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --cov=app.services.data.market_data tests/services/data/test_market_data.py",
+    "exit_code": 0
+  },
+  "tested_revision": "22d171f404802ef2a42b39c4911d3536ba4223e7",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  },
+  "fingerprints": {
+    "owner_module_sha256": "65cc72d1368571a8c0585bf0cf0b690c226b7201e2b0c3558c9dbafa4ac269b3",
+    "public_contract_sha256": "3db2525abfba22b43788d526e37a41e6ed272b6fffb126c6acbe817eee42fe4a",
+    "domain_readme_sha256": "646a7ee763a5d73a253e5c5abd2934b39a745df3e6a7674302cc7647570a7e09"
+  }
+}

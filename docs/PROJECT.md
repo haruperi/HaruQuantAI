@@ -59,7 +59,7 @@ stress-tests, combines, and exports rule-based trading strategies with reproduci
 | Workspace | Settings, jobs, scheduling, recovery, logs, notifications | Completed |
 | Persistence | SQLite mechanics, artifacts, databanks, memberships, retention | Completed |
 | Brokers | MT5/cTrader connectivity, capability discovery, translation, reconciliation | Completed |
-| Data | Instruments, calendars, ticks/bars, import/providers, quality, datasets | Missing |
+| Data | Instruments, calendars, ticks/bars, import/providers, quality, datasets | Completed |
 | Indicator | Series calculations, warm-up, cache, custom indicator contract | Missing |
 | Strategy | Canonical model, authoring, grammar, generation/evolution, export | Missing |
 | Risk | Sizing, protective levels, trailing, break-even, limits | Missing |

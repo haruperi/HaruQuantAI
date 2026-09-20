@@ -1,0 +1,57 @@
+{
+  "feature_id": "FEAT-DATA-QUALITY",
+  "domain": "D-DATA",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-DATA-QUALITY_ANOMALIES",
+    "FR-DATA-DATA_REPAIR"
+  ],
+  "verified_at_utc": "2026-09-20T21:00:00Z",
+  "owner_module": "app/services/data/quality.py",
+  "public_contract": "app/contracts/data.py",
+  "symbols": [
+    "QualityService",
+    "QualityConfig",
+    "QualityFeature",
+    "QualityReport",
+    "DataAnomaly",
+    "RepairPolicy",
+    "RepairAuditReport"
+  ],
+  "capabilities": {
+    "provides": [
+      "data.quality@1"
+    ],
+    "requires": []
+  },
+  "persistence": {
+    "module": "app/services/persistence/data.py",
+    "namespace": "data.v1",
+    "tables": [
+      "data_quality_reports"
+    ]
+  },
+  "test_target": "tests/services/data/test_quality.py",
+  "usage_example": "tests/examples/04_data.py::example_04_quality",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/data/test_quality.py",
+    "exit_code": 0
+  },
+  "tested_revision": "22d171f404802ef2a42b39c4911d3536ba4223e7",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  },
+  "fingerprints": {
+    "owner_module_sha256": "320feca85251e417be45e1c82aa4de5b3ec098435cc882b8a99aa7958db9b490",
+    "public_contract_sha256": "3db2525abfba22b43788d526e37a41e6ed272b6fffb126c6acbe817eee42fe4a",
+    "domain_readme_sha256": "646a7ee763a5d73a253e5c5abd2934b39a745df3e6a7674302cc7647570a7e09"
+  }
+}

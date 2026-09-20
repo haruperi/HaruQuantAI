@@ -32,13 +32,13 @@ def test_migrations_initial_and_apply(tmp_path: Path) -> None:
 
     assert mig_service.current_version() == 0
     pending = mig_service.get_pending_migrations()
-    assert len(pending) == 2
-    assert [p.version for p in pending] == [1, 2]
+    assert len(pending) == 3
+    assert [p.version for p in pending] == [1, 2, 3]
 
     # Apply all migrations
     applied = mig_service.apply_all()
-    assert len(applied) == 2
-    assert mig_service.current_version() == 2
+    assert len(applied) == 3
+    assert mig_service.current_version() == 3
 
     # Second apply_all should be no-op
     pending_after = mig_service.get_pending_migrations()
@@ -47,23 +47,42 @@ def test_migrations_initial_and_apply(tmp_path: Path) -> None:
     assert len(applied_again) == 0
 
 
+def test_migration_0003_drops_orphan_cache_table(tmp_path: Path) -> None:
+    """Test that migration 0003 removes the legacy data_cache_entries table."""
+    db_file = tmp_path / "test_0003.db"
+    db_service = DatabaseServiceImpl(DatabaseConfig(database_path=db_file))
+    db_service.execute_script(
+        "CREATE TABLE IF NOT EXISTS data_cache_entries (cache_key TEXT PRIMARY KEY);"
+    )
+
+    mig_service = MigrationServiceImpl(db_service)
+    applied = mig_service.apply_all()
+
+    assert [m.version for m in applied] == [1, 2, 3]
+    rows = db_service.execute_query(
+        "SELECT count(*) AS count FROM sqlite_master "
+        "WHERE type='table' AND name='data_cache_entries';"
+    )
+    assert rows[0]["count"] == 0
+
+
 def test_custom_migrations_and_directory(tmp_path: Path) -> None:
     """Test custom migrations via configuration and file discovery."""
     db_file = tmp_path / "test_custom_mig.db"
     mig_dir = tmp_path / "sql_migrations"
     mig_dir.mkdir()
 
-    # Create file-based migration 0003
+    # Create file-based migration 0004 (0003 is a built-in)
     file_sql = "CREATE TABLE test_extra (id INTEGER PRIMARY KEY, note TEXT);"
-    (mig_dir / "0003_extra_table.sql").write_text(file_sql, encoding="utf-8")
+    (mig_dir / "0004_extra_table.sql").write_text(file_sql, encoding="utf-8")
 
     db_service = DatabaseServiceImpl(DatabaseConfig(database_path=db_file))
     config = MigrationConfig(
         migrations_dir=mig_dir,
         custom_migrations=(
             (
-                4,
-                "0004_another_table",
+                5,
+                "0005_another_table",
                 "CREATE TABLE test_fourth (val REAL);",
             ),
         ),
@@ -71,11 +90,11 @@ def test_custom_migrations_and_directory(tmp_path: Path) -> None:
     mig_service = MigrationServiceImpl(db_service, config)
 
     pending = mig_service.get_pending_migrations()
-    assert [p.version for p in pending] == [1, 2, 3, 4]
+    assert [p.version for p in pending] == [1, 2, 3, 4, 5]
 
     applied = mig_service.apply_all()
-    assert len(applied) == 4
-    assert mig_service.current_version() == 4
+    assert len(applied) == 5
+    assert mig_service.current_version() == 5
 
     # Verify tables were created
     res = db_service.execute_query(
@@ -92,7 +111,7 @@ def test_migration_checksum_mismatch(tmp_path: Path) -> None:
     # Apply standard migrations
     mig_service_initial = MigrationServiceImpl(db_service)
     mig_service_initial.apply_all()
-    assert mig_service_initial.current_version() == 2
+    assert mig_service_initial.current_version() == 3
 
     # Tamper with recorded checksum in database
     db_service.execute_mutation(
@@ -115,8 +134,8 @@ def test_migration_failure_rollback(tmp_path: Path) -> None:
     broken_config = MigrationConfig(
         custom_migrations=(
             (
-                3,
-                "0003_broken",
+                4,
+                "0004_broken",
                 "INVALID SQL SYNTAX HERE STATEMENT;",
             ),
         )
@@ -126,10 +145,10 @@ def test_migration_failure_rollback(tmp_path: Path) -> None:
     with pytest.raises(MigrationError, match="Failed to apply migration"):
         mig_service.apply_all()
 
-    # Initial built-ins (1 and 2) applied, but 3 was rolled back and not recorded
+    # Initial built-ins (1 through 3) applied, but 4 was rolled back and not recorded
     applied = mig_service.get_applied_migrations()
-    assert len(applied) == 2
-    assert mig_service.current_version() == 2
+    assert len(applied) == 3
+    assert mig_service.current_version() == 3
 
 
 def test_migrations_feature_lifecycle(tmp_path: Path) -> None:
@@ -147,8 +166,8 @@ def test_migrations_feature_lifecycle(tmp_path: Path) -> None:
             mig_service = runtime.require(MIGRATION_SERVICE)
             assert mig_service.current_version() == 0
             applied = mig_service.apply_all()
-            assert len(applied) == 2
-            assert mig_service.current_version() == 2
+            assert len(applied) == 3
+            assert mig_service.current_version() == 3
 
     asyncio.run(_test())
 

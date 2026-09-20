@@ -30,9 +30,18 @@ from app.services.brokers.isolation_fencing import feature as brokers_fencing
 from app.services.brokers.mt5 import feature as brokers_mt5
 from app.services.brokers.reconciliation import feature as brokers_reconciliation
 from app.services.brokers.yahoo import feature as brokers_yahoo
+from app.services.data.datasets import feature as data_datasets
+from app.services.data.imports_exports import feature as data_imports_exports
+from app.services.data.instruments import feature as data_instruments
+from app.services.data.market_data import feature as data_market_data
+from app.services.data.quality import feature as data_quality
+from app.services.data.resampling import feature as data_resampling
+from app.services.data.sessions import feature as data_sessions
+from app.services.data.universes import feature as data_universes
 from app.services.gateway.api_server import feature as gateway_api_server
 from app.services.persistence.artifacts import feature as persistence_artifacts
 from app.services.persistence.brokers import feature as persistence_brokers
+from app.services.persistence.data import feature as persistence_data
 from app.services.persistence.databanks import feature as persistence_databanks
 from app.services.persistence.database import feature as persistence_database
 from app.services.persistence.migrations import feature as persistence_migrations
@@ -62,6 +71,15 @@ FEATURES: tuple[FeatureFactory, ...] = (
     persistence_databanks,
     persistence_parquet,
     persistence_brokers,
+    persistence_data,
+    data_instruments,
+    data_sessions,
+    data_datasets,
+    data_quality,
+    data_imports_exports,
+    data_resampling,
+    data_universes,
+    data_market_data,
     brokers_catalog,
     brokers_mt5,
     brokers_ctrader,
@@ -97,6 +115,15 @@ PROFILES: Mapping[str, frozenset[str]] = {
             "persistence.databanks",
             "persistence.parquet",
             "persistence.brokers",
+            "persistence.data",
+            "data.instruments",
+            "data.sessions",
+            "data.datasets",
+            "data.quality",
+            "data.imports_exports",
+            "data.resampling",
+            "data.universes",
+            "data.market_data",
             "brokers.catalog",
             "brokers.mt5",
             "brokers.ctrader",
@@ -159,6 +186,20 @@ PROFILES: Mapping[str, frozenset[str]] = {
             "workspace.jobs",
             "workspace.scheduler",
             "workspace.workers",
+        }
+    ),
+    "data": frozenset(
+        {
+            "persistence.database",
+            "persistence.data",
+            "data.instruments",
+            "data.sessions",
+            "data.datasets",
+            "data.quality",
+            "data.imports_exports",
+            "data.resampling",
+            "data.universes",
+            "data.market_data",
         }
     ),
     "default": frozenset(),
