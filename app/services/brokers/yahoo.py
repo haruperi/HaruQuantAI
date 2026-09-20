@@ -267,13 +267,13 @@ class YahooFeature:
         """Return the feature specification."""
         return SPEC
 
-    async def start(self, ctx: FeatureContext) -> None:
+    async def start(self, context: FeatureContext) -> None:
         """Start the feature and provide YahooFeedService capability."""
         self._service = YahooFeedService(self._config)
-        ctx.provide(BROKER_YAHOO, self._service)
+        context.provide(BROKER_YAHOO, self._service)
         logger.info("brokers_yahoo_feature_started")
 
-    async def stop(self, _ctx: FeatureContext) -> None:
+    async def stop(self, _context: FeatureContext) -> None:
         """Stop the feature and release resources."""
         if self._service and self._service.is_connected():
             await self._service.disconnect()

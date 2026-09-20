@@ -183,15 +183,15 @@ class BrokerCatalogFeature:
         """Return the feature specification."""
         return SPEC
 
-    async def start(self, ctx: FeatureContext) -> None:
+    async def start(self, context: FeatureContext) -> None:
         """Start the feature and provide BrokerCatalog capability."""
-        persistence = ctx.require(BROKER_PERSISTENCE)
+        persistence = context.require(BROKER_PERSISTENCE)
         self._service = BrokerCatalog(persistence, self._config)
         await self._service.initialize_cache()
-        ctx.provide(BROKER_CATALOG, self._service)
+        context.provide(BROKER_CATALOG, self._service)
         logger.info("brokers_catalog_feature_started")
 
-    async def stop(self, _ctx: FeatureContext) -> None:
+    async def stop(self, _context: FeatureContext) -> None:
         """Stop the feature and release resources."""
         self._service = None
         logger.info("brokers_catalog_feature_stopped")

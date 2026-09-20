@@ -41,8 +41,8 @@
   },
   "tested_revision": "2abbf625a15988cea9a454c33c17789442138931",
   "fingerprints": {
-    "owner_module_sha256": "d79eda13368280fc8689cbc7fa655d03e169a0b940e0e45a7f06956c6fa1e0c2",
-    "public_contract_sha256": "7d678fad73ca3b9ebaa39d4483fbb8fa402cf39c879ae1fc37b0dc986d3ee62b",
+    "owner_module_sha256": "ecf6749b80d8ff08fac94e16cdcfc5a02f7fd02f99b1f94911e1d7a9ce7b1815",
+    "public_contract_sha256": "224958effebea67d9156cf6e2d7b5afaf997d552d8283e17dfbdb50981281415",
     "domain_readme_sha256": "82943a5d4b3c69937123f6874842b28debb24e2283aedfacbe14951f0a75548b"
   },
   "pipeline_stages": {

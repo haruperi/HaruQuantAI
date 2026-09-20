@@ -30,7 +30,7 @@
   },
   "tested_revision": "2abbf625a15988cea9a454c33c17789442138931",
   "fingerprints": {
-    "owner_module_sha256": "2206737fa3e59a7ee30733601fc2675ce8cc19c202921bba11195540b8e9b659",
+    "owner_module_sha256": "82126f93b98122567da3bc4a683748ce40303df4177753d9e0c5c4bf3aeb5781",
     "public_contract_sha256": "224958effebea67d9156cf6e2d7b5afaf997d552d8283e17dfbdb50981281415",
     "domain_readme_sha256": "c91679e17e266f783e0a6c678f974fa5717d4343a04535062bab3261f2df3a5d"
   },

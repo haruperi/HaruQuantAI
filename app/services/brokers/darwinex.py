@@ -271,13 +271,13 @@ class DarwinexFeature:
         """Return the feature specification."""
         return SPEC
 
-    async def start(self, ctx: FeatureContext) -> None:
+    async def start(self, context: FeatureContext) -> None:
         """Start the feature and provide DarwinexFeedService capability."""
         self._service = DarwinexFeedService(self._config)
-        ctx.provide(BROKER_DARWINEX, self._service)
+        context.provide(BROKER_DARWINEX, self._service)
         logger.info("brokers_darwinex_feature_started")
 
-    async def stop(self, _ctx: FeatureContext) -> None:
+    async def stop(self, _context: FeatureContext) -> None:
         """Stop the feature and release resources."""
         if self._service and self._service.is_connected():
             await self._service.disconnect()

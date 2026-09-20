@@ -264,13 +264,13 @@ class SQFuturesFeature:
         """Return the feature specification."""
         return SPEC
 
-    async def start(self, ctx: FeatureContext) -> None:
+    async def start(self, context: FeatureContext) -> None:
         """Start the feature and provide SQFuturesFeedService capability."""
         self._service = SQFuturesFeedService(self._config)
-        ctx.provide(BROKER_FUTURES, self._service)
+        context.provide(BROKER_FUTURES, self._service)
         logger.info("brokers_futures_feature_started")
 
-    async def stop(self, _ctx: FeatureContext) -> None:
+    async def stop(self, _context: FeatureContext) -> None:
         """Stop the feature and release resources."""
         if self._service and self._service.is_connected():
             await self._service.disconnect()

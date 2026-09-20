@@ -450,14 +450,14 @@ class BrokersPersistenceFeature:
         """Return the feature specification."""
         return SPEC
 
-    async def start(self, ctx: FeatureContext) -> None:
+    async def start(self, context: FeatureContext) -> None:
         """Start the feature and provide BrokersPersistenceService capability."""
-        db = ctx.require(DATABASE_SERVICE)
+        db = context.require(DATABASE_SERVICE)
         self._service = BrokersPersistenceService(db, self._config)
-        ctx.provide(BROKER_PERSISTENCE, self._service)
+        context.provide(BROKER_PERSISTENCE, self._service)
         logger.info("brokers_persistence_started")
 
-    async def stop(self, _ctx: FeatureContext) -> None:
+    async def stop(self, _context: FeatureContext) -> None:
         """Stop the feature and release resources."""
         self._service = None
         logger.info("brokers_persistence_stopped")

@@ -188,14 +188,14 @@ class BrokerReconciliationFeature:
         """Return the feature specification."""
         return SPEC
 
-    async def start(self, ctx: FeatureContext) -> None:
+    async def start(self, context: FeatureContext) -> None:
         """Start the feature and provide BrokerReconciler capability."""
-        fencing = ctx.optional(BROKER_FENCING)
+        fencing = context.optional(BROKER_FENCING)
         self._service = BrokerReconciler(fencing, self._config)
-        ctx.provide(BROKER_RECONCILIATION, self._service)
+        context.provide(BROKER_RECONCILIATION, self._service)
         logger.info("brokers_reconciliation_feature_started")
 
-    async def stop(self, _ctx: FeatureContext) -> None:
+    async def stop(self, _context: FeatureContext) -> None:
         """Stop the feature and release resources."""
         self._service = None
         logger.info("brokers_reconciliation_feature_stopped")

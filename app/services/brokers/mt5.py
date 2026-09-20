@@ -306,13 +306,13 @@ class Mt5Feature:
         """Return the feature specification."""
         return SPEC
 
-    async def start(self, ctx: FeatureContext) -> None:
+    async def start(self, context: FeatureContext) -> None:
         """Start the feature and provide Mt5Adapter capability."""
         self._adapter = Mt5Adapter(self._config)
-        ctx.provide(BROKER_MT5, self._adapter)
+        context.provide(BROKER_MT5, self._adapter)
         logger.info("brokers_mt5_feature_started")
 
-    async def stop(self, _ctx: FeatureContext) -> None:
+    async def stop(self, _context: FeatureContext) -> None:
         """Stop the feature and release resources."""
         if self._adapter and self._adapter.is_connected():
             await self._adapter.disconnect()
