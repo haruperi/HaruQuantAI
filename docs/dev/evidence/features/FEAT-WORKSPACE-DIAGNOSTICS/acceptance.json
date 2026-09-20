@@ -34,9 +34,9 @@
   },
   "tested_revision": "663cc6119b5650bd5801410519381f74a442190c",
   "fingerprints": {
-    "owner_module_sha256": "40a774d152b2b4540f9eecce646df1fa09ac086e59e9b678506cc48dd86808d3",
+    "owner_module_sha256": "391b709d84c7b9089860d6d6a90459ebe409e220c8071b81de00e77625960bfe",
     "public_contract_sha256": "e62f0fb06be32d36f85ad8a303bc9aea53460d5f0f1337eb3792d21047cccad7",
-    "domain_readme_sha256": "880f1c9c5ef97733b1a3edd87a07261c2af9cd91c338abf0330f4220d5291b01"
+    "domain_readme_sha256": "beabe574873700d10cb30b145e04f3a7921c7ade18414417472c7f8d7b212520"
   },
   "pipeline_stages": {
     "Contract": "PASS",

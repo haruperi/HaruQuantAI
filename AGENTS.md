@@ -4,7 +4,7 @@
 
 ## 1. Core engineering principles
 
-- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, owning domain READMEs, and the Git-tracked code and tests. Conversation history is useful context but is never authoritative.
+- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, owning domain READMEs, and implementation history in `.agents/logs/<date-time>_<task_name>/<implementation-plan.md, walkthrough.md>`. Consequent iterarion of the same task is appended to the same task file as an iteration block. Chat history is useful context but is never authoritative.
 - **Scoped authority.**
   - `AGENTS.md` owns contributor, task workflow, and verification rules.
   - `docs/PROJECT.md` owns product scope, domain index, functional requirements, and NFRs.
@@ -69,7 +69,7 @@ Task Completed
 - Implement strictly within the approved `ALLOWED_WRITE_PATHS` and sequential implementation order.
 - Follow the authoritative build procedure in [docs/dev/feature_implementation_pipeline.md](docs/dev/feature_implementation_pipeline.md).
 - Follow change-scoped testing during development (`uv run pytest --no-cov <affected_tests>`).
-- Maintain or add a dedicated, self-contained offline usage example in `tests/examples/<domain_file>.py`.
+- Maintain or add a dedicated, real-world usage example in `tests/examples/<domain_file>.py`.
 - Verify the full qualification suite before finalizing:
   ```bash
   uv run python scripts/ci_check.py

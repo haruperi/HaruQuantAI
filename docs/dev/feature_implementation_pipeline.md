@@ -91,7 +91,7 @@ Begin with a truthful module docstring containing:
 3. `Key capabilities:` bounded operations and important failure semantics.
 4. `Python API usage:` consumption through a public capability resolved from a
    context, never a private service import.
-5. `CLI usage:` the domain's consolidated offline example command.
+5. `CLI usage:` the domain's consolidated real-world usage example command.
 
 The snippet is documentation, not a second implementation. It must be
 secret-safe and must not imply live, provider, browser, or release
@@ -334,7 +334,7 @@ from the public contract and owning feature card.
 
 ### Phase D — Usage and tests
 
-13. Add one realistic, offline, deterministic, secret-safe
+13. Add one realistic, real-world, deterministic, secret-safe
     `example_<NN>_<feature_slug>()` function to the consolidated domain example
     (`tests/examples/<NN>_<domain>.py`).
 14. Add focused owner tests for configuration, public operations, boundaries,
@@ -379,7 +379,7 @@ rather than "Implemented".
 | `FIP-05 SPEC`            | Keep module `SPEC`, capability versions, feature attributes, dependencies, conflicts, state, strict configuration, README, and registry semantics in exact parity.                                                                                                 |
 | `FIP-06 IMPORT`          | Use public contracts and context-resolved capabilities; prohibit sibling/cross-domain feature implementation imports in production, examples, gateways, workflows, and integration code.                                                                            |
 | `FIP-07 CONTRACT-PURITY` | Keep domain contracts typed, versioned, side-effect-free, implementation-independent, generated-schema compatible, and free of hidden orchestration or persistence.                                                                                                 |
-| `FIP-08 USE`             | Supply one bounded offline primary-purpose example function per completed backend feature in the consolidated domain example, with truthful output and cleanup.                                                                                                     |
+| `FIP-08 USE`             | Supply one bounded real-world usage example function per completed backend feature in the consolidated domain example, with truthful output and cleanup.                                                                                                     |
 | `FIP-09 WF`              | Map every active workflow contribution to its lead, participants, handoffs, failure states, final oracle, and independently owned system evidence; do not count reading sequences as `WF-*` identities.                                                            |
 | `FIP-10 TEST`            | Implement focused owner tests for applicable happy, failure, boundary, authorization, numerical/computational, lifecycle, dependency, idempotency, cancellation, replay, removal, and acceptance-traceability behavior.                                             |
 | `FIP-11 INTEG`           | Add independently owned compatibility and integration evidence for contracts, composition, consumers, Interfaces, UI, persistence, workflows, removal, and qualified providers where applicable.                                                                    |

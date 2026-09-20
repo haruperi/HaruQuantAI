@@ -1,7 +1,7 @@
 # Persistence
 
 > **Package:** `app/services/persistence/`
-> **Status:** `Missing`
+> **Status:** `Completed`
 > **Last updated:** `2026-09-20`
 > **Domain ID:** `D-PERSISTENCE`
 
@@ -34,7 +34,7 @@ app/services/persistence/
 
 app/contracts/persistence.py
 app/services/persistence/persistence.py
-tests/services/persistence/<feature>/
+tests/services/persistence/
 tests/examples/02_persistence.py
 ```
 
@@ -81,13 +81,13 @@ private implementation import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `persistence.database@1` | `DatabaseService` | `1` | SQLite lifecycle and transactions |
-| Missing | `persistence.artifacts@1` | `ArtifactStore` | `1` | Immutable artifact catalog and lineage |
-| Missing | `persistence.databanks@1` | `DatabankStore` | `1` | Databanks, memberships, annotations, and ranking |
-| Missing | `persistence.migrations@1` | `MigrationService` | `1` | Forward schema migration and compatibility |
-| Missing | `persistence.retention@1` | `RetentionService` | `1` | Reference-safe retention and purge planning |
-| Missing | `persistence.parquet@1` | `ParquetStoreService` | `1` | Partitioned columnar market data storage engine |
-| Missing | `persistence.snapshots@1` | `SnapshotService` | `1` | Atomic point-in-time database hot snapshots and backups |
+| Completed | `persistence.database@1` | `DatabaseService` | `1` | SQLite lifecycle and transactions |
+| Completed | `persistence.artifacts@1` | `ArtifactStore` | `1` | Immutable artifact catalog and lineage |
+| Completed | `persistence.databanks@1` | `DatabankStore` | `1` | Databanks, memberships, annotations, and ranking |
+| Completed | `persistence.migrations@1` | `MigrationService` | `1` | Forward schema migration and compatibility |
+| Completed | `persistence.retention@1` | `RetentionService` | `1` | Reference-safe retention and purge planning |
+| Completed | `persistence.parquet@1` | `ParquetStoreService` | `1` | Partitioned columnar market data storage engine |
+| Completed | `persistence.snapshots@1` | `SnapshotService` | `1` | Atomic point-in-time database hot snapshots and backups |
 
 ### Persisted-state ownership
 
@@ -95,7 +95,7 @@ Semantic state remains feature-owned although database mechanics are centralized
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `persistence.v1` | `FEAT-PERSISTENCE-DATABASE` and registry peers | `sqlite` | Retain versioned records until explicit policy permits purge | `persistence.database@1` |
+| Completed | `persistence.v1` | `FEAT-PERSISTENCE-DATABASE` and registry peers | `sqlite` | Retain versioned records until explicit policy permits purge | `persistence.database@1` |
 
 ---
 
@@ -103,13 +103,13 @@ Semantic state remains feature-owned although database mechanics are centralized
 
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-PERSISTENCE-DATABASE` | SQLite lifecycle and transactions | `app/services/persistence/database.py` | `persistence.database@1` | None | Missing |
-| `FEAT-PERSISTENCE-ARTIFACTS` | Immutable artifact catalog, lineage, and packaging | `app/services/persistence/artifacts.py` | `persistence.artifacts@1` | `persistence.database@1` | Missing |
-| `FEAT-PERSISTENCE-DATABANKS` | Databanks, memberships, annotations, ranking, similarity dismissal, and column views | `app/services/persistence/databanks.py` | `persistence.databanks@1` | `persistence.database@1` | Missing |
-| `FEAT-PERSISTENCE-MIGRATIONS` | Forward schema migration and compatibility | `app/services/persistence/migrations.py` | `persistence.migrations@1` | `persistence.database@1` | Missing |
-| `FEAT-PERSISTENCE-RETENTION` | Reference-safe retention and purge planning | `app/services/persistence/retention.py` | `persistence.retention@1` | `persistence.artifacts@1` | Missing |
-| `FEAT-PERSISTENCE-PARQUET` | Partitioned columnar market data store | `app/services/persistence/parquet_store.py` | `persistence.parquet@1` | None | Missing |
-| `FEAT-PERSISTENCE-SNAPSHOTS` | Point-in-time database hot snapshots and backups | `app/services/persistence/snapshots.py` | `persistence.snapshots@1` | `persistence.database@1` | Missing |
+| `FEAT-PERSISTENCE-DATABASE` | SQLite lifecycle and transactions | `app/services/persistence/database.py` | `persistence.database@1` | None | Completed |
+| `FEAT-PERSISTENCE-ARTIFACTS` | Immutable artifact catalog, lineage, and packaging | `app/services/persistence/artifacts.py` | `persistence.artifacts@1` | `persistence.database@1` | Completed |
+| `FEAT-PERSISTENCE-DATABANKS` | Databanks, memberships, annotations, ranking, similarity dismissal, and column views | `app/services/persistence/databanks.py` | `persistence.databanks@1` | `persistence.database@1`, `persistence.artifacts@1` | Completed |
+| `FEAT-PERSISTENCE-MIGRATIONS` | Forward schema migration and compatibility | `app/services/persistence/migrations.py` | `persistence.migrations@1` | `persistence.database@1` | Completed |
+| `FEAT-PERSISTENCE-RETENTION` | Reference-safe retention and purge planning | `app/services/persistence/retention.py` | `persistence.retention@1` | `persistence.database@1`, `persistence.artifacts@1` | Completed |
+| `FEAT-PERSISTENCE-PARQUET` | Partitioned columnar market data store | `app/services/persistence/parquet_store.py` | `persistence.parquet@1` | None | Completed |
+| `FEAT-PERSISTENCE-SNAPSHOTS` | Point-in-time database hot snapshots and backups | `app/services/persistence/snapshots.py` | `persistence.snapshots@1` | `persistence.database@1` | Completed |
 
 > **Note on Domain Persistence Drivers:** Physical modules implementing cross-domain persistence (such as `app/services/persistence/workspace.py` providing `persistence.workspace@1`) are registered under their consuming domain's capability lifecycle while executing within the persistence physical boundary.
 
@@ -150,7 +150,7 @@ Section 9.
 ### `database.py` — `FEAT-PERSISTENCE-DATABASE`
 
 > **Feature ID:** `FEAT-PERSISTENCE-DATABASE` (representative registry entry)
-> **Status:** `Missing`
+> **Status:** `Completed`
 > **Owner module:** `app/services/persistence/database.py`
 
 #### Purpose
@@ -170,11 +170,20 @@ evidence obligations without merging their responsibilities into this module.
 Each owner module defines a slotted immutable `<Feature>Config`. No reference sample value is
 promoted to a default without product approval.
 
-| Status | Setting | Type / unit | Default | Validation and failure |
+| Feature Config | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Missing | `schema_version` | positive integer | `1` | Reject unknown/incompatible versions |
-| Missing | `operation_timeout_s` | finite seconds | operation-specific | Must be positive and bounded |
-| Missing | `resource_limit` | positive integer | deployment-specific | Reject nonpositive/unbounded values |
+| `DatabaseConfig` | `database_path` | `Path` | `data/database/haruquantai.db` | Directory created if missing |
+| `DatabaseConfig` | `timeout_s` | `float` | `5.0` | Must be > 0 |
+| `DatabaseConfig` | `busy_timeout_ms` | `int` | `5000` | Must be > 0 |
+| `DatabaseConfig` | `wal_mode` | `bool` | `True` | Configures WAL pragma |
+| `ArtifactConfig` | `artifacts_dir` | `Path` | `data/artifacts` | Directory created if missing |
+| `ArtifactConfig` | `staging_dir` | `Path` | `data/staging` | Directory created if missing |
+| `DatabankConfig` | `default_capacity` | `int` | `1000` | Must be > 0 |
+| `MigrationConfig` | `migrations_dir` | `Path \| None` | `None` | Optional SQL directory |
+| `MigrationConfig` | `custom_migrations` | `tuple` | `()` | Sequence of custom migrations |
+| `RetentionConfig` | `artifacts_dir` | `Path` | `data/artifacts` | Target directory for managed payload removal |
+| `SnapshotConfig` | `snapshot_dir` | `Path` | `data/snapshots` | Target directory for hot backup files |
+| `ParquetConfig` | `market_dir` | `Path` | `data/market` | Root directory for partitioned columnar store |
 
 #### Runtime effects and cleanup
 
@@ -188,35 +197,35 @@ promoted to a default without product approval.
 
 - **Domain persistence module:** `app/services/persistence/persistence.py`
 - **Namespace:** `persistence.v1`
-- **Schema version:** `1` initially; forward migrations only
-- **Retention and purge:** retain lineage-bearing records; purge only by explicit, reference-safe policy
+- **Schema version:** `1` initially (authoritative `0001_initial_schema` applied via forward migration ledger; manager initialization is idempotent)
+- **Retention and purge:** retain lineage-bearing records; purge only by explicit, reference-safe policy re-validated at execution time
 
 #### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `database.py` | SQLite lifecycle and transactions; config, service, lifecycle, `SPEC`, factory | `DatabaseService` |
-| Missing | `artifacts.py` | Immutable artifact catalog, lineage, and packaging; config, service, lifecycle, `SPEC`, factory | `ArtifactStore` |
-| Missing | `databanks.py` | Databanks, memberships, annotations, ranking, similarity, and views; config, service, lifecycle, `SPEC`, factory | `DatabankStore` |
-| Missing | `migrations.py` | Forward schema migration and compatibility; config, service, lifecycle, `SPEC`, factory | `MigrationService` |
-| Missing | `retention.py` | Reference-safe retention and purge planning; config, service, lifecycle, `SPEC`, factory | `RetentionService` |
-| Missing | `parquet_store.py` | Partitioned columnar market data time-series engine; config, service, lifecycle, `SPEC`, factory | `ParquetStoreService` |
-| Missing | `snapshots.py` | Point-in-time database hot snapshots and backups; config, service, lifecycle, `SPEC`, factory | `SnapshotService` |
-| Missing | `tests/examples/02_persistence.py` | Offline primary-purpose evidence | one `example_<NN>_<feature_slug>()` per completed feature |
+| Completed | `database.py` | SQLite lifecycle and transactions; config, service, lifecycle, `SPEC`, factory | `DatabaseService` |
+| Completed | `artifacts.py` | Immutable artifact catalog, lineage, and packaging; config, service, lifecycle, `SPEC`, factory | `ArtifactStore` |
+| Completed | `databanks.py` | Databanks, memberships, annotations, ranking, similarity, and views; config, service, lifecycle, `SPEC`, factory | `DatabankStore` |
+| Completed | `migrations.py` | Forward schema migration and compatibility; config, service, lifecycle, `SPEC`, factory | `MigrationService` |
+| Completed | `retention.py` | Reference-safe retention and purge planning; config, service, lifecycle, `SPEC`, factory | `RetentionService` |
+| Completed | `parquet_store.py` | Partitioned columnar market data time-series engine; config, service, lifecycle, `SPEC`, factory | `ParquetStoreService` |
+| Completed | `snapshots.py` | Point-in-time database hot snapshots and backups; config, service, lifecycle, `SPEC`, factory | `SnapshotService` |
+| Completed | `tests/examples/02_persistence.py` | Offline primary-purpose evidence | one `example_<NN>_<feature_slug>()` per completed feature |
 
 #### Functional requirements
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-PERSISTENCE-CONCURRENCY_INSERT` | Repeated insertion by canonical content identity is idempotent under concurrency. | Concurrent insert test |
-| Missing | `FR-PERSISTENCE-COPY_MOVE` | Copy adds membership; move atomically adds target and removes source without duplicating content. | Rollback fixtures |
-| Missing | `FR-PERSISTENCE-DETERMINISTIC_RANKING` | Ranking defines metric/version/scope/nulls/ties and evaluates deterministically. | Golden admission table |
-| Missing | `FR-PERSISTENCE-SAFE_PURGE` | Purge refuses referenced content and requires an explicit audited operation. | Reference graph test |
-| Missing | `FR-PERSISTENCE-SIMILARITY_FILTER` | Configurable similarity filtering compares candidate strategy metrics against databank members and dismisses redundant candidates or replaces lower-fitness members. | Boundary tolerance fixtures (`SQX144-EV-000006`) |
-| Missing | `FR-PERSISTENCE-CAPACITY_EVICTION` | Bounded databank capacity enforces deterministic admission gating and evicts the lowest-ranked strategy when capacity is exceeded and candidate fitness is superior. | Capacity boundary test |
-| Missing | `FR-PERSISTENCE-PARQUET_STORE` | Partitioned columnar Parquet store provides partitioned storage (`symbol/timeframe/year.parquet`), idempotent upserts, and time-bounded range reads for bars and tick streams. | Parquet time-range benchmarks |
-| Missing | `FR-PERSISTENCE-PACKAGE_BUNDLE` | Artifact store provides packaging and unpacking of portable strategy bundles with manifest verification, checksum integrity, and lineage preservation. | Package round-trip fixtures |
-| Missing | `FR-PERSISTENCE-COLUMN_VIEWS` | Persisted column views configure visible metric projections, sample scopes (IS, OOS, Full), sub-results, and display formats for databank inspection. | View schema validation test |
+| Completed | `FR-PERSISTENCE-CONCURRENCY_INSERT` | Repeated insertion by canonical content identity is idempotent under concurrency without constraint errors. | `tests/services/persistence/test_artifacts.py` |
+| Completed | `FR-PERSISTENCE-COPY_MOVE` | Copy adds membership; move atomically adds target and removes source in a single transaction without duplicating content. | `tests/services/persistence/test_databanks.py` |
+| Completed | `FR-PERSISTENCE-DETERMINISTIC_RANKING` | Ranking defines metric/version/scope/nulls/ties and evaluates deterministically. | `tests/services/persistence/test_databanks.py` |
+| Completed | `FR-PERSISTENCE-SAFE_PURGE` | Purge refuses referenced content, re-validates references at execution time, and requires an explicit audited operation. | `tests/services/persistence/test_retention.py` |
+| Completed | `FR-PERSISTENCE-SIMILARITY_FILTER` | Configurable similarity filtering compares candidate strategy metrics against databank members and dismisses redundant candidates or replaces lower-fitness members. | `tests/services/persistence/test_databanks.py` (`SQX144-EV-000006`) |
+| Completed | `FR-PERSISTENCE-CAPACITY_EVICTION` | Bounded databank capacity enforces deterministic admission gating and evicts the lowest-ranked strategy when capacity is exceeded and candidate fitness is superior. | `tests/services/persistence/test_databanks.py` |
+| Completed | `FR-PERSISTENCE-PARQUET_STORE` | Partitioned columnar Parquet store provides partitioned storage (`symbol/timeframe/year.parquet`), idempotent upserts, and time-bounded range reads for bars and tick streams. | `tests/services/persistence/test_parquet_store.py` |
+| Completed | `FR-PERSISTENCE-PACKAGE_BUNDLE` | Artifact store provides packaging and unpacking of portable strategy bundles with manifest verification, checksum integrity, and lineage preservation. | `tests/services/persistence/test_artifacts.py` |
+| Completed | `FR-PERSISTENCE-COLUMN_VIEWS` | Persisted column views configure visible metric projections, sample scopes (IS, OOS, Full), sub-results, and display formats for databank inspection. | `tests/services/persistence/test_databanks.py` |
 
 #### Removal behavior
 
@@ -230,12 +239,12 @@ return an attributed unavailable result. Reinstall may resume only after schema 
 
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
-| Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
-| Missing | `ARCH-004` | Public contracts live in `app/contracts/persistence.py`. | Import/contract checks |
-| Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/persistence.py`. | Architecture/schema checks |
+| Completed | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
+| Completed | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Completed | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
+| Completed | `ARCH-004` | Public contracts live in `app/contracts/persistence.py`. | Import/contract checks |
+| Completed | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
+| Completed | `ARCH-006` | SQL/schema operations live in `app/services/persistence/persistence.py`. | Architecture/schema checks |
 
 ---
 
@@ -255,27 +264,43 @@ sample value, or third-party function name is not proof of runtime semantics.
 ## 7. Tests and definition of done
 
 ```text
-tests/services/persistence/<feature>/
-|-- test_config.py
-|-- test_<feature>.py
-|-- test_lifecycle.py
-|-- test_removal.py
-`-- test_persistence.py       # when applicable
+tests/services/persistence/
+|-- test_database.py
+|-- test_migrations.py
+|-- test_snapshots.py
+|-- test_artifacts.py
+|-- test_retention.py
+|-- test_databanks.py
+|-- test_parquet_store.py
+|-- test_composition.py
+`-- test_workspace_persistence.py
 
 tests/examples/02_persistence.py
 ```
 
+### Acceptance Evidence Ledger
+
+| Feature ID | Manifest | Test Target | Canonical Example | Workflow Bound | Status |
+| --- | --- | --- | --- | --- | --- |
+| `FEAT-PERSISTENCE-DATABASE` | [acceptance.json](../../../docs/dev/evidence/features/FEAT-PERSISTENCE-DATABASE/acceptance.json) | `test_database.py` | `example_02_database` | — | ACCEPTED |
+| `FEAT-PERSISTENCE-MIGRATIONS` | [acceptance.json](../../../docs/dev/evidence/features/FEAT-PERSISTENCE-MIGRATIONS/acceptance.json) | `test_migrations.py` | `example_02_migrations` | — | ACCEPTED |
+| `FEAT-PERSISTENCE-SNAPSHOTS` | [acceptance.json](../../../docs/dev/evidence/features/FEAT-PERSISTENCE-SNAPSHOTS/acceptance.json) | `test_snapshots.py` | `example_02_snapshots` | — | ACCEPTED |
+| `FEAT-PERSISTENCE-ARTIFACTS` | [acceptance.json](../../../docs/dev/evidence/features/FEAT-PERSISTENCE-ARTIFACTS/acceptance.json) | `test_artifacts.py` | `example_02_artifacts` | `ATW-PERSISTENCE-PUBLISH-001` | ACCEPTED |
+| `FEAT-PERSISTENCE-RETENTION` | [acceptance.json](../../../docs/dev/evidence/features/FEAT-PERSISTENCE-RETENTION/acceptance.json) | `test_retention.py` | `example_02_retention` | — | ACCEPTED |
+| `FEAT-PERSISTENCE-DATABANKS` | [acceptance.json](../../../docs/dev/evidence/features/FEAT-PERSISTENCE-DATABANKS/acceptance.json) | `test_databanks.py` | `example_02_databanks` | — | ACCEPTED |
+| `FEAT-PERSISTENCE-PARQUET` | [acceptance.json](../../../docs/dev/evidence/features/FEAT-PERSISTENCE-PARQUET/acceptance.json) | `test_parquet_store.py` | `example_02_parquet_store` | — | ACCEPTED |
+
 Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
 `uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature and requirement IDs have one owner.
-- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
-- [ ] Registration is explicit; imports have no runtime effects.
-- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
-- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
-- [ ] Domain status reflects repository evidence, not reference-product evidence.
-- [ ] Architecture and full qualification gates pass.
+- [x] Stable feature and requirement IDs have one owner.
+- [x] Public contracts and exact `FeatureSpec` dependencies exist.
+- [x] Registration is explicit; imports have no runtime effects.
+- [x] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [x] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [x] One real-world usage example exists per completed feature.
+- [x] Domain status reflects repository evidence, not reference-product evidence.
+- [x] Architecture and full qualification gates pass.
 
 ---
 

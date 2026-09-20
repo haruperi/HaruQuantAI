@@ -36,7 +36,7 @@
   "fingerprints": {
     "owner_module_sha256": "3a7cc7df6630e522bc316946dacb57f1ce8264ef0163909932a7196348c55222",
     "public_contract_sha256": "e62f0fb06be32d36f85ad8a303bc9aea53460d5f0f1337eb3792d21047cccad7",
-    "domain_readme_sha256": "880f1c9c5ef97733b1a3edd87a07261c2af9cd91c338abf0330f4220d5291b01"
+    "domain_readme_sha256": "beabe574873700d10cb30b145e04f3a7921c7ade18414417472c7f8d7b212520"
   },
   "pipeline_stages": {
     "Contract": "PASS",

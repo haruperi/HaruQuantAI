@@ -163,7 +163,7 @@ changes use an explicit new capability major.
 
 Verify one `example_<NN>_<feature_slug>()` function exists per completed backend
 feature in `tests/examples/<NN>_<domain>.py`. Run the consolidated example when
-safe. It must be realistic, offline, deterministic, bounded, secret-safe,
+safe. It must be realistic, real-world, deterministic, bounded, secret-safe,
 truthful about illustrative/unavailable/refused/partial outcomes, and clean up
 resources. It must not duplicate production logic or claim provider, browser,
 or release qualification. Do not require an arbitrary number of print

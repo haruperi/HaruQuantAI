@@ -20,6 +20,13 @@ from collections.abc import Mapping, Sequence
 
 from app.kernel.bootstrapper import FeatureFactory
 from app.services.gateway.api_server import feature as gateway_api_server
+from app.services.persistence.artifacts import feature as persistence_artifacts
+from app.services.persistence.databanks import feature as persistence_databanks
+from app.services.persistence.database import feature as persistence_database
+from app.services.persistence.migrations import feature as persistence_migrations
+from app.services.persistence.parquet_store import feature as persistence_parquet
+from app.services.persistence.retention import feature as persistence_retention
+from app.services.persistence.snapshots import feature as persistence_snapshots
 from app.services.persistence.workspace import feature as persistence_workspace
 from app.services.workspace.diagnostics import feature as workspace_diagnostics
 from app.services.workspace.jobs import feature as workspace_jobs
@@ -34,7 +41,14 @@ from app.services.workspace.settings import feature as workspace_settings
 # Features will be topologically sorted by Runtime before startup.
 FEATURES: tuple[FeatureFactory, ...] = (
     gateway_api_server,
+    persistence_database,
     persistence_workspace,
+    persistence_migrations,
+    persistence_snapshots,
+    persistence_artifacts,
+    persistence_retention,
+    persistence_databanks,
+    persistence_parquet,
     workspace_settings,
     workspace_notifications,
     workspace_diagnostics,
@@ -51,6 +65,13 @@ PROFILES: Mapping[str, frozenset[str]] = {
         {
             "gateway.api_server",
             "persistence.workspace",
+            "persistence.database",
+            "persistence.migrations",
+            "persistence.snapshots",
+            "persistence.artifacts",
+            "persistence.retention",
+            "persistence.databanks",
+            "persistence.parquet",
             "workspace.settings",
             "workspace.notifications",
             "workspace.diagnostics",
@@ -62,6 +83,17 @@ PROFILES: Mapping[str, frozenset[str]] = {
         }
     ),
     "api": frozenset({"gateway.api_server"}),
+    "persistence": frozenset(
+        {
+            "persistence.database",
+            "persistence.migrations",
+            "persistence.snapshots",
+            "persistence.artifacts",
+            "persistence.retention",
+            "persistence.databanks",
+            "persistence.parquet",
+        }
+    ),
     "workspace": frozenset(
         {
             "persistence.workspace",

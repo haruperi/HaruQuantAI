@@ -26,7 +26,7 @@ file. Do not create a second plan for the same task run.
 
 - **Problem Statement & Goal**: Brief context and what this change accomplishes.
 - **Ratified Requirements**: Exact functional requirements / specifications being satisfied.
-- **Usage Evidence**: Primary purpose demonstrated by a realistic offline harness in `tests/examples/`.
+- **Usage Evidence**: Primary purpose demonstrated by a realistic real-world usage example in `tests/examples/`.
 
 ## 2. Files Read (Audit Trail)
 

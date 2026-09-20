@@ -8,6 +8,7 @@ import pytest
 from app.contracts.workspace import (
     WORKSPACE_DIAGNOSTICS,
     CpuCoreMode,
+    WorkspaceError,
 )
 from app.kernel.bootstrapper import Runtime
 from app.services.workspace.diagnostics import (
@@ -103,4 +104,19 @@ def test_diagnostics_active_jobs_persistence_integration() -> None:
     service = DiagnosticsService(DiagnosticsConfig(), persistence=mock_persistence)
     health = service.get_health()
     assert health.active_jobs == 5
+    mock_persistence.count_active_jobs.assert_called_once()
+
+
+def test_diagnostics_active_jobs_error_handling() -> None:
+    """Verify get_health gracefully falls back when persistence raises WorkspaceError."""
+    from unittest.mock import MagicMock
+
+    mock_persistence = MagicMock()
+    mock_persistence.count_active_jobs.side_effect = WorkspaceError(
+        "simulated database failure"
+    )
+
+    service = DiagnosticsService(DiagnosticsConfig(), persistence=mock_persistence)
+    health = service.get_health()
+    assert health.active_jobs == 0
     mock_persistence.count_active_jobs.assert_called_once()

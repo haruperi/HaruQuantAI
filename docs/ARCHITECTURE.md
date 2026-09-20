@@ -250,7 +250,7 @@ Tracebacks remain local. Logs are not an artifact database or event bus.
 ## 6. Testing and Verification Architecture
 
 Every completed feature has configuration, behavior, boundary, unavailable, lifecycle,
-persistence (when relevant), and physical-removal tests plus a deterministic offline example.
+persistence (when relevant), and physical-removal tests plus a deterministic real-world example.
 Cross-domain suites cover:
 
 - artifact identity/lineage, SQLite migrations, crash-safe promotion, backup/restore;

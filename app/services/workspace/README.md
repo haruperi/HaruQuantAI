@@ -279,7 +279,7 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 - [x] Registration is explicit; imports have no runtime effects.
 - [x] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
 - [x] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [x] One offline usage example exists per completed feature.
+- [x] One real-world usage example exists per completed feature.
 - [x] Domain status reflects repository evidence, not reference-product evidence.
 - [x] Architecture and full qualification gates pass.
 

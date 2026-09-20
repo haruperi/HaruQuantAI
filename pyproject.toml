@@ -10,6 +10,7 @@ requires-python = ">=3.14"
 dependencies = [
     "fastapi>=0.115.0",
     "pydantic>=2.10.0",
+    "pyarrow>=18.0.0",
     "uvicorn>=0.34.0",
 ]
 
@@ -293,6 +294,13 @@ disable_error_code = ["explicit-override"]
 [[tool.mypy.overrides]]
 module = "scripts.*"
 check_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pyarrow",
+    "pyarrow.*",
+]
+ignore_missing_imports = true
 
 # ============================================================================
 # Execution Profile Capability Manifest

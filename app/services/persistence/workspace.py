@@ -29,8 +29,12 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, override
 from uuid import uuid4
 
+from app.contracts.persistence import (
+    DATABASE_SERVICE,
+)
 from app.contracts.workspace import (
     WORKSPACE_PERSISTENCE,
+    WorkspaceError,
 )
 from app.contracts.workspace import (
     WorkspacePersistenceService as IWorkspacePersistenceService,
@@ -1032,6 +1036,9 @@ class WorkspacePersistenceService(IWorkspacePersistenceService):
             )
             row = cursor.fetchone()
             return int(row[0]) if row and row[0] is not None else 0
+        except sqlite3.Error as exc:
+            msg = f"Failed to query active jobs: {exc}"
+            raise WorkspaceError(msg) from exc
         finally:
             cursor.close()
 
@@ -1049,7 +1056,7 @@ SPEC: FeatureSpec = FeatureSpec(
     name="persistence.workspace",
     provides=frozenset({WORKSPACE_PERSISTENCE}),
     requires=frozenset(),
-    optional=frozenset(),
+    optional=frozenset({DATABASE_SERVICE}),
     description="Transactional SQLite persistence for the workspace domain.",
 )
 
@@ -1076,7 +1083,19 @@ class WorkspacePersistenceFeature:
         Args:
             context: Lifecycle feature context.
         """
-        service = WorkspacePersistenceService(self._config)
+        db_service = context.optional(DATABASE_SERVICE)
+        if db_service is not None and (
+            not self._config.db_path or self._config.db_path == DEFAULT_DB_PATH
+        ):
+            effective_config = WorkspacePersistenceConfig(
+                db_path=str(db_service.database_path),
+                busy_timeout_ms=self._config.busy_timeout_ms,
+                wal_mode=self._config.wal_mode,
+            )
+        else:
+            effective_config = self._config
+
+        service = WorkspacePersistenceService(effective_config)
         context.on_close(service.close)
         context.provide(WORKSPACE_PERSISTENCE, service)
 

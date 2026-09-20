@@ -57,7 +57,7 @@ stress-tests, combines, and exports rule-based trading strategies with reproduci
 | Domain | Owns | Product status |
 | --- | --- | --- |
 | Workspace | Settings, jobs, scheduling, recovery, logs, notifications | Completed |
-| Persistence | SQLite mechanics, artifacts, databanks, memberships, retention | Missing |
+| Persistence | SQLite mechanics, artifacts, databanks, memberships, retention | Completed |
 | Brokers | MT5/cTrader connectivity, capability discovery, translation, reconciliation | Missing |
 | Data | Instruments, calendars, ticks/bars, import/providers, quality, datasets | Missing |
 | Indicator | Series calculations, warm-up, cache, custom indicator contract | Missing |
@@ -378,7 +378,7 @@ Commands above are target contracts, not claims that the current greenfield CLI 
 
 ### Usage Scenarios & Verification Examples
 
-Each completed backend feature contributes one deterministic offline function under
+Each completed backend feature contributes one deterministic real-world usage function under
 `tests/examples/<domain>.py`. Cross-domain scenarios must cover: build/filter; coarse-to-tick
 retest; Monte Carlo; walk-forward/WFM; optimization; portfolio composition; custom-project
 routing; safe export; job pause/resume/cancel/recovery; and Gateway reconnect/resync. External,
@@ -463,7 +463,7 @@ not needed for topology, and unresolved edge semantics remain explicitly unverif
 - [ ] Numerical goldens, accounting invariants, and accelerated equivalence pass.
 - [ ] Security tests cover paths/archives/uploads, redaction, authorization, extensions, and live denial.
 - [ ] Browser/headless/optional desktop packaging and shutdown/recovery are evidenced.
-- [ ] Offline usage examples exist for every completed backend feature.
+- [ ] Real-world usage examples exist for every completed backend feature.
 - [ ] `uv run python scripts/ci_check.py` passes.
 - [ ] Documentation, walkthrough, migrations, and owner-approved commit are complete.
 

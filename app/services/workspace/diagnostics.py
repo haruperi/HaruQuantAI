@@ -25,7 +25,6 @@ from __future__ import annotations
 import importlib.metadata
 import os
 import platform
-import sqlite3
 import sys
 import time
 from dataclasses import dataclass
@@ -39,6 +38,7 @@ from app.contracts.workspace import (
     BenchmarkResult,
     CpuCoreMode,
     SystemHealth,
+    WorkspaceError,
     WorkspacePersistenceService,
 )
 from app.contracts.workspace import (
@@ -213,7 +213,7 @@ class DiagnosticsService(IDiagnosticsService):
         if self._persistence is not None:
             try:
                 active_jobs = self._persistence.count_active_jobs()
-            except (sqlite3.Error, OSError, ValueError) as err:
+            except (WorkspaceError, OSError, ValueError) as err:
                 logger.debug("failed_to_query_active_jobs", error=str(err))
 
         if total_mb <= 0.0 or pct <= 0.0:
