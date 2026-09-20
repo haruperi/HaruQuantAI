@@ -41,7 +41,7 @@
     "command": "uv run pytest --no-cov tests/services/data/test_imports_exports.py tests/services/data/test_mt_exports.py",
     "exit_code": 0
   },
-  "tested_revision": "22d171f404802ef2a42b39c4911d3536ba4223e7",
+  "tested_revision": "0acb104203111fe9f10221157ba9da42ae7820f3",
   "pipeline_stages": {
     "Contract": "PASS",
     "Provider": "PASS",

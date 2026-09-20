@@ -37,9 +37,9 @@
     "command": "uv run pytest --no-cov tests/services/persistence/test_migrations.py",
     "exit_code": 0
   },
-  "tested_revision": "a99cd758f1972511a74e9122511cfc5aaa3d1833",
+  "tested_revision": "0acb104203111fe9f10221157ba9da42ae7820f3",
   "fingerprints": {
-    "owner_module_sha256": "346df1d1d4ee67e85f3e24353420cc08f2fac1f3a1096def3c46be9e05aaf851",
+    "owner_module_sha256": "7e18311340c8ef893a2c75b21c4f9ef257df84a56a41713b69b662e92c6b5fb3",
     "public_contract_sha256": "b142e8647cf4eac7d92bc7fb04ab2008ced5bbe2907be6c31e00735b7a4a3529",
     "domain_readme_sha256": "e02d4d0dbebca24e5a0f67e554e271f4697dc1aa10200d0177d05a9b5249f49b"
   },
