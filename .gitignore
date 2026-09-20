@@ -184,12 +184,13 @@ log_*.txt
 # ============================================================================
 # Data Files & Storage
 # ============================================================================
-/data/
+/data/**
 !/data/**/
 !/data/**/*.py
 !/data/**/*.json
 !/data/**/*.md
 !/data/**/*.sql
+!/data/market/dukascopy/dukascopy.csv
 /data/cache/
 /data/saved/
 /data/states/
@@ -318,6 +319,7 @@ worker_state/
 # Agent Orchestrator Worktrees & Logs
 # ============================================================================
 .agents/worktrees/
+.agents/logs/
 
 # ============================================================================
 # Node / Frontend UI

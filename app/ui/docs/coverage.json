@@ -1,18 +1,3439 @@
 {
   "schemaVersion": 1,
-  "auditDate": "2026-09-18",
+  "auditDate": "2026-09-20",
   "visualVerification": "static-resource-reconstruction",
   "entries": [
-    {"id":"SHELL-001","product":"Platform","screen":"Application shell","sources":["internal/web/app/layout/views/header.html"],"trigger":"launch","controls":["application navigation","theme","notifications","configuration"],"preconditions":[],"validation":["settings ranges"],"transitions":["module changes","modal open/close"],"outcome":"active module and settings persist","mockOperation":"workspace.updateSettings","persistence":"localStorage v1","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"build + browser smoke","gaps":"native window chrome not compared"},
-    {"id":"BUILD-001","product":"Builder","screen":"Progress","sources":["internal/web/BUILDER/layout/views/layout.html","internal/web/app/layout/views/startBuildPopup.html"],"trigger":"Builder > Progress","controls":["start","pause","resume","stop","reset"],"preconditions":["valid settings"],"validation":[],"transitions":["idle","running","paused","cancelled","completed"],"outcome":"retained deterministic progress/results","mockOperation":"ResearchService.start","persistence":"job record","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"manual smoke","gaps":"no native engine"},
-    {"id":"BUILD-002","product":"Builder/Improver","screen":"Full settings","sources":["internal/plugins/SettingsWhatToBuild","internal/plugins/SettingsGeneticOptions","internal/plugins/SettingsBlocks","internal/plugins/SettingsCrossChecks"],"trigger":"Full settings tab","controls":["mode","architecture","data","genetic options","SL/PT","blocks","cross-checks"],"preconditions":[],"validation":["numeric min/max","date fields"],"transitions":["settings patch"],"outcome":"mock run configuration changes","mockOperation":"workspace.updateBuilder","persistence":"builder settings","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"typecheck","gaps":"not every installed plugin property"},
-    {"id":"OPT-001","product":"Optimizer","screen":"Optimization setup","sources":["internal/plugins/SettingsOptimization"],"trigger":"Optimizer > Full settings","controls":["mode","parameter","min","max","step","objective","storage"],"preconditions":["selected strategy"],"validation":["step > 0","max >= min"],"transitions":["mode changes visible schedule"],"outcome":"combination count and applicable controls update","mockOperation":"optimization.configure","persistence":"optimization settings","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"manual smoke","gaps":"advanced parameter categories summarized"},
-    {"id":"BANK-001","product":"Databanks","screen":"Shared strategy grid","sources":["internal/plugins/ProjectDatabanks/views/databanks.html","internal/plugins/ResultsDatabankActions"],"trigger":"research module","controls":["bank tabs","sort","filter","select","copy","move","rename","notes","delete","export"],"preconditions":[],"validation":["required name","target differs from source"],"transitions":["membership changes","selection changes"],"outcome":"correct IDs affected under virtualization","mockOperation":"databank.moveStrategies","persistence":"strategies + memberships","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"manual smoke","gaps":"column drag/resize not persisted"},
-    {"id":"RESULT-001","product":"Results","screen":"Linked result workspace","sources":["internal/plugins/ResultsOverview","internal/plugins/ResultsTradeList","internal/plugins/ResultsEquityChart","internal/plugins/ResultsSourceCode"],"trigger":"Results tab","controls":["result view","sample","direction"],"preconditions":["selected strategy"],"validation":[],"transitions":["view and selected identity"],"outcome":"all views use same strategy/trades/equity","mockOperation":"analytics.project","persistence":"selected strategy/view","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"chart + table smoke","gaps":"specialized renderers projected generically"},
-    {"id":"DATA-001","product":"Data Manager","screen":"Data sources","sources":["internal/web/SQMANAGER/layout/views/layout.html","internal/plugins/DataSourceDukascopy","internal/plugins/DataSourceTD","internal/plugins/DataSourceFiles","internal/plugins/DataSourceSQEquityData","internal/plugins/DataSourceSQFuturesData","internal/plugins/DataSourceDarwinex","internal/plugins/DataSourceCrypto","internal/plugins/DataSourceYahoo","internal/plugins/DataSourceMt5Api"],"trigger":"Data Manager > Data sources","controls":["Dukascopy add/download/information menu","TickDownloader import menu","file add/single import/mass import/application import menu","SQ Equity find/add and direct update","SQ Futures find/add and direct update","Darwinex add/folder import/download menu","Crypto six-exchange add submenu and download","Yahoo add/download menu","MetaTrader 5 import menu","update all","update selected","mass delete","save definitions","load definitions"],"preconditions":["dataset selection for selection-scoped actions","usage-condition acceptance for SQ Equity and SQ Futures additions"],"validation":["supported browser files","required selection","dependency warning before simulated deletion","definition-file validation notice"],"transitions":["menu closed to open","dialog open to cancel or simulated completion","idle to running to paused/resumed to completed or cancelled"],"outcome":"every provider and contextual operation is explicit, keyboard reachable, focus-restoring, and visibly mock-only","mockOperation":"data.sourceRibbon.simulate","persistence":"configuration only","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"Vitest inventory test + Playwright provider-menu interaction test + typecheck + production build","gaps":"no live provider, native folder picker, credential transmission, native data mutation, or pixel-parity claim"},
-    {"id":"AW-001","product":"AlgoWizard","screen":"Rule editor","sources":["internal/web/AlgoWizard","internal/web/app/directives/blockConfig"],"trigger":"AlgoWizard","controls":["open","save","undo","redo","add","remove","reorder","generate","export"],"preconditions":[],"validation":["block configuration"],"transitions":["rule tree edits"],"outcome":"strategy definition revision updates","mockOperation":"strategy.saveRevision","persistence":"rules","status":{"visual":"implemented","interaction":"partial","state":"implemented"},"verification":"manual smoke","gaps":"undo/redo buttons are identifiable but history stack pending"},
-    {"id":"PORT-001","product":"Portfolio Master/Composer","screen":"Portfolio setup and results","sources":["internal/web/PORTFOLIOMASTER/layout/views/layout.html","internal/web/PORTFOLIOCOMPOSER/layout/views/layout.html","internal/plugins/PortfolioComposer"],"trigger":"portfolio modules","controls":["members","weights","capital","leverage","constraints","simulate"],"preconditions":["candidate strategies"],"validation":["allocation total"],"transitions":["setup to results"],"outcome":"member-linked shared-capital equity","mockOperation":"portfolio.simulate","persistence":"portfolio members","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"manual smoke","gaps":"full search algorithm not implemented"},
-    {"id":"WF-001","product":"Custom Projects","screen":"Task manager","sources":["internal/web/TASKMANAGER/layout/views/layout.html","internal/plugins/Task*","user/projects/*/project.cfx"],"trigger":"Custom Projects","controls":["project","add task","clone","enable","settings","run","stop"],"preconditions":[],"validation":["task output names"],"transitions":["idle","running","completed"],"outcome":"enabled tasks execute in sequence","mockOperation":"workflow.run","persistence":"workflow tasks","status":{"visual":"implemented","interaction":"implemented","state":"implemented"},"verification":"manual smoke","gaps":"conditional jump evaluation simplified"},
-    {"id":"EXT-001","product":"Extensions","screen":"Code Editor / SQX Business / Prop result plugins","sources":["internal/web/SQEDITOR","internal/web/SQXBUSINESS","user/extend/ResultsPlugins"],"trigger":"extension navigation/results","controls":["file tree","save","compile","team/compute settings"],"preconditions":[],"validation":[],"transitions":["file selection","mock compile"],"outcome":"extension surfaces identifiable and safe","mockOperation":"extension.validate","persistence":"limited","status":{"visual":"implemented","interaction":"partial","state":"partial"},"verification":"manual smoke","gaps":"native compilation and remote APIs intentionally excluded"}
+    {
+      "id": "SHELL-NAV-COLLAPSE-001",
+      "product": "HaruQuantAI / Application shell",
+      "screen": "Primary application sidebar",
+      "sources": [
+        "app/ui/src/app/App.tsx",
+        "owner-supplied collapse and expand icon references"
+      ],
+      "trigger": "Icon-only Collapse navigation or Expand navigation button beside the HaruQuantAI brand in the topbar",
+      "controls": [
+        "line-and-left-chevron collapse button",
+        "line-and-right-chevron expand button",
+        "application navigation icons"
+      ],
+      "preconditions": [],
+      "validation": [
+        "190 px expanded width",
+        "49 px collapsed width",
+        "topbar control remains visible in both states",
+        "sidebar begins with Home and renders no Applications heading",
+        "state-specific accessible name",
+        "application names remain available as accessible labels and tooltips"
+      ],
+      "transitions": [
+        "collapse labelled sidebar to icon rail",
+        "navigate while collapsed",
+        "restore persisted state after reload",
+        "expand icon rail to labelled sidebar"
+      ],
+      "outcome": "topbar control collapses the labelled sidebar to an icon rail; navigation retains icons, active state and routing while collapsed and restores labels when expanded",
+      "mockOperation": "useAppStore.updateSettings.navigationCollapsed",
+      "persistence": "navigationCollapsed in sqx-recreation-v1 AppSettings",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "globalSettings.test.ts, sidebar-navigation.spec.ts, and branding-cleanup.spec.ts",
+      "gaps": "supplied raster references are matched with theme-aware Lucide silhouettes; native pixel comparison remains outstanding"
+    },
+    {
+      "id": "SHELL-HEADER-APPS-001",
+      "product": "SQX / Application shell",
+      "screen": "Header applications and Volume Profile addon",
+      "sources": [
+        "internal/web/app/layout/views/header.html",
+        "internal/plugins/AppDebugConsole/module.js",
+        "internal/web/DEBUGCONSOLE/debugconsole/src/components/DebugConsole.vue",
+        "internal/web/DEBUGCONSOLE/debugconsole/src/components/DebugConsoleToolbar.vue",
+        "internal/plugins/AppGridControl/module.js",
+        "internal/web/GRIDCONTROL/layout/views/layout.html",
+        "internal/web/GRIDCONTROL/layout/LayoutCtrl.js",
+        "internal/web/app/layout/views/volumeProfileAddonPopup.html"
+      ],
+      "trigger": "Top-right Bug, Grid, or Area-chart icon",
+      "controls": [
+        "Debug category",
+        "Debug filter",
+        "Clear log",
+        "Grid node",
+        "Refresh",
+        "three job tables",
+        "job error detail",
+        "addon links",
+        "Close"
+      ],
+      "preconditions": [],
+      "validation": [
+        "bounded 10000-character debug view",
+        "maximum 100 finished jobs",
+        "safe external link attributes"
+      ],
+      "transitions": [
+        "switch to Debug Console",
+        "filter or clear log",
+        "switch to Grid Control",
+        "manual or automatic display refresh",
+        "open error detail",
+        "open and close addon dialog"
+      ],
+      "outcome": "cleaned header retains notifications, registered top-only applications, addon information and Settings without duplicate Theme/Help or Feature Profile controls",
+      "mockOperation": "shell.headerApplications",
+      "persistence": "active application uses the existing versioned shell store; console/grid/addon draft state is session-local",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "headerApplications.test.ts and header-applications.spec.ts",
+      "gaps": "debug websocket, gridControl/getData, remote workers, addon entitlement, purchase, and activation are intentionally not connected; Starter entitlement is test-only persisted fixture state"
+    },
+    {
+      "id": "DATA-BROKER-EDITOR-001",
+      "product": "SQX / Data Manager / Broker profiles",
+      "screen": "Add/Edit Broker profile",
+      "sources": [
+        "internal/plugins/DataManagerBroker/views/addBrokerModal.html",
+        "internal/plugins/DataManagerBroker/controllers/BrokersCtrl.js",
+        "internal/libs/SQDataLib.jar BrokerManager"
+      ],
+      "trigger": "Add new or row double-click",
+      "controls": [
+        "name",
+        "description",
+        "Stockpicker",
+        "MT4/5",
+        "timezone",
+        "postfix",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "custom profile for Edit"
+      ],
+      "validation": [
+        "required unique normalized name",
+        "50/250/100 limits",
+        "dependency-disabled flags/timezone",
+        "storage"
+      ],
+      "transitions": [
+        "open",
+        "configure",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "canonical persisted broker profile shared by all broker selectors",
+      "mockOperation": "useDataManagerStore.saveBroker",
+      "persistence": "sqx-data-manager-v1 schema version 2",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "brokerProfiles.test.ts and data-manager-broker-profiles.spec.ts",
+      "gaps": "runtime system broker rows are database-backed and not fabricated"
+    },
+    {
+      "id": "DATA-BROKER-STOCKS-001",
+      "product": "SQX / Data Manager / Broker profiles",
+      "screen": "Edit stocks",
+      "sources": [
+        "internal/plugins/DataManagerBroker/views/editStocksModal.html",
+        "DataManagerBroker.jar",
+        "SQDataLib.jar BrokerManager"
+      ],
+      "trigger": "Edit stocks",
+      "controls": [
+        "help/example",
+        "Import from file",
+        "Export to file",
+        "stock lines",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "selected custom Stockpicker broker"
+      ],
+      "validation": [
+        "bounded UTF-8 CSV",
+        "line ticker parsing",
+        "protected state",
+        "storage"
+      ],
+      "transitions": [
+        "open",
+        "replace/import/export",
+        "save/cancel"
+      ],
+      "outcome": "profile stock membership replaced or exported",
+      "mockOperation": "saveBrokerStocks",
+      "persistence": "profile stocks in schema version 2",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "brokerProfiles.test.ts and browser stock/update workflow",
+      "gaps": "HaruQuantAI replaces the observed SQX XML-named newline export with BrokerStocks.json"
+    },
+    {
+      "id": "DATA-BROKER-IMPORT-001",
+      "product": "SQX / Data Manager / Broker profiles",
+      "screen": "Instruments/Session import from JSON",
+      "sources": [
+        "internal/plugins/DataManagerBroker/views/importInstrumentsModal.html",
+        "internal/plugins/DataManagerBroker/views/importSessionsModal.html",
+        "DataManagerBroker.jar BrokerXmlImporter"
+      ],
+      "trigger": "Import broker instruments/sessions from JSON",
+      "controls": [
+        "Data file",
+        "Browse",
+        "broker",
+        "postfix",
+        "overview selection",
+        "Close",
+        "Start Import",
+        "conflict confirmation"
+      ],
+      "preconditions": [
+        "bounded valid versioned JSON",
+        "selected overview rows"
+      ],
+      "validation": [
+        "complete source schema",
+        "MT-enabled target",
+        "target conflicts",
+        "storage"
+      ],
+      "transitions": [
+        "parse overview",
+        "select",
+        "confirm",
+        "atomic import/cancel"
+      ],
+      "outcome": "selected broker-qualified records appear in Instruments or Sessions",
+      "mockOperation": "useFileSymbols.importInstruments / useSessions.importForBroker",
+      "persistence": "owning instrument/session stores; file transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "selected instrument/session import browser workflow",
+      "gaps": "browser file input replaces native picker"
+    },
+    {
+      "id": "DATA-BROKER-UPDATE-001",
+      "product": "SQX / Data Manager / Broker profiles",
+      "screen": "Automatic broker data update",
+      "sources": [
+        "internal/plugins/DataManagerBroker/actions/updateData/module.js",
+        "BrokerService.js",
+        "DataManagerBroker.jar BrokerServlet._onUpdateData"
+      ],
+      "trigger": "Update data for broker (automatic)",
+      "controls": [
+        "shared progress",
+        "Pause/Resume",
+        "Stop"
+      ],
+      "preconditions": [
+        "selected Stockpicker broker",
+        "stocks",
+        "no active broker update"
+      ],
+      "validation": [
+        "selection",
+        "Stockpicker capability",
+        "non-empty stocks",
+        "storage"
+      ],
+      "transitions": [
+        "running",
+        "paused",
+        "resumed",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload paused"
+      ],
+      "outcome": "missing broker stock symbols become local SQ Equity datasets",
+      "mockOperation": "startBrokerUpdate/advanceBrokerUpdate/brokerAction",
+      "persistence": "schema version 2 job and generated definitions",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "pause/reload/resume/completion browser workflow",
+      "gaps": "remote stock-information lookup replaced by deterministic local rows"
+    },
+    {
+      "id": "DATA-BROKER-DELETE-001",
+      "product": "SQX / Data Manager / Broker profiles",
+      "screen": "Remove broker(s)",
+      "sources": [
+        "internal/plugins/DataManagerBroker/controllers/BrokersCtrl.js",
+        "SQDataLib.jar BrokerManager.deleteBroker"
+      ],
+      "trigger": "Mass delete",
+      "controls": [
+        "singular/plural confirmation",
+        "No",
+        "Yes"
+      ],
+      "preconditions": [
+        "selected custom profile without instrument/session dependencies"
+      ],
+      "validation": [
+        "selection",
+        "system protection",
+        "dependencies",
+        "storage"
+      ],
+      "transitions": [
+        "confirm",
+        "cancel",
+        "blocked",
+        "removed"
+      ],
+      "outcome": "atomic dependency-safe profile removal",
+      "mockOperation": "removeBrokers",
+      "persistence": "schema version 2 profiles",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "data-manager-broker-profiles.spec.ts",
+      "gaps": "none"
+    },
+    {
+      "id": "DATA-BROKER-TRANSFER-001",
+      "product": "SQX / Data Manager / Broker profiles",
+      "screen": "Brokers JSON Save/Load",
+      "sources": [
+        "internal/plugins/DataManagerActions/save",
+        "internal/plugins/DataManagerActions/load",
+        "DataManagerBroker.jar BrokerServlet.toXML/onLoad"
+      ],
+      "trigger": "Save or Load",
+      "controls": [
+        "download",
+        "JSON picker",
+        "Validate and load",
+        "Cancel/Skip/Overwrite/Overwrite all"
+      ],
+      "preconditions": [
+        "selection for Save",
+        "bounded Brokers JSON for Load"
+      ],
+      "validation": [
+        "exact Brokers schema",
+        "complete profiles/stocks",
+        "duplicate decisions",
+        "protected overwrite",
+        "storage"
+      ],
+      "transitions": [
+        "download",
+        "parse/stage",
+        "resolve conflicts",
+        "atomic apply/cancel"
+      ],
+      "outcome": "Brokers.json download or validated profile import",
+      "mockOperation": "serializeBrokersJson/parseBrokersJson/importBrokers",
+      "persistence": "schema version 2 profiles; file transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "JSON unit round trip and browser load/overwrite/download",
+      "gaps": "browser download replaces native save path"
+    },
+    {
+      "id": "DATA-BROKER-TABLE-001",
+      "product": "SQX / Data Manager / Broker profiles",
+      "screen": "Broker profiles table",
+      "sources": [
+        "internal/plugins/DataManagerBroker/views/brokers.html",
+        "internal/plugins/DataManagerBroker/controllers/BrokersCtrl.js"
+      ],
+      "trigger": "Data Manager > Broker profiles",
+      "controls": [
+        "selection",
+        "select all",
+        "double-click",
+        "Name",
+        "Description",
+        "Postfix",
+        "Timezone",
+        "customized counts"
+      ],
+      "preconditions": [],
+      "validation": [],
+      "transitions": [
+        "select",
+        "edit",
+        "refresh after cross-tab mutation"
+      ],
+      "outcome": "reactive profile catalogue with effective stock/instrument/session counts",
+      "mockOperation": "brokerProfiles.list/count",
+      "persistence": "profiles persisted; selection transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "source-ribbon and broker-profile browser tests",
+      "gaps": "QuantDataManager reduced view is inapplicable"
+    },
+    {
+      "id": "DATA-EXTERNAL-EDITOR-001",
+      "product": "SQX / Data Manager / External indicators",
+      "screen": "Add/Edit external indicator",
+      "sources": [
+        "internal/plugins/DataManagerCustomData/add/customDataAdd.html",
+        "internal/plugins/DataManagerCustomData/add/CustomDataAddCtrl.js"
+      ],
+      "trigger": "Data Manager > External indicators",
+      "controls": [
+        "Name",
+        "Return type",
+        "three value lines",
+        "MT4 code",
+        "MT5 code",
+        "EL code",
+        "Help",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "selection or valid file where required"
+      ],
+      "validation": [
+        "bounded input",
+        "domain validation",
+        "fail-closed persistence"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persistent realistic frontend mock outcome",
+      "mockOperation": "externalIndicators.add/edit",
+      "persistence": "haru-external-indicators-v1 where stateful",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "externalIndicators.test.ts; data-manager-external-indicators.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "See external-indicators-coverage.md for per-feature evidence gaps."
+    },
+    {
+      "id": "DATA-EXTERNAL-IMPORT-001",
+      "product": "SQX / Data Manager / External indicators",
+      "screen": "Import indicator data and format dialogs",
+      "sources": [
+        "internal/plugins/DataManagerCustomData/import/customDataImport.html",
+        "internal/plugins/DataManagerCustomData/import/customDataNewFormatPopup.html",
+        "internal/plugins/DataManagerCustomData/import/CustomDataImportCtrl.js"
+      ],
+      "trigger": "Data Manager > External indicators",
+      "controls": [
+        "Data file",
+        "format",
+        "Save",
+        "Save as",
+        "Delete",
+        "skip rows/columns",
+        "separator",
+        "date format",
+        "error handling",
+        "column mapping",
+        "Start Import"
+      ],
+      "preconditions": [
+        "selection or valid file where required"
+      ],
+      "validation": [
+        "bounded input",
+        "domain validation",
+        "fail-closed persistence"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persistent realistic frontend mock outcome",
+      "mockOperation": "externalIndicators.import",
+      "persistence": "haru-external-indicators-v1 where stateful",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "externalIndicators.test.ts; data-manager-external-indicators.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "See external-indicators-coverage.md for per-feature evidence gaps."
+    },
+    {
+      "id": "DATA-EXTERNAL-RECOGNIZE-001",
+      "product": "SQX / Data Manager / External indicators",
+      "screen": "Recognize MQ4 definition",
+      "sources": [
+        "internal/plugins/DataManagerCustomData/recognize/CustomDataRecognizeCtrl.js",
+        "custom_indicators/MetaTrader4/Indicators/*.mq4"
+      ],
+      "trigger": "Data Manager > External indicators",
+      "controls": [
+        "MQ4 file",
+        "recognized summary",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "selection or valid file where required"
+      ],
+      "validation": [
+        "bounded input",
+        "domain validation",
+        "fail-closed persistence"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persistent realistic frontend mock outcome",
+      "mockOperation": "externalIndicators.recognize",
+      "persistence": "haru-external-indicators-v1 where stateful",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "externalIndicators.test.ts; data-manager-external-indicators.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "See external-indicators-coverage.md for per-feature evidence gaps."
+    },
+    {
+      "id": "DATA-EXTERNAL-VIEW-001",
+      "product": "SQX / Data Manager / External indicators",
+      "screen": "View custom data",
+      "sources": [
+        "internal/plugins/DataManagerActions/review/ReviewCtrl.js",
+        "internal/plugins/DataManagerCustomData/view/customDataView.html"
+      ],
+      "trigger": "Data Manager > External indicators",
+      "controls": [
+        "Date/Value table",
+        "Close"
+      ],
+      "preconditions": [
+        "selection or valid file where required"
+      ],
+      "validation": [
+        "bounded input",
+        "domain validation",
+        "fail-closed persistence"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persistent realistic frontend mock outcome",
+      "mockOperation": "externalIndicators.reviewData",
+      "persistence": "haru-external-indicators-v1 where stateful",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "externalIndicators.test.ts; data-manager-external-indicators.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "See external-indicators-coverage.md for per-feature evidence gaps."
+    },
+    {
+      "id": "DATA-EXTERNAL-DELETE-001",
+      "product": "SQX / Data Manager / External indicators",
+      "screen": "Clear or delete external indicators",
+      "sources": [
+        "internal/plugins/DataManagerCustomData/DMCustomDataCtrl.js",
+        "internal/plugins/DataManagerCustomData/customDataDeleteConfirmPopup.html"
+      ],
+      "trigger": "Data Manager > External indicators",
+      "controls": [
+        "Close",
+        "Clear data",
+        "Delete"
+      ],
+      "preconditions": [
+        "selection or valid file where required"
+      ],
+      "validation": [
+        "bounded input",
+        "domain validation",
+        "fail-closed persistence"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persistent realistic frontend mock outcome",
+      "mockOperation": "externalIndicators.clear/remove",
+      "persistence": "haru-external-indicators-v1 where stateful",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "externalIndicators.test.ts; data-manager-external-indicators.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "See external-indicators-coverage.md for per-feature evidence gaps."
+    },
+    {
+      "id": "DATA-EXTERNAL-TRANSFER-001",
+      "product": "SQX / Data Manager / External indicators",
+      "screen": "Save/Load ExternalIndicators JSON",
+      "sources": [
+        "internal/plugins/DataManagerCustomData/DMCustomDataCtrl.js",
+        "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
+        "internal/libs/SQDataLib.jar"
+      ],
+      "trigger": "Data Manager > External indicators",
+      "controls": [
+        "JSON download/input",
+        "Cancel",
+        "Skip",
+        "Overwrite",
+        "Validate and load"
+      ],
+      "preconditions": [
+        "selection or valid file where required"
+      ],
+      "validation": [
+        "bounded input",
+        "domain validation",
+        "fail-closed persistence"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persistent realistic frontend mock outcome",
+      "mockOperation": "externalIndicators.save/load",
+      "persistence": "haru-external-indicators-v1 where stateful",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "externalIndicators.test.ts; data-manager-external-indicators.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "See external-indicators-coverage.md for per-feature evidence gaps."
+    },
+    {
+      "id": "DATA-EXTERNAL-TABLE-001",
+      "product": "SQX / Data Manager / External indicators",
+      "screen": "External indicators table",
+      "sources": [
+        "internal/plugins/DataManagerCustomData/customData.html",
+        "internal/plugins/DataManagerCustomData/DMCustomDataCtrl.js"
+      ],
+      "trigger": "Data Manager > External indicators",
+      "controls": [
+        "search",
+        "return-type filter",
+        "selection",
+        "select all",
+        "double-click",
+        "row delete",
+        "status"
+      ],
+      "preconditions": [
+        "selection or valid file where required"
+      ],
+      "validation": [
+        "bounded input",
+        "domain validation",
+        "fail-closed persistence"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persistent realistic frontend mock outcome",
+      "mockOperation": "externalIndicators.list",
+      "persistence": "haru-external-indicators-v1 where stateful",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "externalIndicators.test.ts; data-manager-external-indicators.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "See external-indicators-coverage.md for per-feature evidence gaps."
+    },
+    {
+      "id": "DATA-STOCK-GROUP-EDITOR-001",
+      "product": "SQX / Data Manager / Stock groups",
+      "screen": "Add/Edit stocks group",
+      "sources": [
+        "DataManagerBasket/actions/add/module.js",
+        "DataManagerBasket/views/addBasketModal.html",
+        "BasketOfStocksManager.saveGroup"
+      ],
+      "trigger": "Stock groups > Add new or row double-click",
+      "controls": [
+        "Group name",
+        "Description",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "custom group for Edit"
+      ],
+      "validation": [
+        "required unique normalized name",
+        "50-character name",
+        "250-character description",
+        "system immutability"
+      ],
+      "transitions": [
+        "open",
+        "validate",
+        "save/cancel",
+        "reload"
+      ],
+      "outcome": "persisted custom group metadata while preserving members",
+      "mockOperation": "stockGroups.saveGroup",
+      "persistence": "sqx-stock-groups-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "stockGroups.test.ts; data-manager-stock-groups.spec.ts",
+      "gaps": "Runtime built-in catalogue is unavailable and not fabricated."
+    },
+    {
+      "id": "DATA-STOCK-GROUP-MEMBERS-001",
+      "product": "SQX / Data Manager / Stock groups",
+      "screen": "Edit stocks",
+      "sources": [
+        "DataManagerBasket/views/editStocksModal.html",
+        "BasketOfStocksManager.readStocksFromCsv",
+        "BasketOfStocksManager.writeStocksToCsv"
+      ],
+      "trigger": "Stock groups > Edit stocks",
+      "controls": [
+        "help/examples",
+        "Import from file",
+        "Export to file",
+        "member textarea",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "selected custom group"
+      ],
+      "validation": [
+        "bounded UTF-8 CSV",
+        "non-empty member list",
+        "ticker constraints",
+        "dual optional date format"
+      ],
+      "transitions": [
+        "open",
+        "manual/import replacement",
+        "export",
+        "save/cancel"
+      ],
+      "outcome": "ordered historical membership periods replace the prior list",
+      "mockOperation": "stockGroups.replaceMembers",
+      "persistence": "sqx-stock-groups-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "stockGroups.test.ts; data-manager-stock-groups.spec.ts",
+      "gaps": "Compiled SQX silently maps invalid dates to undefined; mock preserves this behavior."
+    },
+    {
+      "id": "DATA-STOCK-GROUP-UPDATE-001",
+      "product": "SQX / Data Manager / Stock groups",
+      "screen": "Automatic group data update",
+      "sources": [
+        "DataManagerBasket/actions/updateData/module.js",
+        "BasketService.js",
+        "BasketOfStocksManager readiness methods"
+      ],
+      "trigger": "Update toolbar or inline No, Update data",
+      "controls": [
+        "Update data in group (automatic)",
+        "No, Update data",
+        "Pause/Resume all",
+        "Stop all"
+      ],
+      "preconditions": [
+        "selected non-empty groups",
+        "no active data job",
+        "group is not the limited clean-install group"
+      ],
+      "validation": [
+        "deduplicated tickers",
+        "persistent valid job",
+        "existing dataset reuse"
+      ],
+      "transitions": [
+        "running",
+        "paused",
+        "resumed",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload running to paused"
+      ],
+      "outcome": "missing member data becomes deterministic SQ Equity rows and group summaries refresh",
+      "mockOperation": "stockGroups.start/advance/action",
+      "persistence": "sqx-stock-groups-v1 job and generated datasets",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "data-manager-stock-groups.spec.ts; Data sources assertion",
+      "gaps": "Live providers and backend aggregate generation are replaced with local simulation."
+    },
+    {
+      "id": "DATA-STOCK-GROUP-DELETE-001",
+      "product": "SQX / Data Manager / Stock groups",
+      "screen": "Remove group(s)",
+      "sources": [
+        "DataManagerActions/delete",
+        "BasketsCtrl.getSelectedBaskets"
+      ],
+      "trigger": "Stock groups > Mass delete",
+      "controls": [
+        "No",
+        "Yes"
+      ],
+      "preconditions": [
+        "at least one selected non-system group"
+      ],
+      "validation": [
+        "system groups excluded",
+        "atomic persistence"
+      ],
+      "transitions": [
+        "select",
+        "confirm/cancel",
+        "remove"
+      ],
+      "outcome": "selected custom groups are removed",
+      "mockOperation": "stockGroups.remove",
+      "persistence": "sqx-stock-groups-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "data-manager-stock-groups.spec.ts",
+      "gaps": "No active dependency endpoint is exposed in supplied web resources."
+    },
+    {
+      "id": "DATA-STOCK-GROUP-TRANSFER-001",
+      "product": "SQX / Data Manager / Stock groups",
+      "screen": "Groups JSON Save/Load",
+      "sources": [
+        "DataManagerActions/save",
+        "DataManagerActions/load",
+        "BasketDto.toXML",
+        "compiled BasketsCtrl onLoad"
+      ],
+      "trigger": "Stock groups > Save or Load",
+      "controls": [
+        "Groups.json download",
+        "JSON file",
+        "Load",
+        "Cancel",
+        "Skip",
+        "Overwrite"
+      ],
+      "preconditions": [
+        "selection for Save",
+        "bounded valid JSON for Load"
+      ],
+      "validation": [
+        "version/kind envelope",
+        "complete group/member shape",
+        "valid ISO dates",
+        "duplicate decisions",
+        "system protection"
+      ],
+      "transitions": [
+        "download",
+        "parse/stage",
+        "resolve duplicates",
+        "atomic apply/cancel"
+      ],
+      "outcome": "exact group definitions export or load without partial mutation",
+      "mockOperation": "stockGroups.save/load",
+      "persistence": "sqx-stock-groups-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "stockGroups.test.ts; data-manager-stock-groups.spec.ts",
+      "gaps": "Browser file controls replace native path dialogs."
+    },
+    {
+      "id": "DATA-STOCK-GROUP-TABLE-001",
+      "product": "SQX / Data Manager / Stock groups",
+      "screen": "Stock groups table",
+      "sources": [
+        "DataManagerBasket/views/baskets.html",
+        "BasketsCtrl.js",
+        "BasketOfStocksManager count/download/readiness methods"
+      ],
+      "trigger": "Data Manager > Stock groups",
+      "controls": [
+        "selection",
+        "select all",
+        "double-click",
+        "Name",
+        "Count",
+        "Description",
+        "Number of symbols",
+        "Downloaded",
+        "Ready to use?",
+        "Data from",
+        "Data to"
+      ],
+      "preconditions": [],
+      "validation": [
+        "validated persisted definitions and datasets"
+      ],
+      "transitions": [
+        "select",
+        "edit",
+        "update",
+        "summary refresh",
+        "reload"
+      ],
+      "outcome": "reactive SQX-shaped group catalogue and exact empty state",
+      "mockOperation": "stockGroups.list/summarize",
+      "persistence": "definitions and jobs persisted; selection transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "data-manager-stock-groups.spec.ts; data-manager-source-ribbon.spec.ts",
+      "gaps": "Date range is inferred from member datasets because SQX aggregate data is backend-generated."
+    },
+    {
+      "id": "DATA-SESSIONS-EDITOR-001",
+      "product": "SQX / Data Manager / Sessions",
+      "screen": "Add/Edit session template and nested session element",
+      "sources": [
+        "internal/plugins/DataManagerSessions/views/sessionTemplatePopup.html",
+        "internal/plugins/DataManagerSessions/views/sessionElementPopup.html",
+        "internal/plugins/DataManagerSessions/controllers/SessionsCtrl.js",
+        "internal/plugins/DataManagerSessions/services/SessionService.js",
+        "internal/plugins/DataManagerSessions/DataManagerSessions.jar"
+      ],
+      "trigger": "Sessions > Add Session or row double-click",
+      "controls": [
+        "session name",
+        "broker profile/postfix",
+        "element grid",
+        "Add",
+        "Add Mon-Fri",
+        "Edit",
+        "Remove",
+        "start/end day and time",
+        "Session End Means EOD",
+        "Close",
+        "Save",
+        "discard confirmation"
+      ],
+      "preconditions": [
+        "valid broker for Add",
+        "selected element for Edit/Remove"
+      ],
+      "validation": [
+        "required SQX-safe new name",
+        "unique broker-qualified identity",
+        "at least one element",
+        "valid HH:mm",
+        "same-day end not before start",
+        "readable storage"
+      ],
+      "transitions": [
+        "open",
+        "edit elements",
+        "generate weekdays",
+        "save",
+        "discard/continue",
+        "reload"
+      ],
+      "outcome": "persisted broker-owned session definition with ordered elements",
+      "mockOperation": "sessions.add/sessions.edit",
+      "persistence": "haru-data-sessions-v1 custom sessions and seed overrides",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "sessions.test.ts; data-manager-sessions.spec.ts; dark/light screenshots; typecheck/build",
+      "gaps": "fixture legacy names retain spaces/slash; no overlap rule because active SQX controller has none"
+    },
+    {
+      "id": "DATA-SESSIONS-CLONE-001",
+      "product": "SQX / Data Manager / Sessions",
+      "screen": "Clone session",
+      "sources": [
+        "internal/plugins/DataManagerSessions/actions/clone/module.js",
+        "internal/plugins/DataManagerSessions/actions/clone/CloneSessionCtrl.js",
+        "internal/plugins/DataManagerSessions/actions/clone/cloneSession.html",
+        "internal/plugins/DataManagerSessions/DataManagerSessions.jar"
+      ],
+      "trigger": "Sessions > Clone Session",
+      "controls": [
+        "target broker profile",
+        "new session name",
+        "postfix",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "one or more selected sessions; first selected is source"
+      ],
+      "validation": [
+        "SQX-safe name",
+        "unique final identity",
+        "valid broker",
+        "storage"
+      ],
+      "transitions": [
+        "open",
+        "configure",
+        "save/error",
+        "reload"
+      ],
+      "outcome": "deep cloned persistent session elements under target broker identity",
+      "mockOperation": "sessions.clone",
+      "persistence": "haru-data-sessions-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "data-manager-sessions.spec.ts",
+      "gaps": "browser-local broker metadata only"
+    },
+    {
+      "id": "DATA-SESSIONS-DELETE-001",
+      "product": "SQX / Data Manager / Sessions",
+      "screen": "Mass/row session removal",
+      "sources": [
+        "internal/plugins/DataManagerSessions/controllers/SessionsCtrl.js",
+        "internal/plugins/DataManagerActions/delete/module.js",
+        "internal/plugins/DataManagerSessions/DataManagerSessions.jar"
+      ],
+      "trigger": "Sessions > Mass Delete or trailing row x",
+      "controls": [
+        "No",
+        "Yes",
+        "error alert"
+      ],
+      "preconditions": [
+        "selected session(s)"
+      ],
+      "validation": [
+        "not referenced by fixture instruments",
+        "storage"
+      ],
+      "transitions": [
+        "confirm",
+        "blocked or atomically removed",
+        "reload"
+      ],
+      "outcome": "selected unreferenced sessions removed without broken instrument references",
+      "mockOperation": "sessions.remove",
+      "persistence": "haru-data-sessions-v1 custom removal/seed tombstone",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "data-manager-sessions.spec.ts",
+      "gaps": "dependency protection is conservative; >10 native background-worker threshold has no distinct mock UI"
+    },
+    {
+      "id": "DATA-SESSIONS-TRANSFER-001",
+      "product": "SQX / Data Manager / Sessions",
+      "screen": "Save/Load sessions",
+      "sources": [
+        "internal/plugins/DataManagerSessions/controllers/SessionsCtrl.js",
+        "internal/plugins/DataManagerActions/save/module.js",
+        "internal/plugins/DataManagerActions/load/module.js",
+        "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
+        "internal/libs/SQDataLib.jar"
+      ],
+      "trigger": "Sessions > Save or Load",
+      "controls": [
+        "selection summary",
+        "Sessions JSON file",
+        "Download JSON",
+        "Validate and load",
+        "Cancel",
+        "Skip",
+        "Overwrite"
+      ],
+      "preconditions": [
+        "Save selection or bounded JSON file"
+      ],
+      "validation": [
+        "Sessions root",
+        "Session/Element schema",
+        "days/times/EOD",
+        "duplicates",
+        "storage"
+      ],
+      "transitions": [
+        "download",
+        "parse/stage",
+        "resolve conflicts",
+        "atomic commit/cancel",
+        "reload"
+      ],
+      "outcome": "versioned Sessions.json download or validated browser-local import",
+      "mockOperation": "sessions.save/sessions.load",
+      "persistence": "haru-data-sessions-v1 after completed import",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "sessions.test.ts and data-manager-sessions.spec.ts",
+      "gaps": "browser download replaces native path picker; imported broker inferred as SQ default unless overwriting a known record"
+    },
+    {
+      "id": "DATA-SESSIONS-TABLE-001",
+      "product": "SQX / Data Manager / Sessions",
+      "screen": "Sessions table",
+      "sources": [
+        "internal/plugins/DataManagerSessions/views/sessions.html",
+        "internal/plugins/DataManagerSessions/controllers/SessionsCtrl.js"
+      ],
+      "trigger": "Data Manager > Sessions",
+      "controls": [
+        "Filter items",
+        "All broker profiles",
+        "selection",
+        "select all visible",
+        "double click",
+        "row delete"
+      ],
+      "preconditions": [],
+      "validation": [],
+      "transitions": [
+        "filter",
+        "select",
+        "edit/delete",
+        "refresh after mutation"
+      ],
+      "outcome": "reactive persisted session catalogue with broker-aware search/filter",
+      "mockOperation": "sessions.list",
+      "persistence": "selection/filter transient; definitions persisted",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "data-manager-source-ribbon.spec.ts and data-manager-sessions.spec.ts",
+      "gaps": "QuantDataManager-only broker-filter hiding is inapplicable"
+    },
+    {
+      "id": "DATA-TOOLS-TIMEZONE-001",
+      "product": "SQX / Data Manager / Tools",
+      "screen": "Clone to Timezone",
+      "sources": [
+        "internal/plugins/DataManagerActions/cloneToTimezone/module.js",
+        "internal/plugins/DataManagerActions/cloneToTimezone/CloneToTimezoneCtrl.js",
+        "internal/plugins/DataManagerActions/cloneToTimezone/cloneToTimezone.html",
+        "internal/web/SQMANAGER/layout/LayoutCtrl.js",
+        "internal/plugins/DataManagerData/DMDataService.js",
+        "internal/plugins/DataManagerData/DataManagerData.jar"
+      ],
+      "trigger": "Tools > Clone to timezone",
+      "controls": [
+        "source symbol summary",
+        "postfix",
+        "{timeframe}/{cloneTime} constants",
+        "fixed shift -23..23",
+        "named timezone",
+        "remove weekends",
+        "Close",
+        "Proceed",
+        "shared Pause/Resume/Stop"
+      ],
+      "preconditions": [
+        "one or more selected datasets",
+        "no selected derived clone",
+        "no active Data Manager job"
+      ],
+      "validation": [
+        "non-empty postfix",
+        "known shift/timezone",
+        "safe unique generated names",
+        "storage",
+        "active-job conflict"
+      ],
+      "transitions": [
+        "configure",
+        "running",
+        "paused",
+        "resumed",
+        "stopped",
+        "failed",
+        "completed",
+        "reload paused"
+      ],
+      "outcome": "persisted derived mock definitions with lineage, timezone metadata, shared progress, and trailing row status",
+      "mockOperation": "data.tools.clone.start/pause/resume/stop",
+      "persistence": "haru-data-tools-v1 settings/definitions/job; running restores paused",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "dataTools.test.ts and data-manager-tools.spec.ts; dark/light visual inspection; typecheck/build",
+      "gaps": "deterministic metadata clone only; no native history transformation; compiled backend inspected through metadata and javap"
+    },
+    {
+      "id": "DATA-TOOLS-ANALYZE-001",
+      "product": "SQX / Data Manager / Tools",
+      "screen": "View & Analyze data, chart, and quality tabs",
+      "sources": [
+        "internal/plugins/DataManagerActions/review/module.js",
+        "internal/plugins/DataManagerActions/review/ReviewCtrl.js",
+        "internal/plugins/DataManagerActions/review/review.html",
+        "internal/plugins/DataManagerActions/review/styles.css",
+        "internal/plugins/DataManagerActions/review/data",
+        "internal/plugins/DataManagerActions/review/chart",
+        "internal/plugins/DataManagerActions/review/quality",
+        "internal/plugins/DataManagerData/DMDataService.js",
+        "internal/plugins/DataManagerData/DataManagerData.jar"
+      ],
+      "trigger": "Tools > View & Analyze",
+      "controls": [
+        "dataset metadata",
+        "view timeframe",
+        "session",
+        "Data/Chart/Analyze data quality tabs",
+        "Skip to data",
+        "Edit line",
+        "Delete/Restore line",
+        "Save",
+        "Close",
+        "discard confirmation"
+      ],
+      "preconditions": [
+        "first selected eligible dataset has records",
+        "no active Data Manager job"
+      ],
+      "validation": [
+        "supported timeframe/session",
+        "finite numeric edits",
+        "OHLC consistency",
+        "storage",
+        "active-job conflict on save"
+      ],
+      "transitions": [
+        "open",
+        "change projection",
+        "select",
+        "edit",
+        "delete/restore",
+        "save",
+        "discard/keep editing",
+        "reload persisted review"
+      ],
+      "outcome": "coherent deterministic virtualized rows, candlestick chart, and quality findings with browser-local saved mutations",
+      "mockOperation": "data.tools.review.read/save",
+      "persistence": "haru-data-tools-v1 review mutations by dataset/timeframe/session",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "dataTools.test.ts and data-manager-tools.spec.ts; dark/light visual inspection; typecheck/build",
+      "gaps": "bounded 1000-row deterministic sample; no native file reads or writes; chart unavailable for Tick and quality unavailable for Tick/Intraday as in SQX"
+    },
+    {
+      "id": "DATA-EXPORT-CSV-001",
+      "product": "SQX / Data Manager / Export",
+      "screen": "Export data to CSV and nested file-format prompts",
+      "sources": [
+        "internal/plugins/DataManagerActions/exportToCsv/module.js",
+        "internal/plugins/DataManagerActions/exportToCsv/ExportToCsvCtrl.js",
+        "internal/plugins/DataManagerActions/exportToCsv/ExportToCsvService.js",
+        "internal/plugins/DataManagerActions/exportToCsv/exportToCSV.html",
+        "internal/plugins/DataManagerActions/exportToCsv/newFormatPopup.html",
+        "internal/web/QDM/help.txt",
+        "internal/plugins/DataManagerData/DataManagerData.jar"
+      ],
+      "trigger": "Export > Export to CSV",
+      "controls": [
+        "From/To and six presets",
+        "timeframe",
+        "session",
+        "target timezone",
+        "predefined/custom format",
+        "Save",
+        "Save as",
+        "Delete",
+        "Include header",
+        "header/row token editors",
+        "directory",
+        "prefix",
+        "Close",
+        "Export"
+      ],
+      "preconditions": [
+        "one or more selected records with data",
+        "no active Data Manager job"
+      ],
+      "validation": [
+        "date coverage",
+        "known session/timezone",
+        "safe prefix",
+        "supported tokens",
+        "unique custom format",
+        "storage"
+      ],
+      "transitions": [
+        "configure",
+        "format save/delete",
+        "running",
+        "paused",
+        "resumed",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload paused"
+      ],
+      "outcome": "bounded deterministic CSV downloads with shared progress and trailing row status",
+      "mockOperation": "data.export.csv/data.export.pause/data.export.resume/data.export.stop",
+      "persistence": "haru-data-export-v1 formats/settings/history/job",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "dataExport.test.ts and data-manager-export.spec.ts; source-ribbon regression; production build",
+      "gaps": "180 mock rows per target; normal browser downloads replace native directory; compiled backend format metadata only"
+    },
+    {
+      "id": "DATA-EXPORT-MT4-001",
+      "product": "SQX / Data Manager / Export",
+      "screen": "Export to MetaTrader 4 FXT and HST",
+      "sources": [
+        "internal/plugins/DataManagerActions/exportToMT4/module.js",
+        "internal/plugins/DataManagerActions/exportToMT4/ExportToMT4Ctrl.js",
+        "internal/plugins/DataManagerActions/exportToMT4/ExportToMT4Service.js",
+        "internal/plugins/DataManagerActions/exportToMT4/exportToMT4.html",
+        "user/settings/DataConfig/mt4.properties",
+        "internal/plugins/DataManagerData/DataManagerData.jar"
+      ],
+      "trigger": "Export > Export MT4 (FXT & HST)",
+      "controls": [
+        "From/To and presets",
+        "4 GB note",
+        "installation/data folder",
+        "server",
+        "symbol/name/timeframe/timezone/encoding/mode",
+        "properties loader and summary",
+        "spread warning",
+        "Help",
+        "Close",
+        "Start export"
+      ],
+      "preconditions": [
+        "exactly one record with Tick source precision and data",
+        "no active job"
+      ],
+      "validation": [
+        "date coverage",
+        "required output metadata",
+        "supported mode/timeframe",
+        "safe name",
+        "bounded KEY=value properties",
+        "storage"
+      ],
+      "transitions": [
+        "configure",
+        "load specification",
+        "running",
+        "paused",
+        "resumed",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload paused"
+      ],
+      "outcome": "explicit non-native JSON manifest describing requested FXT/HST targets and properties, using shared progress/status",
+      "mockOperation": "data.export.mt4-manifest",
+      "persistence": "haru-data-export-v1 settings/history/job; no folder handles",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "dataExport.test.ts and data-manager-export.spec.ts",
+      "gaps": "native FXT/HST writer is compiled/backend-only and intentionally not fabricated; browser folder metadata only"
+    },
+    {
+      "id": "DATA-EXPORT-MT5-001",
+      "product": "SQX / Data Manager / Export",
+      "screen": "Export to MT5 data (99% history quality) with overwrite prompt",
+      "sources": [
+        "internal/plugins/DataManagerActions/exportToMT5/module.js",
+        "internal/plugins/DataManagerActions/exportToMT5/ExportToMT5Ctrl.js",
+        "internal/plugins/DataManagerActions/exportToMT5/ExportToMT5Service.js",
+        "internal/plugins/DataManagerActions/exportToMT5/exportToMT5.html",
+        "internal/plugins/DataManagerData/DataManagerData.jar"
+      ],
+      "trigger": "Export > Export to MT5 data (99% test)",
+      "controls": [
+        "From/To and presets",
+        "Tick/M1",
+        "fixed points/fixed pips/real spread",
+        "timezone",
+        "directory",
+        "filename",
+        "Close",
+        "Export",
+        "overwrite No/Yes"
+      ],
+      "preconditions": [
+        "exactly one record with Tick or M1 source precision and data",
+        "no active job"
+      ],
+      "validation": [
+        "date coverage",
+        "compatible timeframe/spread",
+        "spread 0-1000",
+        "safe filename",
+        "known timezone",
+        "storage"
+      ],
+      "transitions": [
+        "configure",
+        "overwrite prompt",
+        "running",
+        "paused",
+        "resumed",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload paused"
+      ],
+      "outcome": "bounded deterministic MT5-shaped CSV download with shared progress and trailing row status",
+      "mockOperation": "data.export.mt5",
+      "persistence": "haru-data-export-v1 settings/history/job",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "dataExport.test.ts and data-manager-export.spec.ts",
+      "gaps": "180 deterministic rows rather than full market history; browser downloads replace native directory"
+    },
+    {
+      "id": "MT5-IMPORT-001",
+      "product": "SQX / Data Manager / DataSourceMt5Api",
+      "screen": "Import data from MT5",
+      "sources": [
+        "internal/plugins/DataSourceMt5Api/module.js",
+        "internal/plugins/DataSourceMt5Api/import/module.js",
+        "internal/plugins/DataSourceMt5Api/import/importPopup.html",
+        "internal/plugins/DataSourceMt5Api/import/DataSourceMt5ApiImportCtrl.js",
+        "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.js",
+        "internal/plugins/DataSourceMt5Api/styles.css",
+        "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+        "internal/web/app/directives/dateRange",
+        "internal/web/img/metatrader5.png"
+      ],
+      "trigger": "MT5 import > Import data",
+      "controls": [
+        "MT5 install folder and Select",
+        "Fetch symbols",
+        "filter",
+        "Show types",
+        "group/header/row selection",
+        "From/To and six presets",
+        "Data Availability Disclaimer and More details",
+        "broker profile",
+        "postfix",
+        "Close",
+        "Start import"
+      ],
+      "preconditions": [
+        "session-selected MT5-like folder metadata",
+        "symbols fetched",
+        "readable storage",
+        "no active provider job"
+      ],
+      "validation": [
+        "safe bounded folder paths and MT5 marker",
+        "fetched selection",
+        "valid ordered dates through today and mock availability",
+        "eligible broker",
+        "bounded postfix and selection",
+        "storage"
+      ],
+      "transitions": [
+        "select folder",
+        "fetch",
+        "filter/group/select",
+        "configure",
+        "running",
+        "paused",
+        "resumed",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload paused"
+      ],
+      "outcome": "persisted M1 MT5 definitions with automatic duplicate numbering, synthetic coverage, shared progress/actions and trailing status",
+      "mockOperation": "discoverMt5Folder/filterMt5Symbols/mt5Definitions/mt5ImportRanges/useMt5Import",
+      "persistence": "sqx-mt5-import-v1 definitions, intervals, job, folder display name and postfix; no folder handle or prices",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "MT5 unit and browser popup/lifecycle/storage tests; provider regressions; exact icon hash; production build",
+      "gaps": "12-symbol offline fixture and one synthetic sample/day; no terminal execution, HCC decoding, live broker inventory or market data; donor action-name mismatch recorded"
+    },
+    {
+      "id": "YAHOO-ADD-001",
+      "product": "SQX / Data Manager / DataSourceYahoo",
+      "screen": "Add Yahoo data",
+      "sources": [
+        "internal/plugins/DataSourceYahoo/module.js",
+        "internal/plugins/DataSourceYahoo/add/module.js",
+        "internal/plugins/DataSourceYahoo/add/addPopup.html",
+        "internal/plugins/DataSourceYahoo/add/addPopupCtrl.js",
+        "internal/plugins/DataSourceYahoo/YahooService.js",
+        "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+        "internal/web/img/dm-yahoo.png"
+      ],
+      "trigger": "Yahoo > Add Yahoo data",
+      "controls": [
+        "ticker textarea",
+        "postfix",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "readable storage",
+        "no active provider job"
+      ],
+      "validation": [
+        "recognized bounded mock ticker",
+        "newline/comma/semicolon parsing",
+        "bounded postfix",
+        "unique input and global final name",
+        "storage"
+      ],
+      "transitions": [
+        "open/reset",
+        "edit",
+        "running",
+        "paused",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload"
+      ],
+      "outcome": "persisted empty D1 Yahoo definitions with provider metadata and shared progress/trailing status",
+      "mockOperation": "parseYahooTickers/yahooDefinitions/useYahoo.startAdd",
+      "persistence": "sqx-yahoo-data-v1 definitions and job",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "Yahoo unit and browser add/lifecycle/storage tests; exact icon hash and production build",
+      "gaps": "nine-symbol offline fixture; no live quote metadata or prices; native runtime not executed"
+    },
+    {
+      "id": "YAHOO-DOWNLOAD-001",
+      "product": "SQX / Data Manager / DataSourceYahoo",
+      "screen": "Download Yahoo data for selected records",
+      "sources": [
+        "internal/plugins/DataSourceYahoo/download/module.js",
+        "internal/plugins/DataSourceYahoo/download/downloadPopup.html",
+        "internal/plugins/DataSourceYahoo/download/downloadPopupCtrl.js",
+        "internal/plugins/DataSourceYahoo/YahooService.js",
+        "internal/web/app/directives/dateRange/DateRangeCtrl.js",
+        "internal/web/app/directives/dateRange/dateRange.html"
+      ],
+      "trigger": "Yahoo > Download data for existing symbol",
+      "controls": [
+        "From/To",
+        "six presets",
+        "missing-only/overwrite",
+        "Close",
+        "Start download"
+      ],
+      "preconditions": [
+        "selected eligible Yahoo records",
+        "no clone or active target"
+      ],
+      "validation": [
+        "Yahoo target identity",
+        "date order/today/mock availability",
+        "storage"
+      ],
+      "transitions": [
+        "configure",
+        "running",
+        "paused",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload"
+      ],
+      "outcome": "synthetic interval summaries for selected Yahoo rows using shared progress and trailing status",
+      "mockOperation": "yahooTargets/yahooDownloadRanges/useYahoo.startDownload",
+      "persistence": "sqx-yahoo-data-v1 intervals/job; no prices",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "mixed selection, presets, overwrite, progress, reload and coverage browser/unit tests",
+      "gaps": "one synthetic sample/day; no Yahoo provider traffic or market data"
+    },
+    {
+      "id": "CRYPTO-ADD-BINANCE-001",
+      "product": "SQX / Data Manager / DataSourceCrypto",
+      "screen": "Add Binance symbol(s)",
+      "sources": [
+        "internal/plugins/DataSourceCrypto/add/module.js",
+        "internal/plugins/DataSourceCrypto/add/addPopup.html",
+        "internal/plugins/DataSourceCrypto/add/addPopupCtrl.js",
+        "internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar"
+      ],
+      "trigger": "Crypto data > Add crypto symbol > Binance spot",
+      "controls": [
+        "filter",
+        "Symbol checkboxes",
+        "12 timeframes",
+        "postfix",
+        "free-data consent",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "readable storage",
+        "no active provider job"
+      ],
+      "validation": [
+        "selection",
+        "consent",
+        "supported timeframe",
+        "postfix",
+        "global unique name",
+        "storage"
+      ],
+      "transitions": [
+        "open/reset",
+        "filter",
+        "select",
+        "running",
+        "paused",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload"
+      ],
+      "outcome": "persisted empty Binance Crypto definitions with shared progress and trailing status",
+      "mockOperation": "cryptoDefinitions/useCrypto.startAdd",
+      "persistence": "sqx-crypto-data-v1; consent/filter transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "Crypto unit and browser variants/add lifecycle tests",
+      "gaps": "10-symbol offline fixture; no live exchange inventory or prices"
+    },
+    {
+      "id": "CRYPTO-ADD-BINANCE-COINM-001",
+      "product": "SQX / Data Manager / DataSourceCrypto",
+      "screen": "Add Binance Coin-M symbol(s)",
+      "sources": [
+        "internal/plugins/DataSourceCrypto/add",
+        "internal/plugins/CryptoExchangeBinanceCoinM/CryptoExchangeBinanceCoinM.jar"
+      ],
+      "trigger": "Crypto data > Add crypto symbol > Binance Coin-M",
+      "controls": [
+        "filter",
+        "Symbol checkboxes",
+        "12 timeframes",
+        "postfix",
+        "consent",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "readable storage",
+        "no active job"
+      ],
+      "validation": [
+        "shared Add rules"
+      ],
+      "transitions": [
+        "shared Add lifecycle"
+      ],
+      "outcome": "persisted empty Coin-M definitions",
+      "mockOperation": "cryptoDefinitions(BinanceCoinM)/useCrypto.startAdd",
+      "persistence": "sqx-crypto-data-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "exact title/timeframe browser and unit tests",
+      "gaps": "8-symbol offline fixture; no live contracts"
+    },
+    {
+      "id": "CRYPTO-ADD-BINANCE-USDTM-001",
+      "product": "SQX / Data Manager / DataSourceCrypto",
+      "screen": "Add Binance USDT-M symbol(s)",
+      "sources": [
+        "internal/plugins/DataSourceCrypto/add",
+        "internal/plugins/CryptoExchangeBinanceUsdtM/CryptoExchangeBinanceUsdtM.jar"
+      ],
+      "trigger": "Crypto data > Add crypto symbol > Binance USDT-M",
+      "controls": [
+        "filter",
+        "Symbol checkboxes",
+        "12 timeframes",
+        "postfix",
+        "consent",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "readable storage",
+        "no active job"
+      ],
+      "validation": [
+        "shared Add rules"
+      ],
+      "transitions": [
+        "shared Add lifecycle"
+      ],
+      "outcome": "persisted empty USDT-M definitions",
+      "mockOperation": "cryptoDefinitions(BinanceUsdtM)/useCrypto.startAdd",
+      "persistence": "sqx-crypto-data-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "exact title/timeframe browser and unit tests",
+      "gaps": "10-symbol offline fixture; no live contracts"
+    },
+    {
+      "id": "CRYPTO-ADD-BITFINEX-001",
+      "product": "SQX / Data Manager / DataSourceCrypto",
+      "screen": "Add Bitfinex symbol(s)",
+      "sources": [
+        "internal/plugins/DataSourceCrypto/add",
+        "internal/plugins/CryptoExchangeBitfinex/CryptoExchangeBitfinex.jar"
+      ],
+      "trigger": "Crypto data > Add crypto symbol > Bitfinex",
+      "controls": [
+        "filter",
+        "Symbol checkboxes",
+        "9 timeframes",
+        "postfix",
+        "consent",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "readable storage",
+        "no active job"
+      ],
+      "validation": [
+        "shared Add rules"
+      ],
+      "transitions": [
+        "shared Add lifecycle"
+      ],
+      "outcome": "persisted empty Bitfinex definitions",
+      "mockOperation": "cryptoDefinitions(Bitfinex)/useCrypto.startAdd",
+      "persistence": "sqx-crypto-data-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "exact title/timeframe, light layout and quota browser tests",
+      "gaps": "8-symbol offline fixture; dynamic donor pair list"
+    },
+    {
+      "id": "CRYPTO-ADD-POLONIEX-001",
+      "product": "SQX / Data Manager / DataSourceCrypto",
+      "screen": "Add Poloniex symbol(s)",
+      "sources": [
+        "internal/plugins/DataSourceCrypto/add",
+        "internal/plugins/CryptoExchangePoloniex/CryptoExchangePoloniex.jar"
+      ],
+      "trigger": "Crypto data > Add crypto symbol > Poloniex",
+      "controls": [
+        "filter",
+        "Symbol checkboxes",
+        "6 timeframes",
+        "postfix",
+        "consent",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "readable storage",
+        "no active job"
+      ],
+      "validation": [
+        "shared Add rules"
+      ],
+      "transitions": [
+        "shared Add lifecycle"
+      ],
+      "outcome": "persisted empty Poloniex definitions",
+      "mockOperation": "cryptoDefinitions(Poloniex)/useCrypto.startAdd",
+      "persistence": "sqx-crypto-data-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "exact title/timeframe and pause/reload/resume browser tests",
+      "gaps": "8-symbol offline fixture; dynamic donor market list"
+    },
+    {
+      "id": "CRYPTO-ADD-COINBASE-001",
+      "product": "SQX / Data Manager / DataSourceCrypto",
+      "screen": "Add Coinbase Pro symbol(s)",
+      "sources": [
+        "internal/plugins/DataSourceCrypto/add",
+        "internal/plugins/CryptoExchangeCoinbasePro/CryptoExchangeCoinbasePro.jar"
+      ],
+      "trigger": "Crypto data > Add crypto symbol > Coinbase Pro",
+      "controls": [
+        "filter",
+        "Symbol checkboxes",
+        "6 timeframes",
+        "postfix",
+        "consent",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "readable storage",
+        "no active job"
+      ],
+      "validation": [
+        "shared Add rules with native hyphenated symbols"
+      ],
+      "transitions": [
+        "shared Add lifecycle"
+      ],
+      "outcome": "persisted empty Coinbase definitions",
+      "mockOperation": "cryptoDefinitions(Coinbase)/useCrypto.startAdd",
+      "persistence": "sqx-crypto-data-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "filter/consent/H6/persistence/trailing-status browser tests",
+      "gaps": "8-symbol offline fixture; legacy donor Coinbase Pro naming"
+    },
+    {
+      "id": "CRYPTO-DOWNLOAD-001",
+      "product": "SQX / Data Manager / DataSourceCrypto",
+      "screen": "Download crypto data for selected records",
+      "sources": [
+        "internal/plugins/DataSourceCrypto/import/module.js",
+        "internal/plugins/DataSourceCrypto/import/importPopup.html",
+        "internal/plugins/DataSourceCrypto/import/importPopupCtrl.js",
+        "internal/plugins/DataSourceCrypto/DataSourceCryptoService.js"
+      ],
+      "trigger": "Crypto data > Download data for existing symbol",
+      "controls": [
+        "From/To",
+        "six presets",
+        "missing-only/overwrite",
+        "Close",
+        "Start download"
+      ],
+      "preconditions": [
+        "selected eligible Crypto records",
+        "no clone or active target"
+      ],
+      "validation": [
+        "Crypto target identity",
+        "date order/today/mock availability",
+        "storage"
+      ],
+      "transitions": [
+        "configure",
+        "running",
+        "paused",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload"
+      ],
+      "outcome": "synthetic interval summaries for selected Crypto rows using shared progress/trailing status",
+      "mockOperation": "cryptoTargets/cryptoDownloadRanges/useCrypto.startDownload",
+      "persistence": "sqx-crypto-data-v1 intervals/job; no prices",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "mixed selection, presets, invalid date, overwrite, progress and coverage browser/unit tests",
+      "gaps": "one synthetic sample/day; no provider data"
+    },
+    {
+      "product": "SQX / Data Manager / DataSourceDarwinex",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "persistence": "sqx-darwinex-v1 definitions, job, ranges, folder display name and postfix; reload running as paused; raw files not stored",
+      "id": "DARWINEX-ADD-001",
+      "screen": "Add Darwinex data",
+      "sources": [
+        "internal/plugins/DataSourceDarwinex/module.js",
+        "internal/plugins/DataSourceDarwinex/add/module.js",
+        "internal/plugins/DataSourceDarwinex/add/addPopup.html",
+        "internal/plugins/DataSourceDarwinex/add/addPopupCtrl.js",
+        "internal/plugins/DataSourceDarwinex/add/styles.css",
+        "internal/plugins/DataSourceDarwinex/DarwinexService.js",
+        "internal/plugins/DataSourceDarwinex/darwinex.csv",
+        "internal/web/app/directives/freeDataDisclaimer/freeDataDisclaimer.html"
+      ],
+      "trigger": "Darwinex Tick Data > Add Darwinex data",
+      "controls": [
+        "328-row symbol catalogue",
+        "symbol filter",
+        "row/header checkboxes",
+        "symbol/range sorting",
+        "broker",
+        "postfix",
+        "free-data consent",
+        "Save",
+        "Close"
+      ],
+      "preconditions": [
+        "readable catalogue/storage",
+        "no active provider job"
+      ],
+      "validation": [
+        "selection",
+        "consent",
+        "valid broker and mappings",
+        "unique valid global names",
+        "bounded selections/postfix",
+        "successful storage write"
+      ],
+      "transitions": [
+        "open resets selection/consent",
+        "filter clears selection",
+        "broker applies postfix/notice",
+        "mapping if non-default",
+        "queue",
+        "pause/resume/stop/fail/complete",
+        "reload"
+      ],
+      "outcome": "empty TICK definitions added atomically; availability dates are not downloaded coverage",
+      "mockOperation": "parseDarwinex/darwinexDefinitions/useDarwinex.start(add)",
+      "verification": {
+        "visual": "dark desktop and light narrow screenshots inspected",
+        "interaction": "catalogue/consent/filter/mapping browser tests passed",
+        "state": "atomic commit/reload/storage unit and browser tests passed"
+      },
+      "gaps": "Native runtime not observed. Raw numeric catalogue fields retained without unverified financial interpretation; category is Tick data. Broker preference resets to default on reopen; persisted definitions retain selected broker."
+    },
+    {
+      "product": "SQX / Data Manager / DataSourceDarwinex",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "persistence": "sqx-darwinex-v1 definitions, job, ranges, folder display name and postfix; reload running as paused; raw files not stored",
+      "id": "DARWINEX-MAPPING-001",
+      "screen": "Add Darwinex data - identify instruments",
+      "sources": [
+        "internal/plugins/DataSourceDarwinex/add/selectInstrumentsPopup.html",
+        "internal/plugins/DataSourceDarwinex/add/addPopupCtrl.js"
+      ],
+      "trigger": "Save with non-default mtUse broker",
+      "controls": [
+        "broker explanation",
+        "per-symbol matching instrument/default/skip",
+        "mass default",
+        "mass skip",
+        "Back",
+        "Save"
+      ],
+      "preconditions": [
+        "selected catalogue symbols",
+        "consent",
+        "configured mtUse broker"
+      ],
+      "validation": [
+        "all mappings resolved",
+        "at least one not skipped",
+        "selected mapping belongs to broker",
+        "unique names"
+      ],
+      "transitions": [
+        "prefix auto-match or unresolved",
+        "mass action only unresolved",
+        "Back retains parent selection",
+        "save configured definitions"
+      ],
+      "outcome": "correct instrument and broker timezone stored per included symbol",
+      "mockOperation": "darwinexDefinitions with broker and mappings",
+      "verification": {
+        "visual": "source layout implemented in themed modal",
+        "interaction": "unresolved/skip/default/Back browser scenario passed",
+        "state": "mapping and name rules tested offline"
+      },
+      "gaps": "Default mock has no configured brokers; tests seed isolated fixture. Stray donor DukascopyService call/label intentionally corrected to Darwinex."
+    },
+    {
+      "product": "SQX / Data Manager / DataSourceDarwinex",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "persistence": "sqx-darwinex-v1 definitions, job, ranges, folder display name and postfix; reload running as paused; raw files not stored",
+      "id": "DARWINEX-IMPORT-001",
+      "screen": "Import data from Darwinex",
+      "sources": [
+        "internal/plugins/DataSourceDarwinex/import/module.js",
+        "internal/plugins/DataSourceDarwinex/import/importPopup.html",
+        "internal/plugins/DataSourceDarwinex/import/importPopupCtrl.js",
+        "internal/plugins/DataSourceDarwinex/DarwinexService.js",
+        "internal/plugins/DataSourceDarwinex/style.css",
+        "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar:DarwinexServlet.onImportLoadAvailableSymbols"
+      ],
+      "trigger": "Darwinex Tick Data > Import data from a Darwinex folder",
+      "controls": [
+        "readonly folder",
+        "Select browser directory",
+        "300px checkbox Symbol grid",
+        "postfix",
+        "Close",
+        "Start import"
+      ],
+      "preconditions": [
+        "session-selected folder metadata",
+        "no conflicting job"
+      ],
+      "validation": [
+        "one folder",
+        "safe relative paths",
+        "at most 20000 files/1000 symbols",
+        "direct log.gz discovery",
+        "selection",
+        "global duplicate names",
+        "storage"
+      ],
+      "transitions": [
+        "select folder",
+        "discover direct child symbol folders or known root symbol",
+        "choose symbols",
+        "queue",
+        "pause/resume/stop/fail/complete",
+        "reload requires folder reselect"
+      ],
+      "outcome": "mock imported definitions with zero decoded ticks; source files unchanged",
+      "mockOperation": "discoverDarwinex/useDarwinex.start(import)",
+      "verification": {
+        "visual": "running-app import screenshot reviewed",
+        "interaction": "folder selection, duplicates, stop, retry and remembered folder browser scenario passed",
+        "state": "direct/root/deep/case-sensitive discovery unit checks and persistence tests passed"
+      },
+      "gaps": "Browser cannot expose empty folders or restore native file access; metadata only, no native gzip tick decoding. Compiled discovery was verified with javap; backend import decoding remains excluded."
+    },
+    {
+      "product": "SQX / Data Manager / DataSourceDarwinex",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "persistence": "sqx-darwinex-v1 definitions, job, ranges, folder display name and postfix; reload running as paused; raw files not stored",
+      "id": "DARWINEX-DOWNLOAD-001",
+      "screen": "Download Darwinex data for symbol/multiple",
+      "sources": [
+        "internal/plugins/DataSourceDarwinex/download/module.js",
+        "internal/plugins/DataSourceDarwinex/download/downloadPopup.html",
+        "internal/plugins/DataSourceDarwinex/download/downloadPopupCtrl.js",
+        "internal/plugins/DataSourceDarwinex/DarwinexService.js",
+        "internal/web/app/directives/dateRange/DateRangeCtrl.js",
+        "internal/web/app/directives/dateRange/dateRange.html"
+      ],
+      "trigger": "Darwinex Tick Data > Download data for existing symbols",
+      "controls": [
+        "From/To",
+        "six date presets",
+        "missing/overwrite radios",
+        "Close",
+        "Start download",
+        "restricted license message/upgrade link"
+      ],
+      "preconditions": [
+        "selected Darwinex records",
+        "no clones",
+        "no active job",
+        "Full mock profile to start"
+      ],
+      "validation": [
+        "valid ordered dates through today",
+        "per-target availability and last date",
+        "known target IDs",
+        "storage"
+      ],
+      "transitions": [
+        "select eligible rows",
+        "configure dates/policy",
+        "start",
+        "pause/resume/stop/fail/complete",
+        "reload paused",
+        "profile changes affect available controls"
+      ],
+      "outcome": "synthetic intervals update only selected Darwinex records; one shared progress bar and trailing statuses",
+      "mockOperation": "darwinexTargets/darwinexDownloadRanges/useDarwinex.download,advance,action",
+      "verification": {
+        "visual": "download dark screenshot reviewed; responsive styles share frame",
+        "interaction": "mixed-selection isolation, all six presets, invalid dates, overwrite and restricted profile browser scenario passed",
+        "state": "per-target sinceLast, clone rejection, missing/overwrite deduplication and reload unit tests passed"
+      },
+      "gaps": "Full/Starter is approved mock entitlement mapping: donor forces fullLicense=true on event despite restricted template. Source mixed-provider filtering bug corrected. One synthetic sample per calendar day, not actual ticks; unknown catalogue availability falls back to existing start or today."
+    },
+    {
+      "id": "SQ-EQUITY-ADD-001",
+      "product": "SQX Data Manager / DataSourceSQEquityData",
+      "screen": "Add SQ Equity Data search and results",
+      "sources": [
+        "internal/plugins/DataSourceSQEquityData/module.js",
+        "internal/plugins/DataSourceSQEquityData/add/module.js",
+        "internal/plugins/DataSourceSQEquityData/add/addPopup.html",
+        "internal/plugins/DataSourceSQEquityData/add/SQEquityDataAddCtrl.js",
+        "internal/plugins/DataSourceSQEquityData/SQEquityDataService.js",
+        "internal/plugins/DataSourceSQEquityData/styles.css",
+        "internal/web/SQMANAGER/layout/LayoutCtrl.js",
+        "internal/web/SQMANAGER/timezones.csv"
+      ],
+      "trigger": "SQ Equity data > Find and add equity data",
+      "controls": [
+        "exchange",
+        "ticker/name/exact",
+        "multiline terms",
+        "Lookup",
+        "subscription availability/free list/Subscribe",
+        "eligible checkbox grid and sorting",
+        "Search again",
+        "postfix",
+        "bar type",
+        "exchange/fixed/named timezone",
+        "consent",
+        "conditions",
+        "Close",
+        "Add"
+      ],
+      "preconditions": [
+        "SQX menu applicability",
+        "mock catalogue loaded",
+        "eligible selected tickers for Add",
+        "no active provider operation"
+      ],
+      "validation": [
+        "consent",
+        "selected eligible tickers",
+        "unique valid global dataset names",
+        "bounded strings/selection",
+        "integer shift -23..23",
+        "valid timezone",
+        "successful storage"
+      ],
+      "transitions": [
+        "search",
+        "lookup pending",
+        "results or empty",
+        "select/configure",
+        "conditions and return",
+        "add or validation error",
+        "close",
+        "reload persisted work"
+      ],
+      "outcome": "empty configured mock definitions added; availability dates are not downloaded coverage",
+      "mockOperation": "lookupSQ / sqSubscription / planSQAdd / useSQData.start",
+      "persistence": "sqx-sq-data-v1 definitions, preferred options and add job; selection/search/consent reset on reopen",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": {
+        "visual": "dark/light desktop and narrow layout inspected; source structure with app theme",
+        "interaction": "SQ Playwright scenarios plus source-ribbon regression passed",
+        "state": "SQ unit lifecycle/validation/storage tests and browser add/reload checks passed; reactive profile invalidation reviewed in code"
+      },
+      "gaps": "Backend exchange/catalogue/entitlement responses unavailable; explicit small offline fixtures. Full/Starter mapping is a simulation. Native runtime not observed. Subscription banner local, link source-derived. Separate updates excluded."
+    },
+    {
+      "id": "SQ-FUTURES-ADD-001",
+      "product": "SQX Data Manager / DataSourceSQFuturesData",
+      "screen": "Add SQ Futures Data search and results",
+      "sources": [
+        "internal/plugins/DataSourceSQFuturesData/module.js",
+        "internal/plugins/DataSourceSQFuturesData/add/module.js",
+        "internal/plugins/DataSourceSQFuturesData/add/addPopup.html",
+        "internal/plugins/DataSourceSQFuturesData/add/SQFuturesDataAddCtrl.js",
+        "internal/plugins/DataSourceSQFuturesData/SQFuturesDataService.js",
+        "internal/plugins/DataSourceSQFuturesData/styles.css",
+        "internal/web/SQMANAGER/layout/LayoutCtrl.js",
+        "internal/web/SQMANAGER/timezones.csv"
+      ],
+      "trigger": "SQ Futures data > Find and add futures data",
+      "controls": [
+        "exchange",
+        "ticker/name/exact",
+        "multiline terms",
+        "Lookup",
+        "subscription availability/free list/Subscribe",
+        "eligible checkbox grid and sorting",
+        "Search again",
+        "postfix",
+        "bar type",
+        "exchange/fixed/named timezone",
+        "consent",
+        "conditions",
+        "Close",
+        "Add",
+        "continuous-only"
+      ],
+      "preconditions": [
+        "SQX menu applicability",
+        "mock catalogue loaded",
+        "eligible selected tickers for Add",
+        "no active provider operation"
+      ],
+      "validation": [
+        "consent",
+        "selected eligible tickers",
+        "unique valid global dataset names",
+        "bounded strings/selection",
+        "integer shift -23..23",
+        "valid timezone",
+        "successful storage"
+      ],
+      "transitions": [
+        "search",
+        "lookup pending",
+        "results or empty",
+        "select/configure",
+        "conditions and return",
+        "add or validation error",
+        "close",
+        "reload persisted work"
+      ],
+      "outcome": "empty configured mock definitions added; availability dates are not downloaded coverage",
+      "mockOperation": "lookupSQ / sqSubscription / planSQAdd / useSQData.start",
+      "persistence": "sqx-sq-data-v1 definitions, preferred options and add job; selection/search/consent reset on reopen",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": {
+        "visual": "dark/light desktop and narrow layout inspected; source structure with app theme",
+        "interaction": "SQ Playwright scenarios plus source-ribbon regression passed",
+        "state": "SQ unit lifecycle/validation/storage tests and browser add/reload checks passed; reactive profile invalidation reviewed in code"
+      },
+      "gaps": "Backend exchange/catalogue/entitlement responses unavailable; explicit small offline fixtures. Full/Starter mapping is a simulation. Native runtime not observed. Subscription banner local, link source-derived. Separate updates excluded."
+    },
+    {
+      "id": "SQ-DATA-CONDITIONS-001",
+      "product": "SQX Data Manager / both SQ providers",
+      "screen": "StrategyQuant Data Usage Conditions",
+      "sources": [
+        "internal/plugins/DataSourceSQEquityData/add/dataUsageConditionsPopup.html",
+        "internal/plugins/DataSourceSQFuturesData/add/dataUsageConditionsPopup.html"
+      ],
+      "trigger": "Usage conditions link in either add dialog",
+      "controls": [
+        "source heading and four paragraphs",
+        "Close",
+        "Escape"
+      ],
+      "preconditions": [
+        "add dialog open"
+      ],
+      "validation": [
+        "no external acceptance or submission"
+      ],
+      "transitions": [
+        "parent draft retained",
+        "conditions open",
+        "close restores parent and link focus"
+      ],
+      "outcome": "source text readable in themed nested dialog",
+      "mockOperation": "SQDataAddDialog local conditions state",
+      "persistence": "none; parent draft remains transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": {
+        "visual": "themed modal implementation",
+        "interaction": "browser Escape and return focus passed",
+        "state": "parent selection/configuration retained"
+      },
+      "gaps": "Local mock consent only; no license transaction."
+    },
+    {
+      "id": "SQ-DATA-JOB-001",
+      "product": "HaruQuantAI Data Manager mock adapter",
+      "screen": "Shared progress and trailing dataset status",
+      "sources": [
+        "internal/plugins/DataSourceSQEquityData/add/SQEquityDataAddCtrl.js",
+        "internal/plugins/DataSourceSQFuturesData/add/SQFuturesDataAddCtrl.js",
+        "internal/plugins/DataSourceSQEquityData/SQEquityDataService.js",
+        "internal/plugins/DataSourceSQFuturesData/SQFuturesDataService.js"
+      ],
+      "trigger": "Add with valid form and consent",
+      "controls": [
+        "shared Pause/Resume all",
+        "Stop all",
+        "trailing row status"
+      ],
+      "preconditions": [
+        "no active job",
+        "readable storage",
+        "no duplicate names"
+      ],
+      "validation": [
+        "bounded persisted schema",
+        "storage success",
+        "cross-provider names and operation exclusion"
+      ],
+      "transitions": [
+        "running",
+        "paused",
+        "resume",
+        "cancelled",
+        "failed",
+        "completed",
+        "reload running as paused"
+      ],
+      "outcome": "atomic completed definitions retained, unfinished cancelled work discarded; zero actual history records",
+      "mockOperation": "useSQData.start/advance/action; reservedSQDefinitions",
+      "persistence": "sqx-sq-data-v1; no changes to other storage schemas",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": {
+        "visual": "single shared progress / trailing status verified",
+        "interaction": "pause/resume/stop/exclusion browser checks passed",
+        "state": "atomic completion, reload, corruption, quota/start and mid-job failure unit checks passed"
+      },
+      "gaps": "Deterministic mock timing and incremental commits; backend implementation unavailable. Existing SQ update simulations unchanged."
+    },
+    {
+      "id": "DATA-INSTRUMENTS-EDITOR-001",
+      "product": "SQX Data Manager / Instruments",
+      "screen": "Add/Edit instrument and Commission & Swap Explanation",
+      "sources": [
+        "internal/plugins/DataManagerInstruments/views/addInstrumentPopup.html",
+        "internal/plugins/DataManagerInstruments/controllers/InstrumentsCtrl.js",
+        "internal/plugins/DataManagerInstruments/services/InstrumentService.js",
+        "internal/web/app/directives/instrumentDetails",
+        "internal/web/app/directives/swapSettings"
+      ],
+      "trigger": "Add Instrument or row double click",
+      "controls": [
+        "broker and identity",
+        "description/type/specification",
+        "five commission modes",
+        "swap",
+        "Help",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "writable local configuration",
+        "current row for Edit"
+      ],
+      "validation": [
+        "safe unique identity",
+        "broker/type",
+        "finite numeric bounds",
+        "commission",
+        "swap"
+      ],
+      "transitions": [
+        "open",
+        "configure",
+        "help",
+        "error",
+        "saved",
+        "cancelled"
+      ],
+      "outcome": "reactive shared instrument added or edited",
+      "mockOperation": "useFileSymbols.addInstrument/editInstrument",
+      "persistence": "sqx-file-symbols-v1 version 2 with v1 migration",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "instruments.test.ts; data-manager-instruments.spec.ts; dark screenshot; reload",
+      "gaps": "hidden optional fields excluded; backend numeric IDs unavailable"
+    },
+    {
+      "id": "DATA-INSTRUMENTS-CLONE-001",
+      "product": "SQX Data Manager / Instruments",
+      "screen": "Clone instrument",
+      "sources": [
+        "internal/plugins/DataManagerInstruments/actions/clone",
+        "internal/plugins/DataManagerInstruments/CloneInstrumentCtrl.js",
+        "internal/plugins/DataManagerInstruments/cloneInstrument.html",
+        "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar"
+      ],
+      "trigger": "Clone Instrument",
+      "controls": [
+        "target broker",
+        "target name",
+        "postfix",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "one or more selected instruments; first is source"
+      ],
+      "validation": [
+        "safe unique broker-qualified identity",
+        "storage"
+      ],
+      "transitions": [
+        "selection error",
+        "configure",
+        "error",
+        "saved",
+        "cancelled"
+      ],
+      "outcome": "deep copied specification under new identity",
+      "mockOperation": "useFileSymbols.addInstrument",
+      "persistence": "version 2 instrument catalogue",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "browser clone/copy/reload workflow",
+      "gaps": "typed local broker profile replaces native numeric identity"
+    },
+    {
+      "id": "DATA-INSTRUMENTS-MASS-EDIT-001",
+      "product": "SQX Data Manager / Instruments",
+      "screen": "Edit instrument / Mass-Edit instrument",
+      "sources": [
+        "internal/plugins/DataManagerInstruments/actions/massEdit/module.js",
+        "internal/plugins/DataManagerInstruments/views/massEditInstrumentPopup.html",
+        "internal/web/app/directives/instrumentDetails/instrumentDetails.html",
+        "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar"
+      ],
+      "trigger": "Mass Edit Instrument",
+      "controls": [
+        "per-field change checkboxes",
+        "specification",
+        "commission",
+        "swap",
+        "Help",
+        "Close",
+        "Save"
+      ],
+      "preconditions": [
+        "one or more selected instruments"
+      ],
+      "validation": [
+        "at least one field for many rows",
+        "all resulting records valid before write"
+      ],
+      "transitions": [
+        "selection error",
+        "edit/mass edit",
+        "validation error",
+        "saved",
+        "cancelled"
+      ],
+      "outcome": "enabled fields atomically replace matching fields",
+      "mockOperation": "useFileSymbols.replaceInstruments",
+      "persistence": "version 2 overrides and custom records",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "mass patch unit test; two-row browser workflow; dark screenshot; reload",
+      "gaps": "frontend mock consumers only"
+    },
+    {
+      "id": "DATA-INSTRUMENTS-DELETE-001",
+      "product": "SQX Data Manager / Instruments",
+      "screen": "Remove instrument(s)",
+      "sources": [
+        "internal/plugins/DataManagerInstruments/controllers/InstrumentsCtrl.js",
+        "internal/plugins/DataManagerActions/delete/module.js",
+        "internal/plugins/DataManagerInstruments/services/InstrumentService.js"
+      ],
+      "trigger": "row \u00d7 or Mass Delete",
+      "controls": [
+        "singular/plural confirmation",
+        "No",
+        "Yes",
+        "inline error"
+      ],
+      "preconditions": [
+        "current or selected rows"
+      ],
+      "validation": [
+        "selection",
+        "dataset dependency",
+        "storage"
+      ],
+      "transitions": [
+        "confirm",
+        "cancel",
+        "blocked",
+        "removed"
+      ],
+      "outcome": "atomic removal without broken dataset references",
+      "mockOperation": "useFileSymbols.removeInstruments",
+      "persistence": "version 2 custom removals and seed tombstones",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "row delete, referenced rejection, reload browser coverage",
+      "gaps": "conservative rejection replaces uncertain native cascade"
+    },
+    {
+      "id": "DATA-INSTRUMENTS-TRANSFER-001",
+      "product": "SQX Data Manager / Instruments",
+      "screen": "Save/Load instruments and Overwrite confirm",
+      "sources": [
+        "internal/plugins/DataManagerActions/save/module.js",
+        "internal/plugins/DataManagerActions/load/module.js",
+        "internal/plugins/DataManagerInstruments/controllers/InstrumentsCtrl.js",
+        "internal/plugins/DataManagerInstruments/services/InstrumentService.js",
+        "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar"
+      ],
+      "trigger": "Save or Load",
+      "controls": [
+        "selected count",
+        "filename",
+        "JSON picker",
+        "Download JSON",
+        "Validate and load",
+        "Cancel/Skip/Overwrite/Overwrite all"
+      ],
+      "preconditions": [
+        "selection for Save",
+        "bounded JSON file for Load"
+      ],
+      "validation": [
+        "versioned Instruments kind",
+        "safe bounded JSON",
+        "complete valid records",
+        "broker mapping",
+        "staged duplicate decisions"
+      ],
+      "transitions": [
+        "error",
+        "download",
+        "staged parse",
+        "conflict decisions",
+        "atomic import",
+        "cancelled"
+      ],
+      "outcome": "meaningful browser JSON export or shared catalogue import",
+      "mockOperation": "serializeInstrumentsJson/parseInstrumentsJson/useFileSymbols.importInstruments",
+      "persistence": "version 3 canonical records and overrides; file transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "JSON unit tests; browser download/overwrite/reload; light screenshot",
+      "gaps": "browser files replace native paths; no broker creation"
+    },
+    {
+      "id": "FILE-IMPORT-001",
+      "product": "SQX Data Manager / DataSourceFiles",
+      "screen": "Single-file import, format CRUD and Mass import",
+      "sources": [
+        "internal/plugins/DataSourceFiles/import",
+        "internal/plugins/DataSourceFiles/massImport",
+        "internal/plugins/DataSourceFiles/DataSourceFilesService.js",
+        "internal/web/SQMANAGER/timezones.csv"
+      ],
+      "trigger": "File import > Import one data file / Import multiple files from a folder",
+      "controls": [
+        "file/folder",
+        "timezone/timeframe",
+        "format CRUD",
+        "skip/separator/date",
+        "mapping preview",
+        "error policy",
+        "conflict policy",
+        "postfix/bar type",
+        "stockgroup",
+        "instrument editor/help",
+        "shared job actions"
+      ],
+      "preconditions": [
+        "eligible File record for single import",
+        "valid instrument for mass",
+        "no active provider operation"
+      ],
+      "validation": [
+        "bounded UTF-8 text",
+        "date/price/mapping rules",
+        "duplicates and provider ownership",
+        "storage success"
+      ],
+      "transitions": [
+        "preview",
+        "configure",
+        "queue",
+        "pause/resume",
+        "cancel/fail/complete",
+        "reload paused"
+      ],
+      "outcome": "atomic mock file summaries and optional stock groups",
+      "mockOperation": "parseImport / useFileImports.start,advance,action,saveFormat,deleteFormat",
+      "persistence": "sqx-file-import-v1 normalized summaries/formats/jobs/groups; raw files transient",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "fileImport.test.ts and data-manager-file-import.spec.ts; source-ribbon/provider/Add symbol regressions; detailed register file-import-coverage.md",
+      "gaps": "native recognition presets and merge semantics unavailable; timestamps-only mock with opaque seed history; native migration explicitly excluded; Python CI active logging lock"
+    },
+    {
+      "id": "FILE-SYMBOL-001",
+      "product": "SQX Data Manager",
+      "screen": "File import / Add symbol and nested instrument settings",
+      "sources": [
+        "internal/plugins/DataSourceFiles/add",
+        "internal/web/app/directives/instrumentChooser",
+        "internal/web/app/directives/instrumentDetails",
+        "internal/web/app/directives/swapSettings",
+        "internal/extend/Snippets/SQ/Trading/Commissions"
+      ],
+      "trigger": "File import > Add symbol",
+      "controls": [
+        "name",
+        "timestamp convention",
+        "broker filter",
+        "instrument",
+        "add instrument",
+        "commissions",
+        "swap",
+        "help",
+        "close",
+        "save"
+      ],
+      "preconditions": [
+        "valid instrument for symbol save"
+      ],
+      "validation": [
+        "source name pattern",
+        "duplicates across providers",
+        "finite parameter bounds",
+        "storage"
+      ],
+      "transitions": [
+        "configure",
+        "nested add",
+        "save",
+        "cancel",
+        "reload"
+      ],
+      "outcome": "persisted empty file dataset and independently saved custom instruments",
+      "mockOperation": "useFileSymbols.addSymbol/addInstrument",
+      "persistence": "sqx-file-symbols-v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "fileSymbols.test.ts and data-manager-file-symbol.spec.ts; detailed register file-symbol-coverage.md",
+      "gaps": "seed metadata and runtime constants are mock; no real price import; parent swap draft not persisted"
+    },
+    {
+      "id": "TD-IMPORT-001",
+      "product": "SQX / Data Manager",
+      "screen": "Import data from TickDownloader",
+      "sources": [
+        "internal/plugins/DataSourceTD/import/module.js",
+        "internal/plugins/DataSourceTD/import/importPopup.html",
+        "internal/plugins/DataSourceTD/import/DataSourceTDImportCtrl.js",
+        "internal/plugins/DataSourceTD/DataSourceTDService.js",
+        "internal/plugins/DataSourceTD/styles.css"
+      ],
+      "trigger": "TickDownloader import > Import TickDownloader data",
+      "controls": [
+        "installation field",
+        "Select",
+        "symbol checkboxes",
+        "select all",
+        "postfix",
+        "Close",
+        "Start import"
+      ],
+      "preconditions": [
+        "session folder selection",
+        "file-backed symbol directories"
+      ],
+      "validation": [
+        "bounded metadata",
+        "required selection",
+        "postfix",
+        "duplicate names",
+        "storage",
+        "active job conflict"
+      ],
+      "transitions": [
+        "choose",
+        "discover",
+        "select",
+        "running",
+        "paused",
+        "completed",
+        "cancelled",
+        "failed",
+        "reload paused"
+      ],
+      "outcome": "persisted mock definitions with trailing status and zero actual history records",
+      "mockOperation": "discoverTD / useTickDownloader.start, advance, action",
+      "persistence": "sqx-tickdownloader-v1 metadata only",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "4 unit tests, 2 focused browser scenarios, dark/light screenshot review, source-file preservation; Dukascopy/ribbon regression",
+      "gaps": "native runtime not observed; empty directories unavailable via FileList; no native history decoder; Python CI existing logging-lock blocker"
+    },
+    {
+      "id": "DATA-DUKASCOPY-DOWNLOAD-001",
+      "product": "SQX / Data Manager",
+      "screen": "Download Dukascopy data with CDN disclaimer and trial confirmation",
+      "sources": [
+        "internal/plugins/DataSourceDukascopy/import/module.js",
+        "internal/plugins/DataSourceDukascopy/import/importPopup.html",
+        "internal/plugins/DataSourceDukascopy/import/importPopupCtrl.js",
+        "internal/plugins/DataSourceDukascopy/import/cdnDisclaimerPopup.html",
+        "internal/web/app/directives/dateRange/DateRangeCtrl.js",
+        "internal/web/app/directives/dateRange/dateRange.html"
+      ],
+      "trigger": "Dukascopy data > Download data for existing symbol",
+      "controls": [
+        "From/To",
+        "six range presets",
+        "missing-only/overwrite",
+        "standard/CDN/Hong Kong",
+        "disclaimer",
+        "Close/Start",
+        "trial confirmation",
+        "pause/resume/stop"
+      ],
+      "preconditions": [
+        "eligible selected Dukascopy rows",
+        "no cloned targets",
+        "no conflicting active job"
+      ],
+      "validation": [
+        "date validity and order",
+        "availability bounds",
+        "mode",
+        "storage success"
+      ],
+      "transitions": [
+        "configure",
+        "confirm when trial fast mode",
+        "running",
+        "paused",
+        "cancelled",
+        "completed",
+        "failed",
+        "reload running as paused"
+      ],
+      "outcome": "persisted synthetic intervals and exact-target progress without provider traffic",
+      "mockOperation": "useDukascopyDownloads.start/advance/action",
+      "persistence": "sqx-data-download-v1; existing add-data v1 unaffected",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "4 download unit tests and 4 focused browser cases; add-data/ribbon regression passed; dark/light screenshots inspected; production build passed",
+      "gaps": "native runtime not observed; one sample/day synthetic metadata; Starter represents trial; source filtering bug intentionally not copied; QuantDataManager upsell excluded; Python CI logging lock remains blocked"
+    },
+    {
+      "id": "DATA-DUKASCOPY-ADD-001",
+      "product": "SQX / Data Manager",
+      "screen": "Add Dukascopy data and identify instruments",
+      "sources": [
+        "internal/plugins/DataSourceDukascopy/dukascopy.csv",
+        "internal/plugins/DataSourceDukascopy/add/module.js",
+        "internal/plugins/DataSourceDukascopy/add/addPopup.html",
+        "internal/plugins/DataSourceDukascopy/add/addPopupCtrl.js",
+        "internal/plugins/DataSourceDukascopy/add/selectInstrumentsPopup.html",
+        "internal/plugins/DataSourceDukascopy/add/styles.css",
+        "internal/plugins/DataSourceDukascopy/DukascopyService.js"
+      ],
+      "trigger": "Dukascopy data > Add new Dukascopy symbol",
+      "controls": [
+        "text filter",
+        "category filter",
+        "row/group/header selection",
+        "Tick/M1",
+        "broker profile",
+        "postfix",
+        "consent",
+        "Save",
+        "Close",
+        "conditional broker mappings and mass actions",
+        "Back"
+      ],
+      "preconditions": [
+        "bundled catalogue available",
+        "non-default broker configured for mapping flow"
+      ],
+      "validation": [
+        "selected symbols",
+        "consent",
+        "resolved or skipped mappings",
+        "at least one non-skipped symbol",
+        "unique dataset names",
+        "successful local storage write"
+      ],
+      "transitions": [
+        "open",
+        "filter resets selection",
+        "select",
+        "validate",
+        "map if non-default broker",
+        "save or error",
+        "close",
+        "reload persisted definitions"
+      ],
+      "outcome": "selected mock definitions added with zero downloaded records",
+      "mockOperation": "useDataManagerStore.addData",
+      "persistence": "sqx-data-manager-v1, version 1; draft options retained while DataManager remains mounted; consent and selections reset on open",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": {
+        "visual": "HaruQuantAI dark/light screenshots inspected; SQX structure retained; app font inheritance verified",
+        "interaction": "5 focused popup Playwright tests plus existing ribbon regression passed",
+        "state": "save/reload, duplicate rejection, mapping, storage failure tests passed; 3 catalogue unit tests passed"
+      },
+      "gaps": "Native runtime not observed. Duplicate rejection is conservative mock policy; native duplicate handling not asserted. No configured broker profiles in default mock state. Python qualification blocked by existing logging lock; no backend changes."
+    },
+    {
+      "id": "SHELL-001",
+      "product": "Platform",
+      "screen": "Application shell",
+      "sources": [
+        "internal/web/app/layout/views/header.html"
+      ],
+      "trigger": "launch",
+      "controls": [
+        "application navigation",
+        "theme",
+        "notifications",
+        "configuration"
+      ],
+      "preconditions": [],
+      "validation": [
+        "settings ranges"
+      ],
+      "transitions": [
+        "module changes",
+        "modal open/close"
+      ],
+      "outcome": "active module and settings persist",
+      "mockOperation": "workspace.updateSettings",
+      "persistence": "localStorage v1",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "build + browser smoke",
+      "gaps": "native window chrome not compared"
+    },
+    {
+      "id": "BUILD-001",
+      "product": "Builder",
+      "screen": "Progress",
+      "sources": [
+        "internal/web/BUILDER/layout/views/layout.html",
+        "internal/web/app/layout/views/startBuildPopup.html"
+      ],
+      "trigger": "Builder > Progress",
+      "controls": [
+        "start",
+        "pause",
+        "resume",
+        "stop",
+        "reset"
+      ],
+      "preconditions": [
+        "valid settings"
+      ],
+      "validation": [],
+      "transitions": [
+        "idle",
+        "running",
+        "paused",
+        "cancelled",
+        "completed"
+      ],
+      "outcome": "retained deterministic progress/results",
+      "mockOperation": "ResearchService.start",
+      "persistence": "job record",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "manual smoke",
+      "gaps": "no native engine"
+    },
+    {
+      "id": "BUILD-002",
+      "product": "Builder",
+      "screen": "Full settings",
+      "sources": [
+        "internal/plugins/SettingsWhatToBuild",
+        "internal/plugins/SettingsGeneticOptions",
+        "internal/plugins/SettingsBlocks",
+        "internal/plugins/SettingsCrossChecks"
+      ],
+      "trigger": "Builder Full settings tab",
+      "controls": [
+        "mode",
+        "improve-existing mode",
+        "architecture",
+        "data",
+        "genetic options",
+        "SL/PT",
+        "blocks",
+        "cross-checks"
+      ],
+      "preconditions": [],
+      "validation": [
+        "numeric min/max",
+        "date fields"
+      ],
+      "transitions": [
+        "settings patch"
+      ],
+      "outcome": "mock run configuration changes, including seed-from-input behavior when improve-existing mode is selected",
+      "mockOperation": "workspace.updateBuilder",
+      "persistence": "builder settings",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "typecheck",
+      "gaps": "not every installed plugin property"
+    },
+    {
+      "id": "OPT-001",
+      "product": "Optimizer",
+      "screen": "Optimization setup",
+      "sources": [
+        "internal/plugins/SettingsOptimization"
+      ],
+      "trigger": "Optimizer > Full settings",
+      "controls": [
+        "mode",
+        "parameter",
+        "min",
+        "max",
+        "step",
+        "objective",
+        "storage"
+      ],
+      "preconditions": [
+        "selected strategy"
+      ],
+      "validation": [
+        "step > 0",
+        "max >= min"
+      ],
+      "transitions": [
+        "mode changes visible schedule"
+      ],
+      "outcome": "combination count and applicable controls update",
+      "mockOperation": "optimization.configure",
+      "persistence": "optimization settings",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "manual smoke",
+      "gaps": "advanced parameter categories summarized"
+    },
+    {
+      "id": "BANK-001",
+      "product": "Databanks",
+      "screen": "Shared strategy grid",
+      "sources": [
+        "internal/plugins/ProjectDatabanks/views/databanks.html",
+        "internal/plugins/ResultsDatabankActions"
+      ],
+      "trigger": "research module",
+      "controls": [
+        "bank tabs",
+        "sort",
+        "filter",
+        "select",
+        "copy",
+        "move",
+        "rename",
+        "notes",
+        "delete",
+        "export"
+      ],
+      "preconditions": [],
+      "validation": [
+        "required name",
+        "target differs from source"
+      ],
+      "transitions": [
+        "membership changes",
+        "selection changes"
+      ],
+      "outcome": "correct IDs affected under virtualization",
+      "mockOperation": "databank.moveStrategies",
+      "persistence": "strategies + memberships",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "manual smoke",
+      "gaps": "column drag/resize not persisted"
+    },
+    {
+      "id": "RESULT-001",
+      "product": "Results",
+      "screen": "Linked result workspace",
+      "sources": [
+        "internal/plugins/ResultsOverview",
+        "internal/plugins/ResultsTradeList",
+        "internal/plugins/ResultsEquityChart",
+        "internal/plugins/ResultsSourceCode"
+      ],
+      "trigger": "Results tab",
+      "controls": [
+        "result view",
+        "sample",
+        "direction"
+      ],
+      "preconditions": [
+        "selected strategy"
+      ],
+      "validation": [],
+      "transitions": [
+        "view and selected identity"
+      ],
+      "outcome": "all views use same strategy/trades/equity",
+      "mockOperation": "analytics.project",
+      "persistence": "selected strategy/view",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "chart + table smoke",
+      "gaps": "specialized renderers projected generically"
+    },
+    {
+      "id": "DATA-001",
+      "product": "Data Manager",
+      "screen": "Data sources",
+      "sources": [
+        "internal/web/SQMANAGER/layout/views/layout.html",
+        "internal/plugins/DataSourceDukascopy",
+        "internal/plugins/DataSourceTD",
+        "internal/plugins/DataSourceFiles",
+        "internal/plugins/DataSourceSQEquityData",
+        "internal/plugins/DataSourceSQFuturesData",
+        "internal/plugins/DataSourceDarwinex",
+        "internal/plugins/DataSourceCrypto",
+        "internal/plugins/DataSourceYahoo",
+        "internal/plugins/DataSourceMt5Api"
+      ],
+      "trigger": "Data Manager > Data sources",
+      "controls": [
+        "Dukascopy add/download/information menu",
+        "TickDownloader import menu",
+        "file add/single import/mass import/application import menu",
+        "SQ Equity find/add and direct update",
+        "SQ Futures find/add and direct update",
+        "Darwinex add/folder import/download menu",
+        "Crypto six-exchange add submenu and download",
+        "Yahoo add/download menu",
+        "MetaTrader 5 import menu",
+        "update all",
+        "update selected",
+        "mass delete",
+        "save definitions",
+        "load definitions"
+      ],
+      "preconditions": [
+        "dataset selection for selection-scoped actions",
+        "usage-condition acceptance for SQ Equity and SQ Futures additions"
+      ],
+      "validation": [
+        "supported browser files",
+        "required selection",
+        "dependency warning before simulated deletion",
+        "definition-file validation notice"
+      ],
+      "transitions": [
+        "menu closed to open",
+        "dialog open to cancel or simulated completion",
+        "idle to running to paused/resumed to completed or cancelled"
+      ],
+      "outcome": "every provider and contextual operation is explicit, keyboard reachable, focus-restoring, and visibly mock-only",
+      "mockOperation": "data.sourceRibbon.simulate",
+      "persistence": "configuration only",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "Vitest inventory test + Playwright provider-menu interaction test + typecheck + production build",
+      "gaps": "no live provider, native folder picker, credential transmission, native data mutation, or pixel-parity claim"
+    },
+    {
+      "id": "AW-001",
+      "product": "AlgoWizard",
+      "screen": "Rule editor",
+      "sources": [
+        "internal/web/AlgoWizard",
+        "internal/web/app/directives/blockConfig"
+      ],
+      "trigger": "AlgoWizard",
+      "controls": [
+        "open",
+        "save",
+        "undo",
+        "redo",
+        "add",
+        "remove",
+        "reorder",
+        "generate",
+        "export"
+      ],
+      "preconditions": [],
+      "validation": [
+        "block configuration"
+      ],
+      "transitions": [
+        "rule tree edits"
+      ],
+      "outcome": "strategy definition revision updates",
+      "mockOperation": "strategy.saveRevision",
+      "persistence": "rules",
+      "status": {
+        "visual": "implemented",
+        "interaction": "partial",
+        "state": "implemented"
+      },
+      "verification": "manual smoke",
+      "gaps": "undo/redo buttons are identifiable but history stack pending"
+    },
+    {
+      "id": "PORT-001",
+      "product": "Portfolio Master/Composer",
+      "screen": "Portfolio setup and results",
+      "sources": [
+        "internal/web/PORTFOLIOMASTER/layout/views/layout.html",
+        "internal/web/PORTFOLIOCOMPOSER/layout/views/layout.html",
+        "internal/plugins/PortfolioComposer"
+      ],
+      "trigger": "portfolio modules",
+      "controls": [
+        "members",
+        "weights",
+        "capital",
+        "leverage",
+        "constraints",
+        "simulate"
+      ],
+      "preconditions": [
+        "candidate strategies"
+      ],
+      "validation": [
+        "allocation total"
+      ],
+      "transitions": [
+        "setup to results"
+      ],
+      "outcome": "member-linked shared-capital equity",
+      "mockOperation": "portfolio.simulate",
+      "persistence": "portfolio members",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "manual smoke",
+      "gaps": "full search algorithm not implemented"
+    },
+    {
+      "id": "WF-001",
+      "product": "Custom Projects",
+      "screen": "Task manager",
+      "sources": [
+        "internal/web/TASKMANAGER/layout/views/layout.html",
+        "internal/plugins/Task*",
+        "user/projects/*/project.cfx"
+      ],
+      "trigger": "Custom Projects",
+      "controls": [
+        "project",
+        "add task",
+        "clone",
+        "enable",
+        "settings",
+        "run",
+        "stop"
+      ],
+      "preconditions": [],
+      "validation": [
+        "task output names"
+      ],
+      "transitions": [
+        "idle",
+        "running",
+        "completed"
+      ],
+      "outcome": "enabled tasks execute in sequence",
+      "mockOperation": "workflow.run",
+      "persistence": "workflow tasks",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "manual smoke",
+      "gaps": "conditional jump evaluation simplified"
+    },
+    {
+      "id": "EXT-001",
+      "product": "Extensions",
+      "screen": "Code Editor / Business / Prop result plugins",
+      "sources": [
+        "internal/web/SQEDITOR",
+        "internal/web/SQXBUSINESS",
+        "user/extend/ResultsPlugins"
+      ],
+      "trigger": "extension navigation/results",
+      "controls": [
+        "file tree",
+        "save",
+        "compile",
+        "team/compute settings"
+      ],
+      "preconditions": [],
+      "validation": [],
+      "transitions": [
+        "file selection",
+        "mock compile"
+      ],
+      "outcome": "extension surfaces identifiable and safe",
+      "mockOperation": "extension.validate",
+      "persistence": "limited",
+      "status": {
+        "visual": "implemented",
+        "interaction": "partial",
+        "state": "partial"
+      },
+      "verification": "manual smoke",
+      "gaps": "native compilation and remote APIs intentionally excluded"
+    },
+    {
+      "id": "SHELL-SETTINGS-001",
+      "product": "HaruQuantAI / Application shell",
+      "screen": "Global Settings menu and dialogs",
+      "sources": [
+        "internal/web/app/layout/views/header.html",
+        "internal/web/app/directives/appsZoom/AppsZoomService.js",
+        "internal/web/app/layout/views/performanceDialog.html",
+        "internal/web/app/directives/benchmarkDialog/benchmarkDialog.html",
+        "internal/web/app/layout/views/remoteAccessDialog.html",
+        "internal/web/app/layout/views/mcpDialog.html",
+        "internal/web/app/layout/views/smtpDialog.html"
+      ],
+      "trigger": "Top-right Settings gear",
+      "controls": [
+        "Configuration",
+        "Benchmark",
+        "Remote access",
+        "MCP Server",
+        "SMTP server",
+        "Language",
+        "Skin",
+        "Zoom",
+        "Fullscreen",
+        "Website",
+        "Help center",
+        "Support",
+        "Update license",
+        "About",
+        "Reload UI",
+        "Exit"
+      ],
+      "preconditions": [],
+      "validation": [
+        "bounded CPU cores and memory",
+        "30-character title text",
+        "valid SMTP addresses",
+        "license key required"
+      ],
+      "transitions": [
+        "menu open and closed",
+        "configuration draft to persisted",
+        "benchmark beforeStart to running to showResults",
+        "nested language and skin selection",
+        "exit confirmation"
+      ],
+      "outcome": "Reference-ordered settings commands update safe persisted preferences or complete clearly labeled browser simulations",
+      "mockOperation": "shell.settings.configure",
+      "persistence": "versioned application settings without passwords or license keys",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "Vitest contracts and focused Playwright E2E",
+      "gaps": "native window exit, backend benchmark, remote server, MCP server, SMTP delivery, and license service are intentionally simulated"
+    },
+    {
+      "id": "SHELL-BRANDING-001",
+      "product": "HaruQuantAI / Application shell",
+      "screen": "Global shell, navigation, dialogs, data tables, and persisted display labels",
+      "sources": [
+        "app/ui/src/app/branding.ts",
+        "app/ui/src/app/App.tsx",
+        "app/ui/src/app/GlobalSettingsMenu.tsx",
+        "app/ui/src/domains/data"
+      ],
+      "trigger": "Application load, module navigation, dialog actions, and reload of compatible legacy browser data",
+      "controls": [
+        "browser title",
+        "single-line HaruQuantAI brand header",
+        "navigation",
+        "settings and About",
+        "provider ribbons and dialogs",
+        "local notices for unavailable commercial actions"
+      ],
+      "preconditions": [],
+      "validation": [
+        "rendered text contains no legacy product label",
+        "legacy display values normalize before store validation",
+        "compatibility storage keys remain unchanged",
+        "header brand contains only HaruQuantAI and omits the former Research platform subtitle",
+        "icon-only navigation toggle shares the topbar row and the sidebar renders no Applications heading"
+      ],
+      "transitions": [
+        "legacy label to HaruQuantAI label",
+        "SQ-prefixed provider label to concise provider label",
+        "legacy commercial link to truthful local notice"
+      ],
+      "outcome": "All user-facing product identity is HaruQuantAI while audited reference evidence and compatibility identifiers remain intact",
+      "mockOperation": "shell.branding.normalize",
+      "persistence": "normalizes compatible saved display strings without renaming existing storage namespaces",
+      "status": {
+        "visual": "implemented",
+        "interaction": "implemented",
+        "state": "implemented"
+      },
+      "verification": "Vitest branding and store migration contracts plus Playwright branding and collapsed-navigation traversal",
+      "gaps": "No verified HaruQuantAI website, help, support, subscription, upgrade, or documentation destination exists; those actions remain local mock notices"
+    }
   ]
 }

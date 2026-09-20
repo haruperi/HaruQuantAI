@@ -1,4 +1,4 @@
-"""Static AST Architectural Rule Checker for HaruQuantAI.
+"""Static architectural rule checker for HaruQuantAI.
 
 Enforces universal modular monolith invariants across app/:
 - ARCH-001-INIT-PURITY: __init__.py files must be docstring-only or empty.
@@ -9,12 +9,14 @@ Enforces universal modular monolith invariants across app/:
 - ARCH-006-FEATURE-INDEPENDENCE: Service features must not import other features.
 - ARCH-007-BOOTSTRAP-ISOLATION: Features and kernel must not import app.main/registry.
 - ARCH-008-NO-COMPOSITION: app/composition is obsolete and prohibited.
+- ARCH-009-JSON-ONLY: HaruQuantAI-owned interchange must use JSON, not XML.
 """
 
 from __future__ import annotations
 
 import argparse
 import ast
+import re
 import sys
 from collections.abc import Sequence
 from dataclasses import dataclass
@@ -23,6 +25,23 @@ from typing import override
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 APP_ROOT = REPO_ROOT / "app"
+UI_SOURCE_ROOT = APP_ROOT / "ui" / "src"
+
+FRONTEND_SOURCE_SUFFIXES = frozenset({".js", ".jsx", ".ts", ".tsx"})
+FORBIDDEN_XML_MODULES = frozenset({"defusedxml", "lxml", "xml", "xmltodict"})
+XML_LITERAL_PATTERN = re.compile(
+    r"(?:application|text)/xml|[\"'`][^\"'`\r\n]*\.xml(?:[?#][^\"'`\r\n]*)?[\"'`]",
+    re.IGNORECASE,
+)
+XML_VALUE_PATTERN = re.compile(
+    r"(?:application|text)/xml|\.xml(?:[?#].*)?$",
+    re.IGNORECASE,
+)
+FRONTEND_XML_IMPLEMENTATION_PATTERN = re.compile(
+    r"\b(?:DOMParser|XMLSerializer)\b|"
+    r"(?:fast-xml-parser|xml2js|@xmldom/xmldom)",
+    re.IGNORECASE,
+)
 
 DOMAIN_OFFSET = 1
 FEATURE_OFFSET = 2
@@ -161,8 +180,27 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             self._check_import_target(node.module, node.lineno)
         self.generic_visit(node)
 
+    @override
+    def visit_Constant(self, node: ast.Constant) -> None:
+        """Reject XML interchange literals in Python application source."""
+        if isinstance(node.value, str) and XML_VALUE_PATTERN.search(node.value):
+            self.violations.append(
+                ArchitecturalViolation(
+                    file_path=self.file_path,
+                    line_number=node.lineno,
+                    rule="ARCH-009-JSON-ONLY",
+                    message=(
+                        "XML interchange literals are prohibited. Use a versioned JSON "
+                        "filename and 'application/json' media type."
+                    ),
+                )
+            )
+        self.generic_visit(node)
+
     def _check_import_target(self, target_module: str, lineno: int) -> None:
         """Validate imported target against layer boundary rules."""
+        self._check_xml_import(target_module, lineno)
+
         # Rule 8: Obsolete composition
         if target_module == "app.composition" or target_module.startswith(
             "app.composition."
@@ -284,6 +322,21 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                             )
                         )
 
+    def _check_xml_import(self, target_module: str, lineno: int) -> None:
+        """Reject Python XML parser packages under ARCH-009."""
+        if target_module.split(".", maxsplit=1)[0] in FORBIDDEN_XML_MODULES:
+            self.violations.append(
+                ArchitecturalViolation(
+                    file_path=self.file_path,
+                    line_number=lineno,
+                    rule="ARCH-009-JSON-ONLY",
+                    message=(
+                        f"XML parser module '{target_module}' is prohibited. "
+                        "Use versioned JSON serialization."
+                    ),
+                )
+            )
+
 
 def check_file(py_file: Path) -> list[ArchitecturalViolation]:
     """Scan one Python file for architectural violations."""
@@ -320,11 +373,45 @@ def check_file(py_file: Path) -> list[ArchitecturalViolation]:
     return violations
 
 
+def check_frontend_file(source_file: Path) -> list[ArchitecturalViolation]:
+    """Scan one frontend source file for prohibited XML implementation details."""
+    violations: list[ArchitecturalViolation] = []
+    content = source_file.read_text(encoding="utf-8")
+    for line_number, line in enumerate(content.splitlines(), start=1):
+        if XML_LITERAL_PATTERN.search(
+            line
+        ) or FRONTEND_XML_IMPLEMENTATION_PATTERN.search(line):
+            violations.append(
+                ArchitecturalViolation(
+                    file_path=source_file,
+                    line_number=line_number,
+                    rule="ARCH-009-JSON-ONLY",
+                    message=(
+                        "XML parsing or interchange is prohibited in active frontend "
+                        "source. Use a versioned JSON contract."
+                    ),
+                )
+            )
+    return violations
+
+
+def _is_frontend_source(source_file: Path) -> bool:
+    """Return whether a file is active frontend source covered by ARCH-009."""
+    return (
+        source_file.suffix.lower() in FRONTEND_SOURCE_SUFFIXES
+        and source_file.resolve().is_relative_to(UI_SOURCE_ROOT.resolve())
+    )
+
+
 def check_directory(directory: Path) -> list[ArchitecturalViolation]:
-    """Scan all python files in directory for architectural violations."""
+    """Scan supported active source files in a directory."""
     violations: list[ArchitecturalViolation] = []
     for py_file in directory.rglob("*.py"):
         violations.extend(check_file(py_file))
+    for suffix in FRONTEND_SOURCE_SUFFIXES:
+        for source_file in directory.rglob(f"*{suffix}"):
+            if _is_frontend_source(source_file):
+                violations.extend(check_frontend_file(source_file))
     return violations
 
 
@@ -345,8 +432,12 @@ def check_paths(paths: Sequence[str]) -> list[ArchitecturalViolation]:
             violations.extend(check_directory(resolved))
         elif resolved.suffix == ".py":
             violations.extend(check_file(resolved))
+        elif _is_frontend_source(resolved):
+            violations.extend(check_frontend_file(resolved))
         else:
-            message = f"Architecture target is not Python source: {value}"
+            message = (
+                f"Architecture target is not supported application source: {value}"
+            )
             raise ValueError(message)
     return violations
 

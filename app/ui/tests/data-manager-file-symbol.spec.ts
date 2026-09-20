@@ -1,0 +1,110 @@
+import { expect, test, type Page } from '@playwright/test';
+import { selectLightSkin } from './shellTestUtils';
+async function open(page: Page) {
+  await page.getByRole('button', { name: 'File import', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Add symbol', exact: true }).click();
+  return page.getByRole('dialog', { name: 'Add symbol', exact: true });
+}
+async function launch(page: Page) { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).click(); }
+test('file symbol validation, both bar conventions, cancellation and persistence', async ({ page }) => {
+  await launch(page);
+  let dialog = await open(page);
+  await expect(dialog.getByLabel('Instrument name', { exact: true })).toBeDisabled();
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(dialog.getByRole('alert')).toContainText('required');
+  await dialog.getByLabel('Data symbol name', { exact: true }).pressSequentially('EURUSD');
+  await expect(dialog.getByLabel('Data symbol name', { exact: true })).toHaveValue('EURUSD');
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(dialog.getByRole('alert')).toContainText('already exists');
+  await dialog.getByLabel('Data symbol name', { exact: true }).fill('CUSTOM_FILE');
+  await page.screenshot({ path: 'test-results/file-symbol-dark-top.png' });
+  await dialog.getByRole('button', { name: 'Help', exact: true }).click();
+  await expect(page.getByRole('dialog', { name: 'Commission & Swap Explanation' })).toContainText('Positive swap');
+  await page.keyboard.press('Escape');
+  await expect(dialog.getByRole('button', { name: 'Help', exact: true })).toBeFocused();
+  await page.screenshot({ path: 'test-results/file-symbol-dark.png' });
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('row').filter({ hasText: 'CUSTOM_FILE' })).toContainText('Start of bar');
+  await page.reload();
+  await expect(page.getByRole('row').filter({ hasText: 'CUSTOM_FILE' })).toContainText('Start of bar');
+  dialog = await open(page);
+  await dialog.getByLabel('Data symbol name', { exact: true }).fill('END_FILE');
+  await dialog.getByRole('radio', { name: /Timestamp is end/ }).check();
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(page.getByRole('row').filter({ hasText: 'END_FILE' })).toContainText('End of bar');
+  dialog = await open(page);
+  await dialog.getByLabel('Data symbol name', { exact: true }).fill('CANCELLED');
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('checkbox', { name: 'Select CANCELLED', exact: true })).toHaveCount(0);
+});
+test('nested instrument, broker filtering, commissions, swaps and reload', async ({ page }) => {
+  await launch(page);
+  await page.evaluate(() => localStorage.setItem('sqx-data-manager-v1', JSON.stringify({ version: 1, definitions: [], brokers: [{ id: 'demo', name: 'Demo broker', postfix: '_demo', timezone: 'UTC', mtUse: true, instruments: [] }] })));
+  await page.reload();
+  const parent = await open(page);
+  await parent.getByLabel('Data symbol name', { exact: true }).fill('WITH_INSTRUMENT');
+  await parent.getByLabel('Broker profile filter').selectOption('demo');
+  await expect(parent.getByLabel('Instrument', { exact: true })).toContainText('No instruments');
+  await parent.getByRole('button', { name: /Add new instrument/ }).click();
+  const nested = page.getByRole('dialog', { name: 'Add instrument', exact: true });
+  await nested.getByLabel('Instrument name', { exact: true }).pressSequentially('CUSTOM');
+  await nested.getByLabel('Broker profile', { exact: true }).selectOption('demo');
+  for (const model of ['Per trade','Size based','Percentage based','Stockpicker','None','Stockpicker']) {
+    await nested.getByLabel('Commission model', { exact: true }).selectOption(model);
+    await expect(nested.getByLabel('Commission', { exact: true })).toHaveCount(model === 'None' ? 0 : 1);
+  }
+  await nested.getByLabel('Commission', { exact: true }).fill('0.5');
+  await nested.getByRole('checkbox', { name: 'Use', exact: true }).check();
+  await nested.getByLabel('Long', { exact: true }).fill('-2');
+  await nested.getByLabel('Short', { exact: true }).fill('1');
+  await page.screenshot({ path: 'test-results/file-instrument-settings.png' });
+  await nested.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(parent.getByLabel('Instrument', { exact: true })).toHaveValue('CUSTOM_demo');
+  await expect(parent.getByLabel('Data symbol name', { exact: true })).toHaveValue('WITH_INSTRUMENT');
+  await parent.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.reload();
+  await expect(page.getByRole('row').filter({ hasText: 'WITH_INSTRUMENT' })).toContainText('CUSTOM_demo');
+  await page.getByRole('button', { name: 'Instruments', exact: true }).click();
+  await expect(page.getByRole('table', { name: 'Instruments', exact: true }).getByRole('row').filter({ hasText: 'CUSTOM_demo' })).toContainText('Stockpicker');
+  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-file-symbols-v1')!));
+  expect(saved.instruments[0].swap.long).toBe(-2);
+  expect(saved.instruments[0].commission.model).toBe('Stockpicker');
+});
+test('light narrow layout, nested cancellation and storage failure preserve draft', async ({ page }) => {
+  await launch(page);
+  await selectLightSkin(page);
+  await page.setViewportSize({ width: 600, height: 700 });
+  const dialog = await open(page);
+  await dialog.getByLabel('Data symbol name', { exact: true }).fill('RETRY_FILE');
+  await dialog.getByRole('button', { name: /Add new instrument/ }).click();
+  await page.keyboard.press('Escape');
+  await expect(dialog.getByLabel('Data symbol name', { exact: true })).toHaveValue('RETRY_FILE');
+  await expect(dialog.getByRole('button', { name: 'Save', exact: true })).toBeInViewport();
+  await page.screenshot({ path: 'test-results/file-symbol-light.png' });
+  await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('quota'); }; });
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(dialog.getByRole('alert')).toContainText('No changes were applied');
+  await expect(dialog.getByLabel('Data symbol name', { exact: true })).toHaveValue('RETRY_FILE');
+});
+
+test('saved nested instrument survives parent cancellation and file names block other providers', async ({ page }) => {
+  await launch(page);
+  let dialog = await open(page);
+  await dialog.getByRole('button', { name: /Add new instrument/ }).click();
+  const nested = page.getByRole('dialog', { name: 'Add instrument', exact: true });
+  await nested.getByLabel('Instrument name', { exact: true }).fill('INDEPENDENT');
+  await nested.getByRole('button', { name: 'Save', exact: true }).click();
+  await dialog.getByRole('button', { name: 'Close', exact: true }).last().click();
+  await page.reload();
+  dialog = await open(page);
+  await dialog.getByLabel('Instrument', { exact: true }).selectOption('INDEPENDENT');
+  await dialog.getByLabel('Data symbol name', { exact: true }).fill('AUDUSD');
+  await dialog.getByRole('button', { name: 'Save', exact: true }).click();
+  await page.getByRole('button', { name: 'Dukascopy data', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Add new Dukascopy symbol', exact: true }).click();
+  const add = page.getByRole('dialog', { name: 'Add Dukascopy data', exact: true });
+  await add.getByRole('checkbox', { name: 'Select symbol AUDUSD', exact: true }).check();
+  await add.getByRole('switch', { name: /I confirm/ }).check();
+  await add.getByRole('button', { name: 'Save', exact: true }).click();
+  await expect(add.getByRole('alert')).toContainText('already exists');
+});

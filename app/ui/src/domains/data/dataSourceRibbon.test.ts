@@ -22,7 +22,7 @@ describe('Data sources control inventory', () => {
       provider.commands.flatMap(command => command.children ?? [command]),
     );
 
-    expect(leaves).toHaveLength(25);
+    expect(leaves).toHaveLength(24);
     for (const command of leaves) {
       expect(Boolean(command.dialog) !== Boolean(command.action)).toBe(true);
     }
@@ -32,6 +32,7 @@ describe('Data sources control inventory', () => {
     const crypto = dataSourceProviders.find(provider => provider.id === 'crypto');
     const addCommand = crypto?.commands.find(command => command.id === 'crypto-add');
 
+    expect(crypto?.label).toBe('Crypto');
     expect(addCommand?.children?.map(command => command.label)).toEqual([
       'Binance spot',
       'Binance Coin-M',
@@ -40,6 +41,19 @@ describe('Data sources control inventory', () => {
       'Poloniex',
       'Coinbase Pro',
     ]);
+    expect(addCommand?.children?.map(command => command.exchange)).toEqual([
+      'Binance', 'BinanceCoinM', 'BinanceUsdtM', 'Bitfinex', 'Poloniex', 'Coinbase',
+    ]);
+  });
+
+  it('uses the concise Yahoo provider label', () => {
+    expect(dataSourceProviders.find(provider => provider.id === 'yahoo')?.label).toBe('Yahoo');
+  });
+
+  it('uses the active HaruQuantAI MT5 provider and command labels', () => {
+    const mt5 = dataSourceProviders.find(provider => provider.id === 'mt5');
+    expect(mt5?.label).toBe('MT5 import');
+    expect(mt5?.commands).toMatchObject([{ label: 'Import data', dialog: 'mt5-import' }]);
   });
 
   it('assigns relevant, varied icons to dropdown commands', () => {
@@ -47,7 +61,7 @@ describe('Data sources control inventory', () => {
     const crypto = dataSourceProviders.find(provider => provider.id === 'crypto');
     const cryptoAdd = crypto?.commands.find(command => command.id === 'crypto-add');
 
-    expect(new Set(fileImport?.commands.map(command => command.icon)).size).toBe(4);
+    expect(new Set(fileImport?.commands.map(command => command.icon)).size).toBe(3);
     expect(new Set(cryptoAdd?.children?.map(command => command.icon)).size).toBe(6);
     for (const provider of dataSourceProviders) {
       for (const command of provider.commands) {

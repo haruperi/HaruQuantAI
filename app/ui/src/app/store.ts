@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AppSettings, BuilderSettings, Databank, Job, ModuleId, OptimizationSettings, PortfolioMember, ProjectTab, RuleNode, Strategy, WorkflowTask } from './types';
 import { databanks, portfolioMembers, rules, strategies, workflowTasks } from '../mocks/fixtures';
+import { createInitialAppSettings, mergeAppSettings } from './globalSettings';
 
 interface AppState {
   module: ModuleId; tab: ProjectTab; selectedStrategyId: string; resultView: string; selectedBankId: string; selectedRows: string[];
@@ -15,14 +16,14 @@ interface AppState {
   updatePortfolio: (id: string, patch: Partial<PortfolioMember>) => void; setWorkflow: (tasks: WorkflowTask[]) => void; notify: (message: string) => void; reset: () => void;
 }
 
-const initialSettings: AppSettings = { theme: 'dark', language: 'English', autosave: true, workers: 8, memoryGb: 10, profile: 'Full' };
+const initialSettings: AppSettings = createInitialAppSettings();
 const initialBuilder: BuilderSettings = { mode: 'Genetic evolution', strategyType: 'Standard', symbol: 'EURUSD', timeframe: 'H1', direction: 'Both', population: 100, islands: 4, mutation: 35, crossover: 85, maxConditions: 5, stopLoss: true, profitTarget: true, slMin: 40, slMax: 180, ptMin: 80, ptMax: 360, precision: 'Selected timeframe only', from: '2012-01-01', to: '2026-08-31', oos: 30 };
 const initialOptimization: OptimizationSettings = { mode: 'Simple', parameter: 'FastPeriod', min: 5, max: 50, step: 5, objective: 'Return / Drawdown ratio', keep: 20 };
 
 export const useAppStore = create<AppState>()(persist((set) => ({
   module: 'builder', tab: 'progress', selectedStrategyId: 'str-1', resultView: 'Overview', selectedBankId: 'results', selectedRows: [],
   strategies, databanks, jobs: {}, settings: initialSettings, builder: initialBuilder, optimization: initialOptimization, rules, portfolio: portfolioMembers, workflow: workflowTasks, notifications: [],
-  setModule: module => set({ module, tab: ['datamanager', 'algowizard', 'composer', 'codeeditor', 'business', 'home'].includes(module) ? 'settings' : 'progress' }),
+  setModule: module => set({ module, tab: ['datamanager', 'algowizard', 'composer', 'codeeditor', 'business', 'home', 'debugconsole', 'gridcontrol'].includes(module) ? 'settings' : 'progress' }),
   setTab: tab => set({ tab }), selectStrategy: selectedStrategyId => set({ selectedStrategyId }), setResultView: resultView => set({ resultView }),
   setBank: selectedBankId => set({ selectedBankId, selectedRows: [] }), setRows: selectedRows => set({ selectedRows }),
   updateSettings: patch => set(s => ({ settings: { ...s.settings, ...patch } })), updateBuilder: patch => set(s => ({ builder: { ...s.builder, ...patch } })),
@@ -37,4 +38,12 @@ export const useAppStore = create<AppState>()(persist((set) => ({
   updatePortfolio: (id, patch) => set(s => ({ portfolio: s.portfolio.map(m => m.strategyId === id ? { ...m, ...patch } : m) })), setWorkflow: workflow => set({ workflow }),
   notify: message => set(s => ({ notifications: [message, ...s.notifications].slice(0, 8) })),
   reset: () => set({ module: 'builder', tab: 'progress', selectedStrategyId: 'str-1', resultView: 'Overview', selectedBankId: 'results', selectedRows: [], strategies, databanks, jobs: {}, settings: initialSettings, builder: initialBuilder, optimization: initialOptimization, rules, portfolio: portfolioMembers, workflow: workflowTasks, notifications: [] }),
-}), { name: 'sqx-recreation-v1', version: 1, partialize: s => ({ ...s, notifications: [] }) }));
+}), {
+  name: 'sqx-recreation-v1', version: 1,
+  partialize: s => ({ ...s, notifications: [] }),
+  merge: (persisted, current) => {
+    const saved = persisted as Partial<AppState>;
+    const savedModule = (saved as { module?: unknown }).module;
+    return { ...current, ...saved, module: savedModule === 'improver' ? 'builder' : saved.module ?? current.module, settings: mergeAppSettings(saved.settings) };
+  },
+}));

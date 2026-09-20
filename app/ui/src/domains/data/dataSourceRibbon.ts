@@ -7,7 +7,6 @@ export type DataSourceDialogId =
   | 'file-add'
   | 'file-import'
   | 'file-mass-import'
-  | 'file-application-import'
   | 'sq-equity-find'
   | 'sq-futures-find'
   | 'darwinex-add'
@@ -34,7 +33,6 @@ export type DirectDataSourceAction =
 
 export type DataSourceCommandIcon =
   | 'add'
-  | 'application-import'
   | 'binance'
   | 'bitfinex'
   | 'coinbase'
@@ -77,12 +75,12 @@ export interface DataSourceContextAction {
 }
 
 const cryptoExchanges = [
-  ['binance', 'Binance spot', 'binance'],
-  ['binance-coin-m', 'Binance Coin-M', 'coin-m'],
-  ['binance-usdt-m', 'Binance USDT-M', 'usdt-m'],
-  ['bitfinex', 'Bitfinex', 'bitfinex'],
-  ['poloniex', 'Poloniex', 'poloniex'],
-  ['coinbase-pro', 'Coinbase Pro', 'coinbase'],
+  ['binance', 'Binance spot', 'binance', 'Binance'],
+  ['binance-coin-m', 'Binance Coin-M', 'coin-m', 'BinanceCoinM'],
+  ['binance-usdt-m', 'Binance USDT-M', 'usdt-m', 'BinanceUsdtM'],
+  ['bitfinex', 'Bitfinex', 'bitfinex', 'Bitfinex'],
+  ['poloniex', 'Poloniex', 'poloniex', 'Poloniex'],
+  ['coinbase-pro', 'Coinbase Pro', 'coinbase', 'Coinbase'],
 ] as const;
 
 export const dataSourceProviders: readonly DataSourceProvider[] = [
@@ -92,7 +90,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
     commands: [
       { id: 'dukascopy-add', label: 'Add new Dukascopy symbol', icon: 'add', dialog: 'dukascopy-add' },
       { id: 'dukascopy-download', label: 'Download data for existing symbol', icon: 'download', dialog: 'dukascopy-download' },
-      { id: 'dukascopy-information', label: 'View data usage information', icon: 'information', dialog: 'dukascopy-information' },
+      { id: 'dukascopy-information', label: 'Dukascopy Data Disclaimer', icon: 'information', dialog: 'dukascopy-information' },
     ],
   },
   {
@@ -104,26 +102,25 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
     id: 'file-import',
     label: 'File import',
     commands: [
-      { id: 'file-add', label: 'Add data symbol', icon: 'add', dialog: 'file-add' },
+      { id: 'file-add', label: 'Add symbol', icon: 'add', dialog: 'file-add' },
       { id: 'file-import', label: 'Import one data file', icon: 'file-import', dialog: 'file-import' },
       { id: 'file-mass-import', label: 'Import multiple files from a folder', icon: 'mass-import', dialog: 'file-mass-import' },
-      { id: 'file-application-import', label: 'Import application data', icon: 'application-import', dialog: 'file-application-import' },
     ],
   },
   {
     id: 'sq-equity',
-    label: 'SQ Equity data',
+    label: 'Equity data',
     commands: [
       { id: 'sq-equity-find', label: 'Find and add equity data', icon: 'search', dialog: 'sq-equity-find' },
-      { id: 'sq-equity-update', label: 'Update SQ Equity datasets', icon: 'refresh', action: 'sq-equity-update' },
+      { id: 'sq-equity-update', label: 'Update Equity datasets', icon: 'refresh', action: 'sq-equity-update' },
     ],
   },
   {
     id: 'sq-futures',
-    label: 'SQ Futures data',
+    label: 'Futures data',
     commands: [
       { id: 'sq-futures-find', label: 'Find and add futures data', icon: 'search', dialog: 'sq-futures-find' },
-      { id: 'sq-futures-update', label: 'Update SQ Futures datasets', icon: 'refresh', action: 'sq-futures-update' },
+      { id: 'sq-futures-update', label: 'Update Futures datasets', icon: 'refresh', action: 'sq-futures-update' },
     ],
   },
   {
@@ -137,18 +134,18 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
   },
   {
     id: 'crypto',
-    label: 'Crypto data',
+    label: 'Crypto',
     commands: [
       {
         id: 'crypto-add',
         label: 'Add crypto symbol',
         icon: 'crypto',
-        children: cryptoExchanges.map(([id, label, icon]) => ({
+        children: cryptoExchanges.map(([id, label, icon, exchange]) => ({
           id: `crypto-add-${id}`,
           label,
           icon,
           dialog: 'crypto-add' as const,
-          exchange: label,
+          exchange,
         })),
       },
       { id: 'crypto-download', label: 'Download data for existing symbol', icon: 'download', dialog: 'crypto-download' },
@@ -156,7 +153,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
   },
   {
     id: 'yahoo',
-    label: 'Yahoo data',
+    label: 'Yahoo',
     commands: [
       { id: 'yahoo-add', label: 'Add Yahoo symbols', icon: 'symbol-list', dialog: 'yahoo-add' },
       { id: 'yahoo-download', label: 'Download data for existing symbol', icon: 'download', dialog: 'yahoo-download' },
@@ -165,7 +162,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
   {
     id: 'mt5',
     label: 'MT5 import',
-    commands: [{ id: 'mt5-import', label: 'Import data from MetaTrader 5', icon: 'terminal-import', dialog: 'mt5-import' }],
+    commands: [{ id: 'mt5-import', label: 'Import data', icon: 'terminal-import', dialog: 'mt5-import' }],
   },
 ] as const;
 

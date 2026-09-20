@@ -24,7 +24,7 @@ stress-tests, combines, and exports rule-based trading strategies with reproduci
 - An end-to-end research lifecycle from immutable market data through qualified strategy and
   portfolio artifacts.
 - A deterministic Python quantitative core with durable jobs, lineage, metrics, and reports.
-- A browser/optional desktop workstation exposing Builder, Improver, Retester, Optimizer, Results,
+- A browser/optional desktop workstation exposing Builder with improve-existing mode, Retester, Optimizer, Results,
   Databanks, Data Manager, AlgoWizard, Portfolio tools, Custom Projects, and Extensions.
 - Explicit simulation, demo, and live modes with live execution disabled by default.
 - Typed external boundaries for market data, MetaTrader 5, cTrader, notifications, and optional
@@ -243,6 +243,11 @@ Readers may migrate supported older versions forward. Unsupported newer schemas 
 open read-only; automatic downgrade is forbidden. Export/import manifests record producer,
 template/profile, config, and content hashes.
 
+HaruQuantAI-owned configuration, persistence payloads, imports, exports, and APIs use versioned
+JSON. SQX XML remains valid reference evidence but is not a target runtime format. Any external
+XML compatibility requirement must receive explicit owner approval and remain isolated behind a
+documented adapter boundary; it cannot change the native JSON contract.
+
 ### Data ownership
 
 Data owns normalized market semantics; Strategy owns definitions; Simulator owns event/fill
@@ -291,6 +296,7 @@ and tests proving their units, bounds, and failure behavior.
 | Missing | SYS-013 | Research, UI mocks, and agentic output cannot enable or send live trades. | Negative authorization |
 | Missing | SYS-014 | Agentic proposals cite inputs, validate to schemas, and require mutation approval. | Tool-policy tests |
 | Missing | SYS-015 | Import/export is transactional, provenance-rich, contained, and non-executing. | Round-trip/security tests |
+| Partial | SYS-016 | HaruQuantAI-owned configuration, persistence payloads, imports, exports, and APIs use versioned JSON; reference XML never becomes an implicit runtime contract. | Architecture rule plus JSON round-trip tests |
 
 Non-functional requirements: deterministic results; isolated bounded workers; durable SQLite WAL
 metadata and immutable Parquet artifacts; asynchronous responsive UI; virtualized/paginated scale;

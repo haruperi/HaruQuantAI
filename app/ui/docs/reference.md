@@ -12,6 +12,9 @@ The supplied research inventory records 193 plugin directories, 280 plugin HTML 
 Representative sources used directly:
 
 - `internal/web/app/layout/views/header.html` — global settings, language, skin, zoom, help, about, update, reload and exit entry points.
+- `internal/plugins/AppDebugConsole/module.js`, `internal/web/DEBUGCONSOLE/debugconsole/src/components/{DebugConsole,DebugConsoleToolbar}.vue`, `internal/plugins/AppGridControl/module.js`, `internal/web/GRIDCONTROL/layout/{views/layout.html,LayoutCtrl.js}`, and `internal/web/app/layout/views/volumeProfileAddonPopup.html` — registered header action identities/order, top-only application navigation, log controls, grid sections/refresh/error behavior, and Volume Profile addon branches/links.
+- `internal/web/app/directives/appsZoom/AppsZoomService.js`, `languageMenu/LanguageMenu.js`, `skinPicker/SkinPicker.js`, and `appsZoom/AppsZoom.js` — active language/skin choices, nested menu behavior, and the 70–180 percent zoom bounds.
+- `internal/web/app/layout/views/performanceDialog.html`, `remoteAccessDialog.html`, `mcpDialog.html`, `smtpDialog.html`, `internal/web/app/directives/benchmarkDialog/*`, and `internal/web/app/directives/sqUtils/sqUtilsCtrl.js` — Configuration tab order, visible fields, dialog states, validation boundaries, and command outcomes.
 - `internal/web/BUILDER/layout/views/layout.html`, plus equivalent Retester, Optimizer, Portfolio Master and Task Manager layouts — dashboard above a shared databank.
 - `internal/web/SQMANAGER/layout/views/layout.html` — ribbon groups, batch progress, data tabs and no-data state.
 - `internal/plugins/DataSourceDukascopy`, `DataSourceTD`, `DataSourceFiles`, `DataSourceSQEquityData`, `DataSourceSQFuturesData`, `DataSourceDarwinex`, `DataSourceCrypto`, `DataSourceYahoo`, and `DataSourceMt5Api` — provider registrations, menu commands, and the narrow dialog/controller artifacts needed to define the Data sources command surface.
@@ -27,11 +30,11 @@ The installed executable was launched, but the environment's desktop-control bri
 
 ## Inclusion register
 
-Included as functional frontend simulations: application shell, Builder, Improver, Retester, Optimizer, Data Manager, databanks, linked Results, AlgoWizard, Portfolio Master, Portfolio Composer, Custom Projects, Code Editor, SQX Business surfaces, Prop analytics/result-extension identities, global settings, themes, persistence, fixture reset, file-import flow, mock source export, and deterministic job states. The Data Manager source surface names every supported provider and operation explicitly; it is a HaruQuantAI requirement derived from narrow behavioral evidence, not a claim of copied implementation or runtime parity.
+Included as functional frontend simulations: application shell, Builder with improve-existing mode, Retester, Optimizer, Data Manager, databanks, linked Results, AlgoWizard, Portfolio Master, Portfolio Composer, Custom Projects, Code Editor, Business surfaces, Prop analytics/result-extension identities, Debug Console, Grid Control, the Volume & Market Profile information dialog, the complete global Settings command surface, themes, persistence, file-import flow, mock source export, and deterministic job states. The Data Manager source surface names every supported provider and operation explicitly; it is a HaruQuantAI requirement derived from narrow behavioral evidence, not a claim of copied implementation or runtime parity.
 
 Included as identifiable configuration surfaces rather than real host integration: provider connections, remote access, MCP, SMTP, external scripts, native compilation, broker/platform export, and worker nodes. These controls save or display mock state and state plainly that no external side effect occurs.
 
-Excluded from parity claims: native backtest/genetic execution, proprietary SQX archive compatibility, actual provider downloads, real broker connections, remote worker discovery, native Java compilation, native Electron window behavior, license/update/payment flows, and numerical equivalence to SQX. Bundled libraries, obsolete/dev-only test pages, payment iframes, and shell-only Neural Network artifacts are not exposed as complete products.
+Excluded from parity claims: native backtest/genetic execution, proprietary SQX archive compatibility, actual provider downloads, real broker connections, remote worker discovery, Debug Console websocket delivery, live grid-engine polling, native Java compilation, native Electron window behavior, addon activation, license/update/payment flows, and numerical equivalence to SQX. Bundled libraries, obsolete/dev-only test pages, payment iframes, and shell-only Neural Network artifacts are not exposed as complete products.
 
 ## Technology
 

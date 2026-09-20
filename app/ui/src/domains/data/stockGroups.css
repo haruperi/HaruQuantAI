@@ -1,0 +1,14 @@
+.stock-group-description { min-height: 200px; resize: vertical; }
+.stock-group-members { width: 100%; min-height: 320px; resize: vertical; font-family: var(--font-mono, monospace); line-height: 1.45; }
+.stock-group-help, .stock-group-format { margin: 0 0 12px; color: var(--text-secondary); line-height: 1.45; }
+.stock-group-format { padding: 10px 12px; border: 1px solid var(--border); background: var(--surface-raised); }
+.stock-group-file-actions { display: flex; gap: 8px; margin: 12px 0 8px; }
+.stock-group-error { margin: 0 0 12px; padding: 8px 10px; border-left: 3px solid var(--danger); color: var(--danger); background: color-mix(in srgb, var(--danger) 10%, transparent); }
+.stock-group-file { display: grid; gap: 6px; font-weight: 600; }
+.stock-group-file input { padding: 10px; border: 1px dashed var(--border); background: var(--surface-raised); color: var(--text); }
+.stock-group-conflict { margin-top: 14px; padding: 12px; border: 1px solid var(--accent); background: color-mix(in srgb, var(--accent) 8%, var(--surface)); }
+.stock-group-conflict h3 { margin: 0 0 6px; font-size: 14px; }
+.stock-group-conflict div { display: flex; justify-content: flex-end; gap: 8px; }
+.stock-group-ready-link { border: 0; padding: 0; color: var(--accent); background: transparent; text-decoration: underline; cursor: pointer; }
+.stock-group-table tbody tr { cursor: default; }
+@media (max-width: 720px) { .stock-group-file-actions { flex-wrap: wrap; } .stock-group-members { min-height: 240px; } }

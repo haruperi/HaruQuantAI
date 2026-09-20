@@ -4,7 +4,7 @@
 
 ## 1. Core engineering principles
 
-- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, owning domain READMEs, and the Git-tracked code and tests. Conversation history is useful context but is never authoritative.
+- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, owning domain READMEs, and implementation history in `.agents/logs/<date-time>_<task_name>/<implementation-plan.md, walkthrough.md>`. Consequent iteration of the same task is appended to the same task file as an iteration block. Chat history is useful context but is never authoritative.
 - **Scoped authority.**
   - `AGENTS.md` owns contributor, task workflow, and verification rules.
   - `docs/PROJECT.md` owns product scope, domain index, functional requirements, and NFRs.

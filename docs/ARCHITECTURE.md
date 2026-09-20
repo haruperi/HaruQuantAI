@@ -69,6 +69,8 @@ external broker is not an initial dependency.
 14. Bounded queues, requests, uploads, tables, streams, worker resources, and search budgets are
     mandatory—no unbounded workload is accepted.
 15. A reference observation may define an acceptance target but never changes feature status.
+16. HaruQuantAI-owned configuration, persistence payloads, imports, exports, and API payloads use
+    versioned JSON. Reference-product XML is evidence only and does not authorize runtime XML.
 
 ---
 
@@ -109,6 +111,20 @@ Small standard-library value types may live in the kernel only when domain-neutr
 remain under tests. NumPy, Numba, FastAPI, Pydantic, PyArrow, broker SDKs, and model clients stay
 outside the kernel. Shared code is not a dumping ground: if it has business meaning, one domain
 owns it and others consume its contract.
+
+### Serialization and Interchange Policy
+
+HaruQuantAI-owned configuration, persistence payloads, import/export manifests, and API payloads
+must use versioned JSON. Producers include an explicit schema version; readers validate the schema,
+migrate only declared older versions forward, and fail closed or open read-only for unsupported
+newer versions. File extensions and media types must identify JSON truthfully.
+
+SQX XML files, templates, symbols, and compiled references may be inspected and cited as evidence
+about reference behavior. They must not be copied into HaruQuantAI runtime parsing, serialization,
+persistence, import/export, or transport behavior. XML support requires a separately approved,
+bounded compatibility requirement and a corresponding explicit change to this policy and its
+architecture-check enforcement. SVG assets and their XML namespaces are presentation resources,
+not application interchange payloads.
 
 ---
 
