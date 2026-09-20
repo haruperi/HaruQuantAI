@@ -1,0 +1,56 @@
+{
+  "feature_id": "FEAT-BROKERS-CATALOG",
+  "domain": "D-BROKERS",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-BROKERS-CAPABILITY_DISCOVERY",
+    "FR-BROKERS-SYMBOL_TRANSLATION",
+    "FR-BROKERS-SERVER_TIMEZONE"
+  ],
+  "verified_at_utc": "2026-09-20T13:30:00Z",
+  "owner_module": "app/services/brokers/catalog.py",
+  "public_contract": "app/contracts/brokers.py",
+  "symbols": [
+    "BrokerCatalog",
+    "BrokerCatalogConfig",
+    "BrokerCatalogFeature"
+  ],
+  "capabilities": {
+    "provides": [
+      "brokers.catalog@1"
+    ],
+    "requires": [
+      "persistence.brokers@1"
+    ]
+  },
+  "persistence": {
+    "module": "app/services/persistence/brokers.py",
+    "namespace": "brokers.v1",
+    "tables": [
+      "broker_profiles"
+    ]
+  },
+  "test_target": "tests/services/brokers/test_catalog.py",
+  "usage_example": "tests/examples/03_brokers.py::example_03_catalog",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/brokers/test_catalog.py",
+    "exit_code": 0
+  },
+  "tested_revision": "2abbf625a15988cea9a454c33c17789442138931",
+  "fingerprints": {
+    "owner_module_sha256": "b019e2b3338ebe685768313d8ab9c05f36af5580248f2f2dd8f2074c9160a45a",
+    "public_contract_sha256": "224958effebea67d9156cf6e2d7b5afaf997d552d8283e17dfbdb50981281415",
+    "domain_readme_sha256": "c91679e17e266f783e0a6c678f974fa5717d4343a04535062bab3261f2df3a5d"
+  },
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "PASS",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}

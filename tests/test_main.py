@@ -151,6 +151,10 @@ def test_ui_server_lifecycle(monkeypatch: pytest.MonkeyPatch) -> None:
 
     mock_create_proc = AsyncMock(return_value=mock_proc)
     monkeypatch.setattr(asyncio, "create_subprocess_exec", mock_create_proc)
+    monkeypatch.setattr(
+        "app.services.gateway.api_server.ApiServerService.serve",
+        AsyncMock(return_value=None),
+    )
 
     async def _test() -> int:
         stop_event = asyncio.Event()
@@ -240,6 +244,10 @@ def test_ui_server_spawn_error(monkeypatch: pytest.MonkeyPatch) -> None:
     """Verify --ui handles subprocess creation failure gracefully."""
     mock_create_proc = AsyncMock(side_effect=OSError("Command not found"))
     monkeypatch.setattr(asyncio, "create_subprocess_exec", mock_create_proc)
+    monkeypatch.setattr(
+        "app.services.gateway.api_server.ApiServerService.serve",
+        AsyncMock(return_value=None),
+    )
 
     exit_code = asyncio.run(async_main(["--ui"]))
     assert exit_code == 1
@@ -250,6 +258,10 @@ def test_ui_server_npm_not_found(monkeypatch: pytest.MonkeyPatch) -> None:
     import shutil
 
     monkeypatch.setattr(shutil, "which", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        "app.services.gateway.api_server.ApiServerService.serve",
+        AsyncMock(return_value=None),
+    )
     exit_code = asyncio.run(async_main(["--ui"]))
     assert exit_code == 1
 
@@ -268,3 +280,31 @@ def test_run_entrypoint(monkeypatch: pytest.MonkeyPatch) -> None:
     with pytest.raises(SystemExit) as excinfo:
         run(["--dry-run"])
     assert excinfo.value.code == 0
+
+
+def test_workspace_feature_removal() -> None:
+    """Verify that omitting a workspace feature leaves remaining features modular and functional."""
+    from app.contracts.workspace import (
+        WORKSPACE_DIAGNOSTICS,
+        WORKSPACE_NOTIFICATIONS,
+        NotificationChannel,
+    )
+    from app.kernel.bootstrapper import Runtime
+    from app.services.workspace.diagnostics import feature as diag_feature
+    from app.services.workspace.notifications import feature as notif_feature
+
+    async def _test() -> None:
+        async with Runtime((diag_feature, notif_feature)) as rt:
+            notif = rt.require(WORKSPACE_NOTIFICATIONS)
+            diag = rt.require(WORKSPACE_DIAGNOSTICS)
+            rcpt = notif.send_notification(
+                NotificationChannel.SOUND, "chime", "Test", "Body"
+            )
+            if sys.platform == "win32":
+                assert rcpt.delivered is True
+            else:
+                assert rcpt.delivered is False
+                assert rcpt.error is not None and "skipped:" in rcpt.error
+            assert diag.get_health().status == "healthy"
+
+    asyncio.run(_test())

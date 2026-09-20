@@ -29,7 +29,11 @@ app/services/strategy/
 |-- grammar.py
 |-- generation.py
 |-- evolution.py
-`-- export.py
+|-- export.py
+|-- import_sqx.py
+|-- model_atm_exits.py
+|-- generate_mql5.py
+`-- architectures.py
 
 app/contracts/strategy.py
 app/services/persistence/strategy.py
@@ -82,6 +86,10 @@ The public boundary is `app/contracts/strategy.py`; counterparty status never au
 | Missing | `strategy.generation@1` | `StrategyGenerator` | `1` | Seeded candidate generation |
 | Missing | `strategy.evolution@1` | `EvolutionService` | `1` | Typed genetic improvement and lineage |
 | Missing | `strategy.export@1` | `StrategyExporter` | `1` | Validated deterministic source bundles |
+| Missing | `strategy.sqx_import@1` | `SqxImportService` | `1` | StrategyQuant X (.sqx) archive ingestion and AST conversion |
+| Missing | `strategy.atm@1` | `AtmExitService` | `1` | Advanced Trade Management tiered multi-bracket exit rules |
+| Missing | `strategy.mql5@1` | `Mql5TranspilerService` | `1` | Production-ready MetaTrader 5 Expert Advisor transpiler |
+| Missing | `strategy.architectures@1` | `StrategyArchitectureService` | `1` | Multi-timeframe and symmetric strategy templates |
 
 ### Persisted-state ownership
 
@@ -106,6 +114,10 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-STRATEGY-GENERATION` | Seeded candidate generation | `app/services/strategy/generation.py` | `strategy.generation@1` | `strategy.grammar@1` | Missing |
 | `FEAT-STRATEGY-EVOLUTION` | Typed genetic improvement and lineage | `app/services/strategy/evolution.py` | `strategy.evolution@1` | `strategy.generation@1` | Missing |
 | `FEAT-STRATEGY-EXPORT` | Validated deterministic source bundles | `app/services/strategy/export.py` | `strategy.export@1` | `strategy.validation@1` | Missing |
+| `FEAT-STRATEGY-SQXIMPORT` | StrategyQuant X (.sqx) import and AST converter | `app/services/strategy/import_sqx.py` | `strategy.sqx_import@1` | `strategy.definitions@1` | Missing |
+| `FEAT-STRATEGY-ATM` | Advanced Trade Management multi-tier bracket exits | `app/services/strategy/model_atm_exits.py` | `strategy.atm@1` | `strategy.definitions@1` | Missing |
+| `FEAT-STRATEGY-MQL5` | Production MetaTrader 5 Expert Advisor transpiler | `app/services/strategy/generate_mql5.py` | `strategy.mql5@1` | `strategy.definitions@1` | Missing |
+| `FEAT-STRATEGY-ARCHITECTURES` | Multi-timeframe and symmetric strategy templates | `app/services/strategy/architectures.py` | `strategy.architectures@1` | `strategy.grammar@1` | Missing |
 
 Dependencies point to public contracts, never implementations. Removal withdraws only the named
 capability; required consumers become attributed `BLOCKED`, optional operations return
@@ -250,7 +262,7 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 - [ ] Registration is explicit; imports have no runtime effects.
 - [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
 - [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
+- [ ] One real-world usage example exists per completed feature.
 - [ ] Domain status reflects repository evidence, not reference-product evidence.
 - [ ] Architecture and full qualification gates pass.
 

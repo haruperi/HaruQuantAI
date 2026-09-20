@@ -1,0 +1,52 @@
+{
+  "feature_id": "FEAT-PERSISTENCE-PARQUET",
+  "domain": "D-PERSISTENCE",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-PERSISTENCE-PARQUET_STORE"
+  ],
+  "verified_at_utc": "2026-09-20T10:54:26Z",
+  "owner_module": "app/services/persistence/parquet_store.py",
+  "public_contract": "app/contracts/persistence.py",
+  "symbols": [
+    "ParquetStoreService",
+    "ParquetConfig",
+    "ParquetFeature"
+  ],
+  "capabilities": {
+    "provides": [
+      "persistence.parquet@1"
+    ],
+    "requires": []
+  },
+  "persistence": {
+    "module": "app/services/persistence/parquet_store.py",
+    "namespace": "persistence.v1",
+    "tables": [
+      "market_series_partitions"
+    ]
+  },
+  "test_target": "tests/services/persistence/test_parquet_store.py",
+  "usage_example": "tests/examples/02_persistence.py::example_02_parquet_store",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/persistence/test_parquet_store.py",
+    "exit_code": 0
+  },
+  "tested_revision": "a99cd758f1972511a74e9122511cfc5aaa3d1833",
+  "fingerprints": {
+    "owner_module_sha256": "3f80b5dcc02ed81cd7508d0d3d6e55196804482cf425b79dc6d68a52190b36f6",
+    "public_contract_sha256": "b142e8647cf4eac7d92bc7fb04ab2008ced5bbe2907be6c31e00735b7a4a3529",
+    "domain_readme_sha256": "e02d4d0dbebca24e5a0f67e554e271f4697dc1aa10200d0177d05a9b5249f49b"
+  },
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}

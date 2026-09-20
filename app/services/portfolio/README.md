@@ -27,7 +27,9 @@ app/services/portfolio/
 |-- correlation.py
 |-- composer.py
 |-- search.py
-`-- simulation.py
+|-- simulation.py
+|-- weight_optimizer.py
+`-- drawdown_clustering.py
 
 app/contracts/portfolio.py
 app/services/persistence/portfolio.py
@@ -78,6 +80,8 @@ The public boundary is `app/contracts/portfolio.py`; private implementation impo
 | Missing | `portfolio.composer@1` | `PortfolioComposer` | `1` | Manual weighting and result recomputation |
 | Missing | `portfolio.search@1` | `PortfolioSearch` | `1` | Constrained brute-force/genetic combinations |
 | Missing | `portfolio.simulation@1` | `PortfolioSimulator` | `1` | Shared-capital account replay |
+| Missing | `portfolio.optimizer@1` | `WeightOptimizerService` | `1` | Risk Parity, HRP, and minimum variance allocation algorithms |
+| Missing | `portfolio.clustering@1` | `DrawdownClusteringService` | `1` | Coincident drawdown clustering and tail dependence analysis |
 
 ### Persisted-state ownership
 
@@ -100,6 +104,8 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | `FEAT-PORTFOLIO-COMPOSER` | Manual weighting and result recomputation | `app/services/portfolio/composer.py` | `portfolio.composer@1` | `simulator.backtest@1` | Missing |
 | `FEAT-PORTFOLIO-SEARCH` | Constrained brute-force/genetic combinations | `app/services/portfolio/search.py` | `portfolio.search@1` | `portfolio.correlation@1` | Missing |
 | `FEAT-PORTFOLIO-SIMULATION` | Shared-capital account replay | `app/services/portfolio/simulation.py` | `portfolio.simulation@1` | `simulator.account@1` | Missing |
+| `FEAT-PORTFOLIO-OPTIMIZER` | Risk Parity, HRP, and minimum variance allocation | `app/services/portfolio/weight_optimizer.py` | `portfolio.optimizer@1` | `portfolio.correlation@1` | Missing |
+| `FEAT-PORTFOLIO-CLUSTERING` | Coincident drawdown clustering and tail dependence | `app/services/portfolio/drawdown_clustering.py` | `portfolio.clustering@1` | `portfolio.correlation@1` | Missing |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and
@@ -241,7 +247,7 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 - [ ] Registration is explicit; imports have no runtime effects.
 - [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
 - [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
+- [ ] One real-world usage example exists per completed feature.
 - [ ] Domain status reflects repository evidence, not reference-product evidence.
 - [ ] Architecture and full qualification gates pass.
 

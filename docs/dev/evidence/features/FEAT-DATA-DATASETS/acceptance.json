@@ -1,0 +1,58 @@
+{
+  "feature_id": "FEAT-DATA-DATASETS",
+  "domain": "D-DATA",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-DATA-DATASET_IMMUTABILITY",
+    "FR-DATA-PROVENANCE_LINEAGE"
+  ],
+  "verified_at_utc": "2026-09-20T21:00:00Z",
+  "owner_module": "app/services/data/datasets.py",
+  "public_contract": "app/contracts/data.py",
+  "symbols": [
+    "DatasetService",
+    "DatasetConfig",
+    "DatasetFeature",
+    "DatasetManifest",
+    "BarRecord",
+    "TickRecord"
+  ],
+  "capabilities": {
+    "provides": [
+      "data.datasets@1"
+    ],
+    "requires": [
+      "data.persistence@1"
+    ]
+  },
+  "persistence": {
+    "module": "app/services/persistence/data.py",
+    "namespace": "data.v1",
+    "tables": [
+      "data_datasets"
+    ]
+  },
+  "test_target": "tests/services/data/test_datasets.py",
+  "usage_example": "tests/examples/04_data.py::example_04_datasets",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/data/test_datasets.py",
+    "exit_code": 0
+  },
+  "tested_revision": "0acb104203111fe9f10221157ba9da42ae7820f3",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  },
+  "fingerprints": {
+    "owner_module_sha256": "3b26ad36f6ed2645aaa87a7600af8b46c848abc393dcb0a847ff847e51866707",
+    "public_contract_sha256": "3db2525abfba22b43788d526e37a41e6ed272b6fffb126c6acbe817eee42fe4a",
+    "domain_readme_sha256": "646a7ee763a5d73a253e5c5abd2934b39a745df3e6a7674302cc7647570a7e09"
+  }
+}

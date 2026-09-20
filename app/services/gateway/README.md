@@ -27,7 +27,8 @@ app/services/gateway/
 |-- rest.py
 |-- streams.py
 |-- authorization.py
-`-- errors.py
+|-- errors.py
+`-- command_automator.py
 
 app/contracts/gateway.py
 app/services/persistence/gateway.py
@@ -78,6 +79,7 @@ The public boundary is `app/contracts/gateway.py`; private implementation import
 | Missing | `gateway.streams@1` | `EventStreamGateway` | `1` | WebSocket and optional SSE delivery |
 | Missing | `gateway.authorization@1` | `GatewayAuthorization` | `1` | Identity, scopes, and mutation policy |
 | Missing | `gateway.errors@1` | `ProblemMapper` | `1` | Stable safe transport errors |
+| Missing | `gateway.automation@1` | `CommandAutomationService` | `1` | Headless batch scripting, CLI, and RPC automation hooks |
 
 ### Persisted-state ownership
 
@@ -100,6 +102,7 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | `FEAT-GATEWAY-STREAMS` | WebSocket and optional SSE delivery | `app/services/gateway/streams.py` | `gateway.streams@1` | `workspace.jobs@1` | Missing |
 | `FEAT-GATEWAY-AUTH` | Identity, scopes, and mutation policy | `app/services/gateway/authorization.py` | `gateway.authorization@1` | None | Missing |
 | `FEAT-GATEWAY-ERRORS` | Stable safe transport errors | `app/services/gateway/errors.py` | `gateway.errors@1` | None | Missing |
+| `FEAT-GATEWAY-AUTOMATION` | Headless batch scripting, CLI, and RPC automation | `app/services/gateway/command_automator.py` | `gateway.automation@1` | `gateway.application@1` | Missing |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and
@@ -241,7 +244,7 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 - [ ] Registration is explicit; imports have no runtime effects.
 - [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
 - [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
+- [ ] One real-world usage example exists per completed feature.
 - [ ] Domain status reflects repository evidence, not reference-product evidence.
 - [ ] Architecture and full qualification gates pass.
 

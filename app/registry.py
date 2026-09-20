@@ -19,16 +19,189 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 
 from app.kernel.bootstrapper import FeatureFactory
+from app.services.brokers.catalog import feature as brokers_catalog
+from app.services.brokers.crypto import feature as brokers_crypto
+from app.services.brokers.ctrader import feature as brokers_ctrader
+from app.services.brokers.darwinex import feature as brokers_darwinex
+from app.services.brokers.dukascopy import feature as brokers_dukascopy
+from app.services.brokers.equity import feature as brokers_equity
+from app.services.brokers.futures import feature as brokers_futures
+from app.services.brokers.isolation_fencing import feature as brokers_fencing
+from app.services.brokers.mt5 import feature as brokers_mt5
+from app.services.brokers.reconciliation import feature as brokers_reconciliation
+from app.services.brokers.yahoo import feature as brokers_yahoo
+from app.services.data.datasets import feature as data_datasets
+from app.services.data.imports_exports import feature as data_imports_exports
+from app.services.data.instruments import feature as data_instruments
+from app.services.data.market_data import feature as data_market_data
+from app.services.data.quality import feature as data_quality
+from app.services.data.resampling import feature as data_resampling
+from app.services.data.sessions import feature as data_sessions
+from app.services.data.universes import feature as data_universes
 from app.services.gateway.api_server import feature as gateway_api_server
+from app.services.persistence.artifacts import feature as persistence_artifacts
+from app.services.persistence.brokers import feature as persistence_brokers
+from app.services.persistence.data import feature as persistence_data
+from app.services.persistence.databanks import feature as persistence_databanks
+from app.services.persistence.database import feature as persistence_database
+from app.services.persistence.migrations import feature as persistence_migrations
+from app.services.persistence.parquet_store import feature as persistence_parquet
+from app.services.persistence.retention import feature as persistence_retention
+from app.services.persistence.snapshots import feature as persistence_snapshots
+from app.services.persistence.workspace import feature as persistence_workspace
+from app.services.workspace.diagnostics import feature as workspace_diagnostics
+from app.services.workspace.jobs import feature as workspace_jobs
+from app.services.workspace.notifications import feature as workspace_notifications
+from app.services.workspace.plugin_host import feature as workspace_plugins
+from app.services.workspace.remote_workers import feature as workspace_workers
+from app.services.workspace.resource_governor import feature as workspace_resources
+from app.services.workspace.scheduler import feature as workspace_scheduler
+from app.services.workspace.settings import feature as workspace_settings
 
 # Enumerate all domain feature factory callables here.
 # Features will be topologically sorted by Runtime before startup.
-FEATURES: tuple[FeatureFactory, ...] = (gateway_api_server,)
+FEATURES: tuple[FeatureFactory, ...] = (
+    gateway_api_server,
+    persistence_database,
+    persistence_workspace,
+    persistence_migrations,
+    persistence_snapshots,
+    persistence_artifacts,
+    persistence_retention,
+    persistence_databanks,
+    persistence_parquet,
+    persistence_brokers,
+    persistence_data,
+    data_instruments,
+    data_sessions,
+    data_datasets,
+    data_quality,
+    data_imports_exports,
+    data_resampling,
+    data_universes,
+    data_market_data,
+    brokers_catalog,
+    brokers_mt5,
+    brokers_ctrader,
+    brokers_dukascopy,
+    brokers_equity,
+    brokers_futures,
+    brokers_darwinex,
+    brokers_crypto,
+    brokers_yahoo,
+    brokers_reconciliation,
+    brokers_fencing,
+    workspace_settings,
+    workspace_notifications,
+    workspace_diagnostics,
+    workspace_resources,
+    workspace_plugins,
+    workspace_jobs,
+    workspace_scheduler,
+    workspace_workers,
+)
 
 # Named deployment profiles mapping a profile name to its active feature set.
 PROFILES: Mapping[str, frozenset[str]] = {
-    "all": frozenset({"gateway.api_server"}),
+    "all": frozenset(
+        {
+            "gateway.api_server",
+            "persistence.workspace",
+            "persistence.database",
+            "persistence.migrations",
+            "persistence.snapshots",
+            "persistence.artifacts",
+            "persistence.retention",
+            "persistence.databanks",
+            "persistence.parquet",
+            "persistence.brokers",
+            "persistence.data",
+            "data.instruments",
+            "data.sessions",
+            "data.datasets",
+            "data.quality",
+            "data.imports_exports",
+            "data.resampling",
+            "data.universes",
+            "data.market_data",
+            "brokers.catalog",
+            "brokers.mt5",
+            "brokers.ctrader",
+            "brokers.dukascopy",
+            "brokers.equity",
+            "brokers.futures",
+            "brokers.darwinex",
+            "brokers.crypto",
+            "brokers.yahoo",
+            "brokers.reconciliation",
+            "brokers.fencing",
+            "workspace.settings",
+            "workspace.notifications",
+            "workspace.diagnostics",
+            "workspace.resources",
+            "workspace.plugins",
+            "workspace.jobs",
+            "workspace.scheduler",
+            "workspace.workers",
+        }
+    ),
     "api": frozenset({"gateway.api_server"}),
+    "persistence": frozenset(
+        {
+            "persistence.database",
+            "persistence.migrations",
+            "persistence.snapshots",
+            "persistence.artifacts",
+            "persistence.retention",
+            "persistence.databanks",
+            "persistence.parquet",
+            "persistence.brokers",
+        }
+    ),
+    "brokers": frozenset(
+        {
+            "persistence.database",
+            "persistence.brokers",
+            "brokers.catalog",
+            "brokers.mt5",
+            "brokers.ctrader",
+            "brokers.dukascopy",
+            "brokers.equity",
+            "brokers.futures",
+            "brokers.darwinex",
+            "brokers.crypto",
+            "brokers.yahoo",
+            "brokers.reconciliation",
+            "brokers.fencing",
+        }
+    ),
+    "workspace": frozenset(
+        {
+            "persistence.workspace",
+            "workspace.settings",
+            "workspace.notifications",
+            "workspace.diagnostics",
+            "workspace.resources",
+            "workspace.plugins",
+            "workspace.jobs",
+            "workspace.scheduler",
+            "workspace.workers",
+        }
+    ),
+    "data": frozenset(
+        {
+            "persistence.database",
+            "persistence.data",
+            "data.instruments",
+            "data.sessions",
+            "data.datasets",
+            "data.quality",
+            "data.imports_exports",
+            "data.resampling",
+            "data.universes",
+            "data.market_data",
+        }
+    ),
     "default": frozenset(),
 }
 

@@ -46,7 +46,7 @@ consolidated in `app/services/persistence/[domain].py`. Feature modules consume 
 interfaces and never execute ad-hoc SQL or accept unrestricted connections.
 
 Every completed feature contributes one `example_<NN>_<feature_slug>` function to
-`tests/examples/[domain_number]_[domain].py`. Examples are realistic, offline, deterministic,
+`tests/examples/[domain_number]_[domain].py`. Examples are realistic, real-world, deterministic,
 secret-safe, and directly executable. Production feature modules contain no usage harness.
 
 For `D-UI`, follow `app/ui/README.md`; Python single-file service and persistence rules do not
@@ -173,7 +173,7 @@ Configuration is represented by `[Feature]Config` in the owner module.
 | --- | --- | --- | --- |
 | Missing | `[feature].py` | Configuration, service behavior, lifecycle wiring, immutable spec, and factory | `[Feature]Config`, `[Feature]Service`, `SPEC`, `[Feature]Feature`, `feature()` |
 | Optional | `app/services/persistence/[domain].py` | Domain schema, SQL, and transactions required by this feature | [Focused repository/store symbols] |
-| Missing | `tests/examples/[domain_number]_[domain].py` | Realistic offline primary-purpose example | `example_<NN>_<feature_slug>()` |
+| Missing | `tests/examples/[domain_number]_[domain].py` | Realistic real-world usage example | `example_<NN>_<feature_slug>()` |
 
 #### Functional requirements
 

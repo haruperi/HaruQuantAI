@@ -28,7 +28,10 @@ app/services/risk/
 |-- trailing_stop.py
 |-- break_even.py
 |-- scale_out.py
-`-- limits.py
+|-- limits.py
+|-- kill_switch.py
+|-- allocation_governor.py
+`-- audit_decisions.py
 
 app/contracts/risk.py
 app/services/persistence/risk.py
@@ -80,6 +83,9 @@ The public boundary is `app/contracts/risk.py`; counterparty status never author
 | Missing | `risk.break_even@1` | `BreakEvenPolicy` | `1` | Trigger-based break-even moves |
 | Missing | `risk.scale_out@1` | `ScaleOutPolicy` | `1` | Quantity-step-safe partial exits |
 | Missing | `risk.pretrade_limits@1` | `PretradeLimits` | `1` | Exposure and loss constraints |
+| Missing | `risk.kill_switch@1` | `KillSwitchService` | `1` | Hierarchical fail-closed emergency circuit breaker |
+| Missing | `risk.allocations@1` | `AllocationGovernorService` | `1` | Multi-strategy capital and margin allocation capacity |
+| Missing | `risk.audit@1` | `RiskAuditService` | `1` | Cryptographically signed risk decision audit journal |
 
 ### Persisted-state ownership
 
@@ -103,6 +109,9 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-RISK-BREAKEVEN` | Trigger-based break-even moves | `app/services/risk/break_even.py` | `risk.break_even@1` | `risk.protective_levels@1` | Missing |
 | `FEAT-RISK-SCALEOUT` | Quantity-step-safe partial exits | `app/services/risk/scale_out.py` | `risk.scale_out@1` | `data.instruments@1` | Missing |
 | `FEAT-RISK-LIMITS` | Exposure and loss constraints | `app/services/risk/limits.py` | `risk.pretrade_limits@1` | `risk.position_sizing@1` | Missing |
+| `FEAT-RISK-KILLSWITCH` | Hierarchical fail-closed emergency kill switch | `app/services/risk/kill_switch.py` | `risk.kill_switch@1` | None | Missing |
+| `FEAT-RISK-ALLOCATIONS` | Multi-strategy capital and margin capacity governor | `app/services/risk/allocation_governor.py` | `risk.allocations@1` | `risk.position_sizing@1` | Missing |
+| `FEAT-RISK-AUDIT` | Cryptographic append-only risk decision audit log | `app/services/risk/audit_decisions.py` | `risk.audit@1` | `persistence.artifacts@1` | Missing |
 
 Dependencies point to public contracts, never implementations. Removal withdraws only the named
 capability; required consumers become attributed `BLOCKED`, optional operations return
@@ -246,7 +255,7 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 - [ ] Registration is explicit; imports have no runtime effects.
 - [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
 - [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
+- [ ] One real-world usage example exists per completed feature.
 - [ ] Domain status reflects repository evidence, not reference-product evidence.
 - [ ] Architecture and full qualification gates pass.
 

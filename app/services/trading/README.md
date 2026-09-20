@@ -27,7 +27,9 @@ app/services/trading/
 |-- orders.py
 |-- positions.py
 |-- reconciliation.py
-`-- ledger.py
+|-- ledger.py
+|-- trade_plan_validator.py
+`-- execution_attribution.py
 
 app/contracts/trading.py
 app/services/persistence/trading.py
@@ -78,6 +80,8 @@ The public boundary is `app/contracts/trading.py`; counterparty status never aut
 | Missing | `trading.positions@1` | `PositionService` | `1` | Position and fill-derived state |
 | Missing | `trading.reconciliation@1` | `ReconciliationService` | `1` | External/local state convergence |
 | Missing | `trading.ledger@1` | `ExecutionLedger` | `1` | Immutable execution audit records |
+| Missing | `trading.plan_validator@1` | `TradePlanValidatorService` | `1` | Pre-flight order intent and market readiness validation |
+| Missing | `trading.attribution@1` | `ExecutionAttributionService` | `1` | Order fill slippage and round-trip broker latency attribution |
 
 ### Persisted-state ownership
 
@@ -100,6 +104,8 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-TRADING-POSITIONS` | Position and fill-derived state | `app/services/trading/positions.py` | `trading.positions@1` | `trading.execution_intents@1` | Missing |
 | `FEAT-TRADING-RECONCILIATION` | External/local state convergence | `app/services/trading/reconciliation.py` | `trading.reconciliation@1` | `trading.positions@1` | Missing |
 | `FEAT-TRADING-LEDGER` | Immutable execution audit records | `app/services/trading/ledger.py` | `trading.ledger@1` | `persistence.artifacts@1` | Missing |
+| `FEAT-TRADING-VALIDATOR` | Pre-flight order validation against spreads and sessions | `app/services/trading/trade_plan_validator.py` | `trading.plan_validator@1` | `risk.pretrade_limits@1` | Missing |
+| `FEAT-TRADING-ATTRIBUTION` | Order slippage, fill latency, and broker execution quality | `app/services/trading/execution_attribution.py` | `trading.attribution@1` | `trading.positions@1` | Missing |
 
 Dependencies point to public contracts, never implementations. Removal withdraws only the named
 capability; required consumers become attributed `BLOCKED`, optional operations return
@@ -242,7 +248,7 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 - [ ] Registration is explicit; imports have no runtime effects.
 - [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
 - [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
+- [ ] One real-world usage example exists per completed feature.
 - [ ] Domain status reflects repository evidence, not reference-product evidence.
 - [ ] Architecture and full qualification gates pass.
 

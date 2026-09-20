@@ -27,7 +27,9 @@ app/services/robustness/
 |-- retests.py
 |-- monte_carlo.py
 |-- walk_forward_matrix.py
-`-- verdicts.py
+|-- verdicts.py
+|-- trade_skipping.py
+`-- stress_scenarios.py
 
 app/contracts/robustness.py
 app/services/persistence/robustness.py
@@ -78,6 +80,8 @@ The public boundary is `app/contracts/robustness.py`; private implementation imp
 | Missing | `robustness.monte_carlo@1` | `MonteCarloService` | `1` | Seeded perturbation scenario distributions |
 | Missing | `robustness.walk_forward_matrix@1` | `WalkForwardMatrixService` | `1` | Walk-forward matrix cells and clusters |
 | Missing | `robustness.verdicts@1` | `RobustnessVerdictService` | `1` | Explainable pass/fail/inconclusive verdicts |
+| Missing | `robustness.skipping@1` | `TradeSkippingService` | `1` | Random trade skip sensitivity and signal drop testing |
+| Missing | `robustness.stress@1` | `StressScenarioService` | `1` | Adverse spread and slippage stress multiplier evaluation |
 
 ### Persisted-state ownership
 
@@ -100,6 +104,8 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | `FEAT-ROBUSTNESS-MONTECARLO` | Seeded perturbation scenario distributions | `app/services/robustness/monte_carlo.py` | `robustness.monte_carlo@1` | `simulator.backtest@1` | Missing |
 | `FEAT-ROBUSTNESS-WALKFORWARD` | Walk-forward matrix cells and clusters | `app/services/robustness/walk_forward_matrix.py` | `robustness.walk_forward_matrix@1` | `optimization.walk_forward@1` | Missing |
 | `FEAT-ROBUSTNESS-VERDICTS` | Explainable pass/fail/inconclusive verdicts | `app/services/robustness/verdicts.py` | `robustness.verdicts@1` | `analytics.metrics@1` | Missing |
+| `FEAT-ROBUSTNESS-SKIPPING` | Random trade skip sensitivity and signal drop test | `app/services/robustness/trade_skipping.py` | `robustness.skipping@1` | `simulator.backtest@1` | Missing |
+| `FEAT-ROBUSTNESS-STRESS` | Adverse spread and slippage stress multipliers | `app/services/robustness/stress_scenarios.py` | `robustness.stress@1` | `simulator.backtest@1` | Missing |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and
@@ -241,7 +247,7 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 - [ ] Registration is explicit; imports have no runtime effects.
 - [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
 - [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
+- [ ] One real-world usage example exists per completed feature.
 - [ ] Domain status reflects repository evidence, not reference-product evidence.
 - [ ] Architecture and full qualification gates pass.
 

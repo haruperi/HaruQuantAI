@@ -1,0 +1,57 @@
+{
+  "feature_id": "FEAT-PERSISTENCE-RETENTION",
+  "domain": "D-PERSISTENCE",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-PERSISTENCE-SAFE_PURGE"
+  ],
+  "verified_at_utc": "2026-09-20T10:54:26Z",
+  "owner_module": "app/services/persistence/retention.py",
+  "public_contract": "app/contracts/persistence.py",
+  "symbols": [
+    "RetentionService",
+    "RetentionConfig",
+    "RetentionFeature"
+  ],
+  "capabilities": {
+    "provides": [
+      "persistence.retention@1"
+    ],
+    "requires": [
+      "persistence.database@1",
+      "persistence.artifacts@1"
+    ]
+  },
+  "persistence": {
+    "module": "app/services/persistence/persistence.py",
+    "namespace": "persistence.v1",
+    "tables": [
+      "persistence_retention_audit",
+      "persistence_databank_members",
+      "persistence_artifact_lineage"
+    ]
+  },
+  "test_target": "tests/services/persistence/test_retention.py",
+  "usage_example": "tests/examples/02_persistence.py::example_02_retention",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/persistence/test_retention.py",
+    "exit_code": 0
+  },
+  "tested_revision": "a99cd758f1972511a74e9122511cfc5aaa3d1833",
+  "fingerprints": {
+    "owner_module_sha256": "83ec9f60e62fc459c03c1134d23f872c82df7876a425a9d96cd7e98d212fdf59",
+    "public_contract_sha256": "b142e8647cf4eac7d92bc7fb04ab2008ced5bbe2907be6c31e00735b7a4a3529",
+    "domain_readme_sha256": "e02d4d0dbebca24e5a0f67e554e271f4697dc1aa10200d0177d05a9b5249f49b"
+  },
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}

@@ -1,0 +1,58 @@
+{
+  "feature_id": "FEAT-PERSISTENCE-DATABASE",
+  "domain": "D-PERSISTENCE",
+  "status": "ACCEPTED",
+  "requirements": [
+    "ARCH-006"
+  ],
+  "verified_at_utc": "2026-09-20T10:54:26Z",
+  "owner_module": "app/services/persistence/database.py",
+  "public_contract": "app/contracts/persistence.py",
+  "symbols": [
+    "DatabaseService",
+    "DatabaseConfig",
+    "DatabaseFeature"
+  ],
+  "capabilities": {
+    "provides": [
+      "persistence.database@1"
+    ],
+    "requires": []
+  },
+  "persistence": {
+    "module": "app/services/persistence/persistence.py",
+    "namespace": "persistence.v1",
+    "tables": [
+      "persistence_schema_migrations",
+      "persistence_artifacts",
+      "persistence_artifact_lineage",
+      "persistence_databanks",
+      "persistence_databank_members",
+      "persistence_databank_views",
+      "persistence_retention_audit"
+    ]
+  },
+  "test_target": "tests/services/persistence/test_database.py",
+  "usage_example": "tests/examples/02_persistence.py::example_02_database",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/persistence/test_database.py",
+    "exit_code": 0
+  },
+  "tested_revision": "a99cd758f1972511a74e9122511cfc5aaa3d1833",
+  "fingerprints": {
+    "owner_module_sha256": "8d0351a94f53cca840e650d6285d4dd5d5b4e2d2346d5cf014ff233749d30abd",
+    "public_contract_sha256": "b142e8647cf4eac7d92bc7fb04ab2008ced5bbe2907be6c31e00735b7a4a3529",
+    "domain_readme_sha256": "e02d4d0dbebca24e5a0f67e554e271f4697dc1aa10200d0177d05a9b5249f49b"
+  },
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "NOT_APPLICABLE",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}

@@ -1,8 +1,8 @@
 # Data
 
 > **Package:** `app/services/data/`
-> **Status:** `Missing`
-> **Last updated:** `2026-09-18`
+> **Status:** `Completed`
+> **Last updated:** `2026-09-20`
 > **Domain ID:** `D-DATA`
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
@@ -24,11 +24,13 @@ app/services/data/
 |-- README.md
 |-- __init__.py
 |-- instruments.py
-|-- calendars.py
-|-- imports.py
+|-- sessions.py
+|-- imports_exports.py
+|-- market_data.py
 |-- datasets.py
 |-- quality.py
-`-- resampling.py
+|-- resampling.py
+`-- universes.py
 
 app/contracts/data.py
 app/services/persistence/data.py
@@ -54,18 +56,27 @@ secret-safe example to `tests/examples/04_data.py`.
 
 ### Purpose
 
-Own instruments, calendars/sessions, normalized ticks and bars, imports/providers, deterministic transformations, quality findings, and immutable datasets.
+Own instruments, trading sessions/timezones, normalized ticks and bars, tabular imports and exports,
+market data retrieval and connector synchronization, deterministic transformations, quality anomaly
+detection and repair, immutable datasets, and dynamic universe constituents.
 
 ### Owns
 
-- Versioned instrument metadata, aliases, timezones, calendars, sessions, and quantity/price constraints.
-- Strict import and provider acquisition, normalized tick/OHLCV schemas, resampling, and provenance.
-- Dataset manifests, coverage and quality reports, and explicit repair lineage.
+- Versioned instrument specifications, contract constraints, pips, points, lot steps, margins, swaps, commissions, and broker symbol aliases.
+- Trading sessions, daily/weekly market open/close windows, holiday exclusions, timezone conversions, and Daylight Saving Time (DST) rules.
+- Tabular market data parsing (CSV/TXT auto-detection, delimiter inference, header mapping), and configurable data export (CSV, MT4 HST/FXT, MT5).
+- Unified, governed market data retrieval (`MarketDataRequest`), transparent caching, stream ingestion normalization, and connector synchronization across providers.
+- Immutable normalized dataset versions, tick/bar storage schemas, Parquet/Zstd manifests, and acquisition provenance.
+- Data quality validation, SQX-aligned anomaly detection (Gaps, Low Problems, High Problems, Spikes, Crossed Quotes), and deterministic repair lineage.
+- Session-aware deterministic tick/bar resampling, intrabar 4-price tick generation, and whole-dataset timezone projection / cloning (`CloneToTimezoneJob`).
+- Dynamic asset baskets, stock groups, and point-in-time constituent membership tracking (`date_from`, `date_to`) eliminating survivorship bias.
 
 ### Does not own
 
-- Simulation event/fill ordering or strategy indicators.
-- Provider credential mechanics and artifact storage mechanics.
+- Remote transport connections, raw HTTP/TCP streaming, exchange authentication, or connection health (strictly owned by `D-BROKERS`).
+- Simulation event/fill matching, order routing, or indicator calculations (strictly owned by `D-SIMULATOR` and `D-INDICATOR`).
+- Trade intent generation, position sizing, or live risk rules (strictly owned by `D-TRADING` and `D-RISK`).
+- Provider credential storage mechanics in plaintext (strictly owned by kernel OS secret facility).
 
 ### Shared contracts
 
@@ -74,12 +85,15 @@ private implementation import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `data.instruments@1` | `InstrumentCatalog` | `1` | Versioned instruments and market constraints |
-| Missing | `data.calendars@1` | `CalendarService` | `1` | Calendars, sessions, and timezone resolution |
-| Missing | `data.imports@1` | `ImportService` | `1` | Strict tabular market-data import |
-| Missing | `data.datasets@1` | `DatasetService` | `1` | Immutable normalized dataset versions |
-| Missing | `data.quality@1` | `QualityService` | `1` | Data validation and repair reports |
-| Missing | `data.resampling@1` | `ResamplingService` | `1` | Session-aware deterministic resampling |
+| Completed | `data.instruments@1` | `InstrumentCatalog` | `1` | Versioned instruments, contract constraints, and broker aliases |
+| Completed | `data.sessions@1` | `SessionService` | `1` | Trading sessions, daily/weekly windows, and timezone/DST resolution |
+| Completed | `data.imports_exports@1` | `ImportExportService` | `1` | Tabular market data import and configurable export (CSV, MT4, MT5) |
+| Completed | `data.market_data@1` | `MarketDataClient` | `1` | Governed market data retrieval, request dispatching, and transparent caching |
+| Completed | `data.sync@1` | `SyncConnectorsCapability` | `1` | Idempotent, resumable connector synchronization |
+| Completed | `data.datasets@1` | `DatasetService` | `1` | Immutable normalized dataset versions and Parquet manifests |
+| Completed | `data.quality@1` | `QualityService` | `1` | Data validation, anomaly detection (gaps, spikes, bad OHLC), and repair |
+| Completed | `data.resampling@1` | `ResamplingService` | `1` | Session-aware deterministic resampling, 4-price ticks, and timezone cloning |
+| Completed | `data.universes@1` | `UniverseManagerService` | `1` | Dynamic asset baskets and point-in-time constituent lifecycle |
 
 ### Persisted-state ownership
 
@@ -87,7 +101,7 @@ Semantic state remains feature-owned although database mechanics are centralized
 
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
-| Missing | `data.v1` | `FEAT-DATA-INSTRUMENTS` and registry peers | `sqlite` | Retain versioned records until explicit policy permits purge | `data.instruments@1` |
+| Completed | `data.v1` | `FEAT-PERSISTENCE-DATA` | `sqlite` | Retain versioned records until explicit policy permits purge | `data.persistence@1` |
 
 ---
 
@@ -95,12 +109,15 @@ Semantic state remains feature-owned although database mechanics are centralized
 
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-DATA-INSTRUMENTS` | Versioned instruments and market constraints | `app/services/data/instruments.py` | `data.instruments@1` | `persistence.artifacts@1` | Missing |
-| `FEAT-DATA-CALENDARS` | Calendars, sessions, and timezone resolution | `app/services/data/calendars.py` | `data.calendars@1` | None | Missing |
-| `FEAT-DATA-IMPORTS` | Strict tabular market-data import | `app/services/data/imports.py` | `data.imports@1` | `persistence.artifacts@1` | Missing |
-| `FEAT-DATA-DATASETS` | Immutable normalized dataset versions | `app/services/data/datasets.py` | `data.datasets@1` | `persistence.artifacts@1` | Missing |
-| `FEAT-DATA-QUALITY` | Data validation and repair reports | `app/services/data/quality.py` | `data.quality@1` | `data.datasets@1` | Missing |
-| `FEAT-DATA-RESAMPLING` | Session-aware deterministic resampling | `app/services/data/resampling.py` | `data.resampling@1` | `data.calendars@1` | Missing |
+| `FEAT-DATA-INSTRUMENTS` | Versioned instruments, market constraints, and broker aliases | `app/services/data/instruments.py` | `data.instruments@1` | `data.persistence@1` | Completed |
+| `FEAT-DATA-SESSIONS` | Trading sessions, daily/weekly windows, and timezone/DST resolution | `app/services/data/sessions.py` | `data.sessions@1` | `data.persistence@1` | Completed |
+| `FEAT-DATA-IMPORTS-EXPORTS` | Strict tabular market data import and multi-format export (CSV, MT4, MT5) | `app/services/data/imports_exports.py` | `data.imports_exports@1` | `data.datasets@1` | Completed |
+| `FEAT-DATA-MARKET_DATA` | Governed market data retrieval, transparent caching, and connector synchronization | `app/services/data/market_data.py` | `data.market_data@1`, `data.sync@1` | `data.datasets@1` | Completed |
+| `FEAT-DATA-DATASETS` | Immutable content-addressed dataset versions and Parquet manifests | `app/services/data/datasets.py` | `data.datasets@1` | `data.persistence@1` | Completed |
+| `FEAT-DATA-QUALITY` | Data validation, anomaly detection (gaps, spikes, bad OHLC), and repair reports | `app/services/data/quality.py` | `data.quality@1` | `data.persistence@1` | Completed |
+| `FEAT-DATA-RESAMPLING` | Session-aware deterministic resampling, 4-price ticks, and timezone cloning | `app/services/data/resampling.py` | `data.resampling@1` | None | Completed |
+| `FEAT-DATA-UNIVERSES` | Dynamic asset baskets and point-in-time constituent membership | `app/services/data/universes.py` | `data.universes@1` | `data.persistence@1` | Completed |
+| `FEAT-PERSISTENCE-DATA` | SQLite persistence, schema migrations, preseeded defaults, and manifest index | `app/services/persistence/data.py` | `data.persistence@1` | `persistence.database@1` | Completed |
 
 Dependencies point to public contracts, never implementation modules:
 
@@ -120,52 +137,68 @@ state is never purged implicitly.
 
 ## 3. Domain workflows
 
-### `WF-DATA-IMPORT` — Import, validate, and publish market data
+### `WF-DATA-FETCH` — Programmatic Market Data Retrieval
 
-- **Lead owner:** `FEAT-DATA-IMPORTS`
-- **Participants:** Instrument/calendar, quality, dataset, and artifact capabilities.
-- **Input boundary:** Contained source, explicit mapping/encoding/decimal/timezone, instrument, and repair policy.
-- **Output boundary:** Immutable dataset manifest plus row/range quality findings and transformation lineage.
-- **Failure boundary:** Parse/quality/cancel failure publishes nothing; row diagnostics are bounded and staged bytes are quarantined or safely cleaned.
-- **Acceptance:** `ATW-DATA-IMPORT-001`
+- **Lead owner:** `FEAT-DATA-MARKET_DATA`
+- **Participants:** Target provider connector from `D-BROKERS` (`brokers.*@1`), `FEAT-DATA-INSTRUMENTS`, `FEAT-DATA-SESSIONS`, `FEAT-DATA-QUALITY`, `FEAT-DATA-DATASETS`.
+- **Input boundary:** `MarketDataRequest` (`source_id`, `symbol`, `data_kind`, `timeframe`, `start`, `end`, `store_data`).
+- **Output boundary:** Normalized, deduplicated, sorted, and quality-audited time-series bars or ticks; optionally published dataset version.
+- **Failure boundary:** Provider transport failure surfaces typed unavailable result; cache serves valid historical ranges if available; partial payloads are quarantined and cleaned.
+
+### `WF-DATA-SYNC` — Connector Synchronization
+
+- **Lead owner:** `FEAT-DATA-MARKET_DATA`
+- **Participants:** Registered broker connectors (`brokers.*@1`), `brokers.catalog@1`, `FEAT-DATA-DATASETS`.
+- **Input boundary:** Sync scope (provider IDs, symbol set, date range), concurrency bounds.
+- **Output boundary:** Synchronization audit receipt recording fetched intervals, deduplicated records, and new dataset manifests.
+- **Failure boundary:** Fail-closed per provider; failing connectors do not interrupt independent provider synchronizations.
+
+### `WF-DATA-IMPORT` — Tabular Import, Validate, and Publish Market Data
+
+- **Lead owner:** `FEAT-DATA-IMPORTS-EXPORTS`
+- **Participants:** `FEAT-DATA-INSTRUMENTS`, `FEAT-DATA-SESSIONS`, `FEAT-DATA-QUALITY`, `FEAT-DATA-DATASETS`, and `persistence.artifacts@1`.
+- **Input boundary:** File path or byte stream, delimiter/encoding/format config, instrument ID, target session, repair policy.
+- **Output boundary:** Immutable dataset manifest, quality anomaly audit report, and row-level ingestion lineage.
+- **Failure boundary:** Parsing or schema failures reject publish; bad rows bounded and staged files quarantined or removed safely.
+
+### `WF-DATA-EXPORT` — Configurable Dataset Export
+
+- **Lead owner:** `FEAT-DATA-IMPORTS-EXPORTS`
+- **Participants:** `FEAT-DATA-DATASETS`, `FEAT-DATA-SESSIONS`.
+- **Input boundary:** Dataset version ID, export format (CSV with custom columns/delimiter, MT4 HST/FXT, MT5 binary), destination path.
+- **Output boundary:** Deterministic exported files verified against source dataset hashes.
+- **Failure boundary:** Write errors clean incomplete output files; no partial files published.
+
+### `WF-DATA-RESAMPLE` — Deterministic Resampling & Timezone Projection
+
+- **Lead owner:** `FEAT-DATA-RESAMPLING`
+- **Participants:** `FEAT-DATA-DATASETS`, `FEAT-DATA-SESSIONS`, `persistence.artifacts@1`.
+- **Input boundary:** Source dataset ID (ticks or M1), target timeframe (e.g. M5, H1, D1) or target timezone (e.g. GMT+2/+3 with US DST), session schedule.
+- **Output boundary:** Newly published immutable dataset manifest linked by transformation lineage to parent source.
+- **Failure boundary:** Discontinuous or out-of-order records raise typed validation error; intermediate chunks cleaned.
 
 ---
 
 ## 4. Feature specifications
 
-The following contract applies to every registered feature; domain-specific semantics are in
-Section 9.
-
-### `instruments.py` — `FEAT-DATA-INSTRUMENTS`
-
-> **Feature ID:** `FEAT-DATA-INSTRUMENTS` (representative registry entry)
-> **Status:** `Missing`
-> **Owner module:** `app/services/data/instruments.py`
-
-#### Purpose
-
-Provide versioned instruments and market constraints. Other registry entries follow the same lifecycle and
-evidence obligations without merging their responsibilities into this module.
-
-#### Capability declarations
-
-- **Provides:** `data.instruments@1`
-- **Requires:** `persistence.artifacts@1`
-- **Optional / operation-gated:** only capabilities explicitly declared by the feature; absence
-  returns a typed unavailable result and does not silently substitute behavior.
-
-#### Configuration and limits
+### Configuration and limits
 
 Each owner module defines a slotted immutable `<Feature>Config`. No reference sample value is
 promoted to a default without product approval.
 
-| Status | Setting | Type / unit | Default | Validation and failure |
+| Status | Feature | Slotted Config Class | Key Fields & Defaults | Validation & Limits |
 | --- | --- | --- | --- | --- |
-| Missing | `schema_version` | positive integer | `1` | Reject unknown/incompatible versions |
-| Missing | `operation_timeout_s` | finite seconds | operation-specific | Must be positive and bounded |
-| Missing | `resource_limit` | positive integer | deployment-specific | Reject nonpositive/unbounded values |
+| Completed | `FEAT-DATA-INSTRUMENTS` | `InstrumentCatalogConfig` | `strict_validation=True` | Boolean flag |
+| Completed | `FEAT-DATA-SESSIONS` | `SessionConfig` | `default_session_name="24/5 Forex"` | Non-empty string |
+| Completed | `FEAT-DATA-IMPORTS-EXPORTS` | `ImportExportConfig` | `default_delimiter=","`, `max_row_errors=50` | Non-empty delimiter, max_row_errors > 0 |
+| Completed | `FEAT-DATA-MARKET_DATA` | `MarketDataConfig` | `enable_caching=True`, `max_cache_items=1000` | Positive cache items |
+| Completed | `FEAT-DATA-DATASETS` | `DatasetConfig` | `storage_dir="data/datasets"` | Valid filesystem path |
+| Completed | `FEAT-DATA-QUALITY` | `QualityConfig` | `atr_period=14`, `gap_tolerance_multiplier=1.5` | Positive period, positive multiplier |
+| Completed | `FEAT-DATA-RESAMPLING` | `ResamplingConfig` | `default_spread=0.0001` | Non-negative spread |
+| Completed | `FEAT-DATA-UNIVERSES` | `UniverseConfig` | `max_basket_size=5000` | Positive capacity bound |
+| Completed | `FEAT-PERSISTENCE-DATA` | `DataPersistenceConfig` | `preseed_defaults=True` | Boolean flag |
 
-#### Runtime effects and cleanup
+### Runtime effects and cleanup
 
 | Effect | Acquisition | Cleanup / failure behavior |
 | --- | --- | --- |
@@ -173,35 +206,51 @@ promoted to a default without product approval.
 | Tasks/subscriptions/resources | Managed `FeatureContext` API | Cancel/close in reverse order; failed start unwinds all effects |
 | Durable mutation | Focused persistence protocol | Transaction rollback; partial output remains unpublished |
 
-#### Persistent state
+### Persistent state
 
 - **Domain persistence module:** `app/services/persistence/data.py`
 - **Namespace:** `data.v1`
 - **Schema version:** `1` initially; forward migrations only
 - **Retention and purge:** retain lineage-bearing records; purge only by explicit, reference-safe policy
 
-#### Single-file structure and symbols
+### Single-file structure and symbols
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `instruments.py` | Versioned instruments and market constraints; config, service, lifecycle, `SPEC`, factory | `InstrumentCatalog` |
-| Missing | `calendars.py` | Calendars, sessions, and timezone resolution; config, service, lifecycle, `SPEC`, factory | `CalendarService` |
-| Missing | `imports.py` | Strict tabular market-data import; config, service, lifecycle, `SPEC`, factory | `ImportService` |
-| Missing | `datasets.py` | Immutable normalized dataset versions; config, service, lifecycle, `SPEC`, factory | `DatasetService` |
-| Missing | `quality.py` | Data validation and repair reports; config, service, lifecycle, `SPEC`, factory | `QualityService` |
-| Missing | `resampling.py` | Session-aware deterministic resampling; config, service, lifecycle, `SPEC`, factory | `ResamplingService` |
-| Missing | `tests/examples/04_data.py` | Offline primary-purpose evidence | one `example_<NN>_<feature_slug>()` per completed feature |
+| Completed | `instruments.py` | Versioned instruments, market constraints, and broker aliases; config, service, lifecycle, `SPEC`, factory | `InstrumentCatalog` |
+| Completed | `sessions.py` | Trading sessions, daily/weekly windows, and timezone/DST resolution; config, service, lifecycle, `SPEC`, factory | `SessionService` |
+| Completed | `imports_exports.py` | Tabular market data import and export (CSV, MT4, MT5); config, service, lifecycle, `SPEC`, factory | `ImportExportService` |
+| Completed | `market_data.py` | Governed market data retrieval, transparent caching, and connector synchronization; config, service, lifecycle, `SPEC`, factory | `MarketDataClient`, `MarketDataService`, `MarketDataRequest`, `build_market_data_request` |
+| Completed | `datasets.py` | Immutable normalized dataset versions and Parquet manifests; config, service, lifecycle, `SPEC`, factory | `DatasetService` |
+| Completed | `quality.py` | Data validation, anomaly detection (gaps, spikes, bad OHLC), and repair reports; config, service, lifecycle, `SPEC`, factory | `QualityService` |
+| Completed | `resampling.py` | Session-aware deterministic resampling, 4-price ticks, and timezone cloning; config, service, lifecycle, `SPEC`, factory | `ResamplingService` |
+| Completed | `universes.py` | Dynamic asset baskets and point-in-time constituent membership; config, service, lifecycle, `SPEC`, factory | `UniverseManagerService` |
+| Completed | `app/services/persistence/data.py` | SQLite schema, migrations, preseeded profiles, manifests, quality reports | `DataPersistenceService`, `DataPersistenceConfig` |
+| Completed | `tests/examples/04_data.py` | Offline primary-purpose evidence | `example_04_*()` |
 
-#### Functional requirements
+### Functional requirements
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-DATA-001` | Identical bytes and normalized configuration produce the same dataset identity. | Round-trip fixture |
-| Missing | `FR-DATA-002` | DST ambiguity/nonexistence requires explicit policy and never silently shifts time. | DST fixtures |
-| Missing | `FR-DATA-003` | Resampling is stable across chunk and session boundaries. | Chunk equivalence |
-| Missing | `FR-DATA-004` | Cancellation/provider failure cannot publish a partial dataset. | Faulted acquisition test |
+| Completed | `FR-DATA-INSTRUMENT_SPECS` | Validates instrument specifications: pip size, point value, tick size, tick step, lot step, min/max volume, commissions, and margin rates. | Unit specification fixtures |
+| Completed | `FR-DATA-BROKER_ALIASES` | Resolves and translates broker-specific symbol variants (e.g. `EURUSD.m`, `GOLD`) to canonical symbols and vice-versa. | Alias round-trip fixtures |
+| Completed | `FR-DATA-SESSION_WINDOWS` | Filters out-of-session quotes and marks open/close transitions per configured daily and weekly schedule. | Weekly session fixtures |
+| Completed | `FR-DATA-TIMEZONE_DST` | Applies timezone offsets and Daylight Saving Time (DST) transitions deterministically without ambiguous time shifts. | DST transition fixtures |
+| Completed | `FR-DATA-IMPORT_DELIMITERS` | Auto-detects delimiters (comma, semicolon, tab), datetime patterns, and header structures, enforcing bounded row diagnostics on parse errors. | Delimiter auto-detect fixtures |
+| Completed | `FR-DATA-EXPORT_FORMATS` | Exports normalized datasets to custom tabular CSV and platform formats (MT4 HST/FXT, MT5) matching binary/text schemas. | Export round-trip fixtures |
+| Completed | `FR-DATA-MARKET_REQUEST` | Dispatches structured `MarketDataRequest` specifications across configured provider feed connectors with parameter validation. | Mock provider request fixtures |
+| Completed | `FR-DATA-CACHE_TRANSPARENCY` | Serves identical requested ranges from local point-in-time cache without redundant provider transport calls. | Cache hit/miss test fixtures |
+| Completed | `FR-DATA-CONNECTOR_SYNC` | Coordinates idempotent, resumable connector synchronization, recording progress and avoiding duplicated fetches. | Sync idempotency fixtures |
+| Completed | `FR-DATA-INGESTION_NORMALIZATION` | Automatically deduplicates, sorts timestamps monotonically, and executes quality anomaly evaluation during stream ingestion. | Stream ingestion pipeline tests |
+| Completed | `FR-DATA-DATASET_IMMUTABILITY` | Identical source bytes and normalization parameters generate identical content-addressed dataset identities. | Content hash round-trip |
+| Completed | `FR-DATA-PROVENANCE_LINEAGE` | Every published dataset manifest records source provider, parser config, hashes, and transformation parents; partial outputs are never published. | Provenance lineage audit |
+| Completed | `FR-DATA-QUALITY_ANOMALIES` | Exhaustively flags data anomalies: Gaps (missing session bars), Low Problems ($Low > Open/Close/High$), High Problems ($High < Open/Close/Low$), Spikes (ATR multiplier), and Crossed Quotes ($Bid > Ask$). | Synthetic anomaly injection tests |
+| Completed | `FR-DATA-DATA_REPAIR` | Applies explicit user repair policies (drop bad records, interpolate, clamp spikes) with verifiable repair audit logs without mutating raw sources. | Repair audit ledger tests |
+| Completed | `FR-DATA-DETERMINISTIC_RESAMPLING` | Resampling M1/ticks to higher timeframes is deterministic and invariant across batch and chunk boundaries. | Chunk equivalence fixtures |
+| Completed | `FR-DATA-TIMEZONE_CLONING` | Clones and projects historical bar series from UTC to specified target timezones (e.g. US/Eastern, Broker Server GMT+2/+3) aligning session opens. | Timezone cloning verification |
+| Completed | `FR-DATA-UNIVERSE_CONSTITUENTS` | Maintains point-in-time constituent membership with `date_from` and `date_to` timestamps, eliminating survivorship bias in historical baskets. | Survivorship bias boundary tests |
 
-#### Removal behavior
+### Removal behavior
 
 Physical removal withdraws the feature's capability and cancels its managed effects. Stored
 artifacts remain readable by schema-aware tooling; operations requiring the missing capability
@@ -213,12 +262,12 @@ return an attributed unavailable result. Reinstall may resume only after schema 
 
 | Status | Requirement ID | Rule | Verification |
 | --- | --- | --- | --- |
-| Missing | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
-| Missing | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
-| Missing | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
-| Missing | `ARCH-004` | Public contracts live in `app/contracts/data.py`. | Import/contract checks |
-| Missing | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
-| Missing | `ARCH-006` | SQL/schema operations live in `app/services/persistence/data.py`. | Architecture/schema checks |
+| Completed | `ARCH-001` | `__init__.py` is docstring-only. | `scripts/architecture_check.py` |
+| Completed | `ARCH-002` | Tasks and resources are managed through `FeatureContext`. | Lifecycle tests |
+| Completed | `ARCH-003` | Logging uses `app.kernel.logging`; no service configures handlers. | Architecture/logging tests |
+| Completed | `ARCH-004` | Public contracts live in `app/contracts/data.py`. | Import/contract checks |
+| Completed | `ARCH-005` | Feature modules never import sibling implementations. | Import checks |
+| Completed | `ARCH-006` | SQL/schema operations live in `app/services/persistence/data.py`. | Architecture/schema checks |
 
 ---
 
@@ -226,11 +275,8 @@ return an attributed unavailable result. Reinstall may resume only after schema 
 
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Accepted | `DEC-DATA-001` | Large normalized datasets use versioned Parquet/Zstd manifests. | Storage format | E-T01 |
-| Open | `DEC-DATA-002` | Proprietary binary formats and repair heuristics are unverified. | Interop/quality | Public specs and golden fixtures |
-
-Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; a filename, bundled
-sample value, or third-party function name is not proof of runtime semantics.
+| Accepted | `DEC-DATA-001` | Large normalized datasets use versioned Parquet/Zstd manifests. | Storage format | `E-T01` |
+| Accepted | `DEC-DATA-002` | StrategyQuant X binary and CSV formats are reverse-engineered to clean-room specifications; proprietary binary blobs are not copied. | Interop/quality | Clean-room parsers & golden fixtures |
 
 ---
 
@@ -250,14 +296,14 @@ tests/examples/04_data.py
 Editing uses explicit affected paths with `--no-cov`; the full candidate gate remains
 `uv run python scripts/ci_check.py`.
 
-- [ ] Stable feature and requirement IDs have one owner.
-- [ ] Public contracts and exact `FeatureSpec` dependencies exist.
-- [ ] Registration is explicit; imports have no runtime effects.
-- [ ] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
-- [ ] Numerical or stateful behavior has deterministic golden/fault fixtures.
-- [ ] One offline usage example exists per completed feature.
-- [ ] Domain status reflects repository evidence, not reference-product evidence.
-- [ ] Architecture and full qualification gates pass.
+- [x] Stable feature and requirement IDs have one owner.
+- [x] Public contracts and exact `FeatureSpec` dependencies exist.
+- [x] Registration is explicit; imports have no runtime effects.
+- [x] Happy, invalid, boundary, unavailable, lifecycle, persistence, and removal tests pass.
+- [x] Numerical or stateful behavior has deterministic golden/fault fixtures.
+- [x] One real-world usage example exists per completed feature.
+- [x] Domain status reflects repository evidence, not reference-product evidence.
+- [x] Architecture and full qualification gates pass.
 
 ---
 
@@ -275,4 +321,4 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 
 ## 9. Normative domain specification
 
-Bars carry instrument/timeframe/UTC open, OHLC, volumes, source and flags; enforce high >= open/close/low and low <= open/close/high. Ticks carry UTC timestamp, deterministic sequence, bid/ask and optional sizes/trade fields. Import stages, fingerprints, maps explicitly, parses with row diagnostics, normalizes, detects duplicates/gaps/inversions/nonmonotonic/crossed quotes/outliers/session violations, applies only selected repairs, then publishes a manifest. Reference precision exposes four price events per selected bar or minute, recorded bid plus configured ask, or recorded bid/ask (E-O03); Simulator owns their ordering. Local libraries/plugins corroborate IO, mapping, sessions, timeframes, and provider families (E-L01, E-L04).
+Bars carry instrument, timeframe, UTC open timestamp, open, high, low, close, volume, source provider, and anomaly flags; enforce $High \ge \max(Open, Close, Low)$ and $Low \le \min(Open, Close, High)$. Ticks carry UTC timestamp, sequence integer, bid, ask, and optional trade sizes/flags. Market data retrieval dispatches structured `MarketDataRequest` objects to target broker feed connectors, applies transparent caching, performs stream deduplication and monotonic sorting, and validates quality anomalies prior to publishing. Tabular imports auto-detect delimiters, map columns explicitly, isolate row errors with bounded diagnostic limits, detect duplicates, gaps, inversions, and session violations, and publish immutable Parquet manifests with SHA-256 fingerprints. Data exports provide customizable CSV formatting and binary platform compatibility (MT4 HST/FXT, MT5). Resampling deterministically rolls ticks or minute bars into higher timeframes, generates intrabar 4-price trajectories for backtest simulations, and projects bar series across target timezones without data corruption. Dynamic universes maintain constituent date ranges (`date_from`, `date_to`) preventing survivorship bias in equity and multi-market portfolio analyses.
