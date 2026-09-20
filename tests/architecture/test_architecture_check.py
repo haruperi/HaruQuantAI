@@ -119,6 +119,6 @@ def test_frontend_xml_implementations_are_rejected(
 
 
 def test_reference_evidence_is_outside_active_source_scope() -> None:
-    """Documentation containing SQX XML evidence is not an accepted scan target."""
-    with pytest.raises(ValueError, match="not supported application source"):
-        check_paths(["app/ui/docs/coverage.json"])
+    """Structured reference evidence is not an accepted application target."""
+    with pytest.raises(ValueError, match="outside app or missing"):
+        check_paths(["docs/dev/evidence/reimplementation.json"])

@@ -437,7 +437,7 @@ Source/evidence register used by all domain READMEs:
 | E-L04 | `...\internal\libs\*.jar` and exposed Java snippets; manifests/packages/symbols/targeted behavior | Medium–High; reduced to testable contracts, no source copied |
 | E-L05 | `StrategyQuantX.config` and `sqcli.config`; shipped runtime options | High file evidence; not active-runtime proof |
 | E-L06 | `Extending_SQX.pdf`; one-page redirect to online codebase documentation | Confirmed; no substantive offline API guide |
-| E-R01 | `app/ui/docs/coverage.json`, `parity.md`, `mock-contracts.md` | Confirmed baseline UI evidence |
+| E-R01 | `docs/dev/evidence/reimplementation.json` | Confirmed baseline UI evidence |
 | E-O01 | [Official program layout](https://strategyquant.com/doc/strategyquant/program-layout/) | High; may span builds |
 | E-O02 | [Official programming introduction](https://strategyquant.com/doc/programming-for-sq/introduction-2/) and indicator guides | High public plugin/snippet/XML/template model |
 | E-O03 | [Official data/precision guide](https://strategyquant.com/doc/strategyquant/data/) | High modes; edge ordering unverified |

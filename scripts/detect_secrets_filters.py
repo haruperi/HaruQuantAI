@@ -19,11 +19,18 @@ _BASELINE_UPDATED_EXIT = 3
 _ACCEPTANCE_PATH_RE = re.compile(
     r"^docs/dev/evidence/features/FEAT-[A-Z0-9_-]+/acceptance\.json$"
 )
+_REIMPLEMENTATION_PATH = "docs/dev/evidence/reimplementation.json"
 _BASELINE_COMMIT_LINE_RE = re.compile(
     r'^\s*"(?:baseline_commit|tested_revision)"\s*:\s*"(?P<commit>[a-f0-9]{40})"\s*,?\s*$'
 )
+_REIMPLEMENTATION_COMMIT_LINE_RE = re.compile(
+    r'^\s*"repository_commit"\s*:\s*"(?P<commit>[a-f0-9]{40})"\s*,?\s*$'
+)
 _FINGERPRINT_HASH_LINE_RE = re.compile(
     r'^\s*"(?:owner_module_sha256|public_contract_sha256|domain_readme_sha256)"\s*:\s*"(?P<hash>[a-f0-9]{64})"\s*,?\s*$'
+)
+_REIMPLEMENTATION_FINGERPRINT_LINE_RE = re.compile(
+    r'^\s*"value"\s*:\s*"(?P<hash>[a-f0-9]{64})"\s*,?\s*$'
 )
 
 
@@ -63,6 +70,8 @@ def is_valid_repository_commit_evidence(
         return False
     if _ACCEPTANCE_PATH_RE.fullmatch(relative_path):
         match = _BASELINE_COMMIT_LINE_RE.fullmatch(line)
+    elif relative_path == _REIMPLEMENTATION_PATH:
+        match = _REIMPLEMENTATION_COMMIT_LINE_RE.fullmatch(line)
     else:
         return False
     if match is None or match.group("commit") != secret:
@@ -81,6 +90,8 @@ def is_valid_repository_fingerprint_evidence(
         return False
     if _ACCEPTANCE_PATH_RE.fullmatch(relative_path):
         match = _FINGERPRINT_HASH_LINE_RE.fullmatch(line)
+    elif relative_path == _REIMPLEMENTATION_PATH:
+        match = _REIMPLEMENTATION_FINGERPRINT_LINE_RE.fullmatch(line)
     else:
         return False
     if match is None or match.group("hash") != secret:

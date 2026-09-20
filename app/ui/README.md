@@ -224,20 +224,20 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 | Partial | `FR-UI-018` | Until authoritative provider capabilities exist, every provider download, import, update, save, and load is identified as a simulation and cannot contact providers, transmit credentials, mutate native application data, or imply successful market-data acquisition. | Negative E2E tests |
 | Partial | `FR-UI-019` | Every Data sources dropdown command uses a purpose-specific icon: add-symbol commands use an add cue; searches use search; downloads use cloud download; single-file, multi-file, folder, application, and terminal imports use distinct file or source cues; information uses an information cue; updates use refresh; and each Crypto exchange choice uses a distinct exchange cue. Shape remains meaningful without color, text labels remain authoritative, and restrained color reinforces action categories without replacing accessible names. | Inventory/E2E tests |
 | Partial | `FR-UI-020` | The Data sources workspace displays a full-width dataset table without an Available data sidebar. After the selection checkbox, columns appear in this order: Symbol Name, Instrument, Broker profile, Underlying Symbol, Timeframe, Timezone, Date from, Date to, Total Days, Total Records, Source, Bar type, Data type, Hide. Above the table, provide Filter items, data-source, data-type, stock-group, and broker-profile filters followed by the matching record count. Symbol Name supports ascending and descending sorting; selecting all affects visible rows. Display an empty-result message when filters match no rows and an em dash for unavailable metadata. Total Days counts inclusive calendar days between the displayed dates. The current sample data supports instrument-category filtering; stock-group and broker-profile filters remain disabled until configured, and Hide is a session-local flag. | E2E tests |
-| Implemented | `FR-UI-021` | Switching among Data sources, Export, and Tools preserves the same dataset table, its filters, sorting, selection, and session-local Hide flags. Export provides the three active SQX workflows: Export to CSV with persisted custom formats and bounded browser CSV downloads, Export MT4 (FXT & HST) with specification loading and an explicitly non-native mock manifest, and Export to MT5 data (99% test) with source-dependent spread controls and overwrite confirmation. All jobs use the shared progress strip, pause/resume/stop actions, persistence, and the trailing Status column. | Unit/E2E tests; `docs/data-export-coverage.md` |
-| Implemented | `FR-UI-022` | The Data Manager Tools toolbar contains exactly two actions in order: Clone to timezone, identified by a globe with a clock, and View & Analyze, identified by a candlestick chart. Clone to timezone validates the shared selection, prevents recursive clones, persists derived definitions and settings, and uses the shared progress controls and trailing Status column. View & Analyze provides virtualized deterministic data, chart, and quality views with persisted edits/deletions and discard confirmation. Both workflows retain the HaruQuantAI theme and state across reloads. | Unit/E2E tests; `docs/data-tools-coverage.md` |
-| Implemented | `FR-UI-023` | Data Manager provides separate Instruments and Sessions tabs. Instruments implements Add, Clone, Mass Edit, Mass Delete, Save, and Load. Sessions implements Add, Clone, Mass Delete, Save, and Load with the active SQX template editor, nested session-hours editor, Add Mon-Fri generation, broker postfixes, unsaved-change handling, dependency-safe deletion, and versioned Sessions JSON import/export conflict behavior. All state is browser-local and survives reload. | Unit/E2E tests; `docs/instruments-coverage.md`; `docs/sessions-coverage.md` |
-| Implemented | `FR-UI-024` | Instruments provides working Filter items, All data types, and All broker profiles controls above a selectable reactive table. Columns follow this order: Instrument, Description, Broker profile, Point value, Pip/Tick size, Pip/Tick step, Default spread, Default slippage, Commissions, Swap, Data type, Order size mult., Order size step, followed by row actions. Sorting, combined filters, visible-row select-all, double-click Edit, and trailing row deletion operate on the persisted shared catalogue. | Unit/E2E tests; `docs/instruments-coverage.md` |
-| Implemented | `FR-UI-025` | Sessions provides working Filter items and All broker profiles controls above a full-width persisted table. Rows contain selection, Session Name, Broker profile, flexible space, and far-right delete. Search covers names and broker names, broker filtering works, visible-row select-all preserves hidden selections, double-click opens Edit, and row deletion uses the shared dependency-safe confirmation. | Unit/E2E tests; `docs/sessions-coverage.md` |
-| Implemented | `FR-UI-026` | External indicators implements Add/Edit/Help, timestamped data import with reusable formats and persistent progress, metadata-only MQ4 recognition, View & Analyze, clear/delete, and versioned definition JSON Save/Load conflict handling. The seven actions follow active SQX registration order. The reactive table provides search, return-type filtering, visible select-all, double-click Edit, row delete, record metadata, and trailing job status. Definitions, imported records, formats, and jobs survive reload in validated browser-local state. | Unit/E2E tests; `docs/external-indicators-coverage.md` |
-| Implemented | `FR-UI-027` | Stock groups implements Add/Edit metadata, historical member editing, bounded CSV replacement import, meaningful `GroupStocks.json` export, automatic local data updates with pause/reload/resume/stop, inline readiness updates, protected-group-aware mass deletion, and versioned `Groups.json` Save/Load conflict handling. The audited six actions and eight data columns are fully stateful; file-import groups synchronize into validated versioned persistence and generated Equity rows appear across Data sources, Export, and Tools. | Unit/E2E tests; `docs/stock-groups-coverage.md` |
-| Implemented | `FR-UI-028` | Broker profiles implements Add/Edit with Stockpicker and MT4/5 settings, broker-aware stock membership and CSV import/JSON export, selected Instruments/Sessions JSON import with postfix and conflict handling, automatic persisted data updates with shared pause/reload/resume/stop, dependency-safe mass deletion, and versioned `Brokers.json` Save/Load conflict handling. The eight audited actions and seven data columns are fully stateful; customized counts derive from effective records and profile changes propagate to existing broker selectors. | Unit/E2E tests; `docs/broker-profiles-coverage.md` |
+| Implemented | `FR-UI-021` | Switching among Data sources, Export, and Tools preserves the same dataset table, its filters, sorting, selection, and session-local Hide flags. Export provides the three active SQX workflows: Export to CSV with persisted custom formats and bounded browser CSV downloads, Export MT4 (FXT & HST) with specification loading and an explicitly non-native mock manifest, and Export to MT5 data (99% test) with source-dependent spread controls and overwrite confirmation. All jobs use the shared progress strip, pause/resume/stop actions, persistence, and the trailing Status column. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-022` | The Data Manager Tools toolbar contains exactly two actions in order: Clone to timezone, identified by a globe with a clock, and View & Analyze, identified by a candlestick chart. Clone to timezone validates the shared selection, prevents recursive clones, persists derived definitions and settings, and uses the shared progress controls and trailing Status column. View & Analyze provides virtualized deterministic data, chart, and quality views with persisted edits/deletions and discard confirmation. Both workflows retain the HaruQuantAI theme and state across reloads. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-023` | Data Manager provides separate Instruments and Sessions tabs. Instruments implements Add, Clone, Mass Edit, Mass Delete, Save, and Load. Sessions implements Add, Clone, Mass Delete, Save, and Load with the active SQX template editor, nested session-hours editor, Add Mon-Fri generation, broker postfixes, unsaved-change handling, dependency-safe deletion, and versioned Sessions JSON import/export conflict behavior. All state is browser-local and survives reload. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-024` | Instruments provides working Filter items, All data types, and All broker profiles controls above a selectable reactive table. Columns follow this order: Instrument, Description, Broker profile, Point value, Pip/Tick size, Pip/Tick step, Default spread, Default slippage, Commissions, Swap, Data type, Order size mult., Order size step, followed by row actions. Sorting, combined filters, visible-row select-all, double-click Edit, and trailing row deletion operate on the persisted shared catalogue. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-025` | Sessions provides working Filter items and All broker profiles controls above a full-width persisted table. Rows contain selection, Session Name, Broker profile, flexible space, and far-right delete. Search covers names and broker names, broker filtering works, visible-row select-all preserves hidden selections, double-click opens Edit, and row deletion uses the shared dependency-safe confirmation. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-026` | External indicators implements Add/Edit/Help, timestamped data import with reusable formats and persistent progress, metadata-only MQ4 recognition, View & Analyze, clear/delete, and versioned definition JSON Save/Load conflict handling. The seven actions follow active SQX registration order. The reactive table provides search, return-type filtering, visible select-all, double-click Edit, row delete, record metadata, and trailing job status. Definitions, imported records, formats, and jobs survive reload in validated browser-local state. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-027` | Stock groups implements Add/Edit metadata, historical member editing, bounded CSV replacement import, meaningful `GroupStocks.json` export, automatic local data updates with pause/reload/resume/stop, inline readiness updates, protected-group-aware mass deletion, and versioned `Groups.json` Save/Load conflict handling. The audited six actions and eight data columns are fully stateful; file-import groups synchronize into validated versioned persistence and generated Equity rows appear across Data sources, Export, and Tools. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-028` | Broker profiles implements Add/Edit with Stockpicker and MT4/5 settings, broker-aware stock membership and CSV import/JSON export, selected Instruments/Sessions JSON import with postfix and conflict handling, automatic persisted data updates with shared pause/reload/resume/stop, dependency-safe mass deletion, and versioned `Brokers.json` Save/Load conflict handling. The eight audited actions and seven data columns are fully stateful; customized counts derive from effective records and profile changes propagate to existing broker selectors. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
 | Partial | `FR-UI-029` | Data Manager provides a Log tab after Broker profiles. Hide the action ribbon and progress strip on this tab and fill the remaining workspace with a bordered, scrollable log area. Display Log at the upper left and Clear log at the upper right. Show timestamped simulated operation transitions, retaining at most 500 entries during the mounted Data Manager session. Clear log removes displayed entries without stopping work; subsequent transitions can add entries. An unused or cleared log stays blank. | E2E tests |
 | Partial | `FR-UI-030` | All nine Data sources provider icons and five contextual action icons use distinct or purpose-consistent accent colors while retaining their shapes and text labels. All toolbar buttons remain enabled and keyboard reachable. Clicking Update selected, Mass delete, or Save without selected datasets displays Select at least one dataset first and does not start an operation or open its dialog. | E2E tests |
-| Implemented | `FR-UI-031` | The global Settings gear opens the audited command menu in its registered group order. Configuration provides Global, CPU, Performance, Memory, Databanks, Optimizations, and Troubleshooting tabs with validated draft/save behavior. Benchmark, Remote access, MCP Server, SMTP server, Language, Skin, Zoom/fullscreen, local support notices, Update license, About, Reload UI, and Exit expose complete browser-safe interactions. Secrets remain dialog-local, external/native effects are explicitly simulated, and preferences migrate older persisted state. Redundant standalone Theme/Help controls and the development-only Feature Profile selector are omitted from the header; Full is the normal UI fixture and Starter remains test-only policy state. | Unit/E2E tests; `docs/reference.md` |
-| Implemented | `FR-UI-032` | The header exposes Debug Console, Grid Control, and Volume & Market Profile actions in reference order before Settings, while omitting the duplicate Code Editor top action. Debug Console provides bounded category/text-filtered mock logs and Clear; Grid Control classifies current jobs into running/waiting/finished tables with manual and three-second display refresh plus error detail; Volume Profile presents inactive-addon information and safe local notices for unavailable commercial actions. | Unit/E2E tests; `docs/reference.md` |
-| Implemented | `FR-UI-033` | The application sidebar collapses from its 190 px labelled layout to a 49 px icon rail using matching line-and-chevron controls. Application icons, accessible names, tooltips, active state, and navigation remain available while labels, group headings, and the home shortcut hint are hidden. The preference is stored in the versioned application settings and survives reload. | Unit/E2E tests; `docs/navigation.md` |
-| Implemented | `FR-UI-034` | Every rendered product label uses HaruQuantAI. Provider labels omit the legacy `SQ` prefix, the default broker is `Default`, and persisted legacy display strings are normalized before validation. Compatibility identifiers and lower-case browser-storage keys remain stable. Commercial reference links are replaced by truthful local mock notices. | Unit/E2E tests; `docs/branding-coverage.md` |
+| Implemented | `FR-UI-031` | The global Settings gear opens the audited command menu in its registered group order. Configuration provides Global, CPU, Performance, Memory, Databanks, Optimizations, and Troubleshooting tabs with validated draft/save behavior. Benchmark, Remote access, MCP Server, SMTP server, Language, Skin, Zoom/fullscreen, local support notices, Update license, About, Reload UI, and Exit expose complete browser-safe interactions. Secrets remain dialog-local, external/native effects are explicitly simulated, and preferences migrate older persisted state. Redundant standalone Theme/Help controls and the development-only Feature Profile selector are omitted from the header; Full is the normal UI fixture and Starter remains test-only policy state. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-032` | The header exposes Debug Console, Grid Control, and Volume & Market Profile actions in reference order before Settings, while omitting the duplicate Code Editor top action. Debug Console provides bounded category/text-filtered mock logs and Clear; Grid Control classifies current jobs into running/waiting/finished tables with manual and three-second display refresh plus error detail; Volume Profile presents inactive-addon information and safe local notices for unavailable commercial actions. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-033` | The application sidebar collapses from its 190 px labelled layout to a 49 px icon rail using matching line-and-chevron controls. Application icons, accessible names, tooltips, active state, and navigation remain available while labels, group headings, and the home shortcut hint are hidden. The preference is stored in the versioned application settings and survives reload. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Implemented | `FR-UI-034` | Every rendered product label uses HaruQuantAI. Provider labels omit the legacy `SQ` prefix, the default broker is `Default`, and persisted legacy display strings are normalized before validation. Compatibility identifiers and lower-case browser-storage keys remain stable. Commercial reference links are replaced by truthful local mock notices. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
 
 #### Removal behavior
 
@@ -301,14 +301,9 @@ npm run preview
 
 Workspace state is stored under local storage key `sqx-recreation-v1`. Open **Configuration → Mock developer tools → Reset fixture workspace** to restore deterministic seeds.
 
-### Frontend documentation
+### Frontend evidence
 
-- [Reference audit](docs/reference.md)
-- [Coverage inventory](docs/coverage.json)
-- [Interaction map](docs/interactions.md)
-- [Navigation map](docs/navigation.md)
-- [Mock contracts](docs/mock-contracts.md)
-- [Parity ledger](docs/parity.md)
+- [Clean-room reimplementation ledger](../../docs/dev/evidence/reimplementation.json)
 
 ### Verification boundaries
 
@@ -316,9 +311,7 @@ Workspace state is stored under local storage key `sqx-recreation-v1`. Open **Co
 app/ui/src/**/*.test.ts
 app/ui/src/**/*.test.tsx
 app/ui/e2e/
-app/ui/docs/coverage.json
-app/ui/docs/parity.md
-app/ui/docs/mock-contracts.md
+docs/dev/evidence/reimplementation.json
 |-- domains/trading/TradingDashboard.tsx
 `-- domains/optimization/OptimizationSurface.tsx
 ```
@@ -371,7 +364,7 @@ ranges and zero records. Actual downloads and broker profile management are sepa
 capabilities. Default broker inventory is empty, so only Default appears normally.
 
 Evidence: `src/domains/data/dukascopy.test.ts` and
-`tests/data-manager-dukascopy.spec.ts`; see [coverage details](docs/dukascopy-coverage.md).
+`tests/data-manager-dukascopy.spec.ts`; see [coverage details](../../docs/dev/evidence/reimplementation.json).
 Frontend scenarios replace a Python usage example for this frontend-only change.
 
 The Dukascopy popup inherits the application font and active dark/light theme.
@@ -423,7 +416,7 @@ column. No duplicate status panel is introduced. Completed definitions retain em
 history dates and zero actual records: no tick decoder or backend import exists.
 
 Evidence is `tickDownloader.test.ts` and `tests/data-manager-tickdownloader.spec.ts`.
-See [coverage register](docs/tickdownloader-coverage.md). Overall Data Manager remains Partial.
+See [coverage register](../../docs/dev/evidence/reimplementation.json). Overall Data Manager remains Partial.
 
 Dukascopy fast modes now require an all-profile confirmation explaining limited symbol
 availability and standard fallback. Mock jobs persist per-target resolved modes; unknown
@@ -435,7 +428,7 @@ original paragraphs and Close controls, using the active HaruQuantAI theme.
 File import > Add symbol now has source-derived settings, broker/instrument selection,
 nested Add instrument with commission/swap configuration and explanation, persisted mock
 file definitions/custom instruments, and cross-provider symbol collision checks. See
-[coverage](docs/file-symbol-coverage.md) for source evidence and explicit mock limitations.
+[coverage](../../docs/dev/evidence/reimplementation.json) for source evidence and explicit mock limitations.
 
 File import now includes the source-backed single-file and Mass import dialogs. Single-file
 import targets a selected File record and provides preview, column mapping, custom format
@@ -447,21 +440,21 @@ migration was removed at owner request.
 Files are read locally as bounded UTF-8 text. The mock persists normalized timestamps/counts,
 not a real price series. Known timestamps deduplicate; unknown seeded coverage stays opaque.
 A job resumes after reload in paused state, committing each file atomically. See
-[file import coverage](docs/file-import-coverage.md) for limits, source trace and evidence gaps.
+[file import coverage](../../docs/dev/evidence/reimplementation.json) for limits, source trace and evidence gaps.
 
 Equity / Futures now use source-derived two-stage search/add dialogs, including exchange,
 ticker/name/exact search, continuous futures, eligibility, result sorting/selection, postfix,
 bar timestamp/timezone settings and the nested source usage conditions. They follow the app theme.
 The catalogues and subscriptions are explicit offline fixtures (Full/Starter scenarios), since
 SQX obtains these from backend responses. Add creates empty definitions, with shared progress,
-pause/resume/stop and persisted recovery. See [SQ data coverage](docs/sq-data-coverage.md).
+pause/resume/stop and persisted recovery. See [SQ data coverage](../../docs/dev/evidence/reimplementation.json).
 
 Darwinex now includes source-backed Add data (328-symbol donor catalogue), conditional broker
 instrument mapping, folder import and selected-record download dialogs. The app theme is retained.
 Folder discovery follows SQX's direct `log.gz` rules using local metadata; compressed ticks are not
 decoded. Add/import records start empty; downloads use synthetic calendar-day coverage. All three
 flows share persisted progress and trailing statuses. Full/Starter exercises the two download license
-states as a mock policy. See [Darwinex coverage](docs/darwinex-coverage.md) for source trace and gaps.
+states as a mock policy. See [Darwinex coverage](../../docs/dev/evidence/reimplementation.json) for source trace and gaps.
 
 ## Crypto data workflows (2026-09-20)
 
@@ -483,7 +476,7 @@ Download filters mixed selections to Crypto rows, rejects clones and work alread
 provides all six SQX date presets and missing-only/overwrite policies, and updates only selected
 synthetic coverage. One sample per calendar day is metadata, not market data. Cross-provider name
 reservations and active-operation guards include Crypto. Evidence is `crypto.test.ts` and
-`tests/data-manager-crypto.spec.ts`; see [Crypto coverage](docs/crypto-coverage.md) for all seven
+`tests/data-manager-crypto.spec.ts`; see [Crypto coverage](../../docs/dev/evidence/reimplementation.json) for all seven
 stable feature entries and evidence gaps. Overall Data Manager and `FR-UI-011` remain Partial until
 backend and live-provider integration exist.
 
@@ -498,5 +491,5 @@ records and supplies the six SQX date presets plus missing-only and overwrite be
 The `sqx-yahoo-data-v1` namespace stores definitions, synthetic date intervals and one mock job.
 Running work reloads paused; all lifecycle states use the shared Data Manager progress bar and the
 trailing Status column. The implementation makes no Yahoo request and does not claim current
-listings or prices. See [Yahoo coverage](docs/yahoo-coverage.md) for the source trace, stable feature
+listings or prices. See [Yahoo coverage](../../docs/dev/evidence/reimplementation.json) for the source trace, stable feature
 entries and evidence gaps.

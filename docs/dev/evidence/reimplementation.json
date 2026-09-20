@@ -117,14 +117,14 @@
       "kind": "repository",
       "root": "HARUQUANTAI_ROOT",
       "locators": [
-        "app/ui/docs/coverage.json",
-        "app/ui/docs/mock-contracts.md",
-        "app/ui/docs/parity.md"
+        "app/ui/README.md",
+        "app/ui/src",
+        "app/ui/tests"
       ],
-      "scope": "Current repository evidence for implemented mock screens, state contracts, exercised behavior, and explicit UI gaps.",
+      "scope": "Repository-owned UI requirements, implementation, component tests, and browser scenarios.",
       "confidence": "confirmed",
       "limitations": [
-        "This source describes HaruQuantAI implementation state, not SQX runtime behavior."
+        "Repository evidence establishes HaruQuantAI implementation state, not SQX runtime behavior or pixel parity."
       ]
     },
     "E-O01": {
@@ -981,7 +981,7 @@
       },
       "claim": {
         "classification": "observed",
-        "statement": "The HaruQuantAI frontend provides a broad deterministic mock research workstation with shell, Builder and Improver, Optimizer, virtualized databanks, linked results, Data Manager, AlgoWizard, portfolio tools, custom projects, and extension surfaces, while authoritative engines, providers, proprietary formats, native integrations, and live operations remain absent or simulated.",
+        "statement": "The HaruQuantAI frontend provides a broad deterministic mock research workstation with shell, Builder, Retester, Optimizer, virtualized databanks, linked results, Data Manager, AlgoWizard, portfolio tools, custom projects, and extension surfaces, while authoritative engines, providers, proprietary formats, native integrations, and live operations remain absent or simulated.",
         "confidence": "confirmed",
         "limitations": [
           "This record establishes HaruQuantAI UI implementation state and gaps, not numerical or pixel parity with SQX.",
@@ -991,51 +991,35 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/docs/coverage.json",
+          "artifact_locator": "app/ui/README.md",
           "location": {
             "section": null,
             "symbol": null,
             "line_range": null,
-            "json_pointer": "/entries",
+            "json_pointer": null,
             "xpath": null,
-            "notes": "Per-surface implementation and gap ledger."
+            "notes": "Owning UI feature registry, requirements, status, and explicit limitations."
           },
           "inspection_method": "repository_audit",
           "relation": "supports",
           "fingerprint": null,
-          "accessed_at": "2026-09-18"
+          "accessed_at": "2026-09-20"
         },
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/docs/parity.md",
+          "artifact_locator": "app/ui/tests/smoke.spec.ts",
           "location": {
-            "section": "Completed and exercised / Partial parity",
+            "section": null,
             "symbol": null,
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
-            "notes": "Verified frontend coverage and precise remaining gaps."
+            "notes": "Browser smoke coverage for the current application shell and primary workspaces."
           },
           "inspection_method": "repository_audit",
           "relation": "supports",
           "fingerprint": null,
-          "accessed_at": "2026-09-18"
-        },
-        {
-          "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/docs/mock-contracts.md",
-          "location": {
-            "section": "Mock service contracts",
-            "symbol": "ResearchService",
-            "line_range": null,
-            "json_pointer": null,
-            "xpath": null,
-            "notes": "Deterministic records, mock operations, local persistence, and interrupted-job behavior."
-          },
-          "inspection_method": "repository_audit",
-          "relation": "supports",
-          "fingerprint": null,
-          "accessed_at": "2026-09-18"
+          "accessed_at": "2026-09-20"
         }
       ],
       "target_mapping": {
@@ -1057,15 +1041,14 @@
       },
       "validation": {
         "state": "passed",
-        "procedure": "Reconcile coverage.json, parity.md, and mock-contracts.md at the recorded repository commit.",
-        "expected_observation": "The three ledgers consistently describe a deterministic frontend simulator, implemented primary surfaces, and explicit backend/native/live gaps.",
-        "actual_observation": "All three repository files agree on the mock-only boundary and the UI domain remains Partial.",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The UI registry and executable browser surface agree on the implemented mock workspaces and explicit gaps.",
+        "actual_observation": "The current UI registry and browser evidence describe the same deterministic simulation boundary; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/docs/coverage.json",
-          "app/ui/docs/mock-contracts.md",
-          "app/ui/docs/parity.md"
+          "app/ui/README.md",
+          "app/ui/tests/smoke.spec.ts"
         ],
-        "executed_at": "2026-09-18T12:39:58Z"
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -1074,9 +1057,9 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "a9722d0",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T12:39:58Z",
-        "updated_at": "2026-09-18T12:39:58Z",
+        "updated_at": "2026-09-20T19:17:32Z",
         "review_state": "reviewed"
       },
       "clean_room": {
@@ -1225,12 +1208,17 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/dukascopy.test.ts",
+          "app/ui/src/domains/data/dukascopyDownload.test.ts",
+          "app/ui/tests/data-manager-dukascopy.spec.ts",
+          "app/ui/tests/data-manager-dukascopy-download.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -1239,10 +1227,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -1333,12 +1321,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/tickDownloader.test.ts",
+          "app/ui/tests/data-manager-tickdownloader.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -1347,10 +1338,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -1516,12 +1507,17 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/fileImport.test.ts",
+          "app/ui/src/domains/data/fileSymbols.test.ts",
+          "app/ui/tests/data-manager-file-import.spec.ts",
+          "app/ui/tests/data-manager-file-symbol.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -1530,10 +1526,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -1643,12 +1639,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/sqData.test.ts",
+          "app/ui/tests/data-manager-sq-data.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -1657,10 +1656,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -1770,12 +1769,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/sqData.test.ts",
+          "app/ui/tests/data-manager-sq-data.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -1784,10 +1786,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -1955,12 +1957,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/darwinex.test.ts",
+          "app/ui/tests/data-manager-darwinex.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -1969,10 +1974,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -2101,12 +2106,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/crypto.test.ts",
+          "app/ui/tests/data-manager-crypto.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -2115,10 +2123,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -2247,12 +2255,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/yahoo.test.ts",
+          "app/ui/tests/data-manager-yahoo.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -2261,10 +2272,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -2354,12 +2365,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/mt5Import.test.ts",
+          "app/ui/tests/data-manager-mt5-import.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -2368,10 +2382,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -2555,12 +2569,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Open every named command in the HaruQuantAI Data sources workspace and verify the documented dialog controls and mock-only completion path.",
-        "expected_observation": "Each command is reachable and shows the documented controls without contacting an external provider.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
+        "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/dataSourceRibbon.test.ts",
+          "app/ui/tests/data-manager-source-ribbon.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -2569,10 +2586,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -2615,22 +2632,35 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/docs/coverage.json",
+          "artifact_locator": "app/ui/README.md",
           "location": {
             "section": null,
             "symbol": null,
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
-            "notes": "Repository-owned Data sources control, transition, verification, and gap contract."
+            "notes": "FR-UI-017 and FR-UI-018 define accessibility and simulation boundaries."
           },
           "inspection_method": "repository_audit",
           "relation": "supports",
-          "fingerprint": {
-            "algorithm": "sha256",
-            "value": "2b3511baf3a88bcabcd85c18899c5ab7d1e40cc4744de337021c881998e85861"
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        },
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/tests/data-manager-source-ribbon.spec.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Executable command reachability, selection gating, and safe mock behavior."
           },
-          "accessed_at": "2026-09-18"
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
         }
       ],
       "target_mapping": {
@@ -2650,12 +2680,15 @@
         ]
       },
       "validation": {
-        "state": "planned",
-        "procedure": "Run the focused Vitest inventory test and Playwright Data sources scenario, including selection gating, Escape/focus behavior, and provider-domain request monitoring.",
-        "expected_observation": "All named commands are keyboard reachable, focus returns after dialog closure, and the scenario emits no provider-domain request.",
-        "actual_observation": null,
-        "artifact_paths": [],
-        "executed_at": null
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Provider commands remain keyboard reachable and do not imply or perform live provider operations.",
+        "actual_observation": "Browser scenarios exercise the source ribbon and mock-only boundaries; the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/tests/data-manager-source-ribbon.spec.ts",
+          "app/ui/tests/shellTestUtils.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
       },
       "relationships": {
         "supports_records": [],
@@ -2664,10 +2697,10 @@
         "superseded_by": null
       },
       "provenance": {
-        "repository_commit": "d0d814315412351743acf5a1a117f5d7def27e7e",
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
         "created_at": "2026-09-18T14:00:27Z",
-        "updated_at": "2026-09-18T14:00:27Z",
-        "review_state": "unreviewed"
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
       },
       "clean_room": {
         "contains_proprietary_source": false,
@@ -2681,6 +2714,1096 @@
         "clean-room",
         "data-manager",
         "mock-boundary"
+      ]
+    },
+    "SQX144-EV-000020": {
+      "topic": "ui.data_manager.export_workflows",
+      "title": "Data Manager export workflows",
+      "question": "Which browser-safe export workflows are implemented?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "HaruQuantAI implements CSV, MT4 manifest, and MT5 test-data export dialogs with source-aware validation, browser-safe downloads, shared progress controls, and persisted bounded mock jobs.",
+        "confidence": "confirmed",
+        "limitations": [
+          "No native MT4/MT5 filesystem integration or complete market-price archive is claimed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/dataExport.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "CSV, MT4 manifest, and MT5 test-data export rules and validation."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-021"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/dataExport.test.ts",
+          "app/ui/tests/data-manager-export.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "data-manager",
+        "export",
+        "mock",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000021": {
+      "topic": "ui.data_manager.tools_workflows",
+      "title": "Data Manager tools workflows",
+      "question": "Which Data Manager tools are implemented?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "HaruQuantAI implements timezone cloning and View & Analyze workflows with selection validation, persisted derived definitions or edits, shared progress controls, and bounded deterministic review data.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Review rows, charts, quality findings, and cloned history are browser-local simulations."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/dataTools.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Timezone cloning and bounded data review/analysis behavior."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-022"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/dataTools.test.ts",
+          "app/ui/tests/data-manager-tools.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "analysis",
+        "data-manager",
+        "mock",
+        "tools"
+      ]
+    },
+    "SQX144-EV-000022": {
+      "topic": "ui.data_manager.instruments_sessions_workspaces",
+      "title": "Instrument and session management workspaces",
+      "question": "Which instrument and session management actions are implemented?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "HaruQuantAI provides separate Instruments and Sessions tabs with add, clone, deletion, JSON save/load, and the applicable edit or mass-edit workflows backed by validated browser-local state.",
+        "confidence": "confirmed",
+        "limitations": [
+          "The workspaces do not claim native SQX storage or broker-runtime integration."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/DataManager.tsx",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Separate Instruments and Sessions tabs and action routing."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-023"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/tests/data-manager-instruments.spec.ts",
+          "app/ui/tests/data-manager-sessions.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "data-manager",
+        "instruments",
+        "sessions",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000023": {
+      "topic": "ui.data_manager.instrument_catalog",
+      "title": "Instrument catalogue interaction contract",
+      "question": "How does the instrument catalogue filter, sort, select, and edit records?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Instruments workspace provides combined filters, sorting, visible-row selection, double-click editing, mass editing, deletion, and JSON transfer over the persisted shared catalogue.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Configured records are mock application state until an authoritative backend owns them."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/instruments.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Instrument validation, catalogue transforms, and transfer rules."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-024"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/instruments.test.ts",
+          "app/ui/tests/data-manager-instruments.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "catalogue",
+        "data-manager",
+        "instruments",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000024": {
+      "topic": "ui.data_manager.session_catalog",
+      "title": "Session catalogue interaction contract",
+      "question": "How does the session catalogue filter, select, edit, and protect records?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Sessions workspace provides search and broker filtering, visible-row selection, editing, template hours, dependency-safe deletion, and versioned JSON transfer over persisted browser-local records.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Dependency handling is conservative where native cascade behavior is not evidenced."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/sessions.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Session validation, dependency handling, templates, and transfer rules."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-025"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/sessions.test.ts",
+          "app/ui/tests/data-manager-sessions.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "data-manager",
+        "sessions",
+        "templates",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000025": {
+      "topic": "ui.data_manager.external_indicators",
+      "title": "External indicator workflows",
+      "question": "Which external-indicator definition and data workflows are implemented?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "HaruQuantAI implements external-indicator add/edit, bounded timestamped import formats, metadata-only MQ4 recognition, local data review, clear/delete, and versioned JSON transfer with persisted jobs and records.",
+        "confidence": "confirmed",
+        "limitations": [
+          "MQ4 recognition does not execute or compile code, and native paged data services are replaced by bounded local state."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/externalIndicators.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Indicator definition, import, recognition, review, deletion, and transfer rules."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-026"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/externalIndicators.test.ts",
+          "app/ui/tests/data-manager-external-indicators.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "data-manager",
+        "external-indicators",
+        "import",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000026": {
+      "topic": "ui.data_manager.stock_groups",
+      "title": "Stock group workflows",
+      "question": "Which stock-group management workflows are implemented?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "HaruQuantAI implements stock-group metadata, historical membership editing, bounded CSV replacement, JSON export/import, deterministic automatic updates, protected deletion, and reactive table state.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Remote stock-information lookup is represented by deterministic local rows."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/stockGroups.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Group metadata, historical membership, update, deletion, and transfer rules."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-027"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/stockGroups.test.ts",
+          "app/ui/tests/data-manager-stock-groups.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "data-manager",
+        "stock-groups",
+        "ui",
+        "universes"
+      ]
+    },
+    "SQX144-EV-000027": {
+      "topic": "ui.data_manager.broker_profiles",
+      "title": "Broker profile workflows",
+      "question": "Which broker-profile configuration and transfer workflows are implemented?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Data Manager"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "HaruQuantAI implements broker profile editing, stock membership, selected instrument/session JSON import, deterministic data updates, dependency-safe deletion, and versioned JSON transfer with propagated selectors and counts.",
+        "confidence": "confirmed",
+        "limitations": [
+          "System broker records and live broker connectivity are not fabricated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/domains/data/brokerProfiles.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Broker metadata, stock membership, dependent imports, updates, deletion, and JSON transfer."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATA"
+        ],
+        "requirement_ids": [
+          "FR-UI-028"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/domains/data/brokerProfiles.test.ts",
+          "app/ui/tests/data-manager-broker-profiles.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "broker-profiles",
+        "data-manager",
+        "mock",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000028": {
+      "topic": "ui.shell.global_settings",
+      "title": "Global settings command surface",
+      "question": "Which global settings commands and persisted preferences are implemented?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Application shell"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Settings menu provides validated configuration tabs and browser-safe benchmark, remote access, MCP, SMTP, language, skin, zoom, support, license, about, reload, and exit interactions with versioned preferences.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Native, remote, licensing, SMTP, and process effects are explicit local simulations; secret drafts are not persisted."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/app/globalSettings.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Settings defaults, validation, migration, safe secret handling, and display preferences."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-SHELL"
+        ],
+        "requirement_ids": [
+          "FR-UI-031"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/app/globalSettings.test.ts",
+          "app/ui/tests/global-settings.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "settings",
+        "shell",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000029": {
+      "topic": "ui.shell.header_applications",
+      "title": "Header application actions",
+      "question": "Which application actions remain in the top-right header?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Application shell"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The header exposes Debug Console, Grid Control, and Volume & Market Profile before Settings, with bounded mock logs/jobs and safe local addon information while omitting the duplicate Code Editor action.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Debug streaming, remote workers, entitlements, purchase, and activation are not connected."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/app/HeaderApplications.tsx",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Debug Console, Grid Control, and Volume Profile action routing and dialogs."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-SHELL"
+        ],
+        "requirement_ids": [
+          "FR-UI-032"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/app/headerApplications.test.ts",
+          "app/ui/tests/header-applications.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "header",
+        "shell",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000030": {
+      "topic": "ui.shell.collapsible_navigation",
+      "title": "Collapsible application navigation",
+      "question": "How does the application sidebar collapse while preserving navigation?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Application shell"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The application sidebar collapses from a labelled layout to an icon rail while preserving accessible names, tooltips, active state, routing, and a versioned preference across reloads.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Icon silhouettes are theme-aware approximations rather than a native pixel comparison."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/app/App.tsx",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Expanded and icon-rail navigation rendering, accessible labels, and active routing."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-SHELL"
+        ],
+        "requirement_ids": [
+          "FR-UI-033"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/app/globalSettings.test.ts",
+          "app/ui/tests/sidebar-navigation.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "accessibility",
+        "navigation",
+        "shell",
+        "ui"
+      ]
+    },
+    "SQX144-EV-000031": {
+      "topic": "ui.shell.haruquantai_branding",
+      "title": "HaruQuantAI user-facing branding",
+      "question": "How is legacy StrategyQuant branding excluded from rendered product surfaces?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "HaruQuantAI UI",
+          "Application shell"
+        ],
+        "conditions": [
+          "HaruQuantAI implementation is a deterministic browser-local simulation"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Rendered product surfaces use HaruQuantAI terminology, provider labels omit the legacy SQ prefix, and persisted display strings are normalized while compatibility identifiers and source-reference terminology remain stable.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Reference-product names remain where they identify evidence, compatibility keys, or audited source behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R01",
+          "artifact_locator": "app/ui/src/app/branding.ts",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Rendered-name normalization and compatibility-boundary rules."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-20"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-SHELL"
+        ],
+        "requirement_ids": [
+          "FR-UI-034"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Run the named component and Playwright scenarios, then run the repository qualification pipeline.",
+        "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
+        "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
+        "artifact_paths": [
+          "app/ui/src/app/branding.test.ts",
+          "app/ui/tests/branding-cleanup.spec.ts"
+        ],
+        "executed_at": "2026-09-20T19:17:32Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ce3655dc25b25725a5690e7babda926d35947c7",
+        "created_at": "2026-09-20T19:17:32Z",
+        "updated_at": "2026-09-20T19:17:32Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Repository-owned implementation evidence and paraphrased reference behavior only."
+      },
+      "tags": [
+        "branding",
+        "compatibility",
+        "shell",
+        "ui"
       ]
     }
   }
