@@ -2,7 +2,7 @@
 
 > **Package:** `app/services/brokers/`
 > **Status:** `Missing`
-> **Last updated:** `2026-09-18`
+> **Last updated:** `2026-09-20`
 > **Domain ID:** `D-BROKERS`
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
@@ -26,10 +26,14 @@ app/services/brokers/
 |-- catalog.py
 |-- mt5_adapter.py
 |-- ctrader_adapter.py
-|-- reconciliation.py
+|-- dukascopy.py
+|-- sq_equity.py
+|-- sq_futures.py
+|-- darwinex.py
 |-- crypto_adapter.py
-|-- isolation_fencing.py
-`-- dukascopy.py
+|-- yahoo.py
+|-- reconciliation.py
+`-- isolation_fencing.py
 
 app/contracts/brokers.py
 app/services/persistence/brokers.py
@@ -55,18 +59,24 @@ secret-safe example to `tests/examples/03_brokers.py`.
 
 ### Purpose
 
-Own MetaTrader 5 and cTrader connectivity, capability discovery, platform normalization, connection health, and reconciliation observations.
+Own external broker and market data provider connectivity, remote transport sessions, authentication,
+capability discovery, platform normalization, connection health, and reconciliation observations.
+Exclusively handles transport connection and streaming raw payloads with zero data manipulation,
+saving, compression, or transformation (strictly owned by `D-DATA`).
 
 ### Owns
 
-- Adapter profiles, sessions, capability discovery, symbol/account normalization, health, and rate limits.
-- Translation between normalized trading intents/events and provider SDK/protocol objects.
-- Provider-identity reconciliation after disconnect or uncertain acknowledgement.
+- Adapter profiles, transport sessions, capability discovery, symbol/account normalization, connection health, and rate limits.
+- Translation between normalized trading/data intents and provider SDK/protocol objects.
+- Transport stream acquisition of raw external chunks and provider events.
+- Provider-identity and connection-state reconciliation after disconnect or uncertain acknowledgement.
 
 ### Does not own
 
-- Trade intent, strategy logic, sizing, or live authorization policy.
-- Simulation matching or normalized market-data semantics.
+- Market data persistence, compression, storage schemas, local caching, tick-to-bar aggregation, or resampling (strictly owned by `D-DATA`).
+- Trade intent generation, strategy logic, sizing, or live authorization policy (strictly owned by `D-TRADING`).
+- Simulation matching or normalized backtest data semantics (strictly owned by `D-SIMULATOR`).
+- Provider credential storage mechanics in plaintext (strictly owned by kernel OS secret facility).
 
 ### Shared contracts
 
@@ -75,13 +85,17 @@ private implementation import.
 
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
-| Missing | `brokers.catalog@1` | `BrokerCatalog` | `1` | Provider profiles and capability discovery |
-| Missing | `brokers.mt5@1` | `Mt5Adapter` | `1` | MT5 session and translation |
-| Missing | `brokers.ctrader@1` | `CTraderAdapter` | `1` | cTrader session and translation |
-| Missing | `brokers.reconciliation@1` | `BrokerReconciler` | `1` | Order/position/account reconciliation |
-| Missing | `brokers.crypto@1` | `CryptoBrokerService` | `1` | Unified crypto spot and perpetual futures exchange client |
+| Missing | `brokers.catalog@1` | `BrokerCatalog` | `1` | Provider profiles, capability discovery, postfix/timezone mapping |
+| Missing | `brokers.mt5@1` | `Mt5Adapter` | `1` | MT5 session, quote streaming, and translation |
+| Missing | `brokers.ctrader@1` | `CTraderAdapter` | `1` | cTrader Open API session and translation |
+| Missing | `brokers.dukascopy@1` | `DukascopyFeedService` | `1` | Direct Dukascopy binary tick transport connector |
+| Missing | `brokers.equity@1` | `SQEquityFeedService` | `1` | StrategyQuant Equity data feed transport connector |
+| Missing | `brokers.futures@1` | `SQFuturesFeedService` | `1` | StrategyQuant Futures data feed transport connector |
+| Missing | `brokers.darwinex@1` | `DarwinexFeedService` | `1` | Direct Darwinex tick feed transport connector |
+| Missing | `brokers.crypto@1` | `CryptoBrokerService` | `1` | Unified crypto exchange REST/WS transport connector |
+| Missing | `brokers.yahoo@1` | `YahooFeedService` | `1` | Yahoo Finance daily data transport connector |
+| Missing | `brokers.reconciliation@1` | `BrokerReconciler` | `1` | Session, order/position, and account reconciliation |
 | Missing | `brokers.fencing@1` | `BrokerFencingService` | `1` | Fail-closed uncertainty and disconnect order fencing |
-| Missing | `brokers.dukascopy@1` | `DukascopyFeedService` | `1` | Direct Dukascopy historical tick and bar feed connector |
 
 ### Persisted-state ownership
 
@@ -97,19 +111,23 @@ Semantic state remains feature-owned although database mechanics are centralized
 
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
 | --- | --- | --- | --- | --- | --- |
-| `FEAT-BROKERS-CATALOG` | Provider profiles and capability discovery | `app/services/brokers/catalog.py` | `brokers.catalog@1` | None | Missing |
-| `FEAT-BROKERS-MT5` | MT5 session and translation | `app/services/brokers/mt5_adapter.py` | `brokers.mt5@1` | `trading.execution_intents@1` | Missing |
-| `FEAT-BROKERS-CTRADER` | cTrader session and translation | `app/services/brokers/ctrader_adapter.py` | `brokers.ctrader@1` | `trading.execution_intents@1` | Missing |
-| `FEAT-BROKERS-RECONCILIATION` | Order/position/account reconciliation | `app/services/brokers/reconciliation.py` | `brokers.reconciliation@1` | `trading.reconciliation@1` | Missing |
-| `FEAT-BROKERS-CRYPTO` | Unified crypto exchange adapter (Binance/CCXT) | `app/services/brokers/crypto_adapter.py` | `brokers.crypto@1` | `trading.execution_intents@1` | Missing |
+| `FEAT-BROKERS-CATALOG` | Provider profiles, postfix mapping, server timezones | `app/services/brokers/catalog.py` | `brokers.catalog@1` | None | Missing |
+| `FEAT-BROKERS-MT5` | MT5 session, quote streaming, and translation | `app/services/brokers/mt5_adapter.py` | `brokers.mt5@1` | `trading.execution_intents@1` | Missing |
+| `FEAT-BROKERS-CTRADER` | cTrader Open API session and translation | `app/services/brokers/ctrader_adapter.py` | `brokers.ctrader@1` | `trading.execution_intents@1` | Missing |
+| `FEAT-BROKERS-DUKASCOPY` | Direct Dukascopy binary tick transport connector | `app/services/brokers/dukascopy.py` | `brokers.dukascopy@1` | None | Missing |
+| `FEAT-BROKERS-EQUITY` | StrategyQuant Equity data feed transport connector | `app/services/brokers/sq_equity.py` | `brokers.equity@1` | None | Missing |
+| `FEAT-BROKERS-FUTURES` | StrategyQuant Futures data feed transport connector | `app/services/brokers/sq_futures.py` | `brokers.futures@1` | None | Missing |
+| `FEAT-BROKERS-DARWINEX` | Direct Darwinex tick feed transport connector | `app/services/brokers/darwinex.py` | `brokers.darwinex@1` | None | Missing |
+| `FEAT-BROKERS-CRYPTO` | Unified crypto exchange connector (Binance/CCXT) | `app/services/brokers/crypto_adapter.py` | `brokers.crypto@1` | `trading.execution_intents@1` | Missing |
+| `FEAT-BROKERS-YAHOO` | Yahoo Finance daily feed transport connector | `app/services/brokers/yahoo.py` | `brokers.yahoo@1` | None | Missing |
+| `FEAT-BROKERS-RECONCILIATION` | Session, order/position, and account reconciliation | `app/services/brokers/reconciliation.py` | `brokers.reconciliation@1` | `trading.reconciliation@1` | Missing |
 | `FEAT-BROKERS-FENCING` | Uncertainty and disconnect fail-closed fencing | `app/services/brokers/isolation_fencing.py` | `brokers.fencing@1` | None | Missing |
-| `FEAT-BROKERS-DUKASCOPY` | Direct Dukascopy historical tick and bar feed | `app/services/brokers/dukascopy.py` | `brokers.dukascopy@1` | None | Missing |
 
 Dependencies point to public contracts, never implementation modules:
 
 ```mermaid
 flowchart LR
-    Consumer["Consuming feature"] --> Contract["Versioned public capability"]
+    Consumer["Consuming feature (Trading / Data)"] --> Contract["Versioned public capability"]
     Provider["D-BROKERS feature"] --> Contract
     Provider --> Context["FeatureContext-managed effects"]
     Provider --> Persistence["Domain persistence boundary"]
@@ -123,14 +141,23 @@ state is never purged implicitly.
 
 ## 3. Domain workflows
 
-### `WF-BROKERS-COMMAND` — Submit and reconcile an external command
+### `WF-BROKERS-COMMAND` — Submit and reconcile an external trading command
 
-- **Lead owner:** `FEAT-BROKERS-MT5`
+- **Lead owner:** `FEAT-BROKERS-MT5` / `FEAT-BROKERS-CTRADER`
 - **Participants:** Trading intent capability, selected adapter, secret provider, and reconciler.
 - **Input boundary:** Authorized environment/account, idempotent intent ID, normalized instrument/order fields.
 - **Output boundary:** Normalized acknowledgement/event or explicit unknown state followed by reconciliation.
 - **Failure boundary:** Unsupported capability fails before send; timeout after send is unknown, never rejected; reconnect blocks new commands until reconciled.
 - **Acceptance:** `ATW-BROKERS-COMMAND-001`
+
+### `WF-BROKERS-STREAM` — Connect and stream raw transport chunks to data ingestion
+
+- **Lead owner:** Data source connectors (`FEAT-BROKERS-DUKASCOPY`, `FEAT-BROKERS-DARWINEX`, `FEAT-BROKERS-EQUITY`, etc.)
+- **Participants:** Transport connector, remote provider endpoint, `data.imports@1`.
+- **Input boundary:** Provider profile, symbol, date/time span, connection credentials.
+- **Output boundary:** Raw byte chunks or immutable transport records streamed directly to consumer; zero local persistence or transformation within `brokers`.
+- **Failure boundary:** Transport timeout, authentication failure, or HTTP/socket disconnect emits typed connection error and halts streaming.
+- **Acceptance:** `ATW-BROKERS-STREAM-001`
 
 ---
 
@@ -147,8 +174,9 @@ Section 9.
 
 #### Purpose
 
-Provide provider profiles and capability discovery. Other registry entries follow the same lifecycle and
-evidence obligations without merging their responsibilities into this module.
+Provide provider profiles, symbol postfix mapping, server timezones, and capability discovery.
+Other registry entries follow the same lifecycle and evidence obligations without merging their
+responsibilities into this module.
 
 #### Capability declarations
 
@@ -187,20 +215,30 @@ promoted to a default without product approval.
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Missing | `catalog.py` | Provider profiles and capability discovery; config, service, lifecycle, `SPEC`, factory | `BrokerCatalog` |
-| Missing | `mt5_adapter.py` | MT5 session and translation; config, service, lifecycle, `SPEC`, factory | `Mt5Adapter` |
+| Missing | `catalog.py` | Provider profiles, postfix mapping, server timezones; config, service, lifecycle, `SPEC`, factory | `BrokerCatalog` |
+| Missing | `mt5_adapter.py` | MT5 session, quote streaming, and translation; config, service, lifecycle, `SPEC`, factory | `Mt5Adapter` |
 | Missing | `ctrader_adapter.py` | cTrader session and translation; config, service, lifecycle, `SPEC`, factory | `CTraderAdapter` |
+| Missing | `dukascopy.py` | Direct Dukascopy binary tick transport connector; config, service, lifecycle, `SPEC`, factory | `DukascopyFeedService` |
+| Missing | `sq_equity.py` | StrategyQuant Equity data feed transport connector; config, service, lifecycle, `SPEC`, factory | `SQEquityFeedService` |
+| Missing | `sq_futures.py` | StrategyQuant Futures data feed transport connector; config, service, lifecycle, `SPEC`, factory | `SQFuturesFeedService` |
+| Missing | `darwinex.py` | Direct Darwinex tick feed transport connector; config, service, lifecycle, `SPEC`, factory | `DarwinexFeedService` |
+| Missing | `crypto_adapter.py` | Unified crypto exchange connector (Binance/CCXT); config, service, lifecycle, `SPEC`, factory | `CryptoBrokerService` |
+| Missing | `yahoo.py` | Yahoo Finance daily feed transport connector; config, service, lifecycle, `SPEC`, factory | `YahooFeedService` |
 | Missing | `reconciliation.py` | Order/position/account reconciliation; config, service, lifecycle, `SPEC`, factory | `BrokerReconciler` |
+| Missing | `isolation_fencing.py` | Fail-closed uncertainty and disconnect fencing; config, service, lifecycle, `SPEC`, factory | `BrokerFencingService` |
 | Missing | `tests/examples/03_brokers.py` | Offline primary-purpose evidence | one `example_<NN>_<feature_slug>()` per completed feature |
 
 #### Functional requirements
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-BROKERS-001` | Capability discovery prevents unsupported order semantics from transmission. | Provider matrix test |
-| Missing | `FR-BROKERS-002` | Symbol, price, and quantity conversion is reversible within declared precision. | Golden mapping fixtures |
+| Missing | `FR-BROKERS-001` | Capability discovery prevents unsupported order or stream semantics from transmission. | Provider matrix test |
+| Missing | `FR-BROKERS-002` | Symbol, price, and quantity conversion is reversible within declared precision and accounts for broker-specific prefix/postfix rules. | Golden mapping fixtures |
 | Missing | `FR-BROKERS-003` | Duplicate intent IDs cannot create duplicate submissions. | Retry/timeout test |
 | Missing | `FR-BROKERS-004` | Research, UI mocks, and agentic tools cannot enable or address live profiles. | Negative authorization test |
+| Missing | `FR-BROKERS-005` | Pure transport connection boundary: connectors emit raw chunks/events with zero internal data compression, bar aggregation, storage, or resampling. | Stream isolation test |
+| Missing | `FR-BROKERS-006` | Zero-plaintext credential persistence: all secrets are resolved via OS secret provider and never committed to SQLite, files, logs, or UI reads. | Security audit test |
+| Missing | `FR-BROKERS-007` | Broker server timezone (`server_timezone`) and rollover offset are explicitly tracked to ensure consistent quote timing translation. | Timezone alignment test |
 
 #### Removal behavior
 
@@ -227,8 +265,9 @@ return an attributed unavailable result. Reinstall may resume only after schema 
 
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
-| Accepted | `DEC-BROKERS-001` | MT5 and cTrader are target adapters; live profiles are disabled by default. | Provider scope | Owner-ratified E-T01 |
+| Accepted | `DEC-BROKERS-001` | MT5 and cTrader are target execution adapters; live profiles are disabled by default. | Provider scope | Owner-ratified E-T01 |
 | Open | `DEC-BROKERS-002` | SDK versions, authentication, and execution matrices are unverified. | Adapters | Primary vendor docs plus sandboxes |
+| Accepted | `DEC-BROKERS-003` | Strict pure transport connection boundary: broker connectors stream raw payloads with zero local storage, compression, or bar aggregation. | Domain boundary | Owner-ratified rule |
 
 Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; a filename, bundled
 sample value, or third-party function name is not proof of runtime semantics.
@@ -276,4 +315,4 @@ Editing uses explicit affected paths with `--no-cov`; the full candidate gate re
 
 ## 9. Normative domain specification
 
-Profiles declare provider, demo/live environment, endpoint, account and credential references, timeouts, rate limits, and enabled operations. Credentials use an OS secret facility and never enter projects, artifacts, UI reads, logs, or errors. Connection state is disabled/connecting/ready/degraded/reconnecting/failed/closed. Retrying submissions is allowed only with proven provider idempotency. On reconnect, reconcile account, orders, positions, and fills before accepting commands. Exact-version MT5-related plugin presence (E-L01) is topology evidence, not a wire contract.
+Profiles declare provider, demo/live environment, endpoint, account and credential references, timeouts, rate limits, enabled operations, symbol postfix rules, and server timezone. Credentials use an OS secret facility and never enter projects, artifacts, UI reads, logs, or errors. Connection state is disabled/connecting/ready/degraded/reconnecting/failed/closed. Retrying submissions is allowed only with proven provider idempotency. On reconnect, reconcile account, orders, positions, and fills before accepting commands. All broker and feed connectors adhere strictly to a pure transport boundary: they stream raw chunks or events directly to consumer pipelines (`data.imports@1`), performing zero data persistence, compression, bar aggregation, resampling, or transformation inside `brokers`.
