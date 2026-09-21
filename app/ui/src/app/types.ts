@@ -108,6 +108,14 @@ export interface RuleNode {
   depth: number;
   kind: 'event' | 'if' | 'then' | 'condition' | 'action';
   label: string;
+  parentId?: string;
+  operator?: 'AND' | 'OR';
+  leftExpr?: string;
+  compOp?: '>' | '<' | '>=' | '<=' | '==' | '!=' | 'crosses above' | 'crosses below' | 'is rising' | 'is falling';
+  rightExpr?: string;
+  actionType?: 'Enter at Market' | 'Place Stop Order' | 'Place Limit Order' | 'Set Stop Loss' | 'Set Profit Target' | 'Trailing Stop' | 'Move SL to BE' | 'Exit Market';
+  actionParams?: Record<string, number | string>;
+  signalGroup?: 'Long Entry' | 'Short Entry' | 'Long Exit' | 'Short Exit';
 }
 
 export interface PortfolioMember {
@@ -115,6 +123,42 @@ export interface PortfolioMember {
   weight: number;
   enabled: boolean;
   sector: string;
+  multiplier?: number;
+  color?: string;
+  metrics?: {
+    netProfit: number;
+    maxDrawdown: number;
+    profitFactor: number;
+    sharpe: number;
+  };
+}
+
+export interface PortfolioSettings {
+  initialCapital: number;
+  leverage: number;
+  weightingModel: 'Manual weights' | 'Equal weight' | 'Markowitz Efficient Frontier' | 'Risk Parity' | 'Minimum Variance';
+  maxCorrelation: number;
+  maxStrategies: number;
+  maxSectorWeight: number;
+  dateRange: 'full' | 'limited';
+  startDate: string;
+  endDate: string;
+  sharedCapital: boolean;
+  skipOnMargin: boolean;
+}
+
+export interface PortfolioMasterSettings {
+  searchType: 'genetic' | 'bruteforce';
+  sourceDatabank: string;
+  targetDatabank: string;
+  minStrategies: number;
+  maxStrategies: number;
+  maxCorrelation: number;
+  fitness: 'Return / Drawdown ratio' | 'Sharpe ratio' | 'Net profit' | 'Minimum Drawdown';
+  population: number;
+  generations: number;
+  mutation: number;
+  crossover: number;
 }
 
 export interface WorkflowTask {
@@ -125,6 +169,76 @@ export interface WorkflowTask {
   status: JobStatus;
   input: string;
   output: string;
+  config?: Record<string, any>;
+  durationSeconds?: number;
+  errorPolicy?: 'Stop project' | 'Continue to next' | 'Go to task';
+  goToTaskId?: string;
+  progress?: number;
+}
+
+export interface CustomProject {
+  id: string;
+  name: string;
+  description: string;
+  tasks: WorkflowTask[];
+  status: JobStatus;
+}
+
+export interface ExtensionFile {
+  id: string;
+  name: string;
+  category: 'Snippets' | 'Blocks' | 'Indicators' | 'Columns' | 'CustomAnalysis' | 'ResultsPlugins';
+  language: 'java' | 'python';
+  content: string;
+  dirty?: boolean;
+}
+
+export interface ComputeNode {
+  id: string;
+  name: string;
+  host: string;
+  ip: string;
+  port: number;
+  cores: number;
+  memoryGb: number;
+  gpu: boolean;
+  status: 'Online' | 'Busy' | 'Idle' | 'Offline';
+  cpuUsagePct: number;
+  latencyMs: number;
+  activeTask?: string;
+}
+
+export interface BusinessWorkspaceItem {
+  id: string;
+  name: string;
+  coresAllocated: number;
+  memoryAllocated: number;
+}
+
+export interface BusinessUser {
+  id: string;
+  name: string;
+  email: string;
+  role: 'Owner' | 'Quant Researcher' | 'Risk Manager' | 'Viewer';
+  status: string;
+}
+
+export interface McpServerConfig {
+  id: string;
+  name: string;
+  url: string;
+  transport: 'sse' | 'stdio';
+  status: 'Connected' | 'Error' | 'Disabled';
+  capabilities: string[];
+  activeCalls: number;
+}
+
+export interface BusinessConfig {
+  organization: string;
+  activeWorkspace: string;
+  workspaces: BusinessWorkspaceItem[];
+  users: BusinessUser[];
+  mcpServers: McpServerConfig[];
 }
 
 export interface ConfigurationSettings {
@@ -183,6 +297,32 @@ export interface AppSettings {
   smtp: SmtpSettings;
 }
 
+export type BuildingBlockCategory = 'all' | 'signals' | 'indicators' | 'candles' | 'time' | 'orders' | 'exits';
+
+export interface BuildingBlockItem {
+  id: string;
+  name: string;
+  category: 'signals' | 'indicators' | 'candles' | 'time' | 'orders' | 'exits';
+  description: string;
+  enabled: boolean;
+  defaultParams?: Record<string, number | string>;
+}
+
+export interface OptimizationParamRow {
+  name: string;
+  enabled: boolean;
+  min: number;
+  max: number;
+  step: number;
+  originalValue: number;
+}
+
+export interface CrossCheckItem {
+  id: string;
+  name: string;
+  enabled: boolean;
+}
+
 export interface BuilderSettings {
   mode: 'Genetic evolution' | 'Random generation' | 'Improve existing';
   strategyType: 'Standard' | 'Multi-TF' | 'Stockpicker';
@@ -194,12 +334,45 @@ export interface BuilderSettings {
   mutation: number;
   crossover: number;
   maxConditions: number;
+  minConditions: number;
+  maxPeriods: number;
+  minPeriods: number;
+  symmetricalRules: boolean;
+  fuzzySignals: boolean;
+  generateExitRules: boolean;
   stopLoss: boolean;
   profitTarget: boolean;
   slMin: number;
   slMax: number;
   ptMin: number;
   ptMax: number;
+  slType: 'Fixed pips' | 'ATR' | 'Percent';
+  ptType: 'Fixed pips' | 'ATR' | 'Percent';
+  useTrailingStop: boolean;
+  trailingStopMin: number;
+  trailingStopMax: number;
+  useMoveToBE: boolean;
+  beTriggerPips: number;
+  beProfitOffset: number;
+  mmModel: 'Fixed Size' | 'Risk Fixed Amount' | 'Risk % of Equity' | 'Fixed Risk to Return';
+  initialCapital: number;
+  riskPercent: number;
+  fixedLots: number;
+  maxGenerations: number;
+  migrateCandidates: boolean;
+  migrationInterval: number;
+  restartStagnantIslands: boolean;
+  stagnantGenerations: number;
+  seedFromDatabank: boolean;
+  inputDatabank: string;
+  rankingMetric: string;
+  minReturnDD: number;
+  minTrades: number;
+  maxDrawdownPct: number;
+  minSharpe: number;
+  minProfitFactor: number;
+  crossChecks: CrossCheckItem[];
+  customBlocks: Record<string, boolean>;
   precision: string;
   from: string;
   to: string;
@@ -208,12 +381,39 @@ export interface BuilderSettings {
 
 export interface OptimizationSettings {
   mode: 'Simple' | 'Sequential' | 'Walk-Forward' | 'WF Matrix';
+  source: 'databank' | 'file';
+  sourceDatabank: string;
+  outputDatabank: string;
   parameter: string;
   min: number;
   max: number;
   step: number;
   objective: string;
   keep: number;
+  parameters: OptimizationParamRow[];
+  isMonths: number;
+  oosMonths: number;
+  wfRuns: number;
+  storeBestRevisions: boolean;
+  storeAllTrials: boolean;
+}
+
+export interface RetesterSettings {
+  sourceDatabank: string;
+  outputDatabank: string;
+  symbol: string;
+  timeframe: string;
+  precision: string;
+  from: string;
+  to: string;
+  spreadMultiplier: number;
+  slippagePips: number;
+  stressSpreadSlippage: boolean;
+  skipWorstTradesPct: number;
+  tradeDirection: 'Both' | 'Long only' | 'Short only';
+  additionalMarkets: string[];
+  additionalTimeframes: string[];
+  portfolioRetest: boolean;
 }
 
 /* -------------------------------------------------------------------------- */

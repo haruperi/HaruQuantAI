@@ -196,7 +196,7 @@ log_*.txt
 /data/saved/
 /data/states/
 datasets/
-results/
+/results/
 exports/
 temp_data/
 tmp/

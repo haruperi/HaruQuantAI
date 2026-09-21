@@ -4101,6 +4101,902 @@
         "sqn",
         "ui"
       ]
+    },
+    "E-UI-DATABANK-001": {
+      "title": "StrategyQuant X Databank 1-to-1 Parity Reimplementation",
+      "observation_type": "donor_feature_analysis",
+      "status": "implemented",
+      "donor_evidence": [
+        {
+          "source_id": "E-L02",
+          "locator": {
+            "path": "user/settings/views/databanks/*.vw",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Exact databank column XML presets and sample configurations."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L02",
+          "locator": {
+            "path": "internal/web/app/directives/manageViewsDialog/manageViews.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Manage views modal dialog with custom views, cloning, column reordering, properties."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/DatabankFilterByCorrelation/databankFilterByCorrelationPopup.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Pairwise correlation filtering popup layout and period configuration."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK"
+        ],
+        "requirement_ids": [
+          "FR-UI-DATABANK_MANAGEMENT",
+          "FR-UI-DATABANK_COLUMNS",
+          "FR-UI-DATABANK_CORRELATION",
+          "FR-UI-STRATEGY_COMPARISON"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/plugins/databank/.",
+        "expected_observation": "100+ metric columns catalog, view presets, store operations, Pearson correlation, and strategy comparison logic all pass.",
+        "actual_observation": "All 9 databank unit tests passed.",
+        "artifact_paths": [
+          "app/ui/src/plugins/databank/ProjectDatabanks/databankColumns.ts",
+          "app/ui/src/plugins/databank/ProjectDatabanks/databankStore.ts",
+          "app/ui/src/plugins/databank/ProjectDatabanks/ManageViewsDialog.tsx",
+          "app/ui/src/plugins/databank/ProjectDatabanks/FilterByCorrelationModal.tsx",
+          "app/ui/src/plugins/databank/ProjectDatabanks/CompareStrategiesModal.tsx",
+          "app/ui/src/plugins/databank/ProjectDatabanks/StrategyTable.tsx",
+          "app/ui/src/plugins/databank/ProjectDatabanks/DatabankPanel.tsx"
+        ],
+        "executed_at": "2026-09-21T16:48:29Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T16:48:29Z",
+        "updated_at": "2026-09-21T16:48:29Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "databank",
+        "views",
+        "metrics",
+        "correlation",
+        "strategy-comparison",
+        "ui"
+      ]
+    },
+    "E-UI-RESULTS-001": {
+      "title": "StrategyQuant X Results Analytics 1-to-1 Parity Reimplementation",
+      "observation_type": "donor_feature_analysis",
+      "status": "implemented",
+      "donor_evidence": [
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/ResultsChart/chart.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Trades on chart with candlestick bars, indicators, entry/exit markers, and bar inspection."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/ResultsTradeAnalysis/views/tradeAnalysis.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Trade analysis with annual stats grid, weekday/hour breakdowns, duration distribution, monthly returns matrix, streak analysis."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/ResultsPortfolioCorrelation/portfolioCorrelation.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Portfolio correlation matrix heatmap and overlapping trades exposure matrix."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-RESULTS"
+        ],
+        "requirement_ids": [
+          "FR-UI-TRADES_ON_CHART",
+          "FR-UI-CORRELATION_MATRIX",
+          "FR-UI-TRADE_ANALYSIS"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/Results/.",
+        "expected_observation": "Trades on chart calculations, trade analysis aggregations, and portfolio correlation symmetry/overlapping trades pass all tests.",
+        "actual_observation": "All 6 Results unit tests passed.",
+        "artifact_paths": [
+          "app/ui/src/workspace/Results/views/TradesOnChartView.tsx",
+          "app/ui/src/workspace/Results/views/TradeAnalysisView.tsx",
+          "app/ui/src/workspace/Results/views/PortfolioCorrelationView.tsx",
+          "app/ui/src/workspace/Results/ResultsWorkspace.tsx"
+        ],
+        "executed_at": "2026-09-21T16:48:29Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T16:48:29Z",
+        "updated_at": "2026-09-21T16:48:29Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "results",
+        "trades-on-chart",
+        "trade-analysis",
+        "portfolio-correlation",
+        "ui"
+      ]
+    },
+    "E-UI-BUILDER-001": {
+      "title": "StrategyQuant X Builder 1-to-1 Parity Reimplementation",
+      "observation_type": "donor_feature_analysis",
+      "status": "implemented",
+      "donor_evidence": [
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsWhatToBuild/views/whatToBuild.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "What to build settings: build modes, strategy architecture, trading direction, condition bounds."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsBlocks/views/blocks.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Building blocks selection modal catalog across signals, indicators, candle patterns, time filters, and exits."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsGeneticOptions/views/geneticOptions.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Genetic options: island models, population, mutation, crossover, candidate migration, stagnant restart."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsMoneyManagement/views/moneyManagement.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Advanced Trade Management & Money Management methods: fixed lots, risk % of equity, risk fixed amount, SL/PT ATR/pip ranges."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsRankings/views/ranking.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Ranking fitness objective function, automatic dismissal thresholds, and multi-stage cross-checks."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-RESEARCH"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/Builder/.",
+        "expected_observation": "Building blocks catalog categorization, search, custom overrides, qualification criteria, and genetic islands logic all pass.",
+        "actual_observation": "All 6 Builder unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/Builder/BuildingBlocksCatalog.ts",
+          "app/ui/src/workspace/Builder/BuildingBlocksModal.tsx",
+          "app/ui/src/workspace/Builder/ATMConfigModal.tsx",
+          "app/ui/src/workspace/Builder/RankingSettingsView.tsx",
+          "app/ui/src/workspace/Builder/BuilderWorkspace.tsx"
+        ],
+        "executed_at": "2026-09-21T17:06:33Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:06:33Z",
+        "updated_at": "2026-09-21T17:06:33Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "builder",
+        "building-blocks",
+        "genetic-options",
+        "money-management",
+        "rankings",
+        "ui"
+      ]
+    },
+    "E-UI-OPTIMIZER-001": {
+      "title": "StrategyQuant X Optimizer 1-to-1 Parity Reimplementation",
+      "observation_type": "donor_feature_analysis",
+      "status": "implemented",
+      "donor_evidence": [
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsOptimization/views/optimization.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Optimization settings: 4 modes (Simple, Sequential, Walk-Forward, WF Matrix), parameter grid table, objective functions, WF window configuration."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-RESEARCH"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/Optimizer/.",
+        "expected_observation": "Parameter space combinations calculation, optimization modes, WFE calculation, and Walk-Forward matrix summary stats all pass.",
+        "actual_observation": "All 5 Optimizer unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/Optimizer/WalkForwardMatrixView.tsx",
+          "app/ui/src/workspace/Optimizer/OptimizerWorkspace.tsx"
+        ],
+        "executed_at": "2026-09-21T17:06:33Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:06:33Z",
+        "updated_at": "2026-09-21T17:06:33Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "optimizer",
+        "parameter-grid",
+        "walk-forward",
+        "wf-matrix",
+        "ui"
+      ]
+    },
+    "E-UI-RETESTER-001": {
+      "title": "StrategyQuant X Retester 1-to-1 Parity Reimplementation",
+      "observation_type": "donor_feature_analysis",
+      "status": "implemented",
+      "donor_evidence": [
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsWhatToRetest/whatToRetest.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "What to retest: source databank, output databank, copy vs overwrite behavior."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/web/RETESTER/index.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Retester workspace: alternative markets matrix, timeframes matrix, testing precisions, what-if stress tests."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-RETESTER"
+        ],
+        "requirement_ids": [
+          "FR-UI-RETESTER_WORKFLOW"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/Retester/.",
+        "expected_observation": "Databank routing (copy vs overwrite), alternative markets matrix selection, what-if trade skipping, spread/slippage stress, and direction filtering all pass.",
+        "actual_observation": "All 5 Retester unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/Retester/RetesterWorkspace.tsx"
+        ],
+        "executed_at": "2026-09-21T17:06:33Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:06:33Z",
+        "updated_at": "2026-09-21T17:06:33Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "retester",
+        "multi-market",
+        "stress-testing",
+        "databank-routing",
+        "ui"
+      ]
+    },
+    "E-UI-PORTFOLIO-001": {
+      "title": "StrategyQuant X Portfolio Composer & Portfolio Master 1-to-1 Parity Reimplementation",
+      "observation_type": "donor_feature_analysis",
+      "status": "implemented",
+      "donor_evidence": [
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/PortfolioComposer/settings/composition/composition.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Portfolio composition grid: member strategies, weights, multipliers, sizing, and actions."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/PortfolioComposer/settings/autocomputation/autocomputation.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Automatic computation models: Markowitz Efficient Frontier, Risk Parity, Equal Weight, Min Variance."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/SettingsAutomaticPortfolioBuilder/automaticPortfolioBuilder.html",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Portfolio Master automated search: genetic vs brute force, databank routing, and correlation constraints."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO"
+        ],
+        "requirement_ids": [
+          "FR-UI-PORTFOLIO_SIMULATION"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/Portfolio/.",
+        "expected_observation": "Weight normalization, equal weight, risk parity, minimum variance, Markowitz efficient frontier, correlation matrix, shared capital simulation, and portfolio search constraint filtering all pass.",
+        "actual_observation": "All 12 Portfolio unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx",
+          "app/ui/src/workspace/PortfolioComposer/portfolioOptimization.ts",
+          "app/ui/src/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx"
+        ],
+        "executed_at": "2026-09-21T17:21:00Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:21:00Z",
+        "updated_at": "2026-09-21T17:21:00Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "portfolio",
+        "portfolio-composer",
+        "portfolio-master",
+        "markowitz",
+        "risk-parity",
+        "ui"
+      ]
+    },
+    "E-UI-ALGOWIZARD-001": {
+      "title": "StrategyQuant X AlgoWizard Visual Strategy Authoring 1-to-1 Parity Reimplementation",
+      "observation_type": "donor_feature_analysis",
+      "status": "implemented",
+      "donor_evidence": [
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/web/AlgoWizard/examples/examples.json",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "Pre-seeded strategy examples: EMA Cross, Inside Bar Breakout, Range Breakout, Mean Reversion, Trail Stop by EA."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        },
+        {
+          "source_id": "E-L01",
+          "locator": {
+            "path": "internal/plugins/AppWizard/AlgoWizardService.js",
+            "line_start": 1,
+            "line_end": null,
+            "symbol": null,
+            "xpath": null,
+            "notes": "AlgoWizard service: rule-tree logic, building blocks catalog, condition comparison operators, and order action mapping."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-AUTHORING"
+        ],
+        "requirement_ids": [
+          "FR-UI-ALGOWIZARD_VISUAL_RULES"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/AlgoWizard/.",
+        "expected_observation": "Rule-tree hierarchy, SQX pre-seeded templates, conditions comparison expressions, and multi-language code generation (MQL5, EasyLanguage, Python) all pass.",
+        "actual_observation": "All 5 AlgoWizard unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/AlgoWizard/AlgoWizardWorkspace.tsx",
+          "app/ui/src/workspace/AlgoWizard/algoWizardTemplates.ts",
+          "app/ui/src/workspace/AlgoWizard/StrategyCodeExportModal.tsx",
+          "app/ui/src/workspace/AlgoWizard/StrategyTemplatesModal.tsx"
+        ],
+        "executed_at": "2026-09-21T17:21:00Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:21:00Z",
+        "updated_at": "2026-09-21T17:21:00Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "algowizard",
+        "visual-authoring",
+        "rule-tree",
+        "code-generator",
+        "mql5",
+        "python",
+        "ui"
+      ]
+    },
+    "E-UI-PROJECTS-001": {
+      "record_id": "E-UI-PROJECTS-001",
+      "title": "Custom Projects multi-stage pipeline automation and 16 SQX task types",
+      "kind": "implementation",
+      "summary": "Autonomous multi-stage workflow pipeline runner supporting 16 SQX task types across Strategy Generation, Testing & Robustness, Databanks & Files, and Automation & Control with chained databank routing.",
+      "source_references": [
+        {
+          "source_id": "E-L01",
+          "locator": "internal/plugins/TASKMANAGER",
+          "description": "StrategyQuant X TaskManager multi-stage execution model and task configurations."
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PROJECTS"
+        ],
+        "requirement_ids": [
+          "FR-UI-CUSTOM_PROJECTS_PIPELINE"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/CustomProjects/.",
+        "expected_observation": "16 SQX task types, multi-project CRUD, databank chaining, and pipeline execution simulation pass.",
+        "actual_observation": "All 4 unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/CustomProjects/CustomProjectsWorkspace.tsx",
+          "app/ui/src/workspace/CustomProjects/NewTaskModal.tsx",
+          "app/ui/tests/unit/workspace/CustomProjects/customProjects.test.ts"
+        ],
+        "executed_at": "2026-09-21T17:32:00Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:32:00Z",
+        "updated_at": "2026-09-21T17:32:00Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "custom-projects",
+        "pipeline",
+        "task-manager",
+        "sqx-parity",
+        "ui"
+      ]
+    },
+    "E-UI-CODEEDITOR-001": {
+      "record_id": "E-UI-CODEEDITOR-001",
+      "title": "Code Editor & Extensions Studio with live Indicator Tester",
+      "kind": "implementation",
+      "summary": "Source code editor with 6 extension categories (Snippets, Blocks, Indicators, Columns, CustomAnalysis, ResultsPlugins), multi-tab editing with dirty tracking, AST compiler diagnostics, and live interactive Indicator Tester with SVG candlestick chart and calculated series table.",
+      "source_references": [
+        {
+          "source_id": "E-L01",
+          "locator": "internal/plugins/SQEDITOR",
+          "description": "StrategyQuant X Code Editor and indicator testing suite."
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-CODE-EDITOR"
+        ],
+        "requirement_ids": [
+          "FR-UI-CODE_EDITOR"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/CodeEditor/.",
+        "expected_observation": "6 extension categories, multi-tab dirty tracking, AST compiler diagnostics, and live SVG candlestick indicator tester pass.",
+        "actual_observation": "All 5 unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/CodeEditor/CodeEditorWorkspace.tsx",
+          "app/ui/src/workspace/CodeEditor/IndicatorTesterModal.tsx",
+          "app/ui/src/workspace/CodeEditor/NewExtensionModal.tsx",
+          "app/ui/tests/unit/workspace/CodeEditor/codeEditor.test.ts"
+        ],
+        "executed_at": "2026-09-21T17:32:00Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:32:00Z",
+        "updated_at": "2026-09-21T17:32:00Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "code-editor",
+        "extensions",
+        "indicators",
+        "compiler",
+        "ui"
+      ]
+    },
+    "E-UI-BUSINESS-001": {
+      "record_id": "E-UI-BUSINESS-001",
+      "title": "HaruQuantAI for Business distributed compute & MCP gateway",
+      "kind": "implementation",
+      "summary": "Multi-tenant enterprise workspace management with resource quotas, distributed compute worker cluster monitoring, Model Context Protocol (MCP) AI gateway integration, and role-based access control (RBAC) governance.",
+      "source_references": [
+        {
+          "source_id": "E-L01",
+          "locator": "internal/plugins/SQXBUSINESS",
+          "description": "StrategyQuant X Business cluster administration and team access control."
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUSINESS"
+        ],
+        "requirement_ids": [
+          "FR-UI-BUSINESS_WORKSPACES"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/Business/.",
+        "expected_observation": "Distributed compute cluster telemetry, MCP AI gateway configuration, and team RBAC governance pass.",
+        "actual_observation": "All 4 unit tests passed with 100% success.",
+        "artifact_paths": [
+          "app/ui/src/workspace/Business/BusinessWorkspace.tsx",
+          "app/ui/src/workspace/Business/AddNodeModal.tsx",
+          "app/ui/src/workspace/Business/ConfigureMcpModal.tsx",
+          "app/ui/tests/unit/workspace/Business/business.test.ts"
+        ],
+        "executed_at": "2026-09-21T17:32:00Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "main",
+        "created_at": "2026-09-21T17:32:00Z",
+        "updated_at": "2026-09-21T17:32:00Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend TypeScript reimplementation."
+      },
+      "tags": [
+        "business",
+        "compute-cluster",
+        "mcp-gateway",
+        "rbac",
+        "ui"
+      ]
     }
   }
 }

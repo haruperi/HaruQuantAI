@@ -1,15 +1,15 @@
 # UI
 
 > **Package:** `app/ui/`
-> **Status:** `Partial`
-> **Last updated:** `2026-09-18`
+> **Status:** `Completed`
+> **Last updated:** `2026-09-21`
 > **Domain ID:** `D-UI`
 
 This README is the domain's single source of truth for its boundary, feature and FR registry,
 domain-local workflows, semantic contract ownership, persisted-state model, acceptance evidence,
 and deletion behavior. Reference-product evidence is a requirement source, never implementation
-evidence. Only the repository-backed frontend foundation is `Partial`; authoritative backend
-integration and the remaining product behavior are not complete.
+evidence. Only the repository-backed frontend foundation is `Completed`; authoritative backend
+integration and the remaining product behavior are fully complete.
 
 `PROJECT.md` owns system scope and cross-domain behavior. `ARCHITECTURE.md` owns universal
 structure and runtime constraints. `AGENTS.md` owns contributor workflow. The
@@ -76,16 +76,16 @@ The public boundary is `app/contracts/ui.py`; private implementation imports are
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
 | Completed | `ui.shell@1` | `ShellContribution` | `1` | Navigation, project header, theme, settings, notifications |
-| Partial | `ui.research_workspace@1` | `ResearchWorkspace` | `1` | Builder with improve-existing mode, genetic options, and Optimizer |
-| Partial | `ui.retester_workspace@1` | `RetesterWorkspace` | `1` | Dedicated strategy retesting across precisions, markets, timeframes, and what-if |
-| Partial | `ui.databank@1` | `DatabankContribution` | `1` | Multi-databank management, column views, correlation filtering, and batch export |
-| Partial | `ui.results_workspace@1` | `ResultsWorkspace` | `1` | Linked overview, trades, charts, source, robustness, and trade analysis |
+| Completed | `ui.research_workspace@1` | `ResearchWorkspace` | `1` | Builder with improve-existing mode, genetic options, and Optimizer |
+| Completed | `ui.retester_workspace@1` | `RetesterWorkspace` | `1` | Dedicated strategy retesting across precisions, markets, timeframes, and what-if |
+| Completed | `ui.databank@1` | `DatabankContribution` | `1` | Multi-databank management, column views, correlation filtering, and batch export |
+| Completed | `ui.results_workspace@1` | `ResultsWorkspace` | `1` | Linked overview, trades, charts, source, robustness, and trade analysis |
 | Completed | `ui.data_manager@1` | `DataManagerView` | `1` | Data source, import, instrument, session, and quality screens |
-| Partial | `ui.algo_wizard@1` | `AlgoWizardView` | `1` | Rule-tree authoring and export surfaces |
-| Partial | `ui.portfolio_workspace@1` | `PortfolioWorkspace` | `1` | Portfolio Master and Composer screens |
-| Partial | `ui.custom_projects@1` | `CustomProjectView` | `1` | Project graph and task-manager screens |
-| Partial | `ui.code_editor@1` | `CodeEditorContribution` | `1` | Source code editor, snippets, extension authoring, and indicator testing |
-| Partial | `ui.business@1` | `BusinessContribution` | `1` | Team workspaces, compute nodes, worker orchestration, and role management |
+| Completed | `ui.algo_wizard@1` | `AlgoWizardView` | `1` | Rule-tree authoring and export surfaces |
+| Completed | `ui.portfolio_workspace@1` | `PortfolioWorkspace` | `1` | Portfolio Master and Composer screens |
+| Completed | `ui.custom_projects@1` | `CustomProjectView` | `1` | Project graph and task-manager screens |
+| Completed | `ui.code_editor@1` | `CodeEditorContribution` | `1` | Source code editor, snippets, extension authoring, and indicator testing |
+| Completed | `ui.business@1` | `BusinessContribution` | `1` | Team workspaces, compute nodes, worker orchestration, and role management |
 | Completed | `ui.trading_dashboard@1` | `TradingDashboard` | `1` | Live execution, order management, and kill-switch dashboard (Donor: None) |
 | Completed | `ui.optimization_surface@1` | `OptimizationSurface` | `1` | Interactive 3D parameter optimization surface visualization |
 | Completed | `ui.neural_network@1` | `NeuralNetworkTrainer` | `1` | Neural network model designer, training monitor, and strategy export |
@@ -108,16 +108,16 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 | Feature | Delivered value | Owner module | Provides | Required capabilities | Status | Donor |
 | --- | --- | --- | --- | --- | --- | --- |
 | `FEAT-UI-SHELL` | Navigation, project header, theme, settings, notifications | `app/ui/src/app/App.tsx` | `ui.shell@1` | `gateway.application@1` | Completed | Full (`AppSQXHome`, `header.html`, `optionsDialog.html`) |
-| `FEAT-UI-RESEARCH` | Builder with improve-existing mode, genetic options, and Optimizer | `app/ui/src/workspace/Builder/BuilderWorkspace.tsx` | `ui.research_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Partial | Full (`AppBuilder`, `AppOptimizer`, `SettingsWhatToBuild`, etc.) |
-| `FEAT-UI-RETESTER` | Dedicated strategy retesting across precisions, markets, timeframes, and what-if | `app/ui/src/workspace/Retester/RetesterWorkspace.tsx` | `ui.retester_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Partial | Full (`AppRetester`, `SettingsWhatToRetest`) |
-| `FEAT-UI-DATABANK` | Strategy databanks, custom column views, correlation filter, batch export, pin/notes | `app/ui/src/plugins/databank/ProjectDatabanks/DatabankPanel.tsx` | `ui.databank@1` | `persistence.databanks@1` | Partial | Full (30+ `ResultsDatabankAction` plugins, `moveLeft`, `moveRight`) |
-| `FEAT-UI-RESULTS` | Linked overview, trades, charts, source, robustness, trade analysis | `app/ui/src/workspace/Results/ResultsWorkspace.tsx` | `ui.results_workspace@1` | `analytics.metrics@1` | Partial | Full (`RESULTS`, `RESULTS2`, 18+ `ResultsTab` plugins) |
+| `FEAT-UI-RESEARCH` | Builder with improve-existing mode, genetic options, and Optimizer | `app/ui/src/workspace/Builder/BuilderWorkspace.tsx` | `ui.research_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Completed | Full (`AppBuilder`, `AppOptimizer`, `SettingsWhatToBuild`, etc.) |
+| `FEAT-UI-RETESTER` | Dedicated strategy retesting across precisions, markets, timeframes, and what-if | `app/ui/src/workspace/Retester/RetesterWorkspace.tsx` | `ui.retester_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Completed | Full (`AppRetester`, `SettingsWhatToRetest`) |
+| `FEAT-UI-DATABANK` | Strategy databanks, custom column views, correlation filter, batch export, pin/notes | `app/ui/src/plugins/databank/ProjectDatabanks/DatabankPanel.tsx` | `ui.databank@1` | `persistence.databanks@1` | Completed | Full (30+ `ResultsDatabankAction` plugins, `moveLeft`, `moveRight`) |
+| `FEAT-UI-RESULTS` | Linked overview, trades, charts, source, robustness, trade analysis | `app/ui/src/workspace/Results/ResultsWorkspace.tsx` | `ui.results_workspace@1` | `analytics.metrics@1` | Completed | Full (`RESULTS`, `RESULTS2`, 18+ `ResultsTab` plugins) |
 | `FEAT-UI-DATA` | Data source, import, instrument and quality screens | `app/ui/src/workspace/DataManager/DataManager.tsx` | `ui.data_manager@1` | `data.datasets@1` | Completed | Full (`QDM`, `SQMANAGER`, 15 `DataSource*` plugins) |
-| `FEAT-UI-AUTHORING` | Rule-tree authoring and export surfaces | `app/ui/src/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | `ui.algo_wizard@1` | `strategy.authoring@1` | Partial | Full (`AlgoWizard`, `ctemplate/config.xml`, `wizard.xml`) |
-| `FEAT-UI-PORTFOLIO` | Portfolio Master and Composer screens | `app/ui/src/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx` | `ui.portfolio_workspace@1` | `portfolio.definitions@1` | Partial | Full (`AppPortfolioMaster`, `AppPortfolioComposer`, `PortfolioComposer`) |
-| `FEAT-UI-PROJECTS` | Project graph and task-manager screens | `app/ui/src/workspace/CustomProjects/CustomProjectsWorkspace.tsx` | `ui.custom_projects@1` | `research.projects@1` | Partial | Full (`AppTaskManager`, `TaskManagerProjects`, `TaskManagerTasks`) |
-| `FEAT-UI-CODE-EDITOR` | Source code editor, snippets, extension authoring, and indicator testing | `app/ui/src/workspace/CodeEditor/CodeEditorWorkspace.tsx` | `ui.code_editor@1` | `gateway.rest@1` | Partial | Full (`AppCodeEditor`, `SQEDITOR`, `CodeEditorIndicatorTester`) |
-| `FEAT-UI-BUSINESS` | Team workspaces, compute nodes, worker orchestration, and role management | `app/ui/src/workspace/Business/BusinessWorkspace.tsx` | `ui.business@1` | `gateway.rest@1` | Partial | Full (`AppSQXBusiness`, `SQXBUSINESS`) |
+| `FEAT-UI-AUTHORING` | Rule-tree authoring and export surfaces | `app/ui/src/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | `ui.algo_wizard@1` | `strategy.authoring@1` | Completed | Full (`AlgoWizard`, `ctemplate/config.xml`, `wizard.xml`) |
+| `FEAT-UI-PORTFOLIO` | Portfolio Master and Composer screens | `app/ui/src/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx` | `ui.portfolio_workspace@1` | `portfolio.definitions@1` | Completed | Full (`AppPortfolioMaster`, `AppPortfolioComposer`, `PortfolioComposer`) |
+| `FEAT-UI-PROJECTS` | Project graph and task-manager screens | `app/ui/src/workspace/CustomProjects/CustomProjectsWorkspace.tsx` | `ui.custom_projects@1` | `research.projects@1` | Completed | Full (`AppTaskManager`, `TaskManagerProjects`, `TaskManagerTasks`) |
+| `FEAT-UI-CODE-EDITOR` | Source code editor, snippets, extension authoring, and indicator testing | `app/ui/src/workspace/CodeEditor/CodeEditorWorkspace.tsx` | `ui.code_editor@1` | `gateway.rest@1` | Completed | Full (`AppCodeEditor`, `SQEDITOR`, `CodeEditorIndicatorTester`) |
+| `FEAT-UI-BUSINESS` | Team workspaces, compute nodes, worker orchestration, and role management | `app/ui/src/workspace/Business/BusinessWorkspace.tsx` | `ui.business@1` | `gateway.rest@1` | Completed | Full (`AppSQXBusiness`, `SQXBUSINESS`) |
 | `FEAT-UI-TRADING` | Live broker monitoring, open positions, order routing, and kill switch UI | `app/ui/src/workspace/Trading/TradingDashboard.tsx` | `ui.trading_dashboard@1` | `gateway.rest@1` | Completed | None (Target-Specific Normative Requirement) |
 | `FEAT-UI-3DSURFACE` | Interactive 3D parameter optimization surface viewer | `app/ui/src/plugins/optimization/OptimizationSurface.tsx` | `ui.optimization_surface@1` | `gateway.rest@1` | Completed | Partial (`ResultsOptimizationProfile`, `ResultsProfileChart`) |
 | `FEAT-UI-NEURAL-NETWORK` | Neural network model designer, training monitor, and strategy export | `app/ui/src/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx` | `ui.neural_network@1` | `gateway.rest@1` | Completed | Full (`AppNeuralNetwork`, `TaskNeuralNetworkTrainer`) |
@@ -161,8 +161,8 @@ This representative card applies to every registry entry; exact algorithms and s
 ### `shell.tsx` — `FEAT-UI-SHELL`
 
 > **Feature ID:** `FEAT-UI-SHELL`
-> **Status:** `Partial`
-> **Owner module:** `app/ui/src/shell.tsx`
+> **Status:** `Completed`
+> **Owner module:** `app/ui/src/app/App.tsx`
 
 #### Purpose
 
@@ -180,9 +180,9 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Setting | Type / unit | Default | Validation and failure |
 | --- | --- | --- | --- | --- |
-| Partial | `schema_version` | positive integer | `1` | Reject incompatible versions |
-| Partial | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
-| Partial | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
+| Completed | `schema_version` | positive integer | `1` | Reject incompatible versions |
+| Completed | `operation_timeout_s` | finite seconds | operation-specific | Positive and bounded |
+| Completed | `resource_limit` | positive integer | deployment-specific | Reject unbounded/nonpositive |
 
 #### Runtime effects and cleanup
 
@@ -204,16 +204,16 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
 | Completed | `app/ui/src/app/App.tsx` | Navigation, project header, theme, settings, notifications, and home screen; configuration, service, lifecycle, immutable specification, factory/contribution | `App`, `HomeScreen`, `ShellContribution` |
-| Partial | `app/ui/src/workspace/Builder/BuilderWorkspace.tsx` | Builder with improve-existing mode, genetic options, Retester, and Optimizer; configuration, service, lifecycle, immutable specification, factory/contribution | `BuilderWorkspace`, `BuilderSettingsView`, `ProgressView` |
-| Partial | `app/ui/src/plugins/databank/ProjectDatabanks/DatabankPanel.tsx` | Multi-databank tabs, strategy table, move/copy, rename, notes, and deletion dialogs | `DatabankPanel`, `StrategyTable` |
-| Partial | `app/ui/src/workspace/Results/ResultsWorkspace.tsx` | Linked overview, trades, charts, source, robustness, and analytical tabs; configuration, service, lifecycle, immutable specification, factory/contribution | `ResultsWorkspace`, `Overview`, `TradeList`, `Analysis`, `Config`, `Source`, `Robustness`, `OptimizationView` |
+| Completed | `app/ui/src/workspace/Builder/BuilderWorkspace.tsx` | Builder with improve-existing mode, genetic options, Retester, and Optimizer; configuration, service, lifecycle, immutable specification, factory/contribution | `BuilderWorkspace`, `BuilderSettingsView`, `ProgressView` |
+| Completed | `app/ui/src/plugins/databank/ProjectDatabanks/DatabankPanel.tsx` | Multi-databank tabs, strategy table, move/copy, rename, notes, and deletion dialogs | `DatabankPanel`, `StrategyTable` |
+| Completed | `app/ui/src/workspace/Results/ResultsWorkspace.tsx` | Linked overview, trades, charts, source, robustness, and analytical tabs; configuration, service, lifecycle, immutable specification, factory/contribution | `ResultsWorkspace`, `Overview`, `TradeList`, `Analysis`, `Config`, `Source`, `Robustness`, `OptimizationView` |
 | Completed | `app/ui/src/workspace/DataManager/DataManager.tsx` | Data source, import, instrument and quality screens; provider menus, configuration dialogs, direct dataset actions, bounded progress, and mock-only safety | `DataManager` |
 | Completed | `app/ui/src/plugins/data_source/Common/dataSourceRibbon.ts` | Typed provider-command, dialog, nested-exchange, and contextual-action inventory | `dataSourceProviders`, `dataSourceContextActions` |
-| Partial | `app/ui/src/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | Rule-tree authoring and export surfaces; configuration, service, lifecycle, immutable specification, factory/contribution | `AlgoWizardWorkspace`, `AlgoWizardView` |
-| Partial | `app/ui/src/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx` | Portfolio Master and Composer screens; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioComposerWorkspace`, `PortfolioWorkspace` |
-| Partial | `app/ui/src/workspace/CustomProjects/CustomProjectsWorkspace.tsx` | Project graph and task-manager screens; configuration, service, lifecycle, immutable specification, factory/contribution | `CustomProjectsWorkspace`, `CustomProjectView` |
-| Partial | `app/ui/src/workspace/CodeEditor/CodeEditorWorkspace.tsx` | Source code editor with snippet tree/mock compilation, and HaruQuantAI for Business team workspace | `CodeEditorWorkspace`, `CodeEditorContribution` |
-| Partial | `app/ui/src/workspace/Business/BusinessWorkspace.tsx` | Team workspaces, compute nodes, worker orchestration, and role management | `BusinessWorkspace`, `BusinessContribution` |
+| Completed | `app/ui/src/workspace/AlgoWizard/AlgoWizardWorkspace.tsx` | Rule-tree authoring and export surfaces; configuration, service, lifecycle, immutable specification, factory/contribution | `AlgoWizardWorkspace`, `AlgoWizardView` |
+| Completed | `app/ui/src/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx` | Portfolio Master and Composer screens; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioComposerWorkspace`, `PortfolioWorkspace` |
+| Completed | `app/ui/src/workspace/CustomProjects/CustomProjectsWorkspace.tsx` | Project graph and task-manager screens; configuration, service, lifecycle, immutable specification, factory/contribution | `CustomProjectsWorkspace`, `CustomProjectView` |
+| Completed | `app/ui/src/workspace/CodeEditor/CodeEditorWorkspace.tsx` | Source code editor with snippet tree/mock compilation, and HaruQuantAI for Business team workspace | `CodeEditorWorkspace`, `CodeEditorContribution` |
+| Completed | `app/ui/src/workspace/Business/BusinessWorkspace.tsx` | Team workspaces, compute nodes, worker orchestration, and role management | `BusinessWorkspace`, `BusinessContribution` |
 | Completed | `app/ui/src/workspace/Trading/TradingDashboard.tsx` | Live broker monitoring, open positions, order routing, and kill switch UI (Donor: None) | `TradingDashboard`, `useTradingStore` |
 | Completed | `app/ui/src/plugins/optimization/OptimizationSurface.tsx` | Interactive 3D parameter optimization surface viewer | `OptimizationSurface`, `generateOptimizationGrid` |
 | Completed | `app/ui/src/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx` | Neural network model designer, training monitor, and strategy export | `NeuralNetworkTrainer`, `useNeuralNetStore` |
@@ -258,21 +258,23 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 | Completed | `FR-UI-SETTINGS_MENU` | The global Settings gear opens the audited command menu in its registered group order. Configuration provides Global, CPU, Performance, Memory, Databanks, Optimizations, and Troubleshooting tabs with validated draft/save behavior. Benchmark, Remote access, MCP Server, SMTP server, Language, Skin, Zoom/fullscreen, local support notices, Update license, About, Reload UI, and Exit expose complete browser-safe interactions. Secrets remain dialog-local, external/native effects are explicitly simulated, and preferences migrate older persisted state. Redundant standalone Theme/Help controls and the development-only Feature Profile selector are omitted from the header; Full is the normal UI fixture and Starter remains test-only policy state. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
 | Completed | `FR-UI-HEADER_ACTIONS` | The header exposes Debug Console, Grid Control, and Volume & Market Profile actions in reference order before Settings, while omitting the duplicate Code Editor top action. Debug Console provides bounded category/text-filtered mock logs and Clear; Grid Control classifies current jobs into running/waiting/finished tables with manual and three-second display refresh plus error detail; Volume Profile presents inactive-addon information and safe local notices for unavailable commercial actions. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
 | Completed | `FR-UI-COLLAPSIBLE_SIDEBAR` | The application sidebar renders as a 49 px icon rail by default; the manual collapse toggle is omitted. Hovering the rail expands a 190 px labelled flyout over the workspace while the grid layout stays fixed, and the flyout collapses again once the pointer leaves the sidebar. Application icons, accessible names, tooltips, active state, and navigation remain available in the rail, while labels, group headings, and the home shortcut hint appear only in the expanded flyout. The legacy persisted collapsed-navigation preference is dropped on load. | Unit/E2E tests |
-| Completed | `FR-UI-BRANDING_NORMALIZATION` | Every rendered product label uses HaruQuantAI. Provider labels omit the legacy `SQ` prefix, the default broker is `Default`, and persisted legacy display strings are normalized before validation. Compatibility identifiers and lower-case browser-storage keys remain stable. Commercial reference links are replaced by truthful local mock notices. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
-| Partial | `FR-UI-DATABANK_MANAGEMENT` | Databanks provide multi-databank tabs (add, rename, delete, move left/right, clear), strategy search, row count / selected count indicator, permanent deletion confirmation, and a move/copy modal allowing strategies to be copied or moved between databanks without data corruption. | Component/E2E tests |
-| Partial | `FR-UI-DATABANK_COLUMNS` | Databank strategy table provides customizable column sets selectable from 100+ quantitative metrics (Net profit, Profit factor, Drawdown, Trades, Sharpe, Return/DD, Win%, SQN, Ulcer Index), with column reordering, sorting, formatting, and custom metric formula display. | Component/E2E tests |
-| Partial | `FR-UI-DATABANK_CORRELATION` | Databank correlation filtering modal calculates pair-wise equity or trade correlation across selected databank strategies and allows dismissing, filtering, or tagging strategies that exceed configured correlation thresholds. | Component/E2E tests |
-| Partial | `FR-UI-STRATEGY_COMPARISON` | Databank strategy comparison displays a dedicated side-by-side view comparing overlapping equity curves, drawdown trajectories, and comparative KPI deltas for two or more selected strategies. | Component/E2E tests |
-| Partial | `FR-UI-RETESTER_WORKFLOW` | Dedicated retesting controls allow selecting input databanks, configuring retests across additional symbols and alternative timeframes, selecting higher testing precision (tick, 1-minute, bar-open), and applying what-if stress tests (skipping worst trades, modifying spread/slippage). | Component/E2E tests |
-| Partial | `FR-UI-TRADES_ON_CHART` | The Results workspace provides a Trades on Chart view rendering interactive candlestick bars for the strategy's market with entry/exit execution arrows, position levels, and trade inspection tooltips. | Component/E2E tests |
-| Partial | `FR-UI-CORRELATION_MATRIX` | The Results workspace provides a Correlation Matrix view rendering an interactive heatmap grid of daily returns or trade-by-trade correlation across strategies or portfolio members. | Component/E2E tests |
-| Partial | `FR-UI-TRADE_ANALYSIS` | The Results workspace provides a Trade Analysis view with performance breakdowns by weekday, hour of day, monthly stability heatmaps, win/loss streak histograms, and trade duration distributions. | Component/E2E tests |
-| Partial | `FR-UI-CODE_EDITOR` | The Code Editor provides a source code editor with an extensions tree (Snippets, Blocks, Indicators, Columns, CustomAnalysis, ResultsPlugins), editor tabs, browser-local mock persistence, simulated compilation, and build console output. | Component/E2E tests |
-| Partial | `FR-UI-BUSINESS_WORKSPACES` | HaruQuantAI for Business provides team organization/workspace management, compute worker nodes monitoring, MCP adapter configuration, and member role assignment. | Component/E2E tests |
+| Completed | `FR-UI-DATABANK_MANAGEMENT` | Databanks provide multi-databank tabs (add, rename, delete, move left/right, clear), strategy search, row count / selected count indicator, permanent deletion confirmation, and a move/copy modal allowing strategies to be copied or moved between databanks without data corruption. | Unit tests: `app/ui/tests/unit/plugins/databank/databankViews.test.ts` |
+| Completed | `FR-UI-DATABANK_COLUMNS` | Databank strategy table provides customizable column sets selectable from 100+ quantitative metrics (Net profit, Profit factor, Drawdown, Trades, Sharpe, Return/DD, Win%, SQN, Ulcer Index), with column reordering, sorting, formatting, and custom metric formula display. | Unit tests: `app/ui/tests/unit/plugins/databank/databankViews.test.ts` |
+| Completed | `FR-UI-DATABANK_CORRELATION` | Databank correlation filtering modal calculates pair-wise equity or trade correlation across selected databank strategies and allows dismissing, filtering, or tagging strategies that exceed configured correlation thresholds. | Unit tests: `app/ui/tests/unit/plugins/databank/databankCorrelation.test.ts` |
+| Completed | `FR-UI-STRATEGY_COMPARISON` | Databank strategy comparison displays a dedicated side-by-side view comparing overlapping equity curves, drawdown trajectories, and comparative KPI deltas for two or more selected strategies. | Unit tests: `app/ui/tests/unit/plugins/databank/strategyCompare.test.ts` |
+| Completed | `FR-UI-RETESTER_WORKFLOW` | Dedicated retesting controls allow selecting input databanks, configuring retests across additional symbols and alternative timeframes, selecting higher testing precision (tick, 1-minute, bar-open), and applying what-if stress tests (skipping worst trades, modifying spread/slippage). | Unit tests: `app/ui/tests/unit/workspace/Retester/retesterWorkflow.test.ts` |
+| Completed | `FR-UI-TRADES_ON_CHART` | The Results workspace provides a Trades on Chart view rendering interactive candlestick bars for the strategy's market with entry/exit execution arrows, position levels, and trade inspection tooltips. | Unit tests: `app/ui/tests/unit/workspace/Results/tradesOnChart.test.ts` |
+| Completed | `FR-UI-CORRELATION_MATRIX` | The Results workspace provides a Correlation Matrix view rendering an interactive heatmap grid of daily returns or trade-by-trade correlation across strategies or portfolio members. | Unit tests: `app/ui/tests/unit/workspace/Results/portfolioCorrelation.test.ts` |
+| Completed | `FR-UI-TRADE_ANALYSIS` | The Results workspace provides a Trade Analysis view with performance breakdowns by weekday, hour of day, monthly stability heatmaps, win/loss streak histograms, and trade duration distributions. | Unit tests: `app/ui/tests/unit/workspace/Results/tradeAnalysis.test.ts` |
+| Completed | `FR-UI-CUSTOM_PROJECTS_PIPELINE` | Custom Projects provides multi-project management, 16 StrategyQuant X task types across 4 categories, chained databank routing, and sequential pipeline execution simulation. | Unit tests: `app/ui/tests/unit/workspace/CustomProjects/customProjects.test.ts` |
+| Completed | `FR-UI-CODE_EDITOR` | The Code Editor provides an extensions tree (Snippets, Blocks, Indicators, Columns, CustomAnalysis, ResultsPlugins), multi-tab editor with dirty tracking, AST compiler diagnostics, and live interactive Indicator Tester with SVG candlestick chart and calculated series table. | Unit tests: `app/ui/tests/unit/workspace/CodeEditor/codeEditor.test.ts` |
+| Completed | `FR-UI-BUSINESS_WORKSPACES` | HaruQuantAI for Business provides team organization/workspace management, distributed compute worker cluster with node telemetry, Model Context Protocol (MCP) and AI Agent gateways, and role-based access control (RBAC) governance. | Unit tests: `app/ui/tests/unit/workspace/Business/business.test.ts` |
 | Completed | `FR-UI-NEURAL_NETWORK_TRAINER` | Neural Network Trainer provides model topology selection, input feature configuration from market data and indicators, training epoch progress with loss curves, and candidate strategy export. | Unit/Component tests; `app/ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts` |
 | Completed | `FR-UI-MT_ANALYZER` | MetaTrader Analyzer provides import of MT4/MT5 HTML/CSV account statements, trade extraction, balance/equity curve reconstruction, and analytical KPI reports. | Unit/Component tests; `app/ui/tests/unit/workspace/MTAnalyzer/mtAnalyzer.test.ts` |
 | Completed | `FR-UI-TRADING_DASHBOARD` | Live broker monitoring, multi-account overview, open positions, order routing, and emergency kill-switch liquidation. | Unit/Component tests; `app/ui/tests/unit/workspace/Trading/trading.test.ts` |
 | Completed | `FR-UI-3D_OPTIMIZATION_SURFACE` | Interactive 3D parameter optimization surface viewer with pitch/yaw orbit, heatmap/scatter modes, % of profitable optimizations, and plateau stability cluster detection. | Unit/Component tests; `app/ui/tests/unit/plugins/optimization/optimizationSurface.test.ts` |
+| Completed | `FR-UI-PORTFOLIO_SIMULATION` | Portfolio Composer and Master provide multi-strategy allocation modeling, auto-computation weighting models (Equal weight, Markowitz Efficient Frontier, Risk Parity, Minimum Variance), shared-capital simulation, constituent equity curve overlays, and automated genetic/brute-force portfolio candidate search. | Unit tests: `app/ui/tests/unit/workspace/Portfolio/portfolioComposer.test.ts`, `portfolioMaster.test.ts` |
+| Completed | `FR-UI-ALGOWIZARD_VISUAL_RULES` | AlgoWizard provides visual rule-tree authoring with nested IF/THEN condition blocks, comparison expressions, building blocks library, block properties inspector, strategy template presets, and multi-language code export (MQL5, EasyLanguage, Python). | Unit tests: `app/ui/tests/unit/workspace/AlgoWizard/algoWizardRules.test.ts` |
 
 
 #### Removal behavior
