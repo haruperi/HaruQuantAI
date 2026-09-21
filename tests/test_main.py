@@ -19,6 +19,22 @@ from app.main import (
 from app.registry import available_profiles
 
 
+@pytest.fixture(autouse=True)
+def _isolate_logging(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Isolate logging directory for CLI tests to prevent workspace lock contention."""
+    from app.kernel.logging import LoggingConfig
+
+    orig_init = LoggingConfig.__init__
+
+    def _init(self: LoggingConfig, *args: Any, **kwargs: Any) -> None:
+        if "log_directory" not in kwargs:
+            kwargs["log_directory"] = tmp_path / "logs"
+        orig_init(self, *args, **kwargs)
+
+    monkeypatch.setattr(LoggingConfig, "__init__", _init)
+    monkeypatch.setattr("uvicorn.Server.serve", AsyncMock(return_value=None))
+
+
 def test_parse_args_defaults() -> None:
     """Verify default CLI arguments."""
     args = parse_args([])

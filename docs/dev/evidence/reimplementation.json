@@ -1213,8 +1213,8 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/dukascopy.test.ts",
-          "app/ui/src/domains/data/dukascopyDownload.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Dukascopy/dukascopy.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Dukascopy/dukascopyDownload.test.ts",
           "app/ui/tests/data-manager-dukascopy.spec.ts",
           "app/ui/tests/data-manager-dukascopy-download.spec.ts"
         ],
@@ -1326,7 +1326,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/tickDownloader.test.ts",
+          "app/ui/tests/unit/plugins/data_source/TickDownloader/tickDownloader.test.ts",
           "app/ui/tests/data-manager-tickdownloader.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -1512,8 +1512,8 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/fileImport.test.ts",
-          "app/ui/src/domains/data/fileSymbols.test.ts",
+          "app/ui/tests/unit/plugins/data_source/FileImport/fileImport.test.ts",
+          "app/ui/tests/unit/plugins/data_source/FileImport/fileSymbols.test.ts",
           "app/ui/tests/data-manager-file-import.spec.ts",
           "app/ui/tests/data-manager-file-symbol.spec.ts"
         ],
@@ -1644,7 +1644,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/sqData.test.ts",
+          "app/ui/tests/unit/plugins/data_source/SQData/sqData.test.ts",
           "app/ui/tests/data-manager-sq-data.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -1774,7 +1774,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/sqData.test.ts",
+          "app/ui/tests/unit/plugins/data_source/SQData/sqData.test.ts",
           "app/ui/tests/data-manager-sq-data.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -1962,7 +1962,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/darwinex.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Darwinex/darwinex.test.ts",
           "app/ui/tests/data-manager-darwinex.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -2111,7 +2111,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/crypto.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Crypto/crypto.test.ts",
           "app/ui/tests/data-manager-crypto.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -2260,7 +2260,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/yahoo.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Yahoo/yahoo.test.ts",
           "app/ui/tests/data-manager-yahoo.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -2370,7 +2370,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/mt5Import.test.ts",
+          "app/ui/tests/unit/plugins/data_source/MetaTrader/mt5Import.test.ts",
           "app/ui/tests/data-manager-mt5-import.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -2574,7 +2574,7 @@
         "expected_observation": "The documented controls and transitions are exercised without live provider or native application effects.",
         "actual_observation": "Focused component and browser scenarios cover the documented mock workflow; the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/dataSourceRibbon.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Common/dataSourceRibbon.test.ts",
           "app/ui/tests/data-manager-source-ribbon.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -2742,7 +2742,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/dataExport.ts",
+          "artifact_locator": "app/ui/src/plugins/data_source/Export/dataExport.ts",
           "location": {
             "section": null,
             "symbol": null,
@@ -2776,7 +2776,7 @@
         "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
         "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/dataExport.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Export/dataExport.test.ts",
           "app/ui/tests/data-manager-export.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -2833,7 +2833,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/dataTools.ts",
+          "artifact_locator": "app/ui/src/plugins/data_source/Tools/dataTools.ts",
           "location": {
             "section": null,
             "symbol": null,
@@ -2867,7 +2867,7 @@
         "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
         "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/dataTools.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Tools/dataTools.test.ts",
           "app/ui/tests/data-manager-tools.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -2924,7 +2924,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/DataManager.tsx",
+          "artifact_locator": "app/ui/src/workspace/DataManager/DataManager.tsx",
           "location": {
             "section": null,
             "symbol": null,
@@ -3015,7 +3015,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/instruments.ts",
+          "artifact_locator": "app/ui/src/plugins/data_source/Catalogs/Instruments/instruments.ts",
           "location": {
             "section": null,
             "symbol": null,
@@ -3049,7 +3049,7 @@
         "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
         "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/instruments.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Catalogs/Instruments/instruments.test.ts",
           "app/ui/tests/data-manager-instruments.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -3106,7 +3106,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/sessions.ts",
+          "artifact_locator": "app/ui/src/plugins/data_source/Catalogs/Sessions/sessions.ts",
           "location": {
             "section": null,
             "symbol": null,
@@ -3140,7 +3140,7 @@
         "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
         "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/sessions.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Catalogs/Sessions/sessions.test.ts",
           "app/ui/tests/data-manager-sessions.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -3197,7 +3197,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/externalIndicators.ts",
+          "artifact_locator": "app/ui/src/plugins/data_source/Indicators/externalIndicators.ts",
           "location": {
             "section": null,
             "symbol": null,
@@ -3231,7 +3231,7 @@
         "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
         "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/externalIndicators.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Indicators/externalIndicators.test.ts",
           "app/ui/tests/data-manager-external-indicators.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -3288,7 +3288,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/stockGroups.ts",
+          "artifact_locator": "app/ui/src/plugins/data_source/Catalogs/StockGroups/stockGroups.ts",
           "location": {
             "section": null,
             "symbol": null,
@@ -3322,7 +3322,7 @@
         "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
         "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/stockGroups.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Catalogs/StockGroups/stockGroups.test.ts",
           "app/ui/tests/data-manager-stock-groups.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"
@@ -3379,7 +3379,7 @@
       "sources": [
         {
           "catalog_id": "E-R01",
-          "artifact_locator": "app/ui/src/domains/data/brokerProfiles.ts",
+          "artifact_locator": "app/ui/src/plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles.ts",
           "location": {
             "section": null,
             "symbol": null,
@@ -3413,7 +3413,7 @@
         "expected_observation": "Focused component and browser scenarios exercise the requirement and its bounded persistence behavior.",
         "actual_observation": "The focused evidence is present and the full repository pipeline passed.",
         "artifact_paths": [
-          "app/ui/src/domains/data/brokerProfiles.test.ts",
+          "app/ui/tests/unit/plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles.test.ts",
           "app/ui/tests/data-manager-broker-profiles.spec.ts"
         ],
         "executed_at": "2026-09-20T19:17:32Z"

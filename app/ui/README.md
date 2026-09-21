@@ -76,14 +76,20 @@ The public boundary is `app/contracts/ui.py`; private implementation imports are
 | Status | Capability or event | Protocol / DTO symbol | Version | Purpose |
 | --- | --- | --- | --- | --- |
 | Partial | `ui.shell@1` | `ShellContribution` | `1` | Navigation, project header, theme, settings, notifications |
-| Partial | `ui.research_workspace@1` | `ResearchWorkspace` | `1` | Builder with improve-existing mode, Retester, Optimizer and databanks |
-| Partial | `ui.results_workspace@1` | `ResultsWorkspace` | `1` | Linked overview, trades, charts, source, robustness |
-| Partial | `ui.data_manager@1` | `DataManagerView` | `1` | Data source, import, instrument and quality screens |
+| Partial | `ui.research_workspace@1` | `ResearchWorkspace` | `1` | Builder with improve-existing mode, genetic options, and Optimizer |
+| Partial | `ui.retester_workspace@1` | `RetesterWorkspace` | `1` | Dedicated strategy retesting across precisions, markets, timeframes, and what-if |
+| Partial | `ui.databank@1` | `DatabankContribution` | `1` | Multi-databank management, column views, correlation filtering, and batch export |
+| Partial | `ui.results_workspace@1` | `ResultsWorkspace` | `1` | Linked overview, trades, charts, source, robustness, and trade analysis |
+| Partial | `ui.data_manager@1` | `DataManagerView` | `1` | Data source, import, instrument, session, and quality screens |
 | Partial | `ui.algo_wizard@1` | `AlgoWizardView` | `1` | Rule-tree authoring and export surfaces |
 | Partial | `ui.portfolio_workspace@1` | `PortfolioWorkspace` | `1` | Portfolio Master and Composer screens |
 | Partial | `ui.custom_projects@1` | `CustomProjectView` | `1` | Project graph and task-manager screens |
-| Missing | `ui.trading_dashboard@1` | `TradingDashboard` | `1` | Live execution, order management, and kill-switch dashboard |
+| Partial | `ui.code_editor@1` | `CodeEditorContribution` | `1` | Source code editor, snippets, extension authoring, and indicator testing |
+| Partial | `ui.business@1` | `BusinessContribution` | `1` | Team workspaces, compute nodes, worker orchestration, and role management |
+| Missing | `ui.trading_dashboard@1` | `TradingDashboard` | `1` | Live execution, order management, and kill-switch dashboard (Donor: None) |
 | Missing | `ui.optimization_surface@1` | `OptimizationSurface` | `1` | Interactive 3D parameter optimization surface visualization |
+| Missing | `ui.neural_network@1` | `NeuralNetworkTrainer` | `1` | Neural network model designer, training monitor, and strategy export |
+| Missing | `ui.mt_analyzer@1` | `MTAnalyzerView` | `1` | MetaTrader statement import, trade extraction, and equity curve analysis |
 
 ### Persisted-state ownership
 
@@ -99,17 +105,23 @@ Semantic state remains feature-owned although storage mechanics are centralized.
 ## 2. Feature registry and dependency direction
 
 
-| Feature | Delivered value | Owner module | Provides | Required capabilities | Status |
-| --- | --- | --- | --- | --- | --- |
-| `FEAT-UI-SHELL` | Navigation, project header, theme, settings, notifications | `app/ui/src/shell.tsx` | `ui.shell@1` | `gateway.application@1` | Partial |
-| `FEAT-UI-RESEARCH` | Builder with improve-existing mode, Retester, Optimizer and databanks | `app/ui/src/research_workspace.tsx` | `ui.research_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Partial |
-| `FEAT-UI-RESULTS` | Linked overview, trades, charts, source, robustness | `app/ui/src/results_workspace.tsx` | `ui.results_workspace@1` | `analytics.metrics@1` | Partial |
-| `FEAT-UI-DATA` | Data source, import, instrument and quality screens | `app/ui/src/domains/data/DataManager.tsx` | `ui.data_manager@1` | `data.datasets@1` | Partial |
-| `FEAT-UI-AUTHORING` | Rule-tree authoring and export surfaces | `app/ui/src/algo_wizard.tsx` | `ui.algo_wizard@1` | `strategy.authoring@1` | Partial |
-| `FEAT-UI-PORTFOLIO` | Portfolio Master and Composer screens | `app/ui/src/portfolio_workspace.tsx` | `ui.portfolio_workspace@1` | `portfolio.definitions@1` | Partial |
-| `FEAT-UI-PROJECTS` | Project graph and task-manager screens | `app/ui/src/custom_projects.tsx` | `ui.custom_projects@1` | `research.projects@1` | Partial |
-| `FEAT-UI-TRADING` | Live broker monitoring, open positions, and kill switch UI | `app/ui/src/domains/trading/TradingDashboard.tsx` | `ui.trading_dashboard@1` | `gateway.rest@1` | Missing |
-| `FEAT-UI-3DSURFACE` | Interactive 3D parameter optimization surface viewer | `app/ui/src/domains/optimization/OptimizationSurface.tsx` | `ui.optimization_surface@1` | `gateway.rest@1` | Missing |
+| Feature | Delivered value | Owner module | Provides | Required capabilities | Status | Donor |
+| --- | --- | --- | --- | --- | --- | --- |
+| `FEAT-UI-SHELL` | Navigation, project header, theme, settings, notifications | `app/ui/src/app/App.tsx` | `ui.shell@1` | `gateway.application@1` | Partial | Full (`AppSQXHome`, `header.html`, `optionsDialog.html`) |
+| `FEAT-UI-RESEARCH` | Builder with improve-existing mode, genetic options, and Optimizer | `app/ui/src/domains/strategy/ResearchProject.tsx` | `ui.research_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Partial | Full (`AppBuilder`, `AppOptimizer`, `SettingsWhatToBuild`, etc.) |
+| `FEAT-UI-RETESTER` | Dedicated strategy retesting across precisions, markets, timeframes, and what-if | `app/ui/src/domains/strategy/ResearchProject.tsx` | `ui.retester_workspace@1` | `gateway.rest@1`, `gateway.streams@1` | Partial | Full (`AppRetester`, `SettingsWhatToRetest`) |
+| `FEAT-UI-DATABANK` | Strategy databanks, custom column views, correlation filter, batch export, pin/notes | `app/ui/src/components/DatabankPanel.tsx` | `ui.databank@1` | `persistence.databanks@1` | Partial | Full (30+ `ResultsDatabankAction` plugins, `moveLeft`, `moveRight`) |
+| `FEAT-UI-RESULTS` | Linked overview, trades, charts, source, robustness, trade analysis | `app/ui/src/domains/analytics/ResultsWorkspace.tsx` | `ui.results_workspace@1` | `analytics.metrics@1` | Partial | Full (`RESULTS`, `RESULTS2`, 18+ `ResultsTab` plugins) |
+| `FEAT-UI-DATA` | Data source, import, instrument and quality screens | `app/ui/src/domains/data/DataManager.tsx` | `ui.data_manager@1` | `data.datasets@1` | Partial | Full (`QDM`, `SQMANAGER`, 10+ `DataSource*` plugins) |
+| `FEAT-UI-AUTHORING` | Rule-tree authoring and export surfaces | `app/ui/src/domains/strategy/AlgoWizard.tsx` | `ui.algo_wizard@1` | `strategy.authoring@1` | Partial | Full (`AlgoWizard`, `ctemplate/config.xml`, `wizard.xml`) |
+| `FEAT-UI-PORTFOLIO` | Portfolio Master and Composer screens | `app/ui/src/domains/portfolio/PortfolioComposer.tsx` | `ui.portfolio_workspace@1` | `portfolio.definitions@1` | Partial | Full (`AppPortfolioMaster`, `AppPortfolioComposer`, `PortfolioComposer`) |
+| `FEAT-UI-PROJECTS` | Project graph and task-manager screens | `app/ui/src/domains/workflow/WorkflowManager.tsx` | `ui.custom_projects@1` | `research.projects@1` | Partial | Full (`AppTaskManager`, `TaskManagerProjects`, `TaskManagerTasks`) |
+| `FEAT-UI-CODE-EDITOR` | Source code editor, snippets, extension authoring, and indicator testing | `app/ui/src/domains/platform/ExtensionSurfaces.tsx` | `ui.code_editor@1` | `gateway.rest@1` | Partial | Full (`AppCodeEditor`, `SQEDITOR`, `CodeEditorIndicatorTester`) |
+| `FEAT-UI-BUSINESS` | Team workspaces, compute nodes, worker orchestration, and role management | `app/ui/src/domains/platform/ExtensionSurfaces.tsx` | `ui.business@1` | `gateway.rest@1` | Partial | Full (`AppSQXBusiness`, `SQXBUSINESS`) |
+| `FEAT-UI-TRADING` | Live broker monitoring, open positions, order routing, and kill switch UI | `app/ui/src/domains/trading/TradingDashboard.tsx` | `ui.trading_dashboard@1` | `gateway.rest@1` | Missing | None (Target-Specific Normative Requirement) |
+| `FEAT-UI-3DSURFACE` | Interactive 3D parameter optimization surface viewer | `app/ui/src/domains/optimization/OptimizationSurface.tsx` | `ui.optimization_surface@1` | `gateway.rest@1` | Missing | Partial (`ResultsOptimizationProfile`, `ResultsProfileChart`) |
+| `FEAT-UI-NEURAL-NETWORK` | Neural network model designer, training monitor, and strategy export | `app/ui/src/domains/strategy/NeuralNetworkTrainer.tsx` | `ui.neural_network@1` | `gateway.rest@1` | Missing | Full (`AppNeuralNetwork`, `TaskNeuralNetworkTrainer`) |
+| `FEAT-UI-MT-ANALYZER` | MetaTrader statement import, trade extraction, and equity curve analysis | `app/ui/src/domains/analytics/MTAnalyzer.tsx` | `ui.mt_analyzer@1` | `gateway.rest@1` | Missing | Full (`internal/web/MTANALYZER`) |
 
 Dependencies use versioned public contracts. Removing a contribution withdraws only its capability;
 required consumers become attributed `BLOCKED`, optional operations return unavailable, and
@@ -190,14 +202,20 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Owner | Responsibility | Symbols |
 | --- | --- | --- | --- |
-| Partial | `shell.tsx` | Navigation, project header, theme, settings, notifications; configuration, service, lifecycle, immutable specification, factory/contribution | `ShellContribution` |
-| Partial | `research_workspace.tsx` | Builder with improve-existing mode, Retester, Optimizer and databanks; configuration, service, lifecycle, immutable specification, factory/contribution | `ResearchWorkspace` |
-| Partial | `results_workspace.tsx` | Linked overview, trades, charts, source, robustness; configuration, service, lifecycle, immutable specification, factory/contribution | `ResultsWorkspace` |
-| Partial | `src/domains/data/DataManager.tsx` | Data source, import, instrument and quality screens; provider menus, configuration dialogs, direct dataset actions, bounded progress, and mock-only safety | `DataManager` |
-| Partial | `src/domains/data/dataSourceRibbon.ts` | Typed provider-command, dialog, nested-exchange, and contextual-action inventory | `dataSourceProviders`, `dataSourceContextActions` |
-| Partial | `algo_wizard.tsx` | Rule-tree authoring and export surfaces; configuration, service, lifecycle, immutable specification, factory/contribution | `AlgoWizardView` |
-| Partial | `portfolio_workspace.tsx` | Portfolio Master and Composer screens; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioWorkspace` |
-| Partial | `custom_projects.tsx` | Project graph and task-manager screens; configuration, service, lifecycle, immutable specification, factory/contribution | `CustomProjectView` |
+| Partial | `app/ui/src/app/App.tsx` | Navigation, project header, theme, settings, notifications, and home screen; configuration, service, lifecycle, immutable specification, factory/contribution | `App`, `HomeScreen`, `ShellContribution` |
+| Partial | `app/ui/src/domains/strategy/ResearchProject.tsx` | Builder with improve-existing mode, genetic options, Retester, and Optimizer; configuration, service, lifecycle, immutable specification, factory/contribution | `ResearchProject`, `BuilderSettingsView`, `ProgressView` |
+| Partial | `app/ui/src/components/DatabankPanel.tsx` | Multi-databank tabs, strategy table, move/copy, rename, notes, and deletion dialogs | `DatabankPanel`, `StrategyTable` |
+| Partial | `app/ui/src/domains/analytics/ResultsWorkspace.tsx` | Linked overview, trades, charts, source, robustness, and analytical tabs; configuration, service, lifecycle, immutable specification, factory/contribution | `ResultsWorkspace`, `Overview`, `TradeList`, `Analysis`, `Config`, `Source`, `Robustness`, `OptimizationView` |
+| Partial | `app/ui/src/domains/data/DataManager.tsx` | Data source, import, instrument and quality screens; provider menus, configuration dialogs, direct dataset actions, bounded progress, and mock-only safety | `DataManager` |
+| Partial | `app/ui/src/domains/data/dataSourceRibbon.ts` | Typed provider-command, dialog, nested-exchange, and contextual-action inventory | `dataSourceProviders`, `dataSourceContextActions` |
+| Partial | `app/ui/src/domains/strategy/AlgoWizard.tsx` | Rule-tree authoring and export surfaces; configuration, service, lifecycle, immutable specification, factory/contribution | `AlgoWizard`, `AlgoWizardView` |
+| Partial | `app/ui/src/domains/portfolio/PortfolioComposer.tsx` | Portfolio Master and Composer screens; configuration, service, lifecycle, immutable specification, factory/contribution | `PortfolioComposer`, `PortfolioWorkspace` |
+| Partial | `app/ui/src/domains/workflow/WorkflowManager.tsx` | Project graph and task-manager screens; configuration, service, lifecycle, immutable specification, factory/contribution | `WorkflowManager`, `CustomProjectView` |
+| Partial | `app/ui/src/domains/platform/ExtensionSurfaces.tsx` | Source code editor with snippet tree/mock compilation, and HaruQuantAI for Business team workspace | `CodeEditor`, `Business`, `CodeEditorContribution`, `BusinessContribution` |
+| Missing | `app/ui/src/domains/trading/TradingDashboard.tsx` | Live broker monitoring, open positions, order routing, and kill switch UI (Donor: None) | `TradingDashboard` |
+| Missing | `app/ui/src/domains/optimization/OptimizationSurface.tsx` | Interactive 3D parameter optimization surface viewer | `OptimizationSurface` |
+| Missing | `app/ui/src/domains/strategy/NeuralNetworkTrainer.tsx` | Neural network model designer, training monitor, and strategy export | `NeuralNetworkTrainer` |
+| Missing | `app/ui/src/domains/analytics/MTAnalyzer.tsx` | MetaTrader statement import, trade extraction, and equity curve analysis | `MTAnalyzerView` |
 | Partial | `tests/examples/16_ui.py` | Offline primary-purpose evidence | one named scenario per completed feature |
 
 #### Functional requirements
@@ -208,6 +226,7 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 | Partial | `FR-UI-ACTION_LIFECYCLE` | Every long action has idle/running/paused/cancelling/terminal/error/reconnect states. | State tests |
 | Partial | `FR-UI-DOCK_LAYOUT` | Dock layout is schema-versioned, persisted, migratable, and safely resettable. | Layout tests |
 | Partial | `FR-UI-ACCESSIBILITY_STANDARD` | Keyboard, focus, labels, announcements, reduced motion, and non-color status meet WCAG 2.2 AA. | Automated/manual a11y |
+| Partial | `FR-UI-HOME_SCREEN` | The Home / Getting Started screen displays recent projects with last-opened metadata, quick-start application routing, license profile fixtures, deterministic mock environment diagnostics, and a prominent simulation notice banner. | Component/E2E tests |
 | Partial | `FR-UI-DUKASCOPY_DATA` | The Data sources workspace provides a **Dukascopy data** menu with actions to add new Dukascopy symbols, download data for existing Dukascopy symbols, and view data-usage information. Adding a symbol supports instrument selection, Tick or M1 data, broker profile, and an optional data-name postfix. Downloading supports a date range, existing-data handling, and available download modes. | Component/E2E tests |
 | Partial | `FR-UI-TICKDOWNLOADER_IMPORT` | The Data sources workspace provides a **TickDownloader import** action that accepts TickDownloader data files, displays the symbols available for import, accepts an optional data-name postfix, validates required selections, and starts a simulated import operation. | Component/E2E tests |
 | Partial | `FR-UI-FILE_IMPORT` | The Data sources workspace provides **File import** actions to create a data symbol, import one file, import multiple files, and import data exported by a supported research-data application. Applicable configuration includes instrument, bar timestamp convention, timezone, timeframe, column mapping, separator, date format, skipped rows and columns, error policy, existing-symbol policy, and optional postfix. | Component/E2E tests |
@@ -238,6 +257,18 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 | Implemented | `FR-UI-HEADER_ACTIONS` | The header exposes Debug Console, Grid Control, and Volume & Market Profile actions in reference order before Settings, while omitting the duplicate Code Editor top action. Debug Console provides bounded category/text-filtered mock logs and Clear; Grid Control classifies current jobs into running/waiting/finished tables with manual and three-second display refresh plus error detail; Volume Profile presents inactive-addon information and safe local notices for unavailable commercial actions. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
 | Implemented | `FR-UI-COLLAPSIBLE_SIDEBAR` | The application sidebar renders as a 49 px icon rail by default; the manual collapse toggle is omitted. Hovering the rail expands a 190 px labelled flyout over the workspace while the grid layout stays fixed, and the flyout collapses again once the pointer leaves the sidebar. Application icons, accessible names, tooltips, active state, and navigation remain available in the rail, while labels, group headings, and the home shortcut hint appear only in the expanded flyout. The legacy persisted collapsed-navigation preference is dropped on load. | Unit/E2E tests |
 | Implemented | `FR-UI-BRANDING_NORMALIZATION` | Every rendered product label uses HaruQuantAI. Provider labels omit the legacy `SQ` prefix, the default broker is `Default`, and persisted legacy display strings are normalized before validation. Compatibility identifiers and lower-case browser-storage keys remain stable. Commercial reference links are replaced by truthful local mock notices. | Unit/E2E tests; `docs/dev/evidence/reimplementation.json` |
+| Partial | `FR-UI-DATABANK_MANAGEMENT` | Databanks provide multi-databank tabs (add, rename, delete, move left/right, clear), strategy search, row count / selected count indicator, permanent deletion confirmation, and a move/copy modal allowing strategies to be copied or moved between databanks without data corruption. | Component/E2E tests |
+| Partial | `FR-UI-DATABANK_COLUMNS` | Databank strategy table provides customizable column sets selectable from 100+ quantitative metrics (Net profit, Profit factor, Drawdown, Trades, Sharpe, Return/DD, Win%, SQN, Ulcer Index), with column reordering, sorting, formatting, and custom metric formula display. | Component/E2E tests |
+| Partial | `FR-UI-DATABANK_CORRELATION` | Databank correlation filtering modal calculates pair-wise equity or trade correlation across selected databank strategies and allows dismissing, filtering, or tagging strategies that exceed configured correlation thresholds. | Component/E2E tests |
+| Partial | `FR-UI-STRATEGY_COMPARISON` | Databank strategy comparison displays a dedicated side-by-side view comparing overlapping equity curves, drawdown trajectories, and comparative KPI deltas for two or more selected strategies. | Component/E2E tests |
+| Partial | `FR-UI-RETESTER_WORKFLOW` | Dedicated retesting controls allow selecting input databanks, configuring retests across additional symbols and alternative timeframes, selecting higher testing precision (tick, 1-minute, bar-open), and applying what-if stress tests (skipping worst trades, modifying spread/slippage). | Component/E2E tests |
+| Partial | `FR-UI-TRADES_ON_CHART` | The Results workspace provides a Trades on Chart view rendering interactive candlestick bars for the strategy's market with entry/exit execution arrows, position levels, and trade inspection tooltips. | Component/E2E tests |
+| Partial | `FR-UI-CORRELATION_MATRIX` | The Results workspace provides a Correlation Matrix view rendering an interactive heatmap grid of daily returns or trade-by-trade correlation across strategies or portfolio members. | Component/E2E tests |
+| Partial | `FR-UI-TRADE_ANALYSIS` | The Results workspace provides a Trade Analysis view with performance breakdowns by weekday, hour of day, monthly stability heatmaps, win/loss streak histograms, and trade duration distributions. | Component/E2E tests |
+| Partial | `FR-UI-CODE_EDITOR` | The Code Editor provides a source code editor with an extensions tree (Snippets, Blocks, Indicators, Columns, CustomAnalysis, ResultsPlugins), editor tabs, browser-local mock persistence, simulated compilation, and build console output. | Component/E2E tests |
+| Partial | `FR-UI-BUSINESS_WORKSPACES` | HaruQuantAI for Business provides team organization/workspace management, compute worker nodes monitoring, MCP adapter configuration, and member role assignment. | Component/E2E tests |
+| Missing | `FR-UI-NEURAL_NETWORK_TRAINER` | Neural Network Trainer provides model topology selection, input feature configuration from market data and indicators, training epoch progress with loss curves, and candidate strategy export. | Component/E2E tests |
+| Missing | `FR-UI-MT_ANALYZER` | MetaTrader Analyzer provides import of MT4/MT5 HTML/CSV account statements, trade extraction, balance/equity curve reconstruction, and analytical KPI reports. | Component/E2E tests |
 
 #### Removal behavior
 
@@ -493,3 +524,38 @@ Running work reloads paused; all lifecycle states use the shared Data Manager pr
 trailing Status column. The implementation makes no Yahoo request and does not claim current
 listings or prices. See [Yahoo coverage](../../docs/dev/evidence/reimplementation.json) for the source trace, stable feature
 entries and evidence gaps.
+
+## Clean-room donor parity and target boundaries (2026-09-21)
+
+The UI domain enforces strict separation between donor observations and target decisions:
+- **Full Donor Parity**: `FEAT-UI-SHELL`, `FEAT-UI-RESEARCH`, `FEAT-UI-RETESTER`, `FEAT-UI-DATABANK`, `FEAT-UI-RESULTS`, `FEAT-UI-DATA`, `FEAT-UI-AUTHORING`, `FEAT-UI-PORTFOLIO`, `FEAT-UI-PROJECTS`, `FEAT-UI-CODE-EDITOR`, `FEAT-UI-BUSINESS`, `FEAT-UI-NEURAL-NETWORK`, and `FEAT-UI-MT-ANALYZER` are directly informed by StrategyQuant X build 144.2953 inspected artifacts in `SQX_REFERENCE_ROOT` (`internal/web/` and `internal/plugins/`).
+- **Target-Specific Normative Capability (`Donor: None`)**: `FEAT-UI-TRADING` (`ui.trading_dashboard@1`) is an explicit HaruQuantAI workstation capability required by the Trading (`D-TRD`) and Gateway (`D-GW`) domains. StrategyQuant X is purely an offline strategy laboratory that exports automated scripts to MetaTrader/cTrader without native live execution monitoring or kill-switch controls.
+- **Paraphrased Behavioral Clean-Room Compliance**: All algorithms, parameters, block models, and layouts are clean-room reimplementations using standard React, TypeScript, and Tailwind tokens. No proprietary binaries, copyrighted styling assets, or decompiled code are committed.
+
+## Strategy Retester and Databank subsystem (2026-09-21)
+
+`FEAT-UI-RETESTER` and `FEAT-UI-DATABANK` decouple the databank and retest workflows from generic research runs:
+- **Multi-databank tabs**: Support creating, renaming, deleting, clearing, and reordering tabs (Results, Retest, Portfolio, Candidates). Moving or copying strategies between databanks updates membership without mutating original records.
+- **Customizable metrics columns**: Databank strategy tables expose selection, sorting, and formatting across 100+ standard quantitative metrics, matching SQX's `ResultsDatabankViews` schema.
+- **In-databank correlation filter**: Implements `FR-UI-DATABANK_CORRELATION` via a dedicated dialog calculating pairwise strategy equity correlation and allowing users to dismiss or tag redundant candidates.
+- **Strategy comparison**: Implements `FR-UI-STRATEGY_COMPARISON`, allowing two or more selected databank strategies to be visually inspected side-by-side with overlaid equity curves, drawdown trajectories, and comparative KPI deltas.
+- **Retester workflow**: Retesting targets explicit candidate sets loaded from databanks and evaluates them across alternative market symbols, timeframes, higher execution precision (tick, 1-minute, bar open), and what-if parameter stress tests.
+
+## Results analytical views (2026-09-21)
+
+`FEAT-UI-RESULTS` provides linked analytical views within the Dockview container:
+- **Trades on Chart (`FR-UI-TRADES_ON_CHART`)**: Renders candlestick charts of the underlying market with directional buy/sell arrows, execution prices, stop loss / profit target levels, and hover inspection tooltips.
+- **Correlation Matrix (`FR-UI-CORRELATION_MATRIX`)**: Displays an interactive cross-correlation grid between strategy returns or portfolio components with color-coded heatmap intensity.
+- **Trade Analysis (`FR-UI-TRADE_ANALYSIS`)**: Provides statistical breakdowns including profit by weekday, profit by hour of day, monthly stability heatmaps, win/loss streak histograms, and holding duration distributions.
+
+## Extension surfaces: Code Editor and Business workspaces (2026-09-21)
+
+`FEAT-UI-CODE-EDITOR` and `FEAT-UI-BUSINESS` implement platform extensions in `src/domains/platform/ExtensionSurfaces.tsx`:
+- **Code Editor**: Provides an extensions tree (Snippets, Blocks, Indicators, Columns, CustomAnalysis, ResultsPlugins), file tabs, source editor, simulated syntax compilation with console diagnostics, and indicator testing.
+- **Business Workspaces**: Provides multi-organization and team workspace switching, compute worker node topology and capacity monitoring, MCP adapter status, and user role administration.
+
+## Neural Network Trainer and MT Analyzer (2026-09-21)
+
+`FEAT-UI-NEURAL-NETWORK` and `FEAT-UI-MT-ANALYZER` define target workstation capabilities informed by SQX donor applications:
+- **Neural Network Trainer**: Corresponds to SQX `internal/web/NEURALNETWORK` and `AppNeuralNetwork`, providing deep-learning model configuration, feature input selection from price/indicator data, training loss curves, and candidate strategy export.
+- **MetaTrader Analyzer**: Corresponds to SQX `internal/web/MTANALYZER`, providing drag-and-drop import for MT4 and MT5 HTML/CSV account statements, trade ticket parsing, balance/equity reconstruction, and comparative KPI generation.

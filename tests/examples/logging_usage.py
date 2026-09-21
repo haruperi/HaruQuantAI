@@ -23,9 +23,11 @@ def example_logging() -> None:
         "\n\n 1.1 Standard structured logging levels (Default Configuration)",
         flush=True,
     )
-    # Default settings: level=INFO (20), log_directory="data/logs" (*.jsonl),
+    # Default settings: level=INFO (20), log_directory isolated to temp directory (*.jsonl),
     # and console=True. DEBUG is filtered out because default level is INFO.
-    with configure_logging(stream=sys.stdout) as default_diagnostics:
+    default_dir = Path(mkdtemp(prefix="logging-default-"))
+    default_config = LoggingConfig(log_directory=default_dir)
+    with configure_logging(default_config, stream=sys.stdout) as default_diagnostics:
         logger.debug("This debug message is filtered out under default INFO level.")
         logger.info("This is an info message using default logging configuration.")
         logger.warning("This is a warning indicating a potential issue.")
@@ -85,7 +87,7 @@ def example_logging() -> None:
         # Sensitive context keys (e.g. api_key, password, token) redact their values.
         logger.info(
             "Authenticating via Bearer token-xyz with custom-secret-token-999",
-            api_key="super-secret-value",
+            api_key="super-secret-value",  # pragma: allowlist secret
         )
         diagnostics.flush()
 
