@@ -1,4 +1,4 @@
-"""Unit tests for the remote worker grid and leasing feature (FR-WORKSPACE-006)."""
+"""Unit tests for the remote worker grid and leasing feature (FR-WORKSPACE-COOPERATIVE_CONTROL)."""
 
 from __future__ import annotations
 

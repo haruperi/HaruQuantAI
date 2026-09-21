@@ -214,13 +214,13 @@ promoted to a default without product approval.
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Completed | `FR-WORKSPACE-001` | State machine is queued/running/pausing/paused/cancelling/cancelled/succeeded/failed/interrupted with compare-and-swap transitions. | Exhaustive transition test |
-| Completed | `FR-WORKSPACE-002` | Pause/cancel are cooperative and bounded; resume uses a validated checkpoint or a new attempt. | Worker fault fixture |
-| Completed | `FR-WORKSPACE-003` | Restart marks orphan attempts interrupted and never fabricates completion. | Coordinator restart test |
-| Completed | `FR-WORKSPACE-004` | Notification failure cannot change job outcome and all messages are secret-safe. Supports email, sound alerts, desktop popups, Telegram, and webhooks with cooperative pause gates. Unconfigured or platform-unavailable channels return explicit skipped receipts and never fabricate delivery. | Failure/redaction tests |
-| Completed | `FR-WORKSPACE-005` | Finite resource governor enforces CPU core profiles (single, reserve UI core, custom, max) and trips an active memory watchdog at 85% RAM to prevent freezing. | Resource limit/watchdog tests |
-| Completed | `FR-WORKSPACE-006` | Diagnostics service executes hardware throughput benchmark computing time-per-tick and calibrating task completion estimates. | Benchmark calibration test |
-| Completed | `FR-WORKSPACE-007` | Settings resolve hierarchically (run > project > application) via typed Pydantic models persisted in SQLite, with JSON preset import/export and zero XML dependency. | Settings hierarchy and format tests |
+| Completed | `FR-WORKSPACE-STATE_MACHINE` | State machine is queued/running/pausing/paused/cancelling/cancelled/succeeded/failed/interrupted with compare-and-swap transitions. | Exhaustive transition test |
+| Completed | `FR-WORKSPACE-COOPERATIVE_CONTROL` | Pause/cancel are cooperative and bounded; resume uses a validated checkpoint or a new attempt. | Worker fault fixture |
+| Completed | `FR-WORKSPACE-ORPHAN_RECOVERY` | Restart marks orphan attempts interrupted and never fabricates completion. | Coordinator restart test |
+| Completed | `FR-WORKSPACE-SAFE_NOTIFICATIONS` | Notification failure cannot change job outcome and all messages are secret-safe. Supports email, sound alerts, desktop popups, Telegram, and webhooks with cooperative pause gates. Unconfigured or platform-unavailable channels return explicit skipped receipts and never fabricate delivery. | Failure/redaction tests |
+| Completed | `FR-WORKSPACE-RESOURCE_GOVERNOR` | Finite resource governor enforces CPU core profiles (single, reserve UI core, custom, max) and trips an active memory watchdog at 85% RAM to prevent freezing. | Resource limit/watchdog tests |
+| Completed | `FR-WORKSPACE-HARDWARE_BENCHMARK` | Diagnostics service executes hardware throughput benchmark computing time-per-tick and calibrating task completion estimates. | Benchmark calibration test |
+| Completed | `FR-WORKSPACE-HIERARCHICAL_SETTINGS` | Settings resolve hierarchically (run > project > application) via typed Pydantic models persisted in SQLite, with JSON preset import/export and zero XML dependency. | Settings hierarchy and format tests |
 
 #### Removal behavior
 

@@ -1,4 +1,4 @@
-"""Unit tests for the sandboxed plugin host feature (FR-WORKSPACE-007)."""
+"""Unit tests for the sandboxed plugin host feature."""
 
 from __future__ import annotations
 

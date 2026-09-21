@@ -1,7 +1,7 @@
 """Unit tests for the durable job and attempt lifecycle management feature.
 
 Fulfills requirements:
-    * FR-WORKSPACE-002: Durable job lifecycle, attempts, and checkpoints.
+    * FR-WORKSPACE-COOPERATIVE_CONTROL: Durable job lifecycle, attempts, and checkpoints.
     * ATW-WORKSPACE-JOB-001: Job state machine transition invariants and CAS integrity.
 """
 

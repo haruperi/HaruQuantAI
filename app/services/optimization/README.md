@@ -192,10 +192,10 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-OPTIMIZATION-001` | Typed steps and constraints yield deterministic finite schedules/counts. | Boundary/enumeration tests |
-| Missing | `FR-OPTIMIZATION-002` | Identical study inputs and seeds reproduce trial order and selection. | Golden study |
-| Missing | `FR-OPTIMIZATION-003` | Failed/cancelled/pruned trials never become objective winners. | Fault tests |
-| Missing | `FR-OPTIMIZATION-004` | Walk-forward windows expose anchoring, overlap, warm-up, IS/OOS, and aggregation. | Window table tests |
+| Missing | `FR-OPTIMIZATION-SPACE_ENUMERATION` | Typed steps and constraints yield deterministic finite schedules/counts. | Boundary/enumeration tests |
+| Missing | `FR-OPTIMIZATION-REPRODUCIBLE_STUDY` | Identical study inputs and seeds reproduce trial order and selection. | Golden study |
+| Missing | `FR-OPTIMIZATION-PRUNED_EXCLUSION` | Failed/cancelled/pruned trials never become objective winners. | Fault tests |
+| Missing | `FR-OPTIMIZATION-WALK_FORWARD` | Walk-forward windows expose anchoring, overlap, warm-up, IS/OOS, and aggregation. | Window table tests |
 
 #### Removal behavior
 

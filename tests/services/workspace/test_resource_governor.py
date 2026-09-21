@@ -1,4 +1,4 @@
-"""Tests for the finite resource governor feature (FR-WORKSPACE-003)."""
+"""Tests for the finite resource governor feature (FR-WORKSPACE-RESOURCE_GOVERNOR)."""
 
 from __future__ import annotations
 

@@ -188,10 +188,10 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-ROBUSTNESS-001` | Checks run in configured order and early dismissal is recorded. | Funnel integration |
-| Missing | `FR-ROBUSTNESS-002` | Scenario generation is reproducible and each seed/config is retained. | Monte Carlo golden |
-| Missing | `FR-ROBUSTNESS-003` | Acceptance uses named metric versions, quantiles, comparators, and sample scope. | Boundary tests |
-| Missing | `FR-ROBUSTNESS-004` | WFM cluster evaluation is deterministic and example thresholds are not defaults. | Matrix fixtures |
+| Missing | `FR-ROBUSTNESS-ORDERED_FUNNEL` | Checks run in configured order and early dismissal is recorded. | Funnel integration |
+| Missing | `FR-ROBUSTNESS-REPRODUCIBLE_SCENARIOS` | Scenario generation is reproducible and each seed/config is retained. | Monte Carlo golden |
+| Missing | `FR-ROBUSTNESS-ACCEPTANCE_CRITERIA` | Acceptance uses named metric versions, quantiles, comparators, and sample scope. | Boundary tests |
+| Missing | `FR-ROBUSTNESS-DETERMINISTIC_WFM` | WFM cluster evaluation is deterministic and example thresholds are not defaults. | Matrix fixtures |
 
 #### Removal behavior
 

@@ -192,10 +192,10 @@ Each owner has a slotted immutable `<Feature>Config`; sample reference values ar
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-ANALYTICS-001` | One metric ID/version agrees in API, UI, filter, rank, and report. | Cross-surface golden |
-| Missing | `FR-ANALYTICS-002` | Empty, invalid, undefined, not-applicable, and zero remain distinct. | Edge table |
-| Missing | `FR-ANALYTICS-003` | Equity/drawdown reconcile to the source ledger. | Accounting invariants |
-| Missing | `FR-ANALYTICS-004` | Rounding happens only at registered output unless explicitly profiled. | Neighbor test |
+| Missing | `FR-ANALYTICS-SURFACE_CONSISTENCY` | One metric ID/version agrees in API, UI, filter, rank, and report. | Cross-surface golden |
+| Missing | `FR-ANALYTICS-NULL_SEMANTICS` | Empty, invalid, undefined, not-applicable, and zero remain distinct. | Edge table |
+| Missing | `FR-ANALYTICS-LEDGER_RECONCILIATION` | Equity/drawdown reconcile to the source ledger. | Accounting invariants |
+| Missing | `FR-ANALYTICS-OUTPUT_ROUNDING` | Rounding happens only at registered output unless explicitly profiled. | Neighbor test |
 
 #### Removal behavior
 

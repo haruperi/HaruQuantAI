@@ -189,10 +189,10 @@ Each owner has a slotted immutable `<Feature>Config`; sample reference values ar
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-TRADING-001` | Order/position transitions are exhaustive and version-checked. | State tables |
-| Missing | `FR-TRADING-002` | Intent idempotency prevents duplicate effects across retry/restart. | Fault test |
-| Missing | `FR-TRADING-003` | Simulation, demo, and live identities cannot mix or relabel. | Isolation tests |
-| Missing | `FR-TRADING-004` | Live commands require enabled profile, authorization, limits, and audit. | Negative test |
+| Missing | `FR-TRADING-ORDER_TRANSITIONS` | Order/position transitions are exhaustive and version-checked. | State tables |
+| Missing | `FR-TRADING-INTENT_IDEMPOTENCY` | Intent idempotency prevents duplicate effects across retry/restart. | Fault test |
+| Missing | `FR-TRADING-ENVIRONMENT_ISOLATION` | Simulation, demo, and live identities cannot mix or relabel. | Isolation tests |
+| Missing | `FR-TRADING-LIVE_AUTHORIZATION` | Live commands require enabled profile, authorization, limits, and audit. | Negative test |
 
 #### Removal behavior
 

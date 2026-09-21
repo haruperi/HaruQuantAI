@@ -72,7 +72,7 @@ def test_diagnostics_lifecycle_within_runtime() -> None:
 
 
 def test_diagnostics_health_status_thresholds() -> None:
-    """Verify dynamic health status calculation (FR-WORKSPACE-008)."""
+    """Verify dynamic health status calculation (FR-WORKSPACE-HARDWARE_BENCHMARK)."""
     from unittest.mock import patch
 
     service = DiagnosticsService(DiagnosticsConfig())
@@ -95,7 +95,7 @@ def test_diagnostics_health_status_thresholds() -> None:
 
 
 def test_diagnostics_active_jobs_persistence_integration() -> None:
-    """Verify live count_active_jobs integration with persistence (FR-WORKSPACE-008)."""
+    """Verify live count_active_jobs integration with persistence (FR-WORKSPACE-HARDWARE_BENCHMARK)."""
     from unittest.mock import MagicMock
 
     mock_persistence = MagicMock()

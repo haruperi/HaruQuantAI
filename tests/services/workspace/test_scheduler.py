@@ -1,4 +1,4 @@
-"""Unit tests for the bounded scheduler feature (FR-WORKSPACE-005)."""
+"""Unit tests for the bounded scheduler feature (FR-WORKSPACE-COOPERATIVE_CONTROL)."""
 
 from __future__ import annotations
 

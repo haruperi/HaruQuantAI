@@ -188,10 +188,10 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-PORTFOLIO-001` | Member identity binds result/data/config, not display name. | Identity test |
-| Missing | `FR-PORTFOLIO-002` | Correlation declares return transform, alignment, overlap, missing policy, and minimum samples. | Golden matrix |
-| Missing | `FR-PORTFOLIO-003` | Weight edits create a new result without rewriting member backtests. | Lineage test |
-| Missing | `FR-PORTFOLIO-004` | Search enforces member/group/correlation/capital constraints deterministically. | Search fixtures |
+| Missing | `FR-PORTFOLIO-MEMBER_IDENTITY` | Member identity binds result/data/config, not display name. | Identity test |
+| Missing | `FR-PORTFOLIO-CORRELATION_MATRIX` | Correlation declares return transform, alignment, overlap, missing policy, and minimum samples. | Golden matrix |
+| Missing | `FR-PORTFOLIO-WEIGHT_MUTATION` | Weight edits create a new result without rewriting member backtests. | Lineage test |
+| Missing | `FR-PORTFOLIO-CONSTRAINED_SEARCH` | Search enforces member/group/correlation/capital constraints deterministically. | Search fixtures |
 
 #### Removal behavior
 

@@ -3,7 +3,7 @@
   "domain": "D-WORKSPACE",
   "status": "ACCEPTED",
   "requirements": [
-    "FR-WORKSPACE-006"
+    "FR-WORKSPACE-HARDWARE_BENCHMARK"
   ],
   "verified_at_utc": "2026-09-20T09:03:00Z",
   "owner_module": "app/services/workspace/diagnostics.py",

@@ -192,10 +192,10 @@ Each owner has a slotted immutable `<Feature>Config`; sample reference values ar
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-SIMULATOR-001` | Frozen inputs reproduce event, fill, ledger, and account identities. | Golden backtest |
-| Missing | `FR-SIMULATOR-002` | Ties use a total order independent of map/thread/filesystem order. | Permutation test |
-| Missing | `FR-SIMULATOR-003` | Visibility rules prevent same/future-event look-ahead. | Adversarial test |
-| Missing | `FR-SIMULATOR-004` | Costs, rounding, margin, and accounts reconcile per event. | Accounting test |
+| Missing | `FR-SIMULATOR-DETERMINISTIC_REPRODUCTION` | Frozen inputs reproduce event, fill, ledger, and account identities. | Golden backtest |
+| Missing | `FR-SIMULATOR-TOTAL_ORDERING` | Ties use a total order independent of map/thread/filesystem order. | Permutation test |
+| Missing | `FR-SIMULATOR-LOOKAHEAD_PREVENTION` | Visibility rules prevent same/future-event look-ahead. | Adversarial test |
+| Missing | `FR-SIMULATOR-ACCOUNT_RECONCILIATION` | Costs, rounding, margin, and accounts reconcile per event. | Accounting test |
 
 #### Removal behavior
 

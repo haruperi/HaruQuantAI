@@ -215,7 +215,7 @@ def test_email_dispatch_failure_isolation() -> None:
 
 
 def test_channel_disabled_by_configuration() -> None:
-    """Verify disabled notification channels yield explicit error outcomes (FR-WORKSPACE-004)."""
+    """Verify disabled notification channels yield explicit error outcomes (FR-WORKSPACE-SAFE_NOTIFICATIONS)."""
     cfg = NotificationConfig(
         enable_email=False, enable_telegram=False, enable_desktop=False
     )

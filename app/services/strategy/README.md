@@ -203,10 +203,10 @@ Each owner has a slotted immutable `<Feature>Config`; sample reference values ar
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-STRATEGY-001` | Canonical serialize/parse round-trips with stable content identity. | Golden fixtures |
-| Missing | `FR-STRATEGY-002` | Identical grammar/config/seed/evaluator results reproduce candidates and lineage. | Determinism test |
-| Missing | `FR-STRATEGY-003` | Genetic operators preserve types, bounds, limits, and lineage. | Property tests |
-| Missing | `FR-STRATEGY-004` | Export is offline, deterministic, path-contained, and manifest-backed. | Golden/security tests |
+| Missing | `FR-STRATEGY-CANONICAL_ROUNDTRIP` | Canonical serialize/parse round-trips with stable content identity. | Golden fixtures |
+| Missing | `FR-STRATEGY-REPRODUCIBLE_GENERATION` | Identical grammar/config/seed/evaluator results reproduce candidates and lineage. | Determinism test |
+| Missing | `FR-STRATEGY-GENETIC_OPERATORS` | Genetic operators preserve types, bounds, limits, and lineage. | Property tests |
+| Missing | `FR-STRATEGY-DETERMINISTIC_EXPORT` | Export is offline, deterministic, path-contained, and manifest-backed. | Golden/security tests |
 
 #### Removal behavior
 

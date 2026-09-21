@@ -455,8 +455,8 @@
           "FEAT-STRATEGY-EXPORT"
         ],
         "requirement_ids": [
-          "FR-STRATEGY-001",
-          "FR-STRATEGY-004"
+          "FR-STRATEGY-CANONICAL_ROUNDTRIP",
+          "FR-STRATEGY-DETERMINISTIC_EXPORT"
         ],
         "decision_ids": [
           "DEC-STRATEGY-001"
@@ -652,7 +652,7 @@
           "FEAT-ROBUSTNESS-FUNNEL"
         ],
         "requirement_ids": [
-          "FR-ROBUSTNESS-001",
+          "FR-ROBUSTNESS-ORDERED_FUNNEL",
           "SYS-008"
         ],
         "decision_ids": [
@@ -741,7 +741,7 @@
           "FEAT-ROBUSTNESS-WALKFORWARD"
         ],
         "requirement_ids": [
-          "FR-ROBUSTNESS-004"
+          "FR-ROBUSTNESS-DETERMINISTIC_WFM"
         ],
         "decision_ids": [
           "DEC-ROBUSTNESS-002"
@@ -834,7 +834,7 @@
           "FEAT-PERSISTENCE-DATABANKS"
         ],
         "requirement_ids": [
-          "FR-PERSISTENCE-003"
+          "FR-PERSISTENCE-SIMILARITY_FILTER"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -922,7 +922,7 @@
           "FEAT-PORTFOLIO-SIMULATION"
         ],
         "requirement_ids": [
-          "FR-PORTFOLIO-003"
+          "FR-PORTFOLIO-WEIGHT_MUTATION"
         ],
         "decision_ids": [
           "DEC-PORTFOLIO-001"
@@ -1200,7 +1200,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-005"
+          "FR-UI-DUKASCOPY_DATA"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -1313,7 +1313,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-006"
+          "FR-UI-TICKDOWNLOADER_IMPORT"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -1499,7 +1499,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-007"
+          "FR-UI-FILE_IMPORT"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -1631,7 +1631,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-008"
+          "FR-UI-EQUITY_SEARCH"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -1761,7 +1761,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-009"
+          "FR-UI-FUTURES_SEARCH"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -1949,7 +1949,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-010"
+          "FR-UI-DARWINEX_DATA"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -2098,7 +2098,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-011"
+          "FR-UI-CRYPTO_DATA"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -2247,7 +2247,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-012"
+          "FR-UI-YAHOO_DATA"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -2357,7 +2357,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-013"
+          "FR-UI-MT5_IMPORT"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -2559,9 +2559,9 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-014",
-          "FR-UI-015",
-          "FR-UI-016"
+          "FR-UI-DATASET_UPDATES",
+          "FR-UI-MASS_DELETE",
+          "FR-UI-DEFINITION_IO"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -2639,7 +2639,7 @@
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
-            "notes": "FR-UI-017 and FR-UI-018 define accessibility and simulation boundaries."
+            "notes": "FR-UI-ACCESSIBLE_DIALOGS and FR-UI-SIMULATION_BOUNDARY define accessibility and simulation boundaries."
           },
           "inspection_method": "repository_audit",
           "relation": "supports",
@@ -2669,8 +2669,8 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-017",
-          "FR-UI-018"
+          "FR-UI-ACCESSIBLE_DIALOGS",
+          "FR-UI-SIMULATION_BOUNDARY"
         ],
         "decision_ids": [
           "DEC-UI-002"
@@ -2763,7 +2763,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-021"
+          "FR-UI-EXPORT_WORKFLOWS"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -2854,7 +2854,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-022"
+          "FR-UI-TOOLS_WORKFLOWS"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -2945,7 +2945,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-023"
+          "FR-UI-CATALOG_MANAGEMENT"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3036,7 +3036,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-024"
+          "FR-UI-INSTRUMENTS_TABLE"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3127,7 +3127,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-025"
+          "FR-UI-SESSIONS_TABLE"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3218,7 +3218,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-026"
+          "FR-UI-EXTERNAL_INDICATORS"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3309,7 +3309,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-027"
+          "FR-UI-STOCK_GROUPS"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3400,7 +3400,7 @@
           "FEAT-UI-DATA"
         ],
         "requirement_ids": [
-          "FR-UI-028"
+          "FR-UI-BROKER_PROFILES"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3491,7 +3491,7 @@
           "FEAT-UI-SHELL"
         ],
         "requirement_ids": [
-          "FR-UI-031"
+          "FR-UI-SETTINGS_MENU"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3581,7 +3581,7 @@
           "FEAT-UI-SHELL"
         ],
         "requirement_ids": [
-          "FR-UI-032"
+          "FR-UI-HEADER_ACTIONS"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3671,7 +3671,7 @@
           "FEAT-UI-SHELL"
         ],
         "requirement_ids": [
-          "FR-UI-033"
+          "FR-UI-COLLAPSIBLE_SIDEBAR"
         ],
         "decision_ids": [],
         "documentation_targets": [
@@ -3762,7 +3762,7 @@
           "FEAT-UI-SHELL"
         ],
         "requirement_ids": [
-          "FR-UI-034"
+          "FR-UI-BRANDING_NORMALIZATION"
         ],
         "decision_ids": [],
         "documentation_targets": [

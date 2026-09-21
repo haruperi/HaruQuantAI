@@ -194,10 +194,10 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-AGENTIC-001` | Outputs validate against a deterministic schema before use. | Malformed-output tests |
-| Missing | `FR-AGENTIC-002` | Tool authority is allowlisted, scoped, expiring, and no broader than user approval. | Policy tests |
-| Missing | `FR-AGENTIC-003` | Quantitative values link to deterministic artifacts/calculators, not model assertion. | Provenance tests |
-| Missing | `FR-AGENTIC-004` | Secrets/private data are minimized and redacted across provider, logs, and audit. | Adversarial privacy tests |
+| Missing | `FR-AGENTIC-SCHEMA_VALIDATION` | Outputs validate against a deterministic schema before use. | Malformed-output tests |
+| Missing | `FR-AGENTIC-TOOL_AUTHORITY` | Tool authority is allowlisted, scoped, expiring, and no broader than user approval. | Policy tests |
+| Missing | `FR-AGENTIC-QUANTITATIVE_PROVENANCE` | Quantitative values link to deterministic artifacts/calculators, not model assertion. | Provenance tests |
+| Missing | `FR-AGENTIC-PRIVACY_REDACTION` | Secrets/private data are minimized and redacted across provider, logs, and audit. | Adversarial privacy tests |
 
 #### Removal behavior
 

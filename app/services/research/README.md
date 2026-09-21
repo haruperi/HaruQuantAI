@@ -206,10 +206,10 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-RESEARCH-001` | Graph validation rejects missing capabilities, invalid edges, unsafe cycles, and unbounded loops. | Graph property tests |
-| Missing | `FR-RESEARCH-002` | Every route stores expression version, input metric identities, result, and chosen edge. | Routing golden |
-| Missing | `FR-RESEARCH-003` | Artifact handoffs are immutable and type/schema checked. | Contract tests |
-| Missing | `FR-RESEARCH-004` | Restart/resume never reruns an externally effectful task without idempotency proof. | Fault test |
+| Missing | `FR-RESEARCH-GRAPH_VALIDATION` | Graph validation rejects missing capabilities, invalid edges, unsafe cycles, and unbounded loops. | Graph property tests |
+| Missing | `FR-RESEARCH-ROUTING_PROVENANCE` | Every route stores expression version, input metric identities, result, and chosen edge. | Routing golden |
+| Missing | `FR-RESEARCH-ARTIFACT_HANDOFF` | Artifact handoffs are immutable and type/schema checked. | Contract tests |
+| Missing | `FR-RESEARCH-IDEMPOTENT_RESUME` | Restart/resume never reruns an externally effectful task without idempotency proof. | Fault test |
 
 #### Removal behavior
 

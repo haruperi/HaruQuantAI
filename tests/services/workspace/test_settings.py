@@ -1,4 +1,4 @@
-"""Unit tests for Settings service and feature (FR-WORKSPACE-001)."""
+"""Unit tests for Settings service and feature (FR-WORKSPACE-HIERARCHICAL_SETTINGS)."""
 
 from __future__ import annotations
 
@@ -477,7 +477,7 @@ def test_broker_and_agent_settings() -> None:
 
 
 def test_export_preset_redacts_secrets() -> None:
-    """Verify export_preset redacts secrets and omits user access credentials (FR-WORKSPACE-001)."""
+    """Verify export_preset redacts secrets and omits user access credentials (FR-WORKSPACE-HIERARCHICAL_SETTINGS)."""
     service = SettingsService(SettingsConfig())
 
     service.set_model(

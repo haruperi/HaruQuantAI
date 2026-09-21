@@ -185,10 +185,10 @@ Configuration is immutable, typed, versioned, and bounded. Reference sample valu
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-GATEWAY-001` | REST /api/v1 resources validate bounded input and emit schema-stable DTOs. | OpenAPI/contract tests |
-| Missing | `FR-GATEWAY-002` | Lists use stable cursor pagination/order and bounded limits. | Mutation pagination test |
-| Missing | `FR-GATEWAY-003` | Mutations implement authorization, idempotency, conflict versions, and correlation IDs. | Retry/auth tests |
-| Missing | `FR-GATEWAY-004` | Streams sequence events, heartbeat, reconnect by cursor, resync snapshots, and bound buffers. | Reconnect/slow-consumer test |
+| Missing | `FR-GATEWAY-REST_RESOURCES` | REST /api/v1 resources validate bounded input and emit schema-stable DTOs. | OpenAPI/contract tests |
+| Missing | `FR-GATEWAY-CURSOR_PAGINATION` | Lists use stable cursor pagination/order and bounded limits. | Mutation pagination test |
+| Missing | `FR-GATEWAY-MUTATION_IDEMPOTENCY` | Mutations implement authorization, idempotency, conflict versions, and correlation IDs. | Retry/auth tests |
+| Missing | `FR-GATEWAY-STREAM_SEQUENCING` | Streams sequence events, heartbeat, reconnect by cursor, resync snapshots, and bound buffers. | Reconnect/slow-consumer test |
 
 #### Removal behavior
 

@@ -196,10 +196,10 @@ Each owner has a slotted immutable `<Feature>Config`; sample reference values ar
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-RISK-001` | Sizing is finite, unit-safe, deterministic, and step compliant. | Golden table |
-| Missing | `FR-RISK-002` | Invalid or stale monetary inputs fail closed. | Boundary tests |
-| Missing | `FR-RISK-003` | Protective rounding never increases risk beyond policy. | Tick-neighbor test |
-| Missing | `FR-RISK-004` | Trailing and break-even changes are side-correct and monotonic. | Long/short tables |
+| Missing | `FR-RISK-POSITION_SIZING` | Sizing is finite, unit-safe, deterministic, and step compliant. | Golden table |
+| Missing | `FR-RISK-FAIL_CLOSED` | Invalid or stale monetary inputs fail closed. | Boundary tests |
+| Missing | `FR-RISK-PROTECTIVE_ROUNDING` | Protective rounding never increases risk beyond policy. | Tick-neighbor test |
+| Missing | `FR-RISK-MONOTONIC_PROTECTION` | Trailing and break-even changes are side-correct and monotonic. | Long/short tables |
 
 #### Removal behavior
 

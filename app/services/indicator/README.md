@@ -204,10 +204,10 @@ promoted to a default without product approval.
 
 | Status | Requirement ID | Observable behavior | Evidence |
 | --- | --- | --- | --- |
-| Missing | `FR-INDICATOR-001` | Batch, chunked, and incremental outputs agree. | Golden/property tests |
-| Missing | `FR-INDICATOR-002` | Visibility guards prevent future-index reads. | Look-ahead negative test |
-| Missing | `FR-INDICATOR-003` | Scalar and NumPy/Numba profiles match within declared tolerance. | Acceleration equivalence |
-| Missing | `FR-INDICATOR-004` | Rounding feeds comparison only where a named block contract requires it. | Threshold-neighbor test |
+| Missing | `FR-INDICATOR-INCREMENTAL_CONSISTENCY` | Batch, chunked, and incremental outputs agree. | Golden/property tests |
+| Missing | `FR-INDICATOR-LOOKAHEAD_PREVENTION` | Visibility guards prevent future-index reads. | Look-ahead negative test |
+| Missing | `FR-INDICATOR-PROFILE_EQUIVALENCE` | Scalar and NumPy/Numba profiles match within declared tolerance. | Acceleration equivalence |
+| Missing | `FR-INDICATOR-ROUNDING_CONTRACT` | Rounding feeds comparison only where a named block contract requires it. | Threshold-neighbor test |
 
 #### Removal behavior
 
