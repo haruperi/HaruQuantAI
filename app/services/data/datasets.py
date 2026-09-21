@@ -25,7 +25,11 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, override
 
 import pyarrow as pa
-import pyarrow.parquet as pq
+
+try:
+    import pyarrow.parquet as pq
+except ImportError:
+    pq = None
 
 from app.contracts.data import (
     DATA_DATASETS,
@@ -46,6 +50,15 @@ if TYPE_CHECKING:
     from app.kernel.context import FeatureContext
 
 logger = get_logger(__name__)
+
+
+def _require_pq() -> Any:
+    """Return pyarrow.parquet module or raise RuntimeError if unavailable."""
+    if pq is None:
+        msg = "Parquet support is unavailable (pyarrow.parquet failed to load)"
+        raise RuntimeError(msg)
+    return pq
+
 
 BARS_SCHEMA: pa.Schema = pa.schema(
     [
@@ -89,7 +102,9 @@ def _atomic_write_parquet(table: pa.Table, target_file: Path) -> str:
         f"{target_file.stem}.tmp_{uuid.uuid4().hex[:8]}.parquet"
     )
     try:
-        pq.write_table(table, temp_file, compression="zstd", compression_level=3)
+        _require_pq().write_table(
+            table, temp_file, compression="zstd", compression_level=3
+        )
         temp_file.replace(target_file)
     finally:
         temp_file.unlink(missing_ok=True)
@@ -135,7 +150,7 @@ def _read_parquet_bars(
         msg = f"Parquet file {file_path} does not exist"
         raise DatasetNotFoundError(msg)
 
-    table = pq.read_table(file_path)
+    table = _require_pq().read_table(file_path)
     df_dict = table.to_pydict()
 
     ts_col = df_dict["timestamp_utc"]
@@ -184,7 +199,7 @@ def _read_parquet_ticks(
         msg = f"Parquet file {file_path} does not exist"
         raise DatasetNotFoundError(msg)
 
-    table = pq.read_table(file_path)
+    table = _require_pq().read_table(file_path)
     df_dict = table.to_pydict()
 
     ts_col = df_dict["timestamp_utc"]

@@ -88,6 +88,7 @@ private implementation import.
 | Completed | `persistence.retention@1` | `RetentionService` | `1` | Reference-safe retention and purge planning |
 | Completed | `persistence.parquet@1` | `ParquetStoreService` | `1` | Partitioned columnar market data storage engine |
 | Completed | `persistence.snapshots@1` | `SnapshotService` | `1` | Atomic point-in-time database hot snapshots and backups |
+| Completed | `gateway.persistence@1` | `GatewayPersistenceService` | `1` | Durable gateway settings, API tokens, and idempotency responses |
 
 ### Persisted-state ownership
 
@@ -96,6 +97,7 @@ Semantic state remains feature-owned although database mechanics are centralized
 | Status | Namespace | Owning feature | Driver | Retention | Public read boundary |
 | --- | --- | --- | --- | --- | --- |
 | Completed | `persistence.v1` | `FEAT-PERSISTENCE-DATABASE` and registry peers | `sqlite` | Retain versioned records until explicit policy permits purge | `persistence.database@1` |
+| Completed | `gateway.v1` | `FEAT-PERSISTENCE-GATEWAY` | `sqlite` | Expired idempotency keys pruned; settings and tokens durable | `gateway.persistence@1` |
 
 ---
 
@@ -110,6 +112,7 @@ Semantic state remains feature-owned although database mechanics are centralized
 | `FEAT-PERSISTENCE-RETENTION` | Reference-safe retention and purge planning | `app/services/persistence/retention.py` | `persistence.retention@1` | `persistence.database@1`, `persistence.artifacts@1` | Completed |
 | `FEAT-PERSISTENCE-PARQUET` | Partitioned columnar market data store | `app/services/persistence/parquet_store.py` | `persistence.parquet@1` | None | Completed |
 | `FEAT-PERSISTENCE-SNAPSHOTS` | Point-in-time database hot snapshots and backups | `app/services/persistence/snapshots.py` | `persistence.snapshots@1` | `persistence.database@1` | Completed |
+| `FEAT-PERSISTENCE-GATEWAY` | Gateway durable settings, API tokens, and idempotency responses | `app/services/persistence/gateway.py` | `gateway.persistence@1` | `persistence.database@1` | Completed |
 
 > **Note on Domain Persistence Drivers:** Physical modules implementing cross-domain persistence (such as `app/services/persistence/workspace.py` providing `persistence.workspace@1`) are registered under their consuming domain's capability lifecycle while executing within the persistence physical boundary.
 

@@ -23,10 +23,14 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import override
+from typing import Any, override
 
 import pyarrow as pa
-import pyarrow.parquet as pq
+
+try:
+    import pyarrow.parquet as pq
+except ImportError:
+    pq = None
 
 from app.contracts.persistence import (
     PARQUET_STORE_SERVICE,
@@ -43,6 +47,15 @@ from app.kernel.feature import FeatureSpec
 from app.kernel.logging import get_logger
 
 logger = get_logger(__name__)
+
+
+def _require_pq() -> Any:
+    """Return pyarrow.parquet module or raise ParquetStorageError if unavailable."""
+    if pq is None:
+        msg = "Parquet format support is not available on this platform/environment"
+        raise ParquetStorageError(msg)
+    return pq
+
 
 BARS_SCHEMA: pa.Schema = pa.schema(
     [
@@ -86,7 +99,9 @@ def _atomic_write_table(table: pa.Table, target_file: Path) -> None:
         f"{target_file.stem}.tmp_{uuid.uuid4().hex[:8]}.parquet"
     )
     try:
-        pq.write_table(table, temp_file, compression="zstd", compression_level=3)
+        _require_pq().write_table(
+            table, temp_file, compression="zstd", compression_level=3
+        )
         temp_file.replace(target_file)
     finally:
         temp_file.unlink(missing_ok=True)
@@ -125,7 +140,7 @@ class ParquetStoreServiceImpl(IParquetStoreService):
             return []
 
         try:
-            table = pq.read_table(file_path)
+            table = _require_pq().read_table(file_path)
             timestamps = table.column("timestamp_utc").to_pylist()
             opens = table.column("open").to_pylist()
             highs = table.column("high").to_pylist()
@@ -160,7 +175,7 @@ class ParquetStoreServiceImpl(IParquetStoreService):
             return []
 
         try:
-            table = pq.read_table(file_path)
+            table = _require_pq().read_table(file_path)
             timestamps = table.column("timestamp_utc").to_pylist()
             bids = table.column("bid").to_pylist()
             asks = table.column("ask").to_pylist()
@@ -456,7 +471,7 @@ class ParquetStoreServiceImpl(IParquetStoreService):
                 year = int(file_path.stem)
                 size = file_path.stat().st_size
 
-                table = pq.read_table(file_path, columns=["timestamp_utc"])
+                table = _require_pq().read_table(file_path, columns=["timestamp_utc"])
                 num_rows = table.num_rows
                 if num_rows == 0:
                     continue

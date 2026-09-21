@@ -70,7 +70,7 @@ stress-tests, combines, and exports rule-based trading strategies with reproduci
 | Robustness | Ordered cross-checks, Monte Carlo, WFM, verdicts | Missing |
 | Portfolio | Definitions, weights, correlation, search, shared-capital results | Missing |
 | Research | Versioned task graphs, routing, runs, automation | Missing |
-| Gateway | REST/OpenAPI, WebSocket/SSE, DTO/auth/error boundary | Missing |
+| Gateway | REST/OpenAPI, WebSocket/SSE, DTO/auth/error boundary | Completed |
 | UI | Research workstation and deterministic mock simulator | Partial |
 | Agentic | Optional providers, context, tools, approvals, audit | Missing |
 
@@ -291,7 +291,7 @@ and tests proving their units, bounds, and failure behavior.
 | Missing | SYS-008 | Robustness checks run configured order with retained early-dismiss reasons. | Funnel integration |
 | Missing | SYS-009 | Extensions declare contract, permissions, determinism, limits, and isolation. | Compatibility/fault tests |
 | Missing | SYS-010 | All untrusted files/archives/templates/expressions are validated before use. | Adversarial tests |
-| Missing | SYS-011 | Gateway mutations are authorized, idempotent, correlated, and safely errored. | API contract tests |
+| Completed | SYS-011 | Gateway mutations are authorized, idempotent, correlated, and safely errored. | API contract tests |
 | Partial | SYS-012 | UI primary surfaces are coherent, accessible, identity-stable, and honest about progress/mocks. | UI/a11y/E2E suites |
 | Missing | SYS-013 | Research, UI mocks, and agentic output cannot enable or send live trades. | Negative authorization |
 | Missing | SYS-014 | Agentic proposals cite inputs, validate to schemas, and require mutation approval. | Tool-policy tests |

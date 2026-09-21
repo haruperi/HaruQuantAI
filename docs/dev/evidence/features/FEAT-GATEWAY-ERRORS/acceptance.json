@@ -1,0 +1,41 @@
+{
+  "feature_id": "FEAT-GATEWAY-ERRORS",
+  "domain": "D-GATEWAY",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-GATEWAY-PROBLEM_ERRORS"
+  ],
+  "verified_at_utc": "2026-09-21T10:20:00Z",
+  "owner_module": "app/services/gateway/errors.py",
+  "public_contract": "app/contracts/gateway.py",
+  "symbols": [
+    "ProblemMapperService",
+    "ErrorConfig"
+  ],
+  "capabilities": {
+    "provides": [
+      "gateway.errors@1"
+    ],
+    "requires": [],
+    "optional": []
+  },
+  "persistence": null,
+  "test_target": "tests/services/gateway/errors/",
+  "usage_example": "tests/examples/05_gateway.py::example_05_errors",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/gateway/errors/",
+    "exit_code": 0
+  },
+  "tested_revision": "463ada098098bb40775f5c4f4a092efefabaaba9",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "PASS",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}

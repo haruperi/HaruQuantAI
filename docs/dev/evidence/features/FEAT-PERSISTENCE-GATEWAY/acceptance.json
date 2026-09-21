@@ -1,0 +1,52 @@
+{
+  "feature_id": "FEAT-PERSISTENCE-GATEWAY",
+  "domain": "D-PERSISTENCE",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-GATEWAY-MUTATION_IDEMPOTENCY",
+    "FR-GATEWAY-TRANSPORT_AUTH"
+  ],
+  "verified_at_utc": "2026-09-21T10:20:00Z",
+  "owner_module": "app/services/persistence/gateway.py",
+  "public_contract": "app/contracts/gateway.py",
+  "symbols": [
+    "GatewayPersistenceService",
+    "GatewayPersistenceConfig"
+  ],
+  "capabilities": {
+    "provides": [
+      "gateway.persistence@1"
+    ],
+    "requires": [
+      "persistence.database@1"
+    ],
+    "optional": []
+  },
+  "persistence": {
+    "module": "app/services/persistence/gateway.py",
+    "namespace": "gateway.v1",
+    "tables": [
+      "gateway_settings",
+      "gateway_tokens",
+      "gateway_idempotency"
+    ]
+  },
+  "test_target": "tests/services/persistence/test_gateway.py",
+  "usage_example": "tests/examples/05_gateway.py::example_05_persistence",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/persistence/test_gateway.py",
+    "exit_code": 0
+  },
+  "tested_revision": "463ada098098bb40775f5c4f4a092efefabaaba9",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "PASS",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}

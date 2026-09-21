@@ -1,0 +1,45 @@
+{
+  "feature_id": "FEAT-GATEWAY-STREAMS",
+  "domain": "D-GATEWAY",
+  "status": "ACCEPTED",
+  "requirements": [
+    "FR-GATEWAY-STREAM_SEQUENCING"
+  ],
+  "verified_at_utc": "2026-09-21T10:20:00Z",
+  "owner_module": "app/services/gateway/streams.py",
+  "public_contract": "app/contracts/gateway.py",
+  "symbols": [
+    "EventStreamService",
+    "StreamsConfig"
+  ],
+  "capabilities": {
+    "provides": [
+      "gateway.streams@1"
+    ],
+    "requires": [
+      "gateway.application@1"
+    ],
+    "optional": [
+      "gateway.authorization@1"
+    ]
+  },
+  "persistence": null,
+  "test_target": "tests/services/gateway/streams/",
+  "usage_example": "tests/examples/05_gateway.py::example_05_streams",
+  "verification": {
+    "coverage_floor_met": true,
+    "mypy_strict_passed": true,
+    "ruff_clean": true,
+    "command": "uv run pytest --no-cov tests/services/gateway/streams/",
+    "exit_code": 0
+  },
+  "tested_revision": "463ada098098bb40775f5c4f4a092efefabaaba9",
+  "pipeline_stages": {
+    "Contract": "PASS",
+    "Provider": "PASS",
+    "Composition": "PASS",
+    "Interfaces": "PASS",
+    "UI": "NOT_APPLICABLE",
+    "EndToEnd": "PASS"
+  }
+}

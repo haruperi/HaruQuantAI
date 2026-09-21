@@ -38,12 +38,18 @@ from app.services.data.quality import feature as data_quality
 from app.services.data.resampling import feature as data_resampling
 from app.services.data.sessions import feature as data_sessions
 from app.services.data.universes import feature as data_universes
-from app.services.gateway.api_server import feature as gateway_api_server
+from app.services.gateway.application import feature as gateway_application
+from app.services.gateway.authorization import feature as gateway_authorization
+from app.services.gateway.command_automator import feature as gateway_automation
+from app.services.gateway.errors import feature as gateway_errors
+from app.services.gateway.rest import feature as gateway_rest
+from app.services.gateway.streams import feature as gateway_streams
 from app.services.persistence.artifacts import feature as persistence_artifacts
 from app.services.persistence.brokers import feature as persistence_brokers
 from app.services.persistence.data import feature as persistence_data
 from app.services.persistence.databanks import feature as persistence_databanks
 from app.services.persistence.database import feature as persistence_database
+from app.services.persistence.gateway import feature as persistence_gateway
 from app.services.persistence.migrations import feature as persistence_migrations
 from app.services.persistence.parquet_store import feature as persistence_parquet
 from app.services.persistence.retention import feature as persistence_retention
@@ -61,7 +67,13 @@ from app.services.workspace.settings import feature as workspace_settings
 # Enumerate all domain feature factory callables here.
 # Features will be topologically sorted by Runtime before startup.
 FEATURES: tuple[FeatureFactory, ...] = (
-    gateway_api_server,
+    gateway_application,
+    gateway_rest,
+    gateway_streams,
+    gateway_authorization,
+    gateway_errors,
+    gateway_automation,
+    persistence_gateway,
     persistence_database,
     persistence_workspace,
     persistence_migrations,
@@ -105,7 +117,13 @@ FEATURES: tuple[FeatureFactory, ...] = (
 PROFILES: Mapping[str, frozenset[str]] = {
     "all": frozenset(
         {
-            "gateway.api_server",
+            "gateway.application",
+            "gateway.rest",
+            "gateway.streams",
+            "gateway.authorization",
+            "gateway.errors",
+            "gateway.automation",
+            "persistence.gateway",
             "persistence.workspace",
             "persistence.database",
             "persistence.migrations",
@@ -145,10 +163,25 @@ PROFILES: Mapping[str, frozenset[str]] = {
             "workspace.workers",
         }
     ),
-    "api": frozenset({"gateway.api_server"}),
+    "api": frozenset(
+        {
+            "gateway.application",
+            "gateway.rest",
+            "gateway.streams",
+            "gateway.authorization",
+            "gateway.errors",
+            "gateway.automation",
+            "persistence.gateway",
+            "persistence.database",
+            "persistence.workspace",
+            "workspace.diagnostics",
+            "workspace.jobs",
+        }
+    ),
     "persistence": frozenset(
         {
             "persistence.database",
+            "persistence.gateway",
             "persistence.migrations",
             "persistence.snapshots",
             "persistence.artifacts",
