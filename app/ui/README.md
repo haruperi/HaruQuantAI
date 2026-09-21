@@ -303,6 +303,7 @@ operations return attributed unavailable; reinstall requires schema/version comp
 | Status | Decision ID | Decision or missing evidence | Scope | Required closure |
 | --- | --- | --- | --- | --- |
 | Accepted | `DEC-UI-001` | React/TypeScript/Vite/Tailwind, Dockview, TanStack Table/Virtual, and Lightweight Charts are target stack. | Frontend | E-T01 |
+| Accepted | `DEC-UI-003` | React Router with Path Routing and Synchronized Hybrid State Model enables deep linking, query params (`?someParam=someValue`), multi-tab isolation, and browser Back/Forward navigation. | Frontend / Routing | `tests/unit/app/router.test.ts` |
 | Open | `DEC-UI-002` | Pixel parity is unverified because native screenshots were unavailable. | Visual parity | Approved screenshot baselines |
 
 Evidence IDs resolve through `docs/PROJECT.md`. Unknowns remain explicit; installed names and

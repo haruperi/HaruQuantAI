@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { Activity, Bell, BrainCircuit, BriefcaseBusiness, ChartNoAxesCombined, Code2, Database, FolderKanban, Gauge, GitCompareArrows, Layers3, LineChart, WandSparkles, Workflow, X } from 'lucide-react';
 import type { ModuleId } from './types';
 import { useAppStore } from './store';
+import { getPathForModule, useRouteSync } from './router';
 import { DatabankPanel } from '../plugins/databank/ProjectDatabanks/DatabankPanel';
 import { HomeScreen } from '../workspace/Home/HomeScreen';
 import { DataManager } from '../workspace/DataManager/DataManager';
@@ -39,8 +41,13 @@ const nav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined; grou
 
 export function App() {
   const store = useAppStore();
+  const navigate = useNavigate();
   const [notifications, setNotifications] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
+
+  // Hook up bidirectional route and query parameter synchronization
+  useRouteSync();
+
   const showBank = ['builder', 'retester', 'optimizer', 'portfolio', 'projects'].includes(store.module);
 
   useEffect(() => {
@@ -48,24 +55,6 @@ export function App() {
     document.documentElement.dataset.profile = store.settings.profile;
     document.documentElement.style.setProperty('--app-zoom', String(store.settings.zoom));
   }, [store.settings.profile, store.settings.theme, store.settings.zoom]);
-
-  let content = <HomeScreen />;
-  if (store.module === 'builder') content = <BuilderWorkspace />;
-  else if (store.module === 'retester') content = <RetesterWorkspace />;
-  else if (store.module === 'optimizer') content = <OptimizerWorkspace />;
-  else if (store.module === 'portfolio') content = <PortfolioMasterWorkspace />;
-  else if (store.module === 'composer') content = <PortfolioComposerWorkspace />;
-  else if (store.module === 'datamanager') content = <DataManager />;
-  else if (store.module === 'algowizard') content = <AlgoWizardWorkspace />;
-  else if (store.module === 'projects') content = <CustomProjectsWorkspace />;
-  else if (store.module === 'codeeditor') content = <CodeEditorWorkspace />;
-  else if (store.module === 'business') content = <BusinessWorkspace />;
-  else if (store.module === 'trading') content = <TradingDashboard />;
-  else if (store.module === 'neuralnet') content = <NeuralNetworkTrainer />;
-  else if (store.module === 'mtanalyzer') content = <MTAnalyzerWorkspace />;
-  else if (store.module === 'debugconsole') content = <DebugConsole />;
-  else if (store.module === 'gridcontrol') content = <GridControl />;
-
 
   return (
     <div className="app-shell">
@@ -85,7 +74,7 @@ export function App() {
                 aria-label={item.label}
                 className={store.module === item.id ? 'active' : ''}
                 onClick={() => {
-                  store.setModule(item.id);
+                  navigate(getPathForModule(item.id));
                   setNavOpen(false);
                 }}
               >
@@ -104,7 +93,28 @@ export function App() {
       </aside>
 
       <main className="app-main">
-        <div className="module-area">{content}</div>
+        <div className="module-area">
+          <Routes>
+            <Route path="/" element={<HomeScreen />} />
+            <Route path="/home" element={<HomeScreen />} />
+            <Route path="/datamanager" element={<DataManager />} />
+            <Route path="/business" element={<BusinessWorkspace />} />
+            <Route path="/builder" element={<BuilderWorkspace />} />
+            <Route path="/algowizard" element={<AlgoWizardWorkspace />} />
+            <Route path="/codeeditor" element={<CodeEditorWorkspace />} />
+            <Route path="/neuralnet" element={<NeuralNetworkTrainer />} />
+            <Route path="/retester" element={<RetesterWorkspace />} />
+            <Route path="/optimizer" element={<OptimizerWorkspace />} />
+            <Route path="/mtanalyzer" element={<MTAnalyzerWorkspace />} />
+            <Route path="/projects" element={<CustomProjectsWorkspace />} />
+            <Route path="/portfolio" element={<PortfolioMasterWorkspace />} />
+            <Route path="/composer" element={<PortfolioComposerWorkspace />} />
+            <Route path="/trading" element={<TradingDashboard />} />
+            <Route path="/debugconsole" element={<DebugConsole />} />
+            <Route path="/gridcontrol" element={<GridControl />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+        </div>
         {showBank && (
           <div className="databank-resize">
             <DatabankPanel />

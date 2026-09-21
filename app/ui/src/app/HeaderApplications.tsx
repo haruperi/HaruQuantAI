@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Bug, ChartArea, Grid2X2, RefreshCw, TriangleAlert } from 'lucide-react';
 import { Button, Modal, Select, TextInput } from '../components/ui';
 import { useAppStore } from './store';
@@ -53,11 +54,13 @@ export function filterDebugLog(entries: DebugLogEntry[], category: string, text:
 export function debugCategories(entries: DebugLogEntry[]): string[] { return ['All', ...new Set(entries.map(entry => entry.category))]; }
 
 export function HeaderApplicationActions() {
-  const module = useAppStore(s => s.module); const setModule = useAppStore(s => s.setModule); const [volumeOpen, setVolumeOpen] = useState(false);
+  const module = useAppStore(s => s.module);
+  const navigate = useNavigate();
+  const [volumeOpen, setVolumeOpen] = useState(false);
   return <>
     <button className="top-action" title="Volume & Market Profile Addon" aria-label="Volume & Market Profile Addon" onClick={() => setVolumeOpen(true)}><ChartArea/></button>
-    <button className={`top-action ${module === 'debugconsole' ? 'active' : ''}`} title="Debug Console" aria-label="Debug Console" onClick={() => setModule('debugconsole')}><Bug/></button>
-    <button className={`top-action ${module === 'gridcontrol' ? 'active' : ''}`} title="Grid Control" aria-label="Grid Control" onClick={() => setModule('gridcontrol')}><Grid2X2/></button>
+    <button className={`top-action ${module === 'debugconsole' ? 'active' : ''}`} title="Debug Console" aria-label="Debug Console" onClick={() => navigate('/debugconsole')}><Bug/></button>
+    <button className={`top-action ${module === 'gridcontrol' ? 'active' : ''}`} title="Grid Control" aria-label="Grid Control" onClick={() => navigate('/gridcontrol')}><Grid2X2/></button>
     {volumeOpen && <VolumeProfileDialog onClose={() => setVolumeOpen(false)}/>}
   </>;
 }
