@@ -1,1 +1,0 @@
-"""Trading domain service package."""

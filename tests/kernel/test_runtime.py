@@ -495,22 +495,6 @@ def test_dynamic_subset_missing_required_dependency_fails_fast() -> None:
         asyncio.run(runtime.__aenter__())
 
 
-def test_registry_profile_resolution() -> None:
-    from app.registry import get_features
-
-    factories, enabled = get_features(profile="default")
-    assert enabled == frozenset()
-    factories, enabled = get_features(enabled=["feat_a", "feat_b"])
-    assert enabled == frozenset({"feat_a", "feat_b"})
-    factories, enabled = get_features()
-    assert enabled is None
-
-    with pytest.raises(ValueError, match="Cannot specify both"):
-        get_features(profile="default", enabled=["feat_a"])
-    with pytest.raises(ValueError, match="Unknown profile"):
-        get_features(profile="nonexistent_profile")
-
-
 def test_runtime_convenience_inspection_methods() -> None:
     async def scenario() -> None:
         async def provide_val(ctx: FeatureContext) -> None:

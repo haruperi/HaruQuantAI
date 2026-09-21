@@ -7,17 +7,7 @@ authors = [
     { name = "Haruperi", email = "r.haruperi@hotmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = [
-    "fastapi>=0.115.0",
-    "pydantic>=2.10.0",
-    "pyarrow>=18.0.0",
-    "uvicorn>=0.34.0",
-    "MetaTrader5>=5.0.0; sys_platform == 'win32'",
-    "tzdata>=2026.4",
-]
-
-[project.scripts]
-haruquantai = "app.main:main"
+dependencies = []
 
 [dependency-groups]
 dev = [
@@ -27,7 +17,6 @@ dev = [
     "mypy>=1.15,<2",
     "detect-secrets>=1.5.0",
     "pre-commit>=4.0.0",
-    "httpx>=0.28.0",
 ]
 
 # ============================================================================
@@ -151,10 +140,6 @@ ignore = [
     "SIM",
     "PTH",
     "SLF001",
-]
-"app/main.py" = [
-    "BLE001",
-    "TRY400",
 ]
 "tests/**/*.py" = [
     "S",
@@ -296,25 +281,3 @@ disable_error_code = ["explicit-override"]
 [[tool.mypy.overrides]]
 module = "scripts.*"
 check_untyped_defs = true
-
-[[tool.mypy.overrides]]
-module = [
-    "pyarrow",
-    "pyarrow.*",
-]
-ignore_missing_imports = true
-
-# ============================================================================
-# Execution Profile Capability Manifest
-# ============================================================================
-[tool.template.schema]
-version = 1
-description = "Business-neutral runtime profile capability dependency manifest"
-
-[tool.template.profile.default]
-description = "Default startup profile"
-required_capabilities = []
-
-[tool.template.profile.full]
-description = "Full application composition profile activating all domain capabilities"
-required_capabilities = []

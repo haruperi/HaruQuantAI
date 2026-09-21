@@ -1,1 +1,0 @@
-"""Gateway domain service package."""

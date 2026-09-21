@@ -1,1 +1,0 @@
-"""Data domain service package."""

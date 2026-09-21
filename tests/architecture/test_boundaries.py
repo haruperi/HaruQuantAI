@@ -6,6 +6,16 @@ from pathlib import Path
 APP = Path(__file__).resolve().parents[2] / "app"
 
 
+def test_reset_application_roots_are_exact() -> None:
+    """Only the retained kernel and UI roots exist before backend rebuilding."""
+    names = {
+        path.name
+        for path in APP.iterdir()
+        if path.is_file() or path.name == "ui" or any(path.rglob("*.py"))
+    }
+    assert names == {"__init__.py", "kernel", "ui"}
+
+
 def test_package_initializers_are_docstring_only() -> None:
     for path in APP.rglob("__init__.py"):
         body = ast.parse(path.read_text(encoding="utf-8")).body

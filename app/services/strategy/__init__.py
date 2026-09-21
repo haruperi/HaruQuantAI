@@ -1,1 +1,0 @@
-"""Strategy domain service package."""

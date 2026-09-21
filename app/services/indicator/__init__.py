@@ -1,1 +1,0 @@
-"""Indicator domain service package."""

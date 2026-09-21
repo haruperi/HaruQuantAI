@@ -1,138 +1,121 @@
-# Standards and Principles
+# HaruQuantAI Contributor Constitution
 
-**Purpose:** Authoritative contributor and workflow constitution for HaruQuantAI (Generic Modular Monolith Architecture).
+## 1. Authority and engineering principles
 
-## 1. Core engineering principles
+- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`,
+  `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, applicable package READMEs, and
+  `.agents/logs/<timestamp>_<task>/`.
+- **Scoped authority.** `AGENTS.md` owns workflow and verification;
+  `docs/PROJECT.md` owns product scope; `docs/ARCHITECTURE.md` owns structural
+  constraints; `docs/dev/feature_implementation_pipeline.md` and
+  `docs/dev/domain_implementation_audit.md` own plugin build and audit standards.
+- **Five Spatial Composability laws.** All future backend work must preserve:
+  locality of behavior, orthogonality, explicit typed capability slots,
+  hierarchical/algebraic composition, and schema-driven self-description.
+- **One concrete plugin, one cohesive Python file.** Calculation, configuration,
+  parameter schema, bounds, outputs, compatibility, lowering, and presentation
+  metadata for one quantitative concept stay together. Shared universal
+  metamodels may be imported; plugin-specific contracts may not be centralized.
+- **No ambient coupling.** Components do not reach through registries, globals,
+  private imports, or filesystem conventions at operation time. Collaboration is
+  declared through typed capabilities and immutable documents.
+- **Repository evidence over assertion.** Never invent behavior, tests, results,
+  contracts, or completion status.
+- **Surgical changes.** Implement the smallest complete approved change. Preserve
+  unrelated user changes and report authority conflicts before editing.
+- **Standard-library kernel.** `app/kernel/` uses only the Python standard
+  library and contains no product, plugin, UI, persistence, or integration logic.
+- **Honest UI.** `app/ui/` owns presentation and local view state. It must not
+  duplicate backend algorithms, durable truth, authorization, or plugin schemas.
 
-- **Repository truth, not chat memory.** Permanent truth lives in `AGENTS.md`, `docs/PROJECT.md`, `docs/ARCHITECTURE.md`, owning domain READMEs, and implementation history in `.agents/logs/<date-time>_<task_name>/<implementation-plan.md, walkthrough.md>`. Consequent iteration of the same task is appended to the same task file as an iteration block. Chat history is useful context but is never authoritative.
-- **Scoped authority.**
-  - `AGENTS.md` owns contributor, task workflow, and verification rules.
-  - `docs/PROJECT.md` owns product scope, domain index, functional requirements, and NFRs.
-  - `docs/ARCHITECTURE.md` owns universal structural, lifecycle, persistence, and runtime constraints.
-  - `docs/dev/feature_implementation_pipeline.md` and `docs/dev/domain_implementation_audit.md` own authoritative build-side feature implementation rules (`FIP-01` through `FIP-26`) and verification criteria.
-  - `docs/templates/` owns canonical task operational templates (`implementation-plan.md`, `walkthrough.md`).
-  - Owning domain READMEs own current-state feature registries, state declarations, and requirement mappings.
-  Satisfy all non-overlapping authorities and report real conflicts before editing.
-- **Think first.** State assumptions, boundaries, trade-offs, validation, and rollback before coding. Never silently resolve missing requirements.
-- **Surgical changes.** Implement the minimum complete change. No speculative features, unrelated refactors, or scope expansion.
-- **Correctness over speed.** Verify with tools and repository evidence; never invent behavior, tests, results, or upstream contracts.
-- **SOLID/focused ownership.** One feature owns one coherent capability. Single-file domain modules (`app/services/<domain>/<feature>.py`) own one feature; classes and functions stay focused on one responsibility.
-- **Pure architectural boundaries.** Python `__init__.py` files are empty or docstring-only. Cross-boundary collaboration uses typed capability tokens and public contracts in `app/contracts/<domain>.py` resolved via `FeatureContext`, never private service imports.
-- **Managed side effects.** Features use lifecycle-owned resources and `FeatureScope`/`FeatureContext` facilities for background tasks, subscriptions, capabilities, and cleanup.
-- **Standard-library kernel.** `app/kernel/` relies exclusively on the Python standard library with zero third-party dependencies.
+The repository is currently at a backend-reset baseline. No backend plugin,
+host, registry, persistence, or gateway implementation may be added until an
+approved architecture plan establishes its paths and public metamodel.
 
----
+## 2. Plan -> Execute -> Walkthrough workflow
 
-## 2. Streamlined Task Workflow (Plan -> Execute -> Walkthrough)
+Every development task follows this sequence:
 
-Every development task follows a disciplined, transparent, and reviewable workflow structured around two standard operational artifacts:
-1. **Implementation Plan** (`docs/templates/implementation-plan.md`) - Created before touching code.
-2. **Walkthrough** (`docs/templates/walkthrough.md`) - Created after implementation and verification are complete.
+1. **Research and audit:** inspect active code, documentation, tests, references,
+   dependencies, and working-tree state. Make no source edits.
+2. **Implementation plan:** create or append
+   `.agents/logs/<timestamp>_<task>/implementation-plan.md` using the canonical
+   template and define exact `ALLOWED_WRITE_PATHS`.
+3. **Owner approval gate:** stop until the owner explicitly responds
+   `APPROVED: EXECUTE` or equivalently approves the documented plan.
+4. **Surgical implementation:** edit only approved paths and record material
+   deviations as a plan iteration before proceeding.
+5. **Focused verification:** run change-scoped tests during development.
+6. **Candidate qualification:** run `uv run python scripts/ci_check.py` after the
+   candidate is complete, plus applicable UI commands.
+7. **Walkthrough:** create `walkthrough.md` from the canonical template,
+   including changes, exact commands/results, deviations, residual risks,
+   `git status`, and a proposed commit message.
+8. **Owner commit gate:** do not commit, merge, push, rebase, or rewrite history
+   without explicit owner authorization after walkthrough review.
 
-```text
-Task Request
-  ↓
-1. Research & Audit (inspect repository truth, read active code/contracts; zero speculative edits)
-  ↓
-2. Implementation Plan (author plan adhering strictly to docs/templates/implementation-plan.md)
-  ↓
-3. Owner Approval Gate (stop and wait for explicit confirmation: "APPROVED: EXECUTE")
-  ↓
-4. Surgical Implementation & Verification (code within ALLOWED_WRITE_PATHS; pytest, mypy, ruff, AST checks)
-  ↓
-5. Walkthrough (document changes, verification results, and usage evidence via docs/templates/walkthrough.md)
-  ↓
-6. Owner Commit Gate (user reviews walkthrough and authorizes git commit)
-  ↓
-Task Completed
-```
+Approval applies only to the plan version presented. New destructive targets,
+public contracts, dependencies, or architectural decisions require a recorded
+iteration and renewed approval when they materially expand scope.
 
-### 2.1 Research & Audit (Think First)
+## 3. Plugin implementation standard
 
-- Read all relevant existing files, contracts, registry entries, and tests to ground the plan in repository truth.
-- Identify all dependencies, affected scopes, and potential side effects.
-- DO NOT make source code changes or run modifying commands during research.
+Once the replacement architecture is ratified, plugin work must follow
+`docs/dev/feature_implementation_pipeline.md` and its companion audit. At
+minimum, each plugin must provide:
 
-### 2.2 Implementation Plan Creation
+- a stable namespaced ID and explicit compatibility version;
+- immutable, typed inputs/outputs and capability requirements;
+- an introspectable parameter schema with defaults, constraints, optimization
+  bounds, units, and presentation hints;
+- deterministic behavior with explicit missing-data, warm-up, error, and
+  numerical policies;
+- algebraic node/port declarations when composable in strategy trees;
+- no import-time registration, I/O, tasks, threads, environment reads, or
+  global mutation;
+- discovery through the host catalog without editing a central plugin list;
+- focused tests, removal/orthogonality tests, schema tests, and a deterministic
+  offline usage example;
+- truthful documentation with no metadata duplicated outside the plugin file.
 
-- Author a comprehensive Implementation Plan adhering strictly to [docs/templates/implementation-plan.md](docs/templates/implementation-plan.md).
-- Fulfill all 8 canonical sections: `Goal & Requirements`, `Files Read / Audit Trail`, `Proposed Changes & Implementation Order` (with clickable links and action tags), `Dependencies & Contracts`, `Blockers & Risks`, `Scope Boundaries`, `Verification Plan`, and `Rollback & Contingency` (defining `ALLOWED_WRITE_PATHS`).
-- Highlight critical items under `### User Review Required` and record any open questions under `### Open Questions`.
+Python `__init__.py` files are empty or docstring-only. Cross-plugin private
+imports and sibling implementation imports are prohibited.
 
-### 2.3 User Approval Gate
+## 4. Coding and verification baseline
 
-- Present the plan to the user/owner.
-- **STOP and wait for explicit approval** before proceeding to execution. Work commences only after receiving explicit owner confirmation (e.g. `APPROVED: EXECUTE`).
+- Ruff formatting: four spaces, 88-character lines, Google-style docstrings.
+- Mypy strict mode with all public signatures explicitly typed.
+- No bare `except`, silent failures, application `print`, hidden logging setup,
+  or secret-bearing diagnostics.
+- Minimum 80% branch-aware pytest coverage across retained Python application
+  source. Coverage is evidence, not semantic proof.
+- Architecture checks must pass:
+  `uv run python scripts/architecture_check.py`.
+- Focused iteration uses explicit test paths and `--no-cov`; do not repeatedly
+  run the complete suite while editing.
+- UI changes require, as applicable:
+  `npm --prefix app/ui run typecheck`, `npm --prefix app/ui run test`, and
+  `npm --prefix app/ui run build`.
+- Every backend plugin eventually requires a self-contained deterministic usage
+  example in the location ratified by the replacement architecture.
 
-### 2.4 Surgical Implementation & Verification
+## 5. Security, persistence, and external effects
 
-- Implement strictly within the approved `ALLOWED_WRITE_PATHS` and sequential implementation order.
-- Follow the authoritative build procedure in [docs/dev/feature_implementation_pipeline.md](docs/dev/feature_implementation_pipeline.md).
-- Follow change-scoped testing during development (`uv run pytest --no-cov <affected_tests>`).
-- Maintain or add a dedicated, real-world usage example in `tests/examples/<domain_file>.py`.
-- Verify the full qualification suite before finalizing:
-  ```bash
-  uv run python scripts/ci_check.py
-  ```
+- Never commit credentials, tokens, secrets, private endpoints, or sensitive
+  configuration. Keep secret detection current.
+- Fail closed when authority, compatibility, schema, credentials, or evidence is
+  uncertain.
+- Never delete, reset, truncate, migrate, or repurpose an active database without
+  explicit owner authorization. Tests use isolated temporary stores.
+- Persistence schemas, migrations, transactions, and retention belong to an
+  explicitly ratified host capability; plugins never execute ad-hoc SQL.
+- External integrations require typed capabilities, bounded timeouts, retry and
+  rate policies, redaction, and explicit lifecycle ownership.
+- Live trading and other irreversible external mutations are disabled by default
+  and require distinct authorization beyond ordinary implementation work.
 
-### 2.5 Walkthrough & Delivery
+## 6. Git authority
 
-- Once implementation and validation are fully verified, author a post-implementation Walkthrough adhering strictly to [docs/templates/walkthrough.md](docs/templates/walkthrough.md).
-- Document:
-  1. `Summary of Changes Made` with clickable file links.
-  2. `Verification Results` with commands and outputs for unit tests, usage examples, and `scripts/ci_check.py`.
-  3. `Deviations & Residuals` detailing any approved plan deviations, clean working tree status (`git status`), and proposed commit message.
-- Present the walkthrough to the user/owner for final review and commit authorization.
-
----
-
-## 3. Coding Style and Verification
-
-All code implementation, module anatomy, imports, logging, docstrings, typing, persistence boundaries, and test obligations are authoritatively governed by [docs/dev/feature_implementation_pipeline.md](docs/dev/feature_implementation_pipeline.md) (controls `FIP-01` through `FIP-26`) and audited via [docs/dev/domain_implementation_audit.md](docs/dev/domain_implementation_audit.md).
-
-### Non-negotiable verification baseline:
-
-- **Formatting & Linting:** Strict adherence to the Google Python Style Guide via Ruff (`ruff format` with 4 spaces, 88-character line length; `ruff check` enforcing 50+ rule groups).
-- **Static Typing:** Mypy strict mode (`strict = true`) with advanced error codes enabled (`deprecated`, `explicit-override`, `truthy-bool`). Explicit type hints on all signatures.
-- **Google Docstrings:** Every module, class, public method, and non-obvious function has a fitted Google-style docstring (`Args`, `Returns`, `Raises` only when applicable).
-- **Structured Logging:** Import `get_logger` from `app.kernel.logging` (`logger = get_logger(__name__)`). Bounded structured fields, strict secret/token/path redaction, and zero global logging configuration in service modules.
-- **Quality & Coverage:** Minimum 80% pytest coverage floor across `app`. No bare `except:`, no silent failures, and no application `print`.
-- **Usage Evidence:** Every backend feature must have a dedicated, self-contained offline scenario in `tests/examples/` exercising its primary purpose with deterministic, secret-safe inputs.
-- **Architectural Boundary Linter:** `uv run python scripts/architecture_check.py` verifies boundary isolation, imports purity, and docstring-only `__init__.py` files.
-
-### Testing Cadence Boundaries
-
-- **Editing & Iteration (Focused Only):** Run **ONLY** behavior-specific tests for changed or directly affected files with explicit paths and no coverage:
-  ```bash
-  uv run pytest --no-cov tests/path/to/test_feature.py
-  ```
-  **Never run unfiltered full test suites or coverage calculations iteratively on every edit.**
-- **Candidate Verification & Pre-Push:** The complete repository test suite, full Mypy checks, and the 80% coverage floor calculation are executed **only** after implementation is complete to qualify the candidate before commit/push via the unified check runner:
-  ```bash
-  uv run python scripts/ci_check.py
-  ```
-
----
-
-## 4. Security and Operational Safety
-
-- **Zero Secrets:** Never commit credentials, API keys, private tokens, or sensitive configuration. Keep `.secrets.baseline` up to date via `detect-secrets`.
-- **Fail Closed:** Fail closed whenever authority, policy, credentials, environment, or evidence is ambiguous or uncertain.
-- **Destructive Action Guard:** Deleting database files, dropping tables, purging data, force-pushing, or running uncontained external mutations requires explicit owner authorization.
-- **Authoritative Controls:** Python code and runtime policy enforcement are authoritative; chat memory and prompt guidance are never substitutes for deterministic verification.
-
----
-
-## 5. Database and External API Rules
-
-- **Database Preservation:** Never delete, unlink, truncate, reset, or drop tables in active workspace databases. Tests, benchmarks, and example harnesses must strictly execute against isolated temporary databases (e.g. via `tmp_path`).
-- **Persistence Boundary:** Database schemas, parameterized SQL, and transactions belong strictly in `app/services/persistence/<domain>.py` (`FIP-14 PERSIST`). Feature modules never execute ad-hoc SQL or manipulate raw connections.
-- **External Integration Isolation:** External services (HTTP clients, third-party APIs, messaging brokers) must be encapsulated behind typed protocols and capabilities in `app/contracts/` with explicit timeouts, retries, and circuit breakers.
-
----
-
-## 6. Git Authority Summary
-
-- The user/owner retains exclusive authority over Git commits, branch merges, and remote repository operations.
-- The assistant operates locally within the current workspace, proposing diffs, running tests, and preparing commit summaries.
-- No unsolicited branch creation, rebase, force-push, history rewrite, or destructive repository modifications are permitted without explicit owner direction.
+The owner retains exclusive authority over commits, branches, merges, rebases,
+pushes, and history rewrites. The assistant may inspect Git, prepare diffs,
+verify the candidate, and propose a commit message within the approved task.

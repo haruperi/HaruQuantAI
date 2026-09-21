@@ -1,110 +1,117 @@
-# Implementation Plan: [Goal / Task / Feature Title]
+# Implementation Plan: [Goal / Task / Plugin]
 
-> **Task ID:** `[FEAT-XXX | TASK-XXX]`
+> **Task ID:** `[TASK-XXX | PLUGIN-ID]`
 > **Iteration:** `[1]`
-> **Branch:** `[feature/... | task/... | main]`
+> **Branch:** `[branch | main]`
 > **Baseline Commit:** `[SHA]`
 
-Follow-up work on the same task appends a clearly labelled iteration to this
-file. Do not create a second plan for the same task run.
+Follow-up work on the same task appends a labelled iteration to this file.
 
 ---
 
 ### User Review Required
 
 > [!IMPORTANT]
-> Highlight critical design decisions, breaking changes, or items needing explicit owner sign-off.
+> [Breaking changes, destructive actions, compatibility choices, or explicit
+> owner decisions.]
 
 ### Open Questions
 
 > [!NOTE]
-> Clarifying questions or unresolved assumptions that impact the scope (or `- NONE`).
+> [Questions that materially affect scope, or `NONE`.]
 
 ---
 
 ## 1. Goal, Requirements & Usage Evidence
 
-- **Problem Statement & Goal**: Brief context and what this change accomplishes.
-- **Ratified Requirements**: Exact functional requirements / specifications being satisfied.
-- **Usage Evidence**: Primary purpose demonstrated by a realistic real-world usage example in `tests/examples/`.
+- **Problem and outcome:** [What changes and why.]
+- **Ratified requirements:** [Exact IDs/laws/acceptance.]
+- **Spatial invariants:** [How the five laws are preserved.]
+- **Usage evidence:** [Deterministic primary-purpose scenario.]
 
 ## 2. Files Read (Audit Trail)
 
-List of all existing files inspected to ground this plan in repository truth:
+- [authority or source](C:/absolute/path) — [what was verified].
 
-- [filename.py](file:///path/to/filename.py) — brief note on what was verified.
+Include active implementation, universal APIs, consumers, tests, documentation,
+working-tree state, and affected schemas. Do not plan from chat memory alone.
 
 ## 3. Proposed Changes & Implementation Order
 
-Grouped by component / domain layer, using explicit action tags and clickable links:
+Use explicit action tags:
 
-### [Component / Layer Name]
-
-- `[MODIFY]` [existing_file.py](file:///path/to/existing_file.py) — summary of edits.
-- `[NEW]` [new_file.py](file:///path/to/new_file.py) — purpose and public symbols.
-- `[DELETE]` [deprecated_file.py](file:///path/to/deprecated_file.py) — removal rationale.
+- `[NEW]` [plugin.py](C:/absolute/path/app/plugins/kind/plugin.py) — complete
+  cohesive behavior and self-description.
+- `[MODIFY]` [consumer.py](C:/absolute/path) — only when a universal boundary,
+  not plugin-specific wiring, genuinely changes.
+- `[DELETE]` [obsolete.py](C:/absolute/path) — reason and replacement/recovery.
 
 ### Sequential Implementation Order
 
-1. Step 1 (e.g. contracts / DTOs first)
-2. Step 2 (persistence / internal helpers)
-3. Step 3 (service feature implementation)
-4. Step 4 (tests and usage examples)
+1. Universal contract/schema change, when explicitly approved.
+2. One cohesive plugin or host owner.
+3. Discovery/catalog/algebra integration through generic mechanisms.
+4. Focused tests, usage scenario, and evidence.
+5. Documentation reconciliation and qualification.
 
 ## 4. Dependencies and Contracts
 
-- Public contracts, DTOs, protocols, and events imported or exported.
-- Cross-boundary capability keys resolved via `FeatureContext`.
-- Persistence boundaries (ensuring database operations stay in `app/services/persistence/`).
+- Capability slots and protocol/value types.
+- Plugin/API and algebra/schema versions.
+- Inputs, outputs, units, compatibility, and failure semantics.
+- Persistence or external effects and their lifecycle owner.
+- Consumer impact and why no plugin-specific duplication is introduced.
 
 ## 5. Blockers, Risks, and Trade-offs
 
-- Technical risks, potential side effects, and design trade-offs.
-- Assumptions made and rationale.
+- [Risk, observable consequence, and mitigation.]
+- [Authority or compatibility conflict.]
+- [Rollback trigger.]
 
 ## 6. Scope Boundaries (Inclusions & Exclusions)
 
-- **In Scope**: Explicit list of deliverables.
-- **Out of Scope / Non-Goals**: Explicit exclusions to prevent scope creep.
+- **In scope:** [Exact deliverables.]
+- **Out of scope:** [Explicit non-goals and prohibited expansion.]
 
 ## 7. Verification Plan
 
-Summary of how you will verify that your changes have the desired effects.
+### Focused tests
 
-### Automated Tests
+```powershell
+uv run pytest --no-cov tests/plugins/[kind]/test_[plugin].py -v
+```
+### Usage evidence
 
-- Exact unit / integration test commands to run:
-  ```bash
-  uv run pytest tests/path/to/test_feature.py -v
-  ```
+```powershell
+uv run python -m tests.examples.[approved_example]
+```
 
-### Usage Evidence Run
+### Architecture and qualification
 
-- Primary purpose demonstrated by a realistic harness in `tests/examples/`:
-  ```bash
-  uv run python tests/examples/NN_domain.py
-  ```
+```powershell
+uv run python scripts/architecture_check.py
+uv run python scripts/ci_check.py
+```
 
-### Quality Pipeline
+Add UI typecheck/test/build when catalog, schema, algebra, transport, or rendering
+changes. List every exact command planned.
 
-- Full verification suite:
-  ```bash
-  uv run python scripts/ci_check.py
-  ```
+### Manual verification
 
-### Manual Verification
-
-- Asking the user to verify behavior, interactive prompts, etc. (or `- NONE`).
+[Manual checks or `NONE`.]
 
 ## 8. Rollback & Contingency
 
-Step-by-step procedure to safely undo all changes done by this implementation.
+[Targeted recovery steps, failure contingencies, and Git baseline.]
 
 ```text
 ALLOWED_WRITE_PATHS:
-- app/contracts/domain.py
-- app/services/domain/feature.py
-- tests/services/domain/test_feature.py
-- tests/examples/NN_domain.py
+- app/plugins/[kind]/[plugin].py
+- tests/plugins/[kind]/test_[plugin].py
+- tests/examples/[approved_example].py
+- app/plugins/[kind]/README.md
+- docs/dev/evidence/[approved_manifest].json
+- .agents/logs/[task]/implementation-plan.md
+- .agents/logs/[task]/walkthrough.md
 END_ALLOWED_WRITE_PATHS:
 ```

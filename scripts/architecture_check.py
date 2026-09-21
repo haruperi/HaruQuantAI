@@ -1,16 +1,4 @@
-"""Static architectural rule checker for HaruQuantAI.
-
-Enforces universal modular monolith invariants across app/:
-- ARCH-001-INIT-PURITY: __init__.py files must be docstring-only or empty.
-- ARCH-002-MANAGED-TASKS: Direct asyncio.create_task() prohibited in services.
-- ARCH-003-NO-LOGGING-BASICCONFIG: logging.basicConfig() prohibited in features.
-- ARCH-004-KERNEL-PURITY: app/kernel must not import contracts or services.
-- ARCH-005-CONTRACT-PURITY: app/contracts must not import services or runtime.
-- ARCH-006-FEATURE-INDEPENDENCE: Service features must not import other features.
-- ARCH-007-BOOTSTRAP-ISOLATION: Features and kernel must not import app.main/registry.
-- ARCH-008-NO-COMPOSITION: app/composition is obsolete and prohibited.
-- ARCH-009-JSON-ONLY: HaruQuantAI-owned interchange must use JSON, not XML.
-"""
+"""Check the architecture invariants of the retained kernel/UI baseline."""
 
 from __future__ import annotations
 
@@ -28,13 +16,10 @@ APP_ROOT = REPO_ROOT / "app"
 UI_SOURCE_ROOT = APP_ROOT / "ui" / "src"
 
 FRONTEND_SOURCE_SUFFIXES = frozenset({".js", ".jsx", ".ts", ".tsx"})
+FORBIDDEN_APP_ROOTS = frozenset({"contracts", "services", "registry.py", "main.py"})
 FORBIDDEN_XML_MODULES = frozenset({"defusedxml", "lxml", "xml", "xmltodict"})
 XML_LITERAL_PATTERN = re.compile(
     r"(?:application|text)/xml|[\"'`][^\"'`\r\n]*\.xml(?:[?#][^\"'`\r\n]*)?[\"'`]",
-    re.IGNORECASE,
-)
-XML_VALUE_PATTERN = re.compile(
-    r"(?:application|text)/xml|\.xml(?:[?#].*)?$",
     re.IGNORECASE,
 )
 FRONTEND_XML_IMPLEMENTATION_PATTERN = re.compile(
@@ -43,14 +28,10 @@ FRONTEND_XML_IMPLEMENTATION_PATTERN = re.compile(
     re.IGNORECASE,
 )
 
-DOMAIN_OFFSET = 1
-FEATURE_OFFSET = 2
-MIN_TARGET_PARTS = 4
-
 
 @dataclass(frozen=True, slots=True)
 class ArchitecturalViolation:
-    """Represents a static architectural constraint violation."""
+    """Describe one source-bound architecture violation."""
 
     file_path: Path
     line_number: int
@@ -58,419 +39,234 @@ class ArchitecturalViolation:
     message: str
 
 
-def _is_obsolete_composition_path(file_path: Path) -> bool:
-    """Return whether source is inside the obsolete composition package."""
-    parts = file_path.parts
-    return any(
-        part == "app" and parts[index + 1] == "composition"
-        for index, part in enumerate(parts[:-1])
+def _app_parts(file_path: Path) -> tuple[str, ...]:
+    """Return path components beginning at the application package."""
+    parts = file_path.resolve().parts
+    if "app" not in parts:
+        return ()
+    return parts[parts.index("app") :]
+
+
+def _is_docstring_only(module: ast.Module) -> bool:
+    """Return whether a module is empty or contains only one docstring."""
+    if not module.body:
+        return True
+    return (
+        len(module.body) == 1
+        and isinstance(module.body[0], ast.Expr)
+        and isinstance(module.body[0].value, ast.Constant)
+        and isinstance(module.body[0].value.value, str)
     )
 
 
 class ArchitecturalVisitor(ast.NodeVisitor):
-    """AST visitor enforcing strict architectural invariants across the codebase."""
+    """Enforce Python invariants retained during the backend reset."""
 
     def __init__(self, file_path: Path) -> None:
+        """Initialize the visitor for one source file."""
         self.file_path = file_path
-        if "app" in file_path.parts:
-            app_idx = file_path.parts.index("app")
-            self.app_parts = file_path.parts[app_idx:]
-        else:
-            self.app_parts = file_path.parts
-
+        parts = _app_parts(file_path)
+        self._is_kernel = len(parts) > 1 and parts[1] == "kernel"
         self.violations: list[ArchitecturalViolation] = []
-        self._is_kernel = len(self.app_parts) > 1 and self.app_parts[1] == "kernel"
-        self._is_service = len(self.app_parts) > 1 and self.app_parts[1] == "services"
-        self._is_contract = len(self.app_parts) > 1 and self.app_parts[1] == "contracts"
-        self._is_init = self.file_path.name == "__init__.py"
 
-    def check_init_purity(self, node: ast.Module) -> None:
-        """Rule 1: __init__.py files must only contain a docstring or be empty."""
-        if not self._is_init:
-            return
-
-        body = node.body
-        if not body:
-            return
-
-        if (
-            len(body) == 1
-            and isinstance(body[0], ast.Expr)
-            and isinstance(body[0].value, ast.Constant)
-            and isinstance(body[0].value.value, str)
-        ):
-            return
-
-        for stmt in body:
-            if (
-                stmt is body[0]
-                and isinstance(stmt, ast.Expr)
-                and isinstance(stmt.value, ast.Constant)
-                and isinstance(stmt.value.value, str)
-            ):
-                continue
+    def check_module(self, node: ast.Module) -> None:
+        """Check package initializer purity."""
+        if self.file_path.name == "__init__.py" and not _is_docstring_only(node):
+            statement = node.body[1] if len(node.body) > 1 else node.body[0]
             self.violations.append(
                 ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=stmt.lineno,
-                    rule="ARCH-001-INIT-PURITY",
-                    message=(
-                        "__init__.py must not contain executable code, assignments, "
-                        f"or imports; found unexpected {type(stmt).__name__}."
-                    ),
+                    self.file_path,
+                    statement.lineno,
+                    "ARCH-001-INIT-PURITY",
+                    "__init__.py must be empty or docstring-only.",
                 )
             )
 
-    @override
-    def visit_Call(self, node: ast.Call) -> None:
-        """Check forbidden function and method calls."""
-        # Rule 2: asyncio.create_task() prohibited in services (use context.spawn)
-        if (
-            self._is_service
-            and isinstance(node.func, ast.Attribute)
-            and node.func.attr == "create_task"
-            and isinstance(node.func.value, ast.Name)
-            and node.func.value.id == "asyncio"
+    def _check_import(self, target: str, line_number: int) -> None:
+        """Check kernel purity and XML interchange imports."""
+        root = target.split(".", maxsplit=1)[0]
+        if root in FORBIDDEN_XML_MODULES:
+            self.violations.append(
+                ArchitecturalViolation(
+                    self.file_path,
+                    line_number,
+                    "ARCH-009-JSON-ONLY",
+                    f"XML interchange import is prohibited: {target}",
+                )
+            )
+        if self._is_kernel and not (
+            target.startswith("app.kernel.") or root in sys.stdlib_module_names
         ):
             self.violations.append(
                 ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=node.lineno,
-                    rule="ARCH-002-MANAGED-TASKS",
-                    message=(
-                        "Direct 'asyncio.create_task()' is prohibited outside "
-                        "app/kernel. Use 'context.spawn()' instead."
-                    ),
+                    self.file_path,
+                    line_number,
+                    "ARCH-004-KERNEL-PURITY",
+                    f"Kernel imports must be standard-library or app.kernel: {target}",
                 )
             )
-
-        # Rule 3: logging.basicConfig() prohibited in features
-        if (
-            (self._is_service or self._is_kernel or self._is_contract)
-            and isinstance(node.func, ast.Attribute)
-            and node.func.attr == "basicConfig"
-            and isinstance(node.func.value, ast.Name)
-            and node.func.value.id == "logging"
-        ):
-            self.violations.append(
-                ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=node.lineno,
-                    rule="ARCH-003-NO-LOGGING-BASICCONFIG",
-                    message=(
-                        "Features must not call logging.basicConfig(). "
-                        "Use 'from app.kernel.logging import get_logger'."
-                    ),
-                )
-            )
-
-        self.generic_visit(node)
 
     @override
     def visit_Import(self, node: ast.Import) -> None:
-        """Check forbidden module-level imports."""
+        """Check every direct import."""
         for alias in node.names:
-            self._check_import_target(alias.name, node.lineno)
+            self._check_import(alias.name, node.lineno)
         self.generic_visit(node)
 
     @override
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
-        """Check forbidden from-imports."""
-        if node.module:
-            self._check_import_target(node.module, node.lineno)
+        """Check every from-import."""
+        if node.level:
+            if self._is_kernel:
+                self.violations.append(
+                    ArchitecturalViolation(
+                        self.file_path,
+                        node.lineno,
+                        "ARCH-004-KERNEL-PURITY",
+                        "Kernel source must use absolute imports.",
+                    )
+                )
+        else:
+            self._check_import(node.module or "", node.lineno)
         self.generic_visit(node)
 
     @override
     def visit_Constant(self, node: ast.Constant) -> None:
-        """Reject XML interchange literals in Python application source."""
-        if isinstance(node.value, str) and XML_VALUE_PATTERN.search(node.value):
+        """Reject XML media types and transfer filenames."""
+        if isinstance(node.value, str) and XML_LITERAL_PATTERN.search(repr(node.value)):
             self.violations.append(
                 ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=node.lineno,
-                    rule="ARCH-009-JSON-ONLY",
-                    message=(
-                        "XML interchange literals are prohibited. Use a versioned JSON "
-                        "filename and 'application/json' media type."
-                    ),
+                    self.file_path,
+                    node.lineno,
+                    "ARCH-009-JSON-ONLY",
+                    "HaruQuantAI-owned interchange must use versioned JSON, not XML.",
                 )
             )
         self.generic_visit(node)
 
-    def _check_import_target(self, target_module: str, lineno: int) -> None:
-        """Validate imported target against layer boundary rules."""
-        self._check_xml_import(target_module, lineno)
-
-        # Rule 8: Obsolete composition
-        if target_module == "app.composition" or target_module.startswith(
-            "app.composition."
-        ):
-            self.violations.append(
-                ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=lineno,
-                    rule="ARCH-008-NO-COMPOSITION",
-                    message=(
-                        f"Import of '{target_module}' is prohibited. "
-                        "app/composition is obsolete; use app/kernel."
-                    ),
-                )
-            )
-
-        # Rule 4: Kernel purity
-        if self._is_kernel:
-            if target_module.startswith(
-                ("app.services", "app.contracts", "app.ui", "app.main", "app.registry")
-            ):
-                self.violations.append(
-                    ArchitecturalViolation(
-                        file_path=self.file_path,
-                        line_number=lineno,
-                        rule="ARCH-004-KERNEL-PURITY",
-                        message=(
-                            "Kernel must not import application module "
-                            f"'{target_module}'."
-                        ),
-                    )
-                )
-
-        # Rule 5: Contract purity
-        if self._is_contract:
-            if target_module.startswith(
-                ("app.services", "app.ui", "app.main", "app.registry")
-            ):
-                self.violations.append(
-                    ArchitecturalViolation(
-                        file_path=self.file_path,
-                        line_number=lineno,
-                        rule="ARCH-005-CONTRACT-PURITY",
-                        message=(
-                            "Contract must not import service or runtime module "
-                            f"'{target_module}'."
-                        ),
-                    )
-                )
-            elif target_module.startswith(
-                "app.kernel"
-            ) and not target_module.startswith("app.kernel.capability"):
-                self.violations.append(
-                    ArchitecturalViolation(
-                        file_path=self.file_path,
-                        line_number=lineno,
-                        rule="ARCH-005-CONTRACT-PURITY",
-                        message=(
-                            "Contract must not import kernel runtime module "
-                            f"'{target_module}'. Only app.kernel.capability is allowed."
-                        ),
-                    )
-                )
-
-        # Rule 7: Bootstrap isolation
-        if (
-            self._is_service or self._is_contract or self._is_kernel
-        ) and target_module in ("app.main", "app.registry"):
-            self.violations.append(
-                ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=lineno,
-                    rule="ARCH-007-BOOTSTRAP-ISOLATION",
-                    message=(
-                        f"Module must not import bootstrap module '{target_module}'. "
-                        "Bootstrap composes features; features do not depend on it."
-                    ),
-                )
-            )
-
-        # Rule 6: Cross-feature independence in app/services/<domain>/<feature>.py
-        if (
-            self._is_service
-            and not self.file_path.name.endswith(("_usage.py", "example.py"))
-            and target_module.startswith("app.services.")
-            and "services" in self.app_parts
-        ):
-            srv_idx = self.app_parts.index("services")
-            if len(self.app_parts) > srv_idx + FEATURE_OFFSET:
-                source_domain = self.app_parts[srv_idx + DOMAIN_OFFSET]
-                source_feature = self.app_parts[srv_idx + FEATURE_OFFSET].removesuffix(
-                    ".py"
-                )
-                target_parts = target_module.split(".")
-                if len(target_parts) >= MIN_TARGET_PARTS:
-                    target_domain = target_parts[2]
-                    target_feature = target_parts[3]
-
-                    # Dedicated domain persistence is permitted for its own domain
-                    if target_domain == "persistence" and (
-                        len(target_parts) == 3 or target_feature == source_domain
-                    ):
-                        return
-
-                    if (source_domain, source_feature) != (
-                        target_domain,
-                        target_feature,
-                    ):
-                        self.violations.append(
-                            ArchitecturalViolation(
-                                file_path=self.file_path,
-                                line_number=lineno,
-                                rule="ARCH-006-FEATURE-INDEPENDENCE",
-                                message=(
-                                    f"Feature '{source_domain}/{source_feature}' "
-                                    f"imports '{target_domain}/{target_feature}'. "
-                                    "Features must collaborate via contracts."
-                                ),
-                            )
-                        )
-
-    def _check_xml_import(self, target_module: str, lineno: int) -> None:
-        """Reject Python XML parser packages under ARCH-009."""
-        if target_module.split(".", maxsplit=1)[0] in FORBIDDEN_XML_MODULES:
-            self.violations.append(
-                ArchitecturalViolation(
-                    file_path=self.file_path,
-                    line_number=lineno,
-                    rule="ARCH-009-JSON-ONLY",
-                    message=(
-                        f"XML parser module '{target_module}' is prohibited. "
-                        "Use versioned JSON serialization."
-                    ),
-                )
-            )
-
 
 def check_file(py_file: Path) -> list[ArchitecturalViolation]:
-    """Scan one Python file for architectural violations."""
-    violations: list[ArchitecturalViolation] = []
-    if _is_obsolete_composition_path(py_file):
-        violations.append(
-            ArchitecturalViolation(
-                file_path=py_file,
-                line_number=1,
-                rule="ARCH-008-NO-COMPOSITION",
-                message=(
-                    "app/composition is obsolete. "
-                    "Use business-neutral primitives from app/kernel."
-                ),
-            )
-        )
-
+    """Check one Python source file."""
     try:
-        content = py_file.read_text(encoding="utf-8")
-        tree = ast.parse(content, filename=str(py_file))
-        visitor = ArchitecturalVisitor(py_file)
-        visitor.check_init_purity(tree)
-        visitor.visit(tree)
-        violations.extend(visitor.violations)
-    except SyntaxError as error:
-        violations.append(
+        tree = ast.parse(py_file.read_text(encoding="utf-8"), filename=str(py_file))
+    except (OSError, SyntaxError) as error:
+        return [
             ArchitecturalViolation(
-                file_path=py_file,
-                line_number=error.lineno or 1,
-                rule="SYNTAX-ERROR",
-                message=str(error),
+                py_file,
+                getattr(error, "lineno", 1) or 1,
+                "ARCH-000-PARSE",
+                str(error),
             )
-        )
-    return violations
+        ]
+    visitor = ArchitecturalVisitor(py_file)
+    visitor.check_module(tree)
+    visitor.visit(tree)
+    return visitor.violations
 
 
 def check_frontend_file(source_file: Path) -> list[ArchitecturalViolation]:
-    """Scan one frontend source file for prohibited XML implementation details."""
-    violations: list[ArchitecturalViolation] = []
-    content = source_file.read_text(encoding="utf-8")
-    for line_number, line in enumerate(content.splitlines(), start=1):
-        if XML_LITERAL_PATTERN.search(
+    """Check one frontend source file for XML interchange implementation."""
+    try:
+        lines = source_file.read_text(encoding="utf-8").splitlines()
+    except OSError as error:
+        return [ArchitecturalViolation(source_file, 1, "ARCH-000-PARSE", str(error))]
+    for line_number, line in enumerate(lines, start=1):
+        if FRONTEND_XML_IMPLEMENTATION_PATTERN.search(
             line
-        ) or FRONTEND_XML_IMPLEMENTATION_PATTERN.search(line):
+        ) or XML_LITERAL_PATTERN.search(line):
+            return [
+                ArchitecturalViolation(
+                    source_file,
+                    line_number,
+                    "ARCH-009-JSON-ONLY",
+                    "Frontend interchange must use versioned JSON, not XML.",
+                )
+            ]
+    return []
+
+
+def _is_frontend_source(source_file: Path) -> bool:
+    """Return whether a file is an active frontend source file."""
+    return (
+        source_file.suffix.lower() in FRONTEND_SOURCE_SUFFIXES
+        and UI_SOURCE_ROOT in source_file.resolve().parents
+    )
+
+
+def _reset_boundary_violations() -> list[ArchitecturalViolation]:
+    """Reject accidental restoration of superseded backend roots."""
+    violations: list[ArchitecturalViolation] = []
+    for name in sorted(FORBIDDEN_APP_ROOTS):
+        path = APP_ROOT / name
+        contains_source = path.is_file() or (path.is_dir() and any(path.rglob("*.py")))
+        if contains_source:
             violations.append(
                 ArchitecturalViolation(
-                    file_path=source_file,
-                    line_number=line_number,
-                    rule="ARCH-009-JSON-ONLY",
-                    message=(
-                        "XML parsing or interchange is prohibited in active frontend "
-                        "source. Use a versioned JSON contract."
-                    ),
+                    path,
+                    1,
+                    "ARCH-010-RESET-BOUNDARY",
+                    f"Superseded backend path must remain absent: app/{name}",
                 )
             )
     return violations
 
 
-def _is_frontend_source(source_file: Path) -> bool:
-    """Return whether a file is active frontend source covered by ARCH-009."""
-    return (
-        source_file.suffix.lower() in FRONTEND_SOURCE_SUFFIXES
-        and source_file.resolve().is_relative_to(UI_SOURCE_ROOT.resolve())
-    )
-
-
 def check_directory(directory: Path) -> list[ArchitecturalViolation]:
-    """Scan supported active source files in a directory."""
+    """Check supported source files recursively under a directory."""
     violations: list[ArchitecturalViolation] = []
-    for py_file in directory.rglob("*.py"):
-        violations.extend(check_file(py_file))
-    for suffix in FRONTEND_SOURCE_SUFFIXES:
-        for source_file in directory.rglob(f"*{suffix}"):
-            if _is_frontend_source(source_file):
-                violations.extend(check_frontend_file(source_file))
+    if directory.resolve() == APP_ROOT.resolve():
+        violations.extend(_reset_boundary_violations())
+    for source_file in directory.rglob("*"):
+        if source_file.suffix == ".py":
+            violations.extend(check_file(source_file))
+        elif _is_frontend_source(source_file):
+            violations.extend(check_frontend_file(source_file))
     return violations
 
 
 def check_paths(paths: Sequence[str]) -> list[ArchitecturalViolation]:
-    """Validate and scan explicit application paths."""
+    """Resolve and check application-relative paths."""
     violations: list[ArchitecturalViolation] = []
-    for value in paths:
-        candidate = Path(value)
-        resolved = (
-            candidate.resolve()
-            if candidate.is_absolute()
-            else (REPO_ROOT / candidate).resolve()
-        )
-        if not resolved.is_relative_to(APP_ROOT.resolve()) or not resolved.exists():
-            message = f"Architecture target is outside app or missing: {value}"
-            raise ValueError(message)
+    for raw_path in paths:
+        candidate = Path(raw_path)
+        resolved = candidate if candidate.is_absolute() else REPO_ROOT / candidate
+        resolved = resolved.resolve()
+        if not resolved.exists() or not (
+            resolved == APP_ROOT.resolve() or APP_ROOT.resolve() in resolved.parents
+        ):
+            raise ValueError(f"Path is outside app or missing: {raw_path}")
         if resolved.is_dir():
             violations.extend(check_directory(resolved))
         elif resolved.suffix == ".py":
             violations.extend(check_file(resolved))
         elif _is_frontend_source(resolved):
             violations.extend(check_frontend_file(resolved))
-        else:
-            message = (
-                f"Architecture target is not supported application source: {value}"
-            )
-            raise ValueError(message)
     return violations
 
 
 def main(arguments: Sequence[str] | None = None) -> int:
-    """Run architectural check across the application source tree."""
+    """Run architecture checks and return a process exit code."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("paths", nargs="*")
-    options = parser.parse_args(arguments)
-    targets = options.paths or [str(APP_ROOT)]
-
-    print("========================================")
-    print("Running Architectural AST Invariant Check...")
-    print(f"Scanning targets: {', '.join(targets)}")
-    print("========================================")
-
+    parser.add_argument("paths", nargs="*", default=[str(APP_ROOT)])
+    args = parser.parse_args(arguments)
     try:
-        violations = check_paths(targets)
+        violations = check_paths(args.paths)
     except ValueError as error:
-        print(f"[FAILURE] {error}")
+        print(error)
         return 2
-
-    if not violations:
-        print("[SUCCESS] All architectural rules passed without violations!")
-        return 0
-
-    print(f"\n[FAILURE] Found {len(violations)} architectural violations:\n")
-    for v in violations:
-        print(f"  [{v.rule}] {v.file_path}:{v.line_number}")
-        print(f"    -> {v.message}\n")
-
-    return 1
+    for violation in violations:
+        path = violation.file_path
+        try:
+            path = path.resolve().relative_to(REPO_ROOT)
+        except ValueError:
+            pass
+        print(f"{path}:{violation.line_number}: {violation.rule}: {violation.message}")
+    if violations:
+        print(f"Architecture check failed with {len(violations)} violation(s).")
+        return 1
+    print("Architecture check passed.")
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    raise SystemExit(main())

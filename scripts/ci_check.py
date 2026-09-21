@@ -21,8 +21,6 @@ def main() -> int:
         ],
         ["tests.examples.composition"],
         ["tests.examples.logging_usage"],
-        ["tests.examples.05_gateway"],
-        ["app.main"],
     ]
     for command in commands:
         result = subprocess.run([sys.executable, "-m", *command], cwd=root, check=False)
