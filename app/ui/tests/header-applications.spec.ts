@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => { await page.goto('/'); });
 
-test('header exposes the three requested HaruQuantAI actions and skips Code Editor', async ({ page }) => {
-  const actions = page.locator('.top-actions');
+test('footer exposes the requested HaruQuantAI actions and skips Code Editor', async ({ page }) => {
+  const actions = page.locator('.status-actions');
   await expect(actions.getByRole('button', { name: 'Theme', exact: true })).toHaveCount(0);
   await expect(actions.getByRole('button', { name: 'Help', exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: /Feature Profile/ })).toHaveCount(0);

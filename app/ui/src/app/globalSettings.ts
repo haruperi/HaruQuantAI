@@ -42,17 +42,18 @@ export function createDefaultConfiguration(): ConfigurationSettings {
 export function createInitialAppSettings(): AppSettings {
   return {
     theme: 'dark', language: 'English', autosave: true, workers: 8, memoryGb: 10,
-    profile: 'Full', zoom: 1, navigationCollapsed: false, configuration: createDefaultConfiguration(),
+    profile: 'Full', zoom: 1, configuration: createDefaultConfiguration(),
     remoteAccess: { allow: false, requirePassword: false },
     smtp: { server: '', port: '587', ssl: true, username: '', emailFrom: '' },
   };
 }
 
-export function mergeAppSettings(saved?: Partial<AppSettings>): AppSettings {
+export function mergeAppSettings(saved?: Partial<AppSettings> & { navigationCollapsed?: boolean }): AppSettings {
   const defaults = createInitialAppSettings();
+  const { navigationCollapsed: _legacyCollapsed, ...rest } = saved ?? {};
   return {
     ...defaults,
-    ...saved,
+    ...rest,
     configuration: { ...defaults.configuration, ...saved?.configuration },
     remoteAccess: { ...defaults.remoteAccess, ...saved?.remoteAccess },
     smtp: { ...defaults.smtp, ...saved?.smtp },

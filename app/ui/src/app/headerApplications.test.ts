@@ -7,7 +7,7 @@ const job = (status: Job['status'], progress: number, message: string = status):
 
 describe('HaruQuantAI header applications', () => {
   it('keeps the requested non-Code-Editor actions in reference order', () => {
-    expect(HEADER_APPLICATION_ACTIONS.map(item => item.title)).toEqual(['Debug Console', 'Grid Control', 'Volume & Market Profile Addon']);
+    expect(HEADER_APPLICATION_ACTIONS.map(item => item.title)).toEqual(['Volume & Market Profile Addon', 'Debug Console', 'Grid Control']);
     expect(HEADER_APPLICATION_ACTIONS.map(item => String(item.title))).not.toContain('Code Editor');
   });
 

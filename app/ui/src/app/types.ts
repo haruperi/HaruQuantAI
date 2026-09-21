@@ -35,7 +35,7 @@ export interface RemoteAccessSettings { allow: boolean; requirePassword: boolean
 export interface SmtpSettings { server: string; port: string; ssl: boolean; username: string; emailFrom: string; }
 export interface AppSettings {
   theme: Theme; language: string; autosave: boolean; workers: number; memoryGb: number;
-  profile: 'Full' | 'Starter'; zoom: number; navigationCollapsed: boolean; configuration: ConfigurationSettings;
+  profile: 'Full' | 'Starter'; zoom: number; configuration: ConfigurationSettings;
   remoteAccess: RemoteAccessSettings; smtp: SmtpSettings;
 }
 export interface BuilderSettings {

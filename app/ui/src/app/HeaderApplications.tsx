@@ -5,9 +5,9 @@ import { useAppStore } from './store';
 import type { Job } from './types';
 
 export const HEADER_APPLICATION_ACTIONS = [
+  { id: 'volume-profile', title: 'Volume & Market Profile Addon' },
   { id: 'debugconsole', title: 'Debug Console' },
   { id: 'gridcontrol', title: 'Grid Control' },
-  { id: 'volume-profile', title: 'Volume & Market Profile Addon' },
 ] as const;
 
 export const VOLUME_PROFILE_ACTIONS = ['Learn more', 'Upgrade to Ultimate', 'Pro V&MP monthly subscription', 'Pro V&MP yearly subscription'] as const;
@@ -55,9 +55,9 @@ export function debugCategories(entries: DebugLogEntry[]): string[] { return ['A
 export function HeaderApplicationActions() {
   const module = useAppStore(s => s.module); const setModule = useAppStore(s => s.setModule); const [volumeOpen, setVolumeOpen] = useState(false);
   return <>
+    <button className="top-action" title="Volume & Market Profile Addon" aria-label="Volume & Market Profile Addon" onClick={() => setVolumeOpen(true)}><ChartArea/></button>
     <button className={`top-action ${module === 'debugconsole' ? 'active' : ''}`} title="Debug Console" aria-label="Debug Console" onClick={() => setModule('debugconsole')}><Bug/></button>
     <button className={`top-action ${module === 'gridcontrol' ? 'active' : ''}`} title="Grid Control" aria-label="Grid Control" onClick={() => setModule('gridcontrol')}><Grid2X2/></button>
-    <button className="top-action" title="Volume & Market Profile Addon" aria-label="Volume & Market Profile Addon" onClick={() => setVolumeOpen(true)}><ChartArea/></button>
     {volumeOpen && <VolumeProfileDialog onClose={() => setVolumeOpen(false)}/>}
   </>;
 }

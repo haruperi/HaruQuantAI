@@ -4,49 +4,48 @@ import { selectLightSkin } from './shellTestUtils';
 
 test.beforeEach(async ({ page }) => { await page.goto('/'); });
 
-test('sidebar collapses to a persistent icon rail and expands again', async ({ page }) => {
-  const shell = page.locator('.app-shell');
+test('collapsed icon rail expands as a hover flyout and collapses when the pointer leaves', async ({ page }) => {
   const navigation = page.getByRole('complementary', { name: 'Applications' });
-  const topbar = page.locator('.topbar');
-  const brandName = page.locator('.brand strong');
+  const flyout = navigation.locator('.nav-flyout');
+  const brandButton = navigation.getByRole('button', { name: 'HaruQuantAI', exact: true });
   const builder = navigation.getByRole('button', { name: 'Builder', exact: true });
-  const collapse = page.getByRole('button', { name: 'Collapse navigation', exact: true });
 
-  await expect(navigation).toHaveCSS('width', '190px');
-  await expect(topbar.locator(':scope > .nav-toggle')).toBeVisible();
-  await expect(navigation.locator('.nav-toggle')).toHaveCount(0);
-  await expect(page.getByText('Applications', { exact: true })).toHaveCount(0);
+  await expect(page.locator('.topbar > .nav-toggle')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Collapse navigation', exact: true })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Expand navigation', exact: true })).toHaveCount(0);
+  await expect(navigation).toHaveCSS('width', '49px');
+  await expect(flyout).toHaveCSS('width', '49px');
+  await expect(brandButton.getByText('HaruQuantAI', { exact: true })).toBeHidden();
+  await expect(brandButton).toHaveText('HaruQuantAI');
   await expect(navigation.getByRole('button', { name: 'Improver', exact: true })).toHaveCount(0);
   await expect(navigation.getByRole('button', { name: 'Retester', exact: true })).toBeVisible();
   await expect(navigation.getByRole('button', { name: 'Optimizer', exact: true })).toBeVisible();
-  await expect(brandName).toHaveText('HaruQuantAI');
-  await expect(brandName).toBeVisible();
-  await expect(collapse.locator('.lucide-list-indent-decrease')).toBeVisible();
-  await expect(builder.locator('span')).toBeVisible();
-  await expect(navigation.getByText('Research', { exact: true })).toBeVisible();
-
-  await collapse.click();
-  await expect(shell).toHaveClass(/nav-collapsed/);
-  await expect(navigation).toHaveCSS('width', '49px');
-  await expect(brandName).toBeHidden();
-  await expect(page.getByRole('button', { name: 'Expand navigation', exact: true }).locator('.lucide-list-indent-increase')).toBeVisible();
   await expect(builder.locator('svg')).toBeVisible();
   await expect(builder.locator('span')).toBeHidden();
-  await expect(navigation.getByText('Research', { exact: true })).toBeHidden();
+  await expect(navigation.getByText('Fundamentals', { exact: true })).toBeHidden();
+
+  await navigation.hover();
+  await expect(flyout).toHaveCSS('width', '190px');
+  await expect(navigation).toHaveCSS('width', '49px');
+  await expect(builder.locator('span')).toBeVisible();
+  await expect(navigation.getByText('Fundamentals', { exact: true })).toBeVisible();
+  await expect(brandButton.getByText('HaruQuantAI', { exact: true })).toBeVisible();
+
+  await navigation.getByRole('button', { name: 'Retester', exact: true }).hover();
+  await expect(flyout).toHaveCSS('width', '190px');
 
   await navigation.getByRole('button', { name: 'Data Manager', exact: true }).click();
   await expect(navigation.getByRole('button', { name: 'Data Manager', exact: true })).toHaveClass(/active/);
   await expect(page.locator('.dm-title')).toHaveText('Data Manager');
+  await expect(flyout).toHaveCSS('width', '49px');
+
+  await page.locator('.app-main').hover();
+  await expect(flyout).toHaveCSS('width', '49px');
+  await expect(builder.locator('span')).toBeHidden();
 
   await page.reload();
-  await expect(shell).toHaveClass(/nav-collapsed/);
-  await expect(navigation).toHaveCSS('width', '49px');
-  await page.getByRole('button', { name: 'Expand navigation', exact: true }).click();
-  await expect(shell).not.toHaveClass(/nav-collapsed/);
-  await expect(navigation).toHaveCSS('width', '190px');
-  await expect(brandName).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Collapse navigation', exact: true })).toBeVisible();
-  await expect(navigation.getByRole('button', { name: 'Data Manager', exact: true }).locator('span')).toBeVisible();
+  await expect(flyout).toHaveCSS('width', '49px');
+  await expect(navigation.getByRole('button', { name: 'Data Manager', exact: true })).toHaveClass(/active/);
 });
 
 test('legacy Improver workspace opens Builder with improve-existing behavior retained', async ({ page }) => {
@@ -70,8 +69,9 @@ test('collapsed navigation remains usable with the light skin', async ({ page })
   await page.setViewportSize({ width: 520, height: 700 });
   await selectLightSkin(page);
   const navigation = page.getByRole('complementary', { name: 'Applications' });
-  await page.getByRole('button', { name: 'Collapse navigation', exact: true }).click();
   await expect(navigation).toHaveCSS('width', '49px');
-  await expect(navigation.getByRole('button', { name: 'Home', exact: true }).locator('svg')).toBeVisible();
+  await expect(navigation.getByRole('button', { name: 'HaruQuantAI', exact: true }).locator('svg')).toBeVisible();
   await expect(navigation).toHaveCSS('background-color', 'rgb(226, 231, 235)');
+  await navigation.hover();
+  await expect(navigation.locator('.nav-flyout')).toHaveCSS('width', '190px');
 });

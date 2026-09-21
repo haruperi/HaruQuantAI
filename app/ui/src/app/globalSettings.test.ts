@@ -35,15 +35,14 @@ describe('global settings contracts', () => {
     const settings = mergeAppSettings({ theme: 'light', workers: 3 } as never);
     expect(settings.theme).toBe('light');
     expect(settings.workers).toBe(3);
-    expect(settings.navigationCollapsed).toBe(false);
     expect(settings.configuration.coreUsage).toBe('reserve-one');
     expect(settings.remoteAccess.allow).toBe(false);
     expect(settings.smtp.port).toBe('587');
   });
 
-  it('preserves a persisted collapsed navigation preference', () => {
+  it('drops the legacy persisted collapsed navigation preference', () => {
     const settings = mergeAppSettings({ navigationCollapsed: true });
-    expect(settings.navigationCollapsed).toBe(true);
+    expect('navigationCollapsed' in settings).toBe(false);
   });
 
   it('validates bounded cores, memory, and custom window text', () => {

@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('research settings persist and linked results navigate', async ({ page }) => {
   await page.goto('/');
-  await expect(page.getByText('Builder', { exact: true }).first()).toBeVisible();
+  await expect(page.locator('.project-header h1')).toHaveText('Builder');
   await page.getByRole('button', { name: 'Full settings' }).click();
   await page.getByLabel('Maximum conditions').fill('7');
   await page.getByRole('button', { name: 'Results', exact: true }).click();

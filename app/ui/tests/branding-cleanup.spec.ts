@@ -11,9 +11,9 @@ test.beforeEach(async ({ page }) => { await page.goto('/'); });
 
 test('shell, primary modules and settings dialogs expose HaruQuantAI branding', async ({ page }) => {
   await expect(page).toHaveTitle('HaruQuantAI — Frontend Research Workspace');
-  await expect(page.locator('.brand')).toHaveText('HaruQuantAI');
-  await expect(page.locator('.brand')).not.toContainText('Research platform');
-  await expect(page.locator('.topbar > .nav-toggle')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'HaruQuantAI', exact: true })).toHaveText('HaruQuantAI');
+  await expect(page.getByRole('complementary', { name: 'Applications' })).not.toContainText('Research platform');
+  await expect(page.locator('.topbar > .nav-toggle')).toHaveCount(0);
   await expect(page.getByText('Applications', { exact: true })).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Improver', exact: true })).toHaveCount(0);
   await expectCurrentBranding(page);
