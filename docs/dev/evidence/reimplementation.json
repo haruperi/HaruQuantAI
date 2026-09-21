@@ -3805,6 +3805,302 @@
         "shell",
         "ui"
       ]
+    },
+    "REC-UI-TRADING-001": {
+      "record_id": "REC-UI-TRADING-001",
+      "title": "Live Trading Dashboard and Emergency Kill Switch",
+      "summary": "Stateful multi-broker account management, order execution, position modifications, and emergency kill-switch liquidation.",
+      "status": "implemented",
+      "primary_evidence": "E-T01",
+      "sources": [
+        {
+          "catalog_id": "E-T01",
+          "locator": {
+            "path": "app/ui/src/workspace/Trading/TradingDashboard.tsx",
+            "line_range": null,
+            "symbol": "TradingDashboard",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Live trading dashboard and execution monitor."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-TRADING"
+        ],
+        "requirement_ids": [
+          "FR-UI-TRADING_DASHBOARD"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/Trading/trading.test.ts.",
+        "expected_observation": "Order placement, position modification, cancel order, and emergency kill switch liquidation pass all assertions.",
+        "actual_observation": "All 7 tests passed.",
+        "artifact_paths": [
+          "app/ui/src/workspace/Trading/TradingDashboard.tsx",
+          "app/ui/src/workspace/Trading/tradingStore.ts",
+          "app/ui/tests/unit/workspace/Trading/trading.test.ts"
+        ],
+        "executed_at": "2026-09-21T15:48:04Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3da94a7",
+        "created_at": "2026-09-21T15:48:04Z",
+        "updated_at": "2026-09-21T15:48:04Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend simulation."
+      },
+      "tags": [
+        "trading",
+        "execution",
+        "kill-switch",
+        "ui"
+      ]
+    },
+    "REC-UI-3DSURFACE-001": {
+      "record_id": "REC-UI-3DSURFACE-001",
+      "title": "Interactive 3D Optimization Surface and Plateau Detection",
+      "summary": "HTML5 Canvas 3D surface projection with pitch/yaw orbit, colormap shading, SQX % of Profitable Optimizations card, and plateau cluster identification.",
+      "status": "implemented",
+      "primary_evidence": "E-T01",
+      "sources": [
+        {
+          "catalog_id": "E-T01",
+          "locator": {
+            "path": "app/ui/src/plugins/optimization/OptimizationSurface.tsx",
+            "line_range": null,
+            "symbol": "OptimizationSurface",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "3D Optimization surface component and plateau analysis."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-3DSURFACE"
+        ],
+        "requirement_ids": [
+          "FR-UI-3D_OPTIMIZATION_SURFACE"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/plugins/optimization/optimizationSurface.test.ts.",
+        "expected_observation": "Surface mesh generation, perspective projection, depth sorting, and plateau cluster metrics pass all assertions.",
+        "actual_observation": "All 5 tests passed.",
+        "artifact_paths": [
+          "app/ui/src/plugins/optimization/OptimizationSurface.tsx",
+          "app/ui/src/plugins/optimization/optimizationSurfaceLogic.ts",
+          "app/ui/tests/unit/plugins/optimization/optimizationSurface.test.ts"
+        ],
+        "executed_at": "2026-09-21T15:48:04Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3da94a7",
+        "created_at": "2026-09-21T15:48:04Z",
+        "updated_at": "2026-09-21T15:48:04Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend simulation."
+      },
+      "tags": [
+        "optimization",
+        "3d-surface",
+        "plateau-stability",
+        "ui"
+      ]
+    },
+    "REC-UI-NEURAL-NETWORK-001": {
+      "record_id": "REC-UI-NEURAL-NETWORK-001",
+      "title": "Neural Network Trainer and Strategy Code Generator",
+      "summary": "Deep learning model architecture designer, layer topology, hyperparameter tuning, simulated epoch training loop, and strategy code export.",
+      "status": "implemented",
+      "primary_evidence": "E-T01",
+      "sources": [
+        {
+          "catalog_id": "E-T01",
+          "locator": {
+            "path": "app/ui/src/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx",
+            "line_range": null,
+            "symbol": "NeuralNetworkTrainer",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Neural network training workspace and architecture builder."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-NEURAL-NETWORK"
+        ],
+        "requirement_ids": [
+          "FR-UI-NEURAL_NETWORK_TRAINER"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts.",
+        "expected_observation": "Model layer mutations, hyperparameter updates, training loss convergence, evaluation metrics, and code export pass all assertions.",
+        "actual_observation": "All 7 tests passed.",
+        "artifact_paths": [
+          "app/ui/src/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx",
+          "app/ui/src/workspace/NeuralNetwork/neuralNetStore.ts",
+          "app/ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts"
+        ],
+        "executed_at": "2026-09-21T15:48:04Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3da94a7",
+        "created_at": "2026-09-21T15:48:04Z",
+        "updated_at": "2026-09-21T15:48:04Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend simulation."
+      },
+      "tags": [
+        "neural-network",
+        "deep-learning",
+        "strategy-export",
+        "ui"
+      ]
+    },
+    "REC-UI-MT-ANALYZER-001": {
+      "record_id": "REC-UI-MT-ANALYZER-001",
+      "title": "MetaTrader Statement Analyzer and Performance Profiler",
+      "summary": "MT4/MT5 statement parser, comprehensive performance metrics (SQN, Profit Factor, DD), equity/underwater charts, and monthly returns matrix heatmap.",
+      "status": "implemented",
+      "primary_evidence": "E-T01",
+      "sources": [
+        {
+          "catalog_id": "E-T01",
+          "locator": {
+            "path": "app/ui/src/workspace/MTAnalyzer/MTAnalyzerWorkspace.tsx",
+            "line_range": null,
+            "symbol": "MTAnalyzerWorkspace",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "MetaTrader statement analyzer and performance workspace."
+          },
+          "inspection_method": "source_code_inspection",
+          "relation": "implements",
+          "fingerprint": null,
+          "accessed_at": "2026-09-21"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-MT-ANALYZER"
+        ],
+        "requirement_ids": [
+          "FR-UI-MT_ANALYZER"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Execute Vitest unit tests in app/ui/tests/unit/workspace/MTAnalyzer/mtAnalyzer.test.ts.",
+        "expected_observation": "Statement parsing, performance metric calculations (SQN, Profit Factor, DD), preset loading, and symbol filtering pass all assertions.",
+        "actual_observation": "All 6 tests passed.",
+        "artifact_paths": [
+          "app/ui/src/workspace/MTAnalyzer/MTAnalyzerWorkspace.tsx",
+          "app/ui/src/workspace/MTAnalyzer/mtAnalyzerStore.ts",
+          "app/ui/tests/unit/workspace/MTAnalyzer/mtAnalyzer.test.ts"
+        ],
+        "executed_at": "2026-09-21T15:48:04Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3da94a7",
+        "created_at": "2026-09-21T15:48:04Z",
+        "updated_at": "2026-09-21T15:48:04Z",
+        "review_state": "reviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Clean-room frontend simulation."
+      },
+      "tags": [
+        "mt-analyzer",
+        "statement-analysis",
+        "sqn",
+        "ui"
+      ]
     }
   }
 }

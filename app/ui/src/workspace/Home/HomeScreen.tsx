@@ -1,4 +1,4 @@
-import { ChartCandlestick, ChartNoAxesCombined, FlaskConical, BriefcaseBusiness, WandSparkles, Workflow, Code2, GitCompareArrows, Gauge, Database } from 'lucide-react';
+import { Activity, BrainCircuit, ChartCandlestick, ChartNoAxesCombined, FlaskConical, BriefcaseBusiness, WandSparkles, Workflow, Code2, GitCompareArrows, Gauge, Database, LineChart } from 'lucide-react';
 import type { ModuleId } from '../../app/types';
 import { useAppStore } from '../../app/store';
 
@@ -8,9 +8,13 @@ const quickNav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined 
   { id: 'builder', label: 'Builder', icon: WandSparkles },
   { id: 'algowizard', label: 'AlgoWizard', icon: Workflow },
   { id: 'codeeditor', label: 'Code Editor', icon: Code2 },
+  { id: 'neuralnet', label: 'Neural Network', icon: BrainCircuit },
   { id: 'retester', label: 'Retester', icon: GitCompareArrows },
   { id: 'optimizer', label: 'Optimizer', icon: Gauge },
+  { id: 'mtanalyzer', label: 'MT Analyzer', icon: LineChart },
+  { id: 'trading', label: 'Live Trading', icon: Activity },
 ];
+
 
 export function HomeScreen() {
   const store = useAppStore();

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Bell, BriefcaseBusiness, ChartNoAxesCombined, Code2, Database, FolderKanban, Gauge, GitCompareArrows, Layers3, WandSparkles, Workflow, X } from 'lucide-react';
+import { Activity, Bell, BrainCircuit, BriefcaseBusiness, ChartNoAxesCombined, Code2, Database, FolderKanban, Gauge, GitCompareArrows, Layers3, LineChart, WandSparkles, Workflow, X } from 'lucide-react';
 import type { ModuleId } from './types';
 import { useAppStore } from './store';
 import { DatabankPanel } from '../plugins/databank/ProjectDatabanks/DatabankPanel';
@@ -14,6 +14,9 @@ import { PortfolioComposerWorkspace } from '../workspace/PortfolioComposer/Portf
 import { PortfolioMasterWorkspace } from '../workspace/PortfolioMaster/PortfolioMasterWorkspace';
 import { CodeEditorWorkspace } from '../workspace/CodeEditor/CodeEditorWorkspace';
 import { BusinessWorkspace } from '../workspace/Business/BusinessWorkspace';
+import { TradingDashboard } from '../workspace/Trading/TradingDashboard';
+import { NeuralNetworkTrainer } from '../workspace/NeuralNetwork/NeuralNetworkTrainer';
+import { MTAnalyzerWorkspace } from '../workspace/MTAnalyzer/MTAnalyzerWorkspace';
 import { GlobalSettingsMenu } from './GlobalSettingsMenu';
 import { DebugConsole, GridControl, HeaderApplicationActions } from './HeaderApplications';
 
@@ -24,11 +27,14 @@ const nav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined; grou
   { id: 'builder', label: 'Builder', icon: WandSparkles, group: 'Development' },
   { id: 'algowizard', label: 'AlgoWizard', icon: Workflow },
   { id: 'codeeditor', label: 'Code Editor', icon: Code2 },
+  { id: 'neuralnet', label: 'Neural Network', icon: BrainCircuit },
   { id: 'retester', label: 'Retester', icon: GitCompareArrows, group: 'Robustness' },
   { id: 'optimizer', label: 'Optimizer', icon: Gauge },
+  { id: 'mtanalyzer', label: 'MT Analyzer', icon: LineChart },
   { id: 'projects', label: 'Custom Projects', icon: FolderKanban, group: 'Automation' },
   { id: 'portfolio', label: 'Portfolio Master', icon: Layers3, group: 'Trading' },
   { id: 'composer', label: 'Portfolio Composer', icon: ChartNoAxesCombined },
+  { id: 'trading', label: 'Live Trading', icon: Activity },
 ];
 
 export function App() {
@@ -54,8 +60,12 @@ export function App() {
   else if (store.module === 'projects') content = <CustomProjectsWorkspace />;
   else if (store.module === 'codeeditor') content = <CodeEditorWorkspace />;
   else if (store.module === 'business') content = <BusinessWorkspace />;
+  else if (store.module === 'trading') content = <TradingDashboard />;
+  else if (store.module === 'neuralnet') content = <NeuralNetworkTrainer />;
+  else if (store.module === 'mtanalyzer') content = <MTAnalyzerWorkspace />;
   else if (store.module === 'debugconsole') content = <DebugConsole />;
   else if (store.module === 'gridcontrol') content = <GridControl />;
+
 
   return (
     <div className="app-shell">
