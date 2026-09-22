@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import os
 import sys
 import time
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol, override
 
@@ -44,96 +46,100 @@ class WorkerOversizedOutputError(WorkerError):
     """Raised when worker stdout exceeds maximum output bytes."""
 
 
+class WorkerStartupError(WorkerError):
+    """Raised when the worker process does not start within its budget."""
+
+
 class WorkerProtocolError(WorkerError):
     """Raised when worker request or response violates wire protocol."""
 
 
+@dataclass(frozen=True, slots=True)
 class WorkerBudget:
-    """Resource limits for subprocess worker task."""
+    """Immutable resource limits for one subprocess worker task."""
 
-    __slots__ = ("grace_period_seconds", "max_output_bytes", "timeout_seconds")
+    timeout_seconds: float = 60.0
+    max_output_bytes: int = 10_000_000
+    grace_period_seconds: float = 2.0
+    startup_timeout_seconds: float = 10.0
+    idle_timeout_seconds: float = 30.0
 
-    def __init__(
-        self,
-        timeout_seconds: float = 60.0,
-        max_output_bytes: int = 10_000_000,
-        grace_period_seconds: float = 2.0,
-    ) -> None:
-        if timeout_seconds <= 0:
+    def __post_init__(self) -> None:
+        """Validate budget fields."""
+        if self.timeout_seconds <= 0:
             raise ValueError("timeout_seconds must be > 0")
-        if max_output_bytes <= 0:
+        if self.max_output_bytes <= 0:
             raise ValueError("max_output_bytes must be > 0")
-        if grace_period_seconds <= 0:
+        if self.grace_period_seconds <= 0:
             raise ValueError("grace_period_seconds must be > 0")
-        self.timeout_seconds = timeout_seconds
-        self.max_output_bytes = max_output_bytes
-        self.grace_period_seconds = grace_period_seconds
+        if self.startup_timeout_seconds <= 0:
+            raise ValueError("startup_timeout_seconds must be > 0")
+        if self.idle_timeout_seconds <= 0:
+            raise ValueError("idle_timeout_seconds must be > 0")
 
 
 DEFAULT_WORKER_BUDGET = WorkerBudget()
 
+MAX_STDERR_BYTES = 10_000
+_READ_CHUNK_BYTES = 65_536
 
+
+@dataclass(frozen=True, slots=True)
 class WorkerTask:
-    """Specification for one isolated worker execution task."""
+    """Immutable specification for one isolated worker execution task."""
 
-    __slots__ = ("budget", "payload", "task_id", "task_kind")
+    task_id: str
+    task_kind: str = "execution.evaluate"
+    payload: FrozenObject = EMPTY_FROZEN_OBJECT
+    budget: WorkerBudget = DEFAULT_WORKER_BUDGET
 
-    def __init__(
-        self,
-        task_id: str,
-        task_kind: str = "execution.evaluate",
-        payload: FrozenObject | dict[str, Any] = EMPTY_FROZEN_OBJECT,
-        budget: WorkerBudget = DEFAULT_WORKER_BUDGET,
-    ) -> None:
-        if not task_id or not isinstance(task_id, str):
+    def __post_init__(self) -> None:
+        """Validate and normalize the task specification."""
+        if not self.task_id or not isinstance(self.task_id, str):
             raise ValueError("task_id must be a non-empty string")
-        if not task_kind or not isinstance(task_kind, str):
+        if not self.task_kind or not isinstance(self.task_kind, str):
             raise ValueError("task_kind must be a non-empty string")
-        self.task_id = task_id
-        self.task_kind = task_kind
+        if not isinstance(self.budget, WorkerBudget):
+            raise TypeError("budget must be a WorkerBudget")
+
+    @classmethod
+    def from_payload(
+        cls,
+        task_id: str,
+        payload: FrozenObject | dict[str, Any],
+        *,
+        task_kind: str = "execution.evaluate",
+        budget: WorkerBudget = DEFAULT_WORKER_BUDGET,
+    ) -> WorkerTask:
+        """Build a task, freezing dict payloads into immutable form."""
         if isinstance(payload, dict):
             frozen = freeze_value(payload)
             if not isinstance(frozen, FrozenObject):
                 raise TypeError("payload must freeze to FrozenObject")
-            self.payload = frozen
+            normalized = frozen
         elif isinstance(payload, FrozenObject):
-            self.payload = payload
+            normalized = payload
         else:
             raise TypeError("payload must be a FrozenObject or dict")
-        self.budget = budget
+        return cls(
+            task_id=task_id,
+            task_kind=task_kind,
+            payload=normalized,
+            budget=budget,
+        )
 
 
+@dataclass(frozen=True, slots=True)
 class WorkerResult:
-    """Outcome of subprocess execution."""
+    """Immutable outcome of one subprocess worker task."""
 
-    __slots__ = (
-        "elapsed_seconds",
-        "error_code",
-        "error_message",
-        "exit_code",
-        "result_payload",
-        "success",
-        "task_id",
-    )
-
-    def __init__(
-        self,
-        task_id: str,
-        success: bool,
-        *,
-        result_payload: FrozenObject = EMPTY_FROZEN_OBJECT,
-        elapsed_seconds: float = 0.0,
-        exit_code: int = 0,
-        error_code: str = "",
-        error_message: str = "",
-    ) -> None:
-        self.task_id = task_id
-        self.success = success
-        self.result_payload = result_payload
-        self.elapsed_seconds = elapsed_seconds
-        self.exit_code = exit_code
-        self.error_code = error_code
-        self.error_message = error_message
+    task_id: str
+    success: bool
+    result_payload: FrozenObject = EMPTY_FROZEN_OBJECT
+    elapsed_seconds: float = 0.0
+    exit_code: int = 0
+    error_code: str = ""
+    error_message: str = ""
 
 
 class WorkersConfig:
@@ -217,12 +223,7 @@ class _SubprocessWorkers(Workers):
 
         async with self._semaphore:
             start_time = time.monotonic()
-            cmd = [
-                sys.executable,
-                "-m",
-                "app.host.bootstrap",
-                "--worker",
-            ]
+            cmd = [sys.executable, "-m", "app.host.bootstrap", "--worker"]
             env = self._build_sanitized_env()
 
             request_envelope = {
@@ -233,119 +234,221 @@ class _SubprocessWorkers(Workers):
             }
             request_bytes = to_canonical_json_bytes(request_envelope)
 
-            proc = await asyncio.create_subprocess_exec(
-                *cmd,
-                stdin=asyncio.subprocess.PIPE,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE,
-                env=env,
-                cwd=str(self._config.repo_root),
+            stdout_data, stderr_data, exit_code = await self._spawn_and_exchange(
+                task, request_bytes, env, cmd
             )
-            self._active_processes[task.task_id] = proc
-
-            try:
-                try:
-                    stdout_data, stderr_data = await asyncio.wait_for(
-                        proc.communicate(input=request_bytes),
-                        timeout=task.budget.timeout_seconds,
-                    )
-                except TimeoutError:
-                    await self._terminate_process(
-                        proc, task.budget.grace_period_seconds
-                    )
-                    raise WorkerTimeoutError(
-                        f"Task {task.task_id} timed out after "
-                        f"{task.budget.timeout_seconds}s"
-                    ) from None
-                except asyncio.CancelledError:
-                    await self._terminate_process(
-                        proc, task.budget.grace_period_seconds
-                    )
-                    raise WorkerCancellationError(
-                        f"Task {task.task_id} was cancelled"
-                    ) from None
-
-            finally:
-                self._active_processes.pop(task.task_id, None)
 
             elapsed = time.monotonic() - start_time
-
-            # Output size check
-            if len(stdout_data) > task.budget.max_output_bytes:
-                raise WorkerOversizedOutputError(
-                    f"Task {task.task_id} produced {len(stdout_data)} bytes, "
-                    f"exceeding {task.budget.max_output_bytes}"
-                )
-
-            if proc.returncode != 0:
-                stderr_text = stderr_data.decode("utf-8", errors="replace")[:1000]
-                raise WorkerCrashError(
-                    f"Worker process for task {task.task_id} exited with "
-                    f"code {proc.returncode}: {stderr_text}"
-                )
-
-            # Parse response JSON
-            try:
-                raw_response = parse_strict_json(stdout_data)
-            except Exception as err:
-                raise WorkerProtocolError(
-                    f"Worker for task {task.task_id} returned invalid JSON: {err}"
-                ) from err
-
-            if (
-                not isinstance(raw_response, dict)
-                or raw_response.get("version") != 1
-                or raw_response.get("task_id") != task.task_id
-            ):
-                raise WorkerProtocolError(
-                    f"Worker response failed protocol validation for task "
-                    f"{task.task_id}"
-                )
-
-            success = bool(raw_response.get("success", False))
-            result_raw = raw_response.get("result", {})
-            frozen_result = (
-                freeze_value(result_raw)
-                if isinstance(result_raw, dict)
-                else EMPTY_FROZEN_OBJECT
-            )
-            if not isinstance(frozen_result, FrozenObject):
-                frozen_result = EMPTY_FROZEN_OBJECT
-
-            error_code = str(raw_response.get("error_code") or "")
-            error_message = str(raw_response.get("error_message") or "")
-
-            return WorkerResult(
-                task_id=task.task_id,
-                success=success,
-                result_payload=frozen_result,
-                elapsed_seconds=elapsed,
-                exit_code=proc.returncode,
-                error_code=error_code,
-                error_message=error_message,
+            return self._finalize_result(
+                task, stdout_data, stderr_data, exit_code, elapsed
             )
 
-    async def _terminate_process(
+    def _finalize_result(
+        self,
+        task: WorkerTask,
+        stdout_data: bytes,
+        stderr_data: bytes,
+        exit_code: int,
+        elapsed: float,
+    ) -> WorkerResult:
+        """Validate the raw exchange outcome into a WorkerResult."""
+        if exit_code != 0:
+            stderr_text = stderr_data.decode("utf-8", errors="replace")[:1000]
+            raise WorkerCrashError(
+                f"Worker process for task {task.task_id} exited with "
+                f"code {exit_code}: {stderr_text}"
+            )
+
+        try:
+            raw_response = parse_strict_json(stdout_data)
+        except Exception as err:
+            raise WorkerProtocolError(
+                f"Worker for task {task.task_id} returned invalid JSON: {err}"
+            ) from err
+
+        if (
+            not isinstance(raw_response, dict)
+            or raw_response.get("version") != 1
+            or raw_response.get("task_id") != task.task_id
+        ):
+            raise WorkerProtocolError(
+                f"Worker response failed protocol validation for task {task.task_id}"
+            )
+
+        success = bool(raw_response.get("success", False))
+        result_raw = raw_response.get("result", {})
+        frozen_result = (
+            freeze_value(result_raw)
+            if isinstance(result_raw, dict)
+            else EMPTY_FROZEN_OBJECT
+        )
+        if not isinstance(frozen_result, FrozenObject):
+            frozen_result = EMPTY_FROZEN_OBJECT
+
+        error_code = str(raw_response.get("error_code") or "")
+        error_message = str(raw_response.get("error_message") or "")
+
+        return WorkerResult(
+            task_id=task.task_id,
+            success=success,
+            result_payload=frozen_result,
+            elapsed_seconds=elapsed,
+            exit_code=exit_code,
+            error_code=error_code,
+            error_message=error_message,
+        )
+
+    async def _spawn_and_exchange(
+        self,
+        task: WorkerTask,
+        request_bytes: bytes,
+        env: dict[str, str],
+        cmd: list[str],
+    ) -> tuple[bytes, bytes, int]:
+        """Spawn the worker and run the bounded JSON exchange.
+
+        Raises WorkerTimeoutError / WorkerOversizedOutputError /
+        WorkerStartupError according to which budget phase failed.
+        """
+        try:
+            proc = await asyncio.wait_for(
+                asyncio.create_subprocess_exec(
+                    *cmd,
+                    stdin=asyncio.subprocess.PIPE,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                    env=env,
+                    cwd=str(self._config.repo_root),
+                ),
+                timeout=task.budget.startup_timeout_seconds,
+            )
+        except TimeoutError as err:
+            raise WorkerStartupError(
+                f"Task {task.task_id} worker did not start within "
+                f"{task.budget.startup_timeout_seconds}s"
+            ) from err
+
+        self._active_processes[task.task_id] = proc
+        if proc.stdin is None or proc.stdout is None or proc.stderr is None:
+            raise WorkerProtocolError("worker pipes were not created")
+        try:
+            stdout_data, stderr_data = await asyncio.wait_for(
+                self._exchange(proc, request_bytes, task.budget),
+                timeout=task.budget.timeout_seconds,
+            )
+        except TimeoutError:
+            await self._escalate_termination(proc, task.budget.grace_period_seconds)
+            raise WorkerTimeoutError(
+                f"Task {task.task_id} timed out after {task.budget.timeout_seconds}s"
+            ) from None
+        except asyncio.CancelledError:
+            await self._escalate_termination(proc, task.budget.grace_period_seconds)
+            raise WorkerCancellationError(
+                f"Task {task.task_id} was cancelled"
+            ) from None
+        except WorkerOversizedOutputError:
+            await self._escalate_termination(proc, task.budget.grace_period_seconds)
+            raise
+        finally:
+            self._active_processes.pop(task.task_id, None)
+
+        if len(stdout_data) > task.budget.max_output_bytes:
+            await self._escalate_termination(proc, task.budget.grace_period_seconds)
+            raise WorkerOversizedOutputError(
+                f"Task {task.task_id} produced {len(stdout_data)} bytes, "
+                f"exceeding {task.budget.max_output_bytes}"
+            )
+        return stdout_data, stderr_data, proc.returncode or 0
+
+    async def _exchange(
+        self,
+        proc: asyncio.subprocess.Process,
+        request_bytes: bytes,
+        budget: WorkerBudget,
+    ) -> tuple[bytes, bytes]:
+        """Write one request, then read bounded stdout/stderr concurrently."""
+        if proc.stdin is None or proc.stdout is None or proc.stderr is None:
+            raise WorkerProtocolError("worker pipes were not created")
+        stdin = proc.stdin
+
+        async def write_request() -> None:
+            stdin.write(request_bytes)
+            await stdin.drain()
+            stdin.close()
+            # Closing stdin is the graceful shutdown signal: the worker
+            # child exits on request EOF.
+            await stdin.wait_closed()
+
+        async def read_bounded(stream: asyncio.StreamReader, cap: int) -> bytes:
+            chunks: list[bytes] = []
+            total = 0
+            while True:
+                chunk = await asyncio.wait_for(
+                    stream.read(_READ_CHUNK_BYTES), timeout=budget.idle_timeout_seconds
+                )
+                if not chunk:
+                    break
+                total += len(chunk)
+                if total > cap:
+                    raise WorkerOversizedOutputError(
+                        f"Worker output exceeded {cap} bytes mid-read"
+                    )
+                chunks.append(chunk)
+            return b"".join(chunks)
+
+        await write_request()
+        stdout_data, stderr_data = await asyncio.gather(
+            read_bounded(proc.stdout, budget.max_output_bytes),
+            read_bounded(proc.stderr, MAX_STDERR_BYTES),
+        )
+        await proc.wait()
+        return stdout_data, stderr_data
+
+    async def _escalate_termination(
         self, proc: asyncio.subprocess.Process, grace_period: float
     ) -> None:
-        """Gracefully terminate a subprocess, falling back to kill if needed."""
-        try:
+        """Full cancellation escalation: stdin close, grace, terminate, kill."""
+        # Phase 1: close stdin so a well-formed child exits on request EOF.
+        if proc.stdin is not None and not proc.stdin.is_closing():
+            proc.stdin.close()
+        if await self._await_exit(proc, grace_period):
+            self._reap_transport(proc)
+            return
+        # Phase 2: request OS-level termination.
+        with contextlib.suppress(ProcessLookupError):
             proc.terminate()
+        if await self._await_exit(proc, grace_period):
+            self._reap_transport(proc)
+            return
+        # Phase 3: unconditional kill, then reap.
+        with contextlib.suppress(ProcessLookupError):
+            proc.kill()
+            await proc.wait()
+        self._reap_transport(proc)
+
+    async def _await_exit(
+        self, proc: asyncio.subprocess.Process, grace_period: float
+    ) -> bool:
+        """Wait bounded for exit; False when still live after the grace."""
+        try:
             await asyncio.wait_for(proc.wait(), timeout=grace_period)
+            return True
         except TimeoutError, ProcessLookupError:
-            try:
-                proc.kill()
-                await proc.wait()
-            except ProcessLookupError:
-                pass
+            return False
+
+    def _reap_transport(self, proc: asyncio.subprocess.Process) -> None:
+        """Close the subprocess transport so no pipe survives termination."""
+        transport = getattr(proc, "_transport", None)
+        if transport is not None:
+            transport.close()
 
     @override
     async def close(self) -> None:
-        """Terminate all active worker processes."""
+        """Terminate all active worker processes with full escalation."""
         self._closed = True
         active = list(self._active_processes.values())
         for proc in active:
-            await self._terminate_process(proc, grace_period=1.0)
+            await self._escalate_termination(proc, grace_period=1.0)
         self._active_processes.clear()
 
 
@@ -376,6 +479,7 @@ def _workers_feature(config: WorkersConfig) -> _WorkersFeature:
 __all__ = (
     "DEFAULT_WORKER_BUDGET",
     "HOST_WORKERS",
+    "MAX_STDERR_BYTES",
     "WorkerBudget",
     "WorkerCancellationError",
     "WorkerCrashError",
@@ -383,6 +487,7 @@ __all__ = (
     "WorkerOversizedOutputError",
     "WorkerProtocolError",
     "WorkerResult",
+    "WorkerStartupError",
     "WorkerTask",
     "WorkerTimeoutError",
     "Workers",

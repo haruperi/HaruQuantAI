@@ -6,6 +6,7 @@ import asyncio
 import sys
 from collections.abc import Callable, Sequence
 from pathlib import Path
+from typing import Any
 
 from app.host.artifacts import ArtifactsConfig, _artifacts_feature
 from app.host.catalog import HOST_CATALOG, CatalogRoot, _catalog_feature
@@ -115,6 +116,148 @@ def create_runtime(
     )
 
 
+def _reject_local(task_id: str, code: str, message: str) -> None:
+    """Write a worker error envelope to stdout."""
+    err_resp = {
+        "version": 1,
+        "task_id": task_id,
+        "success": False,
+        "result": None,
+        "error_code": code,
+        "error_message": message,
+    }
+    sys.stdout.buffer.write(to_canonical_json_bytes(err_resp))
+    sys.stdout.buffer.flush()
+
+
+def _parse_worker_execution_payload(
+    payload: Any,
+) -> tuple[Any, dict[str, Any], Any, Any] | dict[str, Any]:
+    """Parse graph/inputs/seed/catalog fingerprint from the worker payload.
+
+    Returns (graph_doc, inputs, seed, catalog_fp) or an error envelope
+    dict with "code"/"message" when the graph document is malformed.
+    """
+    graph_data = payload.get("graph") or payload.get("graph_document")
+    if not isinstance(graph_data, dict):
+        return {
+            "code": "INVALID_GRAPH_DOCUMENT",
+            "message": "Missing or malformed graph_document in payload",
+        }
+    graph_doc = graph_document_from_wire(graph_data)
+    inputs = {
+        k: parse_strict_json(v) if isinstance(v, str) else v
+        for k, v in payload.get("inputs", {}).items()
+    }
+    return graph_doc, inputs, payload.get("seed"), payload.get("catalog_fingerprint")
+
+
+def _budget_from_wire(budget_raw: Any) -> ExecutionBudget:
+    """Decode the execution budget from the worker payload."""
+    return ExecutionBudget(
+        max_nodes=int(budget_raw.get("max_nodes", 1_000)),
+        max_samples=int(budget_raw.get("max_samples", 1_000_000)),
+        max_output_values=int(budget_raw.get("max_output_values", 10_000_000)),
+        max_trials=int(budget_raw.get("max_trials", 100)),
+        max_elapsed_seconds=float(budget_raw.get("max_elapsed_seconds", 60.0)),
+    )
+
+
+def _execution_response(task_id: str, result: Any) -> dict[str, Any]:
+    """Build the worker envelope for a completed execution result."""
+    return {
+        "version": 1,
+        "task_id": task_id,
+        "success": result.success,
+        "result": {
+            "success": result.success,
+            "outputs": value_to_wire(result.outputs),
+            "reproducibility": (
+                {
+                    "graph_id": result.reproducibility.graph_id,
+                    "graph_fingerprint": result.reproducibility.graph_fingerprint,
+                    "catalog_fingerprint": result.reproducibility.catalog_fingerprint,
+                    "dependency_fingerprint": (
+                        result.reproducibility.dependency_fingerprint
+                    ),
+                    "plugin_versions": list(result.reproducibility.plugin_versions),
+                    "source_digests": list(result.reproducibility.source_digests),
+                    "normalized_parameters": value_to_wire(
+                        result.reproducibility.normalized_parameters
+                    ),
+                    "input_hash": result.reproducibility.input_hash,
+                    "seed": result.reproducibility.seed,
+                    "output_hash": result.reproducibility.output_hash,
+                    "elapsed_seconds": result.reproducibility.elapsed_seconds,
+                    "status": result.reproducibility.status,
+                }
+                if result.reproducibility
+                else None
+            ),
+            "issues": [
+                {"code": i.code, "message": i.message, "path": i.path}
+                for i in result.issues
+            ],
+            "elapsed_seconds": result.elapsed_seconds,
+        },
+        "error_code": None,
+        "error_message": None,
+    }
+
+
+def _verify_worker_identity(
+    catalog_svc: Any,
+    payload: Any,
+    catalog_fp: Any,
+) -> tuple[str, str] | None:
+    """Verify pinned catalog/entry/dependency fingerprints, or reject.
+
+    Returns an (error_code, message) tuple when verification fails, None
+    when the pinned identity matches. Never silently substitutes code.
+    """
+    if catalog_fp and catalog_svc.snapshot().whole_fingerprint != catalog_fp:
+        return (
+            "CATALOG_FINGERPRINT_MISMATCH",
+            "Catalog fingerprint changed across worker boundary",
+        )
+
+    entry_fps = payload.get("entry_fingerprints") or {}
+    dep_fp = payload.get("dependency_fingerprint")
+    if not entry_fps and not dep_fp:
+        return None
+
+    from hashlib import sha256
+
+    from app.plugins.spec import PluginRef
+
+    computed: list[str] = []
+    for key, expected in entry_fps.items():
+        ref_str, _, op_id = str(key).rpartition("#")
+        try:
+            ref = PluginRef.parse(ref_str)
+            admitted = catalog_svc.admit(ref, op_id)
+        except Exception as admit_err:  # noqa: BLE001 - worker boundary
+            return (
+                "DEPENDENCY_MISSING",
+                f"Required dependency {key!r} is not admitted: {admit_err}",
+            )
+        if admitted.entry_fingerprint != expected:
+            return (
+                "ENTRY_FINGERPRINT_MISMATCH",
+                f"Entry fingerprint for {key!r} changed across worker boundary",
+            )
+        computed.append(admitted.entry_fingerprint)
+
+    if dep_fp and computed:
+        actual = sha256(":".join(sorted(computed)).encode("utf-8")).hexdigest()
+        if actual != dep_fp:
+            return (
+                "DEPENDENCY_FINGERPRINT_MISMATCH",
+                "Dependency fingerprint changed across worker boundary",
+            )
+    return None
+
+
 def worker_main(argv: Sequence[str] | None = None) -> int:
     """Entry point for worker subprocess mode."""
     _ = argv
@@ -147,37 +290,12 @@ def worker_main(argv: Sequence[str] | None = None) -> int:
                 sys.stdout.buffer.flush()
                 return
 
-            graph_data = payload.get("graph") or payload.get("graph_document")
-            inputs_data = payload.get("inputs", {})
-            seed = payload.get("seed")
-            budget_raw = payload.get("budget", {})
-            catalog_fp = payload.get("catalog_fingerprint")
-
-            if not isinstance(graph_data, dict):
-                err_resp = {
-                    "version": 1,
-                    "task_id": task_id,
-                    "success": False,
-                    "result": None,
-                    "error_code": "INVALID_GRAPH_DOCUMENT",
-                    "error_message": "Missing or malformed graph_document in payload",
-                }
-                sys.stdout.buffer.write(to_canonical_json_bytes(err_resp))
-                sys.stdout.buffer.flush()
+            parsed = _parse_worker_execution_payload(payload)
+            if isinstance(parsed, dict):
+                _reject_local(task_id, parsed["code"], parsed["message"])
                 return
-
-            graph_doc = graph_document_from_wire(graph_data)
-            inputs = {
-                k: parse_strict_json(v) if isinstance(v, str) else v
-                for k, v in inputs_data.items()
-            }
-            budget = ExecutionBudget(
-                max_nodes=int(budget_raw.get("max_nodes", 1_000)),
-                max_samples=int(budget_raw.get("max_samples", 1_000_000)),
-                max_output_values=int(budget_raw.get("max_output_values", 10_000_000)),
-                max_trials=int(budget_raw.get("max_trials", 100)),
-                max_elapsed_seconds=float(budget_raw.get("max_elapsed_seconds", 60.0)),
-            )
+            graph_doc, inputs, seed, catalog_fp = parsed
+            budget = _budget_from_wire(payload.get("budget", {}))
 
             async with create_runtime(
                 catalog_roots=approved_catalog_roots(),
@@ -185,23 +303,35 @@ def worker_main(argv: Sequence[str] | None = None) -> int:
                 catalog_svc = runtime.require(HOST_CATALOG)
                 execution_svc = runtime.require(HOST_EXECUTION)
 
-                # Verify catalog fingerprint if provided
-                if (
-                    catalog_fp
-                    and catalog_svc.snapshot().whole_fingerprint != catalog_fp
-                ):
+                def _reject(code: str, message: str) -> None:
                     err_resp = {
                         "version": 1,
                         "task_id": task_id,
                         "success": False,
                         "result": None,
-                        "error_code": "CATALOG_FINGERPRINT_MISMATCH",
-                        "error_message": (
-                            "Catalog fingerprint changed across worker boundary"
-                        ),
+                        "error_code": code,
+                        "error_message": message,
                     }
                     sys.stdout.buffer.write(to_canonical_json_bytes(err_resp))
                     sys.stdout.buffer.flush()
+
+                # Verify catalog fingerprint if provided
+                if (
+                    catalog_fp
+                    and catalog_svc.snapshot().whole_fingerprint != catalog_fp
+                ):
+                    _reject(
+                        "CATALOG_FINGERPRINT_MISMATCH",
+                        "Catalog fingerprint changed across worker boundary",
+                    )
+                    return
+
+                identity_error = _verify_worker_identity(
+                    catalog_svc, payload, catalog_fp
+                )
+                if identity_error is not None:
+                    code, message = identity_error
+                    _reject(code, message)
                     return
 
                 result = execution_svc.execute(
@@ -213,55 +343,9 @@ def worker_main(argv: Sequence[str] | None = None) -> int:
                     )
                 )
 
-                result_dict = {
-                    "success": result.success,
-                    "outputs": value_to_wire(result.outputs),
-                    "reproducibility": (
-                        {
-                            "graph_id": result.reproducibility.graph_id,
-                            "graph_fingerprint": (
-                                result.reproducibility.graph_fingerprint
-                            ),
-                            "catalog_fingerprint": (
-                                result.reproducibility.catalog_fingerprint
-                            ),
-                            "dependency_fingerprint": (
-                                result.reproducibility.dependency_fingerprint
-                            ),
-                            "plugin_versions": list(
-                                result.reproducibility.plugin_versions
-                            ),
-                            "source_digests": list(
-                                result.reproducibility.source_digests
-                            ),
-                            "normalized_parameters": value_to_wire(
-                                result.reproducibility.normalized_parameters
-                            ),
-                            "input_hash": result.reproducibility.input_hash,
-                            "seed": result.reproducibility.seed,
-                            "output_hash": result.reproducibility.output_hash,
-                            "elapsed_seconds": result.reproducibility.elapsed_seconds,
-                            "status": result.reproducibility.status,
-                        }
-                        if result.reproducibility
-                        else None
-                    ),
-                    "issues": [
-                        {"code": i.code, "message": i.message, "path": i.path}
-                        for i in result.issues
-                    ],
-                    "elapsed_seconds": result.elapsed_seconds,
-                }
-
-                resp = {
-                    "version": 1,
-                    "task_id": task_id,
-                    "success": result.success,
-                    "result": result_dict,
-                    "error_code": None,
-                    "error_message": None,
-                }
-                sys.stdout.buffer.write(to_canonical_json_bytes(resp))
+                sys.stdout.buffer.write(
+                    to_canonical_json_bytes(_execution_response(task_id, result))
+                )
                 sys.stdout.buffer.flush()
 
         except Exception as err:  # noqa: BLE001 - worker process boundary
