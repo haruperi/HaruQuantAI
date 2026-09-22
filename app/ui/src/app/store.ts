@@ -8,7 +8,7 @@ import { customProjects, workflowTasks } from '../workspace/CustomProjects/fixtu
 import { portfolioMembers } from '../workspace/PortfolioComposer/fixtures';
 import { databanks, strategies } from '../plugins/databank/fixtures';
 import { createInitialAppSettings, mergeAppSettings } from './globalSettings';
-import type { BatchExecutionResult, SingleExecutionResult } from '../api/contracts.generated';
+import type { BatchExecutionResult, SingleExecutionResult } from './transport';
 
 interface AppState {
   module: ModuleId; tab: ProjectTab; selectedStrategyId: string; resultView: string; selectedBankId: string; selectedRows: string[];

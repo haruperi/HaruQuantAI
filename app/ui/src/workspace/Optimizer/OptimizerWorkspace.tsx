@@ -6,7 +6,7 @@ import { ResultsWorkspace } from '../Results/ResultsWorkspace';
 import { WalkForwardMatrixView } from './WalkForwardMatrixView';
 import type { OptimizationParamRow } from '../../app/types';
 
-import { defaultApiClient } from '../../api/client';
+import { runOptimizationTrials } from './optimizerClient';
 
 function NumberField({
   label,
@@ -53,35 +53,7 @@ function ProgressView() {
       startedAt: new Date().toISOString(),
     });
     try {
-      const rsiNode = {
-        id: 'rsi_node',
-        plugin_ref: 'indicator.rsi@1.0.0',
-        operation_id: 'compute',
-        parameters: { period: 14 },
-      };
-      const doc = {
-        schema_version: 1,
-        spec: {
-          nodes: [rsiNode],
-          edges: [],
-          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
-        },
-      };
-      const trials = [
-        {
-          trial_id: 'trial_14',
-          parameter_overrides: { rsi_node: { period: 14 } },
-        },
-        {
-          trial_id: 'trial_21',
-          parameter_overrides: { rsi_node: { period: 21 } },
-        },
-      ];
-      const res = await defaultApiClient.batchExecution({
-        graph_document: doc,
-        trials,
-        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
-      });
+      const res = await runOptimizationTrials();
       if (res.success) {
         store.setLastBatchResult(res);
         store.patchJob('optimizer', {

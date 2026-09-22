@@ -7,7 +7,7 @@ import { BuildingBlocksModal } from './BuildingBlocksModal';
 import { ATMConfigModal } from './ATMConfigModal';
 import { RankingSettingsView } from './RankingSettingsView';
 import { BUILDING_BLOCKS_CATALOG } from './BuildingBlocksCatalog';
-import { defaultApiClient } from '../../api/client';
+import { evaluateStrategyGraph, runBatchTrials } from './builderClient';
 
 function ProgressView() {
   const store = useAppStore();
@@ -25,24 +25,7 @@ function ProgressView() {
       startedAt: new Date().toISOString(),
     });
     try {
-      const rsiNode = {
-        id: 'rsi_node',
-        plugin_ref: 'indicator.rsi@1.0.0',
-        operation_id: 'compute',
-        parameters: { period: 14 },
-      };
-      const doc = {
-        schema_version: 1,
-        spec: {
-          nodes: [rsiNode],
-          edges: [],
-          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
-        },
-      };
-      const res = await defaultApiClient.evaluateExecution({
-        graph_document: doc,
-        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
-      });
+      const res = await evaluateStrategyGraph();
       if (res.success) {
         store.setLastExecutionResult(res);
         store.patchJob('builder', {
@@ -81,28 +64,7 @@ function ProgressView() {
       startedAt: new Date().toISOString(),
     });
     try {
-      const rsiNode = {
-        id: 'rsi_node',
-        plugin_ref: 'indicator.rsi@1.0.0',
-        operation_id: 'compute',
-        parameters: { period: 14 },
-      };
-      const doc = {
-        schema_version: 1,
-        spec: {
-          nodes: [rsiNode],
-          edges: [],
-          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
-        },
-      };
-      const batchRes = await defaultApiClient.batchExecution({
-        graph_document: doc,
-        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
-        trials: [
-          { trial_id: 'fast_period', parameter_overrides: { rsi_node: { period: 7 } } },
-          { trial_id: 'slow_period', parameter_overrides: { rsi_node: { period: 21 } } },
-        ],
-      });
+      const batchRes = await runBatchTrials();
       if (batchRes.success) {
         store.setLastBatchResult(batchRes);
         store.patchJob('builder', {

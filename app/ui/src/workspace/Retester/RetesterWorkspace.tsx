@@ -4,7 +4,7 @@ import { useAppStore } from '../../app/store';
 import { Button, Checkbox, Field, ProgressBar, Section, Select, Stat, TextInput } from '../../components/ui';
 import { ResultsWorkspace } from '../Results/ResultsWorkspace';
 
-import { defaultApiClient } from '../../api/client';
+import { evaluateStrategyGraph, runBatchTrials } from './retesterClient';
 
 const AVAILABLE_MARKETS = ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'USDCHF', 'XAUUSD', 'NQ', 'BTCUSD'];
 const AVAILABLE_TIMEFRAMES = ['M5', 'M15', 'M30', 'H1', 'H4', 'D1'];
@@ -54,24 +54,7 @@ function ProgressView() {
       startedAt: new Date().toISOString(),
     });
     try {
-      const rsiNode = {
-        id: 'rsi_node',
-        plugin_ref: 'indicator.rsi@1.0.0',
-        operation_id: 'compute',
-        parameters: { period: 14 },
-      };
-      const doc = {
-        schema_version: 1,
-        spec: {
-          nodes: [rsiNode],
-          edges: [],
-          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
-        },
-      };
-      const res = await defaultApiClient.evaluateExecution({
-        graph_document: doc,
-        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
-      });
+      const res = await evaluateStrategyGraph();
       if (res.success) {
         store.setLastExecutionResult(res);
         store.patchJob('retester', {
@@ -110,28 +93,7 @@ function ProgressView() {
       startedAt: new Date().toISOString(),
     });
     try {
-      const rsiNode = {
-        id: 'rsi_node',
-        plugin_ref: 'indicator.rsi@1.0.0',
-        operation_id: 'compute',
-        parameters: { period: 14 },
-      };
-      const doc = {
-        schema_version: 1,
-        spec: {
-          nodes: [rsiNode],
-          edges: [],
-          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
-        },
-      };
-      const batchRes = await defaultApiClient.batchExecution({
-        graph_document: doc,
-        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
-        trials: [
-          { trial_id: 'retest_period_10', parameter_overrides: { rsi_node: { period: 10 } } },
-          { trial_id: 'retest_period_20', parameter_overrides: { rsi_node: { period: 20 } } },
-        ],
-      });
+      const batchRes = await runBatchTrials();
       if (batchRes.success) {
         store.setLastBatchResult(batchRes);
         store.patchJob('retester', {
