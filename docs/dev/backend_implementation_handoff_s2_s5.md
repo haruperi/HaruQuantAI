@@ -30,10 +30,10 @@ Read these files before planning any stage:
 2. [`PROJECT.md`](../PROJECT.md) — product scope, stage order, and current status.
 3. [`ARCHITECTURE.md`](../ARCHITECTURE.md) — normative paths, import matrix,
    lifecycle, metamodel, discovery, graph, wire, and reproducibility rules.
-4. [`feature_implementation_pipeline.md`](feature_implementation_pipeline.md) —
-   plugin construction and evidence standard.
-5. [`domain_implementation_audit.md`](domain_implementation_audit.md) — required
-   plugin audit procedure.
+4. [`workspace_plugin_implementation_pipeline.md`](workspace_plugin_implementation_pipeline.md) —
+   workspace and plugin construction and evidence standard.
+5. [`workspace_plugin_implementation_audit.md`](workspace_plugin_implementation_audit.md) —
+   required workspace and plugin audit procedure.
 
 At the baseline commit, only these backend foundations exist:
 

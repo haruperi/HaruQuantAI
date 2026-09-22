@@ -61,6 +61,6 @@ npm --prefix app/ui run build
 ## Contributor workflow
 
 All changes follow the repository plan/approval/execution/walkthrough/commit
-gates in [AGENTS.md](AGENTS.md). Plugin implementation must follow the canonical
-[implementation pipeline](docs/dev/feature_implementation_pipeline.md) after the
+gates in [AGENTS.md](AGENTS.md). Workspace and plugin implementation must follow the
+canonical [implementation pipeline](docs/dev/workspace_plugin_implementation_pipeline.md) after the
 replacement backend architecture is ratified.

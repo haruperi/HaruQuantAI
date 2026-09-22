@@ -7,8 +7,9 @@
   `.agents/logs/<timestamp>_<task>/`.
 - **Scoped authority.** `AGENTS.md` owns workflow and verification;
   `docs/PROJECT.md` owns product scope; `docs/ARCHITECTURE.md` owns structural
-  constraints; `docs/dev/feature_implementation_pipeline.md` and
-  `docs/dev/domain_implementation_audit.md` own plugin build and audit standards.
+  constraints; `docs/dev/workspace_plugin_implementation_pipeline.md` and
+  `docs/dev/workspace_plugin_implementation_audit.md` own workspace and plugin
+  build and audit standards.
 - **Five Spatial Composability laws.** All future backend work must preserve:
   locality of behavior, orthogonality, explicit typed capability slots,
   hierarchical/algebraic composition, and schema-driven self-description.
@@ -58,11 +59,12 @@ Approval applies only to the plan version presented. New destructive targets,
 public contracts, dependencies, or architectural decisions require a recorded
 iteration and renewed approval when they materially expand scope.
 
-## 3. Plugin implementation standard
+## 3. Workspace and plugin implementation standard
 
-Once the replacement architecture is ratified, plugin work must follow
-`docs/dev/feature_implementation_pipeline.md` and its companion audit. At
-minimum, each plugin must provide:
+Once the replacement architecture is ratified, workspace and plugin work must
+follow `docs/dev/workspace_plugin_implementation_pipeline.md` and its companion
+audit. Use the independent workspace track (W) or concrete non-workspace plugin
+track (P), with their shared controls. At minimum, each plugin must provide:
 
 - a stable namespaced ID and explicit compatibility version;
 - immutable, typed inputs/outputs and capability requirements;

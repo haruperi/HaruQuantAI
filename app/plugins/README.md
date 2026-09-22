@@ -67,10 +67,10 @@ public host contracts — never the kernel runtime/context, host
 implementations, live catalog objects, UI code, or sibling plugins
 (enforced by ARCH-013 and ARCH-014).
 
-Plugin construction and auditing follow
-[`docs/dev/feature_implementation_pipeline.md`](../../docs/dev/feature_implementation_pipeline.md)
+Workspace and plugin construction and auditing follow
+[`docs/dev/workspace_plugin_implementation_pipeline.md`](../../docs/dev/workspace_plugin_implementation_pipeline.md)
 and
-[`docs/dev/domain_implementation_audit.md`](../../docs/dev/domain_implementation_audit.md).
+[`docs/dev/workspace_plugin_implementation_audit.md`](../../docs/dev/workspace_plugin_implementation_audit.md).
 
 ## Verification
 

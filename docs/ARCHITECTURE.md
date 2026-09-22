@@ -388,8 +388,8 @@ purity, initializer purity, superseded-root exclusions, and composition-only
 access to private host construction symbols. Each later approved source stage
 must deliberately extend this enforcement with its new owners and import rules.
 
-Follow the [plugin implementation pipeline](dev/feature_implementation_pipeline.md)
-and [companion audit](dev/domain_implementation_audit.md). Focused tests and offline
+Follow the [workspace and plugin implementation pipeline](dev/workspace_plugin_implementation_pipeline.md)
+and [companion audit](dev/workspace_plugin_implementation_audit.md). Focused tests and offline
 usage examples belong to each source plan; candidate qualification remains
 `uv run python scripts/ci_check.py` plus applicable UI checks.
 
