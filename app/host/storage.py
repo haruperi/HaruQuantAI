@@ -1,4 +1,29 @@
-"""Host storage owner: SQLite versioned records, migrations, and CAS."""
+"""Host storage owner: SQLite versioned records, migrations, and CAS.
+
+This file is the single owner of the ``host.storage@1`` capability:
+generic ``(namespace, key)`` records carrying a revision, schema
+version, payload bytes, and UTC stamps, with compare-and-swap updates,
+all-or-nothing transactions, deterministic bounded pagination, and
+forward-only migrations on SQLite. Per the one-file-owner rule, all
+SQLite details for this capability live here and nowhere else.
+
+It does not own artifact content layout (``host.artifacts``), job
+lifecycle semantics (``host.jobs``), plugin schemas, or UI state; it
+stores opaque payload bytes only.
+
+Persistence safety:
+- Tests use isolated temporary stores only; no hard-coded or shared
+  production path is ever touched.
+- Callers see typed records and results, never SQL statements,
+  connections, cursors, or filesystem paths beyond the configured
+  database path.
+- ARCH-017: this is the only module permitted to import ``sqlite3``.
+- ARCH-019: this module and ``app/host/artifacts.py`` are the only
+  filesystem mutators in the host; here mutation is limited to
+  creating the database file's parent directory.
+- Every operation serializes onto one owned single-writer thread, and
+  ``close()`` drains that writer before returning.
+"""
 
 from __future__ import annotations
 
@@ -19,24 +44,55 @@ from app.kernel.feature import FeatureSpec
 
 
 class StorageError(RuntimeError):
-    """Base error for storage failures."""
+    """Base error for storage failures.
+
+    Wraps engine-level failures such as being unable to open or
+    migrate a database. Compare-and-swap mismatches are reported
+    through ``StorageTransactionResult.conflicts`` instead of this
+    hierarchy.
+    """
 
 
 class StorageConflictError(StorageError):
-    """Raised when an optimistic concurrency check fails."""
+    """CAS expectation was not satisfied by the stored revision.
+
+    Part of the public error hierarchy for callers that prefer raising;
+    the engine itself surfaces CAS failures on the transaction result
+    so a whole batch can fail atomically without an exception.
+    """
 
 
 class StorageClosedError(StorageError):
-    """Raised when an operation is attempted on a closed store."""
+    """Operation attempted on a closed store.
+
+    Raised synchronously before submission once ``close()`` has run,
+    including from the async facade methods.
+    """
 
 
 class StorageMigrationError(StorageError):
-    """Raised when a schema migration fails."""
+    """Schema migration failed or the database is too new to open.
+
+    Raised when a migration statement fails (that migration rolls
+    back) or when stored schema versions are newer than the newest
+    version this code supports; both cases fail closed.
+    """
 
 
 @dataclass(frozen=True, slots=True)
 class StorageRecord:
-    """Immutable versioned storage record."""
+    """Immutable versioned storage record.
+
+    Attributes:
+        namespace: Non-empty namespace owning this key space.
+        key: Non-empty key, unique within its namespace.
+        revision: Monotonic revision starting at 1 on insert and
+            incremented on every update.
+        schema_version: Caller-declared payload schema version (>= 1).
+        payload_bytes: Opaque application payload.
+        created_at_utc: ISO-8601 UTC stamp of the first write.
+        updated_at_utc: ISO-8601 UTC stamp of the latest write.
+    """
 
     namespace: str
     key: str
@@ -62,7 +118,17 @@ class StorageRecord:
 
 @dataclass(frozen=True, slots=True)
 class StorageMutation:
-    """Requested record upsert with optional compare-and-swap revision."""
+    """Requested record upsert with optional compare-and-swap revision.
+
+    Attributes:
+        namespace: Target namespace (non-empty string).
+        key: Target key (non-empty string).
+        schema_version: Payload schema version to write (>= 1).
+        payload_bytes: Opaque payload to store.
+        expected_revision: Optional CAS guard. ``None`` applies
+            unconditionally; a positive value must match the stored
+            revision; ``0`` requires the record to be absent.
+    """
 
     namespace: str
     key: str
@@ -86,7 +152,15 @@ class StorageMutation:
 
 @dataclass(frozen=True, slots=True)
 class StorageDelete:
-    """Requested record deletion with optional compare-and-swap revision."""
+    """Requested record deletion with optional compare-and-swap revision.
+
+    Attributes:
+        namespace: Target namespace (non-empty string).
+        key: Target key (non-empty string).
+        expected_revision: Optional CAS guard that must equal the
+            stored revision (>= 1). ``None`` deletes unconditionally
+            but conflicts when the record is already absent.
+    """
 
     namespace: str
     key: str
@@ -104,7 +178,16 @@ class StorageDelete:
 
 @dataclass(frozen=True, slots=True)
 class StorageConflict:
-    """Record conflict information on CAS failure."""
+    """Record conflict information on CAS failure.
+
+    Attributes:
+        namespace: Namespace of the conflicting record.
+        key: Key of the conflicting record.
+        expected_revision: Revision the caller required, where ``0``
+            means "expected absent" and ``None`` means unconditional.
+        actual_revision: Revision actually stored, or ``None`` when no
+            record exists.
+    """
 
     namespace: str
     key: str
@@ -114,7 +197,15 @@ class StorageConflict:
 
 @dataclass(frozen=True, slots=True)
 class StorageTransactionResult:
-    """Result of an all-or-nothing storage transaction."""
+    """Result of an all-or-nothing storage transaction.
+
+    Attributes:
+        committed: Whether every mutation was applied atomically.
+        records: Resulting records for applied upserts, in order;
+            deletes emit no records. Empty when not committed.
+        conflicts: CAS mismatches that rolled the transaction back;
+            empty when committed.
+    """
 
     committed: bool
     records: tuple[StorageRecord, ...] = ()
@@ -123,7 +214,16 @@ class StorageTransactionResult:
 
 @dataclass(frozen=True, slots=True)
 class StoragePage:
-    """Deterministic page of scanned records."""
+    """Deterministic page of scanned records.
+
+    Attributes:
+        records: Records in ascending key order, at most the bounded
+            page size.
+        next_token: Key to pass as ``after_key`` for the next page, or
+            ``None`` when the scan is exhausted.
+        total_count: Total records in the namespace (honoring the
+            prefix filter), independent of pagination.
+    """
 
     records: tuple[StorageRecord, ...]
     next_token: str | None = None
@@ -132,7 +232,16 @@ class StoragePage:
 
 @dataclass(frozen=True, slots=True)
 class StorageConfig:
-    """Configuration for SQLite storage provider."""
+    """Configuration for SQLite storage provider.
+
+    Attributes:
+        database_path: Database file path, or the string
+            ``":memory:"`` for an in-memory database (no WAL journal).
+        busy_timeout_ms: SQLite busy timeout in milliseconds, applied
+            both at connect time and as the ``busy_timeout`` pragma.
+        max_page_size: Upper bound clamping every requested scan page
+            size.
+    """
 
     database_path: Path | str
     busy_timeout_ms: int = 5000
@@ -147,16 +256,55 @@ class StorageConfig:
 
 
 class Storage(Protocol):
-    """Public capability protocol for durable record persistence."""
+    """Public capability protocol for durable record persistence.
+
+    Contract: generic ``(namespace, key)`` records with revision,
+    schema version, payload bytes, and UTC stamps; compare-and-swap
+    via ``expected_revision`` (``0`` expects absence); all-or-nothing
+    transactions returning immutable results; deterministic
+    key-ordered bounded pagination; and fail-closed behavior on
+    corrupt databases and unsupported newer schema versions.
+
+    Concurrency: implementations own exactly one single-writer thread.
+    Both the synchronous methods and the async facade serialize onto
+    it (executing inline only when already on that thread), and
+    ``close()`` drains the writer before returning.
+    """
 
     def get_record(self, namespace: str, key: str) -> StorageRecord | None:
-        """Retrieve a record by namespace and key, or None if absent."""
+        """Retrieve a record by namespace and key, or None if absent.
+
+        Runs on the owned writer thread.
+
+        Args:
+            namespace: Namespace to read from.
+            key: Exact key to read.
+
+        Returns:
+            The stored record, or ``None`` when no such record exists.
+
+        Raises:
+            StorageClosedError: If the store is closed.
+        """
         ...
 
     def commit_transaction(
         self, mutations: Sequence[StorageMutation | StorageDelete]
     ) -> StorageTransactionResult:
-        """Commit an all-or-nothing batch of mutations with CAS validation."""
+        """Commit an all-or-nothing batch of mutations with CAS checks.
+
+        Runs on the owned writer thread; either every mutation applies
+        in one transaction or none do.
+
+        Args:
+            mutations: Upserts and deletes to apply in order.
+
+        Returns:
+            The immutable transaction outcome; ``committed`` is false
+            exactly when CAS conflicts were found, in which case the
+            batch is rolled back and the conflicts are reported on the
+            result.
+        """
         ...
 
     def scan_records(
@@ -167,17 +315,67 @@ class Storage(Protocol):
         limit: int = 50,
         after_key: str | None = None,
     ) -> StoragePage:
-        """Deterministically scan records in a namespace ordered by key ASC."""
+        """Deterministically scan records in a namespace by key ASC.
+
+        Runs on the owned writer thread.
+
+        Args:
+            namespace: Namespace to scan.
+            prefix: Optional key prefix filter.
+            limit: Requested page size, clamped to at least 1 and at
+                most ``StorageConfig.max_page_size``.
+            after_key: Exclusive lower key bound for pagination; pass
+                the previous page's ``next_token``.
+
+        Returns:
+            One page of records in ascending key order, with the total
+            count for the namespace and prefix.
+
+        Raises:
+            StorageClosedError: If the store is closed.
+        """
         ...
 
     async def async_get_record(self, namespace: str, key: str) -> StorageRecord | None:
-        """Retrieve a record on the owned writer thread (event-loop safe)."""
+        """Retrieve a record on the owned writer thread (event-loop safe).
+
+        The read is submitted to the single owned writer thread so the
+        event loop never blocks on SQLite; it executes inline only
+        when already on that thread.
+
+        Args:
+            namespace: Namespace to read from.
+            key: Exact key to read.
+
+        Returns:
+            The stored record, or ``None`` when no such record exists.
+
+        Raises:
+            StorageClosedError: If the store is closed before
+                submission.
+        """
         ...
 
     async def async_commit_transaction(
         self, mutations: Sequence[StorageMutation | StorageDelete]
     ) -> StorageTransactionResult:
-        """Commit mutations on the owned writer thread (event-loop safe)."""
+        """Commit mutations on the owned writer thread (event-loop safe).
+
+        Semantics match ``commit_transaction``; the work is submitted
+        to the owned writer thread so the event loop never blocks on
+        SQLite.
+
+        Args:
+            mutations: Upserts and deletes to apply in order.
+
+        Returns:
+            The immutable transaction outcome; conflicts roll the
+            whole batch back without raising.
+
+        Raises:
+            StorageClosedError: If the store is closed before
+                submission.
+        """
         ...
 
     async def async_scan_records(
@@ -188,21 +386,60 @@ class Storage(Protocol):
         limit: int = 50,
         after_key: str | None = None,
     ) -> StoragePage:
-        """Deterministically scan records off the event loop."""
+        """Deterministically scan records off the event loop.
+
+        Semantics match ``scan_records``; the scan runs on the owned
+        writer thread.
+
+        Args:
+            namespace: Namespace to scan.
+            prefix: Optional key prefix filter.
+            limit: Requested page size, clamped to configuration
+                bounds.
+            after_key: Exclusive lower key bound for pagination.
+
+        Returns:
+            One page of records in ascending key order with the total
+            count for the namespace and prefix.
+
+        Raises:
+            StorageClosedError: If the store is closed before
+                submission.
+        """
         ...
 
     def status(self) -> StorageStatus:
-        """Return migration and readiness status."""
+        """Return migration and readiness status.
+
+        Runs on the owned writer thread.
+
+        Returns:
+            The applied migration versions and readiness flag; a
+            closed store reports version 0, no migrations, and
+            ``ready=False``.
+        """
         ...
 
     def close(self) -> None:
-        """Flush and safely close the storage engine."""
+        """Flush and safely close the storage engine.
+
+        Marks the store closed so subsequent operations (sync or
+        async) raise ``StorageClosedError`` before submission, then
+        drains the owned writer thread.
+        """
         ...
 
 
 @dataclass(frozen=True, slots=True)
 class StorageStatus:
-    """Immutable migration/readiness status of the storage engine."""
+    """Immutable migration/readiness status of the storage engine.
+
+    Attributes:
+        schema_version: Highest applied migration version, or 0 when
+            none are applied or the engine is closed.
+        applied_migrations: Applied migration versions, ascending.
+        ready: Whether the engine is open and serving operations.
+    """
 
     schema_version: int
     applied_migrations: tuple[int, ...]
@@ -225,10 +462,30 @@ def _utc_now_iso() -> str:
 
 
 class _SqliteStorage(Storage):
-    """Private SQLite implementation of Storage protocol."""
+    """Private SQLite implementation of Storage protocol.
+
+    Concurrency model: one dedicated executor thread owns the
+    connection, and every operation (sync or async) serializes onto it
+    under an RLock. File databases open with WAL journaling,
+    ``foreign_keys = ON``, a ``busy_timeout`` pragma, and explicit
+    ``BEGIN IMMEDIATE`` transactions. Corrupt databases and
+    newer-than-supported schema versions fail closed at open.
+    """
 
     def __init__(self, config: StorageConfig) -> None:
-        """Initialize and migrate the SQLite database."""
+        """Initialize and migrate the SQLite database.
+
+        Creates the parent directory for file-backed databases, starts
+        the single-writer executor, configures pragmas, and applies
+        migrations. In-memory databases skip WAL journaling.
+
+        Args:
+            config: Path, timeout, and page-size configuration.
+
+        Raises:
+            StorageError: If opening or migrating fails; the writer
+                thread is shut down before raising.
+        """
         self._config = config
         db_path = Path(config.database_path)
         if db_path != Path(":memory:"):
@@ -264,7 +521,14 @@ class _SqliteStorage(Storage):
             ) from err
 
     def _migrate(self) -> None:
-        """Apply idempotent forward-only migrations."""
+        """Apply idempotent forward-only migrations.
+
+        Each unapplied migration runs inside ``BEGIN IMMEDIATE`` and
+        appends its version to the ``schema_migrations`` history table
+        on success; a failed statement rolls that migration back. A
+        database recording versions newer than the newest supported
+        version fails closed instead of opening.
+        """
         with self._lock:
             self._conn.execute(
                 """
@@ -335,7 +599,18 @@ class _SqliteStorage(Storage):
 
     @override
     def get_record(self, namespace: str, key: str) -> StorageRecord | None:
-        """Retrieve a record by namespace and key on the writer thread."""
+        """Retrieve a record by namespace and key on the writer thread.
+
+        Args:
+            namespace: Namespace to read from.
+            key: Exact key to read.
+
+        Returns:
+            The stored record, or ``None`` when absent.
+
+        Raises:
+            StorageClosedError: If the store is closed.
+        """
         return self._on_writer(lambda: self._get_record_impl(namespace, key))
 
     def _get_record_impl(self, namespace: str, key: str) -> StorageRecord | None:
@@ -368,7 +643,11 @@ class _SqliteStorage(Storage):
     def _check_conflict(
         self, op: StorageMutation | StorageDelete
     ) -> StorageConflict | None:
-        """Check optimistic concurrency expectations for a single operation."""
+        """Check optimistic concurrency expectations for one operation.
+
+        ``expected_revision`` 0 expects absence; a delete with no
+        expectation conflicts when the record is already gone.
+        """
         cursor = self._conn.execute(
             "SELECT revision FROM records WHERE namespace = ? AND key = ?;",
             (op.namespace, op.key),
@@ -403,7 +682,12 @@ class _SqliteStorage(Storage):
         return None
 
     def _apply_mutation(self, op: StorageMutation, now_iso: str) -> StorageRecord:
-        """Apply an individual record insertion or update."""
+        """Apply an individual record insertion or update.
+
+        Inserts at revision 1 with a fresh creation stamp; updates
+        increment the stored revision and preserve the original
+        creation stamp.
+        """
         cursor = self._conn.execute(
             "SELECT revision, created_at_utc FROM records "
             "WHERE namespace = ? AND key = ?;",
@@ -464,13 +748,38 @@ class _SqliteStorage(Storage):
     def commit_transaction(
         self, mutations: Sequence[StorageMutation | StorageDelete]
     ) -> StorageTransactionResult:
-        """Commit mutations on the owned writer thread (blocking)."""
+        """Commit mutations on the owned writer thread (blocking).
+
+        Args:
+            mutations: Upserts and deletes to apply in order.
+
+        Returns:
+            The immutable transaction outcome.
+
+        Raises:
+            StorageClosedError: If the store is closed.
+        """
         return self._on_writer(lambda: self._commit_transaction_impl(mutations))
 
     def _commit_transaction_impl(
         self, mutations: Sequence[StorageMutation | StorageDelete]
     ) -> StorageTransactionResult:
-        """Commit mutations and deletes in an atomic transaction."""
+        """Commit mutations and deletes in an atomic transaction.
+
+        Checks every CAS expectation inside ``BEGIN IMMEDIATE``; any
+        mismatch rolls the whole batch back and reports the conflicts.
+        On success all writes commit together under a single
+        ``updated_at_utc`` stamp.
+
+        Args:
+            mutations: Upserts and deletes to apply in order.
+
+        Returns:
+            The immutable transaction outcome.
+
+        Raises:
+            StorageClosedError: If the store is closed.
+        """
         if not mutations:
             return StorageTransactionResult(committed=True)
 
@@ -518,7 +827,22 @@ class _SqliteStorage(Storage):
         limit: int = 50,
         after_key: str | None = None,
     ) -> StoragePage:
-        """Scan records on the owned writer thread (blocking)."""
+        """Scan records on the owned writer thread (blocking).
+
+        Args:
+            namespace: Namespace to scan.
+            prefix: Optional key prefix filter.
+            limit: Requested page size, clamped to configuration
+                bounds.
+            after_key: Exclusive lower key bound for pagination.
+
+        Returns:
+            One page of records in ascending key order with the total
+            count for the namespace and prefix.
+
+        Raises:
+            StorageClosedError: If the store is closed.
+        """
         return self._on_writer(
             lambda: self._scan_records_impl(
                 namespace, prefix=prefix, limit=limit, after_key=after_key
@@ -533,7 +857,12 @@ class _SqliteStorage(Storage):
         limit: int = 50,
         after_key: str | None = None,
     ) -> StoragePage:
-        """Scan records in deterministic key order with pagination."""
+        """Scan records in deterministic key order with pagination.
+
+        Fetches one row beyond the bounded limit to detect a next
+        page, uses the last returned key as the ``next_token``, and
+        computes the namespace/prefix total separately from paging.
+        """
         with self._lock:
             if self._closed:
                 raise StorageClosedError("Storage is closed")
@@ -604,7 +933,12 @@ class _SqliteStorage(Storage):
 
     @override
     def status(self) -> StorageStatus:
-        """Return migration and readiness status from the writer thread."""
+        """Return migration and readiness status from the writer thread.
+
+        Returns:
+            Applied migrations and readiness; a closed store reports
+            version 0 with ``ready=False``.
+        """
         return self._on_writer(self._status_impl)
 
     def _status_impl(self) -> StorageStatus:
@@ -626,7 +960,12 @@ class _SqliteStorage(Storage):
 
     @override
     async def async_get_record(self, namespace: str, key: str) -> StorageRecord | None:
-        """Retrieve a record on the owned writer thread."""
+        """Retrieve a record on the owned writer thread.
+
+        Raises ``StorageClosedError`` synchronously when already
+        closed; otherwise the read executes inline on the writer
+        thread or is awaited there without blocking the event loop.
+        """
         return await self._await_on_writer(
             lambda: self._get_record_impl(namespace, key)
         )
@@ -635,7 +974,12 @@ class _SqliteStorage(Storage):
     async def async_commit_transaction(
         self, mutations: Sequence[StorageMutation | StorageDelete]
     ) -> StorageTransactionResult:
-        """Commit mutations on the owned writer thread."""
+        """Commit mutations on the owned writer thread.
+
+        All-or-nothing CAS semantics as ``commit_transaction``, with
+        submission to the writer thread so the caller's event loop
+        stays responsive.
+        """
         return await self._await_on_writer(
             lambda: self._commit_transaction_impl(mutations)
         )
@@ -649,7 +993,11 @@ class _SqliteStorage(Storage):
         limit: int = 50,
         after_key: str | None = None,
     ) -> StoragePage:
-        """Deterministically scan records on the owned writer thread."""
+        """Deterministically scan records on the owned writer thread.
+
+        Key-ordered bounded pagination as ``scan_records``, executed
+        off the caller's event loop.
+        """
         return await self._await_on_writer(
             lambda: self._scan_records_impl(
                 namespace, prefix=prefix, limit=limit, after_key=after_key
@@ -669,7 +1017,12 @@ class _SqliteStorage(Storage):
         return self._writer.submit(fn).result()
 
     async def _await_on_writer(self, fn: Callable[[], _T]) -> _T:
-        """Run a storage operation on the owned writer thread (async)."""
+        """Run a storage operation on the owned writer thread (async).
+
+        Mirrors ``_on_writer`` for coroutines: executes inline when
+        already on the writer thread, otherwise wraps the submitted
+        work as an awaitable future.
+        """
         if self._closed:
             raise StorageClosedError("Storage is closed")
         if threading.get_ident() == self._writer_ident:
@@ -678,7 +1031,12 @@ class _SqliteStorage(Storage):
 
     @override
     def close(self) -> None:
-        """Safely close the database connection and drain the writer thread."""
+        """Safely close the connection and drain the writer thread.
+
+        Idempotent: the first call closes the connection and blocks
+        until queued writer work finishes; later calls are no-ops.
+        Operations attempted afterwards raise ``StorageClosedError``.
+        """
         with self._lock:
             if not self._closed:
                 self._closed = True
@@ -692,6 +1050,8 @@ class _SqliteStorage(Storage):
 
 
 class _StorageFeature:
+    """Feature wiring the SQLite storage service into the host runtime."""
+
     spec = FeatureSpec(
         "host.storage",
         provides=frozenset({HOST_STORAGE}),
@@ -699,9 +1059,11 @@ class _StorageFeature:
     )
 
     def __init__(self, config: StorageConfig) -> None:
+        """Construct the feature and its private storage service."""
         self._service = _SqliteStorage(config)
 
     async def start(self, context: FeatureContext) -> None:
+        """Provide HOST_STORAGE and register close-on-shutdown."""
         context.on_close(self._service.close)
         context.provide(HOST_STORAGE, self._service)
 

@@ -1,4 +1,26 @@
-"""Host jobs owner: durable job state machine, recovery, and worker scheduling."""
+"""Host jobs owner: durable job state machine, recovery, and worker scheduling.
+
+This file is the single owner of the ``host.jobs@1`` capability:
+durable quantitative jobs persisted through ``host.storage``, executed
+through ``host.workers``, with results published as artifacts and the
+lifecycle driven by a strict state machine. Per the one-file-owner
+rule, all job lifecycle semantics for this capability live here.
+
+It owns no SQL, subprocesses, or filesystem mutation directly; it
+composes the storage, artifacts, workers, catalog, and execution
+capabilities. Tests use isolated temporary stores only.
+
+State machine (every transition is CAS-persisted together with an
+append-only ``jobs.events`` record in the same transaction):
+
+    queued -> running -> succeeded | failed
+    running -> cancelling -> cancelled
+    queued -> cancelled
+    running -> recovery_pending -> queued | failed
+
+``cancelling -> failed`` is illegal, terminal states are immutable,
+and successful jobs are never rerun.
+"""
 
 from __future__ import annotations
 
@@ -62,11 +84,18 @@ class JobError(RuntimeError):
 
 
 class JobNotFoundError(JobError):
-    """Raised when a job ID is not found."""
+    """Raised when a job ID is not found.
+
+    Surfaced by get, cancel, and await operations on unknown jobs.
+    """
 
 
 class JobConflictError(JobError):
-    """Raised when an idempotency key conflicts with an existing payload."""
+    """Raised when an idempotency key conflicts with an existing payload.
+
+    Also raised when the initial job creation transaction fails to
+    commit.
+    """
 
 
 class JobCancelledError(JobError):
@@ -74,11 +103,22 @@ class JobCancelledError(JobError):
 
 
 class JobStateError(JobError):
-    """Raised on an illegal job state machine transition."""
+    """Raised on an illegal job state machine transition.
+
+    Covers transitions outside the legal table and CAS revision
+    conflicts observed while persisting a transition.
+    """
 
 
 class JobState(StrEnum):
-    """Durable job lifecycle states."""
+    """Durable job lifecycle states.
+
+    Legal transitions: QUEUED to RUNNING or CANCELLED; RUNNING to
+    SUCCEEDED, FAILED, CANCELLING, or RECOVERY_PENDING; CANCELLING to
+    CANCELLED only; RECOVERY_PENDING to QUEUED or FAILED. SUCCEEDED,
+    FAILED, and CANCELLED are terminal and immutable, and
+    ``cancelling -> failed`` is illegal by construction.
+    """
 
     QUEUED = "queued"
     RUNNING = "running"
@@ -113,7 +153,18 @@ _VALID_TRANSITIONS: dict[JobState, frozenset[JobState]] = {
 
 @dataclass(frozen=True, slots=True)
 class JobRequest:
-    """Request to submit a durable quantitative job."""
+    """Request to submit a durable quantitative job.
+
+    Attributes:
+        graph_document: Strategy graph to execute; opaque documents
+            are rejected at submission.
+        inputs: JSON-compatible named inputs, frozen on submission.
+        seed: Optional deterministic seed baked into the request.
+        budget: Execution budget limits recorded in the request.
+        idempotency_key: Optional key making submission idempotent.
+        max_attempts: Maximum execution attempts including retries.
+        tags: Ordered key/value pairs carried on the request.
+    """
 
     graph_document: GraphDocument | OpaqueGraphDocument
     inputs: Mapping[str, Any] = EMPTY_FROZEN_OBJECT
@@ -133,7 +184,29 @@ class JobRequest:
 
 @dataclass(frozen=True, slots=True)
 class JobRecord:
-    """Durable state record of a job."""
+    """Durable state record of a job.
+
+    Immutable snapshot; durability and concurrency control come from
+    the storage revision, which every transition compare-and-swaps.
+
+    Attributes:
+        job_id: Unique durable identifier.
+        state: Current lifecycle state.
+        revision: Storage revision used for CAS transitions.
+        request_wire: Frozen submission identity (see ``submit_job``).
+        idempotency_key: Key this job reserves, if any.
+        attempts: Execution attempts consumed so far.
+        max_attempts: Retry ceiling for recovery requeues.
+        lease_owner: Scheduler instance id owning the current claim.
+        lease_expires_utc: ISO-8601 UTC expiry of that claim.
+        result_wire: Frozen result payload on success.
+        artifact_refs: Digests of artifacts published by the job.
+        error_code: Stable failure code once failed.
+        error_message: Human-readable failure detail once failed.
+        created_at_utc: Submission timestamp.
+        updated_at_utc: Last transition timestamp.
+        last_heartbeat_utc: Last lease-renewal timestamp.
+    """
 
     job_id: str
     state: JobState
@@ -155,7 +228,21 @@ class JobRecord:
 
 @dataclass(frozen=True, slots=True)
 class JobEvent:
-    """Persisted job state-transition event record."""
+    """Persisted job state-transition event record.
+
+    Stored append-only under ``jobs.events`` keyed by
+    ``<job_id>:<revision zero-padded to eight digits>`` so events sort
+    in transition order.
+
+    Attributes:
+        job_id: Job the transition belongs to.
+        seq: Sequence number, equal to the resulting record revision.
+        from_state: State before the transition.
+        to_state: State after the transition.
+        utc: ISO-8601 UTC stamp of the transition.
+        reason: Stable cause code (error code) when applicable.
+        detail: Human-readable detail when applicable.
+    """
 
     job_id: str
     seq: int
@@ -168,7 +255,14 @@ class JobEvent:
 
 @dataclass(frozen=True, slots=True)
 class JobQuery:
-    """Query filters for job pagination."""
+    """Query filters for job pagination.
+
+    Attributes:
+        state: Optional exact state to match; ``None`` matches all.
+        limit: Maximum records to return per page.
+        after_job_id: Exclusive lower job-id bound for pagination;
+            pass the previous page's ``next_token``.
+    """
 
     state: JobState | None = None
     limit: int = 50
@@ -177,7 +271,15 @@ class JobQuery:
 
 @dataclass(frozen=True, slots=True)
 class JobPage:
-    """Deterministic page of job records."""
+    """Deterministic page of job records.
+
+    Attributes:
+        records: Matching records in job-id order.
+        next_token: Job id to continue from, or ``None`` when the
+            listing is exhausted.
+        total_count: Total records in the jobs namespace, independent
+            of the state filter.
+    """
 
     records: tuple[JobRecord, ...]
     next_token: str | None = None
@@ -186,7 +288,18 @@ class JobPage:
 
 @dataclass(frozen=True, slots=True)
 class JobsConfig:
-    """Configuration for durable jobs scheduler."""
+    """Configuration for durable jobs scheduler.
+
+    Attributes:
+        poll_interval_seconds: Delay slept before each scheduler
+            poll.
+        lease_duration_seconds: Claim lifetime set at claim time and
+            renewed by heartbeats.
+        shutdown_drain_seconds: Deadline ``close()`` enforces while
+            draining active jobs.
+        scheduler_id: Stable owner id used for claims; derived when
+            left empty.
+    """
 
     poll_interval_seconds: float = 0.05
     lease_duration_seconds: float = 30.0
@@ -204,34 +317,114 @@ class JobsConfig:
 
 
 class Jobs(Protocol):
-    """Public capability protocol for durable jobs orchestration."""
+    """Public capability protocol for durable jobs orchestration.
+
+    Contract: every state change is CAS-persisted with an append-only
+    event record in the same transaction; submission freezes the full
+    execution identity and is idempotent per key; the scheduler claims
+    queued jobs with leases and renews them via heartbeats;
+    running-job cancellation propagates into the worker task;
+    interrupted jobs are recovered at startup; and successful jobs are
+    never rerun.
+    """
 
     async def submit_job(self, request: JobRequest) -> JobRecord:
-        """Submit a job idempotently and persist its initial queued record."""
+        """Submit a job idempotently and persist its initial queued record.
+
+        Args:
+            request: Job specification to freeze and persist.
+
+        Returns:
+            The queued job record, or the existing job when an
+            idempotency key matches the same payload.
+
+        Raises:
+            JobError: For opaque graphs, unadmittable dependencies, or
+                declared non-pure effects.
+            JobConflictError: When the idempotency key is already
+                bound to a different payload, or the creation
+                transaction fails to commit.
+        """
         ...
 
     async def get_job(self, job_id: str) -> JobRecord | None:
-        """Retrieve a job by its unique ID."""
+        """Retrieve a job by its unique ID.
+
+        Args:
+            job_id: Unique identifier of the job.
+
+        Returns:
+            The deserialized record, or ``None`` when absent.
+        """
         ...
 
     async def list_jobs(self, query: JobQuery | None = None) -> JobPage:
-        """List jobs matching query filters."""
+        """List jobs matching query filters, filtering before pagination.
+
+        Args:
+            query: Optional state filter and pagination bounds.
+
+        Returns:
+            One page of matching records in job-id order, with a
+            next-page token and the namespace total.
+        """
         ...
 
     async def cancel_job(self, job_id: str) -> JobRecord:
-        """Request cancellation for a queued or running job."""
+        """Request cancellation for a queued or running job.
+
+        Queued jobs transition directly to CANCELLED; running jobs
+        move to CANCELLING and the active worker task is cancelled;
+        jobs already terminal are returned unchanged.
+
+        Args:
+            job_id: Unique identifier of the job.
+
+        Returns:
+            The latest job record.
+
+        Raises:
+            JobNotFoundError: If the job does not exist.
+        """
         ...
 
     async def await_job(self, job_id: str, timeout_seconds: float = 60.0) -> JobRecord:
-        """Wait until a job reaches a terminal state."""
+        """Wait until a job reaches a terminal state.
+
+        Args:
+            job_id: Unique identifier of the job.
+            timeout_seconds: Maximum wait before failing.
+
+        Returns:
+            The terminal job record.
+
+        Raises:
+            JobNotFoundError: If the job never existed or vanished
+                after completion.
+            TimeoutError: If the deadline elapses first.
+        """
         ...
 
     async def job_events(self, job_id: str) -> tuple[JobEvent, ...]:
-        """Return persisted transition events for a job in order."""
+        """Return persisted transition events for a job in order.
+
+        Args:
+            job_id: Unique identifier of the job.
+
+        Returns:
+            All append-only transition events, oldest first.
+        """
         ...
 
     async def close(self) -> None:
-        """Stop scheduler and drain active jobs."""
+        """Stop the scheduler and drain active jobs.
+
+        Stops new claims, requests cancellation of active job tasks,
+        and waits at most the configured drain deadline; providers
+        stay alive because the composition root closes them after
+        jobs cleanup ends. Jobs still nonterminal at the deadline
+        remain durable for the next startup recovery scan.
+        """
         ...
 
 
@@ -243,14 +436,17 @@ IDEMPOTENCY_NAMESPACE = "job_idempotency"
 
 
 def _utc_now() -> datetime.datetime:
+    """Return the current timezone-aware UTC datetime."""
     return datetime.datetime.now(datetime.UTC)
 
 
 def _utc_now_iso() -> str:
+    """Return the current UTC time as a second-precision ISO-8601 string."""
     return _utc_now().replace(microsecond=0).isoformat().replace("+00:00", "Z")
 
 
 def _serialize_job_record(record: JobRecord) -> bytes:
+    """Serialize a job record to canonical sorted-key JSON bytes."""
     data = {
         "job_id": record.job_id,
         "state": record.state.value,
@@ -275,6 +471,7 @@ def _serialize_job_record(record: JobRecord) -> bytes:
 
 
 def _deserialize_job_record(payload_bytes: bytes, revision: int) -> JobRecord:
+    """Parse canonical JSON bytes back into a job record at a revision."""
     data = json.loads(payload_bytes.decode("utf-8"))
     res_raw = data.get("result_wire")
     frozen_res = freeze_value(res_raw) if res_raw is not None else None
@@ -304,7 +501,16 @@ def _deserialize_job_record(payload_bytes: bytes, revision: int) -> JobRecord:
 
 
 class _DurableJobs(Jobs):
-    """Private implementation of the durable jobs scheduler and state machine."""
+    """Private implementation of the durable jobs scheduler and state machine.
+
+    Recovery at startup scans the full jobs namespace with pagination
+    and respects unexpired leases (a valid lease means a live
+    scheduler elsewhere still owns the job). Stranded CANCELLING jobs
+    resolve to CANCELLED, expired RUNNING jobs move to
+    RECOVERY_PENDING, and requeue only when pinned entry fingerprints
+    still admit exactly and attempts remain; otherwise they fail with
+    a stable recovery code. Successful jobs are never rerun.
+    """
 
     def __init__(
         self,
@@ -316,6 +522,16 @@ class _DurableJobs(Jobs):
         catalog: Catalog,
         execution: Execution,
     ) -> None:
+        """Initialize the scheduler with its capability providers.
+
+        Args:
+            config: Polling, lease, drain, and identity configuration.
+            storage: Durable store for job records and events.
+            artifacts: Artifact store for published results.
+            workers: Subprocess execution capability.
+            catalog: Plugin catalog used for admission and pinning.
+            execution: Execution capability held for the composition.
+        """
         self._config = config
         self._storage = storage
         self._artifacts = artifacts
@@ -329,7 +545,11 @@ class _DurableJobs(Jobs):
         self._completion_events: dict[str, asyncio.Event] = {}
 
     async def start(self) -> None:
-        """Start recovery and scheduler background loop."""
+        """Start recovery and the scheduler background loop.
+
+        Interrupted jobs are recovered before the first poll so the
+        queue reflects restart state before any new claim is made.
+        """
         self._running = True
         await self._recover_interrupted_jobs()
         self._loop_task = asyncio.create_task(self._scheduler_loop())
@@ -337,10 +557,12 @@ class _DurableJobs(Jobs):
     async def _recover_interrupted_jobs(self) -> None:
         """Scan all nonterminal jobs at startup and recover or fail them.
 
+        Paginates the entire jobs namespace before scheduling starts.
         Expired running pure jobs are requeued only when their exact
         entry-fingerprint dependencies are still admitted and attempts
-        remain; otherwise they fail with a stable recovery code. Cancelling
-        jobs resolve to cancelled. Successful jobs are never rerun.
+        remain; otherwise they fail with a stable recovery code.
+        Cancelling jobs resolve to cancelled. Successful jobs are
+        never rerun.
         """
         after_key: str | None = None
         while True:
@@ -357,7 +579,17 @@ class _DurableJobs(Jobs):
             after_key = page.next_token
 
     async def _recover_one(self, job: JobRecord) -> None:
-        """Apply the recovery policy to a single nonterminal job."""
+        """Apply the recovery policy to a single nonterminal job.
+
+        Stranded CANCELLING jobs resolve to CANCELLED; QUEUED jobs are
+        left for the scheduler; a still-valid lease means the job is
+        still owned by a live scheduler elsewhere and is untouched.
+        Expired RUNNING jobs move to RECOVERY_PENDING, then requeue
+        only when pinned entry fingerprints still admit exactly and
+        attempts remain; otherwise they fail with
+        RECOVERY_DEPENDENCY_MISSING (naming the exact pinned key) or
+        MAX_ATTEMPTS_EXCEEDED.
+        """
         if job.state in TERMINAL_JOB_STATES:
             return
 
@@ -411,7 +643,14 @@ class _DurableJobs(Jobs):
             )
 
     def _missing_dependencies(self, job: JobRecord) -> str | None:
-        """Return the first missing/changed pinned dependency, if any."""
+        """Return the first missing or changed pinned dependency, if any.
+
+        Records with pinned entry fingerprints require each
+        ``<plugin-ref>#<operation>`` key to admit exactly with the
+        recorded fingerprint. Legacy records without fingerprints fall
+        back to comparing plugin id and version against the catalog
+        snapshot.
+        """
         req_data = value_to_wire(job.request_wire)
         entry_fps = req_data.get("entry_fingerprints") or {}
         if entry_fps:
@@ -455,7 +694,32 @@ class _DurableJobs(Jobs):
         error_message: str | None = None,
         increment_attempts: bool = False,
     ) -> JobRecord:
-        """Atomically transition job to a new state with CAS revision check."""
+        """Atomically transition job to a new state with CAS revision check.
+
+        Rejects illegal transitions (including any change out of a
+        terminal state), then persists the new record and an
+        append-only ``jobs.events`` entry in a single storage
+        transaction keyed to the expected revision. Waiters are
+        signaled when the new state is terminal.
+
+        Args:
+            job: Current record snapshot to transition from.
+            new_state: Target lifecycle state.
+            lease_owner: Optional new claim owner.
+            lease_expires_utc: Optional new claim expiry.
+            result_wire: Optional result payload to store.
+            artifact_refs: Optional artifact digests to record.
+            error_code: Optional stable failure code.
+            error_message: Optional failure detail.
+            increment_attempts: Whether to consume one attempt.
+
+        Returns:
+            The newly persisted record.
+
+        Raises:
+            JobStateError: On an illegal transition or a CAS revision
+                conflict.
+        """
         allowed = _VALID_TRANSITIONS.get(job.state, frozenset())
         if new_state not in allowed:
             raise JobStateError(
@@ -573,10 +837,28 @@ class _DurableJobs(Jobs):
     async def submit_job(self, request: JobRequest) -> JobRecord:
         """Submit a job with optional idempotency key validation.
 
-        The submission freezes the full execution identity: wire version,
-        graph, inputs hash, seed, budgets, catalog/entry/dependency
-        fingerprints, numerical policies, engine version, and a pure-only
-        effect policy. Refresh never silently rebinds any of them.
+        The submission freezes the full execution identity: wire
+        version, graph, inputs hash, seed, budgets, catalog/entry/
+        dependency fingerprints, numerical policies, engine version,
+        and a pure-only effect policy. Refresh never silently rebinds
+        any of them.
+
+        An idempotency key bound to an identical payload returns the
+        existing job; the same key with a different payload raises.
+
+        Args:
+            request: Job specification to freeze and persist.
+
+        Returns:
+            The newly queued record, or the existing record on an
+            idempotent replay.
+
+        Raises:
+            JobError: For opaque graphs or dependencies that cannot be
+                admitted or declare non-pure effects.
+            JobConflictError: When the idempotency key is bound to a
+                different payload, or the creation transaction does
+                not commit.
         """
         if isinstance(request.graph_document, OpaqueGraphDocument):
             raise JobError("Opaque graph documents cannot be submitted as durable jobs")
@@ -689,7 +971,14 @@ class _DurableJobs(Jobs):
 
     @override
     async def get_job(self, job_id: str) -> JobRecord | None:
-        """Fetch job record by ID."""
+        """Fetch job record by ID.
+
+        Args:
+            job_id: Unique identifier of the job.
+
+        Returns:
+            The deserialized record, or ``None`` when absent.
+        """
         rec = await self._storage.async_get_record(JOBS_NAMESPACE, job_id)
         if rec is None:
             return None
@@ -697,7 +986,19 @@ class _DurableJobs(Jobs):
 
     @override
     async def list_jobs(self, query: JobQuery | None = None) -> JobPage:
-        """List job records, filtering before pagination."""
+        """List job records, filtering before pagination.
+
+        Scans storage pages in key order and applies the optional
+        state filter while accumulating matches, stopping once one
+        page plus one extra record proves a next page exists. The
+        reported total reflects the namespace, not the filter.
+
+        Args:
+            query: Optional state filter and pagination bounds.
+
+        Returns:
+            One page of matching records in job-id order.
+        """
         q = query if query is not None else JobQuery()
         scan_limit = max(q.limit, 50)
         matched: list[JobRecord] = []
@@ -733,7 +1034,22 @@ class _DurableJobs(Jobs):
 
     @override
     async def cancel_job(self, job_id: str) -> JobRecord:
-        """Request cancellation for a queued or running job."""
+        """Request cancellation for a queued or running job.
+
+        Retries a bounded number of times when CAS races with a claim
+        or completion. Queued jobs transition directly to CANCELLED;
+        running jobs move to CANCELLING and the active worker task is
+        cancelled; jobs already terminal are returned unchanged.
+
+        Args:
+            job_id: Unique identifier of the job.
+
+        Returns:
+            The latest job record.
+
+        Raises:
+            JobNotFoundError: If the job does not exist.
+        """
         for _ in range(3):
             job = await self.get_job(job_id)
             if job is None:
@@ -767,7 +1083,20 @@ class _DurableJobs(Jobs):
 
     @override
     async def await_job(self, job_id: str, timeout_seconds: float = 60.0) -> JobRecord:
-        """Await terminal status for a job."""
+        """Await terminal status for a job.
+
+        Args:
+            job_id: Unique identifier of the job.
+            timeout_seconds: Maximum wait before failing.
+
+        Returns:
+            The terminal job record.
+
+        Raises:
+            JobNotFoundError: If the job never existed or vanished
+                after completion.
+            TimeoutError: If the deadline elapses first.
+        """
         job = await self.get_job(job_id)
         if job is None:
             raise JobNotFoundError(f"Job {job_id} not found")
@@ -800,7 +1129,14 @@ class _DurableJobs(Jobs):
                 await self._poll_and_schedule_next()
 
     async def _poll_and_schedule_next(self) -> None:
-        """Claim the next available queued job and dispatch to workers."""
+        """Claim the next available queued job and dispatch to workers.
+
+        Scans one page of job records and claims each queued job by
+        CAS-transitioning it to RUNNING with this scheduler as lease
+        owner, a fresh lease expiry, and an attempt increment, then
+        spawns its execution task. A CAS loss means another scheduler
+        won the claim and is skipped.
+        """
         if not self._running:
             return
 
@@ -839,7 +1175,19 @@ class _DurableJobs(Jobs):
     async def _handle_worker_result(
         self, job: JobRecord, worker_result: WorkerResult
     ) -> None:
-        """Persist worker result artifacts and transition job to terminal state."""
+        """Persist worker result artifacts and transition job to terminal state.
+
+        On success the result payload is published as a JSON artifact
+        first; the artifact digest is then recorded on the job
+        together with the terminal success transition in one CAS
+        transaction. A job already CANCELLING completes as CANCELLED
+        instead, and worker failures transition to FAILED with the
+        worker's error code.
+
+        Args:
+            job: The claimed job snapshot used for scheduling.
+            worker_result: Structured outcome from the worker.
+        """
         current_job = await self.get_job(job.job_id)
         if current_job is None:
             return
@@ -888,7 +1236,12 @@ class _DurableJobs(Jobs):
         )
 
     async def _heartbeat_loop(self, job_id: str) -> None:
-        """Persist bounded lease-renewal heartbeats while the worker runs."""
+        """Persist lease-renewal heartbeats while the worker runs.
+
+        Renews at least every third of the lease duration (floored at
+        50 ms) using CAS writes that also refresh the heartbeat
+        stamp; stops once the job leaves RUNNING.
+        """
         interval = max(self._config.lease_duration_seconds / 3.0, 0.05)
         while True:
             await asyncio.sleep(interval)
@@ -926,7 +1279,15 @@ class _DurableJobs(Jobs):
             )
 
     async def _execute_job(self, job: JobRecord) -> None:
-        """Execute a claimed running job via Workers and ArtifactStore."""
+        """Execute a claimed running job via Workers and ArtifactStore.
+
+        Derives the worker timeout from the frozen request budget and
+        heartbeats the lease throughout. Every failure is contained at
+        the job boundary: caller cancellation and worker cancellation
+        resolve CANCELLING to CANCELLED, timeouts fail with
+        ``TIMEOUT``, and any other error fails with the exception type
+        name as the error code.
+        """
         heartbeat = asyncio.create_task(self._heartbeat_loop(job.job_id))
         try:
             req_data = value_to_wire(job.request_wire)
@@ -980,7 +1341,18 @@ class _DurableJobs(Jobs):
 
     @override
     async def job_events(self, job_id: str) -> tuple[JobEvent, ...]:
-        """Return the persisted transition events for a job, in order."""
+        """Return the persisted transition events for a job, in order.
+
+        Paginates the append-only ``jobs.events`` records keyed by
+        ``<job_id>:<zero-padded seq>`` so events replay in transition
+        order regardless of page size.
+
+        Args:
+            job_id: Unique identifier of the job.
+
+        Returns:
+            All transition events, oldest first.
+        """
         events: list[JobEvent] = []
         after_key: str | None = None
         prefix = f"{job_id}:"
@@ -1013,8 +1385,12 @@ class _DurableJobs(Jobs):
     async def close(self) -> None:
         """Stop admission, request cancellation, drain to the deadline.
 
-        Storage, artifacts, and workers providers stay alive throughout:
-        the composition root closes them only after jobs cleanup ends.
+        Storage, artifacts, and workers providers stay alive
+        throughout: the composition root closes them only after jobs
+        cleanup ends. Claims stop first (the poll loop is cancelled),
+        active job tasks are cancelled, and the drain waits at most
+        ``shutdown_drain_seconds``; jobs still nonterminal at the
+        deadline remain durable for the next startup recovery scan.
         """
         self._running = False
         if self._loop_task is not None:
@@ -1037,7 +1413,13 @@ class _DurableJobs(Jobs):
 
 
 class _JobsFeature:
-    """Feature providing HOST_JOBS requiring storage, artifacts, workers."""
+    """Feature providing HOST_JOBS requiring storage, artifacts, workers.
+
+    Requires storage, artifacts, workers, catalog, and execution
+    capabilities; startup runs recovery before the scheduler loop and
+    registers jobs cleanup with the runtime context so providers
+    outlive it.
+    """
 
     spec = FeatureSpec(
         "host.jobs",
@@ -1055,10 +1437,12 @@ class _JobsFeature:
     )
 
     def __init__(self, config: JobsConfig) -> None:
+        """Store the configuration until capability providers resolve."""
         self._config = config
         self._service: _DurableJobs | None = None
 
     async def start(self, context: FeatureContext) -> None:
+        """Resolve providers, start recovery and scheduling, and provide it."""
         storage = context.require(HOST_STORAGE)
         artifacts = context.require(HOST_ARTIFACTS)
         workers = context.require(HOST_WORKERS)

@@ -1,4 +1,18 @@
-"""Plugin identity, operations, capability declarations, and catalog views."""
+"""Plugin identity, operations, capability declarations, and catalog views.
+
+Authority: this module owns the identity and descriptor types of the
+shared plugin metamodel, as ratified for the S2 handoff in
+``docs/dev/backend_implementation_handoff_s2_s5.md``: validated plugin
+IDs, exact versioned ``PluginRef`` identities, operation/workspace/plugin
+descriptors, the capability-binding and implementation protocols, and the
+wire-safe catalog views. Plugin kinds are validated identifiers, not an
+enum, so new plugin families require no metamodel edit.
+
+Position in the shared-module import DAG
+(``schema <- lowering <- spec <- algebra <- wire``): this module imports
+``schema`` and ``lowering``, and from the kernel only
+``app.kernel.capability``. No shared module may import ``app.host``.
+"""
 
 from __future__ import annotations
 
@@ -25,7 +39,24 @@ VERSION_PARTS_COUNT = 3
 
 
 def validate_plugin_id(plugin_id: str) -> str:
-    """Validate that a string is a lowercase dot-namespaced plugin identifier."""
+    """Validate that a string is a lowercase dot-namespaced plugin identifier.
+
+    IDs must contain at least two dot-separated segments, each starting
+    with a lowercase letter followed by lowercase letters, digits, or
+    underscores (for example ``indicator.rsi``), and be at most
+    ``MAX_PLUGIN_ID_LENGTH`` (128) characters.
+
+    Args:
+        plugin_id: Identifier to validate.
+
+    Returns:
+        The validated plugin ID, unchanged.
+
+    Raises:
+        TypeError: If ``plugin_id`` is not a string.
+        ValueError: If ``plugin_id`` is empty, too long, or violates the
+            dot-namespaced pattern.
+    """
     if not isinstance(plugin_id, str):
         raise TypeError(f"Plugin ID must be a string, got {type(plugin_id).__name__}")
     if (
@@ -42,7 +73,15 @@ def validate_plugin_id(plugin_id: str) -> str:
 
 @dataclass(frozen=True, slots=True)
 class PluginRef:
-    """Exact identity and semantic version of a plugin."""
+    """Exact identity and semantic version of a plugin.
+
+    Frozen and slotted. Identity is exact: two refs are equal only when
+    both the ID and the full version tuple match, and the canonical string
+    form ``id@major.minor.patch`` round trips losslessly through
+    ``to_string``/``parse``. Validation in ``__post_init__``: ``id``
+    passes ``validate_plugin_id``, ``version`` is a 3-tuple of
+    non-negative integers, and the version is not ``0.0.0``.
+    """
 
     id: str
     version: tuple[int, int, int]
@@ -67,7 +106,21 @@ class PluginRef:
 
     @classmethod
     def parse(cls, text: str) -> PluginRef:
-        """Parse 'plugin.id@major.minor.patch' into a PluginRef."""
+        """Parse 'plugin.id@major.minor.patch' into a PluginRef.
+
+        The string is split at the first ``@``; the version part must
+        contain exactly three integer components.
+
+        Args:
+            text: Canonical plugin ref string.
+
+        Returns:
+            The parsed PluginRef.
+
+        Raises:
+            ValueError: If the string has no ``@``, a wrong number of
+                version parts, or non-integer version components.
+        """
         if not isinstance(text, str) or "@" not in text:
             raise ValueError(f"Invalid plugin ref string format: {text!r}")
         pid, ver = text.split("@", maxsplit=1)
@@ -81,7 +134,10 @@ class PluginRef:
         return cls(id=pid, version=version)
 
     def to_string(self) -> str:
-        """Return canonical 'id@major.minor.patch' string."""
+        """Return canonical 'id@major.minor.patch' string.
+
+        The returned form is exactly what ``parse`` accepts.
+        """
         return f"{self.id}@{self.version[0]}.{self.version[1]}.{self.version[2]}"
 
     @override
@@ -95,6 +151,7 @@ DEFAULT_NUMERICAL_POLICY = NumericalPolicy()
 
 
 def _validate_ports(ports: tuple[PortSpec, ...], label: str) -> None:
+    """Validate a port tuple: PortSpec instances with unique keys."""
     if not isinstance(ports, tuple):
         raise TypeError(f"OperationSpec {label} must be a tuple of PortSpec")
     seen: set[str] = set()
@@ -107,6 +164,7 @@ def _validate_ports(ports: tuple[PortSpec, ...], label: str) -> None:
 
 
 def _validate_strings(items: tuple[str, ...], label: str) -> None:
+    """Validate that every item is a non-empty string."""
     for item in items:
         if not isinstance(item, str) or not item:
             raise ValueError(f"{label} must be non-empty string")
@@ -114,7 +172,20 @@ def _validate_strings(items: tuple[str, ...], label: str) -> None:
 
 @dataclass(frozen=True, slots=True)
 class OperationSpec:
-    """Introspectable declaration of one quantitative operation."""
+    """Introspectable declaration of one quantitative operation.
+
+    Frozen and slotted. Fully self-describing: parameters, typed inputs
+    and outputs, determinism, numerical policy, effect identifiers,
+    capability slots, permissions, and exact lowering targets. Effects are
+    validated identifiers; required/optional capabilities and permissions
+    are non-empty strings naming what the host must resolve or grant.
+
+    Validation in ``__post_init__``: ``operation_id`` is a bounded
+    lowercase identifier, ``title`` is non-empty, ``description`` is a
+    string, ``parameters`` is a ``ParameterSchema``, input/output ports
+    are unique-keyed ``PortSpec`` tuples, ``determinism`` is a bool, and
+    ``numerical_policy`` is a ``NumericalPolicy``.
+    """
 
     operation_id: str
     title: str
@@ -153,26 +224,79 @@ class OperationSpec:
 
 
 class OperationBindings(Protocol):
-    """Capability bindings restricted strictly to the operation declaration."""
+    """Capability bindings restricted strictly to the operation declaration.
+
+    Non-enumerable protocol: implementations accept typed ``Capability``
+    tokens only, and every call fails closed for tokens the operation did
+    not declare under ``required_capabilities`` or
+    ``optional_capabilities`` respectively.
+    """
 
     def require[T](self, token: Capability[T]) -> T:
-        """Resolve a declared required capability."""
+        """Resolve a declared required capability.
+
+        Args:
+            token: Typed capability token declared under
+                ``required_capabilities``.
+
+        Returns:
+            The bound capability instance.
+
+        Raises:
+            PermissionError: If the token was not declared as required by
+                this operation.
+            RuntimeError: If the declared capability is unavailable.
+        """
         ...
 
     def optional[T](self, token: Capability[T]) -> T | None:
-        """Resolve a declared optional capability."""
+        """Resolve a declared optional capability.
+
+        Args:
+            token: Typed capability token declared under
+                ``optional_capabilities``.
+
+        Returns:
+            The bound capability instance, or None when it is simply
+            unavailable.
+
+        Raises:
+            PermissionError: If the token was not declared as optional by
+                this operation.
+        """
         ...
 
 
 class OperationImplementation(Protocol):
-    """Protocol for an operation's execution and lowering implementation."""
+    """Protocol for an operation's execution and lowering implementation.
+
+    Implementations are contributed by plugins, held outside wire-safe
+    views, and invoked only after exact operation admission by the host.
+    """
 
     def validate_parameters(self, values: FrozenObject) -> ParameterBindingResult:
-        """Validate parameter values against cross-field constraints."""
+        """Validate parameter values against cross-field constraints.
+
+        Plugin-owned validation that supplements the declarative schema.
+
+        Args:
+            values: Schema-normalized parameter values.
+
+        Returns:
+            ParameterBindingResult for the cross-field checks.
+        """
         ...
 
     def warmup_samples(self, values: FrozenObject) -> int:
-        """Return dynamic warm-up sample count required for these parameters."""
+        """Return dynamic warm-up sample count required for these parameters.
+
+        Args:
+            values: Schema-normalized parameter values.
+
+        Returns:
+            Number of leading input samples the operation cannot produce
+            output for with these parameters.
+        """
         ...
 
     def execute(
@@ -181,7 +305,16 @@ class OperationImplementation(Protocol):
         parameters: FrozenObject,
         bindings: OperationBindings,
     ) -> Mapping[str, Any]:
-        """Execute operation against inputs and parameters."""
+        """Execute operation against inputs and parameters.
+
+        Args:
+            inputs: Mapping of input port keys to delivered values.
+            parameters: Schema-normalized parameter values.
+            bindings: Capability resolver restricted to this operation.
+
+        Returns:
+            Mapping of output port keys to computed values.
+        """
         ...
 
     def lower(
@@ -189,13 +322,29 @@ class OperationImplementation(Protocol):
         context: LoweringContext,
         parameters: FrozenObject,
     ) -> LoweringResult:
-        """Lower operation into semantic IR for target."""
+        """Lower operation into semantic IR for the context target.
+
+        Args:
+            context: Host-provided lowering context carrying the exact
+                target and node ID allocation.
+            parameters: Schema-normalized parameter values.
+
+        Returns:
+            LoweringResult; success requires a complete
+            ``SemanticProgram``.
+        """
         ...
 
 
 @dataclass(frozen=True, slots=True)
 class OperationContribution:
-    """Pair an operation ID with its executable implementation."""
+    """Pair an operation ID with its executable implementation.
+
+    Frozen and slotted. The implementation is opaque to the metamodel and
+    is never placed in wire-safe views. Validation in ``__post_init__``:
+    ``operation_id`` is a bounded lowercase identifier and
+    ``implementation`` is not None.
+    """
 
     operation_id: str
     implementation: Any
@@ -209,7 +358,14 @@ class OperationContribution:
 
 @dataclass(frozen=True, slots=True)
 class WorkspaceCommand:
-    """Declared command exposed by a workspace plugin."""
+    """Declared command exposed by a workspace plugin.
+
+    Frozen and slotted. Declarative metadata only: a command names an
+    interaction the workspace supports and starts nothing by itself.
+    Validation in ``__post_init__``: ``command_id`` is a bounded
+    lowercase identifier, ``title`` is a non-empty string, and
+    ``description`` is a string.
+    """
 
     command_id: str
     title: str
@@ -226,7 +382,13 @@ class WorkspaceCommand:
 
 @dataclass(frozen=True, slots=True)
 class WorkspaceView:
-    """Declared view exposed by a workspace plugin."""
+    """Declared view exposed by a workspace plugin.
+
+    Frozen and slotted. ``component`` names a UI component as a string
+    label, not an import. Validation in ``__post_init__``: ``view_id`` is
+    a bounded lowercase identifier, and ``title`` and ``component`` are
+    non-empty strings.
+    """
 
     view_id: str
     title: str
@@ -243,7 +405,14 @@ class WorkspaceView:
 
 @dataclass(frozen=True, slots=True)
 class WorkspaceSpec:
-    """Introspectable descriptor for a workspace plugin."""
+    """Introspectable descriptor for a workspace plugin.
+
+    Frozen and slotted. ``accepted_kinds`` declares which plugin kinds the
+    workspace selects for; it is an open vocabulary of validated
+    identifiers. Validation in ``__post_init__``: ``ref`` is a
+    ``PluginRef``, ``title`` is non-empty, ``description`` is a string,
+    and every accepted kind is a bounded lowercase identifier.
+    """
 
     ref: PluginRef
     title: str
@@ -266,7 +435,19 @@ class WorkspaceSpec:
 
 @dataclass(frozen=True, slots=True)
 class PluginSpec:
-    """Introspectable descriptor for a quantitative plugin."""
+    """Introspectable descriptor for a quantitative plugin.
+
+    Frozen and slotted. One plugin's complete public description: exact
+    identity, kind, presentation metadata, metamodel major version, and
+    operation descriptors. ``kind`` is a validated identifier, not an
+    enum, so new plugin families need no metamodel change. A descriptor
+    contains no implementations, providers, or callables. Validation in
+    ``__post_init__``: ``ref`` is a ``PluginRef``, ``kind`` is a bounded
+    lowercase identifier, ``title`` is non-empty, ``description`` is a
+    string, ``metamodel_major`` is an integer >= 1, ``operations`` is a
+    tuple of ``OperationSpec`` with unique operation IDs, and
+    ``workspace`` is a ``WorkspaceSpec`` or None.
+    """
 
     ref: PluginRef
     kind: str
@@ -304,7 +485,11 @@ class PluginSpec:
             raise TypeError("PluginSpec workspace must be a WorkspaceSpec")
 
     def get_operation(self, operation_id: str) -> OperationSpec | None:
-        """Find an operation spec by operation_id."""
+        """Find an operation spec by operation_id.
+
+        Returns:
+            The matching ``OperationSpec``, or None when absent.
+        """
         for op in self.operations:
             if op.operation_id == operation_id:
                 return op
@@ -313,7 +498,15 @@ class PluginSpec:
 
 @dataclass(frozen=True, slots=True)
 class PluginContribution:
-    """Side-effect-free return value of a plugin's zero-argument factory."""
+    """Side-effect-free return value of a plugin's zero-argument factory.
+
+    Frozen and slotted. Pairs a ``PluginSpec`` with exactly one
+    ``OperationContribution`` per declared operation. Validation in
+    ``__post_init__``: contributions form a tuple with no duplicate
+    operation IDs, and the implementation IDs match the descriptor's
+    operation IDs exactly — missing and extra contributions are both
+    rejected.
+    """
 
     spec: PluginSpec
     operations: tuple[OperationContribution, ...] = ()
@@ -347,7 +540,11 @@ class PluginContribution:
             )
 
     def get_implementation(self, operation_id: str) -> Any:
-        """Return implementation for operation_id."""
+        """Return the implementation registered for ``operation_id``.
+
+        Returns:
+            The matched implementation, or None when the ID is unknown.
+        """
         for contrib in self.operations:
             if contrib.operation_id == operation_id:
                 return contrib.implementation
@@ -356,7 +553,16 @@ class PluginContribution:
 
 @dataclass(frozen=True, slots=True)
 class CatalogEntryView:
-    """Wire-safe immutable view of an installed plugin descriptor."""
+    """Wire-safe immutable view of an installed plugin descriptor.
+
+    Frozen and slotted. Carries descriptor data only — no implementation
+    objects, provider instances, exceptions, or callables — so it can be
+    projected to JSON by ``wire.py`` and handed to any client. Validation
+    in ``__post_init__``: ``ref`` is a ``PluginRef``, ``kind`` is a
+    bounded lowercase identifier, ``title`` is non-empty,
+    ``metamodel_major`` is an integer >= 1, and ``operations`` is a tuple
+    of ``OperationSpec``.
+    """
 
     ref: PluginRef
     kind: str
@@ -387,7 +593,14 @@ class CatalogEntryView:
 
     @classmethod
     def from_spec(cls, spec: PluginSpec) -> CatalogEntryView:
-        """Create a wire-safe CatalogEntryView from a PluginSpec."""
+        """Create a wire-safe CatalogEntryView from a PluginSpec.
+
+        Args:
+            spec: Fully validated plugin descriptor.
+
+        Returns:
+            Entry view carrying the same descriptor data.
+        """
         return cls(
             ref=spec.ref,
             kind=spec.kind,
@@ -401,7 +614,16 @@ class CatalogEntryView:
 
 @dataclass(frozen=True, slots=True)
 class CatalogView:
-    """Wire-safe immutable snapshot view of the catalog."""
+    """Wire-safe immutable snapshot view of the catalog.
+
+    Frozen and slotted. Entries are unique by exact ref string, so
+    multiple versions of one plugin ID may coexist; the string
+    ``catalog_fingerprint`` identifies the snapshot. Like its entries,
+    the view contains descriptor data only. Validation in
+    ``__post_init__``: ``entries`` is a tuple of ``CatalogEntryView``
+    with no duplicate ``ref.to_string()`` values and
+    ``catalog_fingerprint`` is a string.
+    """
 
     entries: tuple[CatalogEntryView, ...] = ()
     catalog_fingerprint: str = ""
@@ -424,21 +646,36 @@ class CatalogView:
             seen_refs.add(ref_str)
 
     def get_entry(self, ref: PluginRef) -> CatalogEntryView | None:
-        """Find an entry view by exact PluginRef."""
+        """Find an entry view by exact PluginRef.
+
+        Returns:
+            The entry whose ref matches exactly (ID and version), or None
+            when absent.
+        """
         for e in self.entries:
             if e.ref == ref:
                 return e
         return None
 
     def get_entry_by_id(self, plugin_id: str) -> CatalogEntryView | None:
-        """Find an entry view by plugin ID."""
+        """Find an entry view by plugin ID.
+
+        Returns:
+            The first entry (in snapshot order) whose plugin ID matches,
+            or None when absent.
+        """
         for e in self.entries:
             if e.ref.id == plugin_id:
                 return e
         return None
 
     def get_operation(self, ref: PluginRef, operation_id: str) -> OperationSpec | None:
-        """Find an operation spec on an exact entry."""
+        """Find an operation spec on an exact entry.
+
+        Returns:
+            The operation declared by the exactly matched entry, or None
+            when the entry or operation is absent.
+        """
         entry = self.get_entry(ref)
         if entry is None:
             return None

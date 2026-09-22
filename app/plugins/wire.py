@@ -1,4 +1,25 @@
-"""Canonical JSON projection, SHA-256 fingerprinting, and wire serialization."""
+"""Canonical JSON projection, SHA-256 fingerprinting, and wire serialization.
+
+Authority: this module owns every JSON projection of the shared plugin
+metamodel, as ratified for the S2 handoff in
+``docs/dev/backend_implementation_handoff_s2_s5.md``: frozen values and
+missing markers, schemas and plugin specs, catalog views, semantic IR,
+and supported/opaque graph documents.
+
+Position in the shared-module import DAG
+(``schema <- lowering <- spec <- algebra <- wire``): this is the only
+shared module allowed to import all four shared owners. No shared module
+may import ``app.host``.
+
+Wire discipline enforced here: strict UTF-8 JSON with duplicate-key and
+non-finite rejection in both directions; bounded payload bytes, nesting
+depth, object/array sizes, and string lengths; sorted-key,
+whitespace-free canonical JSON with SHA-256 taken over the canonical
+UTF-8 bytes; deterministic round trips; complete raw retention for
+unsupported graph versions; and no serialization of callables,
+exceptions, paths, open resources, or other Python-specific
+representations.
+"""
 
 from __future__ import annotations
 
@@ -86,7 +107,24 @@ def _reject_nan_inf(val: str) -> None:
 
 
 def parse_strict_json(raw_json: str | bytes) -> Any:
-    """Parse UTF-8 JSON strictly, rejecting duplicate keys and non-finite numbers."""
+    """Parse UTF-8 JSON strictly, rejecting duplicate keys and non-finite numbers.
+
+    Args:
+        raw_json: Payload as str or bytes; bytes are decoded as strict
+            UTF-8. Payloads beyond ``MAX_WIRE_BYTES`` (10 MB) are
+            rejected before parsing.
+
+    Returns:
+        Parsed plain-Python structure (dict/list/str/int/float/bool or
+        None).
+
+    Raises:
+        TypeError: If ``raw_json`` is neither str nor bytes.
+        ValueError: If the payload exceeds the byte bound, is not valid
+            UTF-8 or valid JSON, contains a duplicate object key, a
+            NaN/Infinity literal, or nests deeper than
+            ``MAX_WIRE_DEPTH``.
+    """
     if isinstance(raw_json, bytes):
         if len(raw_json) > MAX_WIRE_BYTES:
             raise ValueError(
@@ -132,7 +170,20 @@ def _check_parsed_depth(node: Any, depth: int) -> None:
 
 
 def to_canonical_json_bytes(data: Any) -> bytes:
-    """Serialize a JSON structure to canonical sorted-key compact UTF-8 bytes."""
+    """Serialize a JSON structure to canonical sorted-key compact UTF-8 bytes.
+
+    Keys are sorted, separators are compact (no whitespace), non-ASCII
+    characters stay literal, and non-finite floats are refused.
+
+    Args:
+        data: JSON-compatible structure.
+
+    Returns:
+        Canonical UTF-8 bytes.
+
+    Raises:
+        ValueError: If ``data`` contains a non-finite float.
+    """
     serialized = json.dumps(
         data,
         ensure_ascii=False,
@@ -144,13 +195,39 @@ def to_canonical_json_bytes(data: Any) -> bytes:
 
 
 def sha256_canonical(data: Any) -> str:
-    """Calculate the SHA-256 hex digest of a value's canonical JSON representation."""
+    """Calculate the SHA-256 hex digest of a value's canonical JSON representation.
+
+    The digest is taken over the canonical sorted-key compact UTF-8 bytes
+    produced by ``to_canonical_json_bytes``, so equal values always hash
+    equally.
+
+    Args:
+        data: JSON-compatible structure.
+
+    Returns:
+        Lowercase 64-character hex digest string.
+    """
     canonical_bytes = to_canonical_json_bytes(data)
     return hashlib.sha256(canonical_bytes).hexdigest()
 
 
 def value_to_wire(val: Value) -> Any:
-    """Project an immutable Value to JSON-serializable primitives."""
+    """Project an immutable Value to JSON-serializable primitives.
+
+    ``MissingValue`` becomes the explicit marker object
+    ``{"__missing__": true, "reason": ...}``, ``FrozenArray`` becomes a
+    list, ``FrozenObject`` becomes a dict, and scalars pass through.
+
+    Args:
+        val: Frozen value to project.
+
+    Returns:
+        Plain JSON-compatible structure.
+
+    Raises:
+        ValueError: If a float is non-finite.
+        TypeError: If ``val`` is not one of the frozen ``Value`` types.
+    """
     if val is None or isinstance(val, (bool, int, str)):
         return val
     if isinstance(val, float):
@@ -171,6 +248,19 @@ def value_from_wire(raw: Any, depth: int = 0) -> Value:
 
     Enforces nesting-depth, object-key-count, array-length, and string-length
     bounds, and strictly validates explicit missing markers.
+
+    Args:
+        raw: Decoded JSON structure.
+        depth: Current recursion depth; callers use the default.
+
+    Returns:
+        Frozen value (``FrozenObject``, ``FrozenArray``, or scalar).
+
+    Raises:
+        ValueError: If any bound is exceeded or a missing marker is
+            malformed.
+        TypeError: If a leaf is not a JSON primitive or a marker reason
+            is not a string.
     """
     if depth > MAX_WIRE_DEPTH:
         raise ValueError(f"Wire nesting depth exceeds limit of {MAX_WIRE_DEPTH}")
@@ -232,7 +322,17 @@ def _missing_value_from_wire(raw: dict[str, Any]) -> MissingValue:
 
 
 def parameter_spec_to_wire(spec: ParameterSpec) -> dict[str, Any]:
-    """Project ParameterSpec to wire dictionary."""
+    """Project ParameterSpec to wire dictionary.
+
+    Constraint, optimization, and presentation sections are emitted only
+    when present; the default is emitted only when not None.
+
+    Args:
+        spec: Parameter descriptor to project.
+
+    Returns:
+        Wire dictionary.
+    """
     result: dict[str, Any] = {
         "key": spec.key,
         "kind": spec.kind.value,
@@ -287,7 +387,17 @@ def parameter_spec_to_wire(spec: ParameterSpec) -> dict[str, Any]:
 
 
 def parameter_spec_from_wire(data: dict[str, Any]) -> ParameterSpec:
-    """Decode ParameterSpec from wire dictionary."""
+    """Decode ParameterSpec from wire dictionary.
+
+    Absent optional fields fall back to their declared defaults; all
+    validation happens in the ``ParameterSpec`` constructor.
+
+    Args:
+        data: Wire dictionary produced by ``parameter_spec_to_wire``.
+
+    Returns:
+        The reconstructed ParameterSpec.
+    """
     constraint: NumericConstraint | TextConstraint | EnumConstraint | None = None
     if "constraint" in data and data["constraint"] is not None:
         cdata = data["constraint"]
@@ -357,7 +467,15 @@ def parameter_spec_from_wire(data: dict[str, Any]) -> ParameterSpec:
 
 
 def port_spec_to_wire(port: PortSpec) -> dict[str, Any]:
-    """Project PortSpec to wire dictionary."""
+    """Project PortSpec to wire dictionary.
+
+    Args:
+        port: Port descriptor to project.
+
+    Returns:
+        Flat wire dictionary with key, kind, unit, alignment, label, and
+        description.
+    """
     return {
         "key": port.key,
         "kind": port.kind.value,
@@ -369,7 +487,14 @@ def port_spec_to_wire(port: PortSpec) -> dict[str, Any]:
 
 
 def port_spec_from_wire(data: dict[str, Any]) -> PortSpec:
-    """Decode PortSpec from wire dictionary."""
+    """Decode PortSpec from wire dictionary.
+
+    Args:
+        data: Wire dictionary produced by ``port_spec_to_wire``.
+
+    Returns:
+        The reconstructed PortSpec.
+    """
     return PortSpec(
         key=data["key"],
         kind=ValueKind(data["kind"]),
@@ -381,7 +506,18 @@ def port_spec_from_wire(data: dict[str, Any]) -> PortSpec:
 
 
 def operation_spec_to_wire(op: OperationSpec) -> dict[str, Any]:
-    """Project OperationSpec to wire dictionary."""
+    """Project OperationSpec to wire dictionary.
+
+    Emits the full self-description: parameters, typed ports,
+    determinism, numerical policy, effects, capability requirements,
+    permissions, and exact lowering targets.
+
+    Args:
+        op: Operation descriptor to project.
+
+    Returns:
+        Wire dictionary.
+    """
     return {
         "operation_id": op.operation_id,
         "title": op.title,
@@ -407,7 +543,14 @@ def operation_spec_to_wire(op: OperationSpec) -> dict[str, Any]:
 
 
 def operation_spec_from_wire(data: dict[str, Any]) -> OperationSpec:
-    """Decode OperationSpec from wire dictionary."""
+    """Decode OperationSpec from wire dictionary.
+
+    Args:
+        data: Wire dictionary produced by ``operation_spec_to_wire``.
+
+    Returns:
+        The reconstructed OperationSpec.
+    """
     from app.plugins.lowering import LoweringTarget
 
     params = tuple(parameter_spec_from_wire(p) for p in data.get("parameters", []))
@@ -450,7 +593,14 @@ def operation_spec_from_wire(data: dict[str, Any]) -> OperationSpec:
 
 
 def workspace_command_to_wire(cmd: WorkspaceCommand) -> dict[str, Any]:
-    """Project WorkspaceCommand to wire dictionary."""
+    """Project WorkspaceCommand to wire dictionary.
+
+    Args:
+        cmd: Workspace command descriptor.
+
+    Returns:
+        Wire dictionary with command_id, title, and description.
+    """
     return {
         "command_id": cmd.command_id,
         "title": cmd.title,
@@ -459,7 +609,14 @@ def workspace_command_to_wire(cmd: WorkspaceCommand) -> dict[str, Any]:
 
 
 def workspace_command_from_wire(data: dict[str, Any]) -> WorkspaceCommand:
-    """Decode WorkspaceCommand from wire dictionary."""
+    """Decode WorkspaceCommand from wire dictionary.
+
+    Args:
+        data: Wire dictionary produced by ``workspace_command_to_wire``.
+
+    Returns:
+        The reconstructed WorkspaceCommand.
+    """
     return WorkspaceCommand(
         command_id=data["command_id"],
         title=data["title"],
@@ -468,7 +625,14 @@ def workspace_command_from_wire(data: dict[str, Any]) -> WorkspaceCommand:
 
 
 def workspace_view_to_wire(view: WorkspaceView) -> dict[str, Any]:
-    """Project WorkspaceView to wire dictionary."""
+    """Project WorkspaceView to wire dictionary.
+
+    Args:
+        view: Workspace view descriptor.
+
+    Returns:
+        Wire dictionary with view_id, title, and component.
+    """
     return {
         "view_id": view.view_id,
         "title": view.title,
@@ -477,7 +641,14 @@ def workspace_view_to_wire(view: WorkspaceView) -> dict[str, Any]:
 
 
 def workspace_view_from_wire(data: dict[str, Any]) -> WorkspaceView:
-    """Decode WorkspaceView from wire dictionary."""
+    """Decode WorkspaceView from wire dictionary.
+
+    Args:
+        data: Wire dictionary produced by ``workspace_view_to_wire``.
+
+    Returns:
+        The reconstructed WorkspaceView.
+    """
     return WorkspaceView(
         view_id=data["view_id"],
         title=data["title"],
@@ -486,7 +657,17 @@ def workspace_view_from_wire(data: dict[str, Any]) -> WorkspaceView:
 
 
 def workspace_spec_to_wire(spec: WorkspaceSpec) -> dict[str, Any]:
-    """Project WorkspaceSpec to wire dictionary."""
+    """Project WorkspaceSpec to wire dictionary.
+
+    The plugin ref is serialized in canonical ``id@major.minor.patch``
+    form.
+
+    Args:
+        spec: Workspace descriptor to project.
+
+    Returns:
+        Wire dictionary with commands, views, and accepted kinds.
+    """
     return {
         "ref": spec.ref.to_string(),
         "title": spec.title,
@@ -498,7 +679,14 @@ def workspace_spec_to_wire(spec: WorkspaceSpec) -> dict[str, Any]:
 
 
 def workspace_spec_from_wire(data: dict[str, Any]) -> WorkspaceSpec:
-    """Decode WorkspaceSpec from wire dictionary."""
+    """Decode WorkspaceSpec from wire dictionary.
+
+    Args:
+        data: Wire dictionary produced by ``workspace_spec_to_wire``.
+
+    Returns:
+        The reconstructed WorkspaceSpec.
+    """
     return WorkspaceSpec(
         ref=PluginRef.parse(data["ref"]),
         title=data["title"],
@@ -517,7 +705,17 @@ def workspace_spec_from_wire(data: dict[str, Any]) -> WorkspaceSpec:
 
 
 def catalog_entry_view_to_wire(entry: CatalogEntryView) -> dict[str, Any]:
-    """Project CatalogEntryView to wire dictionary."""
+    """Project CatalogEntryView to wire dictionary.
+
+    Emits descriptor data only; the workspace section appears only when
+    present. No implementations or providers are ever serialized.
+
+    Args:
+        entry: Catalog entry view to project.
+
+    Returns:
+        Wire dictionary.
+    """
     result: dict[str, Any] = {
         "ref": entry.ref.to_string(),
         "kind": entry.kind,
@@ -532,7 +730,14 @@ def catalog_entry_view_to_wire(entry: CatalogEntryView) -> dict[str, Any]:
 
 
 def catalog_entry_view_from_wire(data: dict[str, Any]) -> CatalogEntryView:
-    """Decode CatalogEntryView from wire dictionary."""
+    """Decode CatalogEntryView from wire dictionary.
+
+    Args:
+        data: Wire dictionary produced by ``catalog_entry_view_to_wire``.
+
+    Returns:
+        The reconstructed CatalogEntryView.
+    """
     ref = PluginRef.parse(data["ref"])
     operations = tuple(
         operation_spec_from_wire(op) for op in data.get("operations", [])
@@ -554,7 +759,14 @@ def catalog_entry_view_from_wire(data: dict[str, Any]) -> CatalogEntryView:
 
 
 def catalog_view_to_wire(view: CatalogView) -> dict[str, Any]:
-    """Project CatalogView to wire dictionary."""
+    """Project CatalogView to wire dictionary.
+
+    Args:
+        view: Catalog snapshot view to project.
+
+    Returns:
+        Wire dictionary with entries and catalog_fingerprint.
+    """
     return {
         "entries": [catalog_entry_view_to_wire(e) for e in view.entries],
         "catalog_fingerprint": view.catalog_fingerprint,
@@ -562,7 +774,14 @@ def catalog_view_to_wire(view: CatalogView) -> dict[str, Any]:
 
 
 def catalog_view_from_wire(data: dict[str, Any]) -> CatalogView:
-    """Decode CatalogView from wire dictionary."""
+    """Decode CatalogView from wire dictionary.
+
+    Args:
+        data: Wire dictionary produced by ``catalog_view_to_wire``.
+
+    Returns:
+        The reconstructed CatalogView.
+    """
     entries = tuple(catalog_entry_view_from_wire(e) for e in data.get("entries", []))
     return CatalogView(
         entries=entries,
@@ -576,7 +795,23 @@ def catalog_view_from_wire(data: dict[str, Any]) -> CatalogView:
 
 
 def graph_document_to_wire(doc: GraphDocument | OpaqueGraphDocument) -> dict[str, Any]:
-    """Project GraphDocument or OpaqueGraphDocument to wire dictionary."""
+    """Project GraphDocument or OpaqueGraphDocument to wire dictionary.
+
+    Opaque documents are projected verbatim from their retained raw
+    data, so unsupported versions round trip unchanged. Supported
+    documents with subgraphs are rejected fail-closed rather than
+    silently dropping them, because schema version 1 cannot losslessly
+    encode nesting.
+
+    Args:
+        doc: Document to project.
+
+    Returns:
+        Wire dictionary.
+
+    Raises:
+        ValueError: If a supported document carries subgraphs.
+    """
     if isinstance(doc, OpaqueGraphDocument):
         return doc.raw_data.to_dict()
 
@@ -626,7 +861,23 @@ def graph_document_to_wire(doc: GraphDocument | OpaqueGraphDocument) -> dict[str
 def graph_document_from_wire(
     data: dict[str, Any],
 ) -> GraphDocument | OpaqueGraphDocument:
-    """Decode a GraphDocument or OpaqueGraphDocument from wire dictionary."""
+    """Decode a GraphDocument or OpaqueGraphDocument from wire dictionary.
+
+    Documents whose schema version differs from ``GRAPH_SCHEMA_VERSION``
+    are preserved verbatim as an ``OpaqueGraphDocument`` retaining the
+    complete decoded object. Subgraph-bearing version-1 payloads are
+    rejected fail-closed instead of being silently dropped.
+
+    Args:
+        data: Wire dictionary produced by ``graph_document_to_wire``.
+
+    Returns:
+        GraphDocument for supported versions, otherwise the opaque
+        raw-retaining form.
+
+    Raises:
+        ValueError: If a supported-version payload carries subgraphs.
+    """
     schema_ver = data.get("schema_version", 1)
     if schema_ver != GRAPH_SCHEMA_VERSION:
         return OpaqueGraphDocument(
@@ -710,7 +961,19 @@ def graph_document_from_wire(
 
 
 def semantic_program_to_wire(prog: SemanticProgram) -> dict[str, Any]:
-    """Project SemanticProgram to wire dictionary."""
+    """Project SemanticProgram to wire dictionary.
+
+    Value references and literals are distinguished by a ``type`` tag of
+    ``"ref"`` or ``"literal"``; parameters and literal values use the
+    value projection, so explicit missing markers survive the round
+    trip.
+
+    Args:
+        prog: Semantic IR program to project.
+
+    Returns:
+        Wire dictionary including ``ir_schema_version``.
+    """
     inputs_wire = [
         {
             "key": inp.key,
@@ -770,7 +1033,17 @@ def semantic_program_to_wire(prog: SemanticProgram) -> dict[str, Any]:
 
 
 def semantic_program_from_wire(data: dict[str, Any]) -> SemanticProgram:
-    """Decode SemanticProgram from wire dictionary."""
+    """Decode SemanticProgram from wire dictionary.
+
+    The ``SemanticProgram`` constructor re-validates the full ordered
+    DAG, so decoding a tampered program fails closed.
+
+    Args:
+        data: Wire dictionary produced by ``semantic_program_to_wire``.
+
+    Returns:
+        The reconstructed SemanticProgram.
+    """
     inputs = tuple(
         ProgramInput(
             key=inp["key"],

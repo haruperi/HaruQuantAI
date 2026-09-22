@@ -1,4 +1,17 @@
-"""Graph specifications, document models, cycle detection, and catalog validation."""
+"""Graph specifications, document models, cycle detection, and catalog validation.
+
+Authority: this module owns graph schema version 1 of the shared plugin
+metamodel, as ratified for the S2 handoff in
+``docs/dev/backend_implementation_handoff_s2_s5.md``: bounded workflow
+graph specs, versioned documents (including opaque documents for
+unsupported versions), and structural/catalog validation of a document
+against an immutable ``CatalogView`` supplied by the caller.
+
+Position in the shared-module import DAG
+(``schema <- lowering <- spec <- algebra <- wire``): this module imports
+``schema`` and ``spec``. No shared module may import ``app.host``; the
+catalog arrives as an immutable document, never as a registry lookup.
+"""
 
 from __future__ import annotations
 
@@ -23,7 +36,11 @@ MAX_GRAPH_EDGES = 5_000
 
 @dataclass(frozen=True, slots=True)
 class PortRef:
-    """Reference to a port on a graph node."""
+    """Reference to a port on a graph node.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``node_id`` is a
+    non-empty string and ``port_key`` is a bounded lowercase identifier.
+    """
 
     node_id: str
     port_key: str
@@ -37,7 +54,13 @@ class PortRef:
 
 @dataclass(frozen=True, slots=True)
 class EdgeSpec:
-    """Directed connection from a source output port to a target input port."""
+    """Directed connection from a source output port to a target input port.
+
+    Frozen and slotted. Validation in ``__post_init__``: both endpoints
+    are ``PortRef`` instances and an edge may never connect a node to
+    itself; stateful recurrence is node behavior, never a self-edge or a
+    cycle.
+    """
 
     source: PortRef
     target: PortRef
@@ -56,7 +79,15 @@ class EdgeSpec:
 
 @dataclass(frozen=True, slots=True)
 class NodeSpec:
-    """One immutable node in a quantitative graph."""
+    """One immutable node in a quantitative graph.
+
+    Frozen and slotted. Carries the exact plugin ref and operation ID,
+    immutable parameters, a display title, and optional extension data.
+    Validation in ``__post_init__``: ``id`` is a non-empty string,
+    ``plugin_ref`` is a ``PluginRef``, ``operation_id`` is a bounded
+    lowercase identifier, and ``parameters``/``extension_data`` are
+    ``FrozenObject`` instances.
+    """
 
     id: str
     plugin_ref: PluginRef
@@ -81,6 +112,7 @@ class NodeSpec:
 
 
 def _check_spec_tuples(spec: GraphSpec) -> None:
+    """Validate tuple types and node/edge count bounds."""
     if not isinstance(spec.nodes, tuple):
         raise TypeError("GraphSpec nodes must be a tuple")
     if len(spec.nodes) > MAX_GRAPH_NODES:
@@ -96,6 +128,7 @@ def _check_spec_tuples(spec: GraphSpec) -> None:
 
 
 def _check_spec_elements(spec: GraphSpec) -> None:
+    """Validate element types and node ID uniqueness."""
     seen_node_ids: set[str] = set()
     for node in spec.nodes:
         if not isinstance(node, NodeSpec):
@@ -115,7 +148,18 @@ def _check_spec_elements(spec: GraphSpec) -> None:
 
 @dataclass(frozen=True, slots=True)
 class GraphSpec:
-    """Bounded quantitative workflow DAG specification."""
+    """Bounded quantitative workflow graph DAG specification.
+
+    Frozen and slotted. Graphs are acyclic by contract: stateful behavior
+    such as recurrence lives inside node operations, never in a graph
+    cycle, and validation rejects cycles outright. Validation in
+    ``__post_init__``: ``schema_version`` is an integer >= 1, at most
+    ``MAX_GRAPH_NODES`` (1,000) nodes and ``MAX_GRAPH_EDGES`` (5,000)
+    edges, nodes/edges/roots/subgraphs are tuples of the correct element
+    types, and node IDs are unique. Nested ``subgraphs`` are
+    representable but rejected fail-closed by v1 validation and wire
+    encoding rather than being silently dropped.
+    """
 
     schema_version: int = GRAPH_SCHEMA_VERSION
     nodes: tuple[NodeSpec, ...] = ()
@@ -133,7 +177,11 @@ class GraphSpec:
 
 @dataclass(frozen=True, slots=True)
 class GraphDocument:
-    """Versioned document containing a quantitative graph and metadata."""
+    """Versioned document containing a quantitative graph and metadata.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``spec`` is a
+    ``GraphSpec`` and ``metadata`` is a ``FrozenObject``.
+    """
 
     spec: GraphSpec
     metadata: FrozenObject = EMPTY_FROZEN_OBJECT
@@ -148,7 +196,16 @@ class GraphDocument:
 
 @dataclass(frozen=True, slots=True)
 class OpaqueGraphDocument:
-    """Document for unsupported versions, preserving complete raw representation."""
+    """Document for unsupported versions, preserving complete raw representation.
+
+    Frozen and slotted. Produced when decoding a document whose schema
+    version is not supported: the complete decoded object is retained in
+    ``raw_data`` so it can be round-tripped unchanged. It is read-only
+    for this metamodel — validation reports it unsupported, and it can
+    never be executed or automatically rewritten. Validation in
+    ``__post_init__``: ``schema_version`` is an int and ``raw_data`` is a
+    ``FrozenObject``.
+    """
 
     schema_version: int
     raw_data: FrozenObject
@@ -163,7 +220,16 @@ class OpaqueGraphDocument:
 
 @dataclass(frozen=True, slots=True)
 class GraphValidationResult:
-    """Attributed result of validating a graph document against a catalog view."""
+    """Attributed result of validating a graph document against a catalog view.
+
+    Frozen and slotted. ``is_valid`` is true only when no issues at all
+    were found; ``can_execute`` is false when any issue blocks execution
+    (unavailable plugins or operations, port kind/unit/alignment
+    mismatches, cycles, subgraphs, or unsupported versions).
+    ``normalized_document`` is constructed for every supported version,
+    valid or not, so rejected documents remain readable and structurally
+    intact.
+    """
 
     is_valid: bool
     can_execute: bool
@@ -183,7 +249,12 @@ class GraphValidationResult:
 def _detect_cycles(
     nodes: tuple[NodeSpec, ...], edges: tuple[EdgeSpec, ...]
 ) -> list[str]:
-    """Check for cycles in the directed graph using Kahn's algorithm."""
+    """Check for cycles in the directed graph using Kahn's algorithm.
+
+    Edges touching unknown node IDs are ignored here; those are reported
+    separately by edge validation. Returns one message listing the node
+    IDs left on cycles.
+    """
     in_degree: dict[str, int] = {node.id: 0 for node in nodes}
     adj: dict[str, list[str]] = defaultdict(list)
 
@@ -219,6 +290,15 @@ def _validate_node(
     dict[str, PortSpec] | None,
     dict[str, PortSpec] | None,
 ]:
+    """Validate one node against the catalog.
+
+    An unknown plugin or operation yields an attributed unavailability
+    issue and leaves the node structurally intact but non-executable.
+    Known nodes have their parameters bound against the operation schema;
+    the returned node carries the normalized parameter values. Returns
+    the issues, executability, the normalized node, and the operation's
+    input/output port maps (None when unavailable).
+    """
     issues: list[ValidationIssue] = []
     op_spec = catalog.get_operation(node.plugin_ref, node.operation_id)
     if op_spec is None:
@@ -281,6 +361,13 @@ def _validate_edge_ports(
     src_ports: dict[str, PortSpec],
     tgt_ports: dict[str, PortSpec],
 ) -> tuple[list[ValidationIssue], bool]:
+    """Validate one edge's ports for existence, kind, unit, and alignment.
+
+    Kinds must match exactly. Units must match exactly unless the
+    consuming (target) port declares ``Unit.NONE``, which accepts any
+    source unit. Alignments must match unless either side declares
+    ``Alignment.NONE``.
+    """
     issues: list[ValidationIssue] = []
     can_exec = True
     if edge.source.port_key not in src_ports:
@@ -361,6 +448,7 @@ def _validate_edges(
     known_outputs: dict[str, dict[str, PortSpec]],
     known_inputs: dict[str, dict[str, PortSpec]],
 ) -> tuple[list[ValidationIssue], bool]:
+    """Validate edge endpoints and port compatibility where both are known."""
     issues: list[ValidationIssue] = []
     can_exec = True
     for idx, edge in enumerate(edges):
@@ -399,6 +487,7 @@ def _validate_roots(
     node_map: dict[str, NodeSpec],
     known_outputs: dict[str, dict[str, PortSpec]],
 ) -> tuple[list[ValidationIssue], bool]:
+    """Validate that designated roots name existing nodes and output ports."""
     issues: list[ValidationIssue] = []
     can_exec = True
     for idx, root in enumerate(roots):
@@ -439,6 +528,7 @@ def _validate_all_nodes(
     dict[str, dict[str, PortSpec]],
     dict[str, dict[str, PortSpec]],
 ]:
+    """Validate every node, aggregating issues, port maps, and normalized nodes."""
     issues: list[ValidationIssue] = []
     can_exec = True
     known_outputs: dict[str, dict[str, PortSpec]] = {}
@@ -461,7 +551,32 @@ def validate_graph(
     doc: GraphDocument | OpaqueGraphDocument,
     catalog: CatalogView,
 ) -> GraphValidationResult:
-    """Validate a graph document against an immutable catalog view."""
+    """Validate a graph document against an immutable catalog view.
+
+    Fail-closed checks: unsupported (opaque or version-mismatched)
+    documents are reported read-only and never executed or rewritten;
+    subgraph-bearing documents are rejected rather than silently dropping
+    the subgraphs; cycles are rejected because recurrence is node
+    behavior, never a graph cycle. Nodes referencing unknown plugins or
+    operations stay readable and structurally intact but make the
+    document non-executable. Supported documents are always normalized:
+    each node's parameters are replaced by schema-bound values with
+    defaults applied.
+
+    Args:
+        doc: Graph document to validate; opaque documents are reported
+            as unsupported.
+        catalog: Immutable wire-safe catalog snapshot supplied by the
+            caller.
+
+    Returns:
+        GraphValidationResult whose ``normalized_document`` is present
+        for every supported version, valid or not.
+
+    Raises:
+        TypeError: If ``doc`` is neither ``GraphDocument`` nor
+            ``OpaqueGraphDocument``.
+    """
     if isinstance(doc, OpaqueGraphDocument):
         issue = ValidationIssue(
             path="schema_version",

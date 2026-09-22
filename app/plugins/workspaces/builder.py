@@ -1,4 +1,20 @@
-"""Strategy Builder workspace plugin."""
+"""Strategy Builder workspace plugin.
+
+Cohesive single-file plugin owning its commands, views, and workspace
+descriptor. Stable identity: ``workspace.builder@1.0.0``. The
+zero-argument ``plugin()`` factory is pure — no I/O, no registration,
+no tasks or threads, no environment reads — and the plugin is
+discovered through the host catalog, never imported by name.
+
+A workspace plugin is declarative only: ``BUILDER_COMMANDS`` and
+``BUILDER_VIEWS`` name the graph-editing interactions and UI components
+the builder supports, and ``accepted_kinds`` (``indicator``,
+``comparison``, ``exporter``) selects which plugin kinds may
+participate in its graphs. Declaring the workspace starts no service;
+behavior lives in the host and UI. This file imports only shared
+metamodel types — never other plugins, UI code, or host
+implementations — and contributes no operations.
+"""
 
 from __future__ import annotations
 
@@ -95,7 +111,17 @@ BUILDER_PLUGIN_SPEC = PluginSpec(
 
 
 def plugin() -> PluginContribution:
-    """Return the Strategy Builder workspace plugin contribution."""
+    """Return the Strategy Builder workspace plugin contribution.
+
+    Pure zero-argument factory returning the declarative PluginSpec
+    (kind ``workspace``, identity workspace.builder@1.0.0, no
+    operations) without side effects; discovery happens through the
+    host catalog.
+
+    Returns:
+        Immutable PluginContribution carrying only the workspace
+        descriptor.
+    """
     return PluginContribution(
         spec=BUILDER_PLUGIN_SPEC,
         operations=(),

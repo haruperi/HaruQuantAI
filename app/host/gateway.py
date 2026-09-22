@@ -1,4 +1,34 @@
-"""Host gateway owner: versioned HTTP transport, ASGI dispatch, and server lifecycle."""
+"""Host gateway owner: versioned local HTTP transport and server lifecycle.
+
+One host owner = one file: this module owns the public ``Gateway``
+protocol, the ``HOST_GATEWAY`` capability token (``host.gateway@1``),
+and ``GatewayConfig``. Route handlers, the ASGI app, and the server
+thread are private; ``_gateway_feature`` is a composition-only
+constructor used solely by ``app.host.bootstrap``.
+
+The owner serves the versioned ``/api/v1`` JSON API only: a
+health/catalog/selection/validation/execution/export surface with
+enveloped responses. Server libraries are optional and lazy —
+starlette is imported only when an app or response is constructed
+and uvicorn only when ``start`` runs, so importing this module
+requires neither. The default bind is loopback; CORS uses an
+explicit origin allowlist (never a wildcard, never credentials).
+Every route carries a request timeout, and CPU-bound executions are
+offloaded via ``asyncio.to_thread`` with their cancellation token
+cancelled on coroutine cancellation, so a blocking run can neither
+block the event loop nor defeat the timeout.
+
+Authorization is host-owned: effects, permissions, and capabilities
+are granted only through ``GatewayConfig`` at composition time;
+request bodies carrying entitlement claims are rejected, and body
+effect filters can only narrow the host policy. Error responses map
+host-authored errors to bounded messages while unknown exceptions
+degrade to a generic internal error, so no path or secret crosses
+the boundary. Each request emits a ``gateway.request`` telemetry
+event. Because the runtime closes features in reverse start order,
+the gateway server stops and drains before the catalog and execution
+capabilities withdraw.
+"""
 
 from __future__ import annotations
 
@@ -61,7 +91,26 @@ class GatewayError(RuntimeError):
 
 @dataclass(frozen=True, slots=True)
 class GatewayConfig:
-    """Configuration for the host gateway HTTP server."""
+    """Configuration for the host gateway HTTP server.
+
+    Attributes:
+        bind_host: Bind address; loopback (``127.0.0.1``) by default.
+        port: Listening port; ``0`` requests an ephemeral port.
+        allowed_origins: Explicit CORS origin allowlist; the wildcard
+            ``*`` is rejected and credentials are never allowed.
+        max_payload_bytes: Request body ceiling.
+        request_timeout_seconds: Per-route deadline for every
+            request.
+        shutdown_timeout_seconds: Grace period when joining the
+            server thread on stop.
+        allowed_effects: Effect vocabulary granted by the host.
+        permissions: Permission set granted by the host.
+        available_capabilities: Capability set granted by the host.
+
+    Note:
+        The authorization triple is granted at composition time
+        only; request bodies can never widen it.
+    """
 
     bind_host: str = "127.0.0.1"
     port: int = 8000
@@ -109,7 +158,12 @@ DEFAULT_GATEWAY_CONFIG = GatewayConfig()
 
 
 class Gateway(Protocol):
-    """Public gateway owner protocol."""
+    """Public gateway owner protocol exposed as ``host.gateway@1``.
+
+    The implementing provider is private and is wired to its peer
+    host capabilities by the composition root; callers only consume
+    the config, liveness, and server lifecycle surface here.
+    """
 
     @property
     def config(self) -> GatewayConfig:
@@ -118,24 +172,53 @@ class Gateway(Protocol):
 
     @property
     def is_running(self) -> bool:
-        """Return True if local server thread is active and listening."""
+        """Return True if the local server thread is active and listening.
+
+        True from a successful ``start`` until ``stop`` completes.
+        """
         ...
 
     @property
     def bound_address(self) -> tuple[str, int] | None:
-        """Return bound (host, port) tuple if server is running, else None."""
+        """Return the bound (host, port) tuple if the server is running.
+
+        The actually bound address is reported, which matters when
+        the config requested an ephemeral port; ``None`` otherwise.
+        """
         ...
 
     def create_asgi_app(self) -> Any:
-        """Construct and return the Starlette ASGI application with lazy imports."""
+        """Construct and return the Starlette ASGI application with lazy imports.
+
+        Returns:
+            The ASGI application with the versioned ``/api/v1``
+            routes and the allowlisted CORS middleware.
+
+        Raises:
+            RuntimeError: If starlette is not installed.
+        """
         ...
 
     def start(self) -> None:
-        """Start local Uvicorn server in a background thread."""
+        """Start the local Uvicorn server in a background thread.
+
+        Imports uvicorn lazily, binds the configured address, and
+        waits a bounded time for the server to start. Idempotent: a
+        second call while running is a no-op.
+
+        Raises:
+            RuntimeError: If uvicorn is not installed.
+        """
         ...
 
     def stop(self) -> None:
-        """Stop local Uvicorn server gracefully."""
+        """Stop the local Uvicorn server gracefully.
+
+        Stops admission of new requests, joins the server thread for
+        the configured shutdown timeout, force-closes any remaining
+        sockets, and is idempotent. Called before the catalog and
+        execution capabilities withdraw at runtime close.
+        """
         ...
 
 
@@ -143,6 +226,7 @@ HOST_GATEWAY = Capability[Gateway]("host.gateway", major=1)
 
 
 def _success_envelope(data: Any, request_id: str) -> dict[str, Any]:
+    """Build the versioned success envelope for one request."""
     return {
         "api_version": GATEWAY_API_VERSION,
         "request_id": request_id,
@@ -173,8 +257,10 @@ def _safe_error_code_and_message(
 ) -> tuple[str, str]:
     """Map an exception to a stable code and safe message.
 
-    Host-authored error types keep their bounded messages; anything else
-    degrades to a generic internal error so no path, secret, or arbitrary
+    Host-authored error types keep their bounded messages; plain
+    ValueError/TypeError map to ``INVALID_REQUEST`` with their
+    message as caller-error feedback; anything else degrades to a
+    generic internal error so no path, secret, or arbitrary
     exception text crosses the boundary.
     """
     if isinstance(ex, (ExecutionError, CatalogError)):
@@ -190,6 +276,7 @@ def _error_envelope(
     request_id: str,
     issues: Sequence[Any] | None = None,
 ) -> dict[str, Any]:
+    """Build the versioned error envelope with code, message, and issues."""
     return {
         "api_version": GATEWAY_API_VERSION,
         "request_id": request_id,
@@ -204,7 +291,12 @@ def _error_envelope(
 
 
 class _GatewayProvider:
-    """Internal concrete provider of the Gateway capability."""
+    """Internal concrete provider of the Gateway capability.
+
+    Private. Owns the route handlers, the lazily built ASGI app, and
+    the single background server thread; peer capabilities are
+    injected after feature discovery.
+    """
 
     def __init__(
         self,
@@ -255,7 +347,13 @@ class _GatewayProvider:
             _ACTIVE_CANCELLATION.reset(token_ref)
 
     def _timed(self, handler: Any, route: str) -> Any:
-        """Wrap a handler with the configured request timeout and telemetry."""
+        """Wrap a handler with the configured request timeout and telemetry.
+
+        A timeout cancels the active execution token, answers with a
+        504 ``REQUEST_TIMEOUT`` envelope, and every completion path
+        emits a ``gateway.request`` event with route, status, and
+        elapsed milliseconds.
+        """
 
         async def wrapped(request: Any) -> Any:
             start = time.perf_counter()
@@ -290,14 +388,17 @@ class _GatewayProvider:
 
     @property
     def config(self) -> GatewayConfig:
+        """The active immutable configuration."""
         return self._config
 
     @property
     def is_running(self) -> bool:
+        """Whether a server is active and bound."""
         return self._server is not None and self._bound_address is not None
 
     @property
     def bound_address(self) -> tuple[str, int] | None:
+        """The actually bound (host, port), or None while stopped."""
         return self._bound_address
 
     def set_dependencies(
@@ -314,7 +415,11 @@ class _GatewayProvider:
         self._telemetry = telemetry
 
     async def _read_body_strictly(self, request: Any) -> tuple[Any, str | None]:
-        """Read and strictly parse request body, checking max payload size."""
+        """Read and strictly parse the request body, checking max payload size.
+
+        Duplicate JSON keys are rejected. Returns the parsed object
+        with no error, or ``None`` with a bounded error message.
+        """
         body = await request.body()
         if len(body) > self._config.max_payload_bytes:
             return None, (
@@ -328,6 +433,7 @@ class _GatewayProvider:
             return None, f"Malformed or duplicate JSON: {err}"
 
     async def _handle_health(self, req: Any) -> Any:
+        """Report readiness of the gateway, catalog, and execution services."""
         from starlette.responses import JSONResponse
 
         req_id = req.headers.get("X-Request-Id") or str(uuid.uuid4())
@@ -351,6 +457,7 @@ class _GatewayProvider:
         )
 
     async def _handle_catalog(self, req: Any) -> Any:
+        """Serve the published catalog view, or 503 while unready."""
         from starlette.responses import JSONResponse
 
         req_id = req.headers.get("X-Request-Id") or str(uuid.uuid4())
@@ -367,6 +474,13 @@ class _GatewayProvider:
         )
 
     async def _handle_catalog_select(self, req: Any) -> Any:
+        """Evaluate selection under host-owned authorization.
+
+        Bodies declaring ``permissions`` or ``available_capabilities``
+        are rejected with ``AUTHORIZATION_FIELDS_REJECTED``; a body's
+        ``allowed_effects`` can only narrow the host-configured
+        effects. Everything else in the selection stays host-granted.
+        """
         from starlette.responses import JSONResponse
 
         req_id = req.headers.get("X-Request-Id") or str(uuid.uuid4())
@@ -445,6 +559,7 @@ class _GatewayProvider:
             )
 
     async def _handle_graphs_validate(self, req: Any) -> Any:
+        """Validate a posted graph against the live catalog snapshot."""
         from starlette.responses import JSONResponse
 
         req_id = req.headers.get("X-Request-Id") or str(uuid.uuid4())
@@ -506,6 +621,12 @@ class _GatewayProvider:
             )
 
     async def _handle_executions_evaluate(self, req: Any) -> Any:
+        """Run one execution offloaded to a worker thread.
+
+        Builds a fresh per-request cancellation token so the timeout
+        can interrupt the run, and serializes the reproducibility
+        record into the response.
+        """
         from starlette.responses import JSONResponse
 
         req_id = req.headers.get("X-Request-Id") or str(uuid.uuid4())
@@ -622,6 +743,7 @@ class _GatewayProvider:
             )
 
     async def _handle_executions_batch(self, req: Any) -> Any:
+        """Run bounded batch trials offloaded to a worker thread."""
         from starlette.responses import JSONResponse
 
         req_id = req.headers.get("X-Request-Id") or str(uuid.uuid4())
@@ -731,6 +853,7 @@ class _GatewayProvider:
             )
 
     async def _handle_exports(self, req: Any) -> Any:
+        """Lower and export a graph through the requested target's exporter."""
         from starlette.responses import JSONResponse
 
         req_id = req.headers.get("X-Request-Id") or str(uuid.uuid4())
@@ -802,7 +925,11 @@ class _GatewayProvider:
             )
 
     def create_asgi_app(self) -> Any:
-        """Construct and return the Starlette ASGI application with lazy imports."""
+        """Construct and return the Starlette ASGI application with lazy imports.
+
+        Raises:
+            RuntimeError: If starlette is not installed.
+        """
         try:
             from starlette.applications import Starlette
             from starlette.middleware import Middleware
@@ -872,7 +999,16 @@ class _GatewayProvider:
         return Starlette(debug=False, routes=routes, middleware=middleware)
 
     def start(self) -> None:
-        """Start local Uvicorn server in a background thread."""
+        """Start local Uvicorn server in a background thread.
+
+        Uvicorn is imported lazily here, the server runs on a daemon
+        thread with its own event loop, and start waits a bounded
+        time for the bind before reporting the bound address.
+        Idempotent while running.
+
+        Raises:
+            RuntimeError: If uvicorn is not installed.
+        """
         if self._server is not None:
             return
 
@@ -922,7 +1058,12 @@ class _GatewayProvider:
             self._bound_address = (self._config.bind_host, self._config.port)
 
     def stop(self) -> None:
-        """Stop local Uvicorn server gracefully."""
+        """Stop local Uvicorn server gracefully.
+
+        Stops admission of new requests, joins the server thread for
+        the configured shutdown timeout, then force-closes any
+        remaining server sockets. Idempotent.
+        """
         if self._server is None:
             return
         self._server.should_exit = True
@@ -957,7 +1098,12 @@ class _GatewayFeature(Feature):
 
     @override
     async def start(self, context: FeatureContext) -> None:
-        """Inject peer capabilities, publish capability, and optionally start server."""
+        """Inject peer capabilities, publish capability, and optionally start server.
+
+        Registering ``stop`` on close before publishing means the
+        runtime's reverse-order shutdown stops and drains the server
+        before the catalog and execution capabilities withdraw.
+        """
         catalog = context.require(HOST_CATALOG)
         execution = context.require(HOST_EXECUTION)
         telemetry = context.require(HOST_TELEMETRY)

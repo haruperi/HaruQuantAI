@@ -1,4 +1,24 @@
-"""Application composition root for approved host owners."""
+"""Application composition root for approved host owners.
+
+This module is the only composition and worker entry point; there is
+no ``app/main.py``. ``create_runtime`` selects which host features
+participate and hands them to the single-use ``Runtime``, which
+starts providers before consumers and closes them in reverse order
+at shutdown — the gateway stops and drains before the execution,
+catalog, and telemetry capabilities withdraw.
+
+Composition order: telemetry always first (it receives every
+lifecycle diagnostic), optional storage and artifacts, then catalog
+and execution always, then optional workers, jobs, and gateway. The
+gateway serves only when ``gateway_auto_start`` is set.
+
+The ``--worker`` child mode (``python -m app.host.bootstrap
+--worker``, spawned by the workers owner) serves exactly one
+strict-JSON execution request on stdin and writes one
+canonical-JSON response envelope on stdout, verifying pinned
+catalog, entry, and dependency fingerprints before executing and
+never silently substituting code.
+"""
 
 from __future__ import annotations
 
@@ -36,7 +56,17 @@ from app.plugins.wire import (
 
 
 def approved_catalog_roots(repo_root: Path | None = None) -> tuple[CatalogRoot, ...]:
-    """Return explicit CatalogRoot configurations for approved quantitative families."""
+    """Return explicit CatalogRoot configurations for approved quantitative families.
+
+    Args:
+        repo_root: Repository base containing ``plugins/``; defaults
+            to the parent of this file's ``app/`` directory.
+
+    Returns:
+        Roots for the ``indicators``, ``comparisons``, ``exporters``,
+        and ``workspaces`` families, each admitting only its own
+        plugin kinds.
+    """
     base = (repo_root or Path(__file__).resolve().parent.parent) / "plugins"
     return (
         CatalogRoot(
@@ -74,7 +104,33 @@ def create_runtime(
     gateway_config: GatewayConfig | None = None,
     gateway_auto_start: bool = False,
 ) -> Runtime:
-    """Construct a fresh, inactive runtime for the currently approved host."""
+    """Construct a fresh, inactive runtime for the currently approved host.
+
+    Telemetry is always composed first and receives every lifecycle
+    diagnostic; storage and artifacts are optional; catalog and
+    execution are always composed; workers, jobs, and the gateway
+    join only when configured. The returned runtime serves nothing
+    until entered, and every capability resolves through it.
+
+    Args:
+        telemetry_max_subscribers: Subscription bound for telemetry.
+        diagnostic_capacity: Capacity of the bounded diagnostic ring.
+        catalog_roots: Explicit plugin family roots to scan.
+        storage_config: Optional durable storage configuration.
+        artifacts_config: Optional artifact store configuration.
+        workers_config: Optional subprocess worker supervisor.
+        jobs_config: Optional job queue configuration.
+        gateway_config: Optional HTTP gateway configuration.
+        gateway_auto_start: Start serving immediately when true.
+
+    Returns:
+        A single-use, inactive ``Runtime``; capabilities resolve only
+        inside its async context, and close runs in reverse start
+        order.
+
+    Raises:
+        ValueError: If telemetry bounds are not positive.
+    """
     telemetry = _telemetry_feature(
         max_subscribers=telemetry_max_subscribers,
         diagnostic_capacity=diagnostic_capacity,
@@ -212,8 +268,16 @@ def _verify_worker_identity(
 ) -> tuple[str, str] | None:
     """Verify pinned catalog/entry/dependency fingerprints, or reject.
 
-    Returns an (error_code, message) tuple when verification fails, None
-    when the pinned identity matches. Never silently substitutes code.
+    Checks the pinned whole-catalog fingerprint first, then each
+    pinned entry fingerprint via admission, then the combined
+    dependency fingerprint computed over the admitted entries only.
+
+    Returns:
+        An ``(error_code, message)`` tuple when verification fails
+        (``CATALOG_FINGERPRINT_MISMATCH``, ``DEPENDENCY_MISSING``,
+        ``ENTRY_FINGERPRINT_MISMATCH``, or
+        ``DEPENDENCY_FINGERPRINT_MISMATCH``), or ``None`` when the
+        pinned identity matches. Never silently substitutes code.
     """
     if catalog_fp and catalog_svc.snapshot().whole_fingerprint != catalog_fp:
         return (
@@ -259,7 +323,24 @@ def _verify_worker_identity(
 
 
 def worker_main(argv: Sequence[str] | None = None) -> int:
-    """Entry point for worker subprocess mode."""
+    """Entry point for worker subprocess mode.
+
+    Reads exactly one strict-JSON request from stdin. Only version 1
+    with task kind ``execution.evaluate`` is served; an unsupported
+    version or kind, a malformed payload, or a fingerprint mismatch
+    yields a versioned error envelope on stdout. A valid request
+    composes a fresh runtime over the approved catalog roots,
+    verifies any pinned fingerprints before executing, and writes
+    exactly one canonical-JSON response envelope on stdout. Empty
+    stdin terminates the child with exit status 1.
+
+    Args:
+        argv: Ignored; accepted for entry-point compatibility.
+
+    Returns:
+        The process exit code, 0 once the single response was
+        written.
+    """
     _ = argv
     task_id = ""
 

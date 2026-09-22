@@ -1,4 +1,32 @@
-"""Relative Strength Index (RSI) indicator plugin."""
+"""Relative Strength Index (RSI) indicator plugin.
+
+Cohesive single-file plugin: the calculation behavior, parameter schema
+and bounds, lowering, and presentation metadata for the RSI concept all
+live in this file and nowhere else. Stable identity:
+``indicator.rsi@1.0.0``. The zero-argument ``plugin()`` factory is pure
+— no I/O, no tasks or threads, no environment reads, no registration —
+and returns an immutable ``PluginContribution``; the plugin is
+discovered through the host catalog and is never imported by name by
+the host or by other plugins.
+
+Numerical semantics (cross-checked against the scalar reference below
+and ``tests/plugins/test_rsi.py``): Wilder smoothing over price deltas.
+After one finite sample establishes a previous value, the first
+``period`` consecutive finite deltas seed the average gain/loss with a
+simple mean; every later step applies the Wilder recurrence
+``avg = (avg * (period - 1) + x) / period``. The first sample of a
+series (or of any post-gap segment) is warm-up missing; an explicit
+missing or None sample emits ``MissingValue("GAP")`` and resets all
+state, so reseeding again needs one sample plus ``period`` consecutive
+finite deltas. Degenerate rules: both averages zero -> 50.0; average
+loss zero -> 100.0; average gain zero -> 0.0; otherwise
+``100 - 100 / (1 + avg_gain / avg_loss)``. Output length always equals
+input length. Non-numeric samples raise TypeError and non-finite
+samples raise ValueError before any calculation runs.
+
+Parameter ``period``: integer constrained to 2..1000 with default 14;
+the optimization domain searches 2..100 with step 1 on a linear scale.
+"""
 
 from __future__ import annotations
 
@@ -99,7 +127,11 @@ RSI_POLICY = NumericalPolicy(
 
 
 def _validate_rsi_inputs(raw_series: Sequence[Any]) -> None:
-    """Validate that input series contains finite numeric values."""
+    """Validate that input series contains finite numeric values.
+
+    None and MissingValue samples are permitted gaps; every other
+    sample must be numeric and finite.
+    """
     for idx, val in enumerate(raw_series):
         if val is not None and not isinstance(val, MissingValue):
             if not isinstance(val, (int, float)) or isinstance(val, bool):
@@ -116,7 +148,14 @@ def _validate_rsi_inputs(raw_series: Sequence[Any]) -> None:
 def _compute_rsi_values(
     raw_series: Sequence[Any], period: int
 ) -> tuple[float | MissingValue, ...]:
-    """Compute RSI values series using Wilder smoothing."""
+    """Compute RSI values series using Wilder smoothing.
+
+    Implements the module semantics: ``period`` consecutive finite
+    deltas seed the averages with a simple mean, later steps apply the
+    Wilder recurrence, gaps reset all state, warm-up samples yield
+    ``MissingValue("WARMUP")``, and the 50/100/0 degenerate rules apply.
+    The returned tuple has exactly one output per input sample.
+    """
     outputs: list[float | MissingValue] = []
     consecutive_deltas: list[tuple[float, float]] = []
     prev_val: float | None = None
@@ -179,7 +218,14 @@ class ScalarRsiReference:
     """
 
     def __init__(self, period: int) -> None:
-        """Initialize scalar reference with a validated period."""
+        """Initialize scalar reference with a validated period.
+
+        Args:
+            period: Lookback period within ``[MIN_PERIOD, MAX_PERIOD]``.
+
+        Raises:
+            ValueError: If ``period`` is not an integer in range.
+        """
         if not isinstance(period, int) or not (MIN_PERIOD <= period <= MAX_PERIOD):
             raise ValueError(
                 f"period must be an integer in [{MIN_PERIOD}, {MAX_PERIOD}], "
@@ -192,7 +238,18 @@ class ScalarRsiReference:
         self._avg_loss: float | None = None
 
     def step(self, sample: float | MissingValue | None) -> float | MissingValue:
-        """Consume one sample and return the RSI value at that index."""
+        """Consume one sample and return the RSI value at that index.
+
+        Args:
+            sample: One numeric sample, or None/MissingValue for a gap.
+
+        Returns:
+            The RSI value, or a warm-up/gap MissingValue marker.
+
+        Raises:
+            TypeError: If a non-missing sample is not numeric.
+            ValueError: If a sample is non-finite.
+        """
         if sample is None or isinstance(sample, MissingValue):
             self._prev = None
             self._seed.clear()
@@ -242,22 +299,51 @@ def _rsi_from_averages(avg_gain: float, avg_loss: float) -> float:
 def scalar_reference_rsi(
     raw_series: Sequence[Any], period: int
 ) -> tuple[float | MissingValue, ...]:
-    """Run the scalar reference over a whole series, one sample per step."""
+    """Run the scalar reference over a whole series, one sample per step.
+
+    Args:
+        raw_series: Input series of numbers, None, or MissingValue.
+        period: Lookback period within ``[MIN_PERIOD, MAX_PERIOD]``.
+
+    Returns:
+        Tuple of RSI values or missing markers, one per input sample.
+    """
     ref = ScalarRsiReference(period)
     return tuple(ref.step(s) for s in raw_series)
 
 
 class RsiOperation(OperationImplementation):
-    """Execution and lowering implementation for RSI calculation."""
+    """Execution and lowering implementation for RSI calculation.
+
+    ``execute`` runs the vector computation in this file; ``lower``
+    expresses the identical semantics as a version-1 SemanticProgram
+    built only from ``std.*`` operators, embedding the Wilder recurrence
+    method and the bound period in the IR node parameters.
+    """
 
     @override
     def validate_parameters(self, values: FrozenObject) -> ParameterBindingResult:
-        """Validate parameter values."""
+        """Validate parameter values against the declarative RSI schema.
+
+        Args:
+            values: Parameter values mapping.
+
+        Returns:
+            Binding result; RSI declares no cross-field constraints.
+        """
         return RSI_SCHEMA.validate_bindings(values)
 
     @override
     def warmup_samples(self, values: FrozenObject) -> int:
-        """Dynamic warmup requires 'period' price changes."""
+        """Dynamic warmup requires 'period' price changes.
+
+        Args:
+            values: Bound parameter values.
+
+        Returns:
+            The bound ``period``, or 14 when the stored value is missing
+            or not a positive integer.
+        """
         period = values.get("period", 14)
         if isinstance(period, int) and period > 0:
             return period
@@ -270,7 +356,24 @@ class RsiOperation(OperationImplementation):
         parameters: FrozenObject,
         bindings: OperationBindings,
     ) -> Mapping[str, Any]:
-        """Compute RSI series using Wilder smoothing."""
+        """Compute RSI series using Wilder smoothing.
+
+        The input series is fully validated before any calculation; the
+        output series has exactly one value per input sample, and an
+        empty or absent series yields an empty output.
+
+        Args:
+            inputs: Mapping with the ``values`` series.
+            parameters: Bound parameters containing ``period``.
+            bindings: Unused; RSI requires no capabilities.
+
+        Returns:
+            Mapping with the ``rsi`` output series.
+
+        Raises:
+            TypeError: If a non-missing sample is not numeric.
+            ValueError: If a sample is non-finite.
+        """
         period_val = parameters.get("period", 14)
         period = int(period_val) if isinstance(period_val, (int, float)) else 14
 
@@ -290,7 +393,22 @@ class RsiOperation(OperationImplementation):
         context: LoweringContext,
         parameters: FrozenObject,
     ) -> LoweringResult:
-        """Lower RSI calculation into universal semantic IR."""
+        """Lower RSI calculation into universal semantic IR.
+
+        Only the exact target ``python@1.0.0`` is supported. The emitted
+        program mirrors the vector semantics: delta, gain/loss clipping,
+        two Wilder recurrence nodes parameterized with the bound period,
+        and conditional nodes implementing the 50/100/0 degenerate
+        rules.
+
+        Args:
+            context: Host lowering context carrying the exact target.
+            parameters: Bound parameters containing ``period``.
+
+        Returns:
+            Successful LoweringResult with a SemanticProgram, or a
+            failure carrying an UNSUPPORTED_TARGET issue.
+        """
         if context.target != TARGET_PYTHON:
             from app.plugins.lowering import LoweringIssue
 
@@ -458,7 +576,16 @@ class RsiOperation(OperationImplementation):
 
 
 def plugin() -> PluginContribution:
-    """Return the zero-argument pure plugin contribution for indicator.rsi."""
+    """Return the zero-argument pure plugin contribution for indicator.rsi.
+
+    Builds the self-describing PluginSpec — identity indicator.rsi
+    version 1.0.0, kind ``indicator``, one ``compute`` operation — and
+    its implementation. Performs no I/O and no registration; discovery
+    happens through the host catalog.
+
+    Returns:
+        Immutable PluginContribution for indicator.rsi@1.0.0.
+    """
     op_spec = OperationSpec(
         operation_id=OPERATION_ID,
         title="Compute RSI",

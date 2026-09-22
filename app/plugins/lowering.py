@@ -1,4 +1,18 @@
-"""Universal semantic intermediate representation and lowering protocols."""
+"""Universal semantic intermediate representation and lowering protocols.
+
+Authority: this module owns the semantic lowering mechanics of the shared
+plugin metamodel, as ratified for the S2 handoff in
+``docs/dev/backend_implementation_handoff_s2_s5.md``: the reserved
+``std.*`` operator namespace, the bounded ``SemanticProgram`` IR (schema
+version 1), exact lowering targets, attributed issues/results, and the
+``LoweringContext`` protocol consumed by operation contributions. It
+contains no concrete plugin formula — no plugin ID appears here, and
+adding a new IR primitive is metamodel evolution requiring review.
+
+Position in the shared-module import DAG
+(``schema <- lowering <- spec <- algebra <- wire``): this module imports
+only ``schema``. No shared module may import ``app.host``.
+"""
 
 from __future__ import annotations
 
@@ -85,11 +99,20 @@ UNIVERSAL_OPERATORS: frozenset[str] = frozenset(
 def validate_operator(op: str) -> str:
     """Validate that an operator belongs to the universal std.* namespace.
 
+    The operator must match ``std.<identifier>`` and be a member of
+    ``UNIVERSAL_OPERATORS``; the ``std.*`` namespace is reserved for the
+    shared metamodel and cannot be extended by plugins.
+
     Args:
         op: Operator identifier string.
 
     Returns:
         The validated operator string.
+
+    Raises:
+        TypeError: If ``op`` is not a string.
+        ValueError: If ``op`` violates the ``std.*`` pattern or is not one
+            of the known universal operators.
     """
     if not isinstance(op, str):
         raise TypeError(f"Operator must be a string, got {type(op).__name__}")
@@ -102,7 +125,11 @@ def validate_operator(op: str) -> str:
 
 @dataclass(frozen=True, slots=True)
 class ValueRef:
-    """Reference to an output port of a preceding IR node or program input."""
+    """Reference to an output port of a preceding IR node or program input.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``node_id`` is a
+    non-empty string and ``output_key`` is a bounded lowercase identifier.
+    """
 
     node_id: str
     output_key: str
@@ -116,7 +143,12 @@ class ValueRef:
 
 @dataclass(frozen=True, slots=True)
 class LiteralRef:
-    """Literal constant input value in IR."""
+    """Literal constant input value in IR.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``value`` is
+    replaced by its ``freeze_value`` representation, so stored literals
+    are always immutable and bounded.
+    """
 
     value: Value
 
@@ -130,7 +162,12 @@ type IRArgument = ValueRef | LiteralRef
 
 @dataclass(frozen=True, slots=True)
 class ProgramInput:
-    """Declared input to a SemanticProgram."""
+    """Declared input to a SemanticProgram.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``key`` is a
+    bounded lowercase identifier, ``kind`` is a ``ValueKind``, and
+    ``unit`` and ``alignment`` are the corresponding enums.
+    """
 
     key: str
     kind: ValueKind
@@ -150,7 +187,14 @@ class ProgramInput:
 
 @dataclass(frozen=True, slots=True)
 class IRNode:
-    """One immutable node in a SemanticProgram."""
+    """One immutable node in a SemanticProgram.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``id`` is a
+    non-empty string, ``operator`` passes ``validate_operator``,
+    ``inputs`` is a tuple of ``ValueRef``/``LiteralRef`` arguments,
+    ``parameters`` is a ``FrozenObject``, and ``outputs`` is a non-empty
+    tuple of unique bounded identifiers.
+    """
 
     id: str
     operator: str
@@ -185,7 +229,13 @@ class IRNode:
 
 @dataclass(frozen=True, slots=True)
 class ProgramOutput:
-    """Declared output of a SemanticProgram."""
+    """Declared output of a SemanticProgram.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``key`` is a
+    bounded lowercase identifier, ``source`` is a ``ValueRef``, ``kind``
+    is a ``ValueKind``, and ``unit`` and ``alignment`` are the
+    corresponding enums.
+    """
 
     key: str
     source: ValueRef
@@ -211,7 +261,12 @@ def _validate_program_nodes(
     input_keys: set[str],
     available_refs: set[tuple[str, str]],
 ) -> None:
-    """Validate program nodes and dependency resolution."""
+    """Validate program nodes and dependency resolution.
+
+    Node IDs must be unique and disjoint from input keys, and every
+    ``ValueRef`` must resolve to a program input or the output of an
+    already-seen (preceding) node.
+    """
     seen_node_ids: set[str] = set()
     for node in nodes:
         if node.id in seen_node_ids or node.id in input_keys:
@@ -235,7 +290,11 @@ def _validate_program_outputs(
     outputs: tuple[ProgramOutput, ...],
     available_refs: set[tuple[str, str]],
 ) -> None:
-    """Validate program outputs against available references."""
+    """Validate program outputs against available references.
+
+    Output keys must be unique and every output source must resolve to a
+    program input or a node output.
+    """
     output_keys: set[str] = set()
     for out in outputs:
         if out.key in output_keys:
@@ -250,7 +309,23 @@ def _validate_program_outputs(
 
 @dataclass(frozen=True, slots=True)
 class SemanticProgram:
-    """Complete, bounded semantic intermediate representation."""
+    """Complete, bounded semantic intermediate representation.
+
+    Frozen and slotted. The node tuple is an ordered DAG: a node may only
+    reference program inputs or outputs of preceding nodes, so node order
+    defines a valid evaluation order and cycles are impossible by
+    construction. Program inputs are addressable as ``(key, key)`` and
+    ``(key, "out")``.
+
+    Validation in ``__post_init__``:
+
+    - ``ir_schema_version`` equals ``IR_SCHEMA_VERSION`` (currently 1);
+    - at most ``MAX_IR_NODES`` (10,000) nodes;
+    - input keys and output keys are unique;
+    - node IDs are unique and disjoint from input keys;
+    - every ``ValueRef`` resolves against the ordered view of inputs and
+      preceding node outputs.
+    """
 
     inputs: tuple[ProgramInput, ...]
     nodes: tuple[IRNode, ...]
@@ -284,7 +359,14 @@ class SemanticProgram:
 
 @dataclass(frozen=True, slots=True)
 class LoweringTarget:
-    """Exact lowering target identifier and version."""
+    """Exact lowering target identifier and version.
+
+    Frozen and slotted. Matching is exact: a lowering implementation
+    supports a target only when both ``target_id`` and the full
+    ``(major, minor, patch)`` version compare equal. Validation in
+    ``__post_init__``: ``target_id`` is a bounded lowercase identifier and
+    ``version`` is a 3-tuple of non-negative integers.
+    """
 
     target_id: str
     version: tuple[int, int, int]
@@ -306,7 +388,11 @@ class LoweringTarget:
 
 @dataclass(frozen=True, slots=True)
 class LoweringIssue:
-    """Attributed lowering issue with reason and optional node attribution."""
+    """Attributed lowering issue with reason and optional node attribution.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``code`` and
+    ``message`` are non-empty strings and ``node_id`` is a string or None.
+    """
 
     code: str
     message: str
@@ -324,7 +410,12 @@ class LoweringIssue:
 
 @dataclass(frozen=True, slots=True)
 class LoweringResult:
-    """Result of lowering an operation or graph to a target SemanticProgram."""
+    """Result of lowering an operation or graph to a target SemanticProgram.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``success`` is a
+    bool, a successful result carries a non-None ``SemanticProgram``, and
+    ``issues`` is a tuple.
+    """
 
     success: bool
     program: SemanticProgram | None = None
@@ -341,7 +432,12 @@ class LoweringResult:
 
 
 class LoweringContext(Protocol):
-    """Context provided to an operation lowering implementation."""
+    """Protocol for the host-provided context of an operation lowering.
+
+    ``allocate_node_id`` must return deterministic, collision-free node
+    IDs so that lowering the same parameters twice produces identical
+    programs.
+    """
 
     @property
     def target(self) -> LoweringTarget:
@@ -349,5 +445,12 @@ class LoweringContext(Protocol):
         ...
 
     def allocate_node_id(self, prefix: str = "node") -> str:
-        """Allocate a deterministic, unique node ID within the program being lowered."""
+        """Allocate a deterministic, unique node ID for the lowered program.
+
+        Args:
+            prefix: Stable prefix for the generated identifier.
+
+        Returns:
+            A node ID distinct from every previously allocated one.
+        """
         ...

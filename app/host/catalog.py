@@ -1,4 +1,25 @@
-"""Host catalog owner: discovery, snapshots, and admission."""
+"""Host catalog owner: discovery, snapshots, selection, and admission.
+
+One host owner = one file: this module owns the public ``Catalog``
+protocol, the ``HOST_CATALOG`` capability token (``host.catalog@1``),
+and the public value types describing roots, snapshots, refresh
+outcomes, selection, and admitted operations. Discovery helpers and
+the in-memory provider are private, and ``_catalog_feature`` is a
+composition-only constructor used solely by
+``app.host.bootstrap``.
+
+The owner provides bounded discovery from explicit family roots,
+atomic whole-registry publication with content-addressed
+fingerprints, availability selection under explicit constraints, and
+admission that pins an exact plugin/operation identity. It does not
+own execution, graph validation, persistence, or serving.
+
+Purity: importing this module performs no I/O. Discovery performs
+only bounded reads of the configured roots; candidates are filtered
+before import and exercised through their zero-argument ``plugin()``
+factory, and the host tests pin import-and-factory purity (no
+writes, environment, logging, task, or thread effects).
+"""
 
 from __future__ import annotations
 
@@ -38,7 +59,20 @@ class CatalogAdmissionError(CatalogError):
 
 @dataclass(frozen=True, slots=True)
 class CatalogRoot:
-    """Configuration for an explicit filesystem plugin family root."""
+    """Configuration for one explicit filesystem plugin family root.
+
+    Immutable. Discovery only ever inspects the immediate ``.py``
+    children of ``path`` (no recursion), bounded by ``max_files``
+    candidates and ``max_source_bytes`` bytes per file, both checked
+    before any candidate is imported.
+
+    Attributes:
+        logical_family: Stable identifier for the family.
+        path: Directory holding the family's plugin files.
+        accepted_kinds: Plugin kinds this root admits.
+        max_files: Candidate ceiling per root.
+        max_source_bytes: Per-file size ceiling before import.
+    """
 
     logical_family: str
     path: Path
@@ -63,7 +97,19 @@ class CatalogRoot:
 
 @dataclass(frozen=True, slots=True)
 class CatalogSnapshot:
-    """Immutable published catalog state."""
+    """Immutable published catalog state.
+
+    A snapshot is published only by a fully successful refresh; its
+    entries are ordered canonically by plugin ref string so the whole
+    fingerprint is independent of filesystem enumeration order.
+
+    Attributes:
+        view: Canonical catalog view of every published entry.
+        whole_fingerprint: Digest over all published entry
+            fingerprints (empty catalog hashes the empty digest).
+        entry_fingerprints: ``(PluginRef, fingerprint)`` pairs in
+            canonical entry order.
+    """
 
     view: CatalogView
     whole_fingerprint: str
@@ -81,7 +127,16 @@ class CatalogSnapshot:
             raise TypeError("CatalogSnapshot entry_fingerprints must be a tuple")
 
     def get_entry_fingerprint(self, ref: PluginRef) -> str | None:
-        """Get entry fingerprint for an exact PluginRef."""
+        """Get the entry fingerprint for an exactly equal ref.
+
+        Args:
+            ref: Plugin ref matching the published entry exactly
+                (identity and version).
+
+        Returns:
+            The entry fingerprint, or ``None`` when no published entry
+            carries this exact ref.
+        """
         for r, fp in self.entry_fingerprints:
             if r == ref:
                 return fp
@@ -90,7 +145,18 @@ class CatalogSnapshot:
 
 @dataclass(frozen=True, slots=True)
 class CatalogRefreshResult:
-    """Result of scanning and refreshing catalog roots."""
+    """Outcome of one scan-and-refresh attempt over catalog roots.
+
+    Attributes:
+        success: Whether a new snapshot was published. Any issue
+            anywhere makes the refresh fail.
+        snapshot: The freshly published snapshot on success; the
+            preserved last good snapshot on a later failure; ``None``
+            when an initial failure left no snapshot at all.
+        added: Refs present now but not in the previous snapshot.
+        removed: Refs present in the previous snapshot but not now.
+        issues: Human-readable problem descriptions on failure.
+    """
 
     success: bool
     snapshot: CatalogSnapshot | None = None
@@ -112,7 +178,23 @@ class CatalogRefreshResult:
 
 @dataclass(frozen=True, slots=True)
 class SelectionRequest:
-    """Explicit parameters for evaluating operation availability."""
+    """Explicit parameters for evaluating operation availability.
+
+    Attributes:
+        enabled_refs: Plugins enabled by the caller; the default
+            empty tuple leaves every operation ``NOT_ENABLED``.
+        allowed_effects: Effect vocabulary the caller accepts
+            (default: pure effects only).
+        allowed_kinds: Optional kind allowlist; empty means no kind
+            restriction.
+        available_capabilities: Capability names granted to this
+            selection.
+        permissions: Permissions granted to this selection.
+        operation_ids: Optional operation-id allowlist; empty means
+            no operation-id restriction.
+        allowed_lowering_targets: Optional lowering-target allowlist;
+            empty means no lowering restriction.
+    """
 
     enabled_refs: tuple[PluginRef, ...] = ()
     allowed_effects: tuple[str, ...] = ("pure",)
@@ -142,7 +224,21 @@ class SelectionRequest:
 
 @dataclass(frozen=True, slots=True)
 class SelectionResult:
-    """Result of evaluating operation availability against selection constraints."""
+    """Result of evaluating operation availability against selection constraints.
+
+    Attributes:
+        snapshot: The immutable snapshot the evaluation ran against.
+        available_operations: ``(PluginRef, operation_id)`` pairs that
+            satisfy every constraint.
+        unavailable_reasons: ``(PluginRef, operation_id, reason)``
+            triples; reasons are stable codes such as
+            ``NOT_ENABLED``, ``KIND_NOT_ALLOWED:<kind>``,
+            ``OPERATION_NOT_SELECTED``,
+            ``NO_ALLOWED_LOWERING_TARGET:<targets>``,
+            ``UNSUPPORTED_EFFECTS:<effects>``,
+            ``MISSING_CAPABILITIES:<names>``, and
+            ``MISSING_PERMISSIONS:<names>``.
+    """
 
     snapshot: CatalogSnapshot
     available_operations: tuple[tuple[PluginRef, str], ...] = ()
@@ -160,7 +256,29 @@ class SelectionResult:
 
 @dataclass(frozen=True, slots=True)
 class AdmittedOperation:
-    """Admitted operation pinned to exact source and catalog identity."""
+    """Admitted operation pinned to exact source and catalog identity.
+
+    Immutable. Admission binds the exact operation spec and
+    implementation object together with the source digest, entry
+    fingerprint, dependency fingerprint (SHA-256 of this entry's
+    fingerprint, covering admitted entries rather than the whole
+    registry), and the whole-snapshot fingerprint at admission time.
+    The pinned values stay bound and usable even if a later refresh
+    removes the plugin; only new admissions then fail.
+
+    Attributes:
+        ref: Pinned plugin ref.
+        operation_id: Pinned operation identifier.
+        spec: Pinned operation descriptor.
+        contribution: Pinned operation contribution holding the
+            implementation object.
+        source_digest: SHA-256 of the exact imported source bytes.
+        entry_fingerprint: Digest of descriptor JSON plus source.
+        dependency_fingerprint: Digest derived from this entry's
+            fingerprint.
+        snapshot_fingerprint: Whole-registry fingerprint of the
+            snapshot current at admission.
+    """
 
     ref: PluginRef
     operation_id: str
@@ -191,26 +309,104 @@ class AdmittedOperation:
 
 
 class Catalog(Protocol):
-    """Public catalog protocol."""
+    """Public catalog protocol exposed as ``host.catalog@1``.
+
+    The implementing owner is private and published through the host
+    composition root; callers never construct it directly.
+    """
 
     def is_ready(self) -> bool:
-        """Return whether catalog has a valid active snapshot."""
+        """Return whether the catalog has a published snapshot.
+
+        Returns:
+            ``True`` exactly after at least one fully successful
+            refresh (including a successful empty scan).
+        """
         ...
 
     def snapshot(self) -> CatalogSnapshot:
-        """Return the current immutable catalog snapshot."""
+        """Return the current immutable catalog snapshot.
+
+        Returns:
+            The published snapshot; the same object is retained on
+            later failed refreshes (last good snapshot).
+
+        Raises:
+            CatalogUnavailableError: If no refresh has succeeded yet.
+        """
         ...
 
     def refresh(self) -> CatalogRefreshResult:
-        """Discover approved local plugin files and publish an atomic snapshot."""
+        """Discover approved local plugin files and publish a snapshot.
+
+        Per root, discovery considers only immediate ``.py`` children,
+        excluding ``__init__``, underscore-prefixed, test-named, and
+        ``conftest`` files plus oversized candidates before any
+        import, rejecting symlinks that escape the root, and walking
+        children in sorted canonical filename order. Each accepted
+        file is imported under a path-and-content-addressed module
+        name and must expose a zero-argument ``plugin()`` factory
+        whose contribution matches the current metamodel major and
+        the root's accepted kinds, with plugin IDs unique across all
+        roots.
+
+        Publication is whole-registry and all-or-nothing: a scan with
+        zero issues atomically replaces contributions, digests,
+        fingerprints, and snapshot at once. A successful empty scan
+        publishes a ready empty snapshot. Any issue fails the
+        refresh: an initial failure leaves no snapshot, while a later
+        failure preserves the last good snapshot and state unchanged.
+
+        Returns:
+            The refresh outcome with published/preserved snapshot,
+            added/removed refs versus the previous snapshot, and
+            human-readable issues on failure.
+        """
         ...
 
     def select(self, request: SelectionRequest) -> SelectionResult:
-        """Evaluate operation availability against explicit selection constraints."""
+        """Evaluate operation availability against explicit constraints.
+
+        Evaluation order per entry: enabled refs, then allowed kinds,
+        then per operation the operation-id allowlist, the
+        lowering-target allowlist (an operation declaring no targets
+        is unavailable when a restriction is set), and finally the
+        operation's declared effects, required capabilities, and
+        permissions against the granted sets.
+
+        Args:
+            request: Explicit selection constraints; the default
+                enabled set is empty, so effectful or not, nothing is
+                available unless explicitly enabled.
+
+        Returns:
+            Available ``(ref, operation_id)`` pairs plus attributed
+            unavailability reasons for everything else.
+
+        Raises:
+            CatalogUnavailableError: If the catalog is not ready.
+        """
         ...
 
     def admit(self, ref: PluginRef, operation_id: str) -> AdmittedOperation:
-        """Pin an exact operation by version and source identity."""
+        """Pin an exact operation by version and source identity.
+
+        Args:
+            ref: Exact plugin ref (identity and version) as published
+                in the current snapshot.
+            operation_id: Operation to pin on that plugin.
+
+        Returns:
+            The admitted operation bound to the exact spec,
+            implementation, and identity digests; it stays valid after
+            later removal from the catalog.
+
+        Raises:
+            CatalogUnavailableError: If the catalog is not ready.
+            CatalogAdmissionError: If the plugin is not installed in
+                the current snapshot, or the operation or its
+                implementation is not found on it.
+        """
         ...
 
 
@@ -218,6 +414,7 @@ HOST_CATALOG = Capability[Catalog]("host.catalog", major=1)
 
 
 def _is_candidate_filename(name: str) -> bool:
+    """Accept plain ``.py`` files that are not private or test modules."""
     if name.startswith("_") or not name.endswith(".py"):
         return False
     return not (
@@ -226,7 +423,7 @@ def _is_candidate_filename(name: str) -> bool:
 
 
 class _CandidateDiscovery:
-    """Private helper to scan, filter, and load candidate plugin files."""
+    """Private helper to scan one root and pre-filter candidate files."""
 
     def __init__(self, root: CatalogRoot) -> None:
         self.root = root
@@ -234,6 +431,7 @@ class _CandidateDiscovery:
     def _check_candidate(
         self, child: Path, resolved_root: Path
     ) -> tuple[Path | None, str | None]:
+        """Resolve one child, rejecting escapes and oversized non-candidates."""
         try:
             resolved_child = child.resolve()
             if not resolved_child.is_relative_to(resolved_root):
@@ -257,6 +455,7 @@ class _CandidateDiscovery:
         return child, None
 
     def collect_candidate_files(self) -> tuple[list[Path], list[str]]:
+        """List one root's sorted candidate paths, or issues when the root fails."""
         issues: list[str] = []
         resolved_root = self.root.path.resolve()
         if not resolved_root.exists() or not resolved_root.is_dir():
@@ -306,6 +505,8 @@ _PLUGIN_LOAD_ERRORS = (
 
 @dataclass(frozen=True, slots=True)
 class _LoadedCandidate:
+    """Private immutable load result: contribution plus identity digests."""
+
     contribution: PluginContribution
     source_digest: str
     entry_fingerprint: str
@@ -313,6 +514,7 @@ class _LoadedCandidate:
 
 
 def _load_plugin_module(file_path: Path, module_name: str) -> tuple[Any, str | None]:
+    """Import one candidate file under its addressed module name."""
     try:
         spec = importlib.util.spec_from_file_location(module_name, file_path)
         if spec is None or spec.loader is None:
@@ -327,6 +529,7 @@ def _load_plugin_module(file_path: Path, module_name: str) -> tuple[Any, str | N
 def _extract_contribution(
     mod: Any, file_path: Path
 ) -> tuple[PluginContribution | None, str | None]:
+    """Call the zero-argument ``plugin()`` factory and type-check its result."""
     factory = getattr(mod, "plugin", None)
     if not callable(factory):
         return None, (
@@ -351,6 +554,7 @@ def _validate_contribution_policy(
     root: CatalogRoot,
     seen_plugin_ids: set[str],
 ) -> str | None:
+    """Enforce metamodel major, accepted kind, and global plugin-ID uniqueness."""
     spec_obj = contribution.spec
     if spec_obj.metamodel_major != CURRENT_METAMODEL_MAJOR:
         return (
@@ -372,6 +576,14 @@ def _load_candidate_file(
     root: CatalogRoot,
     seen_plugin_ids: set[str],
 ) -> tuple[_LoadedCandidate | None, str | None]:
+    """Read, import, validate, and fingerprint one candidate file.
+
+    The source digest is the SHA-256 of the exact bytes that were
+    imported; the module name embeds that digest prefix plus the file
+    stem, making it path- and content-addressed. The entry
+    fingerprint digests the canonical descriptor JSON concatenated
+    with the source digest.
+    """
     try:
         source_bytes = file_path.read_bytes()
     except OSError as err:
@@ -418,6 +630,7 @@ def _evaluate_operation(
     available_caps: set[str],
     permissions: set[str],
 ) -> str | None:
+    """Return an effect/capability/permission unavailability reason or None."""
     unsupported_effects = set(op.effects) - allowed_effects
     if unsupported_effects:
         return f"UNSUPPORTED_EFFECTS:{sorted(unsupported_effects)}"
@@ -431,7 +644,12 @@ def _evaluate_operation(
 
 
 class _CatalogProvider:
-    """In-memory implementation of the Catalog protocol."""
+    """In-memory private implementation of the ``Catalog`` protocol.
+
+    Holds the single published snapshot plus the contributions,
+    digests, and entry fingerprints backing it; a failed refresh
+    never mutates this state.
+    """
 
     def __init__(self, roots: tuple[CatalogRoot, ...] = ()) -> None:
         self._roots = roots
@@ -442,10 +660,11 @@ class _CatalogProvider:
         self._issues: list[str] = []
 
     def is_ready(self) -> bool:
+        """Whether a snapshot is currently published."""
         return self._snapshot is not None
 
     def clear(self) -> None:
-        """Clear all active catalog state."""
+        """Clear all active catalog state at lifecycle close."""
         self._contributions.clear()
         self._source_digests.clear()
         self._entry_fingerprints.clear()
@@ -454,9 +673,11 @@ class _CatalogProvider:
 
     @property
     def issues(self) -> tuple[str, ...]:
+        """Issues from the most recent failed refresh."""
         return tuple(self._issues)
 
     def snapshot(self) -> CatalogSnapshot:
+        """Return the published snapshot or fail closed when unready."""
         if self._snapshot is None:
             raise CatalogUnavailableError(
                 "Catalog is not ready; no valid snapshot available"
@@ -464,6 +685,7 @@ class _CatalogProvider:
         return self._snapshot
 
     def refresh(self) -> CatalogRefreshResult:
+        """Scan all roots and publish atomically; see ``Catalog.refresh``."""
         new_contributions: dict[PluginRef, PluginContribution] = {}
         new_source_digests: dict[PluginRef, str] = {}
         new_entry_fingerprints: dict[PluginRef, str] = {}
@@ -551,6 +773,7 @@ class _CatalogProvider:
         )
 
     def select(self, request: SelectionRequest) -> SelectionResult:
+        """Evaluate availability per the request constraints (Catalog.select)."""
         if self._snapshot is None:
             raise CatalogUnavailableError("Cannot select on an unready catalog")
 
@@ -625,6 +848,7 @@ class _CatalogProvider:
         )
 
     def admit(self, ref: PluginRef, operation_id: str) -> AdmittedOperation:
+        """Pin an exact operation identity or fail closed; see ``Catalog.admit``."""
         if self._snapshot is None:
             raise CatalogUnavailableError(
                 "Cannot admit operation; catalog is not ready"
@@ -690,7 +914,12 @@ class _CatalogFeature(Feature):
 
     @override
     async def start(self, context: FeatureContext) -> None:
-        """Publish catalog capability upon successful initialization."""
+        """Refresh once, fail startup on any issue, then publish the capability.
+
+        Registering ``clear`` on close withdraws catalog state during
+        runtime shutdown, after consumers such as execution have
+        closed.
+        """
         refresh_res = self._provider.refresh()
         if not refresh_res.success:
             raise CatalogUnavailableError(

@@ -1,4 +1,19 @@
-"""Bounded immutable value and descriptor vocabulary for the shared plugin metamodel."""
+"""Bounded immutable value and descriptor vocabulary for the plugin metamodel.
+
+Authority: this module owns the shared universal vocabulary every plugin
+declares itself with, as ratified for the S2 shared metamodel in
+``docs/dev/backend_implementation_handoff_s2_s5.md``: frozen value types,
+explicit missing markers, parameter and port descriptors, constraints,
+optimization domains, presentation hints, and validation results. It holds
+no product concept — no concrete plugin's parameters, bounds, titles, or
+missing-data behavior belong here.
+
+Position in the shared-module import DAG
+(``schema <- lowering <- spec <- algebra <- wire``): this is the root. It
+imports no sibling plugin module, and no shared module may import
+``app.host``. All bounds are enforced eagerly in constructors, so every
+successfully constructed value is already immutable and wire-portable.
+"""
 
 from __future__ import annotations
 
@@ -25,12 +40,20 @@ IDENTIFIER_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 def validate_identifier(name: str, field_name: str = "Identifier") -> str:
     """Validate that a string is a bounded lowercase identifier.
 
+    Identifiers must be non-empty, at most ``MAX_IDENTIFIER_LENGTH``
+    characters, and match ``^[a-z][a-z0-9_]*$``.
+
     Args:
         name: Name to validate.
         field_name: Context label for error messages.
 
     Returns:
-        The validated name.
+        The validated name, unchanged.
+
+    Raises:
+        TypeError: If ``name`` is not a string.
+        ValueError: If ``name`` is empty, too long, or violates the
+            pattern.
     """
     if not isinstance(name, str):
         raise TypeError(f"{field_name} must be a string, got {type(name).__name__}")
@@ -48,7 +71,14 @@ def validate_identifier(name: str, field_name: str = "Identifier") -> str:
 
 @dataclass(frozen=True, slots=True)
 class MissingValue:
-    """Explicit missing value marker, distinct from None / JSON null."""
+    """Explicit missing value marker, distinct from None / JSON null.
+
+    Frozen and slotted. Carries an optional bounded ``reason`` describing
+    why the value is missing (for example ``"WARMUP"`` or ``"GAP"``),
+    which is preserved through wire round trips. Validation in
+    ``__post_init__``: ``reason`` must be a string no longer than
+    ``MAX_STRING_LENGTH`` characters.
+    """
 
     reason: str = ""
 
@@ -68,7 +98,15 @@ type Value = ScalarValue | FrozenArray | FrozenObject
 
 @dataclass(frozen=True, slots=True)
 class FrozenArray(Sequence[Value]):
-    """Immutable sequence wrapper for schema and parameter values."""
+    """Immutable sequence wrapper for schema and parameter values.
+
+    Frozen and slotted; implements ``Sequence[Value]`` over a plain tuple
+    so arrays are portable across the wire boundary. Validation in
+    ``__post_init__``: ``items`` must already be a tuple and must not
+    exceed ``MAX_COLLECTION_SIZE`` entries. Element contents are not
+    re-validated here; ``freeze_value`` produces the bounded, immutable
+    elements.
+    """
 
     items: tuple[Value, ...] = ()
 
@@ -102,7 +140,19 @@ class FrozenArray(Sequence[Value]):
 
 @dataclass(frozen=True, slots=True)
 class FrozenObject(Mapping[str, Value]):
-    """Immutable mapping wrapper with sorted keys and duplicate rejection."""
+    """Immutable mapping wrapper with sorted keys and duplicate rejection.
+
+    Frozen and slotted; implements ``Mapping[str, Value]`` over a tuple of
+    key/value pairs kept in ascending key order. Key lookup is a linear
+    scan over the entries tuple, which is intended for descriptor-sized
+    data. Validation in ``__post_init__``:
+
+    - ``entries`` is a tuple of exactly ``(key, value)`` 2-tuples with at
+      most ``MAX_COLLECTION_SIZE`` entries;
+    - keys are non-empty strings of at most ``MAX_KEY_LENGTH`` characters;
+    - keys are unique (duplicates rejected) and sorted strictly ascending
+      (out-of-order keys rejected).
+    """
 
     entries: tuple[tuple[str, Value], ...] = ()
 
@@ -173,20 +223,40 @@ class FrozenObject(Mapping[str, Value]):
 
     @classmethod
     def from_mapping(cls, mapping: Mapping[str, Any]) -> FrozenObject:
-        """Create a FrozenObject from any mapping, sorting keys automatically."""
+        """Create a FrozenObject from any mapping, sorting keys automatically.
+
+        Args:
+            mapping: Source mapping; values are converted with
+                ``freeze_value``.
+
+        Returns:
+            Frozen object with keys sorted ascending.
+        """
         pairs = [(k, freeze_value(v)) for k, v in mapping.items()]
         pairs.sort(key=lambda p: p[0])
         return cls(tuple(pairs))
 
     @classmethod
     def from_pairs(cls, pairs: Iterable[tuple[str, Any]]) -> FrozenObject:
-        """Create a FrozenObject from an iterable of key-value pairs."""
+        """Create a FrozenObject from an iterable of key-value pairs.
+
+        Args:
+            pairs: ``(key, value)`` pairs; values are converted with
+                ``freeze_value``.
+
+        Returns:
+            Frozen object with keys sorted ascending.
+        """
         frozen_pairs = [(k, freeze_value(v)) for k, v in pairs]
         frozen_pairs.sort(key=lambda p: p[0])
         return cls(tuple(frozen_pairs))
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert to regular dict for serialization or reading."""
+        """Convert to regular dict for serialization or reading.
+
+        Returns:
+            Shallow dict copy of the sorted entries.
+        """
         return dict(self.entries)
 
 
@@ -195,7 +265,7 @@ EMPTY_FROZEN_ARRAY = FrozenArray()
 
 
 def _freeze_scalar(val: Any) -> ScalarValue:
-    """Validate and return scalar value."""
+    """Validate one scalar leaf; bounds-check ints, floats, and strings."""
     if val is None or isinstance(val, (bool, MissingValue)):
         return val
     if isinstance(val, int):
@@ -220,14 +290,24 @@ def _freeze_scalar(val: Any) -> ScalarValue:
 def freeze_value(val: Any, depth: int = 0) -> Value:
     """Recursively freeze and validate values into portable immutable forms.
 
+    Mappings become ``FrozenObject`` with keys sorted ascending, sequences
+    (other than strings/bytes) become ``FrozenArray`` of frozen items, and
+    already-frozen values pass through unchanged. Scalar leaves are
+    bounded: ``int`` must stay within the 2^53-1 safe-integer range,
+    ``float`` must be finite, and ``str`` must respect
+    ``MAX_STRING_LENGTH``. ``MissingValue`` leaves are preserved as
+    explicit missing markers and never collapsed to ``None``.
+
     Args:
         val: Value to freeze.
-        depth: Current recursion depth.
+        depth: Current recursion depth; callers use the default.
 
     Returns:
         Frozen immutable representation of val.
 
     Raises:
+        TypeError: If a mapping key is not a string or a leaf type is
+            unsupported.
         ValueError: If depth, collection size, or the total frozen element
             count exceeds its bound.
     """
@@ -265,7 +345,12 @@ def _freeze_counted(val: Any, depth: int, counter: list[int]) -> Value:
 
 
 class ValueKind(StrEnum):
-    """Supported data types for ports and parameters."""
+    """Supported data types for ports and parameters.
+
+    ``ALIGNED_SERIES`` marks index/timestamp-aligned series values,
+    ``ENUM`` a string restricted by an ``EnumConstraint``, and ``OBJECT``
+    a frozen structured value.
+    """
 
     BOOLEAN = "boolean"
     INTEGER = "integer"
@@ -299,7 +384,16 @@ class Alignment(StrEnum):
 
 @dataclass(frozen=True, slots=True)
 class NumericConstraint:
-    """Numeric validity constraints independent of optimization domains."""
+    """Numeric validity constraints independent of optimization domains.
+
+    Frozen and slotted. Describes what a stored or executed value must
+    satisfy; ``OptimizationDomain`` describes where search may wander and
+    must stay inside these bounds. Validation in ``__post_init__``:
+    ``min_value``/``max_value``/``step`` must be finite numbers when
+    present, ``step`` must be positive, ``min_value`` must not exceed
+    ``max_value``, and ``min_value`` cannot be negative when
+    ``allow_negative`` is false.
+    """
 
     min_value: float | int | None = None
     max_value: float | int | None = None
@@ -341,6 +435,10 @@ class NumericConstraint:
     def validate(self, val: Any) -> list[str]:
         """Validate a single numeric value against constraints.
 
+        Note:
+            Booleans are treated as non-numeric, and non-finite values are
+            rejected outright.
+
         Args:
             val: Value to validate.
 
@@ -363,7 +461,13 @@ class NumericConstraint:
 
 @dataclass(frozen=True, slots=True)
 class TextConstraint:
-    """Text validity constraints."""
+    """Text validity constraints.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``min_length``
+    is a non-negative integer, ``max_length`` lies between ``min_length``
+    and ``MAX_STRING_LENGTH``, and a non-None ``pattern`` is a non-empty
+    string that must compile as a regular expression.
+    """
 
     min_length: int = 0
     max_length: int = 256
@@ -395,6 +499,10 @@ class TextConstraint:
     def validate(self, val: Any) -> list[str]:
         """Validate a single text value against constraints.
 
+        Note:
+            ``pattern`` is applied with ``re.search``, so it matches
+            substrings, not the full string.
+
         Args:
             val: Value to validate.
 
@@ -417,7 +525,11 @@ class TextConstraint:
 
 @dataclass(frozen=True, slots=True)
 class EnumChoice:
-    """Choice definition for enum parameters."""
+    """Choice definition for enum parameters.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``value`` and
+    ``label`` are non-empty strings and ``description`` is a string.
+    """
 
     value: str
     label: str
@@ -435,7 +547,12 @@ class EnumChoice:
 
 @dataclass(frozen=True, slots=True)
 class EnumConstraint:
-    """Enum validity constraints."""
+    """Enum validity constraints.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``choices`` is a
+    non-empty tuple of ``EnumChoice`` instances with unique ``value``
+    strings.
+    """
 
     choices: tuple[EnumChoice, ...]
 
@@ -471,7 +588,7 @@ class EnumConstraint:
 
 
 class OptimizationScale(StrEnum):
-    """Distribution scale for parameter search/optimization."""
+    """Sampling scale for parameter search: linear, logarithmic, or stepped."""
 
     LINEAR = "linear"
     LOGARITHMIC = "logarithmic"
@@ -479,7 +596,7 @@ class OptimizationScale(StrEnum):
 
 
 class OptimizationDistribution(StrEnum):
-    """Sampling distribution for parameter search/optimization."""
+    """Sampling distribution for parameter search: uniform or normal."""
 
     UNIFORM = "uniform"
     NORMAL = "normal"
@@ -491,7 +608,11 @@ def _validate_opt_bounds(
     step: float | None,
     scale: OptimizationScale,
 ) -> None:
-    """Validate optimization search bounds."""
+    """Validate optimization bounds.
+
+    Step must be positive, min must not exceed max, and logarithmic scale
+    requires a positive min_value.
+    """
     if step is not None and step <= 0:
         raise ValueError(f"OptimizationDomain step must be > 0, got {step}")
     if min_val is not None and max_val is not None and min_val > max_val:
@@ -504,7 +625,16 @@ def _validate_opt_bounds(
 
 @dataclass(frozen=True, slots=True)
 class OptimizationDomain:
-    """Optimization search bounds and distribution for parameter search."""
+    """Optimization search bounds and distribution for parameter search.
+
+    Frozen and slotted. Declares where a parameter may wander during
+    search; when ``eligible`` is false the remaining fields are inert
+    descriptors and only type/finite checks apply. Validation in
+    ``__post_init__`` when ``eligible``: bounds are finite numbers, step
+    is positive, min does not exceed max, logarithmic scale requires a
+    positive min, and the normal distribution requires both ``min_value``
+    and ``max_value`` to be set.
+    """
 
     eligible: bool = True
     min_value: float | int | None = None
@@ -556,7 +686,14 @@ class WidgetKind(StrEnum):
 
 @dataclass(frozen=True, slots=True)
 class PresentationHint:
-    """Safe, bounded UI presentation hints."""
+    """Safe, bounded UI presentation hints.
+
+    Frozen and slotted. Hints are advisory rendering metadata only; they
+    carry no behavior and no authority over validation. Validation in
+    ``__post_init__``: ``widget`` is a ``WidgetKind``, ``order`` is an
+    integer, and ``group``/``label``/``help_text`` are strings bounded by
+    ``MAX_STRING_LENGTH``.
+    """
 
     widget: WidgetKind
     group: str = ""
@@ -644,7 +781,11 @@ def _validate_param_optimization(
     constraint: NumericConstraint | TextConstraint | EnumConstraint | None,
     optimization: OptimizationDomain | None,
 ) -> None:
-    """Validate optimization domain compatibility with validity constraint."""
+    """Validate optimization domain compatibility with validity constraint.
+
+    Optimization is only legal for numeric kinds, and an eligible domain's
+    bounds must lie within the constraint's bounds.
+    """
     if optimization is None:
         return
     if not isinstance(optimization, OptimizationDomain):
@@ -670,7 +811,18 @@ def _validate_param_optimization(
 
 @dataclass(frozen=True, slots=True)
 class ParameterSpec:
-    """Self-describing declaration for one configurable parameter."""
+    """Self-describing declaration for one configurable parameter.
+
+    Frozen and slotted. Owns the parameter's key, kind, presentation
+    label, validity constraint, optimization domain, UI hint, and default
+    in one immutable document. Validation in ``__post_init__``: ``key``
+    is a bounded lowercase identifier, ``kind`` is a ``ValueKind``,
+    ``label`` is non-empty, the constraint type matches the kind, the
+    default satisfies the constraint, and any optimization domain is
+    compatible with both. A non-None default is replaced by its
+    ``freeze_value`` representation, so the stored default is always
+    immutable.
+    """
 
     key: str
     kind: ValueKind
@@ -706,7 +858,11 @@ class ParameterSpec:
 
 @dataclass(frozen=True, slots=True)
 class ParameterSchema:
-    """Collection of parameter declarations with unique keys."""
+    """Collection of parameter declarations with unique keys.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``parameters``
+    is a tuple of ``ParameterSpec`` with no duplicate keys.
+    """
 
     parameters: tuple[ParameterSpec, ...] = ()
 
@@ -738,11 +894,21 @@ class ParameterSchema:
     def validate_bindings(self, values: FrozenObject) -> ParameterBindingResult:
         """Validate provided parameter values against declared schema.
 
+        Unknown keys, constraint violations, boolean type mismatches (for
+        boolean parameters without a declared constraint), and missing
+        required parameters are reported as ``ValidationIssue``s.
+        Normalized values contain exactly the declared keys: bound values
+        pass through, absent keys with defaults are filled in, and absent
+        required keys stay missing.
+
         Args:
             values: Parameter values mapping.
 
         Returns:
             ParameterBindingResult with issues and normalized values.
+
+        Raises:
+            TypeError: If ``values`` is not a ``FrozenObject``.
         """
         if not isinstance(values, FrozenObject):
             raise TypeError("Parameter values must be a FrozenObject")
@@ -798,7 +964,13 @@ class ParameterSchema:
 
 @dataclass(frozen=True, slots=True)
 class PortSpec:
-    """Self-describing declaration for an input or output port."""
+    """Self-describing declaration for an input or output port.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``key`` is a
+    bounded lowercase identifier, ``kind`` is a ``ValueKind``, ``unit``
+    and ``alignment`` are the corresponding enums, and ``label`` and
+    ``description`` are strings.
+    """
 
     key: str
     kind: ValueKind
@@ -824,7 +996,13 @@ class PortSpec:
 
 @dataclass(frozen=True, slots=True)
 class NumericalPolicy:
-    """Numerical precision and missing data behavior specification."""
+    """Numerical precision and missing data behavior specification.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``tolerance`` is
+    a positive number, ``nan_policy`` is ``"reject"`` or ``"propagate"``,
+    and ``missing_policy`` is ``"propagate"``, ``"reset"``, or
+    ``"interpolate"``.
+    """
 
     tolerance: float = 1e-9
     nan_policy: str = "reject"
@@ -849,7 +1027,12 @@ class ValidationSeverity(StrEnum):
 
 @dataclass(frozen=True, slots=True)
 class ValidationIssue:
-    """Describe one schema or graph validation issue."""
+    """Describe one schema or graph validation issue.
+
+    Frozen and slotted. Validation in ``__post_init__``: ``path`` is a
+    string, ``code`` and ``message`` are non-empty strings, and
+    ``severity`` is a ``ValidationSeverity``.
+    """
 
     path: str
     code: str
@@ -870,7 +1053,13 @@ class ValidationIssue:
 
 @dataclass(frozen=True, slots=True)
 class ParameterBindingResult:
-    """Result of validating and normalizing parameter bindings."""
+    """Result of validating and normalizing parameter bindings.
+
+    Frozen and slotted. As produced by ``ParameterSchema
+    .validate_bindings``, ``is_valid`` is true exactly when ``issues`` is
+    empty. Validation in ``__post_init__``: ``is_valid`` is a bool,
+    ``issues`` is a tuple, and ``values`` is a ``FrozenObject``.
+    """
 
     is_valid: bool
     issues: tuple[ValidationIssue, ...] = ()
