@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Activity, CheckCircle2, CircleStop, Copy, Database, Filter, Layers, Pause, Play, RotateCcw, ShieldAlert, Sliders, XCircle } from 'lucide-react';
 import { useAppStore } from '../../app/store';
-import { mockResearchService } from '../../mocks/service';
 import { Button, Checkbox, Field, ProgressBar, Section, Select, Stat, TextInput } from '../../components/ui';
 import { ResultsWorkspace } from '../Results/ResultsWorkspace';
+
+import { defaultApiClient } from '../../api/client';
 
 const AVAILABLE_MARKETS = ['EURUSD', 'GBPUSD', 'USDJPY', 'AUDUSD', 'USDCAD', 'USDCHF', 'XAUUSD', 'NQ', 'BTCUSD'];
 const AVAILABLE_TIMEFRAMES = ['M5', 'M15', 'M30', 'H1', 'H4', 'D1'];
@@ -40,36 +41,121 @@ function NumberField({
 function ProgressView() {
   const store = useAppStore();
   const job = store.jobs['retester'];
-  const timer = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (job?.status !== 'running') return;
-    timer.current = window.setInterval(() => {
-      const latest = useAppStore.getState().jobs['retester'];
-      if (!latest || latest.status !== 'running') return;
-      const next = Math.min(100, latest.progress + 3);
-      const accepted = Math.floor(next * 0.48);
-      const rejected = Math.floor(next * 0.52);
-      useAppStore.getState().patchJob('retester', {
-        progress: next,
-        accepted,
-        rejected,
-        message:
-          next >= 100
-            ? 'Retest run completed; retested strategy evaluations updated.'
-            : `Retesting strategy ${Math.floor(next / 16) + 1} across alternative markets and precisions…`,
-        status: next >= 100 ? 'completed' : 'running',
-      });
-    }, 360);
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [job?.status]);
 
   const start = async () => {
-    const created = await mockResearchService.start('retester');
-    store.setJob('retester', created);
-    store.notify('Retester stress run started');
+    store.setJob('retester', {
+      id: `job-retester-${Date.now()}`,
+      kind: 'retester',
+      status: 'running',
+      progress: 0,
+      accepted: 0,
+      rejected: 0,
+      message: 'Executing synchronous graph evaluation via /api/v1/executions/evaluate...',
+      startedAt: new Date().toISOString(),
+    });
+    try {
+      const rsiNode = {
+        id: 'rsi_node',
+        plugin_ref: 'indicator.rsi@1.0.0',
+        operation_id: 'compute',
+        parameters: { period: 14 },
+      };
+      const doc = {
+        schema_version: 1,
+        spec: {
+          nodes: [rsiNode],
+          edges: [],
+          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
+        },
+      };
+      const res = await defaultApiClient.evaluateExecution({
+        graph_document: doc,
+        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
+      });
+      if (res.success) {
+        store.setLastExecutionResult(res);
+        store.patchJob('retester', {
+          status: 'completed',
+          progress: 100,
+          accepted: 1,
+          rejected: 0,
+          message: `Evaluation completed in ${res.elapsed_seconds.toFixed(3)}s. Outputs ready in Execution Results workspace.`,
+        });
+        store.notify('Retester execution completed via gateway');
+      } else {
+        store.patchJob('retester', {
+          status: 'failed',
+          progress: 0,
+          message: `Evaluation issues: ${res.issues.map(i => i.message).join('; ')}`,
+        });
+      }
+    } catch (err: any) {
+      store.patchJob('retester', {
+        status: 'failed',
+        progress: 0,
+        message: err.message || 'Execution failed',
+      });
+    }
+  };
+
+  const startBatch = async () => {
+    store.setJob('retester', {
+      id: `job-retester-batch-${Date.now()}`,
+      kind: 'retester',
+      status: 'running',
+      progress: 0,
+      accepted: 0,
+      rejected: 0,
+      message: 'Executing batch parameter retest via /api/v1/executions/batch...',
+      startedAt: new Date().toISOString(),
+    });
+    try {
+      const rsiNode = {
+        id: 'rsi_node',
+        plugin_ref: 'indicator.rsi@1.0.0',
+        operation_id: 'compute',
+        parameters: { period: 14 },
+      };
+      const doc = {
+        schema_version: 1,
+        spec: {
+          nodes: [rsiNode],
+          edges: [],
+          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
+        },
+      };
+      const batchRes = await defaultApiClient.batchExecution({
+        graph_document: doc,
+        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
+        trials: [
+          { trial_id: 'retest_period_10', parameter_overrides: { rsi_node: { period: 10 } } },
+          { trial_id: 'retest_period_20', parameter_overrides: { rsi_node: { period: 20 } } },
+        ],
+      });
+      if (batchRes.success) {
+        store.setLastBatchResult(batchRes);
+        store.patchJob('retester', {
+          status: 'completed',
+          progress: 100,
+          accepted: batchRes.trials.length,
+          rejected: 0,
+          message: `Batch retest completed ${batchRes.trials.length} trials in ${batchRes.elapsed_seconds.toFixed(3)}s.`,
+        });
+        store.notify('Batch retest completed via gateway');
+      } else {
+        store.patchJob('retester', {
+          status: 'failed',
+          progress: 0,
+          message: `Batch retest issues: ${batchRes.issues.map(i => i.message).join('; ')}`,
+        });
+      }
+    } catch (err: any) {
+      store.patchJob('retester', {
+        status: 'failed',
+        progress: 0,
+        message: err.message || 'Batch retest failed',
+      });
+    }
   };
 
   const status = job?.status ?? 'idle';
@@ -93,18 +179,25 @@ function ProgressView() {
           onClick={status === 'paused' ? () => store.patchJob('retester', { status: 'running', message: 'Resumed' }) : start}
         >
           <Play size={15} />
-          {status === 'paused' ? 'Resume' : 'Start'}
+          {status === 'paused' ? 'Resume' : 'Retest Single'}
+        </Button>
+        <Button
+          disabled={status === 'running'}
+          onClick={startBatch}
+        >
+          <Layers size={14} />
+          Batch Retest
         </Button>
         <Button
           disabled={status !== 'running'}
-          onClick={() => store.patchJob('retester', { status: 'paused', message: 'Paused by user; retest state retained.' })}
+          onClick={() => store.patchJob('retester', { status: 'paused', message: 'Paused by user.' })}
         >
           <Pause size={15} />
           Pause
         </Button>
         <Button
           disabled={!['running', 'paused'].includes(status)}
-          onClick={() => store.patchJob('retester', { status: 'cancelled', message: 'Stopped by user; completed retests preserved.' })}
+          onClick={() => store.patchJob('retester', { status: 'cancelled', message: 'Stopped by user.' })}
         >
           <CircleStop size={15} />
           Stop
@@ -130,8 +223,11 @@ function ProgressView() {
           {status.toUpperCase()}
         </span>
       </div>
+      <div style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: '4px 0 10px 4px' }}>
+        Evaluating standard benchmark RSI-14 strategy graph document through gateway. Results available in Execution Results workspace.
+      </div>
 
-      <Section title="Retester progress" description="Deterministic StrategyQuant X multi-market & stress retesting execution.">
+      <Section title="Retester progress" description="Graph re-evaluation on the primary dataset through the execution gateway. Multi-market and precision cross-checks are deferred to S6.">
         <ProgressBar
           value={job?.progress ?? 0}
           label={`${Math.round(job?.progress ?? 0)}% · ${job?.message ?? 'Ready to start'}`}
@@ -284,6 +380,9 @@ function RetesterSettingsView() {
         title="Alternative markets matrix"
         description="Retest strategies across additional financial instruments to confirm cross-market robustness."
       >
+        <div style={{ marginBottom: 12, padding: 10, background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', borderRadius: 6, fontSize: '0.82rem', color: 'var(--text)' }}>
+          ⚠️ <strong>Deferred Capability:</strong> Multi-market retesting requires data provider integration (deferred to S6). Current execution evaluates the primary strategy dataset via <code>/api/v1/executions/evaluate</code>.
+        </div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
           {AVAILABLE_MARKETS.map((market) => {
             const active = r.additionalMarkets.includes(market);
@@ -360,6 +459,9 @@ function RetesterSettingsView() {
         title="Testing precision and execution models"
         description="Select fill accuracy and apply custom spread/slippage stress multipliers."
       >
+        <div style={{ marginBottom: 12, padding: 10, background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', borderRadius: 6, fontSize: '0.82rem', color: 'var(--text)' }}>
+          ⚠️ <strong>Deferred Capability:</strong> Precision cross-check requires tick engine plugin (deferred to S6). Current evaluation executes bar-level series data.
+        </div>
         <div className="form-grid">
           <Field label="Testing Precision">
             <Select

@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Activity, CircleStop, Database, FileText, Grid, Pause, Play, RotateCcw, Settings2, Sliders } from 'lucide-react';
 import { useAppStore } from '../../app/store';
-import { mockResearchService } from '../../mocks/service';
 import { Button, Checkbox, Field, ProgressBar, Section, Select, Stat, TextInput } from '../../components/ui';
 import { ResultsWorkspace } from '../Results/ResultsWorkspace';
 import { WalkForwardMatrixView } from './WalkForwardMatrixView';
 import type { OptimizationParamRow } from '../../app/types';
+
+import { defaultApiClient } from '../../api/client';
 
 function NumberField({
   label,
@@ -39,36 +40,72 @@ function NumberField({
 function ProgressView() {
   const store = useAppStore();
   const job = store.jobs['optimizer'];
-  const timer = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (job?.status !== 'running') return;
-    timer.current = window.setInterval(() => {
-      const latest = useAppStore.getState().jobs['optimizer'];
-      if (!latest || latest.status !== 'running') return;
-      const next = Math.min(100, latest.progress + 4);
-      const accepted = Math.floor(next * 0.28);
-      const rejected = Math.floor(next * 1.42);
-      useAppStore.getState().patchJob('optimizer', {
-        progress: next,
-        accepted,
-        rejected,
-        message:
-          next >= 100
-            ? 'Optimization run completed; optimal parameter sets stored in destination databank.'
-            : `Evaluating parameter trial combination #${Math.floor(next * 4.8)}…`,
-        status: next >= 100 ? 'completed' : 'running',
-      });
-    }, 350);
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [job?.status]);
 
   const start = async () => {
-    const created = await mockResearchService.start('optimizer');
-    store.setJob('optimizer', created);
-    store.notify('Optimizer parameter run started');
+    store.setJob('optimizer', {
+      id: `job-optimizer-${Date.now()}`,
+      kind: 'optimizer',
+      status: 'running',
+      progress: 0,
+      accepted: 0,
+      rejected: 0,
+      message: 'Executing user parameter trials via /api/v1/executions/batch...',
+      startedAt: new Date().toISOString(),
+    });
+    try {
+      const rsiNode = {
+        id: 'rsi_node',
+        plugin_ref: 'indicator.rsi@1.0.0',
+        operation_id: 'compute',
+        parameters: { period: 14 },
+      };
+      const doc = {
+        schema_version: 1,
+        spec: {
+          nodes: [rsiNode],
+          edges: [],
+          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
+        },
+      };
+      const trials = [
+        {
+          trial_id: 'trial_14',
+          parameter_overrides: { rsi_node: { period: 14 } },
+        },
+        {
+          trial_id: 'trial_21',
+          parameter_overrides: { rsi_node: { period: 21 } },
+        },
+      ];
+      const res = await defaultApiClient.batchExecution({
+        graph_document: doc,
+        trials,
+        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
+      });
+      if (res.success) {
+        store.setLastBatchResult(res);
+        store.patchJob('optimizer', {
+          status: 'completed',
+          progress: 100,
+          accepted: res.trials.length,
+          rejected: 0,
+          message: `Batch execution of ${res.trials.length} trials completed in ${res.elapsed_seconds.toFixed(3)}s.`,
+        });
+        store.notify('Optimizer batch execution completed via gateway');
+      } else {
+        store.patchJob('optimizer', {
+          status: 'failed',
+          progress: 0,
+          message: 'Batch trial execution encountered errors',
+        });
+      }
+    } catch (err: any) {
+      store.patchJob('optimizer', {
+        status: 'failed',
+        progress: 0,
+        message: err.message || 'Batch execution failed',
+      });
+    }
   };
 
   const status = job?.status ?? 'idle';
@@ -82,18 +119,18 @@ function ProgressView() {
           onClick={status === 'paused' ? () => store.patchJob('optimizer', { status: 'running', message: 'Resumed' }) : start}
         >
           <Play size={15} />
-          {status === 'paused' ? 'Resume' : 'Start'}
+          {status === 'paused' ? 'Resume' : 'Run Trials'}
         </Button>
         <Button
           disabled={status !== 'running'}
-          onClick={() => store.patchJob('optimizer', { status: 'paused', message: 'Paused by user; trial results retained.' })}
+          onClick={() => store.patchJob('optimizer', { status: 'paused', message: 'Paused by user.' })}
         >
           <Pause size={15} />
           Pause
         </Button>
         <Button
           disabled={!['running', 'paused'].includes(status)}
-          onClick={() => store.patchJob('optimizer', { status: 'cancelled', message: 'Stopped by user; optimal revisions preserved.' })}
+          onClick={() => store.patchJob('optimizer', { status: 'cancelled', message: 'Stopped by user.' })}
         >
           <CircleStop size={15} />
           Stop
@@ -119,8 +156,11 @@ function ProgressView() {
           {status.toUpperCase()}
         </span>
       </div>
+      <div style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: '4px 0 10px 4px' }}>
+        Evaluating parameter trials on standard benchmark RSI-14 strategy graph document through gateway. Results available in Execution Results workspace.
+      </div>
 
-      <Section title="Optimizer progress" description="Deterministic StrategyQuant X parameter optimization simulation.">
+      <Section title="Optimizer progress" description="Explicit user parameter trials evaluated in batch through the execution gateway. Algorithmic optimization is deferred to S6.">
         <ProgressBar
           value={job?.progress ?? 0}
           label={`${Math.round(job?.progress ?? 0)}% · ${job?.message ?? 'Ready to start'}`}
@@ -213,6 +253,11 @@ function OptimizerSettingsView() {
             </button>
           ))}
         </div>
+        {opt.mode !== 'Simple' && (
+          <div style={{ marginTop: 12, padding: 10, background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', borderRadius: 6, fontSize: '0.82rem', color: 'var(--text)' }}>
+            ⚠️ <strong>Deferred Capability:</strong> {opt.mode} optimization requires an optimizer algorithm plugin (deferred to S6). Current execution supports 'Simple' user parameter trials via <code>/api/v1/executions/batch</code>.
+          </div>
+        )}
       </Section>
 
       {/* 2. Strategy Source Selection */}

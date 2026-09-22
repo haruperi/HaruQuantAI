@@ -3,6 +3,7 @@ import { persist } from 'zustand/middleware';
 import type { AppSettings, BuilderSettings, BusinessConfig, BusinessUser, BusinessWorkspaceItem, ComputeNode, CustomProject, Databank, ExtensionFile, Job, McpServerConfig, ModuleId, OptimizationSettings, PortfolioMasterSettings, PortfolioMember, PortfolioSettings, ProjectTab, RetesterSettings, RuleNode, Strategy, WorkflowTask } from './types';
 import { businessConfig, computeNodes, customProjects, databanks, extensionFiles, portfolioMembers, rules, strategies, workflowTasks } from '../mocks/fixtures';
 import { createInitialAppSettings, mergeAppSettings } from './globalSettings';
+import type { BatchExecutionResult, SingleExecutionResult } from '../api/contracts.generated';
 
 interface AppState {
   module: ModuleId; tab: ProjectTab; selectedStrategyId: string; resultView: string; selectedBankId: string; selectedRows: string[];
@@ -12,6 +13,9 @@ interface AppState {
   projects: CustomProject[]; activeProjectId: string;
   extensionFiles: ExtensionFile[]; activeFileId: string; openFileIds: string[]; compileOutput: string;
   computeNodes: ComputeNode[]; businessConfig: BusinessConfig;
+  lastExecutionResult: SingleExecutionResult | null; lastBatchResult: BatchExecutionResult | null;
+  setLastExecutionResult: (res: SingleExecutionResult | null) => void;
+  setLastBatchResult: (res: BatchExecutionResult | null) => void;
   setModule: (module: ModuleId) => void; setTab: (tab: ProjectTab) => void; selectStrategy: (id: string) => void; setResultView: (view: string) => void;
   setBank: (id: string) => void; setRows: (ids: string[]) => void; updateSettings: (patch: Partial<AppSettings>) => void; updateBuilder: (patch: Partial<BuilderSettings>) => void;
   updateOptimization: (patch: Partial<OptimizationSettings>) => void; updateRetester: (patch: Partial<RetesterSettings>) => void;
@@ -332,13 +336,18 @@ export const useAppStore = create<AppState>()(persist((set) => ({
       mcpServers: s.businessConfig.mcpServers.filter(m => m.id !== id),
     },
   })),
+  lastExecutionResult: null,
+  lastBatchResult: null,
+  setLastExecutionResult: res => set({ lastExecutionResult: res }),
+  setLastBatchResult: res => set({ lastBatchResult: res }),
   notify: message => set(s => ({ notifications: [message, ...s.notifications].slice(0, 8) })),
   reset: () => set({
     module: 'builder', tab: 'progress', selectedStrategyId: 'str-1', resultView: 'Overview', selectedBankId: 'results', selectedRows: [],
     strategies, databanks, jobs: {}, settings: initialSettings, builder: initialBuilder, optimization: initialOptimization, retester: initialRetester,
     portfolioSettings: initialPortfolioSettings, portfolioMasterSettings: initialPortfolioMasterSettings, rules, portfolio: portfolioMembers,
     workflow: workflowTasks, projects: customProjects, activeProjectId: customProjects[0].id, extensionFiles, activeFileId: extensionFiles[0].id,
-    openFileIds: [extensionFiles[0].id], compileOutput: '[info] Compiler ready.', computeNodes, businessConfig, notifications: []
+    openFileIds: [extensionFiles[0].id], compileOutput: '[info] Compiler ready.', computeNodes, businessConfig, notifications: [],
+    lastExecutionResult: null, lastBatchResult: null
   }),
 }), {
   name: 'sqx-recreation-v1', version: 1,

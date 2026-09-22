@@ -58,7 +58,9 @@ CURRENT_PLUGIN_FAMILIES: dict[str, frozenset[str]] = {
     "indicators": frozenset({"__init__.py", "rsi.py"}),
     "comparisons": frozenset({"__init__.py", "greater_than.py"}),
     "exporters": frozenset({"__init__.py", "python.py"}),
-    "workspaces": frozenset({"__init__.py", "builder.py", "results.py"}),
+    "workspaces": frozenset(
+        {"__init__.py", "builder.py", "optimizer.py", "results.py", "retester.py"}
+    ),
 }
 _SHARED_METAMODEL_PREFIXES = (
     "app.plugins.schema",

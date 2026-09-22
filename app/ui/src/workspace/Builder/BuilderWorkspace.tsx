@@ -1,47 +1,132 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Activity, CircleStop, Layers, Pause, Play, RotateCcw, Settings, ShieldCheck, Sliders } from 'lucide-react';
 import { useAppStore } from '../../app/store';
-import { mockResearchService } from '../../mocks/service';
 import { Button, Checkbox, Field, ProgressBar, Section, Select, Stat, TextInput } from '../../components/ui';
 import { ResultsWorkspace } from '../Results/ResultsWorkspace';
 import { BuildingBlocksModal } from './BuildingBlocksModal';
 import { ATMConfigModal } from './ATMConfigModal';
 import { RankingSettingsView } from './RankingSettingsView';
 import { BUILDING_BLOCKS_CATALOG } from './BuildingBlocksCatalog';
+import { defaultApiClient } from '../../api/client';
 
 function ProgressView() {
   const store = useAppStore();
   const job = store.jobs['builder'];
-  const timer = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (job?.status !== 'running') return;
-    timer.current = window.setInterval(() => {
-      const latest = useAppStore.getState().jobs['builder'];
-      if (!latest || latest.status !== 'running') return;
-      const next = Math.min(100, latest.progress + 2);
-      const accepted = Math.floor(next * 0.38);
-      const rejected = Math.floor(next * 1.84);
-      useAppStore.getState().patchJob('builder', {
-        progress: next,
-        accepted,
-        rejected,
-        message:
-          next >= 100
-            ? 'Builder run completed; top evolved strategies retained in databank.'
-            : `Evaluating generation ${Math.floor(next / 10) + 1}, island ${((Math.floor(next) % 4) + 1)}…`,
-        status: next >= 100 ? 'completed' : 'running',
-      });
-    }, 380);
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [job?.status]);
 
   const start = async () => {
-    const created = await mockResearchService.start('builder');
-    store.setJob('builder', created);
-    store.notify('Builder genetic run started');
+    store.setJob('builder', {
+      id: `job-builder-${Date.now()}`,
+      kind: 'builder',
+      status: 'running',
+      progress: 0,
+      accepted: 0,
+      rejected: 0,
+      message: 'Evaluating strategy graph via /api/v1/executions/evaluate...',
+      startedAt: new Date().toISOString(),
+    });
+    try {
+      const rsiNode = {
+        id: 'rsi_node',
+        plugin_ref: 'indicator.rsi@1.0.0',
+        operation_id: 'compute',
+        parameters: { period: 14 },
+      };
+      const doc = {
+        schema_version: 1,
+        spec: {
+          nodes: [rsiNode],
+          edges: [],
+          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
+        },
+      };
+      const res = await defaultApiClient.evaluateExecution({
+        graph_document: doc,
+        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
+      });
+      if (res.success) {
+        store.setLastExecutionResult(res);
+        store.patchJob('builder', {
+          status: 'completed',
+          progress: 100,
+          accepted: 1,
+          rejected: 0,
+          message: `Evaluation completed in ${res.elapsed_seconds.toFixed(3)}s. Reproducibility fingerprint: ${res.reproducibility?.graph_fingerprint?.substring(0, 12) ?? 'confirmed'}...`,
+        });
+        store.notify('Builder execution completed via gateway');
+      } else {
+        store.patchJob('builder', {
+          status: 'failed',
+          progress: 0,
+          message: `Evaluation issues: ${res.issues.map(i => i.message).join('; ')}`,
+        });
+      }
+    } catch (err: any) {
+      store.patchJob('builder', {
+        status: 'failed',
+        progress: 0,
+        message: err.message || 'Execution failed',
+      });
+    }
+  };
+
+  const startBatch = async () => {
+    store.setJob('builder', {
+      id: `job-builder-batch-${Date.now()}`,
+      kind: 'builder',
+      status: 'running',
+      progress: 0,
+      accepted: 0,
+      rejected: 0,
+      message: 'Executing batch parameter trials via /api/v1/executions/batch...',
+      startedAt: new Date().toISOString(),
+    });
+    try {
+      const rsiNode = {
+        id: 'rsi_node',
+        plugin_ref: 'indicator.rsi@1.0.0',
+        operation_id: 'compute',
+        parameters: { period: 14 },
+      };
+      const doc = {
+        schema_version: 1,
+        spec: {
+          nodes: [rsiNode],
+          edges: [],
+          designated_roots: [{ node_id: 'rsi_node', port_key: 'rsi' }],
+        },
+      };
+      const batchRes = await defaultApiClient.batchExecution({
+        graph_document: doc,
+        inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
+        trials: [
+          { trial_id: 'fast_period', parameter_overrides: { rsi_node: { period: 7 } } },
+          { trial_id: 'slow_period', parameter_overrides: { rsi_node: { period: 21 } } },
+        ],
+      });
+      if (batchRes.success) {
+        store.setLastBatchResult(batchRes);
+        store.patchJob('builder', {
+          status: 'completed',
+          progress: 100,
+          accepted: batchRes.trials.length,
+          rejected: 0,
+          message: `Batch completed ${batchRes.trials.length} trials in ${batchRes.elapsed_seconds.toFixed(3)}s.`,
+        });
+        store.notify('Batch trials completed via gateway');
+      } else {
+        store.patchJob('builder', {
+          status: 'failed',
+          progress: 0,
+          message: `Batch execution issues: ${batchRes.issues.map(i => i.message).join('; ')}`,
+        });
+      }
+    } catch (err: any) {
+      store.patchJob('builder', {
+        status: 'failed',
+        progress: 0,
+        message: err.message || 'Batch execution failed',
+      });
+    }
   };
 
   const status = job?.status ?? 'idle';
@@ -81,18 +166,25 @@ function ProgressView() {
           onClick={status === 'paused' ? () => store.patchJob('builder', { status: 'running', message: 'Resumed' }) : start}
         >
           <Play size={15} />
-          {status === 'paused' ? 'Resume' : 'Start'}
+          {status === 'paused' ? 'Resume' : 'Evaluate'}
+        </Button>
+        <Button
+          disabled={status === 'running'}
+          onClick={startBatch}
+        >
+          <Layers size={14} />
+          Batch Trials
         </Button>
         <Button
           disabled={status !== 'running'}
-          onClick={() => store.patchJob('builder', { status: 'paused', message: 'Paused by user; island state retained.' })}
+          onClick={() => store.patchJob('builder', { status: 'paused', message: 'Paused by user.' })}
         >
           <Pause size={15} />
           Pause
         </Button>
         <Button
           disabled={!['running', 'paused'].includes(status)}
-          onClick={() => store.patchJob('builder', { status: 'cancelled', message: 'Stopped by user; accepted candidates preserved.' })}
+          onClick={() => store.patchJob('builder', { status: 'cancelled', message: 'Stopped by user.' })}
         >
           <CircleStop size={15} />
           Stop
@@ -118,8 +210,11 @@ function ProgressView() {
           {status.toUpperCase()}
         </span>
       </div>
+      <div style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: '4px 0 10px 4px' }}>
+        Evaluating standard benchmark RSI-14 strategy graph document through gateway. Results available in Execution Results workspace.
+      </div>
 
-      <Section title="Builder progress" description="Deterministic StrategyQuant X genetic engine simulation; candidate strategies evaluated in real-time.">
+      <Section title="Builder progress" description="Synchronous strategy graph evaluation through the execution gateway. Genetic generation is deferred to S6.">
         <ProgressBar
           value={job?.progress ?? 0}
           label={`${Math.round(job?.progress ?? 0)}% · ${job?.message ?? 'Ready to start'}`}
@@ -314,6 +409,9 @@ function BuilderSettingsView() {
             checked={s.generateExitRules}
             onChange={(generateExitRules) => update({ generateExitRules })}
           />
+        </div>
+        <div style={{ marginTop: 12, padding: 10, background: 'rgba(234, 179, 8, 0.1)', border: '1px solid rgba(234, 179, 8, 0.3)', borderRadius: 6, fontSize: '0.82rem', color: 'var(--text)' }}>
+          ⚠️ <strong>Deferred Capability:</strong> Genetic strategy generation requires generator plugin (deferred to S6). Current execution evaluates interactive strategy graphs via <code>/api/v1/executions/evaluate</code>.
         </div>
       </Section>
 

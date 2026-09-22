@@ -70,6 +70,13 @@ BUILDER_COMMANDS = (
         title="Export Code",
         description="Export graph to target source code via an admitted exporter.",
     ),
+    WorkspaceCommand(
+        command_id="generate_genetic",
+        title="Genetic Strategy Generation",
+        description=(
+            "Run evolutionary genetic strategy generation and search (deferred to S6)."
+        ),
+    ),
 )
 
 BUILDER_VIEWS = (

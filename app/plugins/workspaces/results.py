@@ -6,13 +6,15 @@ zero-argument ``plugin()`` factory is pure — no I/O, no registration,
 no tasks or threads, no environment reads — and the plugin is
 discovered through the host catalog, never imported by name.
 
-Peer of ``workspace.builder``: a declarative workspace whose commands
-inspect metrics, output series, and provenance of finished runs and
-whose views render them. ``accepted_kinds`` (``indicator``,
-``comparison``, ``exporter``) selects which plugin kinds the results
-workspace concerns. Declaring the workspace starts no service. This
-file imports only shared metamodel types — never other plugins, UI
-code, or host implementations — and contributes no operations.
+Peer of ``workspace.builder``, ``workspace.retester``, and
+``workspace.optimizer``: a declarative workspace whose commands
+inspect calculation outputs, reproducibility metadata, and execution
+issues of finished runs and whose views render them. ``accepted_kinds``
+(``indicator``, ``comparison``, ``exporter``) selects which plugin kinds
+the results workspace concerns. Declaring the workspace starts no
+service. This file imports only shared metamodel types — never other
+plugins, UI code, or host implementations — and contributes no
+operations.
 """
 
 from __future__ import annotations
@@ -30,20 +32,45 @@ PLUGIN_REF = PluginRef("workspace.results", (1, 0, 0))
 
 RESULTS_COMMANDS = (
     WorkspaceCommand(
-        command_id="inspect_metrics",
-        title="Inspect Metrics",
-        description="Inspect calculated execution metrics and summary statistics.",
-    ),
-    WorkspaceCommand(
-        command_id="inspect_series",
-        title="Inspect Series",
-        description="Inspect output series data points and timestamps.",
-    ),
-    WorkspaceCommand(
-        command_id="inspect_provenance",
-        title="Inspect Provenance",
+        command_id="inspect_outputs",
+        title="Inspect Outputs",
         description=(
-            "Inspect execution reproducibility record, hashes, and fingerprints."
+            "Inspect calculation output series and scalar values keyed by node"
+            " and port."
+        ),
+    ),
+    WorkspaceCommand(
+        command_id="inspect_reproducibility",
+        title="Inspect Reproducibility",
+        description=(
+            "Inspect execution reproducibility record, graph fingerprint, seed,"
+            " and elapsed duration."
+        ),
+    ),
+    WorkspaceCommand(
+        command_id="inspect_issues",
+        title="Inspect Issues",
+        description="Inspect structured validation or execution issues.",
+    ),
+    WorkspaceCommand(
+        command_id="export_strategy",
+        title="Export Strategy",
+        description="Export candidate strategy graph to target source code.",
+    ),
+    WorkspaceCommand(
+        command_id="trading_metrics",
+        title="Trading Performance Metrics",
+        description=(
+            "Compute financial backtest metrics such as Sharpe, Drawdown, Profit"
+            " Factor, and trade list (deferred to S6)."
+        ),
+    ),
+    WorkspaceCommand(
+        command_id="monte_carlo",
+        title="Monte Carlo Permutation",
+        description=(
+            "Execute Monte Carlo trade order reshuffling and parameter"
+            " permutation analysis (deferred to S6)."
         ),
     ),
 )
@@ -70,8 +97,7 @@ WORKSPACE_SPEC = WorkspaceSpec(
     ref=PLUGIN_REF,
     title="Execution Results",
     description=(
-        "Quantitative execution result analysis, metric calculation, and chart"
-        " inspection workspace."
+        "Execution result analysis, output inspection, and chart rendering workspace."
     ),
     commands=RESULTS_COMMANDS,
     views=RESULTS_VIEWS,
@@ -83,8 +109,7 @@ RESULTS_PLUGIN_SPEC = PluginSpec(
     kind="workspace",
     title="Execution Results",
     description=(
-        "Quantitative execution result analysis, metric calculation, and chart"
-        " inspection workspace."
+        "Execution result analysis, output inspection, and chart rendering workspace."
     ),
     operations=(),
     workspace=WORKSPACE_SPEC,

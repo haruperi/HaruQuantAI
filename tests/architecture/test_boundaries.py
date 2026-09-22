@@ -59,7 +59,9 @@ def test_s5_python_owner_files_are_exact() -> None:
     assert {path.name for path in (APP / "plugins" / "workspaces").glob("*.py")} == {
         "__init__.py",
         "builder.py",
+        "optimizer.py",
         "results.py",
+        "retester.py",
     }
 
 
