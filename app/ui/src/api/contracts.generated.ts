@@ -4,53 +4,44 @@
  */
 
 export type ValueKind =
-  | "scalar"
-  | "aligned_series"
-  | "unaligned_series"
-  | "table"
-  | "matrix"
-  | "string"
   | "boolean"
+  | "integer"
+  | "number"
+  | "text"
+  | "enum"
   | "object"
-  | "array"
-  | "categorical"
-  | "token"
-  | "reference";
+  | "aligned_series";
 
 export type Unit =
   | "none"
-  | "currency"
   | "percent"
+  | "currency"
   | "points"
-  | "pips"
-  | "bars"
   | "seconds"
-  | "ratio"
-  | "count";
+  | "bars"
+  | "ratio";
 
 export type Alignment =
   | "none"
   | "index"
   | "timestamp"
-  | "symbol";
+  | "bar_index";
 
 export type WidgetKind =
-  | "default"
-  | "number_input"
+  | "numeric_input"
   | "slider"
   | "text_input"
-  | "select"
-  | "checkbox"
-  | "date_picker"
-  | "color_picker"
-  | "code_editor";
+  | "dropdown"
+  | "checkbox";
 
 export type OptimizationScale =
   | "linear"
   | "logarithmic"
-  | "integer"
-  | "discrete";
+  | "step";
 
+export type OptimizationDistribution =
+  | "uniform"
+  | "normal";
 export interface PluginRef {
   id: string;
   version: [number, number, number];
@@ -93,6 +84,7 @@ export interface OptimizationDomain {
   max_value?: number | null;
   step?: number | null;
   scale: OptimizationScale;
+  distribution: OptimizationDistribution;
 }
 
 export interface PresentationHint {

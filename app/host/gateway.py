@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import contextvars
 import json
 import threading
 import time
@@ -12,7 +13,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, Protocol, override
 
-from app.host.catalog import HOST_CATALOG, Catalog, SelectionRequest
+from app.host.catalog import HOST_CATALOG, Catalog, CatalogError, SelectionRequest
 from app.host.execution import (
     HOST_EXECUTION,
     BatchExecutionRequest,
@@ -20,9 +21,11 @@ from app.host.execution import (
     Execution,
     ExecutionBudget,
     ExecutionBudgetExceededError,
+    ExecutionError,
     ExportRequest,
     SingleExecutionRequest,
 )
+from app.host.telemetry import HOST_TELEMETRY, Telemetry, TelemetryLevel
 from app.kernel.capability import Capability
 from app.kernel.context import FeatureContext
 from app.kernel.feature import Feature, FeatureSpec
@@ -42,6 +45,12 @@ from app.plugins.wire import (
 )
 
 GATEWAY_API_VERSION = "1.0.0"
+
+# Per-request cancellation token for executions offloaded to worker
+# threads; the timeout wrapper cancels it when the deadline fires.
+_ACTIVE_CANCELLATION: contextvars.ContextVar[Any] = contextvars.ContextVar(
+    "gateway_active_cancellation", default=None
+)
 MAX_PORT = 65535
 DEFAULT_SERVER_START_TIMEOUT_SECONDS = 5.0
 
@@ -63,6 +72,11 @@ class GatewayConfig:
     max_payload_bytes: int = 10_000_000
     request_timeout_seconds: float = 30.0
     shutdown_timeout_seconds: float = 5.0
+    # Host-owned authorization policy, granted at composition time only.
+    # Request bodies can never widen these; they are rejected if they try.
+    allowed_effects: tuple[str, ...] = ("pure",)
+    permissions: tuple[str, ...] = ()
+    available_capabilities: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         """Validate gateway configuration."""
@@ -81,6 +95,14 @@ class GatewayConfig:
             raise ValueError("request_timeout_seconds must be > 0")
         if self.shutdown_timeout_seconds <= 0:
             raise ValueError("shutdown_timeout_seconds must be > 0")
+        self._check_policy_tuples(self)
+
+    @staticmethod
+    def _check_policy_tuples(cfg: GatewayConfig) -> None:
+        """Authorization policy fields must be tuples of strings."""
+        for name in ("allowed_effects", "permissions", "available_capabilities"):
+            if not isinstance(getattr(cfg, name), tuple):
+                raise TypeError(f"{name} must be a tuple of strings")
 
 
 DEFAULT_GATEWAY_CONFIG = GatewayConfig()
@@ -130,6 +152,38 @@ def _success_envelope(data: Any, request_id: str) -> dict[str, Any]:
     }
 
 
+def _request_id_of(request: Any) -> str:
+    """Derive the request ID from the header or a fresh UUID."""
+    return request.headers.get("X-Request-Id") or str(uuid.uuid4())
+
+
+def _json_response(envelope: dict[str, Any], status_code: int = 200) -> Any:
+    """Build a JSONResponse carrying the request ID header."""
+    from starlette.responses import JSONResponse
+
+    return JSONResponse(
+        envelope,
+        status_code=status_code,
+        headers={"X-Request-Id": str(envelope.get("request_id", ""))},
+    )
+
+
+def _safe_error_code_and_message(
+    ex: BaseException, default_code: str
+) -> tuple[str, str]:
+    """Map an exception to a stable code and safe message.
+
+    Host-authored error types keep their bounded messages; anything else
+    degrades to a generic internal error so no path, secret, or arbitrary
+    exception text crosses the boundary.
+    """
+    if isinstance(ex, (ExecutionError, CatalogError)):
+        return type(ex).__name__, str(ex)
+    if isinstance(ex, (ValueError, TypeError)):
+        return "INVALID_REQUEST", str(ex)
+    return default_code, "Internal gateway error; see host diagnostics"
+
+
 def _error_envelope(
     code: str,
     message: str,
@@ -157,13 +211,82 @@ class _GatewayProvider:
         config: GatewayConfig,
         catalog: Catalog | None = None,
         execution: Execution | None = None,
+        telemetry: Telemetry | None = None,
     ) -> None:
         self._config = config
         self._catalog = catalog
         self._execution = execution
+        self._telemetry = telemetry
         self._server: Any = None
         self._server_thread: threading.Thread | None = None
         self._bound_address: tuple[str, int] | None = None
+
+    async def _emit_telemetry(self, name: str, fields: dict[str, Any]) -> None:
+        """Emit a bounded gateway telemetry event, never failing a request."""
+        if self._telemetry is None:
+            return
+        from app.host.telemetry import TelemetryEvent
+
+        with contextlib.suppress(Exception):
+            await self._telemetry.emit(
+                TelemetryEvent(
+                    name=name,
+                    level=TelemetryLevel.INFO,
+                    fields=tuple(fields.items()),
+                )
+            )
+
+    async def _offload_execution(self, fn: Any, request: Any) -> Any:
+        """Run a blocking execution on a worker thread.
+
+        The request's cancellation token is cancelled the moment this
+        coroutine is cancelled (request timeout/disconnect), so the
+        abandoned worker thread stops at its next node boundary.
+        """
+        token = request.cancellation
+        token_ref = _ACTIVE_CANCELLATION.set(token)
+        try:
+            return await asyncio.to_thread(fn, request)
+        except asyncio.CancelledError:
+            if token is not None:
+                token.cancel()
+            raise
+        finally:
+            _ACTIVE_CANCELLATION.reset(token_ref)
+
+    def _timed(self, handler: Any, route: str) -> Any:
+        """Wrap a handler with the configured request timeout and telemetry."""
+
+        async def wrapped(request: Any) -> Any:
+            start = time.perf_counter()
+            status = "completed"
+            try:
+                async with asyncio.timeout(self._config.request_timeout_seconds):
+                    return await handler(request)
+            except TimeoutError:
+                status = "timeout"
+                token = _ACTIVE_CANCELLATION.get()
+                if token is not None:
+                    token.cancel()
+                return _json_response(
+                    _error_envelope(
+                        "REQUEST_TIMEOUT",
+                        f"Request exceeded {self._config.request_timeout_seconds}s",
+                        _request_id_of(request),
+                    ),
+                    504,
+                )
+            finally:
+                await self._emit_telemetry(
+                    "gateway.request",
+                    {
+                        "route": route,
+                        "status": status,
+                        "elapsed_ms": round((time.perf_counter() - start) * 1000.0, 3),
+                    },
+                )
+
+        return wrapped
 
     @property
     def config(self) -> GatewayConfig:
@@ -185,6 +308,10 @@ class _GatewayProvider:
         """Set peer host capabilities after feature discovery."""
         self._catalog = catalog
         self._execution = execution
+
+    def set_telemetry(self, telemetry: Telemetry | None) -> None:
+        """Attach the telemetry owner for gateway request events."""
+        self._telemetry = telemetry
 
     async def _read_body_strictly(self, request: Any) -> tuple[Any, str | None]:
         """Read and strictly parse request body, checking max payload size."""
@@ -256,16 +383,38 @@ class _GatewayProvider:
                 status_code=400,
                 headers={"X-Request-Id": req_id},
             )
+        # Authorization is host-owned: bodies carrying entitlement claims
+        # are rejected instead of trusted.
+        claimed = {"permissions", "available_capabilities"} & set(body)
+        if claimed:
+            return JSONResponse(
+                _error_envelope(
+                    "AUTHORIZATION_FIELDS_REJECTED",
+                    "Request bodies cannot declare permissions or "
+                    "capabilities; they are granted by host composition",
+                    req_id,
+                ),
+                status_code=400,
+                headers={"X-Request-Id": req_id},
+            )
         try:
             enabled_refs = tuple(
                 PluginRef.parse(r) for r in body.get("enabled_refs", [])
             )
+            # The request may only NARROW the host's effect policy.
+            host_effects = self._config.allowed_effects
+            body_effects = tuple(body.get("allowed_effects", host_effects))
+            effective_effects = tuple(e for e in body_effects if e in host_effects)
             sel_req = SelectionRequest(
                 enabled_refs=enabled_refs,
-                allowed_effects=tuple(body.get("allowed_effects", ["pure"])),
+                allowed_effects=effective_effects,
                 allowed_kinds=tuple(body.get("allowed_kinds", [])),
-                available_capabilities=tuple(body.get("available_capabilities", [])),
-                permissions=tuple(body.get("permissions", [])),
+                available_capabilities=self._config.available_capabilities,
+                permissions=self._config.permissions,
+                operation_ids=tuple(body.get("operation_ids", [])),
+                allowed_lowering_targets=tuple(
+                    body.get("allowed_lowering_targets", [])
+                ),
             )
             result = self._catalog.select(sel_req)
             resp_data = {
@@ -288,7 +437,9 @@ class _GatewayProvider:
             )
         except (KeyError, ValueError, TypeError, RuntimeError) as ex:
             return JSONResponse(
-                _error_envelope("SELECTION_FAILED", str(ex), req_id),
+                _error_envelope(
+                    *_safe_error_code_and_message(ex, "SELECTION_FAILED"), req_id
+                ),
                 status_code=400,
                 headers={"X-Request-Id": req_id},
             )
@@ -347,7 +498,9 @@ class _GatewayProvider:
             )
         except (KeyError, ValueError, TypeError, RuntimeError) as ex:
             return JSONResponse(
-                _error_envelope("VALIDATION_ERROR", str(ex), req_id),
+                _error_envelope(
+                    *_safe_error_code_and_message(ex, "VALIDATION_ERROR"), req_id
+                ),
                 status_code=400,
                 headers={"X-Request-Id": req_id},
             )
@@ -399,12 +552,18 @@ class _GatewayProvider:
                     max_trials=b.get("max_trials", 1),
                     max_elapsed_seconds=b.get("max_elapsed_seconds", 30.0),
                 )
+            from app.host.execution import CancellationToken
+
+            token = CancellationToken()
             single_req = SingleExecutionRequest(
                 graph_document=doc,
                 inputs=inputs,
                 budget=budget,
+                cancellation=token,
             )
-            res = self._execution.execute(single_req)
+            # Offloaded: a CPU-bound run cannot block the event loop, and
+            # cancellation reaches the executor at its node boundary.
+            res = await self._offload_execution(self._execution.execute, single_req)
             resp_data: dict[str, Any] = {
                 "success": res.success,
                 "elapsed_seconds": res.elapsed_seconds,
@@ -455,7 +614,9 @@ class _GatewayProvider:
             ExecutionBudgetExceededError,
         ) as ex:
             return JSONResponse(
-                _error_envelope("EXECUTION_FAILED", str(ex), req_id),
+                _error_envelope(
+                    *_safe_error_code_and_message(ex, "EXECUTION_FAILED"), req_id
+                ),
                 status_code=400,
                 headers={"X-Request-Id": req_id},
             )
@@ -518,14 +679,20 @@ class _GatewayProvider:
                     max_trials=b.get("max_trials", 100),
                     max_elapsed_seconds=b.get("max_elapsed_seconds", 60.0),
                 )
+            from app.host.execution import CancellationToken
+
+            token = CancellationToken()
             batch_req = BatchExecutionRequest(
                 graph_document=doc,
                 inputs=inputs,
                 trials=tuple(trials_list),
                 budget=budget,
                 seed=body.get("seed"),
+                cancellation=token,
             )
-            res = self._execution.execute_batch(batch_req)
+            res = await self._offload_execution(
+                self._execution.execute_batch, batch_req
+            )
             resp_data = {
                 "success": res.success,
                 "trials": [
@@ -556,7 +723,9 @@ class _GatewayProvider:
             ExecutionBudgetExceededError,
         ) as ex:
             return JSONResponse(
-                _error_envelope("BATCH_EXECUTION_FAILED", str(ex), req_id),
+                _error_envelope(
+                    *_safe_error_code_and_message(ex, "BATCH_EXECUTION_FAILED"), req_id
+                ),
                 status_code=400,
                 headers={"X-Request-Id": req_id},
             )
@@ -599,7 +768,9 @@ class _GatewayProvider:
                 version=tuple(target_dict["version"]),
             )
             exp_req = ExportRequest(graph_document=doc, target=target)
-            res = self._execution.export(exp_req)
+            # Lowering/export is CPU-bound: offload so the loop stays
+            # responsive; it is bounded by graph and IR limits.
+            res = await asyncio.to_thread(self._execution.export, exp_req)
             resp_data = {
                 "success": res.success,
                 "target": {
@@ -623,7 +794,9 @@ class _GatewayProvider:
             )
         except (KeyError, ValueError, TypeError, RuntimeError) as ex:
             return JSONResponse(
-                _error_envelope("EXPORT_FAILED", str(ex), req_id),
+                _error_envelope(
+                    *_safe_error_code_and_message(ex, "EXPORT_FAILED"), req_id
+                ),
                 status_code=400,
                 headers={"X-Request-Id": req_id},
             )
@@ -641,29 +814,49 @@ class _GatewayProvider:
             ) from err
 
         routes = [
-            Route("/api/v1/health", self._handle_health, methods=["GET"]),
-            Route("/api/v1/catalog", self._handle_catalog, methods=["GET"]),
+            Route(
+                "/api/v1/health",
+                self._timed(self._handle_health, "GET /api/v1/health"),
+                methods=["GET"],
+            ),
+            Route(
+                "/api/v1/catalog",
+                self._timed(self._handle_catalog, "GET /api/v1/catalog"),
+                methods=["GET"],
+            ),
             Route(
                 "/api/v1/catalog/select",
-                self._handle_catalog_select,
+                self._timed(self._handle_catalog_select, "POST /api/v1/catalog/select"),
                 methods=["POST"],
             ),
             Route(
                 "/api/v1/graphs/validate",
-                self._handle_graphs_validate,
+                self._timed(
+                    self._handle_graphs_validate, "POST /api/v1/graphs/validate"
+                ),
                 methods=["POST"],
             ),
             Route(
                 "/api/v1/executions/evaluate",
-                self._handle_executions_evaluate,
+                self._timed(
+                    self._handle_executions_evaluate,
+                    "POST /api/v1/executions/evaluate",
+                ),
                 methods=["POST"],
             ),
             Route(
                 "/api/v1/executions/batch",
-                self._handle_executions_batch,
+                self._timed(
+                    self._handle_executions_batch,
+                    "POST /api/v1/executions/batch",
+                ),
                 methods=["POST"],
             ),
-            Route("/api/v1/exports", self._handle_exports, methods=["POST"]),
+            Route(
+                "/api/v1/exports",
+                self._timed(self._handle_exports, "POST /api/v1/exports"),
+                methods=["POST"],
+            ),
         ]
 
         middleware = [
@@ -749,7 +942,7 @@ class _GatewayFeature(Feature):
 
     spec = FeatureSpec(
         "host.gateway",
-        requires=frozenset({HOST_CATALOG, HOST_EXECUTION}),
+        requires=frozenset({HOST_CATALOG, HOST_EXECUTION, HOST_TELEMETRY}),
         provides=frozenset({HOST_GATEWAY}),
     )
 
@@ -767,6 +960,8 @@ class _GatewayFeature(Feature):
         """Inject peer capabilities, publish capability, and optionally start server."""
         catalog = context.require(HOST_CATALOG)
         execution = context.require(HOST_EXECUTION)
+        telemetry = context.require(HOST_TELEMETRY)
+        self._provider.set_telemetry(telemetry)
         self._provider.set_dependencies(catalog, execution)
 
         context.on_close(self._provider.stop)

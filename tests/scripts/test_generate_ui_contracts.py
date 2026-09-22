@@ -52,3 +52,60 @@ def test_contracts_check_cli() -> None:
     res = subprocess.run(cmd, cwd=root, capture_output=True, text=True, check=False)
     assert res.returncode == 0
     assert "up to date" in res.stdout
+
+
+def test_contracts_source_matches_live_backend() -> None:
+    """The checked-in JSON descriptions cannot drift from the live backend."""
+    import json
+    from pathlib import Path
+
+    from app.plugins.schema import (
+        Alignment,
+        OptimizationDistribution,
+        OptimizationScale,
+        Unit,
+        ValueKind,
+        WidgetKind,
+    )
+
+    source_path = (
+        Path(__file__).resolve().parent.parent.parent
+        / "scripts"
+        / "ui_contracts_source.json"
+    )
+    source = json.loads(source_path.read_text(encoding="utf-8"))
+
+    live = {
+        "ValueKind": [v.value for v in ValueKind],
+        "Unit": [v.value for v in Unit],
+        "Alignment": [v.value for v in Alignment],
+        "WidgetKind": [v.value for v in WidgetKind],
+        "OptimizationScale": [v.value for v in OptimizationScale],
+        "OptimizationDistribution": [v.value for v in OptimizationDistribution],
+    }
+    for name, expected in live.items():
+        assert source["enums"][name] == expected, (
+            f"{name} drifted: source={source['enums'][name]} live={expected}"
+        )
+
+    # envelope shape matches the gateway's actual envelopes
+    from app.host.gateway import GATEWAY_API_VERSION, _error_envelope, _success_envelope
+
+    assert source["api_version"] == GATEWAY_API_VERSION
+    success = _success_envelope({"k": 1}, "req_1")
+    assert sorted(source["envelope"]["top_level_keys"]) == sorted(success)
+    assert success["status"] == source["envelope"]["success_status"]
+    error = _error_envelope("CODE", "message", "req_1")
+    assert error["status"] == source["envelope"]["error_status"]
+    assert sorted(source["envelope"]["error_object_keys"]) == sorted(error["error"])
+
+    # route list matches the gateway's registered routes
+    from app.host.gateway import GatewayConfig, _GatewayProvider
+
+    provider = _GatewayProvider(GatewayConfig())
+    provider.set_dependencies(None, None)
+    app = provider.create_asgi_app()
+    routes = sorted(
+        f"{sorted(r.methods)[0]} {r.path}" for r in app.routes if hasattr(r, "methods")
+    )
+    assert sorted(source["routes"]) == routes

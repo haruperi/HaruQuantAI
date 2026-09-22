@@ -79,7 +79,7 @@ export function ParameterForm({
                   onChange={(e) => handleChange(spec.key, e.target.checked)}
                 />
               );
-            } else if (spec.kind === 'scalar') {
+            } else if (spec.kind === 'number' || spec.kind === 'integer') {
               const numConstraint = spec.constraint?.type === 'numeric' ? spec.constraint : null;
               control = (
                 <input
