@@ -2,8 +2,8 @@
 
 > **Status:** Owner-local target architecture ratified on 2026-09-22 through
 > `ARCH-FINALIZE-001`, iteration 2, amended by iteration 3 for single-file host
-> owners. Backend implementation remains at the reset
-> baseline. Source changes require their own approved implementation plans.
+> owners. S1 kernel, composition, and telemetry ownership are implemented;
+> later source stages require their own approved implementation plans.
 
 This document owns structural constraints. [PROJECT.md](PROJECT.md) owns product
 scope and implementation status; [AGENTS.md](../AGENTS.md) owns workflow and
@@ -15,14 +15,19 @@ it does not supply implemented APIs or authorize source scaffolding.
 ```text
 app/
 |-- __init__.py
-|-- kernel/   # retained composition/lifecycle candidate
+|-- host/
+|   |-- __init__.py
+|   |-- bootstrap.py  # S1 application composition root
+|   `-- telemetry.py  # S1 observation contract, provider, and lifecycle
+|-- kernel/           # remediated S1 composition/lifecycle primitives
 `-- ui/       # retained mock-backed prototype
 ```
 
-The host, plugin metamodel, catalog, algebra, and quantitative plugins below are
-future implementation. Exact Python signatures, complete wire field definitions,
-transport, database, numerical dependencies, and isolation choices require their
-own approved source-stage decisions. No backend capability is marked complete.
+The plugin metamodel, catalog, algebra, execution, gateway, durable infrastructure,
+and quantitative plugins below remain future implementation. Exact Python
+signatures, complete wire fields, transport, database, numerical dependencies,
+and isolation choices require their own approved source-stage decisions. S1 does
+not claim a quantitative backend capability.
 
 ## D1. Runtime layers and target folders
 
@@ -173,9 +178,9 @@ against malicious Python; the initial implementation trusts approved local code.
 The kernel uses only the Python standard library and business-neutral kernel
 primitives. Plugin, product, persistence, transport, and UI knowledge stay outside.
 
-Retain the concepts and filenames of `Capability`, `FeatureSpec`, `Feature`,
-`FeatureContext`, and `Runtime`, subject to focused remediation in a later plan.
-The retained implementation requires a focused audit before source remediation.
+S1 retains and remediates the concepts and filenames of `Capability`,
+`FeatureSpec`, `Feature`, `FeatureContext`, and `Runtime`. The rules below remain
+normative for later extensions of that lifecycle foundation.
 
 - Keep immutable capability names and compatibility majors; reject ambiguous
   same-identity incompatible contracts before startup. Static typing is not
@@ -371,9 +376,10 @@ consumer parity evidence must enforce the ownership and semantics above.
 Documentation, an advertised export target, or a shared graph object alone is not
 proof of implementation correctness.
 
-The retained exact-root architecture test remains valid for the reset baseline.
-A later approved source stage must replace it with enforcement of the ratified
-topology and dependency rules; it must not simply remove the protection.
+The S1 architecture tests enforce the exact current kernel/host topology, kernel
+purity, initializer purity, superseded-root exclusions, and composition-only
+access to private host construction symbols. Each later approved source stage
+must deliberately extend this enforcement with its new owners and import rules.
 
 Follow the [plugin implementation pipeline](dev/feature_implementation_pipeline.md)
 and [companion audit](dev/domain_implementation_audit.md). Focused tests and offline

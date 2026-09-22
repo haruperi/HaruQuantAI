@@ -20,7 +20,7 @@ def main() -> int:
             "--cov-report=term-missing",
         ],
         ["tests.examples.composition"],
-        ["tests.examples.logging_usage"],
+        ["tests.examples.telemetry_usage"],
     ]
     for command in commands:
         result = subprocess.run([sys.executable, "-m", *command], cwd=root, check=False)

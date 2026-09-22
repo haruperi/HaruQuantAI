@@ -1,8 +1,8 @@
 # HaruQuantAI Project Specification
 
-> **Status:** Backend reset baseline. Kernel and UI retained; replacement backend
-> not yet implemented. Owner-local target architecture ratified on 2026-09-22;
-> its implementation stages remain separately planned and approved.
+> **Status:** S1 host foundation implemented on 2026-09-22. The remediated kernel,
+> host composition root, and telemetry owner are present; plugin vocabulary,
+> catalog, execution, durable infrastructure, and integrations remain pending.
 
 ## 1. Product goal
 
@@ -12,9 +12,9 @@ and execution graph without hidden coupling. The workstation will eventually
 support data acquisition, strategy construction, simulation, optimization,
 robustness analysis, portfolios, exports, and controlled external integrations.
 
-No backend product capability is currently marked complete. The retained UI is
-a UX prototype and the retained kernel is a candidate foundation, not proof of
-the future architecture.
+No quantitative backend product capability is currently marked complete. The
+retained UI remains a UX prototype. S1 proves composition and observation
+lifecycle behavior; it does not imply a plugin catalog or execution engine.
 
 ## 2. Ratified system laws
 
@@ -54,9 +54,9 @@ renderer vocabulary, a new backend plugin requires no frontend source edit.
 
 | Area | State | Current truth |
 |---|---|---|
-| Kernel | Retained / under review | Standard-library capability, lifecycle, events, runtime, and logging primitives |
+| Kernel | S1 implemented | Standard-library typed capabilities, required-edge lifecycle, restricted scopes, transactional startup, and reverse cleanup |
 | UI | Retained prototype | React/TypeScript workstation using frontend mocks and browser-local state |
-| Backend host | Missing | No composition root, gateway, persistence, jobs, workers, or integrations |
+| Backend host | S1 foundation | Composition root and bounded telemetry owner; gateway, persistence, jobs, workers, and integrations remain absent |
 | Plugin SDK/catalog | Missing | Metamodel ownership and discovery rules ratified; exact APIs and implementation remain pending |
 | Quantitative plugins | Missing | No production indicators, rules, metrics, tasks, or exporters |
 | Algebra AST | Missing | No shared typed strategy/workflow document |
@@ -81,16 +81,16 @@ renderer vocabulary, a new backend plugin requires no frontend source edit.
 - Explicit bounded discovery produces validated immutable snapshots; adding a
   supported plugin or comparison requires no central source edit.
 
-The ratified stages are not implementation-completion claims:
+The ratified stages and current evidence status are:
 
-| Stage | Objective | Required exit evidence |
-|---|---|---|
-| S1 Kernel | Restrict slots, canonicalize ordering, correct lifecycle and event/logging ownership | Failure/cancellation cleanup, provider lifetime, ordering, and purity tests |
-| S2 Plugin vocabulary/catalog | Define exact schema, graph, wire, operation APIs and discovery | Validation, unknown-node round trips, immutable snapshots, and pre-import exclusions |
-| S3 Execution slice | Cohesive RSI and comparison; generic execution with supported optimization/export | Numerical goldens, lowering parity, independent indicator/comparison add/remove proof |
-| S4 UI/workspaces | Generic catalog/schema/graph client and workspace declarations for the proven slice | Shared schema/document, unavailable placeholders, and two-workspace selection/removal |
-| S5 Durable infrastructure | Jobs, isolated persistence/artifacts, workers and budgets | Recovery, cancellation, resource lifetime, and process-boundary tests |
-| S6 Integrations/families | Additional algorithms, data sources, brokers, and tasks | Family-specific semantics/effect evidence and separate live-trading authorization |
+| Stage | Status | Objective | Required exit evidence |
+|---|---|---|---|
+| S1 Kernel | Implemented | Restrict slots, canonicalize ordering, correct lifecycle and event/logging ownership | Failure/cancellation cleanup, provider lifetime, ordering, import purity, and observer-isolation tests |
+| S2 Plugin vocabulary/catalog | Pending | Define exact schema, graph, wire, operation APIs and discovery | Validation, unknown-node round trips, immutable snapshots, and pre-import exclusions |
+| S3 Execution slice | Pending | Cohesive RSI and comparison; generic execution with supported optimization/export | Numerical goldens, lowering parity, independent indicator/comparison add/remove proof |
+| S4 UI/workspaces | Pending | Generic catalog/schema/graph client and workspace declarations for the proven slice | Shared schema/document, unavailable placeholders, and two-workspace selection/removal |
+| S5 Durable infrastructure | Pending | Jobs, isolated persistence/artifacts, workers and budgets | Recovery, cancellation, resource lifetime, and process-boundary tests |
+| S6 Integrations/families | Pending | Additional algorithms, data sources, brokers, and tasks | Family-specific semantics/effect evidence and separate live-trading authorization |
 
 Each stage requires its own exact-path implementation plan and owner approval.
 Minimal in-process execution can prove S3 before durable infrastructure. Do not
@@ -143,5 +143,5 @@ a thin slice.
 - Transport/server, database engine, process implementation, numerical libraries,
   and bounded shutdown policies. No dependency is selected by this ratification.
 - Concrete UI renderer implementations and reviewed extension security boundary.
-- Exact event/logging source migration and deletion targets. Host ownership is
-  decided; the retained kernel has not yet been remediated.
+- Durable telemetry sinks, retention, and external forwarding. S1 supplies only
+  the bounded in-process observation contract and provider.

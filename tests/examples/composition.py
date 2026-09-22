@@ -10,28 +10,19 @@ from app.kernel.feature import FeatureSpec
 
 
 class Greeting(Protocol):
-    """Public greeting capability."""
+    """Public greeting capability used only by this offline example."""
 
     def greet(self, name: str) -> str:
         """Create a greeting."""
         ...
 
 
-class Metrics(Protocol):
-    """Optional telemetry capability."""
-
-    def record(self, metric: str) -> None:
-        """Record an event."""
-        ...
-
-
-GREETING = Capability[Greeting]("greetings.greet")
-METRICS = Capability[Metrics]("telemetry.metrics")
-MESSAGE = Capability[str]("welcome.message")
+GREETING = Capability[Greeting]("example.greeting")
+MESSAGE = Capability[str]("example.message")
 
 
 class GreetingFeature:
-    """Provide an offline greeting service."""
+    """Provide a deterministic in-memory greeting service."""
 
     spec = FeatureSpec("greeting", provides=frozenset({GREETING}))
 
@@ -40,65 +31,34 @@ class GreetingFeature:
         return f"Hello, {name}!"
 
     async def start(self, context: FeatureContext) -> None:
-        """Publish the service through its public protocol."""
+        """Publish the service through its typed capability."""
         context.provide(GREETING, self)
 
 
-class MetricsFeature:
-    """Provide an optional telemetry tracking service."""
-
-    spec = FeatureSpec("metrics", provides=frozenset({METRICS}))
-
-    def __init__(self) -> None:
-        self.events: list[str] = []
-
-    def record(self, metric: str) -> None:
-        """Record a telemetry event."""
-        self.events.append(metric)
-
-    async def start(self, context: FeatureContext) -> None:
-        """Publish the telemetry service."""
-        context.provide(METRICS, self)
-
-
 class WelcomeFeature:
-    """Consume a mandatory greeting and an optional telemetry service."""
+    """Consume the declared greeting dependency."""
 
     spec = FeatureSpec(
         "welcome",
         provides=frozenset({MESSAGE}),
         requires=frozenset({GREETING}),
-        optional=frozenset({METRICS}),
     )
 
     async def start(self, context: FeatureContext) -> None:
-        """Build a message and progressively enhance with telemetry if present."""
-        greeting_service = context.require(GREETING)
-        message = greeting_service.greet("template")
-
-        metrics = context.optional(METRICS)
-        if metrics is not None:
-            metrics.record("greeting_composed")
-
-        context.provide(MESSAGE, message)
+        """Build and publish one deterministic message."""
+        context.provide(MESSAGE, context.require(GREETING).greet("template"))
 
 
 async def example_composition() -> None:
-    """Demonstrate dependency ordering, optional enhancements, and dynamic subsets."""
-    # 1. Full composition with optional metrics active:
-    async with Runtime((WelcomeFeature, GreetingFeature, MetricsFeature)) as runtime:
-        message = runtime.require(MESSAGE)
-        assert message == "Hello, template!"
-        print(f"Full composition with telemetry: {message}")
+    """Demonstrate required-edge ordering and explicit subset composition."""
+    async with Runtime((WelcomeFeature, GreetingFeature)) as runtime:
+        assert runtime.active_features == ("greeting", "welcome")
+        assert runtime.require(MESSAGE) == "Hello, template!"
 
-    # 2. Dynamic subset (progressive enhancement when metrics is excluded):
     async with Runtime(
-        (WelcomeFeature, GreetingFeature, MetricsFeature),
-        enabled={"welcome", "greeting"},
+        (WelcomeFeature, GreetingFeature), enabled={"greeting"}
     ) as runtime:
-        message = runtime.require(MESSAGE)
-        assert message == "Hello, template!"
-        print(f"Dynamic subset without telemetry: {message}")
+        assert runtime.require(GREETING).greet("subset") == "Hello, subset!"
 
 
 if __name__ == "__main__":

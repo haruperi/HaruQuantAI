@@ -1,341 +1,192 @@
-# cspell:words awaitables awaitable unregisters
-"""Comprehensive unit tests for FeatureContext."""
+"""Behavioral evidence for restricted feature scopes."""
 
 import asyncio
+import inspect
 from collections.abc import AsyncIterator, Iterator
 from contextlib import asynccontextmanager, contextmanager
 
 import pytest
 from app.kernel.capability import Capability, CapabilityUnavailableError
-from app.kernel.context import FeatureContext
-from app.kernel.events import EventBus
+from app.kernel.context import FeatureContext, KernelDiagnostic
 from app.kernel.feature import FeatureSpec
 
-CAP_A = Capability[str]("service.a")
-CAP_B = Capability[int]("service.b")
-CAP_OPT = Capability[str]("service.opt")
-CAP_OUT = Capability[str]("service.out")
+INPUT = Capability[str]("test.input")
+OUTPUT = Capability[str]("test.output")
 
 
-def test_context_properties_and_introspection() -> None:
-    """Verify spec, is_open, has, and capability property helpers."""
-    spec = FeatureSpec(
-        name="test_feature",
-        provides=frozenset({CAP_OUT}),
-        requires=frozenset({CAP_A}),
-        optional=frozenset({CAP_OPT}),
+def test_context_exposes_no_ambient_lookup_or_observation() -> None:
+    context = FeatureContext(FeatureSpec("restricted"), {})
+
+    for forbidden in (
+        "available_capabilities",
+        "has",
+        "get",
+        "optional",
+        "subscribe",
+        "publish",
+    ):
+        assert not hasattr(context, forbidden)
+
+
+def test_require_is_limited_to_declared_dependencies() -> None:
+    context = FeatureContext(
+        FeatureSpec("consumer", requires=frozenset({INPUT})), {INPUT: "value"}
     )
-    bus = EventBus()
-    ctx = FeatureContext(spec, {CAP_A: "hello"}, bus)
+    assert context.require(INPUT) == "value"
 
-    assert ctx.spec is spec
-    assert ctx.is_open is True
-    assert ctx.has(CAP_A) is True
-    assert ctx.has(CAP_OPT) is False
-    assert ctx.available_capabilities == frozenset({CAP_A})
-    assert ctx.staged_capabilities == frozenset()
-
-    ctx.provide(CAP_OUT, "export")
-    assert ctx.staged_capabilities == frozenset({CAP_OUT})
-
-
-def test_require_and_optional_lookups() -> None:
-    """Verify strict declaration checks and default fallback behavior."""
-    spec = FeatureSpec(
-        name="test_feature",
-        requires=frozenset({CAP_A, CAP_B}),
-        optional=frozenset({CAP_OPT}),
-    )
-    bus = EventBus()
-    ctx = FeatureContext(spec, {CAP_A: "service_a"}, bus)
-
-    # 1. Successful require
-    assert ctx.require(CAP_A) == "service_a"
-
-    # 2. Missing required capability
-    with pytest.raises(CapabilityUnavailableError) as exc_info:
-        ctx.require(CAP_B)
-    assert exc_info.value.capability == "test_feature: service.b"
-
-    # 3. Undeclared require
-    undeclared = Capability[str]("service.undeclared")
     with pytest.raises(ValueError, match="Undeclared dependency"):
-        ctx.require(undeclared)
-
-    # 4. Optional missing returns default
-    assert ctx.optional(CAP_OPT) is None
-    assert ctx.optional(CAP_OPT, default="custom_default") == "custom_default"
-
-    # 5. Optional present returns service
-    ctx_with_opt = FeatureContext(spec, {CAP_OPT: "present"}, bus)
-    assert ctx_with_opt.optional(CAP_OPT) == "present"
-
-    # 6. Undeclared optional
-    with pytest.raises(ValueError, match="Undeclared optional dependency"):
-        ctx.optional(undeclared)
+        context.require(OUTPUT)
+    missing = FeatureContext(FeatureSpec("consumer", requires=frozenset({INPUT})), {})
+    with pytest.raises(CapabilityUnavailableError) as captured:
+        missing.require(INPUT)
+    assert captured.value.blocked_by == "consumer"
 
 
-def test_provide_and_commit_exports() -> None:
-    """Verify export staging and commit validation rules."""
-    spec = FeatureSpec(
-        name="test_feature",
-        provides=frozenset({CAP_OUT}),
-    )
-    bus = EventBus()
-    ctx = FeatureContext(spec, {}, bus)
+def test_exports_are_exact_and_committed_once() -> None:
+    context = FeatureContext(FeatureSpec("provider", provides=frozenset({OUTPUT})), {})
+    with pytest.raises(ValueError, match="undeclared"):
+        context.provide(INPUT, "wrong")
+    with pytest.raises(ValueError, match="exact export"):
+        context.commit_exports()
 
-    # Undeclared export
-    with pytest.raises(ValueError, match="Export is undeclared"):
-        ctx.provide(CAP_A, "not_in_provides")
-
-    # Staging valid export
-    ctx.provide(CAP_OUT, "service_out")
-
-    # Duplicate staging
-    with pytest.raises(ValueError, match="Export is undeclared, duplicate"):
-        ctx.provide(CAP_OUT, "duplicate")
-
-    # Commit successfully
-    exports = ctx.commit_exports()
-    assert exports == {CAP_OUT: "service_out"}
-
-    # Second commit disallowed
-    with pytest.raises(ValueError, match="Feature did not stage"):
-        ctx.commit_exports()
-
-    # Provide after commit disallowed
-    with pytest.raises(ValueError, match="Export is undeclared"):
-        ctx.provide(CAP_OUT, "after_commit")
+    context.provide(OUTPUT, "result")
+    with pytest.raises(ValueError, match="duplicate"):
+        context.provide(OUTPUT, "again")
+    assert context.staged_capabilities == frozenset({OUTPUT})
+    assert context.commit_exports() == {OUTPUT: "result"}
+    with pytest.raises(ValueError, match="exact export"):
+        context.commit_exports()
 
 
-def test_commit_incomplete_exports_raises() -> None:
-    """Verify commit fails if not all declared exports are staged."""
-    spec = FeatureSpec(
-        name="test_feature",
-        provides=frozenset({CAP_A, CAP_OUT}),
-    )
-    bus = EventBus()
-    ctx = FeatureContext(spec, {}, bus)
-    ctx.provide(CAP_A, "only_one")
-
-    with pytest.raises(ValueError, match="Feature did not stage"):
-        ctx.commit_exports()
-
-
-def test_sync_and_async_on_close_callbacks() -> None:
-    """Verify both sync and async cleanup callbacks execute in LIFO order."""
-
+def test_owned_resources_and_callbacks_close_in_reverse_order() -> None:
     async def scenario() -> None:
-        spec = FeatureSpec(name="cleanup_feature")
-        bus = EventBus()
-        ctx = FeatureContext(spec, {}, bus)
         events: list[str] = []
-
-        def sync_cleanup() -> None:
-            events.append("sync_cleanup")
-
-        async def async_cleanup() -> None:
-            await asyncio.sleep(0.001)
-            events.append("async_cleanup")
-
-        ctx.on_close(sync_cleanup)
-        ctx.on_close(async_cleanup)
-
-        await ctx.close()
-        # LIFO: async_cleanup (registered 2nd) runs before sync_cleanup (registered 1st)
-        assert events == ["async_cleanup", "sync_cleanup"]
-        assert ctx.is_open is False
-
-    asyncio.run(scenario())
-
-
-def test_enter_sync_and_async_context_managers() -> None:
-    """Verify enter_context and enter manage resource lifecycles."""
-
-    async def scenario() -> None:
-        spec = FeatureSpec(name="context_feature")
-        bus = EventBus()
-        ctx = FeatureContext(spec, {}, bus)
-        events: list[str] = []
+        context = FeatureContext(FeatureSpec("owner"), {})
 
         @contextmanager
         def sync_resource() -> Iterator[str]:
-            events.append("sync_enter")
+            events.append("sync-enter")
             try:
-                yield "sync_val"
+                yield "sync"
             finally:
-                events.append("sync_exit")
+                events.append("sync-exit")
 
         @asynccontextmanager
         async def async_resource() -> AsyncIterator[str]:
-            events.append("async_enter")
+            events.append("async-enter")
             try:
-                yield "async_val"
+                yield "async"
             finally:
-                events.append("async_exit")
+                events.append("async-exit")
 
-        val1 = ctx.enter_context(sync_resource())
-        assert val1 == "sync_val"
-
-        val2 = await ctx.enter(async_resource())
-        assert val2 == "async_val"
-
-        assert events == ["sync_enter", "async_enter"]
-        await ctx.close()
-        # LIFO: async_exit runs before sync_exit
-        assert events == ["sync_enter", "async_enter", "async_exit", "sync_exit"]
-
-    asyncio.run(scenario())
-
-
-def test_context_manager_exit_errors_captured() -> None:
-    """Verify exceptions during context exit are accumulated into exception group."""
-
-    async def scenario() -> None:
-        spec = FeatureSpec(name="error_feature")
-        bus = EventBus()
-        ctx = FeatureContext(spec, {}, bus)
-
-        @contextmanager
-        def failing_sync() -> Iterator[None]:
-            yield
-            raise ValueError("sync exit failure")
-
-        @asynccontextmanager
-        async def failing_async() -> AsyncIterator[None]:
-            yield
-            raise RuntimeError("async exit failure")
-
-        ctx.enter_context(failing_sync())
-        await ctx.enter(failing_async())
-
-        with pytest.raises(BaseExceptionGroup) as exc_info:
-            await ctx.close()
-
-        errors = exc_info.value.exceptions
-        assert len(errors) == 2
-        assert any(isinstance(e, RuntimeError) for e in errors)
-        assert any(isinstance(e, ValueError) for e in errors)
+        assert context.enter_context(sync_resource()) == "sync"
+        assert await context.enter(async_resource()) == "async"
+        context.on_close(lambda: events.append("callback"))
+        await context.close()
+        await context.close()
+        assert events == [
+            "sync-enter",
+            "async-enter",
+            "callback",
+            "async-exit",
+            "sync-exit",
+        ]
 
     asyncio.run(scenario())
 
 
-def test_spawn_task_lifecycle_and_error_capture() -> None:
-    """Verify task spawning, naming, cancellation, and error capture."""
-
+def test_cleanup_aggregates_independent_failures_and_diagnoses_them() -> None:
     async def scenario() -> None:
-        spec = FeatureSpec(name="task_feature")
-        bus = EventBus()
-        ctx = FeatureContext(spec, {}, bus)
+        diagnostics: list[KernelDiagnostic] = []
+        context = FeatureContext(
+            FeatureSpec("owner"), {}, diagnostic_sink=diagnostics.append
+        )
+
+        def fail_value() -> None:
+            raise ValueError("first")
+
+        async def fail_runtime() -> None:
+            raise RuntimeError("second")
+
+        context.on_close(fail_value)
+        context.on_close(fail_runtime)
+        with pytest.raises(BaseExceptionGroup) as captured:
+            await context.close()
+        assert {type(error) for error in captured.value.exceptions} == {
+            ValueError,
+            RuntimeError,
+        }
+        assert len(diagnostics) == 2
+
+    asyncio.run(scenario())
+
+
+def test_managed_tasks_are_cancelled_and_task_failures_surface() -> None:
+    async def scenario() -> None:
+        context = FeatureContext(FeatureSpec("tasks"), {})
         started = asyncio.Event()
 
-        async def worker() -> None:
+        async def waiting() -> None:
             started.set()
-            await asyncio.sleep(10)
+            await asyncio.Event().wait()
 
-        task = ctx.spawn(worker(), name="my_worker")
-        assert task.get_name() == "my_worker"
-
+        task = context.spawn(waiting(), name="waiting")
         await started.wait()
-        await ctx.close()
+        await context.close()
         assert task.cancelled()
 
-    asyncio.run(scenario())
+        failing = FeatureContext(FeatureSpec("failing-task"), {})
 
+        async def fail() -> None:
+            raise KeyError("failed")
 
-def test_spawn_task_exception_captured_on_close() -> None:
-    """Verify that a crashed background task is surfaced during close."""
-
-    async def scenario() -> None:
-        spec = FeatureSpec(name="crash_feature")
-        bus = EventBus()
-        ctx = FeatureContext(spec, {}, bus)
-
-        async def failing_task() -> None:
-            raise KeyError("task died")
-
-        task = ctx.spawn(failing_task())
-        await asyncio.wait({task})
-
-        with pytest.raises(BaseExceptionGroup) as exc_info:
-            await ctx.close()
-
-        assert any(isinstance(e, KeyError) for e in exc_info.value.exceptions)
+        failed_task = failing.spawn(fail())
+        await asyncio.wait({failed_task})
+        with pytest.raises(BaseExceptionGroup) as captured:
+            await failing.close()
+        assert isinstance(captured.value.exceptions[0], KeyError)
 
     asyncio.run(scenario())
 
 
-def test_subscribe_and_publish_with_auto_cleanup() -> None:
-    """Verify event subscription is automatically cleaned up when context closes."""
-
+def test_closed_context_rejects_operations_and_closes_rejected_coroutine() -> None:
     async def scenario() -> None:
-        spec = FeatureSpec(name="pubsub_feature")
-        bus = EventBus()
-        ctx = FeatureContext(spec, {}, bus)
-        received: list[str] = []
-
-        ctx.subscribe(str, received.append)
-        await ctx.publish("message_1")
-        assert received == ["message_1"]
-
-        await ctx.close()
-
-        # Publishing on bus after ctx.close() should NOT deliver to ctx's subscriber
-        await bus.publish("message_2")
-        assert received == ["message_1"]
-
-    asyncio.run(scenario())
-
-
-def test_operations_on_closed_context_raise_runtime_error() -> None:
-    """Verify that every operation on a closed context raises RuntimeError."""
-
-    async def scenario() -> None:
-        spec = FeatureSpec(
-            name="closed_feature",
-            provides=frozenset({CAP_OUT}),
-            requires=frozenset({CAP_A}),
-            optional=frozenset({CAP_OPT}),
+        context = FeatureContext(
+            FeatureSpec(
+                "closed", provides=frozenset({OUTPUT}), requires=frozenset({INPUT})
+            ),
+            {INPUT: "value"},
         )
-        bus = EventBus()
-        ctx = FeatureContext(spec, {CAP_A: "val"}, bus)
-        await ctx.close()
-
+        await context.close()
         with pytest.raises(RuntimeError, match="is closed"):
-            ctx.require(CAP_A)
-
+            context.require(INPUT)
         with pytest.raises(RuntimeError, match="is closed"):
-            ctx.optional(CAP_OPT)
-
+            context.provide(OUTPUT, "value")
         with pytest.raises(RuntimeError, match="is closed"):
-            ctx.provide(CAP_OUT, "val")
-
+            context.commit_exports()
         with pytest.raises(RuntimeError, match="is closed"):
-            ctx.commit_exports()
+            context.on_close(lambda: None)
 
+        async def unused() -> None:
+            return None
+
+        coroutine = unused()
         with pytest.raises(RuntimeError, match="is closed"):
-            ctx.on_close(lambda: None)
+            context.spawn(coroutine)
+        assert inspect.getcoroutinestate(coroutine) == inspect.CORO_CLOSED
 
-        with pytest.raises(RuntimeError, match="is closed"):
-            ctx.enter_context(contextmanager(lambda: iter([""]))())
+    asyncio.run(scenario())
 
-        @asynccontextmanager
-        async def dummy() -> AsyncIterator[str]:
-            yield ""
 
-        with pytest.raises(RuntimeError, match="is closed"):
-            await ctx.enter(dummy())
+def test_diagnostic_sink_failure_never_changes_cleanup_result() -> None:
+    async def scenario() -> None:
+        def broken_sink(_diagnostic: KernelDiagnostic) -> None:
+            raise RuntimeError("observer")
 
-        async def coroutine() -> None:
-            pass
-
-        with pytest.raises(RuntimeError, match="is closed"):
-            ctx.spawn(coroutine())
-
-        with pytest.raises(RuntimeError, match="is closed"):
-            ctx.subscribe(str, lambda _: None)
-
-        with pytest.raises(RuntimeError, match="is closed"):
-            await ctx.publish("event")
+        context = FeatureContext(FeatureSpec("owner"), {}, diagnostic_sink=broken_sink)
+        context.on_close(lambda: (_ for _ in ()).throw(ValueError("cleanup")))
+        with pytest.raises(BaseExceptionGroup) as captured:
+            await context.close()
+        assert isinstance(captured.value.exceptions[0], ValueError)
 
     asyncio.run(scenario())

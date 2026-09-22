@@ -1,4 +1,4 @@
-"""Check the architecture invariants of the retained kernel/UI baseline."""
+"""Check the architecture invariants of the approved S1 host foundation."""
 
 from __future__ import annotations
 
@@ -16,7 +16,21 @@ APP_ROOT = REPO_ROOT / "app"
 UI_SOURCE_ROOT = APP_ROOT / "ui" / "src"
 
 FRONTEND_SOURCE_SUFFIXES = frozenset({".js", ".jsx", ".ts", ".tsx"})
-FORBIDDEN_APP_ROOTS = frozenset({"contracts", "services", "registry.py", "main.py"})
+CURRENT_APP_ROOTS = frozenset({"__init__.py", "host", "kernel", "ui"})
+CURRENT_KERNEL_FILES = frozenset(
+    {"__init__.py", "bootstrapper.py", "capability.py", "context.py", "feature.py"}
+)
+CURRENT_HOST_FILES = frozenset({"__init__.py", "bootstrap.py", "telemetry.py"})
+FORBIDDEN_APP_ROOTS = frozenset(
+    {
+        "api",
+        "contracts",
+        "main.py",
+        "registry.py",
+        "services",
+        "workspaces",
+    }
+)
 FORBIDDEN_XML_MODULES = frozenset({"defusedxml", "lxml", "xml", "xmltodict"})
 XML_LITERAL_PATTERN = re.compile(
     r"(?:application|text)/xml|[\"'`][^\"'`\r\n]*\.xml(?:[?#][^\"'`\r\n]*)?[\"'`]",
@@ -59,6 +73,19 @@ def _is_docstring_only(module: ast.Module) -> bool:
     )
 
 
+def _dotted_name(node: ast.expr) -> str | None:
+    """Return a dotted attribute chain when it is rooted in a name."""
+    parts: list[str] = []
+    current = node
+    while isinstance(current, ast.Attribute):
+        parts.append(current.attr)
+        current = current.value
+    if not isinstance(current, ast.Name):
+        return None
+    parts.append(current.id)
+    return ".".join(reversed(parts))
+
+
 class ArchitecturalVisitor(ast.NodeVisitor):
     """Enforce Python invariants retained during the backend reset."""
 
@@ -67,6 +94,11 @@ class ArchitecturalVisitor(ast.NodeVisitor):
         self.file_path = file_path
         parts = _app_parts(file_path)
         self._is_kernel = len(parts) > 1 and parts[1] == "kernel"
+        self._is_host_bootstrap = (
+            len(parts) == 3 and parts[1] == "host" and parts[2] == "bootstrap.py"
+        )
+        self._is_host_owner = len(parts) > 2 and parts[1] == "host"
+        self._host_module_aliases: set[str] = set()
         self.violations: list[ArchitecturalViolation] = []
 
     def check_module(self, node: ast.Module) -> None:
@@ -111,6 +143,12 @@ class ArchitecturalVisitor(ast.NodeVisitor):
         """Check every direct import."""
         for alias in node.names:
             self._check_import(alias.name, node.lineno)
+            if (
+                self._is_host_owner
+                and not self._is_host_bootstrap
+                and alias.name.startswith("app.host.")
+            ):
+                self._host_module_aliases.add(alias.asname or alias.name)
         self.generic_visit(node)
 
     @override
@@ -128,6 +166,55 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                 )
         else:
             self._check_import(node.module or "", node.lineno)
+            if (
+                self._is_host_owner
+                and not self._is_host_bootstrap
+                and (node.module or "").startswith("app.host.")
+            ):
+                for alias in node.names:
+                    if alias.name.startswith("_"):
+                        self.violations.append(
+                            ArchitecturalViolation(
+                                self.file_path,
+                                node.lineno,
+                                "ARCH-011-HOST-PRIVATE",
+                                "Only host/bootstrap.py may import another "
+                                "owner's private construction symbols.",
+                            )
+                        )
+            if (
+                self._is_host_owner
+                and not self._is_host_bootstrap
+                and node.module == "app.host"
+            ):
+                self._host_module_aliases.update(
+                    alias.asname or alias.name for alias in node.names
+                )
+        self.generic_visit(node)
+
+    @override
+    def visit_Attribute(self, node: ast.Attribute) -> None:
+        """Reject module-qualified access to another host owner's private symbol."""
+        dotted = _dotted_name(node)
+        if (
+            dotted is not None
+            and self._is_host_owner
+            and not self._is_host_bootstrap
+            and node.attr.startswith("_")
+            and (
+                dotted.startswith("app.host.")
+                or dotted.rsplit(".", maxsplit=1)[0] in self._host_module_aliases
+            )
+        ):
+            self.violations.append(
+                ArchitecturalViolation(
+                    self.file_path,
+                    node.lineno,
+                    "ARCH-011-HOST-PRIVATE",
+                    "Only host/bootstrap.py may access another owner's private "
+                    "construction symbols.",
+                )
+            )
         self.generic_visit(node)
 
     @override
@@ -211,11 +298,46 @@ def _reset_boundary_violations() -> list[ArchitecturalViolation]:
     return violations
 
 
+def _current_topology_violations() -> list[ArchitecturalViolation]:
+    """Require the exact source topology approved for S1."""
+    violations: list[ArchitecturalViolation] = []
+    roots = {
+        path.name
+        for path in APP_ROOT.iterdir()
+        if path.is_file() or path.name == "ui" or any(path.rglob("*.py"))
+    }
+    if roots != CURRENT_APP_ROOTS:
+        violations.append(
+            ArchitecturalViolation(
+                APP_ROOT,
+                1,
+                "ARCH-010-RESET-BOUNDARY",
+                f"Unexpected application roots: {sorted(roots ^ CURRENT_APP_ROOTS)}",
+            )
+        )
+    for directory, expected in (
+        (APP_ROOT / "kernel", CURRENT_KERNEL_FILES),
+        (APP_ROOT / "host", CURRENT_HOST_FILES),
+    ):
+        actual = {path.name for path in directory.glob("*.py")}
+        if actual != expected:
+            violations.append(
+                ArchitecturalViolation(
+                    directory,
+                    1,
+                    "ARCH-012-STAGE-TOPOLOGY",
+                    f"Unexpected source files: {sorted(actual ^ expected)}",
+                )
+            )
+    return violations
+
+
 def check_directory(directory: Path) -> list[ArchitecturalViolation]:
     """Check supported source files recursively under a directory."""
     violations: list[ArchitecturalViolation] = []
     if directory.resolve() == APP_ROOT.resolve():
         violations.extend(_reset_boundary_violations())
+        violations.extend(_current_topology_violations())
     for source_file in directory.rglob("*"):
         if source_file.suffix == ".py":
             violations.extend(check_file(source_file))

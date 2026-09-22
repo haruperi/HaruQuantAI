@@ -1,4 +1,4 @@
-"""Check the starter's package boundaries without importing service code."""
+"""Check the approved S1 package boundaries without importing providers."""
 
 import ast
 from pathlib import Path
@@ -6,14 +6,29 @@ from pathlib import Path
 APP = Path(__file__).resolve().parents[2] / "app"
 
 
-def test_reset_application_roots_are_exact() -> None:
-    """Only the retained kernel and UI roots exist before backend rebuilding."""
+def test_s1_application_roots_are_exact() -> None:
+    """Only the approved kernel, host foundation, and UI roots exist."""
     names = {
         path.name
         for path in APP.iterdir()
         if path.is_file() or path.name == "ui" or any(path.rglob("*.py"))
     }
-    assert names == {"__init__.py", "kernel", "ui"}
+    assert names == {"__init__.py", "host", "kernel", "ui"}
+
+
+def test_s1_python_owner_files_are_exact() -> None:
+    assert {path.name for path in (APP / "kernel").glob("*.py")} == {
+        "__init__.py",
+        "bootstrapper.py",
+        "capability.py",
+        "context.py",
+        "feature.py",
+    }
+    assert {path.name for path in (APP / "host").glob("*.py")} == {
+        "__init__.py",
+        "bootstrap.py",
+        "telemetry.py",
+    }
 
 
 def test_package_initializers_are_docstring_only() -> None:

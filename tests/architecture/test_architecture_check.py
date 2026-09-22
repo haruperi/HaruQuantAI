@@ -122,3 +122,46 @@ def test_reference_evidence_is_outside_active_source_scope() -> None:
     """Structured reference evidence is not an accepted application target."""
     with pytest.raises(ValueError, match="outside app or missing"):
         check_paths(["docs/dev/evidence/reimplementation.json"])
+
+
+def test_kernel_cannot_import_host(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "kernel" / "invalid.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("from app.host import telemetry\n", encoding="utf-8")
+
+    assert "ARCH-004-KERNEL-PURITY" in _rules(check_file(source))
+
+
+def test_non_bootstrap_host_owner_cannot_import_private_peer(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "host" / "invalid.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "from app.host.telemetry import _telemetry_feature\n", encoding="utf-8"
+    )
+
+    assert "ARCH-011-HOST-PRIVATE" in _rules(check_file(source))
+
+
+def test_host_bootstrap_may_import_owner_construction_entry(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "host" / "bootstrap.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "from app.host.telemetry import _telemetry_feature\n", encoding="utf-8"
+    )
+
+    assert "ARCH-011-HOST-PRIVATE" not in _rules(check_file(source))
+
+
+@pytest.mark.parametrize(
+    "statement",
+    [
+        "import app.host.telemetry as telemetry\nVALUE = telemetry._telemetry_feature\n",
+        "from app.host import telemetry\nVALUE = telemetry._telemetry_feature\n",
+    ],
+)
+def test_host_private_module_access_is_rejected(tmp_path: Path, statement: str) -> None:
+    source = tmp_path / "app" / "host" / "invalid.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(statement, encoding="utf-8")
+
+    assert "ARCH-011-HOST-PRIVATE" in _rules(check_file(source))
