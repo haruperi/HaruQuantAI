@@ -3,7 +3,7 @@ import {
   calculatePearsonCorrelation,
   extractReturnsSeries,
 } from '../../../../src/plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
-import { strategies } from '../../../../src/mocks/fixtures';
+import { strategies } from '../../../../src/plugins/databank/fixtures';
 
 describe('Portfolio Correlation Engine & Overlapping Trades', () => {
   it('generates a valid symmetric correlation matrix with 1.0 on diagonal', () => {

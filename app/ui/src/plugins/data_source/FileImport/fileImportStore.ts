@@ -1,5 +1,5 @@
 import { normalizeLegacyBranding } from '../../../app/branding';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from '../Common/fixtures';
 import { validateName } from './fileSymbols';
 import { create } from 'zustand';
 import { builtInFormats, limits, timezones, validateFormat, type ImportFormat, type ImportJob, type ImportRecord, type ImportTask } from './fileImport';

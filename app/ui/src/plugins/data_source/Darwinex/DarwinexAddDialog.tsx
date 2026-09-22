@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { Button, Modal, TextInput } from '../../../components/ui';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from '../Common/fixtures';
 import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
 import { useFileSymbols } from '../FileImport/fileSymbolsStore';
 import { useFileImports } from '../FileImport/fileImportStore';

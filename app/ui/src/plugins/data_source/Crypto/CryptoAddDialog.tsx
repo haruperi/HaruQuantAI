@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, Modal, TextInput } from '../../../components/ui';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from '../Common/fixtures';
 import { cryptoDefinitions, cryptoExchange, type CryptoExchangeId } from './crypto';
 import { cryptoActive, reservedCrypto, useCrypto } from './cryptoStore';
 import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';

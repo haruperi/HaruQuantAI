@@ -77,7 +77,7 @@ import {
 
 import { useAppStore } from '../../app/store';
 import { Button, Checkbox, Field, Modal, ProgressBar, Section, Select, TextInput } from '../../components/ui';
-import { datasets, instruments } from '../../mocks/fixtures';
+import { datasets, instruments } from '../../plugins/data_source/Common/fixtures';
 import {
   dataSourceContextActions, dataSourceProviders, type DataSourceCommand,
   type DataSourceCommandIcon, type DataSourceDialogId, type DataSourceProvider,

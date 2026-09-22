@@ -5,7 +5,7 @@ import { useSQData, reservedSQDefinitions } from '../SQData/sqDataStore';
 import { reservedMt5, useMt5Import } from '../MetaTrader/mt5ImportStore';
 import { useCallback, useRef, useState } from 'react';
 import { Button, Field, TextInput } from '../../../components/ui';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from '../Common/fixtures';
 import { FileSymbolDialog } from './FileSymbolDialog';
 import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
 import { useFileSymbols } from './fileSymbolsStore';

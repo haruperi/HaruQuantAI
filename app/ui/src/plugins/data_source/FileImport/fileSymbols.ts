@@ -1,4 +1,4 @@
-import { instruments } from '../../../mocks/fixtures';
+import { instruments } from '../Common/fixtures';
 export const dataTypes = ['Stock', 'Futures', 'Forex', 'CFD'] as const;
 export const commissionModels = ['None', 'Per trade', 'Size based', 'Percentage based', 'Stockpicker'] as const;
 export type CommissionModel = typeof commissionModels[number];

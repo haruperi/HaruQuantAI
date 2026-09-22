@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react';
 import { Button, Modal, TextInput } from '../../../components/ui';
 import { useAppStore } from '../../../app/store';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from '../Common/fixtures';
 import { reservedCrypto, useCrypto } from '../Crypto/cryptoStore';
 import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
 import { reservedDarwinex, useDarwinex } from '../Darwinex/darwinexStore';

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, Field, Modal, TextInput } from '../../../components/ui';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from '../Common/fixtures';
 import { useDataManagerStore, useTickDownloader } from '../Common/dataManagerStore';
 import { useFileSymbols } from './fileSymbolsStore';
 import { commissionModels, dataTypes, days, defaultCommission, effectiveInstruments, newInstrument, validateName, type CommissionModel, type FileInstrument, type Swap } from './fileSymbols';

@@ -9,7 +9,7 @@ import { useFileSymbols } from '../FileImport/fileSymbolsStore';
 import { validateTD, type TDJob, type TDRequest } from '../TickDownloader/tickDownloader';
 import { emptyDownload, resolveDownloadModes, downloadStep, validateDownload, availableStart, mergeRanges, validDate, type DownloadState, type DownloadRequest, type Interval } from '../Dukascopy/dukascopyDownload';
 import { create } from 'zustand';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from './fixtures';
 import { catalogue, type AddDukasRequest } from '../Dukascopy/dukascopy';
 import { normalizeBrokerName, validateBroker, type BrokerProfile, type BrokerUpdateJob } from '../Catalogs/BrokerProfiles/brokerProfiles';
 

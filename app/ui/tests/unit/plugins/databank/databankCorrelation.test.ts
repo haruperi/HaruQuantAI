@@ -4,7 +4,7 @@ import {
   extractReturnsSeries,
   filterStrategiesByCorrelation,
 } from '../../../../src/plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
-import { strategies } from '../../../../src/mocks/fixtures';
+import { strategies } from '../../../../src/plugins/databank/fixtures';
 
 describe('Databank Filter By Correlation Math & Logic', () => {
   it('calculates Pearson correlation coefficient accurately', () => {

@@ -5,7 +5,7 @@ import { reservedMt5, useMt5Import } from '../MetaTrader/mt5ImportStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAppStore } from '../../../app/store';
 import { Button, Field, Modal, TextInput } from '../../../components/ui';
-import { datasets } from '../../../mocks/fixtures';
+import { datasets } from '../Common/fixtures';
 import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
 import { useFileSymbols } from '../FileImport/fileSymbolsStore';
 import { activeImport, useFileImports } from '../FileImport/fileImportStore';

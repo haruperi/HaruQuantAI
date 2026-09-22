@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { databanks, portfolioMembers, strategies } from '../../../src/mocks/fixtures';
+import { databanks, strategies } from '../../../../src/plugins/databank/fixtures';
 
-describe('deterministic research fixtures', () => {
+describe('deterministic databank fixtures', () => {
   it('keeps headline metrics consistent with linked trade and equity records', () => {
     for (const strategy of strategies) {
       expect(strategy.metrics.trades).toBe(strategy.trades.length);
@@ -14,9 +14,8 @@ describe('deterministic research fixtures', () => {
     }
   });
 
-  it('uses stable IDs for databank and portfolio membership', () => {
+  it('uses stable IDs for databank membership', () => {
     const ids = new Set(strategies.map(s => s.id));
     expect(databanks.every(bank => bank.strategyIds.every(id => ids.has(id)))).toBe(true);
-    expect(portfolioMembers.every(member => ids.has(member.strategyId))).toBe(true);
   });
 });

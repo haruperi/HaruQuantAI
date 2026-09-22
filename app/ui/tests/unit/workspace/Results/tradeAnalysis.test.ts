@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { strategies } from '../../../../src/mocks/fixtures';
+import { strategies } from '../../../../src/plugins/databank/fixtures';
 
 describe('Trade Analysis Performance Breakdown and Statistics', () => {
   it('aggregates annual statistics from trades accurately', () => {

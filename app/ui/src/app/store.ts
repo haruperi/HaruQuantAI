@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { AppSettings, BuilderSettings, BusinessConfig, BusinessUser, BusinessWorkspaceItem, ComputeNode, CustomProject, Databank, ExtensionFile, Job, McpServerConfig, ModuleId, OptimizationSettings, PortfolioMasterSettings, PortfolioMember, PortfolioSettings, ProjectTab, RetesterSettings, RuleNode, Strategy, WorkflowTask } from './types';
-import { businessConfig, computeNodes, customProjects, databanks, extensionFiles, portfolioMembers, rules, strategies, workflowTasks } from '../mocks/fixtures';
+import { businessConfig, computeNodes } from '../workspace/Business/fixtures';
+import { rules } from '../workspace/Builder/fixtures';
+import { extensionFiles } from '../workspace/CodeEditor/fixtures';
+import { customProjects, workflowTasks } from '../workspace/CustomProjects/fixtures';
+import { portfolioMembers } from '../workspace/PortfolioComposer/fixtures';
+import { databanks, strategies } from '../plugins/databank/fixtures';
 import { createInitialAppSettings, mergeAppSettings } from './globalSettings';
 import type { BatchExecutionResult, SingleExecutionResult } from '../api/contracts.generated';
 

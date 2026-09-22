@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { strategies } from '../../../../src/mocks/fixtures';
+import { strategies } from '../../../../src/plugins/databank/fixtures';
 
 describe('Trades On Chart Computations and Layout', () => {
   it('maps strategy trades with entry and exit prices and direction', () => {

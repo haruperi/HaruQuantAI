@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { strategies } from '../../../../src/mocks/fixtures';
+import { strategies } from '../../../../src/plugins/databank/fixtures';
 
 describe('Compare Strategies Logic & Equity Normalization', () => {
   it('correctly extracts comparative metrics between two strategies', () => {
