@@ -275,3 +275,74 @@ def test_host_subprocess_import_isolated_to_workers(tmp_path: Path) -> None:
     valid = tmp_path / "app" / "host" / "workers.py"
     valid.write_text("import subprocess\n", encoding="utf-8")
     assert "ARCH-017-HOST-OWNERSHIP" not in _rules(check_file(valid))
+
+
+def test_host_cannot_import_concrete_plugin_modules(tmp_path: Path) -> None:
+    """ARCH-018: host owners reach plugins only through catalog discovery."""
+    invalid = tmp_path / "app" / "host" / "jobs.py"
+    invalid.parent.mkdir(parents=True)
+    invalid.write_text(
+        "from app.plugins.indicators.rsi import plugin\n", encoding="utf-8"
+    )
+    assert "ARCH-018-HOST-PLUGIN-IMPORTS" in _rules(check_file(invalid))
+
+    # shared metamodel imports remain allowed
+    valid = tmp_path / "app" / "host" / "execution.py"
+    valid.write_text("from app.plugins.spec import PluginRef\n", encoding="utf-8")
+    assert "ARCH-018-HOST-PLUGIN-IMPORTS" not in _rules(check_file(valid))
+
+
+def test_filesystem_mutation_isolated_to_artifacts_and_storage(
+    tmp_path: Path,
+) -> None:
+    """ARCH-019: only artifacts/storage owners mutate the filesystem."""
+    invalid = tmp_path / "app" / "host" / "jobs.py"
+    invalid.parent.mkdir(parents=True)
+    invalid.write_text(
+        "from pathlib import Path\n"
+        "def f(p):\n"
+        "    p.write_text('x')\n"
+        "    Path('a').unlink()\n"
+        "    open('b', 'w').close()\n",
+        encoding="utf-8",
+    )
+    rules = _rules(check_file(invalid))
+    assert rules.count("ARCH-019-FILESYSTEM-OWNERSHIP") == 3
+
+    owner = tmp_path / "app" / "host" / "artifacts.py"
+    owner.write_text(
+        "from pathlib import Path\n"
+        "def f(p):\n"
+        "    p.write_text('x')\n"
+        "    open('b', 'wb').close()\n",
+        encoding="utf-8",
+    )
+    assert "ARCH-019-FILESYSTEM-OWNERSHIP" not in _rules(check_file(owner))
+
+    storage = tmp_path / "app" / "host" / "storage.py"
+    storage.write_text(
+        "import os\nfrom pathlib import Path\n"
+        "def f(p):\n"
+        "    os.replace('a', 'b')\n"
+        "    Path('c').mkdir()\n",
+        encoding="utf-8",
+    )
+    assert "ARCH-019-FILESYSTEM-OWNERSHIP" not in _rules(check_file(storage))
+
+    # str.replace / datetime.replace must not be flagged
+    benign = tmp_path / "app" / "host" / "gateway.py"
+    benign.write_text("def f(s):\n    return s.replace('a', 'b')\n", encoding="utf-8")
+    assert "ARCH-019-FILESYSTEM-OWNERSHIP" not in _rules(check_file(benign))
+
+
+def test_pickle_imports_rejected_anywhere_in_app(tmp_path: Path) -> None:
+    """ARCH-020: pickle never crosses any boundary."""
+    for rel in (
+        ("app", "host", "workers.py"),
+        ("app", "plugins", "indicators", "rsi.py"),
+        ("app", "kernel", "context.py"),
+    ):
+        source = tmp_path.joinpath(*rel)
+        source.parent.mkdir(parents=True, exist_ok=True)
+        source.write_text("import pickle\n", encoding="utf-8")
+        assert "ARCH-020-NO-PICKLE" in _rules(check_file(source))

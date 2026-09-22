@@ -171,6 +171,10 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             parts[2] if len(parts) == 3 and parts[1] == "plugins" else None
         )
         self._host_module_aliases: set[str] = set()
+        self._is_artifacts_or_storage = self.file_path.name in {
+            "artifacts.py",
+            "storage.py",
+        }
         self.violations: list[ArchitecturalViolation] = []
 
     def check_module(self, node: ast.Module) -> None:
@@ -250,6 +254,15 @@ class ArchitecturalVisitor(ast.NodeVisitor):
     def _check_import(self, target: str, line_number: int) -> None:
         """Check kernel purity, plugin acyclic DAG, and XML interchange imports."""
         root = target.split(".", maxsplit=1)[0]
+        if root in ("pickle", "cPickle"):
+            self.violations.append(
+                ArchitecturalViolation(
+                    self.file_path,
+                    line_number,
+                    "ARCH-020-NO-PICKLE",
+                    f"Pickle imports are prohibited: {target}",
+                )
+            )
         if root in FORBIDDEN_XML_MODULES:
             self.violations.append(
                 ArchitecturalViolation(
@@ -287,6 +300,29 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                 )
             )
         if self._is_host_owner:
+            shared_plugin_roots = {
+                "schema",
+                "spec",
+                "algebra",
+                "lowering",
+                "wire",
+            }
+            plugin_parts = target.split(".")
+            if (
+                len(plugin_parts) > 2
+                and plugin_parts[0] == "app"
+                and plugin_parts[1] == "plugins"
+                and plugin_parts[2] not in shared_plugin_roots
+            ):
+                self.violations.append(
+                    ArchitecturalViolation(
+                        self.file_path,
+                        line_number,
+                        "ARCH-018-HOST-PLUGIN-IMPORTS",
+                        "Host owners must not import concrete plugin modules "
+                        f"(use catalog discovery): {target}",
+                    )
+                )
             if root == "sqlite3" and self.file_path.name != "storage.py":
                 self.violations.append(
                     ArchitecturalViolation(
@@ -305,6 +341,89 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                         f"Only app/host/workers.py may import subprocess: {target}",
                     )
                 )
+
+    # Unambiguous pathlib mutation methods (attribute call form). The
+    # ambiguous str.replace/datetime.replace names are covered instead by
+    # the module-qualified set below.
+    _MUTATING_FILE_CALLS = frozenset(
+        {
+            "write_text",
+            "write_bytes",
+            "unlink",
+            "mkdir",
+            "rmdir",
+            "touch",
+        }
+    )
+    _MUTATING_OS_CALLS = frozenset(
+        {
+            "os.replace",
+            "os.rename",
+            "os.remove",
+            "os.mkdir",
+            "os.rmdir",
+            "os.makedirs",
+            "shutil.rmtree",
+            "shutil.move",
+            "shutil.copy",
+            "shutil.copyfile",
+        }
+    )
+
+    @override
+    def visit_Call(self, node: ast.Call) -> None:
+        """Flag filesystem mutation outside the owning host artifacts/storage."""
+        func = node.func
+        qualified = ""
+        if isinstance(func, ast.Attribute):
+            call_name = func.attr
+            if isinstance(func.value, ast.Name):
+                qualified = f"{func.value.id}.{func.attr}"
+        elif isinstance(func, ast.Name):
+            # bare-name calls: only the open() builtin is a filesystem
+            # mutation (dataclasses.replace and friends are not)
+            call_name = "open" if func.id == "open" else ""
+        else:
+            call_name = ""
+        if (
+            self._is_host_owner
+            and not self._is_artifacts_or_storage
+            and (
+                call_name in self._MUTATING_FILE_CALLS
+                or qualified in self._MUTATING_OS_CALLS
+                or (call_name == "open" and self._call_has_write_mode(node))
+            )
+        ):
+            self.violations.append(
+                ArchitecturalViolation(
+                    self.file_path,
+                    node.lineno,
+                    "ARCH-019-FILESYSTEM-OWNERSHIP",
+                    "Only app/host/artifacts.py and app/host/storage.py may "
+                    f"mutate the filesystem: {call_name}",
+                )
+            )
+        self.generic_visit(node)
+
+    @staticmethod
+    def _call_has_write_mode(node: ast.Call) -> bool:
+        """Return True when open() is called with a write/append mode literal."""
+        if len(node.args) < 2:
+            keyword_mode = next((k for k in node.keywords if k.arg == "mode"), None)
+            if keyword_mode is None:
+                return False
+            value = keyword_mode.value
+            return (
+                isinstance(value, ast.Constant)
+                and isinstance(value.value, str)
+                and any(m in value.value for m in ("w", "a", "x", "+"))
+            )
+        value = node.args[1]
+        return (
+            isinstance(value, ast.Constant)
+            and isinstance(value.value, str)
+            and any(m in value.value for m in ("w", "a", "x", "+"))
+        )
 
     @override
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
