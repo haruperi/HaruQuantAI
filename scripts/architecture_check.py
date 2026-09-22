@@ -23,11 +23,25 @@ CURRENT_KERNEL_FILES = frozenset(
 CURRENT_HOST_FILES = frozenset(
     {
         "__init__.py",
+        "artifacts.py",
         "bootstrap.py",
         "catalog.py",
         "execution.py",
         "gateway.py",
+        "jobs.py",
+        "storage.py",
         "telemetry.py",
+        "workers.py",
+    }
+)
+FORBIDDEN_PLUGIN_MODULES = frozenset(
+    {
+        "multiprocessing",
+        "shutil",
+        "socket",
+        "sqlite3",
+        "subprocess",
+        "tempfile",
     }
 )
 CURRENT_PLUGINS_FILES = frozenset(
@@ -221,6 +235,18 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                         )
                     )
 
+        root = target.split(".", maxsplit=1)[0]
+        if root in FORBIDDEN_PLUGIN_MODULES:
+            self.violations.append(
+                ArchitecturalViolation(
+                    self.file_path,
+                    line_number,
+                    "ARCH-016-PLUGIN-SIDE-EFFECTS",
+                    "Plugins must not import process, socket, or raw storage "
+                    f"modules: {target}",
+                )
+            )
+
     def _check_import(self, target: str, line_number: int) -> None:
         """Check kernel purity, plugin acyclic DAG, and XML interchange imports."""
         root = target.split(".", maxsplit=1)[0]
@@ -260,6 +286,25 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                     f"module level: {target}",
                 )
             )
+        if self._is_host_owner:
+            if root == "sqlite3" and self.file_path.name != "storage.py":
+                self.violations.append(
+                    ArchitecturalViolation(
+                        self.file_path,
+                        line_number,
+                        "ARCH-017-HOST-OWNERSHIP",
+                        f"Only app/host/storage.py may import sqlite3: {target}",
+                    )
+                )
+            if root == "subprocess" and self.file_path.name != "workers.py":
+                self.violations.append(
+                    ArchitecturalViolation(
+                        self.file_path,
+                        line_number,
+                        "ARCH-017-HOST-OWNERSHIP",
+                        f"Only app/host/workers.py may import subprocess: {target}",
+                    )
+                )
 
     @override
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:

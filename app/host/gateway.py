@@ -195,7 +195,7 @@ class _GatewayProvider:
                 f"{self._config.max_payload_bytes} bytes"
             )
         try:
-            parsed = parse_strict_json(body) if body else {}
+            parsed: dict[str, Any] = parse_strict_json(body) if body else {}
             return parsed, None
         except (ValueError, TypeError, json.JSONDecodeError) as err:
             return None, f"Malformed or duplicate JSON: {err}"

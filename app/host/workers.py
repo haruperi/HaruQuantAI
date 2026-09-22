@@ -1,0 +1,391 @@
+"""Host workers owner: subprocess-per-job execution and supervisor."""
+
+from __future__ import annotations
+
+import asyncio
+import os
+import sys
+import time
+from pathlib import Path
+from typing import Any, Protocol, override
+
+from app.kernel.capability import Capability
+from app.kernel.context import FeatureContext
+from app.kernel.feature import FeatureSpec
+from app.plugins.schema import (
+    EMPTY_FROZEN_OBJECT,
+    FrozenObject,
+    freeze_value,
+)
+from app.plugins.wire import (
+    parse_strict_json,
+    to_canonical_json_bytes,
+    value_to_wire,
+)
+
+
+class WorkerError(RuntimeError):
+    """Base error for worker failures."""
+
+
+class WorkerTimeoutError(WorkerError):
+    """Raised when worker execution exceeds configured budget timeout."""
+
+
+class WorkerCrashError(WorkerError):
+    """Raised when worker process terminates unexpectedly with non-zero exit code."""
+
+
+class WorkerCancellationError(WorkerError):
+    """Raised when worker execution is cancelled."""
+
+
+class WorkerOversizedOutputError(WorkerError):
+    """Raised when worker stdout exceeds maximum output bytes."""
+
+
+class WorkerProtocolError(WorkerError):
+    """Raised when worker request or response violates wire protocol."""
+
+
+class WorkerBudget:
+    """Resource limits for subprocess worker task."""
+
+    __slots__ = ("grace_period_seconds", "max_output_bytes", "timeout_seconds")
+
+    def __init__(
+        self,
+        timeout_seconds: float = 60.0,
+        max_output_bytes: int = 10_000_000,
+        grace_period_seconds: float = 2.0,
+    ) -> None:
+        if timeout_seconds <= 0:
+            raise ValueError("timeout_seconds must be > 0")
+        if max_output_bytes <= 0:
+            raise ValueError("max_output_bytes must be > 0")
+        if grace_period_seconds <= 0:
+            raise ValueError("grace_period_seconds must be > 0")
+        self.timeout_seconds = timeout_seconds
+        self.max_output_bytes = max_output_bytes
+        self.grace_period_seconds = grace_period_seconds
+
+
+DEFAULT_WORKER_BUDGET = WorkerBudget()
+
+
+class WorkerTask:
+    """Specification for one isolated worker execution task."""
+
+    __slots__ = ("budget", "payload", "task_id", "task_kind")
+
+    def __init__(
+        self,
+        task_id: str,
+        task_kind: str = "execution.evaluate",
+        payload: FrozenObject | dict[str, Any] = EMPTY_FROZEN_OBJECT,
+        budget: WorkerBudget = DEFAULT_WORKER_BUDGET,
+    ) -> None:
+        if not task_id or not isinstance(task_id, str):
+            raise ValueError("task_id must be a non-empty string")
+        if not task_kind or not isinstance(task_kind, str):
+            raise ValueError("task_kind must be a non-empty string")
+        self.task_id = task_id
+        self.task_kind = task_kind
+        if isinstance(payload, dict):
+            frozen = freeze_value(payload)
+            if not isinstance(frozen, FrozenObject):
+                raise TypeError("payload must freeze to FrozenObject")
+            self.payload = frozen
+        elif isinstance(payload, FrozenObject):
+            self.payload = payload
+        else:
+            raise TypeError("payload must be a FrozenObject or dict")
+        self.budget = budget
+
+
+class WorkerResult:
+    """Outcome of subprocess execution."""
+
+    __slots__ = (
+        "elapsed_seconds",
+        "error_code",
+        "error_message",
+        "exit_code",
+        "result_payload",
+        "success",
+        "task_id",
+    )
+
+    def __init__(
+        self,
+        task_id: str,
+        success: bool,
+        *,
+        result_payload: FrozenObject = EMPTY_FROZEN_OBJECT,
+        elapsed_seconds: float = 0.0,
+        exit_code: int = 0,
+        error_code: str = "",
+        error_message: str = "",
+    ) -> None:
+        self.task_id = task_id
+        self.success = success
+        self.result_payload = result_payload
+        self.elapsed_seconds = elapsed_seconds
+        self.exit_code = exit_code
+        self.error_code = error_code
+        self.error_message = error_message
+
+
+class WorkersConfig:
+    """Configuration for subprocess worker supervisor."""
+
+    __slots__ = ("default_budget", "max_concurrent_workers", "repo_root")
+
+    def __init__(
+        self,
+        max_concurrent_workers: int = 4,
+        default_budget: WorkerBudget = DEFAULT_WORKER_BUDGET,
+        repo_root: Path | None = None,
+    ) -> None:
+        if max_concurrent_workers <= 0:
+            raise ValueError("max_concurrent_workers must be > 0")
+        self.max_concurrent_workers = max_concurrent_workers
+        self.default_budget = default_budget
+        self.repo_root = (
+            repo_root or Path(__file__).resolve().parent.parent.parent
+        ).resolve()
+
+
+class Workers(Protocol):
+    """Public capability protocol for isolated subprocess execution."""
+
+    async def run_task(self, task: WorkerTask) -> WorkerResult:
+        """Run an isolated task in a subprocess and return its result."""
+        ...
+
+    async def close(self) -> None:
+        """Terminate active workers and release supervisor resources."""
+        ...
+
+
+HOST_WORKERS = Capability[Workers]("host.workers", 1)
+
+_ENV_ALLOWLIST = frozenset(
+    {
+        "PATH",
+        "SYSTEMROOT",
+        "SYSTEMDRIVE",
+        "TEMP",
+        "TMP",
+        "USERPROFILE",
+        "HOMEDRIVE",
+        "HOMEPATH",
+        "LANG",
+        "LC_ALL",
+        "VIRTUAL_ENV",
+    }
+)
+
+
+class _SubprocessWorkers(Workers):
+    """Private supervisor launching process-per-job workers."""
+
+    def __init__(self, config: WorkersConfig) -> None:
+        """Initialize supervisor."""
+        self._config = config
+        self._semaphore = asyncio.Semaphore(config.max_concurrent_workers)
+        self._active_processes: dict[str, asyncio.subprocess.Process] = {}
+        self._closed = False
+
+    def _build_sanitized_env(self) -> dict[str, str]:
+        """Construct a minimal sanitized environment allowlist."""
+        env: dict[str, str] = {}
+        for key in _ENV_ALLOWLIST:
+            if key in os.environ:
+                env[key] = os.environ[key]
+
+        # Explicitly configure PYTHONPATH to repository root
+        env["PYTHONPATH"] = str(self._config.repo_root)
+        env["PYTHONUNBUFFERED"] = "1"
+        return env
+
+    @override
+    async def run_task(self, task: WorkerTask) -> WorkerResult:
+        """Run task inside a dedicated subprocess with timeout and cancellation."""
+        if self._closed:
+            raise WorkerError("Workers supervisor is closed")
+
+        async with self._semaphore:
+            start_time = time.monotonic()
+            cmd = [
+                sys.executable,
+                "-m",
+                "app.host.bootstrap",
+                "--worker",
+            ]
+            env = self._build_sanitized_env()
+
+            request_envelope = {
+                "version": 1,
+                "task_id": task.task_id,
+                "task_kind": task.task_kind,
+                "payload": value_to_wire(task.payload),
+            }
+            request_bytes = to_canonical_json_bytes(request_envelope)
+
+            proc = await asyncio.create_subprocess_exec(
+                *cmd,
+                stdin=asyncio.subprocess.PIPE,
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
+                env=env,
+                cwd=str(self._config.repo_root),
+            )
+            self._active_processes[task.task_id] = proc
+
+            try:
+                try:
+                    stdout_data, stderr_data = await asyncio.wait_for(
+                        proc.communicate(input=request_bytes),
+                        timeout=task.budget.timeout_seconds,
+                    )
+                except TimeoutError:
+                    await self._terminate_process(
+                        proc, task.budget.grace_period_seconds
+                    )
+                    raise WorkerTimeoutError(
+                        f"Task {task.task_id} timed out after "
+                        f"{task.budget.timeout_seconds}s"
+                    ) from None
+                except asyncio.CancelledError:
+                    await self._terminate_process(
+                        proc, task.budget.grace_period_seconds
+                    )
+                    raise WorkerCancellationError(
+                        f"Task {task.task_id} was cancelled"
+                    ) from None
+
+            finally:
+                self._active_processes.pop(task.task_id, None)
+
+            elapsed = time.monotonic() - start_time
+
+            # Output size check
+            if len(stdout_data) > task.budget.max_output_bytes:
+                raise WorkerOversizedOutputError(
+                    f"Task {task.task_id} produced {len(stdout_data)} bytes, "
+                    f"exceeding {task.budget.max_output_bytes}"
+                )
+
+            if proc.returncode != 0:
+                stderr_text = stderr_data.decode("utf-8", errors="replace")[:1000]
+                raise WorkerCrashError(
+                    f"Worker process for task {task.task_id} exited with "
+                    f"code {proc.returncode}: {stderr_text}"
+                )
+
+            # Parse response JSON
+            try:
+                raw_response = parse_strict_json(stdout_data)
+            except Exception as err:
+                raise WorkerProtocolError(
+                    f"Worker for task {task.task_id} returned invalid JSON: {err}"
+                ) from err
+
+            if (
+                not isinstance(raw_response, dict)
+                or raw_response.get("version") != 1
+                or raw_response.get("task_id") != task.task_id
+            ):
+                raise WorkerProtocolError(
+                    f"Worker response failed protocol validation for task "
+                    f"{task.task_id}"
+                )
+
+            success = bool(raw_response.get("success", False))
+            result_raw = raw_response.get("result", {})
+            frozen_result = (
+                freeze_value(result_raw)
+                if isinstance(result_raw, dict)
+                else EMPTY_FROZEN_OBJECT
+            )
+            if not isinstance(frozen_result, FrozenObject):
+                frozen_result = EMPTY_FROZEN_OBJECT
+
+            error_code = str(raw_response.get("error_code") or "")
+            error_message = str(raw_response.get("error_message") or "")
+
+            return WorkerResult(
+                task_id=task.task_id,
+                success=success,
+                result_payload=frozen_result,
+                elapsed_seconds=elapsed,
+                exit_code=proc.returncode,
+                error_code=error_code,
+                error_message=error_message,
+            )
+
+    async def _terminate_process(
+        self, proc: asyncio.subprocess.Process, grace_period: float
+    ) -> None:
+        """Gracefully terminate a subprocess, falling back to kill if needed."""
+        try:
+            proc.terminate()
+            await asyncio.wait_for(proc.wait(), timeout=grace_period)
+        except TimeoutError, ProcessLookupError:
+            try:
+                proc.kill()
+                await proc.wait()
+            except ProcessLookupError:
+                pass
+
+    @override
+    async def close(self) -> None:
+        """Terminate all active worker processes."""
+        self._closed = True
+        active = list(self._active_processes.values())
+        for proc in active:
+            await self._terminate_process(proc, grace_period=1.0)
+        self._active_processes.clear()
+
+
+class _WorkersFeature:
+    """Feature providing HOST_WORKERS."""
+
+    spec = FeatureSpec(
+        "host.workers",
+        provides=frozenset({HOST_WORKERS}),
+        description="Subprocess worker pool for isolated task execution",
+    )
+
+    def __init__(self, config: WorkersConfig) -> None:
+        self._config = config
+        self._service: _SubprocessWorkers | None = None
+
+    async def start(self, context: FeatureContext) -> None:
+        self._service = _SubprocessWorkers(self._config)
+        context.on_close(self._service.close)
+        context.provide(HOST_WORKERS, self._service)
+
+
+def _workers_feature(config: WorkersConfig) -> _WorkersFeature:
+    """Construct the workers owner for the host composition root only."""
+    return _WorkersFeature(config)
+
+
+__all__ = (
+    "DEFAULT_WORKER_BUDGET",
+    "HOST_WORKERS",
+    "WorkerBudget",
+    "WorkerCancellationError",
+    "WorkerCrashError",
+    "WorkerError",
+    "WorkerOversizedOutputError",
+    "WorkerProtocolError",
+    "WorkerResult",
+    "WorkerTask",
+    "WorkerTimeoutError",
+    "Workers",
+    "WorkersConfig",
+    "_workers_feature",
+)

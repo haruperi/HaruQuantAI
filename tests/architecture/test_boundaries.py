@@ -16,7 +16,7 @@ def test_s2_application_roots_are_exact() -> None:
     assert names == {"__init__.py", "host", "kernel", "plugins", "ui"}
 
 
-def test_s4_python_owner_files_are_exact() -> None:
+def test_s5_python_owner_files_are_exact() -> None:
     assert {path.name for path in (APP / "kernel").glob("*.py")} == {
         "__init__.py",
         "bootstrapper.py",
@@ -26,11 +26,15 @@ def test_s4_python_owner_files_are_exact() -> None:
     }
     assert {path.name for path in (APP / "host").glob("*.py")} == {
         "__init__.py",
+        "artifacts.py",
         "bootstrap.py",
         "catalog.py",
         "execution.py",
         "gateway.py",
+        "jobs.py",
+        "storage.py",
         "telemetry.py",
+        "workers.py",
     }
     assert {path.name for path in (APP / "plugins").glob("*.py")} == {
         "__init__.py",

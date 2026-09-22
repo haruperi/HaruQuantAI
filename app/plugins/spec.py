@@ -346,7 +346,7 @@ class PluginContribution:
                 f"missing={missing}, extra={extra}"
             )
 
-    def get_implementation(self, operation_id: str) -> Any | None:
+    def get_implementation(self, operation_id: str) -> Any:
         """Return implementation for operation_id."""
         for contrib in self.operations:
             if contrib.operation_id == operation_id:

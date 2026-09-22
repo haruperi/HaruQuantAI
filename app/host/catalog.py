@@ -523,7 +523,7 @@ class _CatalogProvider:
             entry_fingerprints=entry_fp_pairs,
         )
 
-        old_refs = (
+        old_refs: set[PluginRef] = (
             set(self._contributions.keys()) if self._snapshot is not None else set()
         )
         current_refs = set(new_contributions.keys())

@@ -239,3 +239,39 @@ def test_gateway_lazy_server_imports_are_allowed(tmp_path: Path) -> None:
     )
 
     assert "ARCH-015-GATEWAY-LAZY-IMPORTS" not in _rules(check_file(source))
+
+
+@pytest.mark.parametrize(
+    "module_name",
+    ["subprocess", "socket", "sqlite3", "multiprocessing", "shutil", "tempfile"],
+)
+def test_plugin_forbidden_side_effect_imports_are_rejected(
+    tmp_path: Path, module_name: str
+) -> None:
+    source = tmp_path / "app" / "plugins" / "indicators" / "rsi.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(f"import {module_name}\n", encoding="utf-8")
+
+    assert "ARCH-016-PLUGIN-SIDE-EFFECTS" in _rules(check_file(source))
+
+
+def test_host_sqlite3_import_isolated_to_storage(tmp_path: Path) -> None:
+    invalid = tmp_path / "app" / "host" / "execution.py"
+    invalid.parent.mkdir(parents=True)
+    invalid.write_text("import sqlite3\n", encoding="utf-8")
+    assert "ARCH-017-HOST-OWNERSHIP" in _rules(check_file(invalid))
+
+    valid = tmp_path / "app" / "host" / "storage.py"
+    valid.write_text("import sqlite3\n", encoding="utf-8")
+    assert "ARCH-017-HOST-OWNERSHIP" not in _rules(check_file(valid))
+
+
+def test_host_subprocess_import_isolated_to_workers(tmp_path: Path) -> None:
+    invalid = tmp_path / "app" / "host" / "execution.py"
+    invalid.parent.mkdir(parents=True)
+    invalid.write_text("import subprocess\n", encoding="utf-8")
+    assert "ARCH-017-HOST-OWNERSHIP" in _rules(check_file(invalid))
+
+    valid = tmp_path / "app" / "host" / "workers.py"
+    valid.write_text("import subprocess\n", encoding="utf-8")
+    assert "ARCH-017-HOST-OWNERSHIP" not in _rules(check_file(valid))
