@@ -193,3 +193,30 @@ def test_plugin_dag_inversion_is_rejected(tmp_path: Path) -> None:
     )
 
     assert "ARCH-014-PLUGIN-DAG" in _rules(check_file(source))
+
+
+def test_concrete_plugin_cannot_import_host(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "plugins" / "indicators" / "rsi.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("from app.host.catalog import HOST_CATALOG\n", encoding="utf-8")
+
+    assert "ARCH-013-PLUGIN-PURITY" in _rules(check_file(source))
+
+
+def test_concrete_plugin_cross_import_is_rejected(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "plugins" / "indicators" / "rsi.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "from app.plugins.comparisons.greater_than import plugin\n", encoding="utf-8"
+    )
+
+    assert "ARCH-014-PLUGIN-DAG" in _rules(check_file(source))
+
+
+def test_concrete_plugin_shared_metamodel_import_is_allowed(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "plugins" / "indicators" / "rsi.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("from app.plugins.schema import ValueKind\n", encoding="utf-8")
+
+    assert "ARCH-014-PLUGIN-DAG" not in _rules(check_file(source))
+    assert "ARCH-013-PLUGIN-PURITY" not in _rules(check_file(source))

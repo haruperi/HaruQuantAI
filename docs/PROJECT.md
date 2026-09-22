@@ -89,7 +89,7 @@ The ratified stages and current evidence status are:
 |---|---|---|---|
 | S1 Kernel | Implemented | Restrict slots, canonicalize ordering, correct lifecycle and event/logging ownership | Failure/cancellation cleanup, provider lifetime, ordering, import purity, and observer-isolation tests |
 | S2 Plugin vocabulary/catalog | Implemented | Define exact schema, graph, wire, operation APIs and discovery | Validation, unknown-node round trips, immutable snapshots, and pre-import exclusions |
-| S3 Execution slice | Pending | Cohesive RSI and comparison; generic execution with supported optimization/export | Numerical goldens, lowering parity, independent indicator/comparison add/remove proof |
+| S3 Execution slice | Implemented | Cohesive RSI and comparison; generic execution with supported optimization/export | Numerical goldens, lowering parity, independent indicator/comparison add/remove proof |
 | S4 UI/workspaces | Pending | Generic catalog/schema/graph client and workspace declarations for the proven slice | Shared schema/document, unavailable placeholders, and two-workspace selection/removal |
 | S5 Durable infrastructure | Pending | Jobs, isolated persistence/artifacts, workers and budgets | Recovery, cancellation, resource lifetime, and process-boundary tests |
 | S6 Integrations/families | Pending | Additional algorithms, data sources, brokers, and tasks | Family-specific semantics/effect evidence and separate live-trading authorization |

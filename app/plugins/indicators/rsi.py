@@ -1,0 +1,404 @@
+"""Relative Strength Index (RSI) indicator plugin."""
+
+from __future__ import annotations
+
+import math
+from collections.abc import Mapping, Sequence
+from typing import Any, override
+
+from app.plugins.lowering import (
+    OP_STD_ADD,
+    OP_STD_COND,
+    OP_STD_DELTA,
+    OP_STD_DIV,
+    OP_STD_EQ,
+    OP_STD_MAX,
+    OP_STD_RECURRENCE,
+    OP_STD_SUB,
+    IRNode,
+    LiteralRef,
+    LoweringContext,
+    LoweringResult,
+    LoweringTarget,
+    ProgramInput,
+    ProgramOutput,
+    SemanticProgram,
+    ValueRef,
+)
+from app.plugins.schema import (
+    Alignment,
+    FrozenObject,
+    MissingValue,
+    NumericalPolicy,
+    NumericConstraint,
+    OptimizationDomain,
+    OptimizationScale,
+    ParameterBindingResult,
+    ParameterSchema,
+    ParameterSpec,
+    PortSpec,
+    Unit,
+    ValueKind,
+)
+from app.plugins.spec import (
+    CURRENT_METAMODEL_MAJOR,
+    OperationBindings,
+    OperationContribution,
+    OperationImplementation,
+    OperationSpec,
+    PluginContribution,
+    PluginRef,
+    PluginSpec,
+)
+
+PLUGIN_REF = PluginRef(id="indicator.rsi", version=(1, 0, 0))
+OPERATION_ID = "compute"
+TARGET_PYTHON = LoweringTarget(target_id="python", version=(1, 0, 0))
+
+PARAMETER_PERIOD = ParameterSpec(
+    key="period",
+    kind=ValueKind.INTEGER,
+    label="Period",
+    description="Lookback period for Wilder smoothing",
+    required=True,
+    default=14,
+    constraint=NumericConstraint(min_value=2, max_value=1000),
+    optimization=OptimizationDomain(
+        eligible=True,
+        min_value=2,
+        max_value=100,
+        step=1,
+        scale=OptimizationScale.LINEAR,
+    ),
+)
+
+INPUT_VALUES = PortSpec(
+    key="values",
+    kind=ValueKind.ALIGNED_SERIES,
+    unit=Unit.NONE,
+    alignment=Alignment.INDEX,
+    label="Values",
+    description="Input numeric price or value series",
+)
+
+OUTPUT_RSI = PortSpec(
+    key="rsi",
+    kind=ValueKind.ALIGNED_SERIES,
+    unit=Unit.PERCENT,
+    alignment=Alignment.INDEX,
+    label="RSI",
+    description="Relative Strength Index series (0-100%)",
+)
+
+RSI_SCHEMA = ParameterSchema((PARAMETER_PERIOD,))
+RSI_POLICY = NumericalPolicy(
+    tolerance=1e-9, nan_policy="reject", missing_policy="reset"
+)
+
+
+def _validate_rsi_inputs(raw_series: Sequence[Any]) -> None:
+    """Validate that input series contains finite numeric values."""
+    for idx, val in enumerate(raw_series):
+        if val is not None and not isinstance(val, MissingValue):
+            if not isinstance(val, (int, float)) or isinstance(val, bool):
+                raise TypeError(
+                    f"Input values must be numeric, got {type(val).__name__} "
+                    f"at index {idx}"
+                )
+            if not math.isfinite(val):
+                raise ValueError(
+                    f"Non-finite value {val!r} rejected in RSI input at index {idx}"
+                )
+
+
+def _compute_rsi_values(
+    raw_series: Sequence[Any], period: int
+) -> tuple[float | MissingValue, ...]:
+    """Compute RSI values series using Wilder smoothing."""
+    outputs: list[float | MissingValue] = []
+    consecutive_deltas: list[tuple[float, float]] = []
+    prev_val: float | None = None
+    avg_gain: float | None = None
+    avg_loss: float | None = None
+
+    for raw_val in raw_series:
+        if raw_val is None or isinstance(raw_val, MissingValue):
+            outputs.append(MissingValue(reason="GAP"))
+            prev_val = None
+            consecutive_deltas.clear()
+            avg_gain = None
+            avg_loss = None
+            continue
+
+        current_val = float(raw_val)
+        if prev_val is None:
+            outputs.append(MissingValue(reason="WARMUP"))
+            prev_val = current_val
+            continue
+
+        delta = current_val - prev_val
+        gain = max(delta, 0.0)
+        loss = max(-delta, 0.0)
+        prev_val = current_val
+
+        if avg_gain is None or avg_loss is None:
+            consecutive_deltas.append((gain, loss))
+            if len(consecutive_deltas) < period:
+                outputs.append(MissingValue(reason="WARMUP"))
+                continue
+            avg_gain = sum(g for g, _ in consecutive_deltas) / period
+            avg_loss = sum(loss_val for _, loss_val in consecutive_deltas) / period
+        else:
+            avg_gain = (avg_gain * (period - 1) + gain) / period
+            avg_loss = (avg_loss * (period - 1) + loss) / period
+
+        if avg_gain == 0.0 and avg_loss == 0.0:
+            outputs.append(50.0)
+        elif avg_loss == 0.0:
+            outputs.append(100.0)
+        elif avg_gain == 0.0:
+            outputs.append(0.0)
+        else:
+            rs = avg_gain / avg_loss
+            rsi = 100.0 - 100.0 / (1.0 + rs)
+            outputs.append(rsi)
+
+    return tuple(outputs)
+
+
+class RsiOperation(OperationImplementation):
+    """Execution and lowering implementation for RSI calculation."""
+
+    @override
+    def validate_parameters(self, values: FrozenObject) -> ParameterBindingResult:
+        """Validate parameter values."""
+        return RSI_SCHEMA.validate_bindings(values)
+
+    @override
+    def warmup_samples(self, values: FrozenObject) -> int:
+        """Dynamic warmup requires 'period' price changes."""
+        period = values.get("period", 14)
+        if isinstance(period, int) and period > 0:
+            return period
+        return 14
+
+    @override
+    def execute(
+        self,
+        inputs: Mapping[str, Any],
+        parameters: FrozenObject,
+        bindings: OperationBindings,
+    ) -> Mapping[str, Any]:
+        """Compute RSI series using Wilder smoothing."""
+        period_val = parameters.get("period", 14)
+        period = int(period_val) if isinstance(period_val, (int, float)) else 14
+
+        raw_series = inputs.get("values", ())
+        if not isinstance(raw_series, (tuple, list, Sequence)):
+            raw_series = tuple(raw_series) if raw_series is not None else ()
+
+        _validate_rsi_inputs(raw_series)
+        if not raw_series:
+            return {"rsi": ()}
+
+        return {"rsi": _compute_rsi_values(raw_series, period)}
+
+    @override
+    def lower(
+        self,
+        context: LoweringContext,
+        parameters: FrozenObject,
+    ) -> LoweringResult:
+        """Lower RSI calculation into universal semantic IR."""
+        if context.target != TARGET_PYTHON:
+            from app.plugins.lowering import LoweringIssue
+
+            return LoweringResult(
+                success=False,
+                issues=(
+                    LoweringIssue(
+                        code="UNSUPPORTED_TARGET",
+                        message=(
+                            f"Target {context.target.target_id}@"
+                            f"{context.target.version} "
+                            "is not supported by indicator.rsi"
+                        ),
+                    ),
+                ),
+            )
+
+        period_val = parameters.get("period", 14)
+        period = int(period_val) if isinstance(period_val, (int, float)) else 14
+
+        p_in = ProgramInput(
+            key="values",
+            kind=ValueKind.ALIGNED_SERIES,
+            alignment=Alignment.INDEX,
+        )
+
+        n_delta = IRNode(
+            id=context.allocate_node_id("delta"),
+            operator=OP_STD_DELTA,
+            inputs=(ValueRef("values", "values"),),
+        )
+        n_gain = IRNode(
+            id=context.allocate_node_id("gain"),
+            operator=OP_STD_MAX,
+            inputs=(ValueRef(n_delta.id, "out"), LiteralRef(0.0)),
+        )
+        n_neg = IRNode(
+            id=context.allocate_node_id("neg_delta"),
+            operator=OP_STD_SUB,
+            inputs=(LiteralRef(0.0), ValueRef(n_delta.id, "out")),
+        )
+        n_loss = IRNode(
+            id=context.allocate_node_id("loss"),
+            operator=OP_STD_MAX,
+            inputs=(ValueRef(n_neg.id, "out"), LiteralRef(0.0)),
+        )
+        n_avg_gain = IRNode(
+            id=context.allocate_node_id("avg_gain"),
+            operator=OP_STD_RECURRENCE,
+            inputs=(ValueRef(n_gain.id, "out"),),
+            parameters=FrozenObject.from_mapping(
+                {"method": "wilder_smoothing", "period": period}
+            ),
+        )
+        n_avg_loss = IRNode(
+            id=context.allocate_node_id("avg_loss"),
+            operator=OP_STD_RECURRENCE,
+            inputs=(ValueRef(n_loss.id, "out"),),
+            parameters=FrozenObject.from_mapping(
+                {"method": "wilder_smoothing", "period": period}
+            ),
+        )
+        n_sum_gl = IRNode(
+            id=context.allocate_node_id("sum_gl"),
+            operator=OP_STD_ADD,
+            inputs=(ValueRef(n_avg_gain.id, "out"), ValueRef(n_avg_loss.id, "out")),
+        )
+        n_both_zero = IRNode(
+            id=context.allocate_node_id("both_zero"),
+            operator=OP_STD_EQ,
+            inputs=(ValueRef(n_sum_gl.id, "out"), LiteralRef(0.0)),
+        )
+        n_loss_zero = IRNode(
+            id=context.allocate_node_id("loss_zero"),
+            operator=OP_STD_EQ,
+            inputs=(ValueRef(n_avg_loss.id, "out"), LiteralRef(0.0)),
+        )
+        n_gain_zero = IRNode(
+            id=context.allocate_node_id("gain_zero"),
+            operator=OP_STD_EQ,
+            inputs=(ValueRef(n_avg_gain.id, "out"), LiteralRef(0.0)),
+        )
+        n_rs = IRNode(
+            id=context.allocate_node_id("rs"),
+            operator=OP_STD_DIV,
+            inputs=(ValueRef(n_avg_gain.id, "out"), ValueRef(n_avg_loss.id, "out")),
+        )
+        n_one_plus_rs = IRNode(
+            id=context.allocate_node_id("one_plus_rs"),
+            operator=OP_STD_ADD,
+            inputs=(LiteralRef(1.0), ValueRef(n_rs.id, "out")),
+        )
+        n_inv_rs = IRNode(
+            id=context.allocate_node_id("inv_rs"),
+            operator=OP_STD_DIV,
+            inputs=(LiteralRef(100.0), ValueRef(n_one_plus_rs.id, "out")),
+        )
+        n_normal_rsi = IRNode(
+            id=context.allocate_node_id("normal_rsi"),
+            operator=OP_STD_SUB,
+            inputs=(LiteralRef(100.0), ValueRef(n_inv_rs.id, "out")),
+        )
+        n_cond1 = IRNode(
+            id=context.allocate_node_id("cond1"),
+            operator=OP_STD_COND,
+            inputs=(
+                ValueRef(n_gain_zero.id, "out"),
+                LiteralRef(0.0),
+                ValueRef(n_normal_rsi.id, "out"),
+            ),
+        )
+        n_cond2 = IRNode(
+            id=context.allocate_node_id("cond2"),
+            operator=OP_STD_COND,
+            inputs=(
+                ValueRef(n_loss_zero.id, "out"),
+                LiteralRef(100.0),
+                ValueRef(n_cond1.id, "out"),
+            ),
+        )
+        n_final = IRNode(
+            id=context.allocate_node_id("rsi_final"),
+            operator=OP_STD_COND,
+            inputs=(
+                ValueRef(n_both_zero.id, "out"),
+                LiteralRef(50.0),
+                ValueRef(n_cond2.id, "out"),
+            ),
+        )
+
+        p_out = ProgramOutput(
+            key="rsi",
+            source=ValueRef(n_final.id, "out"),
+            kind=ValueKind.ALIGNED_SERIES,
+            unit=Unit.PERCENT,
+            alignment=Alignment.INDEX,
+        )
+
+        nodes = (
+            n_delta,
+            n_gain,
+            n_neg,
+            n_loss,
+            n_avg_gain,
+            n_avg_loss,
+            n_sum_gl,
+            n_both_zero,
+            n_loss_zero,
+            n_gain_zero,
+            n_rs,
+            n_one_plus_rs,
+            n_inv_rs,
+            n_normal_rsi,
+            n_cond1,
+            n_cond2,
+            n_final,
+        )
+
+        program = SemanticProgram(
+            inputs=(p_in,),
+            nodes=nodes,
+            outputs=(p_out,),
+        )
+        return LoweringResult(success=True, program=program)
+
+
+def plugin() -> PluginContribution:
+    """Return the zero-argument pure plugin contribution for indicator.rsi."""
+    op_spec = OperationSpec(
+        operation_id=OPERATION_ID,
+        title="Compute RSI",
+        description="Compute Relative Strength Index using Wilder smoothing",
+        parameters=RSI_SCHEMA,
+        inputs=(INPUT_VALUES,),
+        outputs=(OUTPUT_RSI,),
+        determinism=True,
+        numerical_policy=RSI_POLICY,
+        effects=("pure",),
+        lowering_targets=(TARGET_PYTHON,),
+    )
+    plugin_spec = PluginSpec(
+        ref=PLUGIN_REF,
+        kind="indicator",
+        title="Relative Strength Index",
+        description="Momentum oscillator measuring speed and change of price moves",
+        metamodel_major=CURRENT_METAMODEL_MAJOR,
+        operations=(op_spec,),
+    )
+    return PluginContribution(
+        spec=plugin_spec,
+        operations=(OperationContribution(OPERATION_ID, RsiOperation()),),
+    )

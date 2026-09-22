@@ -21,7 +21,7 @@ CURRENT_KERNEL_FILES = frozenset(
     {"__init__.py", "bootstrapper.py", "capability.py", "context.py", "feature.py"}
 )
 CURRENT_HOST_FILES = frozenset(
-    {"__init__.py", "bootstrap.py", "catalog.py", "telemetry.py"}
+    {"__init__.py", "bootstrap.py", "catalog.py", "execution.py", "telemetry.py"}
 )
 CURRENT_PLUGINS_FILES = frozenset(
     {
@@ -32,6 +32,18 @@ CURRENT_PLUGINS_FILES = frozenset(
         "spec.py",
         "wire.py",
     }
+)
+CURRENT_PLUGIN_FAMILIES: dict[str, frozenset[str]] = {
+    "indicators": frozenset({"__init__.py", "rsi.py"}),
+    "comparisons": frozenset({"__init__.py", "greater_than.py"}),
+    "exporters": frozenset({"__init__.py", "python.py"}),
+}
+_SHARED_METAMODEL_PREFIXES = (
+    "app.plugins.schema",
+    "app.plugins.lowering",
+    "app.plugins.spec",
+    "app.plugins.algebra",
+    "app.plugins.wire",
 )
 _ALLOWED_PLUGIN_IMPORTS: dict[str, tuple[str, ...]] = {
     "schema.py": (),
@@ -127,6 +139,8 @@ class ArchitecturalVisitor(ast.NodeVisitor):
         )
         self._is_host_owner = len(parts) > 2 and parts[1] == "host"
         self._is_plugins = len(parts) > 1 and parts[1] == "plugins"
+        self._is_shared_plugins = len(parts) == 3 and parts[1] == "plugins"
+        self._is_concrete_plugin = len(parts) == 4 and parts[1] == "plugins"
         self._plugin_module_name = (
             parts[2] if len(parts) == 3 and parts[1] == "plugins" else None
         )
@@ -153,7 +167,7 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                     self.file_path,
                     line_number,
                     "ARCH-013-PLUGIN-PURITY",
-                    f"Shared plugin metamodel must not import host or UI: {target}",
+                    f"Plugins must not import host or UI: {target}",
                 )
             )
         if target.startswith("app.kernel."):
@@ -167,22 +181,33 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                         self.file_path,
                         line_number,
                         "ARCH-013-PLUGIN-PURITY",
-                        f"Metamodel module cannot import kernel: {target}",
+                        f"Plugin cannot import kernel: {target}",
                     )
                 )
         if target.startswith("app.plugins."):
-            allowed_prefixes = _ALLOWED_PLUGIN_IMPORTS.get(
-                self._plugin_module_name or "", ()
-            )
-            if not target.startswith(allowed_prefixes):
-                self.violations.append(
-                    ArchitecturalViolation(
-                        self.file_path,
-                        line_number,
-                        "ARCH-014-PLUGIN-DAG",
-                        f"{self._plugin_module_name} may not import {target}",
-                    )
+            if self._is_shared_plugins:
+                allowed_prefixes = _ALLOWED_PLUGIN_IMPORTS.get(
+                    self._plugin_module_name or "", ()
                 )
+                if not target.startswith(allowed_prefixes):
+                    self.violations.append(
+                        ArchitecturalViolation(
+                            self.file_path,
+                            line_number,
+                            "ARCH-014-PLUGIN-DAG",
+                            f"{self._plugin_module_name} may not import {target}",
+                        )
+                    )
+            elif self._is_concrete_plugin:
+                if not target.startswith(_SHARED_METAMODEL_PREFIXES):
+                    self.violations.append(
+                        ArchitecturalViolation(
+                            self.file_path,
+                            line_number,
+                            "ARCH-014-PLUGIN-DAG",
+                            f"Concrete plugin may not import {target}",
+                        )
+                    )
 
     def _check_import(self, target: str, line_number: int) -> None:
         """Check kernel purity, plugin acyclic DAG, and XML interchange imports."""
@@ -402,6 +427,20 @@ def _current_topology_violations() -> list[ArchitecturalViolation]:
                     1,
                     "ARCH-012-STAGE-TOPOLOGY",
                     f"Unexpected source files: {sorted(actual ^ expected)}",
+                )
+            )
+    for family_name, expected_files in sorted(CURRENT_PLUGIN_FAMILIES.items()):
+        family_dir = APP_ROOT / "plugins" / family_name
+        actual = {path.name for path in family_dir.glob("*.py")}
+        expected_py = {f for f in expected_files if f.endswith(".py")}
+        if actual != expected_py:
+            violations.append(
+                ArchitecturalViolation(
+                    family_dir,
+                    1,
+                    "ARCH-012-STAGE-TOPOLOGY",
+                    f"Unexpected source files in {family_name}: "
+                    f"{sorted(actual ^ expected_py)}",
                 )
             )
     return violations

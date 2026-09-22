@@ -1,0 +1,1 @@
+"""Quantitative indicator plugin family."""

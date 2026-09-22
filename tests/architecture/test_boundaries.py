@@ -16,7 +16,7 @@ def test_s2_application_roots_are_exact() -> None:
     assert names == {"__init__.py", "host", "kernel", "plugins", "ui"}
 
 
-def test_s2_python_owner_files_are_exact() -> None:
+def test_s3_python_owner_files_are_exact() -> None:
     assert {path.name for path in (APP / "kernel").glob("*.py")} == {
         "__init__.py",
         "bootstrapper.py",
@@ -28,6 +28,7 @@ def test_s2_python_owner_files_are_exact() -> None:
         "__init__.py",
         "bootstrap.py",
         "catalog.py",
+        "execution.py",
         "telemetry.py",
     }
     assert {path.name for path in (APP / "plugins").glob("*.py")} == {
@@ -37,6 +38,18 @@ def test_s2_python_owner_files_are_exact() -> None:
         "schema.py",
         "spec.py",
         "wire.py",
+    }
+    assert {path.name for path in (APP / "plugins" / "indicators").glob("*.py")} == {
+        "__init__.py",
+        "rsi.py",
+    }
+    assert {path.name for path in (APP / "plugins" / "comparisons").glob("*.py")} == {
+        "__init__.py",
+        "greater_than.py",
+    }
+    assert {path.name for path in (APP / "plugins" / "exporters").glob("*.py")} == {
+        "__init__.py",
+        "python.py",
     }
 
 
@@ -108,3 +121,33 @@ def test_shared_plugins_acyclic_import_dag() -> None:
             elif isinstance(node, ast.ImportFrom):
                 assert node.level == 0, f"Relative import in {path}"
                 _check_plugin_import(path, module_name, node.module or "")
+
+
+def test_concrete_plugins_isolation() -> None:
+    """Ensure concrete plugins import only the shared metamodel and stdlib."""
+    allowed_metamodel = (
+        "app.plugins.schema",
+        "app.plugins.lowering",
+        "app.plugins.spec",
+        "app.plugins.algebra",
+        "app.plugins.wire",
+    )
+    for family in ("indicators", "comparisons", "exporters"):
+        for path in (APP / "plugins" / family).glob("*.py"):
+            if path.name == "__init__.py":
+                continue
+            for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+                targets: list[str] = []
+                if isinstance(node, ast.Import):
+                    targets = [alias.name for alias in node.names]
+                elif isinstance(node, ast.ImportFrom):
+                    assert node.level == 0, f"Relative import in {path}"
+                    targets = [node.module or ""]
+                for target in targets:
+                    assert not target.startswith(
+                        ("app.host.", "app.ui.", "app.kernel.")
+                    ), f"Forbidden import in {path}: {target}"
+                    if target.startswith("app.plugins."):
+                        assert target.startswith(allowed_metamodel), (
+                            f"Cross-plugin import in {path}: {target}"
+                        )
