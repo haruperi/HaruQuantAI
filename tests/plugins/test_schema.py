@@ -300,3 +300,38 @@ def test_port_spec_and_numerical_policy() -> None:
         NumericalPolicy(tolerance=0)
     with pytest.raises(ValueError, match="Invalid nan_policy"):
         NumericalPolicy(nan_policy="ignore")
+
+
+def test_freeze_value_total_element_limit() -> None:
+    from app.plugins.schema import MAX_TOTAL_ELEMENTS
+
+    huge = list(range(MAX_TOTAL_ELEMENTS + 1))
+    with pytest.raises(ValueError, match="Total frozen element count"):
+        freeze_value(huge)
+
+    # nested composition is also bounded across the whole tree
+    deep_total = {"a": list(range(MAX_TOTAL_ELEMENTS + 1))}
+    with pytest.raises(ValueError, match="Total frozen element count"):
+        freeze_value(deep_total)
+
+
+def test_optimization_distribution_validation() -> None:
+    from app.plugins.schema import (
+        OptimizationDistribution,
+        OptimizationDomain,
+    )
+
+    # default is uniform
+    domain = OptimizationDomain(min_value=2, max_value=100)
+    assert domain.distribution is OptimizationDistribution.UNIFORM
+
+    # normal distribution requires finite bounds
+    normal_ok = OptimizationDomain(
+        min_value=2, max_value=100, distribution=OptimizationDistribution.NORMAL
+    )
+    assert normal_ok.distribution is OptimizationDistribution.NORMAL
+    with pytest.raises(ValueError, match="Normal optimization distribution"):
+        OptimizationDomain(distribution=OptimizationDistribution.NORMAL)
+
+    with pytest.raises(TypeError, match="OptimizationDistribution"):
+        OptimizationDomain(distribution="uniform")  # type: ignore[arg-type]

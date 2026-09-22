@@ -9,6 +9,7 @@ from app.plugins.schema import (
     EMPTY_FROZEN_OBJECT,
     FrozenObject,
     PortSpec,
+    Unit,
     ValidationIssue,
     ValidationSeverity,
     validate_identifier,
@@ -18,7 +19,6 @@ from app.plugins.spec import CatalogView, PluginRef
 GRAPH_SCHEMA_VERSION = 1
 MAX_GRAPH_NODES = 1_000
 MAX_GRAPH_EDGES = 5_000
-MAX_GRAPH_DEPTH = 8
 
 
 @dataclass(frozen=True, slots=True)
@@ -320,6 +320,23 @@ def _validate_edge_ports(
         )
         can_exec = False
 
+    # Unit compatibility: exact equality unless the consuming port declares
+    # Unit.NONE, which accepts any source unit.
+    if src_p.unit != tgt_p.unit and tgt_p.unit is not Unit.NONE:
+        issues.append(
+            ValidationIssue(
+                path=f"edges[{idx}]",
+                code="PORT_UNIT_MISMATCH",
+                message=(
+                    f"Port unit mismatch: {edge.source.node_id}."
+                    f"{edge.source.port_key} produces {src_p.unit.value} but "
+                    f"{edge.target.node_id}.{edge.target.port_key} requires "
+                    f"{tgt_p.unit.value}"
+                ),
+            )
+        )
+        can_exec = False
+
     none_alignment = src_p.alignment.NONE
     if src_p.alignment != tgt_p.alignment and none_alignment not in (
         src_p.alignment,
@@ -485,6 +502,20 @@ def validate_graph(
 
     issues: list[ValidationIssue] = []
     can_execute = True
+
+    if spec.subgraphs:
+        issues.append(
+            ValidationIssue(
+                path="spec.subgraphs",
+                code="SUBGRAPHS_UNSUPPORTED",
+                message=(
+                    "Graph schema version 1 does not support nested subgraphs; "
+                    f"{len(spec.subgraphs)} subgraph(s) present"
+                ),
+                severity=ValidationSeverity.ERROR,
+            )
+        )
+        can_execute = False
 
     for err in _detect_cycles(spec.nodes, spec.edges):
         issues.append(ValidationIssue(path="edges", code="GRAPH_CYCLE", message=err))

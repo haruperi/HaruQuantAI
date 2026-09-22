@@ -281,3 +281,187 @@ def test_catalog_validations_and_unready_errors(tmp_path: Path) -> None:
     # SelectionResult validation
     with pytest.raises(TypeError, match="snapshot must be a CatalogSnapshot"):
         SelectionResult(snapshot="not_snap")  # type: ignore[arg-type]
+
+
+def test_selection_restricts_operation_ids_and_lowering_targets(
+    tmp_path: Path,
+) -> None:
+    # probe plugin with a lowering target and two operations
+    source = VALID_PROBE_SOURCE.replace(
+        'operation_id="compute",\n        title="Probe Alpha",',
+        'operation_id="compute",\n        title="Probe Alpha",',
+    )
+    (tmp_path / "alpha.py").write_text(source, encoding="utf-8")
+    root = CatalogRoot(
+        logical_family="probes", path=tmp_path, accepted_kinds=("probe",)
+    )
+    provider = _CatalogProvider((root,))
+    provider.refresh()
+
+    ref_alpha = PluginRef(id="probe.alpha", version=(1, 0, 0))
+
+    # operation_ids restriction: selected id passes, others are attributed
+    sel = provider.select(
+        SelectionRequest(enabled_refs=(ref_alpha,), operation_ids=("compute",))
+    )
+    assert sel.available_operations == ((ref_alpha, "compute"),)
+
+    sel_other = provider.select(
+        SelectionRequest(enabled_refs=(ref_alpha,), operation_ids=("something_else",))
+    )
+    assert sel_other.available_operations == ()
+    assert sel_other.unavailable_reasons[0][2] == "OPERATION_NOT_SELECTED"
+
+
+def test_selection_lowering_target_restriction(tmp_path: Path) -> None:
+    # probe declaring a python lowering target
+    source = VALID_PROBE_SOURCE.replace(
+        'effects=("pure",),',
+        'effects=("pure",),\n        lowering_targets=(LoweringTarget(target_id="python", version=(1, 0, 0)),),',
+    ).replace(
+        "from app.plugins.schema import PortSpec, ValueKind",
+        "from app.plugins.schema import PortSpec, ValueKind\n"
+        "from app.plugins.lowering import LoweringTarget",
+    )
+    (tmp_path / "alpha.py").write_text(source, encoding="utf-8")
+    root = CatalogRoot(
+        logical_family="probes", path=tmp_path, accepted_kinds=("probe",)
+    )
+    provider = _CatalogProvider((root,))
+    res = provider.refresh()
+    assert res.success is True
+
+    ref_alpha = PluginRef(id="probe.alpha", version=(1, 0, 0))
+
+    allowed = provider.select(
+        SelectionRequest(
+            enabled_refs=(ref_alpha,), allowed_lowering_targets=("python",)
+        )
+    )
+    assert allowed.available_operations == ((ref_alpha, "compute"),)
+
+    denied = provider.select(
+        SelectionRequest(enabled_refs=(ref_alpha,), allowed_lowering_targets=("rust",))
+    )
+    assert denied.available_operations == ()
+    assert denied.unavailable_reasons[0][2].startswith("NO_ALLOWED_LOWERING_TARGET:")
+
+
+def test_canonical_ordering_independent_of_enumeration_order(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import pathlib
+
+    (tmp_path / "alpha.py").write_text(VALID_PROBE_SOURCE, encoding="utf-8")
+    (tmp_path / "beta.py").write_text(VALID_PROBE_BETA_SOURCE, encoding="utf-8")
+    root = CatalogRoot(
+        logical_family="probes", path=tmp_path, accepted_kinds=("probe",)
+    )
+    provider = _CatalogProvider((root,))
+    assert provider.refresh().success is True
+    forward_fp = provider.snapshot().whole_fingerprint
+    forward_entries = [e.ref.id for e in provider.snapshot().view.entries]
+
+    original_iterdir = pathlib.Path.iterdir
+
+    def reversed_iterdir(self: pathlib.Path) -> object:
+        return iter(sorted(original_iterdir(self), reverse=True))
+
+    monkeypatch.setattr(pathlib.Path, "iterdir", reversed_iterdir)
+    assert provider.refresh().success is True
+    assert provider.snapshot().whole_fingerprint == forward_fp
+    assert [e.ref.id for e in provider.snapshot().view.entries] == forward_entries
+
+
+def test_approved_plugin_import_and_factory_purity(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Discovery + factory must not write files or touch env/log/tasks/threads."""
+    import asyncio
+    import builtins
+    import logging
+    import os
+    import socket
+    import threading
+    from typing import Any
+
+    from app.host.bootstrap import approved_catalog_roots
+
+    real_open = builtins.open
+
+    def read_only_open(*args: Any, **kwargs: Any) -> Any:
+        mode = args[1] if len(args) > 1 else kwargs.get("mode", "r")
+        if isinstance(mode, str) and any(m in mode for m in ("w", "a", "x", "+")):
+            raise AssertionError("write-mode I/O during plugin import/factory")
+        return real_open(*args, **kwargs)
+
+    def _fail(name: str) -> Any:
+        def raiser(*args: object, **kwargs: object) -> None:
+            raise AssertionError(f"{name} used during plugin import/factory")
+
+        return raiser
+
+    monkeypatch.setattr(builtins, "open", read_only_open)
+    monkeypatch.setattr(os, "getenv", _fail("os.getenv"))
+    monkeypatch.setattr(os, "environ", {}, raising=False)
+    monkeypatch.setattr(logging, "basicConfig", _fail("logging.basicConfig"))
+    monkeypatch.setattr(threading.Thread, "start", _fail("threading.Thread.start"))
+    monkeypatch.setattr(asyncio, "create_task", _fail("asyncio.create_task"))
+    monkeypatch.setattr(socket, "socket", _fail("socket.socket"))
+
+    roots = approved_catalog_roots()
+    provider = _CatalogProvider(roots)
+    res = provider.refresh()
+    assert res.success is True, f"issues: {res.issues}"
+    assert provider.is_ready()
+    assert len(provider.snapshot().view.entries) >= 4
+
+
+def test_impure_plugin_rejected_and_last_good_retained(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import os
+
+    (tmp_path / "alpha.py").write_text(VALID_PROBE_SOURCE, encoding="utf-8")
+    root = CatalogRoot(
+        logical_family="probes", path=tmp_path, accepted_kinds=("probe",)
+    )
+    provider = _CatalogProvider((root,))
+    assert provider.refresh().success is True
+    good_fp = provider.snapshot().whole_fingerprint
+
+    impure = "import os\n" + VALID_PROBE_SOURCE.replace(
+        "probe.alpha", "probe.impure"
+    ).replace(
+        "def plugin() -> PluginContribution:",
+        'def plugin() -> PluginContribution:\n    os.environ["PROBE_SIDE_EFFECT"] = "1"',
+    )
+    (tmp_path / "impure.py").write_text(impure, encoding="utf-8")
+
+    class _NoSideEffectEnviron(dict):  # type: ignore[type-arg]
+        def __setitem__(self, key: str, value: str) -> None:
+            if key.startswith("PYTEST_"):
+                super().__setitem__(key, value)
+                return
+            raise RuntimeError("environment mutation during factory")
+
+    monkeypatch.setattr(os, "environ", _NoSideEffectEnviron())
+    res2 = provider.refresh()
+    assert res2.success is False
+    assert provider.snapshot().whole_fingerprint == good_fp
+
+
+def test_metamodel_major_mismatch_rejected(tmp_path: Path) -> None:
+    incompatible = VALID_PROBE_SOURCE.replace(
+        'spec = PluginSpec(ref=ref, kind="probe", title="Probe Alpha Plugin", operations=(op,))',
+        'spec = PluginSpec(ref=ref, kind="probe", title="Probe Alpha Plugin", operations=(op,), metamodel_major=999)',
+    )
+    (tmp_path / "alpha.py").write_text(incompatible, encoding="utf-8")
+    root = CatalogRoot(
+        logical_family="probes", path=tmp_path, accepted_kinds=("probe",)
+    )
+    provider = _CatalogProvider((root,))
+    res = provider.refresh()
+    assert res.success is False
+    assert not provider.is_ready()
+    assert any("metamodel major" in issue for issue in res.issues)

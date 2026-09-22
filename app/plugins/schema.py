@@ -14,6 +14,7 @@ MAX_COLLECTION_SIZE = 10_000
 MAX_KEY_LENGTH = 128
 MAX_STRING_LENGTH = 65_536
 MAX_IDENTIFIER_LENGTH = 64
+MAX_TOTAL_ELEMENTS = 100_000
 KEY_VALUE_PAIR_LENGTH = 2
 INT_MIN = -9_007_199_254_740_991  # -2^53 + 1 (JavaScript safe integer lower bound)
 INT_MAX = 9_007_199_254_740_991  # 2^53 - 1 (JavaScript safe integer upper bound)
@@ -225,7 +226,21 @@ def freeze_value(val: Any, depth: int = 0) -> Value:
 
     Returns:
         Frozen immutable representation of val.
+
+    Raises:
+        ValueError: If depth, collection size, or the total frozen element
+            count exceeds its bound.
     """
+    return _freeze_counted(val, depth, [0])
+
+
+def _freeze_counted(val: Any, depth: int, counter: list[int]) -> Value:
+    """Freeze with a shared total-element counter across the whole tree."""
+    counter[0] += 1
+    if counter[0] > MAX_TOTAL_ELEMENTS:
+        raise ValueError(
+            f"Total frozen element count exceeds limit of {MAX_TOTAL_ELEMENTS}"
+        )
     if depth > MAX_VALUE_DEPTH:
         raise ValueError(f"Value nesting depth exceeds limit of {MAX_VALUE_DEPTH}")
     if val is None or isinstance(val, (bool, int, float, str, MissingValue)):
@@ -237,11 +252,13 @@ def freeze_value(val: Any, depth: int = 0) -> Value:
         for k, v in val.items():
             if not isinstance(k, str):
                 raise TypeError(f"Mapping keys must be strings, got {type(k).__name__}")
-            pairs.append((k, freeze_value(v, depth + 1)))
+            pairs.append((k, _freeze_counted(v, depth + 1, counter)))
         pairs.sort(key=lambda p: p[0])
         return FrozenObject(tuple(pairs))
     if isinstance(val, (list, tuple, Sequence)) and not isinstance(val, (str, bytes)):
-        return FrozenArray(tuple(freeze_value(item, depth + 1) for item in val))
+        return FrozenArray(
+            tuple(_freeze_counted(item, depth + 1, counter) for item in val)
+        )
     raise TypeError(
         f"Unsupported leaf value type for freeze_value: {type(val).__name__}"
     )
@@ -461,6 +478,13 @@ class OptimizationScale(StrEnum):
     STEP = "step"
 
 
+class OptimizationDistribution(StrEnum):
+    """Sampling distribution for parameter search/optimization."""
+
+    UNIFORM = "uniform"
+    NORMAL = "normal"
+
+
 def _validate_opt_bounds(
     min_val: float | None,
     max_val: float | None,
@@ -487,6 +511,7 @@ class OptimizationDomain:
     max_value: float | int | None = None
     step: float | int | None = None
     scale: OptimizationScale = OptimizationScale.LINEAR
+    distribution: OptimizationDistribution = OptimizationDistribution.UNIFORM
 
     def __post_init__(self) -> None:
         """Validate optimization bounds."""
@@ -494,6 +519,10 @@ class OptimizationDomain:
             raise TypeError("OptimizationDomain eligible must be a bool")
         if not isinstance(self.scale, OptimizationScale):
             raise TypeError("OptimizationDomain scale must be an OptimizationScale")
+        if not isinstance(self.distribution, OptimizationDistribution):
+            raise TypeError(
+                "OptimizationDomain distribution must be an OptimizationDistribution"
+            )
         for name, val in (
             ("min_value", self.min_value),
             ("max_value", self.max_value),
@@ -506,6 +535,13 @@ class OptimizationDomain:
                     raise ValueError(f"OptimizationDomain {name} must be finite")
         if self.eligible:
             _validate_opt_bounds(self.min_value, self.max_value, self.step, self.scale)
+            if self.distribution is OptimizationDistribution.NORMAL and (
+                self.min_value is None or self.max_value is None
+            ):
+                raise ValueError(
+                    "Normal optimization distribution requires finite "
+                    "min_value and max_value"
+                )
 
 
 class WidgetKind(StrEnum):

@@ -119,6 +119,8 @@ class SelectionRequest:
     allowed_kinds: tuple[str, ...] = ()
     available_capabilities: tuple[str, ...] = ()
     permissions: tuple[str, ...] = ()
+    operation_ids: tuple[str, ...] = ()
+    allowed_lowering_targets: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         """Validate selection request."""
@@ -132,6 +134,10 @@ class SelectionRequest:
             raise TypeError("available_capabilities must be a tuple of str")
         if not isinstance(self.permissions, tuple):
             raise TypeError("permissions must be a tuple of str")
+        if not isinstance(self.operation_ids, tuple):
+            raise TypeError("operation_ids must be a tuple of str")
+        if not isinstance(self.allowed_lowering_targets, tuple):
+            raise TypeError("allowed_lowering_targets must be a tuple of str")
 
 
 @dataclass(frozen=True, slots=True)
@@ -558,6 +564,14 @@ class _CatalogProvider:
         )
         available_caps_set = set(request.available_capabilities)
         permissions_set = set(request.permissions)
+        operation_ids_set = (
+            set(request.operation_ids) if request.operation_ids else None
+        )
+        lowering_targets_set = (
+            set(request.allowed_lowering_targets)
+            if request.allowed_lowering_targets
+            else None
+        )
 
         for entry in self._snapshot.view.entries:
             ref = entry.ref
@@ -575,6 +589,24 @@ class _CatalogProvider:
                 continue
 
             for op in entry.operations:
+                if operation_ids_set is not None and (
+                    op.operation_id not in operation_ids_set
+                ):
+                    unavailable_reasons.append(
+                        (ref, op.operation_id, "OPERATION_NOT_SELECTED")
+                    )
+                    continue
+                if lowering_targets_set is not None:
+                    op_targets = {t.target_id for t in op.lowering_targets}
+                    if not op_targets or not (op_targets & lowering_targets_set):
+                        unavailable_reasons.append(
+                            (
+                                ref,
+                                op.operation_id,
+                                f"NO_ALLOWED_LOWERING_TARGET:{sorted(op_targets)}",
+                            )
+                        )
+                        continue
                 reason = _evaluate_operation(
                     op,
                     allowed_effects_set,

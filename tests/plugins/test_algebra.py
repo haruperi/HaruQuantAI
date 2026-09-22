@@ -17,6 +17,7 @@ from app.plugins.schema import (
     ParameterSchema,
     ParameterSpec,
     PortSpec,
+    Unit,
     ValueKind,
 )
 from app.plugins.spec import CatalogEntryView, CatalogView, OperationSpec, PluginRef
@@ -199,3 +200,120 @@ def test_opaque_graph_document_fails_execution() -> None:
     assert res.is_valid is False
     assert res.can_execute is False
     assert any(i.code == "UNSUPPORTED_VERSION" for i in res.issues)
+
+
+def _build_unit_catalog(source_unit: Unit, target_unit: Unit) -> CatalogView:
+    """Build a two-node catalog with explicit source/target port units."""
+    producer_op = OperationSpec(
+        operation_id="produce",
+        title="Producer",
+        outputs=(
+            PortSpec(
+                key="out",
+                kind=ValueKind.ALIGNED_SERIES,
+                unit=source_unit,
+                alignment=Alignment.INDEX,
+            ),
+        ),
+    )
+    consumer_op = OperationSpec(
+        operation_id="consume",
+        title="Consumer",
+        inputs=(
+            PortSpec(
+                key="in",
+                kind=ValueKind.ALIGNED_SERIES,
+                unit=target_unit,
+                alignment=Alignment.INDEX,
+            ),
+        ),
+        outputs=(
+            PortSpec(
+                key="res",
+                kind=ValueKind.ALIGNED_SERIES,
+                unit=Unit.NONE,
+                alignment=Alignment.INDEX,
+            ),
+        ),
+    )
+    producer_entry = CatalogEntryView(
+        ref=PluginRef(id="probe.producer", version=(1, 0, 0)),
+        kind="probe",
+        title="Producer",
+        operations=(producer_op,),
+    )
+    consumer_entry = CatalogEntryView(
+        ref=PluginRef(id="probe.consumer", version=(1, 0, 0)),
+        kind="probe",
+        title="Consumer",
+        operations=(consumer_op,),
+    )
+    return CatalogView(
+        entries=(producer_entry, consumer_entry), catalog_fingerprint="unit_fp"
+    )
+
+
+def _unit_edge_document() -> GraphDocument:
+    node_p = NodeSpec(
+        id="p1",
+        plugin_ref=PluginRef(id="probe.producer", version=(1, 0, 0)),
+        operation_id="produce",
+    )
+    node_c = NodeSpec(
+        id="c1",
+        plugin_ref=PluginRef(id="probe.consumer", version=(1, 0, 0)),
+        operation_id="consume",
+    )
+    edge = EdgeSpec(source=PortRef("p1", "out"), target=PortRef("c1", "in"))
+    return GraphDocument(spec=GraphSpec(nodes=(node_p, node_c), edges=(edge,)))
+
+
+def test_unit_mismatch_fails_validation() -> None:
+    # percent output feeding a currency-required input must be rejected
+    catalog = _build_unit_catalog(Unit.PERCENT, Unit.CURRENCY)
+    res = validate_graph(_unit_edge_document(), catalog)
+    assert res.is_valid is False
+    assert res.can_execute is False
+    assert any(i.code == "PORT_UNIT_MISMATCH" for i in res.issues)
+
+
+def test_unit_none_consumer_accepts_any_source_unit() -> None:
+    # a Unit.NONE consuming port accepts any source unit (wildcard rule)
+    catalog = _build_unit_catalog(Unit.PERCENT, Unit.NONE)
+    res = validate_graph(_unit_edge_document(), catalog)
+    assert res.is_valid is True
+    assert res.can_execute is True
+
+    catalog_same = _build_unit_catalog(Unit.PERCENT, Unit.PERCENT)
+    res_same = validate_graph(_unit_edge_document(), catalog_same)
+    assert res_same.is_valid is True
+
+
+def test_none_unit_source_into_specific_unit_target_rejected() -> None:
+    # wildcard applies only to the consuming port; a unitless source cannot
+    # feed a unit-requiring input
+    catalog = _build_unit_catalog(Unit.NONE, Unit.PERCENT)
+    res = validate_graph(_unit_edge_document(), catalog)
+    assert res.is_valid is False
+    assert any(i.code == "PORT_UNIT_MISMATCH" for i in res.issues)
+
+
+def test_subgraphs_rejected_with_attributed_issue() -> None:
+    catalog = _build_test_catalog()
+    rsi_ref = PluginRef(id="indicator.rsi", version=(1, 0, 0))
+    inner = NodeSpec(id="rsi_inner", plugin_ref=rsi_ref, operation_id="compute")
+    node = NodeSpec(id="rsi_1", plugin_ref=rsi_ref, operation_id="compute")
+    doc = GraphDocument(
+        spec=GraphSpec(
+            nodes=(node,),
+            subgraphs=(GraphSpec(nodes=(inner,)),),
+        )
+    )
+
+    res = validate_graph(doc, catalog)
+    assert res.is_valid is False
+    assert res.can_execute is False
+    assert any(i.code == "SUBGRAPHS_UNSUPPORTED" for i in res.issues)
+    # structurally intact: the node remains readable in the normalized document
+    assert res.normalized_document is not None
+    assert res.normalized_document.spec.nodes[0].id == "rsi_1"

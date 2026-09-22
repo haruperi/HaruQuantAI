@@ -193,3 +193,136 @@ def test_opaque_graph_document_wire_round_trip() -> None:
     wire_again = graph_document_to_wire(doc)
     assert wire_again["schema_version"] == 999
     assert wire_again["custom_future_field"] == "preserved"
+
+
+def test_wire_nesting_depth_bound_rejected() -> None:
+    from app.plugins.wire import MAX_WIRE_DEPTH
+
+    nested: list[object] = []
+    root = nested
+    for _ in range(MAX_WIRE_DEPTH + 1):
+        child: list[object] = []
+        nested.append(child)
+        nested = child
+    with pytest.raises(ValueError, match="nesting depth"):
+        value_from_wire(root)
+
+
+def test_wire_string_length_bound_rejected() -> None:
+    from app.plugins.wire import MAX_WIRE_STRING_LENGTH
+
+    with pytest.raises(ValueError, match="string length"):
+        value_from_wire("x" * (MAX_WIRE_STRING_LENGTH + 1))
+
+
+def test_wire_object_key_count_bound_rejected() -> None:
+    from app.plugins.wire import MAX_WIRE_OBJECT_KEYS
+
+    raw = {f"k{i}": i for i in range(MAX_WIRE_OBJECT_KEYS + 1)}
+    with pytest.raises(ValueError, match="key count"):
+        value_from_wire(raw)
+
+
+def test_wire_array_length_bound_rejected() -> None:
+    from app.plugins.wire import MAX_WIRE_ARRAY_ITEMS
+
+    with pytest.raises(ValueError, match="array length"):
+        value_from_wire([0] * (MAX_WIRE_ARRAY_ITEMS + 1))
+
+
+def test_malformed_missing_markers_rejected() -> None:
+    # non-bool marker
+    with pytest.raises(ValueError, match="Malformed missing marker"):
+        value_from_wire({"__missing__": "yes", "reason": "gap"})
+    # extra keys beyond the exact marker shape
+    with pytest.raises(ValueError, match="Malformed missing marker"):
+        value_from_wire({"__missing__": True, "reason": "gap", "x": 1})
+    # non-string reason
+    with pytest.raises(TypeError, match="reason must be a string"):
+        value_from_wire({"__missing__": True, "reason": 7})
+    # false marker degrades to a plain object; key collision must not be
+    # silently reinterpreted
+    with pytest.raises(ValueError, match="Malformed missing marker"):
+        value_from_wire({"__missing__": False})
+
+
+def test_valid_missing_marker_round_trip() -> None:
+    val = MissingValue("gap")
+    restored = value_from_wire(value_to_wire(val))
+    assert restored == val
+    bare = value_from_wire({"__missing__": True})
+    assert bare == MissingValue(reason="")
+
+
+def test_parse_strict_json_deep_nesting_raises_valueerror() -> None:
+    deep = "[" * 5000 + "]" * 5000
+    with pytest.raises(ValueError, match="nesting depth"):
+        parse_strict_json(deep)
+
+
+def test_subgraph_bearing_document_decode_refused_not_dropped() -> None:
+    ref = PluginRef(id="indicator.rsi", version=(1, 0, 0))
+    wire_data = {
+        "schema_version": 1,
+        "spec": {
+            "nodes": [
+                {
+                    "id": "rsi_1",
+                    "plugin_ref": ref.to_string(),
+                    "operation_id": "compute",
+                    "parameters": {},
+                }
+            ],
+            "edges": [],
+            "designated_roots": [],
+            "subgraphs": [{"schema_version": 1, "nodes": [], "edges": []}],
+        },
+        "metadata": {},
+    }
+    with pytest.raises(ValueError, match="subgraphs"):
+        graph_document_from_wire(wire_data)
+
+
+def test_subgraph_bearing_document_encode_refused_not_dropped() -> None:
+    ref = PluginRef(id="indicator.rsi", version=(1, 0, 0))
+    node = NodeSpec(id="rsi_1", plugin_ref=ref, operation_id="compute")
+    doc = GraphDocument(
+        spec=GraphSpec(
+            nodes=(node,),
+            subgraphs=(GraphSpec(nodes=(node,)),),
+        )
+    )
+    with pytest.raises(ValueError, match="subgraphs"):
+        graph_document_to_wire(doc)
+
+
+def test_optimization_distribution_wire_round_trip() -> None:
+    from app.plugins.schema import OptimizationDistribution, OptimizationDomain
+
+    spec = ParameterSpec(
+        key="period",
+        kind=ValueKind.INTEGER,
+        label="Period",
+        default=14,
+        optimization=OptimizationDomain(
+            min_value=2, max_value=100, distribution=OptimizationDistribution.NORMAL
+        ),
+    )
+    wire = parameter_spec_to_wire(spec)
+    assert wire["optimization"]["distribution"] == "normal"
+    restored = parameter_spec_from_wire(wire)
+    assert restored.optimization is not None
+    assert restored.optimization.distribution is OptimizationDistribution.NORMAL
+
+    with pytest.raises(ValueError, match="not a valid OptimizationDistribution"):
+        parameter_spec_from_wire(
+            {
+                "key": "period",
+                "kind": "integer",
+                "label": "Period",
+                "optimization": {
+                    "eligible": True,
+                    "distribution": "unknown_dist",
+                },
+            }
+        )

@@ -26,6 +26,9 @@ from app.plugins.lowering import (
     ValueRef,
 )
 from app.plugins.schema import (
+    MAX_COLLECTION_SIZE,
+    MAX_STRING_LENGTH,
+    MAX_VALUE_DEPTH,
     Alignment,
     EnumChoice,
     EnumConstraint,
@@ -34,6 +37,7 @@ from app.plugins.schema import (
     MissingValue,
     NumericalPolicy,
     NumericConstraint,
+    OptimizationDistribution,
     OptimizationDomain,
     OptimizationScale,
     ParameterSchema,
@@ -58,6 +62,10 @@ from app.plugins.spec import (
 )
 
 MAX_WIRE_BYTES = 10_000_000  # 10 MB maximum payload
+MAX_WIRE_DEPTH = MAX_VALUE_DEPTH
+MAX_WIRE_OBJECT_KEYS = MAX_COLLECTION_SIZE
+MAX_WIRE_ARRAY_ITEMS = MAX_COLLECTION_SIZE
+MAX_WIRE_STRING_LENGTH = MAX_STRING_LENGTH
 
 
 def _duplicate_key_pairs_hook(pairs: list[tuple[str, Any]]) -> dict[str, Any]:
@@ -92,11 +100,35 @@ def parse_strict_json(raw_json: str | bytes) -> Any:
     else:
         raise TypeError(f"Expected str or bytes, got {type(raw_json).__name__}")
 
-    return json.loads(
-        text,
-        object_pairs_hook=_duplicate_key_pairs_hook,
-        parse_constant=_reject_nan_inf,
-    )
+    try:
+        parsed = json.loads(
+            text,
+            object_pairs_hook=_duplicate_key_pairs_hook,
+            parse_constant=_reject_nan_inf,
+        )
+    except RecursionError as err:
+        raise ValueError(
+            f"JSON nesting depth exceeds limit of {MAX_WIRE_DEPTH}"
+        ) from err
+    try:
+        _check_parsed_depth(parsed, 0)
+    except RecursionError as err:
+        raise ValueError(
+            f"JSON nesting depth exceeds limit of {MAX_WIRE_DEPTH}"
+        ) from err
+    return parsed
+
+
+def _check_parsed_depth(node: Any, depth: int) -> None:
+    """Walk a parsed JSON structure, rejecting nesting beyond the bound."""
+    if depth > MAX_WIRE_DEPTH:
+        raise ValueError(f"JSON nesting depth exceeds limit of {MAX_WIRE_DEPTH}")
+    if isinstance(node, dict):
+        for val in node.values():
+            _check_parsed_depth(val, depth + 1)
+    elif isinstance(node, list):
+        for item in node:
+            _check_parsed_depth(item, depth + 1)
 
 
 def to_canonical_json_bytes(data: Any) -> bytes:
@@ -134,23 +166,64 @@ def value_to_wire(val: Value) -> Any:
     raise TypeError(f"Unsupported value type for wire projection: {type(val).__name__}")
 
 
-def value_from_wire(raw: Any) -> Value:
-    """Reconstruct an immutable Value from decoded JSON primitives."""
+def value_from_wire(raw: Any, depth: int = 0) -> Value:
+    """Reconstruct an immutable Value from decoded JSON primitives.
+
+    Enforces nesting-depth, object-key-count, array-length, and string-length
+    bounds, and strictly validates explicit missing markers.
+    """
+    if depth > MAX_WIRE_DEPTH:
+        raise ValueError(f"Wire nesting depth exceeds limit of {MAX_WIRE_DEPTH}")
+    if isinstance(raw, dict):
+        if len(raw) > MAX_WIRE_OBJECT_KEYS:
+            raise ValueError(
+                f"Wire object key count {len(raw)} exceeds max {MAX_WIRE_OBJECT_KEYS}"
+            )
+        if "__missing__" in raw:
+            return _missing_value_from_wire(raw)
+        pairs = [(k, value_from_wire(v, depth + 1)) for k, v in raw.items()]
+        pairs.sort(key=lambda p: p[0])
+        return FrozenObject(tuple(pairs))
+    if isinstance(raw, list):
+        if len(raw) > MAX_WIRE_ARRAY_ITEMS:
+            raise ValueError(
+                f"Wire array length {len(raw)} exceeds max {MAX_WIRE_ARRAY_ITEMS}"
+            )
+        return FrozenArray(tuple(value_from_wire(item, depth + 1) for item in raw))
+    return _scalar_from_wire(raw)
+
+
+def _scalar_from_wire(raw: Any) -> Value:
+    """Decode a bounded scalar, rejecting non-finite floats and long strings."""
     if raw is None or isinstance(raw, (bool, int, str)):
+        if isinstance(raw, str) and len(raw) > MAX_WIRE_STRING_LENGTH:
+            raise ValueError(
+                f"Wire string length {len(raw)} exceeds max {MAX_WIRE_STRING_LENGTH}"
+            )
         return raw
     if isinstance(raw, float):
         if not math.isfinite(raw):
             raise ValueError("Non-finite float rejected from wire")
         return raw
-    if isinstance(raw, dict):
-        if raw.get("__missing__") is True:
-            return MissingValue(reason=str(raw.get("reason", "")))
-        pairs = [(k, value_from_wire(v)) for k, v in raw.items()]
-        pairs.sort(key=lambda p: p[0])
-        return FrozenObject(tuple(pairs))
-    if isinstance(raw, list):
-        return FrozenArray(tuple(value_from_wire(item) for item in raw))
     raise TypeError(f"Unsupported wire structure: {type(raw).__name__}")
+
+
+def _missing_value_from_wire(raw: dict[str, Any]) -> MissingValue:
+    """Decode an explicit missing marker, rejecting any malformed shape."""
+    extra = set(raw) - {"__missing__", "reason"}
+    if extra or raw["__missing__"] is not True:
+        raise ValueError(
+            "Malformed missing marker: expected exactly "
+            '{"__missing__": true} with optional bounded string "reason"'
+        )
+    reason = raw.get("reason", "")
+    if not isinstance(reason, str):
+        raise TypeError("Malformed missing marker: reason must be a string")
+    if len(reason) > MAX_WIRE_STRING_LENGTH:
+        raise ValueError(
+            f"Missing marker reason exceeds max length {MAX_WIRE_STRING_LENGTH}"
+        )
+    return MissingValue(reason=reason)
 
 
 # ---------------------------------------------------------------------------
@@ -200,6 +273,7 @@ def parameter_spec_to_wire(spec: ParameterSpec) -> dict[str, Any]:
             "max_value": spec.optimization.max_value,
             "step": spec.optimization.step,
             "scale": spec.optimization.scale.value,
+            "distribution": spec.optimization.distribution.value,
         }
     if spec.presentation is not None:
         result["presentation"] = {
@@ -251,6 +325,7 @@ def parameter_spec_from_wire(data: dict[str, Any]) -> ParameterSpec:
             max_value=odata.get("max_value"),
             step=odata.get("step"),
             scale=OptimizationScale(odata.get("scale", "linear")),
+            distribution=OptimizationDistribution(odata.get("distribution", "uniform")),
         )
 
     presentation: PresentationHint | None = None
@@ -506,6 +581,11 @@ def graph_document_to_wire(doc: GraphDocument | OpaqueGraphDocument) -> dict[str
         return doc.raw_data.to_dict()
 
     spec = doc.spec
+    if spec.subgraphs:
+        raise ValueError(
+            "Graph schema version 1 cannot losslessly encode nested subgraphs; "
+            f"refusing to drop {len(spec.subgraphs)} subgraph(s)"
+        )
     nodes_wire: list[dict[str, Any]] = []
     for node in spec.nodes:
         node_dict: dict[str, Any] = {
@@ -555,6 +635,11 @@ def graph_document_from_wire(
         )
 
     spec_data = data.get("spec", {})
+    if spec_data.get("subgraphs"):
+        raise ValueError(
+            "Graph schema version 1 does not support nested subgraphs; "
+            "document rejected instead of silently dropping them"
+        )
     nodes: list[NodeSpec] = []
     for n in spec_data.get("nodes", []):
         params_val = value_from_wire(n.get("parameters", {}))
