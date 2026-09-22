@@ -19,8 +19,11 @@ import { BusinessWorkspace } from '../workspace/Business/BusinessWorkspace';
 import { TradingDashboard } from '../workspace/Trading/TradingDashboard';
 import { NeuralNetworkTrainer } from '../workspace/NeuralNetwork/NeuralNetworkTrainer';
 import { MTAnalyzerWorkspace } from '../workspace/MTAnalyzer/MTAnalyzerWorkspace';
+import { DebugConsoleWorkspace } from '../workspace/DebugConsole/DebugConsoleWorkspace';
+import { GridControlWorkspace } from '../workspace/GridControl/GridControlWorkspace';
+import { GridTestWorkspace } from '../workspace/GridTest/GridTestWorkspace';
 import { GlobalSettingsMenu } from './GlobalSettingsMenu';
-import { DebugConsole, GridControl, HeaderApplicationActions } from './HeaderApplications';
+import { HeaderApplicationActions } from './HeaderApplications';
 
 const nav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined; group?: string }[] = [
   { id: 'home', label: 'HaruQuantAI', icon: ChartNoAxesCombined },
@@ -110,8 +113,9 @@ export function App() {
             <Route path="/portfolio" element={<PortfolioMasterWorkspace />} />
             <Route path="/composer" element={<PortfolioComposerWorkspace />} />
             <Route path="/trading" element={<TradingDashboard />} />
-            <Route path="/debugconsole" element={<DebugConsole />} />
-            <Route path="/gridcontrol" element={<GridControl />} />
+            <Route path="/debugconsole" element={<DebugConsoleWorkspace />} />
+            <Route path="/gridcontrol" element={<GridControlWorkspace />} />
+            <Route path="/gridtest" element={<GridTestWorkspace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </div>

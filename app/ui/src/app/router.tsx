@@ -20,6 +20,7 @@ export const MODULE_ROUTES: Record<ModuleId, string> = {
   trading: '/trading',
   debugconsole: '/debugconsole',
   gridcontrol: '/gridcontrol',
+  gridtest: '/gridtest',
 };
 
 const TAB_CAPABLE_MODULES: ModuleId[] = ['builder', 'retester', 'optimizer', 'projects'];

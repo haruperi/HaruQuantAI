@@ -8,7 +8,7 @@ describe('HaruQuantAI React Router & Path Routing', () => {
     useAppStore.getState().reset();
   });
 
-  it('maps all 16 workspaces and utility modules to canonical URL paths', () => {
+  it('maps all 17 workspaces and utility modules to canonical URL paths', () => {
     const expectedModules: ModuleId[] = [
       'home',
       'datamanager',
@@ -26,6 +26,7 @@ describe('HaruQuantAI React Router & Path Routing', () => {
       'trading',
       'debugconsole',
       'gridcontrol',
+      'gridtest',
     ];
 
     expectedModules.forEach((mod) => {
@@ -54,6 +55,7 @@ describe('HaruQuantAI React Router & Path Routing', () => {
     expect(getModuleFromPath('/projects')).toBe('projects');
     expect(getModuleFromPath('/debugconsole')).toBe('debugconsole');
     expect(getModuleFromPath('/gridcontrol')).toBe('gridcontrol');
+    expect(getModuleFromPath('/gridtest')).toBe('gridtest');
 
     // Unknown or invalid routes return null
     expect(getModuleFromPath('/unknown-path-123')).toBeNull();

@@ -14,7 +14,8 @@ export type ModuleId =
   | 'neuralnet'
   | 'mtanalyzer'
   | 'debugconsole'
-  | 'gridcontrol';
+  | 'gridcontrol'
+  | 'gridtest';
 
 export type ProjectTab = 'progress' | 'settings' | 'results';
 export type JobStatus = 'idle' | 'queued' | 'running' | 'paused' | 'cancelled' | 'failed' | 'completed';
