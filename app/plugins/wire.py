@@ -52,6 +52,9 @@ from app.plugins.spec import (
     CatalogView,
     OperationSpec,
     PluginRef,
+    WorkspaceCommand,
+    WorkspaceSpec,
+    WorkspaceView,
 )
 
 MAX_WIRE_BYTES = 10_000_000  # 10 MB maximum payload
@@ -367,13 +370,80 @@ def operation_spec_from_wire(data: dict[str, Any]) -> OperationSpec:
 
 
 # ---------------------------------------------------------------------------
+# Workspace Projections
+# ---------------------------------------------------------------------------
+
+
+def workspace_command_to_wire(cmd: WorkspaceCommand) -> dict[str, Any]:
+    """Project WorkspaceCommand to wire dictionary."""
+    return {
+        "command_id": cmd.command_id,
+        "title": cmd.title,
+        "description": cmd.description,
+    }
+
+
+def workspace_command_from_wire(data: dict[str, Any]) -> WorkspaceCommand:
+    """Decode WorkspaceCommand from wire dictionary."""
+    return WorkspaceCommand(
+        command_id=data["command_id"],
+        title=data["title"],
+        description=data.get("description", ""),
+    )
+
+
+def workspace_view_to_wire(view: WorkspaceView) -> dict[str, Any]:
+    """Project WorkspaceView to wire dictionary."""
+    return {
+        "view_id": view.view_id,
+        "title": view.title,
+        "component": view.component,
+    }
+
+
+def workspace_view_from_wire(data: dict[str, Any]) -> WorkspaceView:
+    """Decode WorkspaceView from wire dictionary."""
+    return WorkspaceView(
+        view_id=data["view_id"],
+        title=data["title"],
+        component=data["component"],
+    )
+
+
+def workspace_spec_to_wire(spec: WorkspaceSpec) -> dict[str, Any]:
+    """Project WorkspaceSpec to wire dictionary."""
+    return {
+        "ref": spec.ref.to_string(),
+        "title": spec.title,
+        "description": spec.description,
+        "commands": [workspace_command_to_wire(c) for c in spec.commands],
+        "views": [workspace_view_to_wire(v) for v in spec.views],
+        "accepted_kinds": list(spec.accepted_kinds),
+    }
+
+
+def workspace_spec_from_wire(data: dict[str, Any]) -> WorkspaceSpec:
+    """Decode WorkspaceSpec from wire dictionary."""
+    return WorkspaceSpec(
+        ref=PluginRef.parse(data["ref"]),
+        title=data["title"],
+        description=data.get("description", ""),
+        commands=tuple(
+            workspace_command_from_wire(c) for c in data.get("commands", [])
+        ),
+        views=tuple(workspace_view_from_wire(v) for v in data.get("views", [])),
+        accepted_kinds=tuple(data.get("accepted_kinds", [])),
+    )
+
+
+# ---------------------------------------------------------------------------
 # Catalog View Projections
 # ---------------------------------------------------------------------------
 
 
 def catalog_entry_view_to_wire(entry: CatalogEntryView) -> dict[str, Any]:
     """Project CatalogEntryView to wire dictionary."""
-    return {
+    result: dict[str, Any] = {
         "ref": entry.ref.to_string(),
         "kind": entry.kind,
         "title": entry.title,
@@ -381,6 +451,9 @@ def catalog_entry_view_to_wire(entry: CatalogEntryView) -> dict[str, Any]:
         "metamodel_major": entry.metamodel_major,
         "operations": [operation_spec_to_wire(op) for op in entry.operations],
     }
+    if entry.workspace is not None:
+        result["workspace"] = workspace_spec_to_wire(entry.workspace)
+    return result
 
 
 def catalog_entry_view_from_wire(data: dict[str, Any]) -> CatalogEntryView:
@@ -389,6 +462,11 @@ def catalog_entry_view_from_wire(data: dict[str, Any]) -> CatalogEntryView:
     operations = tuple(
         operation_spec_from_wire(op) for op in data.get("operations", [])
     )
+    workspace = (
+        workspace_spec_from_wire(data["workspace"])
+        if "workspace" in data and data["workspace"] is not None
+        else None
+    )
     return CatalogEntryView(
         ref=ref,
         kind=data["kind"],
@@ -396,6 +474,7 @@ def catalog_entry_view_from_wire(data: dict[str, Any]) -> CatalogEntryView:
         description=data.get("description", ""),
         metamodel_major=data.get("metamodel_major", 1),
         operations=operations,
+        workspace=workspace,
     )
 
 

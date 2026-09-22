@@ -208,50 +208,6 @@ class OperationContribution:
 
 
 @dataclass(frozen=True, slots=True)
-class PluginSpec:
-    """Introspectable descriptor for a quantitative plugin."""
-
-    ref: PluginRef
-    kind: str
-    title: str
-    description: str = ""
-    metamodel_major: int = CURRENT_METAMODEL_MAJOR
-    operations: tuple[OperationSpec, ...] = ()
-
-    def __post_init__(self) -> None:
-        """Validate plugin specification."""
-        if not isinstance(self.ref, PluginRef):
-            raise TypeError("PluginSpec ref must be a PluginRef")
-        validate_identifier(self.kind, "PluginSpec kind")
-        if not isinstance(self.title, str) or not self.title:
-            raise ValueError("PluginSpec title must be a non-empty string")
-        if not isinstance(self.description, str):
-            raise TypeError("PluginSpec description must be a string")
-        if not isinstance(self.metamodel_major, int) or self.metamodel_major < 1:
-            raise ValueError("PluginSpec metamodel_major must be an integer >= 1")
-        if not isinstance(self.operations, tuple):
-            raise TypeError("PluginSpec operations must be a tuple of OperationSpec")
-        seen_ops: set[str] = set()
-        for op in self.operations:
-            if not isinstance(op, OperationSpec):
-                raise TypeError(
-                    "PluginSpec operations must contain OperationSpec instances"
-                )
-            if op.operation_id in seen_ops:
-                raise ValueError(
-                    f"Duplicate operation_id in PluginSpec: {op.operation_id!r}"
-                )
-            seen_ops.add(op.operation_id)
-
-    def get_operation(self, operation_id: str) -> OperationSpec | None:
-        """Find an operation spec by operation_id."""
-        for op in self.operations:
-            if op.operation_id == operation_id:
-                return op
-        return None
-
-
-@dataclass(frozen=True, slots=True)
 class WorkspaceCommand:
     """Declared command exposed by a workspace plugin."""
 
@@ -309,6 +265,53 @@ class WorkspaceSpec:
 
 
 @dataclass(frozen=True, slots=True)
+class PluginSpec:
+    """Introspectable descriptor for a quantitative plugin."""
+
+    ref: PluginRef
+    kind: str
+    title: str
+    description: str = ""
+    metamodel_major: int = CURRENT_METAMODEL_MAJOR
+    operations: tuple[OperationSpec, ...] = ()
+    workspace: WorkspaceSpec | None = None
+
+    def __post_init__(self) -> None:
+        """Validate plugin specification."""
+        if not isinstance(self.ref, PluginRef):
+            raise TypeError("PluginSpec ref must be a PluginRef")
+        validate_identifier(self.kind, "PluginSpec kind")
+        if not isinstance(self.title, str) or not self.title:
+            raise ValueError("PluginSpec title must be a non-empty string")
+        if not isinstance(self.description, str):
+            raise TypeError("PluginSpec description must be a string")
+        if not isinstance(self.metamodel_major, int) or self.metamodel_major < 1:
+            raise ValueError("PluginSpec metamodel_major must be an integer >= 1")
+        if not isinstance(self.operations, tuple):
+            raise TypeError("PluginSpec operations must be a tuple of OperationSpec")
+        seen_ops: set[str] = set()
+        for op in self.operations:
+            if not isinstance(op, OperationSpec):
+                raise TypeError(
+                    "PluginSpec operations must contain OperationSpec instances"
+                )
+            if op.operation_id in seen_ops:
+                raise ValueError(
+                    f"Duplicate operation_id in PluginSpec: {op.operation_id!r}"
+                )
+            seen_ops.add(op.operation_id)
+        if self.workspace is not None and not isinstance(self.workspace, WorkspaceSpec):
+            raise TypeError("PluginSpec workspace must be a WorkspaceSpec")
+
+    def get_operation(self, operation_id: str) -> OperationSpec | None:
+        """Find an operation spec by operation_id."""
+        for op in self.operations:
+            if op.operation_id == operation_id:
+                return op
+        return None
+
+
+@dataclass(frozen=True, slots=True)
 class PluginContribution:
     """Side-effect-free return value of a plugin's zero-argument factory."""
 
@@ -361,6 +364,7 @@ class CatalogEntryView:
     description: str = ""
     metamodel_major: int = CURRENT_METAMODEL_MAJOR
     operations: tuple[OperationSpec, ...] = ()
+    workspace: WorkspaceSpec | None = None
 
     def __post_init__(self) -> None:
         """Validate wire-safe entry view."""
@@ -378,6 +382,8 @@ class CatalogEntryView:
         for op in self.operations:
             if not isinstance(op, OperationSpec):
                 raise TypeError("CatalogEntryView operations must be OperationSpec")
+        if self.workspace is not None and not isinstance(self.workspace, WorkspaceSpec):
+            raise TypeError("CatalogEntryView workspace must be a WorkspaceSpec")
 
     @classmethod
     def from_spec(cls, spec: PluginSpec) -> CatalogEntryView:
@@ -389,6 +395,7 @@ class CatalogEntryView:
             description=spec.description,
             metamodel_major=spec.metamodel_major,
             operations=spec.operations,
+            workspace=spec.workspace,
         )
 
 

@@ -220,3 +220,22 @@ def test_concrete_plugin_shared_metamodel_import_is_allowed(tmp_path: Path) -> N
 
     assert "ARCH-014-PLUGIN-DAG" not in _rules(check_file(source))
     assert "ARCH-013-PLUGIN-PURITY" not in _rules(check_file(source))
+
+
+def test_gateway_top_level_server_imports_are_rejected(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "host" / "gateway.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("import starlette\n", encoding="utf-8")
+
+    assert "ARCH-015-GATEWAY-LAZY-IMPORTS" in _rules(check_file(source))
+
+
+def test_gateway_lazy_server_imports_are_allowed(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "host" / "gateway.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "def create_app():\n    import starlette.applications\n    return None\n",
+        encoding="utf-8",
+    )
+
+    assert "ARCH-015-GATEWAY-LAZY-IMPORTS" not in _rules(check_file(source))

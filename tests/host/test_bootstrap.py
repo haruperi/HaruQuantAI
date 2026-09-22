@@ -80,3 +80,30 @@ def test_invalid_host_bounds_fail_at_explicit_construction(
             telemetry_max_subscribers=subscribers,
             diagnostic_capacity=diagnostics,
         )
+
+
+def test_approved_catalog_roots_includes_workspaces() -> None:
+    from app.host.bootstrap import approved_catalog_roots
+
+    roots = approved_catalog_roots()
+    families = {r.logical_family for r in roots}
+    assert "indicators" in families
+    assert "comparisons" in families
+    assert "exporters" in families
+    assert "workspaces" in families
+
+
+def test_create_runtime_with_gateway() -> None:
+    from app.host.gateway import HOST_GATEWAY, GatewayConfig
+
+    async def scenario() -> None:
+        runtime = create_runtime(
+            gateway_config=GatewayConfig(port=0),
+            gateway_auto_start=False,
+        )
+        async with runtime:
+            assert "host.gateway" in runtime.active_features
+            gw = runtime.require(HOST_GATEWAY)
+            assert gw.config.port == 0
+
+    asyncio.run(scenario())

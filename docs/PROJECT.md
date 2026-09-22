@@ -57,10 +57,10 @@ renderer vocabulary, a new backend plugin requires no frontend source edit.
 | Area | State | Current truth |
 |---|---|---|
 | Kernel | S1 implemented | Standard-library typed capabilities, required-edge lifecycle, restricted scopes, transactional startup, and reverse cleanup |
-| UI | Retained prototype | React/TypeScript workstation using frontend mocks and browser-local state |
-| Backend host | S2 foundation | Composition root composing HOST_TELEMETRY and HOST_CATALOG owners; execution, gateway, persistence, jobs, workers, and integrations remain future stages |
+| UI | S4 implemented | React/TypeScript workstation connected via generated wire contracts, HaruApiClient, and generic schema controls |
+| Backend host | S4 foundation | Composition root composing HOST_TELEMETRY, HOST_CATALOG, HOST_EXECUTION, and HOST_GATEWAY owners; persistence, jobs, workers, and integrations remain future stages |
 | Plugin SDK/catalog | S2 implemented | Shared metamodel (`schema`, `lowering`, `spec`, `algebra`, `wire`) and host filesystem catalog provider (`HOST_CATALOG`) |
-| Quantitative plugins | Missing | No production indicators, rules, metrics, tasks, or exporters |
+| Quantitative plugins | S3/S4 implemented | Production indicator (`rsi`), comparison (`greater_than`), exporter (`python`), and workspaces (`builder`, `results`) |
 | Algebra AST | S2 implemented | Versioned algebraic GraphSpec, GraphDocument, Kahn's cycle detection, and catalog validation (`validate_graph`) |
 
 ## 4. Ratified architecture and implementation sequence
@@ -90,7 +90,7 @@ The ratified stages and current evidence status are:
 | S1 Kernel | Implemented | Restrict slots, canonicalize ordering, correct lifecycle and event/logging ownership | Failure/cancellation cleanup, provider lifetime, ordering, import purity, and observer-isolation tests |
 | S2 Plugin vocabulary/catalog | Implemented | Define exact schema, graph, wire, operation APIs and discovery | Validation, unknown-node round trips, immutable snapshots, and pre-import exclusions |
 | S3 Execution slice | Implemented | Cohesive RSI and comparison; generic execution with supported optimization/export | Numerical goldens, lowering parity, independent indicator/comparison add/remove proof |
-| S4 UI/workspaces | Pending | Generic catalog/schema/graph client and workspace declarations for the proven slice | Shared schema/document, unavailable placeholders, and two-workspace selection/removal |
+| S4 UI/workspaces | Implemented | Generic catalog/schema/graph client and workspace declarations for the proven slice | Shared schema/document, unavailable placeholders, and two-workspace selection/removal |
 | S5 Durable infrastructure | Pending | Jobs, isolated persistence/artifacts, workers and budgets | Recovery, cancellation, resource lifetime, and process-boundary tests |
 | S6 Integrations/families | Pending | Additional algorithms, data sources, brokers, and tasks | Family-specific semantics/effect evidence and separate live-trading authorization |
 

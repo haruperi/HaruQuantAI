@@ -13,6 +13,7 @@ def main() -> int:
         ["ruff", "format", "--check", "."],
         ["mypy"],
         ["scripts.architecture_check"],
+        ["scripts.generate_ui_contracts", "--check"],
         [
             "pytest",
             "tests",
@@ -23,6 +24,7 @@ def main() -> int:
         ["tests.examples.telemetry_usage"],
         ["tests.examples.catalog_usage"],
         ["tests.examples.slice_usage"],
+        ["tests.examples.gateway_usage"],
     ]
     for command in commands:
         result = subprocess.run([sys.executable, "-m", *command], cwd=root, check=False)

@@ -21,7 +21,14 @@ CURRENT_KERNEL_FILES = frozenset(
     {"__init__.py", "bootstrapper.py", "capability.py", "context.py", "feature.py"}
 )
 CURRENT_HOST_FILES = frozenset(
-    {"__init__.py", "bootstrap.py", "catalog.py", "execution.py", "telemetry.py"}
+    {
+        "__init__.py",
+        "bootstrap.py",
+        "catalog.py",
+        "execution.py",
+        "gateway.py",
+        "telemetry.py",
+    }
 )
 CURRENT_PLUGINS_FILES = frozenset(
     {
@@ -37,6 +44,7 @@ CURRENT_PLUGIN_FAMILIES: dict[str, frozenset[str]] = {
     "indicators": frozenset({"__init__.py", "rsi.py"}),
     "comparisons": frozenset({"__init__.py", "greater_than.py"}),
     "exporters": frozenset({"__init__.py", "python.py"}),
+    "workspaces": frozenset({"__init__.py", "builder.py", "results.py"}),
 }
 _SHARED_METAMODEL_PREFIXES = (
     "app.plugins.schema",
@@ -133,9 +141,13 @@ class ArchitecturalVisitor(ast.NodeVisitor):
         """Initialize the visitor for one source file."""
         self.file_path = file_path
         parts = _app_parts(file_path)
+        self._depth = 0
         self._is_kernel = len(parts) > 1 and parts[1] == "kernel"
         self._is_host_bootstrap = (
             len(parts) == 3 and parts[1] == "host" and parts[2] == "bootstrap.py"
+        )
+        self._is_gateway = (
+            len(parts) == 3 and parts[1] == "host" and parts[2] == "gateway.py"
         )
         self._is_host_owner = len(parts) > 2 and parts[1] == "host"
         self._is_plugins = len(parts) > 1 and parts[1] == "plugins"
@@ -234,6 +246,41 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             )
         if self._is_plugins:
             self._check_plugins_import(target, line_number)
+        if (
+            self._is_gateway
+            and self._depth == 0
+            and target.startswith(("starlette", "uvicorn"))
+        ):
+            self.violations.append(
+                ArchitecturalViolation(
+                    self.file_path,
+                    line_number,
+                    "ARCH-015-GATEWAY-LAZY-IMPORTS",
+                    "Gateway must not import optional server dependencies at "
+                    f"module level: {target}",
+                )
+            )
+
+    @override
+    def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
+        """Track nesting depth across function bodies."""
+        self._depth += 1
+        self.generic_visit(node)
+        self._depth -= 1
+
+    @override
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        """Track nesting depth across async function bodies."""
+        self._depth += 1
+        self.generic_visit(node)
+        self._depth -= 1
+
+    @override
+    def visit_ClassDef(self, node: ast.ClassDef) -> None:
+        """Track nesting depth across class definitions."""
+        self._depth += 1
+        self.generic_visit(node)
+        self._depth -= 1
 
     @override
     def visit_Import(self, node: ast.Import) -> None:

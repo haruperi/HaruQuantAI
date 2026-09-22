@@ -16,7 +16,7 @@ def test_s2_application_roots_are_exact() -> None:
     assert names == {"__init__.py", "host", "kernel", "plugins", "ui"}
 
 
-def test_s3_python_owner_files_are_exact() -> None:
+def test_s4_python_owner_files_are_exact() -> None:
     assert {path.name for path in (APP / "kernel").glob("*.py")} == {
         "__init__.py",
         "bootstrapper.py",
@@ -29,6 +29,7 @@ def test_s3_python_owner_files_are_exact() -> None:
         "bootstrap.py",
         "catalog.py",
         "execution.py",
+        "gateway.py",
         "telemetry.py",
     }
     assert {path.name for path in (APP / "plugins").glob("*.py")} == {
@@ -50,6 +51,11 @@ def test_s3_python_owner_files_are_exact() -> None:
     assert {path.name for path in (APP / "plugins" / "exporters").glob("*.py")} == {
         "__init__.py",
         "python.py",
+    }
+    assert {path.name for path in (APP / "plugins" / "workspaces").glob("*.py")} == {
+        "__init__.py",
+        "builder.py",
+        "results.py",
     }
 
 
@@ -132,7 +138,7 @@ def test_concrete_plugins_isolation() -> None:
         "app.plugins.algebra",
         "app.plugins.wire",
     )
-    for family in ("indicators", "comparisons", "exporters"):
+    for family in ("indicators", "comparisons", "exporters", "workspaces"):
         for path in (APP / "plugins" / family).glob("*.py"):
             if path.name == "__init__.py":
                 continue
