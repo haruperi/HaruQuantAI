@@ -230,3 +230,59 @@ def test_rsi_lowering() -> None:
     res_bad = op.lower(bad_ctx, params)
     assert not res_bad.success
     assert any(i.code == "UNSUPPORTED_TARGET" for i in res_bad.issues)
+
+
+SCALAR_GOLDENS: tuple[tuple[str, tuple[Any, ...], int], ...] = (
+    ("empty", (), 3),
+    ("single", (10.0,), 3),
+    ("shorter", (10.0, 11.0, 12.0), 3),
+    ("mixed", (10.0, 12.0, 11.0, 13.0, 10.0, 14.0), 3),
+    ("flat", (10.0, 10.0, 10.0, 10.0, 10.0, 10.0, 10.0), 3),
+    ("rising", (10.0, 11.0, 12.0, 13.0, 14.0, 15.0), 4),
+    ("falling", (15.0, 14.0, 13.0, 12.0, 11.0), 2),
+    (
+        "gap_reseed",
+        (10.0, 11.0, 12.0, 13.0, None, 12.0, 13.0, 14.0, 15.0, 16.0),
+        3,
+    ),
+)
+
+
+@pytest.mark.parametrize("name,series,period", SCALAR_GOLDENS)
+def test_scalar_reference_matches_vector_implementation(
+    name: str, series: tuple[Any, ...], period: int
+) -> None:
+    from app.plugins.indicators.rsi import (
+        scalar_reference_rsi,
+    )
+
+    scalar = scalar_reference_rsi(series, period)
+
+    op = RsiOperation()
+    from app.plugins.schema import FrozenObject
+
+    out = op.execute(
+        {"values": series},
+        FrozenObject.from_mapping({"period": period}),
+        _MockBindings(),
+    )
+    vector = out["rsi"]
+
+    assert len(scalar) == len(vector) == len(series)
+    for s_v, v_v in zip(scalar, vector, strict=True):
+        if isinstance(v_v, MissingValue):
+            assert isinstance(s_v, MissingValue)
+            assert s_v == v_v
+        else:
+            assert s_v == pytest.approx(v_v, rel=1e-12)
+
+
+def test_scalar_reference_rejects_invalid_period_and_inputs() -> None:
+    from app.plugins.indicators.rsi import ScalarRsiReference
+
+    with pytest.raises(ValueError, match="period"):
+        ScalarRsiReference(1)
+    with pytest.raises(TypeError, match="numeric"):
+        ScalarRsiReference(3).step(True)
+    with pytest.raises(ValueError, match="Non-finite"):
+        ScalarRsiReference(3).step(float("nan"))

@@ -54,6 +54,8 @@ from app.plugins.spec import (
 PLUGIN_REF = PluginRef(id="indicator.rsi", version=(1, 0, 0))
 OPERATION_ID = "compute"
 TARGET_PYTHON = LoweringTarget(target_id="python", version=(1, 0, 0))
+MIN_PERIOD = 2
+MAX_PERIOD = 1000
 
 PARAMETER_PERIOD = ParameterSpec(
     key="period",
@@ -62,7 +64,7 @@ PARAMETER_PERIOD = ParameterSpec(
     description="Lookback period for Wilder smoothing",
     required=True,
     default=14,
-    constraint=NumericConstraint(min_value=2, max_value=1000),
+    constraint=NumericConstraint(min_value=MIN_PERIOD, max_value=MAX_PERIOD),
     optimization=OptimizationDomain(
         eligible=True,
         min_value=2,
@@ -164,6 +166,85 @@ def _compute_rsi_values(
             outputs.append(rsi)
 
     return tuple(outputs)
+
+
+class ScalarRsiReference:
+    """Scalar (one-sample-at-a-time) reference RSI implementation.
+
+    Owns the same numerical semantics as the vector implementation in this
+    file: explicit missing samples reset the seed, warm-up needs ``period``
+    consecutive finite deltas, Wilder smoothing thereafter, and the 50/100/0
+    degenerate rules. Used as an independent cross-check in tests; not wired
+    into the host execution path.
+    """
+
+    def __init__(self, period: int) -> None:
+        """Initialize scalar reference with a validated period."""
+        if not isinstance(period, int) or not (MIN_PERIOD <= period <= MAX_PERIOD):
+            raise ValueError(
+                f"period must be an integer in [{MIN_PERIOD}, {MAX_PERIOD}], "
+                f"got {period!r}"
+            )
+        self._period = period
+        self._prev: float | None = None
+        self._seed: list[tuple[float, float]] = []
+        self._avg_gain: float | None = None
+        self._avg_loss: float | None = None
+
+    def step(self, sample: float | MissingValue | None) -> float | MissingValue:
+        """Consume one sample and return the RSI value at that index."""
+        if sample is None or isinstance(sample, MissingValue):
+            self._prev = None
+            self._seed.clear()
+            self._avg_gain = None
+            self._avg_loss = None
+            return MissingValue(reason="GAP")
+        if not isinstance(sample, (int, float)) or isinstance(sample, bool):
+            raise TypeError(f"Sample must be numeric, got {type(sample).__name__}")
+        if not math.isfinite(sample):
+            raise ValueError(f"Non-finite sample {sample!r} rejected")
+
+        current = float(sample)
+        if self._prev is None:
+            self._prev = current
+            return MissingValue(reason="WARMUP")
+
+        delta = current - self._prev
+        gain = max(delta, 0.0)
+        loss = max(-delta, 0.0)
+        self._prev = current
+
+        if self._avg_gain is None or self._avg_loss is None:
+            self._seed.append((gain, loss))
+            if len(self._seed) < self._period:
+                return MissingValue(reason="WARMUP")
+            self._avg_gain = sum(g for g, _ in self._seed) / self._period
+            self._avg_loss = sum(loss_v for _, loss_v in self._seed) / self._period
+        else:
+            self._avg_gain = (self._avg_gain * (self._period - 1) + gain) / self._period
+            self._avg_loss = (self._avg_loss * (self._period - 1) + loss) / self._period
+
+        return _rsi_from_averages(self._avg_gain, self._avg_loss)
+
+
+def _rsi_from_averages(avg_gain: float, avg_loss: float) -> float:
+    """Apply the 50/100/0 degenerate rules and the standard RSI formula."""
+    if avg_gain == 0.0 and avg_loss == 0.0:
+        return 50.0
+    if avg_loss == 0.0:
+        return 100.0
+    if avg_gain == 0.0:
+        return 0.0
+    rs = avg_gain / avg_loss
+    return 100.0 - 100.0 / (1.0 + rs)
+
+
+def scalar_reference_rsi(
+    raw_series: Sequence[Any], period: int
+) -> tuple[float | MissingValue, ...]:
+    """Run the scalar reference over a whole series, one sample per step."""
+    ref = ScalarRsiReference(period)
+    return tuple(ref.step(s) for s in raw_series)
 
 
 class RsiOperation(OperationImplementation):

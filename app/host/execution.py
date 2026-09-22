@@ -72,6 +72,42 @@ class ExecutionValidationError(ExecutionError):
     """Raised when a graph or request fails validation."""
 
 
+class CancellationToken:
+    """Runtime-only caller cancellation control for execution requests.
+
+    A mutable host-owned object by design: the caller cancels it from outside
+    while an execution is in flight. It is never part of any wire value or
+    persisted record.
+    """
+
+    def __init__(self) -> None:
+        self._cancelled = False
+
+    @property
+    def cancelled(self) -> bool:
+        """Whether cancellation has been requested."""
+        return self._cancelled
+
+    def cancel(self) -> None:
+        """Request cancellation of any in-flight execution sharing this token."""
+        self._cancelled = True
+
+    def raise_if_cancelled(self) -> None:
+        """Raise ExecutionCancellationError if cancellation was requested."""
+        if self._cancelled:
+            raise ExecutionCancellationError(
+                "Execution cancelled by caller cancellation token"
+            )
+
+
+def _cancellation_issue() -> ValidationIssue:
+    return ValidationIssue(
+        path="execution",
+        code="EXECUTION_CANCELLED",
+        message="Execution was cancelled by the caller before completion",
+    )
+
+
 @dataclass(frozen=True, slots=True)
 class ExecutionBudget:
     """Immutable bounds and limits for execution."""
@@ -81,6 +117,7 @@ class ExecutionBudget:
     max_output_values: int = 10_000_000
     max_trials: int = 100
     max_elapsed_seconds: float = 60.0
+    cancellation_check_nodes: int = 1
 
     def __post_init__(self) -> None:
         """Validate budget values."""
@@ -94,9 +131,12 @@ class ExecutionBudget:
             raise ValueError("max_trials must be > 0")
         if self.max_elapsed_seconds <= 0:
             raise ValueError("max_elapsed_seconds must be > 0")
+        if self.cancellation_check_nodes <= 0:
+            raise ValueError("cancellation_check_nodes must be > 0")
 
 
 DEFAULT_BUDGET = ExecutionBudget()
+EXECUTION_ENGINE_VERSION = "1.0.0"
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,10 +153,12 @@ class ExecutionReproducibilityRecord:
     input_hash: str
     seed: int | None
     numerical_policy: NumericalPolicy
-    engine_version: str = "1.0.0"
+    engine_version: str = EXECUTION_ENGINE_VERSION
     output_hash: str = ""
     elapsed_seconds: float = 0.0
     status: str = "completed"
+    node_warmup_samples: tuple[tuple[str, int], ...] = ()
+    node_policies: tuple[tuple[str, NumericalPolicy], ...] = ()
 
     def __post_init__(self) -> None:
         """Validate reproducibility record."""
@@ -141,6 +183,7 @@ class SingleExecutionRequest:
     budget: ExecutionBudget = DEFAULT_BUDGET
     catalog_view: CatalogView | None = None
     seed: int | None = None
+    cancellation: CancellationToken | None = None
 
     def __post_init__(self) -> None:
         """Validate single execution request."""
@@ -150,6 +193,10 @@ class SingleExecutionRequest:
             )
         if not isinstance(self.budget, ExecutionBudget):
             raise TypeError("budget must be an ExecutionBudget")
+        if self.cancellation is not None and not isinstance(
+            self.cancellation, CancellationToken
+        ):
+            raise TypeError("cancellation must be a CancellationToken or None")
 
 
 @dataclass(frozen=True, slots=True)
@@ -200,6 +247,7 @@ class BatchExecutionRequest:
     budget: ExecutionBudget = DEFAULT_BUDGET
     catalog_view: CatalogView | None = None
     seed: int | None = None
+    cancellation: CancellationToken | None = None
 
     def __post_init__(self) -> None:
         """Validate batch execution request."""
@@ -209,6 +257,10 @@ class BatchExecutionRequest:
             raise TypeError("trials must be a tuple")
         if not isinstance(self.budget, ExecutionBudget):
             raise TypeError("budget must be an ExecutionBudget")
+        if self.cancellation is not None and not isinstance(
+            self.cancellation, CancellationToken
+        ):
+            raise TypeError("cancellation must be a CancellationToken or None")
 
 
 @dataclass(frozen=True, slots=True)
@@ -427,6 +479,38 @@ def _collect_stitched_outputs(
     ]
 
 
+def _apply_trial_overrides(doc: GraphDocument, trial: BatchTrial) -> GraphDocument:
+    """Build the trial's graph revision by merging parameter overrides."""
+    new_nodes: list[NodeSpec] = []
+    for node in doc.spec.nodes:
+        if node.id in trial.parameter_overrides:
+            merged = dict(node.parameters.entries)
+            merged.update(trial.parameter_overrides[node.id].entries)
+            new_nodes.append(
+                NodeSpec(
+                    id=node.id,
+                    plugin_ref=node.plugin_ref,
+                    operation_id=node.operation_id,
+                    parameters=FrozenObject.from_mapping(merged),
+                    title=node.title,
+                    extension_data=node.extension_data,
+                )
+            )
+        else:
+            new_nodes.append(node)
+
+    return GraphDocument(
+        spec=GraphSpec(
+            schema_version=doc.spec.schema_version,
+            nodes=tuple(new_nodes),
+            edges=doc.spec.edges,
+            designated_roots=doc.spec.designated_roots,
+            subgraphs=doc.spec.subgraphs,
+        ),
+        metadata=doc.metadata,
+    )
+
+
 class _ExecutionProvider:
     """Internal implementation of the Execution protocol."""
 
@@ -527,12 +611,22 @@ class _ExecutionProvider:
         *,
         budget: ExecutionBudget,
         start_time: float,
-    ) -> tuple[dict[str, dict[str, Any]] | None, tuple[ValidationIssue, ...]]:
-        """Iterate through ordered nodes, execute and enforce limits."""
+        cancellation: CancellationToken | None = None,
+    ) -> tuple[
+        dict[str, dict[str, Any]],
+        tuple[ValidationIssue, ...],
+        tuple[tuple[str, int], ...],
+    ]:
+        """Iterate through ordered nodes, execute and enforce limits.
+
+        Raises ExecutionCancellationError when the caller token is cancelled;
+        all run-owned loop state is function-local and discarded on raise.
+        """
         node_outputs: dict[str, dict[str, Any]] = {}
         total_output_values = 0
+        warmups: list[tuple[str, int]] = []
 
-        for node in ordered_nodes:
+        for node_idx, node in enumerate(ordered_nodes):
             elapsed = time.perf_counter() - start_time
             if elapsed > budget.max_elapsed_seconds:
                 raise ExecutionBudgetExceededError(
@@ -540,12 +634,29 @@ class _ExecutionProvider:
                     f"{budget.max_elapsed_seconds}s"
                 )
 
+            if (
+                cancellation is not None
+                and node_idx % budget.cancellation_check_nodes == 0
+            ):
+                cancellation.raise_if_cancelled()
+
             admitted = admitted_map[node.id]
             bind_res = admitted.contribution.implementation.validate_parameters(
                 node.parameters
             )
             if not bind_res.is_valid:
-                return None, bind_res.issues
+                return {}, bind_res.issues, ()
+
+            # Dynamic warm-up policy is owned by the admitted implementation;
+            # the executor consults it for the reproducibility record.
+            warmups.append(
+                (
+                    node.id,
+                    admitted.contribution.implementation.warmup_samples(
+                        node.parameters
+                    ),
+                )
+            )
 
             node_in = self._assemble_node_inputs(
                 node,
@@ -571,7 +682,7 @@ class _ExecutionProvider:
 
             node_outputs[node.id] = frozen_out
 
-        return node_outputs, ()
+        return node_outputs, (), tuple(warmups)
 
     def execute(self, request: SingleExecutionRequest) -> SingleExecutionResult:
         start_time = time.perf_counter()
@@ -636,16 +747,25 @@ class _ExecutionProvider:
         # 4. Freeze inputs to guarantee caller mutation safety
         frozen_inputs = {k: freeze_value(v) for k, v in request.inputs.items()}
 
-        # 5. Execute nodes in order
-        node_outputs, exec_issues = self._run_execution_loop(
-            ordered_nodes,
-            admitted_map,
-            norm_doc,
-            frozen_inputs,
-            budget=budget,
-            start_time=start_time,
-        )
-        if exec_issues or node_outputs is None:
+        # 5. Execute nodes in order; caller cancellation raises and discards
+        #    all run-owned loop state (it is function-local).
+        try:
+            node_outputs, exec_issues, warmups = self._run_execution_loop(
+                ordered_nodes,
+                admitted_map,
+                norm_doc,
+                frozen_inputs,
+                budget=budget,
+                start_time=start_time,
+                cancellation=request.cancellation,
+            )
+        except ExecutionCancellationError:
+            return SingleExecutionResult(
+                success=False,
+                issues=(_cancellation_issue(),),
+                elapsed_seconds=time.perf_counter() - start_time,
+            )
+        if exec_issues:
             return SingleExecutionResult(
                 success=False,
                 issues=exec_issues,
@@ -680,6 +800,10 @@ class _ExecutionProvider:
         )
 
         total_elapsed = time.perf_counter() - start_time
+        node_policies = tuple(
+            (node.id, admitted_map[node.id].spec.numerical_policy)
+            for node in norm_doc.spec.nodes
+        )
 
         reproducibility = ExecutionReproducibilityRecord(
             graph_id=norm_doc.spec.nodes[0].id if norm_doc.spec.nodes else "empty",
@@ -697,6 +821,8 @@ class _ExecutionProvider:
             output_hash=output_hash,
             elapsed_seconds=total_elapsed,
             status="completed",
+            node_warmup_samples=warmups,
+            node_policies=node_policies,
         )
 
         return SingleExecutionResult(
@@ -730,6 +856,7 @@ class _ExecutionProvider:
         doc = request.graph_document
         trial_results: list[BatchTrialResult] = []
         overall_success = True
+        batch_issues: list[ValidationIssue] = []
 
         for trial in request.trials:
             if time.perf_counter() - start_time > request.budget.max_elapsed_seconds:
@@ -737,35 +864,15 @@ class _ExecutionProvider:
                     "Batch execution exceeded elapsed time budget"
                 )
 
-            # Apply parameter overrides to graph nodes
-            new_nodes: list[NodeSpec] = []
-            for node in doc.spec.nodes:
-                if node.id in trial.parameter_overrides:
-                    merged = dict(node.parameters.entries)
-                    merged.update(trial.parameter_overrides[node.id].entries)
-                    new_nodes.append(
-                        NodeSpec(
-                            id=node.id,
-                            plugin_ref=node.plugin_ref,
-                            operation_id=node.operation_id,
-                            parameters=FrozenObject.from_mapping(merged),
-                            title=node.title,
-                            extension_data=node.extension_data,
-                        )
-                    )
-                else:
-                    new_nodes.append(node)
+            if request.cancellation is not None:
+                try:
+                    request.cancellation.raise_if_cancelled()
+                except ExecutionCancellationError:
+                    overall_success = False
+                    batch_issues.append(_cancellation_issue())
+                    break
 
-            trial_doc = GraphDocument(
-                spec=GraphSpec(
-                    schema_version=doc.spec.schema_version,
-                    nodes=tuple(new_nodes),
-                    edges=doc.spec.edges,
-                    designated_roots=doc.spec.designated_roots,
-                    subgraphs=doc.spec.subgraphs,
-                ),
-                metadata=doc.metadata,
-            )
+            trial_doc = _apply_trial_overrides(doc, trial)
             trial_req = SingleExecutionRequest(
                 graph_document=trial_doc,
                 inputs=request.inputs,
@@ -778,6 +885,7 @@ class _ExecutionProvider:
                 ),
                 catalog_view=request.catalog_view,
                 seed=request.seed,
+                cancellation=request.cancellation,
             )
             run_res = self.execute(trial_req)
             if not run_res.success:
@@ -789,11 +897,14 @@ class _ExecutionProvider:
                     result=run_res,
                 )
             )
+            if any(i.code == "EXECUTION_CANCELLED" for i in run_res.issues):
+                batch_issues.append(_cancellation_issue())
+                break
 
         return BatchExecutionResult(
             success=overall_success,
             trials=tuple(trial_results),
-            issues=(),
+            issues=tuple(batch_issues),
             elapsed_seconds=time.perf_counter() - start_time,
         )
 
@@ -857,6 +968,63 @@ class _ExecutionProvider:
             outputs=tuple(combined_outputs),
         )
 
+    def _lower_all_nodes(
+        self,
+        ordered_nodes: Sequence[NodeSpec],
+        target: LoweringTarget,
+    ) -> tuple[dict[str, SemanticProgram], ExportResult | None]:
+        """Lower every node to the exact target, with node attribution.
+
+        Returns the per-node programs, or the attributed failure result.
+        """
+        node_programs: dict[str, SemanticProgram] = {}
+        for node in ordered_nodes:
+            admitted = self._catalog.admit(node.plugin_ref, node.operation_id)
+            ctx = _LocalLoweringContext(target, prefix=node.id)
+            try:
+                lowered = admitted.contribution.implementation.lower(
+                    ctx, node.parameters
+                )
+            except (ValueError, TypeError, RuntimeError, ArithmeticError) as err:
+                return {}, ExportResult(
+                    success=False,
+                    target=target,
+                    issues=(
+                        ValidationIssue(
+                            path=f"nodes.{node.id}",
+                            code="LOWERING_FAILED",
+                            message=(
+                                f"Lowering failed for node {node.id!r} "
+                                f"({node.plugin_ref.to_string()}): {err}"
+                            ),
+                        ),
+                    ),
+                )
+            if not lowered.success or lowered.program is None:
+                attributed = tuple(
+                    (
+                        issue
+                        if issue.node_id is not None
+                        else LoweringIssue(
+                            code=issue.code,
+                            message=(
+                                f"{issue.message} "
+                                f"[node={node.id}, "
+                                f"plugin={node.plugin_ref.to_string()}]"
+                            ),
+                            node_id=node.id,
+                        )
+                    )
+                    for issue in lowered.issues
+                )
+                return {}, ExportResult(
+                    success=False,
+                    target=target,
+                    issues=attributed,
+                )
+            node_programs[node.id] = lowered.program
+        return node_programs, None
+
     def export(self, request: ExportRequest) -> ExportResult:
         if isinstance(request.graph_document, OpaqueGraphDocument):
             issue = ValidationIssue(
@@ -884,19 +1052,12 @@ class _ExecutionProvider:
 
         norm_doc = val_res.normalized_document
         ordered_nodes = _topological_sort(norm_doc.spec.nodes, norm_doc.spec.edges)
-        node_programs: dict[str, SemanticProgram] = {}
 
-        for node in ordered_nodes:
-            admitted = self._catalog.admit(node.plugin_ref, node.operation_id)
-            ctx = _LocalLoweringContext(request.target, prefix=node.id)
-            lowered = admitted.contribution.implementation.lower(ctx, node.parameters)
-            if not lowered.success or lowered.program is None:
-                return ExportResult(
-                    success=False,
-                    target=request.target,
-                    issues=lowered.issues,
-                )
-            node_programs[node.id] = lowered.program
+        node_programs, lower_failure = self._lower_all_nodes(
+            ordered_nodes, request.target
+        )
+        if lower_failure is not None:
+            return lower_failure
 
         unified_program = self._stitch_semantic_programs(
             ordered_nodes, node_programs, norm_doc
@@ -924,9 +1085,25 @@ class _ExecutionProvider:
 
         exporter_impl = exporter_admitted.contribution.implementation
         mock_bindings = _RestrictedOperationBindings(exporter_admitted.spec)
-        exp_res = exporter_impl.execute(
-            {"program": unified_program}, EMPTY_FROZEN_OBJECT, mock_bindings
-        )
+        try:
+            exp_res = exporter_impl.execute(
+                {"program": unified_program}, EMPTY_FROZEN_OBJECT, mock_bindings
+            )
+        except (ValueError, TypeError, RuntimeError, ArithmeticError) as err:
+            return ExportResult(
+                success=False,
+                target=request.target,
+                issues=(
+                    ValidationIssue(
+                        path=f"target.{request.target.target_id}",
+                        code="EXPORT_FAILED",
+                        message=(
+                            f"Exporter {exporter_ref.to_string()} failed on the "
+                            f"combined program: {err}"
+                        ),
+                    ),
+                ),
+            )
 
         return ExportResult(
             success=True,
