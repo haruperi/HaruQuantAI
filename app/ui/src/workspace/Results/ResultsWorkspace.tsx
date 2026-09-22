@@ -3,7 +3,7 @@ import { Check, Copy, Download } from 'lucide-react';
 import { DockviewReact, type DockviewReadyEvent } from 'dockview';
 import { useAppStore } from '../../app/store';
 import { Button, Section, Stat } from '../../components/ui';
-import { EquityChart } from '../../components/EquityChart';
+import { EquityChart } from './EquityChart';
 import { OptimizationSurface } from '../../plugins/optimization/OptimizationSurface';
 import { PortfolioCorrelationView } from './views/PortfolioCorrelationView';
 
