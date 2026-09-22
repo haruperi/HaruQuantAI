@@ -44,6 +44,40 @@ parameter schemas, optimizer bounds, output types, or execution logic.
 Whole new interaction models may require a reviewed generic renderer or explicit
 UI extension. Metadata is not assumed capable of safely producing arbitrary UX.
 
+## Ratified workspace and wire boundary
+
+[ARCHITECTURE.md](../../docs/ARCHITECTURE.md) ratifies the target; this README does
+not claim that the retained prototype implements it.
+
+- Workspaces are discovered backend contributions under
+  `app/plugins/workspaces/`. Their descriptions declare commands, configuration,
+  accepted child kinds/operations, authorization requirements, and a generic
+  view/route or installed-extension reference. A workspace selects plugins; it
+  does not install them or own shared infrastructure.
+- `app/plugins/spec.py`, `schema.py`, `algebra.py`, `lowering.py`, and `wire.py`
+  own the shared plugin language. There is no `app/api/`. The UI consumes JSON
+  projections, not Python classes, factories, registry objects, or contexts.
+- Plugin/catalog/graph wire definitions come from `app/plugins/wire.py`;
+  transport envelopes are public contracts in `app/host/gateway.py`, and resource/job
+  values remain with their public host owner. Generate client representations
+  or verify conformance to those definitions rather than maintain parallel truth.
+- Controls are bounded to numeric/text/boolean/enum forms, groups, typed ports,
+  tables, and charts. A route string cannot supply new React behavior. Existing
+  static routes and hard-coded catalogs require a separately approved migration.
+- Graph editors display the same immutable versioned DAG used by execution,
+  including stable node/port IDs and plugin versions. Comparisons are ordinary
+  plugin nodes. User edits create revisions; the backend validates types, units,
+  alignment, permissions, and compatibility before executing commands.
+- Parameter validity, optimizer bounds, and parameter-derived warm-up come from
+  plugin-owned schema/validation. The UI must not reconstruct numerical policies.
+- Distinguish installed availability, workspace/profile enablement, and operation
+  authorization. Missing optional capabilities disable their operation, not all
+  editing. Unsupported exports must not appear as working targets.
+- Two workspaces may select the same contribution. Removing one workspace does
+  not remove shared children; missing nodes remain lossless placeholders. Unknown
+  document versions may be retained read-only but cannot be executed or silently
+  rewritten. Backend truth stays separate from cache, drafts, and view state.
+
 ## Development
 
 ```powershell

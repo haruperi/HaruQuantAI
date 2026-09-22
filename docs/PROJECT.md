@@ -1,7 +1,8 @@
 # HaruQuantAI Project Specification
 
 > **Status:** Backend reset baseline. Kernel and UI retained; replacement backend
-> not yet implemented.
+> not yet implemented. Owner-local target architecture ratified on 2026-09-22;
+> its implementation stages remain separately planned and approved.
 
 ## 1. Product goal
 
@@ -56,22 +57,45 @@ renderer vocabulary, a new backend plugin requires no frontend source edit.
 | Kernel | Retained / under review | Standard-library capability, lifecycle, events, runtime, and logging primitives |
 | UI | Retained prototype | React/TypeScript workstation using frontend mocks and browser-local state |
 | Backend host | Missing | No composition root, gateway, persistence, jobs, workers, or integrations |
-| Plugin SDK/catalog | Missing | No ratified metamodel or discovery implementation |
+| Plugin SDK/catalog | Missing | Metamodel ownership and discovery rules ratified; exact APIs and implementation remain pending |
 | Quantitative plugins | Missing | No production indicators, rules, metrics, tasks, or exporters |
 | Algebra AST | Missing | No shared typed strategy/workflow document |
 
-## 4. Required architecture sequence
+## 4. Ratified architecture and implementation sequence
 
-1. Ratify the minimal kernel surface and remove ambient discovery/effect paths.
-2. Define the universal plugin metamodel, identity/version policy, catalog
-   snapshot, algebra AST, and compatibility rules.
-3. Define the host boundary for discovery, enablement, execution, persistence,
-   jobs, telemetry, and gateway transport.
-4. Define the UI catalog client, schema renderer vocabulary, algebra editor, and
-   separation between remote truth, drafts, and view state.
-5. Prove a thin vertical slice with one plugin before scaling plugin families.
+[ARCHITECTURE.md](ARCHITECTURE.md) defines the normative target and import rules:
 
-Each step requires its own implementation plan and owner approval.
+- The kernel stays business-neutral and standard-library-only.
+- Shared plugin vocabulary belongs under `app/plugins/`; there is no `app/api/`.
+  Concrete plugin-specific definitions remain in their single owning file.
+- Each host owner occupies one `app/host/<owner>.py` file containing public
+  contracts, private implementation, and lifecycle. Consumers import only
+  designated contract symbols and receive services through declared slots;
+  provider construction belongs to host composition. Importing an owner defines
+  its implementation but must not construct/start it or require optional provider
+  libraries. Plugins cannot access private host symbols or the kernel runtime.
+- Workspaces are discoverable plugins under `app/plugins/workspaces/`. They
+  select children and orchestrate host services without owning either.
+- The host capability graph and quantitative algebra graph stay distinct.
+  Operation effects, run-local state, and lifecycle needs are declared separately.
+- Explicit bounded discovery produces validated immutable snapshots; adding a
+  supported plugin or comparison requires no central source edit.
+
+The ratified stages are not implementation-completion claims:
+
+| Stage | Objective | Required exit evidence |
+|---|---|---|
+| S1 Kernel | Restrict slots, canonicalize ordering, correct lifecycle and event/logging ownership | Failure/cancellation cleanup, provider lifetime, ordering, and purity tests |
+| S2 Plugin vocabulary/catalog | Define exact schema, graph, wire, operation APIs and discovery | Validation, unknown-node round trips, immutable snapshots, and pre-import exclusions |
+| S3 Execution slice | Cohesive RSI and comparison; generic execution with supported optimization/export | Numerical goldens, lowering parity, independent indicator/comparison add/remove proof |
+| S4 UI/workspaces | Generic catalog/schema/graph client and workspace declarations for the proven slice | Shared schema/document, unavailable placeholders, and two-workspace selection/removal |
+| S5 Durable infrastructure | Jobs, isolated persistence/artifacts, workers and budgets | Recovery, cancellation, resource lifetime, and process-boundary tests |
+| S6 Integrations/families | Additional algorithms, data sources, brokers, and tasks | Family-specific semantics/effect evidence and separate live-trading authorization |
+
+Each stage requires its own exact-path implementation plan and owner approval.
+Minimal in-process execution can prove S3 before durable infrastructure. Do not
+scaffold every future service or infer complete simulator/exporter behavior from
+a thin slice.
 
 ## 5. System-wide acceptance
 
@@ -80,11 +104,23 @@ Each step requires its own implementation plan and owner approval.
 - Removing that plugin leaves unrelated catalog entries, runtime order, and
   documents unchanged; referencing documents become explicitly unavailable but
   remain losslessly readable.
+- A new comparison within the supported vocabulary requires no central enum,
+  algebra, executor, or UI edit. Shared framework modules are excluded before
+  discovery imports; concrete workspaces are discovered too.
+- Two workspaces can select the same plugin. Disabling one workspace does not
+  uninstall shared plugins or stop host services needed by the other.
 - UI, generator, simulator, optimizer, and exporter consume the same versioned
   algebra and plugin identities.
 - Unsupported versions and schemas fail closed with attributed diagnostics.
 - Reproducible runs freeze plugin/catalog fingerprints, data identity, settings,
   seeds, and engine version.
+- Whole-catalog fingerprints change with membership; unrelated entry and
+  referenced-dependency fingerprints and results remain stable. Admitted runs
+  never silently bind to replacement code or data.
+- Startup failures and cancellation unwind the composition attempt. Shutdown
+  drains consumers before withdrawing providers and reports cleanup failures.
+- Deep immutability, operation-specific effects, parameter-derived warm-up, and
+  actual lowering are verified; schema declarations alone are insufficient.
 - No live or irreversible external action occurs without separate explicit
   authorization.
 
@@ -95,12 +131,17 @@ Each step requires its own implementation plan and owner approval.
 - Treating UI mocks as production behavior.
 - Supporting arbitrary new UI interactions from unconstrained metadata; dynamic
   UI is bounded by a ratified generic renderer vocabulary.
+- Reactive host hot-swapping, arbitrary third-party Python sandboxing, or claiming
+  the guarantees of a formal dynamic-composition calculus from startup ordering.
 
-## 7. Open decisions
+## 7. Remaining source-stage decisions
 
-- Final plugin metamodel and stable identity grammar.
-- Discovery mechanism, enablement policy, and catalog fingerprint format.
-- Algebra node/port type system and migration policy.
-- Host persistence and process topology.
-- UI schema vocabulary and custom-extension security boundary.
-- Kernel event and logging disposition.
+- Exact public signatures and complete versioned wire fields implementing the
+  ratified metamodel, port/value types, and compatibility rules.
+- Canonical serialization/hash details and concrete migration implementations;
+  stable IDs and lossless unsupported-document behavior are already required.
+- Transport/server, database engine, process implementation, numerical libraries,
+  and bounded shutdown policies. No dependency is selected by this ratification.
+- Concrete UI renderer implementations and reviewed extension security boundary.
+- Exact event/logging source migration and deletion targets. Host ownership is
+  decided; the retained kernel has not yet been remediated.
