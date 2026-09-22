@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
+import asyncio
 import contextlib
 import datetime
 import sqlite3
 import threading
-from collections.abc import Sequence
+from collections.abc import Callable, Sequence
+from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Protocol, override
+from typing import Any, Protocol, TypeVar, override
 
 from app.kernel.capability import Capability
 from app.kernel.context import FeatureContext
@@ -168,10 +170,46 @@ class Storage(Protocol):
         """Deterministically scan records in a namespace ordered by key ASC."""
         ...
 
+    async def async_get_record(self, namespace: str, key: str) -> StorageRecord | None:
+        """Retrieve a record on the owned writer thread (event-loop safe)."""
+        ...
+
+    async def async_commit_transaction(
+        self, mutations: Sequence[StorageMutation | StorageDelete]
+    ) -> StorageTransactionResult:
+        """Commit mutations on the owned writer thread (event-loop safe)."""
+        ...
+
+    async def async_scan_records(
+        self,
+        namespace: str,
+        *,
+        prefix: str | None = None,
+        limit: int = 50,
+        after_key: str | None = None,
+    ) -> StoragePage:
+        """Deterministically scan records off the event loop."""
+        ...
+
+    def status(self) -> StorageStatus:
+        """Return migration and readiness status."""
+        ...
+
     def close(self) -> None:
         """Flush and safely close the storage engine."""
         ...
 
+
+@dataclass(frozen=True, slots=True)
+class StorageStatus:
+    """Immutable migration/readiness status of the storage engine."""
+
+    schema_version: int
+    applied_migrations: tuple[int, ...]
+    ready: bool
+
+
+_T = TypeVar("_T")
 
 HOST_STORAGE = Capability[Storage]("host.storage", 1)
 
@@ -198,19 +236,32 @@ class _SqliteStorage(Storage):
         self._db_path = str(db_path)
         self._lock = threading.RLock()
         self._closed = False
-
-        self._conn = sqlite3.connect(
-            self._db_path,
-            check_same_thread=False,
-            timeout=float(config.busy_timeout_ms) / 1000.0,
-            isolation_level=None,  # Explicit transaction control
+        # One owned single-writer executor thread: async callers bridge
+        # through it so the event loop never blocks on SQLite directly.
+        self._writer = ThreadPoolExecutor(
+            max_workers=1, thread_name_prefix="haruquantai-storage"
         )
-        self._conn.execute(f"PRAGMA busy_timeout = {config.busy_timeout_ms};")
-        self._conn.execute("PRAGMA foreign_keys = ON;")
-        if db_path != Path(":memory:"):
-            self._conn.execute("PRAGMA journal_mode = WAL;")
+        # Identify the single owned writer thread once; every operation,
+        # synchronous or async, serializes through it.
+        self._writer_ident = self._writer.submit(threading.get_ident).result()
 
-        self._migrate()
+        try:
+            self._conn = sqlite3.connect(
+                self._db_path,
+                check_same_thread=False,
+                timeout=float(config.busy_timeout_ms) / 1000.0,
+                isolation_level=None,  # Explicit transaction control
+            )
+            self._conn.execute(f"PRAGMA busy_timeout = {config.busy_timeout_ms};")
+            self._conn.execute("PRAGMA foreign_keys = ON;")
+            if db_path != Path(":memory:"):
+                self._conn.execute("PRAGMA journal_mode = WAL;")
+            self._migrate()
+        except sqlite3.DatabaseError as err:
+            self._writer.shutdown(wait=True)
+            raise StorageError(
+                f"Storage failed to open or migrate {self._db_path!r}: {err}"
+            ) from err
 
     def _migrate(self) -> None:
         """Apply idempotent forward-only migrations."""
@@ -227,7 +278,16 @@ class _SqliteStorage(Storage):
             cursor = self._conn.execute(
                 "SELECT version FROM schema_migrations ORDER BY version ASC;"
             )
-            applied = {row[0] for row in cursor.fetchall()}
+            applied_rows = [row[0] for row in cursor.fetchall()]
+            applied = set(applied_rows)
+
+            max_known = 1
+            newer = [v for v in applied_rows if v > max_known]
+            if newer:
+                raise StorageMigrationError(
+                    f"Database schema version {newer[0]} is newer than "
+                    f"supported version {max_known}; upgrade the host first"
+                )
 
             migrations: list[tuple[int, str, Sequence[str]]] = [
                 (
@@ -275,6 +335,10 @@ class _SqliteStorage(Storage):
 
     @override
     def get_record(self, namespace: str, key: str) -> StorageRecord | None:
+        """Retrieve a record by namespace and key on the writer thread."""
+        return self._on_writer(lambda: self._get_record_impl(namespace, key))
+
+    def _get_record_impl(self, namespace: str, key: str) -> StorageRecord | None:
         """Retrieve a record by namespace and key."""
         with self._lock:
             if self._closed:
@@ -400,6 +464,12 @@ class _SqliteStorage(Storage):
     def commit_transaction(
         self, mutations: Sequence[StorageMutation | StorageDelete]
     ) -> StorageTransactionResult:
+        """Commit mutations on the owned writer thread (blocking)."""
+        return self._on_writer(lambda: self._commit_transaction_impl(mutations))
+
+    def _commit_transaction_impl(
+        self, mutations: Sequence[StorageMutation | StorageDelete]
+    ) -> StorageTransactionResult:
         """Commit mutations and deletes in an atomic transaction."""
         if not mutations:
             return StorageTransactionResult(committed=True)
@@ -441,6 +511,21 @@ class _SqliteStorage(Storage):
 
     @override
     def scan_records(
+        self,
+        namespace: str,
+        *,
+        prefix: str | None = None,
+        limit: int = 50,
+        after_key: str | None = None,
+    ) -> StoragePage:
+        """Scan records on the owned writer thread (blocking)."""
+        return self._on_writer(
+            lambda: self._scan_records_impl(
+                namespace, prefix=prefix, limit=limit, after_key=after_key
+            )
+        )
+
+    def _scan_records_impl(
         self,
         namespace: str,
         *,
@@ -518,12 +603,87 @@ class _SqliteStorage(Storage):
             )
 
     @override
+    def status(self) -> StorageStatus:
+        """Return migration and readiness status from the writer thread."""
+        return self._on_writer(self._status_impl)
+
+    def _status_impl(self) -> StorageStatus:
+        """Return migration and readiness status."""
+        with self._lock:
+            if self._closed:
+                return StorageStatus(
+                    schema_version=0, applied_migrations=(), ready=False
+                )
+            cursor = self._conn.execute(
+                "SELECT version FROM schema_migrations ORDER BY version ASC;"
+            )
+            applied = tuple(row[0] for row in cursor.fetchall())
+            return StorageStatus(
+                schema_version=applied[-1] if applied else 0,
+                applied_migrations=applied,
+                ready=True,
+            )
+
+    @override
+    async def async_get_record(self, namespace: str, key: str) -> StorageRecord | None:
+        """Retrieve a record on the owned writer thread."""
+        return await self._await_on_writer(
+            lambda: self._get_record_impl(namespace, key)
+        )
+
+    @override
+    async def async_commit_transaction(
+        self, mutations: Sequence[StorageMutation | StorageDelete]
+    ) -> StorageTransactionResult:
+        """Commit mutations on the owned writer thread."""
+        return await self._await_on_writer(
+            lambda: self._commit_transaction_impl(mutations)
+        )
+
+    @override
+    async def async_scan_records(
+        self,
+        namespace: str,
+        *,
+        prefix: str | None = None,
+        limit: int = 50,
+        after_key: str | None = None,
+    ) -> StoragePage:
+        """Deterministically scan records on the owned writer thread."""
+        return await self._await_on_writer(
+            lambda: self._scan_records_impl(
+                namespace, prefix=prefix, limit=limit, after_key=after_key
+            )
+        )
+
+    def _on_writer(self, fn: Callable[[], _T]) -> _T:
+        """Run a storage operation on the owned writer thread (blocking).
+
+        Executes inline when already on the writer thread (e.g. nested or
+        async-facade calls); otherwise submits and blocks on the result.
+        """
+        if self._closed:
+            raise StorageClosedError("Storage is closed")
+        if threading.get_ident() == self._writer_ident:
+            return fn()
+        return self._writer.submit(fn).result()
+
+    async def _await_on_writer(self, fn: Callable[[], _T]) -> _T:
+        """Run a storage operation on the owned writer thread (async)."""
+        if self._closed:
+            raise StorageClosedError("Storage is closed")
+        if threading.get_ident() == self._writer_ident:
+            return fn()
+        return await asyncio.wrap_future(self._writer.submit(fn))
+
+    @override
     def close(self) -> None:
-        """Safely close the database connection."""
+        """Safely close the database connection and drain the writer thread."""
         with self._lock:
             if not self._closed:
                 self._closed = True
                 self._conn.close()
+        self._writer.shutdown(wait=True)
 
     def __del__(self) -> None:
         """Close connection if garbage collected."""
@@ -564,6 +724,7 @@ __all__ = (
     "StorageMutation",
     "StoragePage",
     "StorageRecord",
+    "StorageStatus",
     "StorageTransactionResult",
     "_storage_feature",
 )

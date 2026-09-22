@@ -14,9 +14,10 @@ from enum import StrEnum
 from typing import Any, Protocol, override
 
 from app.host.artifacts import HOST_ARTIFACTS, ArtifactStore
-from app.host.catalog import HOST_CATALOG, Catalog
+from app.host.catalog import HOST_CATALOG, Catalog, CatalogAdmissionError
 from app.host.execution import (
     DEFAULT_BUDGET,
+    EXECUTION_ENGINE_VERSION,
     HOST_EXECUTION,
     Execution,
     ExecutionBudget,
@@ -102,7 +103,7 @@ _VALID_TRANSITIONS: dict[JobState, frozenset[JobState]] = {
             JobState.RECOVERY_PENDING,
         }
     ),
-    JobState.CANCELLING: frozenset({JobState.CANCELLED, JobState.FAILED}),
+    JobState.CANCELLING: frozenset({JobState.CANCELLED}),
     JobState.RECOVERY_PENDING: frozenset({JobState.QUEUED, JobState.FAILED}),
     JobState.SUCCEEDED: frozenset(),
     JobState.FAILED: frozenset(),
@@ -149,6 +150,20 @@ class JobRecord:
     error_message: str | None = None
     created_at_utc: str = ""
     updated_at_utc: str = ""
+    last_heartbeat_utc: str = ""
+
+
+@dataclass(frozen=True, slots=True)
+class JobEvent:
+    """Persisted job state-transition event record."""
+
+    job_id: str
+    seq: int
+    from_state: JobState
+    to_state: JobState
+    utc: str
+    reason: str = ""
+    detail: str = ""
 
 
 @dataclass(frozen=True, slots=True)
@@ -211,6 +226,10 @@ class Jobs(Protocol):
         """Wait until a job reaches a terminal state."""
         ...
 
+    async def job_events(self, job_id: str) -> tuple[JobEvent, ...]:
+        """Return persisted transition events for a job in order."""
+        ...
+
     async def close(self) -> None:
         """Stop scheduler and drain active jobs."""
         ...
@@ -219,6 +238,7 @@ class Jobs(Protocol):
 HOST_JOBS = Capability[Jobs]("host.jobs", 1)
 
 JOBS_NAMESPACE = "jobs"
+JOBS_EVENTS_NAMESPACE = "jobs.events"
 IDEMPOTENCY_NAMESPACE = "job_idempotency"
 
 
@@ -249,6 +269,7 @@ def _serialize_job_record(record: JobRecord) -> bytes:
         "error_message": record.error_message,
         "created_at_utc": record.created_at_utc,
         "updated_at_utc": record.updated_at_utc,
+        "last_heartbeat_utc": record.last_heartbeat_utc,
     }
     return json.dumps(data, sort_keys=True, separators=(",", ":")).encode("utf-8")
 
@@ -278,6 +299,7 @@ def _deserialize_job_record(payload_bytes: bytes, revision: int) -> JobRecord:
         error_message=data.get("error_message"),
         created_at_utc=data.get("created_at_utc", ""),
         updated_at_utc=data.get("updated_at_utc", ""),
+        last_heartbeat_utc=data.get("last_heartbeat_utc", ""),
     )
 
 
@@ -313,58 +335,112 @@ class _DurableJobs(Jobs):
         self._loop_task = asyncio.create_task(self._scheduler_loop())
 
     async def _recover_interrupted_jobs(self) -> None:
-        """Scan active or expired jobs at startup and recover or fail them."""
-        page = self._storage.scan_records(JOBS_NAMESPACE, limit=100)
+        """Scan all nonterminal jobs at startup and recover or fail them.
+
+        Expired running pure jobs are requeued only when their exact
+        entry-fingerprint dependencies are still admitted and attempts
+        remain; otherwise they fail with a stable recovery code. Cancelling
+        jobs resolve to cancelled. Successful jobs are never rerun.
+        """
+        after_key: str | None = None
+        while True:
+            page = await self._storage.async_scan_records(
+                JOBS_NAMESPACE, limit=100, after_key=after_key
+            )
+            if not page.records:
+                break
+            for rec in page.records:
+                job = _deserialize_job_record(rec.payload_bytes, rec.revision)
+                await self._recover_one(job)
+            if page.next_token is None:
+                break
+            after_key = page.next_token
+
+    async def _recover_one(self, job: JobRecord) -> None:
+        """Apply the recovery policy to a single nonterminal job."""
+        if job.state in TERMINAL_JOB_STATES:
+            return
+
+        if job.state == JobState.CANCELLING:
+            await self._transition_job(job, JobState.CANCELLED)
+            return
+
+        if job.state == JobState.QUEUED:
+            return  # the scheduler will claim it
+
+        if job.state not in (JobState.RUNNING, JobState.RECOVERY_PENDING):
+            return
+
+        # A still-valid lease means a live scheduler elsewhere owns the job.
+        lease_valid = (
+            job.lease_expires_utc is not None and job.lease_expires_utc > _utc_now_iso()
+        )
+        if lease_valid:
+            return
+
+        if job.state == JobState.RUNNING:
+            pending = await self._transition_job(job, JobState.RECOVERY_PENDING)
+        else:
+            # Already RECOVERY_PENDING (interrupted twice); do not
+            # re-transition into the same state.
+            pending = job
+
+        missing = self._missing_dependencies(pending)
+        if missing:
+            await self._transition_job(
+                pending,
+                JobState.FAILED,
+                error_code="RECOVERY_DEPENDENCY_MISSING",
+                error_message=(
+                    f"Required dependency missing or changed across restart: {missing}"
+                ),
+            )
+        elif pending.attempts >= pending.max_attempts:
+            await self._transition_job(
+                pending,
+                JobState.FAILED,
+                error_code="MAX_ATTEMPTS_EXCEEDED",
+                error_message=f"Job exceeded max attempts ({pending.max_attempts})",
+            )
+        else:
+            await self._transition_job(
+                pending,
+                JobState.QUEUED,
+                lease_owner=None,
+                lease_expires_utc=None,
+            )
+
+    def _missing_dependencies(self, job: JobRecord) -> str | None:
+        """Return the first missing/changed pinned dependency, if any."""
+        req_data = value_to_wire(job.request_wire)
+        entry_fps = req_data.get("entry_fingerprints") or {}
+        if entry_fps:
+            for key, expected in entry_fps.items():
+                ref_str, _, op_id = str(key).rpartition("#")
+                try:
+                    from app.plugins.spec import PluginRef
+
+                    admitted = self._catalog.admit(PluginRef.parse(ref_str), op_id)
+                except KeyError, ValueError, TypeError, CatalogAdmissionError:
+                    return str(key)
+                if admitted.entry_fingerprint != expected:
+                    return str(key)
+            return None
+
+        # Legacy records without pinned fingerprints: id+version fallback.
+        graph_data = req_data.get("graph", {})
         snapshot = self._catalog.snapshot()
-        installed_versions = {
-            entry.ref.id: entry.ref.version for entry in snapshot.view.entries
-        }
-
-        for rec in page.records:
-            job = _deserialize_job_record(rec.payload_bytes, rec.revision)
-            if job.state in (JobState.RUNNING, JobState.RECOVERY_PENDING):
-                # Check if dependencies still exist in catalog
-                req_data = value_to_wire(job.request_wire)
-                graph_data = req_data.get("graph", {})
-                referenced_plugins = [
-                    (node.get("plugin_id"), node.get("plugin_version"))
-                    for node in graph_data.get("nodes", [])
-                ]
-
-                deps_ok = True
-                for p_id, p_ver in referenced_plugins:
-                    if (
-                        p_id not in installed_versions
-                        or installed_versions[p_id] != p_ver
-                    ):
-                        deps_ok = False
-                        break
-
-                if not deps_ok:
-                    await self._transition_job(
-                        job,
-                        JobState.FAILED,
-                        error_code="RECOVERY_DEPENDENCY_MISSING",
-                        error_message=(
-                            "Required plugin dependency missing or changed "
-                            "across restart"
-                        ),
-                    )
-                elif job.attempts >= job.max_attempts:
-                    await self._transition_job(
-                        job,
-                        JobState.FAILED,
-                        error_code="MAX_ATTEMPTS_EXCEEDED",
-                        error_message=f"Job exceeded max attempts ({job.max_attempts})",
-                    )
-                else:
-                    # Safe to requeue
-                    await self._transition_job(
-                        job,
-                        JobState.QUEUED,
-                        lease_owner=None,
-                        lease_expires_utc=None,
-                    )
+        installed = {e.ref.id: e.ref.version for e in snapshot.view.entries}
+        for node in graph_data.get("nodes", []):
+            p_id = node.get("plugin_id") or node.get("plugin_ref", {}).get("id")
+            p_ver_raw = node.get("plugin_version")
+            if p_ver_raw is None:
+                p_ver = node.get("plugin_ref", {}).get("version")
+            else:
+                p_ver = p_ver_raw
+            if p_id is None or installed.get(p_id) != p_ver:
+                return f"{p_id}@{p_ver}"
+        return None
 
     async def _transition_job(
         self,
@@ -421,8 +497,29 @@ class _DurableJobs(Jobs):
             payload_bytes=payload_bytes,
             expected_revision=job.revision,
         )
+        event_bytes = json.dumps(
+            {
+                "job_id": job.job_id,
+                "seq": new_record.revision,
+                "from_state": job.state.value,
+                "to_state": new_state.value,
+                "utc": now_iso,
+                "reason": error_code or "",
+                "detail": error_message or "",
+            },
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        event_mutation = StorageMutation(
+            namespace=JOBS_EVENTS_NAMESPACE,
+            key=f"{job.job_id}:{new_record.revision:08d}",
+            schema_version=1,
+            payload_bytes=event_bytes,
+        )
 
-        tx_res = self._storage.commit_transaction([mutation])
+        tx_res = await self._storage.async_commit_transaction(
+            [mutation, event_mutation]
+        )
         if not tx_res.committed:
             raise JobStateError(
                 f"CAS revision conflict while transitioning job {job.job_id}"
@@ -435,17 +532,72 @@ class _DurableJobs(Jobs):
 
         return new_record
 
+    def _pin_request_identity(
+        self, request: JobRequest
+    ) -> tuple[dict[str, str], dict[str, dict[str, Any]]]:
+        """Admit every referenced operation, pinning exact entry identity.
+
+        Enforces the pure-only effect policy: an operation whose effects
+        exceed {"pure"} is rejected for durable jobs.
+        """
+        if isinstance(request.graph_document, OpaqueGraphDocument):
+            raise JobError("Opaque graph documents cannot be pinned")
+        entry_fingerprints: dict[str, str] = {}
+        policies: dict[str, dict[str, Any]] = {}
+        for node in request.graph_document.spec.nodes:
+            try:
+                admitted = self._catalog.admit(node.plugin_ref, node.operation_id)
+            except (KeyError, ValueError, TypeError, CatalogAdmissionError) as err:
+                raise JobError(
+                    f"Dependency admission failed for node {node.id!r}: {err}"
+                ) from err
+            unsafe_effects = set(admitted.spec.effects) - {"pure"}
+            if unsafe_effects:
+                raise JobError(
+                    f"Node {node.id!r} declares non-pure effects "
+                    f"{sorted(unsafe_effects)}; only pure execution is "
+                    "permitted for durable jobs"
+                )
+            entry_fingerprints[f"{node.plugin_ref.to_string()}#{node.operation_id}"] = (
+                admitted.entry_fingerprint
+            )
+            policy = admitted.spec.numerical_policy
+            policies[node.id] = {
+                "tolerance": policy.tolerance,
+                "nan_policy": policy.nan_policy,
+                "missing_policy": policy.missing_policy,
+            }
+        return entry_fingerprints, policies
+
     @override
     async def submit_job(self, request: JobRequest) -> JobRecord:
-        """Submit a job with optional idempotency key validation."""
-        # Convert request to canonical wire representation
+        """Submit a job with optional idempotency key validation.
+
+        The submission freezes the full execution identity: wire version,
+        graph, inputs hash, seed, budgets, catalog/entry/dependency
+        fingerprints, numerical policies, engine version, and a pure-only
+        effect policy. Refresh never silently rebinds any of them.
+        """
+        if isinstance(request.graph_document, OpaqueGraphDocument):
+            raise JobError("Opaque graph documents cannot be submitted as durable jobs")
+
         graph_wire = graph_document_to_wire(request.graph_document)
         inputs_frozen = freeze_value(request.inputs)
         if not isinstance(inputs_frozen, FrozenObject):
             inputs_frozen = EMPTY_FROZEN_OBJECT
 
         snapshot = self._catalog.snapshot()
+
+        entry_fingerprints, policies = self._pin_request_identity(request)
+        dependency_fingerprint = hashlib.sha256(
+            ":".join(sorted(entry_fingerprints.values())).encode("utf-8")
+        ).hexdigest()
+        input_hash = hashlib.sha256(
+            to_canonical_json_bytes(value_to_wire(inputs_frozen))
+        ).hexdigest()
+
         req_dict = {
+            "wire_version": 1,
             "graph": graph_wire,
             "inputs": value_to_wire(inputs_frozen),
             "seed": request.seed,
@@ -457,6 +609,12 @@ class _DurableJobs(Jobs):
                 "max_elapsed_seconds": request.budget.max_elapsed_seconds,
             },
             "catalog_fingerprint": snapshot.whole_fingerprint,
+            "entry_fingerprints": entry_fingerprints,
+            "dependency_fingerprint": dependency_fingerprint,
+            "input_hash": input_hash,
+            "numerical_policies": policies,
+            "engine_version": EXECUTION_ENGINE_VERSION,
+            "effect_policy": "pure",
         }
         req_bytes = to_canonical_json_bytes(req_dict)
         req_hash = hashlib.sha256(req_bytes).hexdigest()
@@ -465,7 +623,7 @@ class _DurableJobs(Jobs):
 
         # Check idempotency
         if request.idempotency_key:
-            idem_rec = self._storage.get_record(
+            idem_rec = await self._storage.async_get_record(
                 IDEMPOTENCY_NAMESPACE, request.idempotency_key
             )
             if idem_rec is not None:
@@ -522,7 +680,7 @@ class _DurableJobs(Jobs):
             )
             mutations.append(idem_mutation)
 
-        tx_res = self._storage.commit_transaction(mutations)
+        tx_res = await self._storage.async_commit_transaction(mutations)
         if not tx_res.committed:
             raise JobConflictError(f"Failed to commit new job {job_id}")
 
@@ -532,50 +690,80 @@ class _DurableJobs(Jobs):
     @override
     async def get_job(self, job_id: str) -> JobRecord | None:
         """Fetch job record by ID."""
-        rec = self._storage.get_record(JOBS_NAMESPACE, job_id)
+        rec = await self._storage.async_get_record(JOBS_NAMESPACE, job_id)
         if rec is None:
             return None
         return _deserialize_job_record(rec.payload_bytes, rec.revision)
 
     @override
     async def list_jobs(self, query: JobQuery | None = None) -> JobPage:
-        """List job records."""
+        """List job records, filtering before pagination."""
         q = query if query is not None else JobQuery()
-        storage_page = self._storage.scan_records(
-            JOBS_NAMESPACE,
-            limit=q.limit,
-            after_key=q.after_job_id,
-        )
-        records = [
-            _deserialize_job_record(r.payload_bytes, r.revision)
-            for r in storage_page.records
-        ]
-        if q.state is not None:
-            records = [r for r in records if r.state == q.state]
+        scan_limit = max(q.limit, 50)
+        matched: list[JobRecord] = []
+        after_key = q.after_job_id
+        last_scanned: str | None = q.after_job_id
+        total = 0
+        while len(matched) <= q.limit:
+            page = await self._storage.async_scan_records(
+                JOBS_NAMESPACE, limit=scan_limit, after_key=after_key
+            )
+            total = page.total_count
+            if not page.records:
+                last_scanned = None
+                break
+            for rec in page.records:
+                job = _deserialize_job_record(rec.payload_bytes, rec.revision)
+                last_scanned = rec.key
+                if q.state is None or job.state == q.state:
+                    matched.append(job)
+                    if len(matched) > q.limit:
+                        break
+            if page.next_token is None:
+                last_scanned = None
+                break
+            after_key = page.next_token
 
+        has_more = len(matched) > q.limit
         return JobPage(
-            records=tuple(records),
-            next_token=storage_page.next_token,
-            total_count=storage_page.total_count,
+            records=tuple(matched[: q.limit]),
+            next_token=last_scanned if has_more else None,
+            total_count=total,
         )
 
     @override
     async def cancel_job(self, job_id: str) -> JobRecord:
-        """Request cancellation for a job."""
-        job = await self.get_job(job_id)
-        if job is None:
-            raise JobNotFoundError(f"Job {job_id} not found")
+        """Request cancellation for a queued or running job."""
+        for _ in range(3):
+            job = await self.get_job(job_id)
+            if job is None:
+                raise JobNotFoundError(f"Job {job_id} not found")
 
-        if job.state in TERMINAL_JOB_STATES:
+            if job.state in TERMINAL_JOB_STATES:
+                return job
+
+            if job.state == JobState.QUEUED:
+                try:
+                    return await self._transition_job(job, JobState.CANCELLED)
+                except JobStateError:
+                    continue  # raced with a claim; re-read
+
+            if job.state in (JobState.RUNNING, JobState.CANCELLING):
+                try:
+                    job = await self._transition_job(job, JobState.CANCELLING)
+                except JobStateError:
+                    continue  # raced with completion; re-read
+                active = self._active_tasks.get(job_id)
+                if active is not None and not active.done():
+                    active.cancel()
+                return job
+
             return job
 
-        if job.state == JobState.QUEUED:
-            return await self._transition_job(job, JobState.CANCELLED)
-
-        if job.state == JobState.RUNNING:
-            return await self._transition_job(job, JobState.CANCELLING)
-
-        return job
+        final = await self.get_job(job_id)
+        if final is None:
+            raise JobNotFoundError(f"Job {job_id} not found")
+        return final
 
     @override
     async def await_job(self, job_id: str, timeout_seconds: float = 60.0) -> JobRecord:
@@ -601,18 +789,22 @@ class _DurableJobs(Jobs):
         return final_job
 
     async def _scheduler_loop(self) -> None:
-        """Asynchronous scheduler background poll loop."""
+        """Asynchronous scheduler background poll loop.
+
+        Sleeps before the first poll so startup and submission ordering is
+        deterministic with respect to the configured interval.
+        """
         while self._running:
+            await asyncio.sleep(self._config.poll_interval_seconds)
             with contextlib.suppress(asyncio.CancelledError, JobError, StorageError):
                 await self._poll_and_schedule_next()
-            await asyncio.sleep(self._config.poll_interval_seconds)
 
     async def _poll_and_schedule_next(self) -> None:
         """Claim the next available queued job and dispatch to workers."""
         if not self._running:
             return
 
-        page = self._storage.scan_records(JOBS_NAMESPACE, limit=20)
+        page = await self._storage.async_scan_records(JOBS_NAMESPACE, limit=20)
         for rec in page.records:
             job = _deserialize_job_record(rec.payload_bytes, rec.revision)
             if job.state == JobState.QUEUED:
@@ -659,10 +851,15 @@ class _DurableJobs(Jobs):
             result_bytes = to_canonical_json_bytes(
                 value_to_wire(worker_result.result_payload)
             )
-            artifact_res = self._artifacts.put_artifact(
+            dep_fp = str(
+                value_to_wire(job.request_wire).get("dependency_fingerprint", "")
+            )
+            artifact_res = await asyncio.to_thread(
+                self._artifacts.put_artifact,
                 result_bytes,
                 media_type="application/json",
                 provenance_hash=job.job_id,
+                dependency_fingerprint=dep_fp,
                 tags=[("job_id", job.job_id)],
             )
             await self._transition_job(
@@ -679,8 +876,58 @@ class _DurableJobs(Jobs):
                 error_message=worker_result.error_message or "Worker execution failed",
             )
 
+    def _lease_expiry_iso(self) -> str:
+        """Compute the lease expiry timestamp for renewal."""
+        return (
+            (
+                _utc_now()
+                + datetime.timedelta(seconds=self._config.lease_duration_seconds)
+            )
+            .isoformat()
+            .replace("+00:00", "Z")
+        )
+
+    async def _heartbeat_loop(self, job_id: str) -> None:
+        """Persist bounded lease-renewal heartbeats while the worker runs."""
+        interval = max(self._config.lease_duration_seconds / 3.0, 0.05)
+        while True:
+            await asyncio.sleep(interval)
+            current = await self.get_job(job_id)
+            if current is None or current.state != JobState.RUNNING:
+                return
+            renewed = JobRecord(
+                job_id=current.job_id,
+                state=current.state,
+                revision=current.revision,
+                request_wire=current.request_wire,
+                idempotency_key=current.idempotency_key,
+                attempts=current.attempts,
+                max_attempts=current.max_attempts,
+                lease_owner=current.lease_owner,
+                lease_expires_utc=self._lease_expiry_iso(),
+                result_wire=current.result_wire,
+                artifact_refs=current.artifact_refs,
+                error_code=current.error_code,
+                error_message=current.error_message,
+                created_at_utc=current.created_at_utc,
+                updated_at_utc=_utc_now_iso(),
+                last_heartbeat_utc=_utc_now_iso(),
+            )
+            await self._storage.async_commit_transaction(
+                [
+                    StorageMutation(
+                        namespace=JOBS_NAMESPACE,
+                        key=job_id,
+                        schema_version=1,
+                        payload_bytes=_serialize_job_record(renewed),
+                        expected_revision=current.revision,
+                    )
+                ]
+            )
+
     async def _execute_job(self, job: JobRecord) -> None:
         """Execute a claimed running job via Workers and ArtifactStore."""
+        heartbeat = asyncio.create_task(self._heartbeat_loop(job.job_id))
         try:
             req_data = value_to_wire(job.request_wire)
             timeout = float(req_data.get("budget", {}).get("max_elapsed_seconds", 60.0))
@@ -694,6 +941,15 @@ class _DurableJobs(Jobs):
             worker_result = await self._workers.run_task(worker_task)
             await self._handle_worker_result(job, worker_result)
 
+        except asyncio.CancelledError:
+            # The scheduler task was cancelled (running-job cancellation).
+            with contextlib.suppress(JobError, StorageError):
+                current_job = await self.get_job(job.job_id)
+                if current_job is not None and (
+                    current_job.state == JobState.CANCELLING
+                ):
+                    await self._transition_job(current_job, JobState.CANCELLED)
+            raise
         except WorkerCancellationError:
             current_job = await self.get_job(job.job_id)
             if current_job is not None:
@@ -717,21 +973,67 @@ class _DurableJobs(Jobs):
                     error_message=str(err),
                 )
         finally:
+            heartbeat.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await heartbeat
             self._active_tasks.pop(job.job_id, None)
 
     @override
+    async def job_events(self, job_id: str) -> tuple[JobEvent, ...]:
+        """Return the persisted transition events for a job, in order."""
+        events: list[JobEvent] = []
+        after_key: str | None = None
+        prefix = f"{job_id}:"
+        while True:
+            page = await self._storage.async_scan_records(
+                JOBS_EVENTS_NAMESPACE,
+                prefix=prefix,
+                limit=100,
+                after_key=after_key,
+            )
+            for rec in page.records:
+                data = json.loads(rec.payload_bytes.decode("utf-8"))
+                events.append(
+                    JobEvent(
+                        job_id=data["job_id"],
+                        seq=data["seq"],
+                        from_state=JobState(data["from_state"]),
+                        to_state=JobState(data["to_state"]),
+                        utc=data["utc"],
+                        reason=data.get("reason", ""),
+                        detail=data.get("detail", ""),
+                    )
+                )
+            if page.next_token is None:
+                break
+            after_key = page.next_token
+        return tuple(events)
+
+    @override
     async def close(self) -> None:
-        """Safely drain and close the jobs scheduler."""
+        """Stop admission, request cancellation, drain to the deadline.
+
+        Storage, artifacts, and workers providers stay alive throughout:
+        the composition root closes them only after jobs cleanup ends.
+        """
         self._running = False
         if self._loop_task is not None:
             self._loop_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await self._loop_task
 
-        # Drain active worker execution tasks
-        if self._active_tasks:
-            await asyncio.gather(*self._active_tasks.values(), return_exceptions=True)
-            self._active_tasks.clear()
+        # Request cancellation of running jobs, then drain to the deadline.
+        for task in list(self._active_tasks.values()):
+            if not task.done():
+                task.cancel()
+        # Deadline reached: nonterminal jobs remain durable and are
+        # recovered at the next startup scan.
+        with contextlib.suppress(TimeoutError):
+            await asyncio.wait_for(
+                asyncio.gather(*self._active_tasks.values(), return_exceptions=True),
+                timeout=self._config.shutdown_drain_seconds,
+            )
+        self._active_tasks.clear()
 
 
 class _JobsFeature:
@@ -783,10 +1085,12 @@ def _jobs_feature(config: JobsConfig) -> _JobsFeature:
 
 __all__ = (
     "HOST_JOBS",
+    "JOBS_EVENTS_NAMESPACE",
     "TERMINAL_JOB_STATES",
     "JobCancelledError",
     "JobConflictError",
     "JobError",
+    "JobEvent",
     "JobNotFoundError",
     "JobPage",
     "JobQuery",
