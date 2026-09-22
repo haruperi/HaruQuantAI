@@ -2,8 +2,9 @@
 
 > **Status:** Owner-local target architecture ratified on 2026-09-22 through
 > `ARCH-FINALIZE-001`, iteration 2, amended by iteration 3 for single-file host
-> owners. S1 kernel, composition, and telemetry ownership are implemented;
-> later source stages require their own approved implementation plans.
+> owners. S1 kernel, composition, and telemetry ownership, and S2 shared plugin
+> metamodel and host catalog are implemented; later source stages require their
+> own approved implementation plans.
 
 This document owns structural constraints. [PROJECT.md](PROJECT.md) owns product
 scope and implementation status; [AGENTS.md](../AGENTS.md) owns workflow and
@@ -17,17 +18,23 @@ app/
 |-- __init__.py
 |-- host/
 |   |-- __init__.py
-|   |-- bootstrap.py  # S1 application composition root
+|   |-- bootstrap.py  # S1/S2 application composition root (HOST_TELEMETRY, HOST_CATALOG)
+|   |-- catalog.py    # S2 filesystem discovery, validation, snapshots, and admission
 |   `-- telemetry.py  # S1 observation contract, provider, and lifecycle
 |-- kernel/           # remediated S1 composition/lifecycle primitives
-`-- ui/       # retained mock-backed prototype
+|-- plugins/          # S2 shared plugin metamodel
+|   |-- __init__.py
+|   |-- algebra.py    # GraphSpec, GraphDocument, Kahn cycle check, validate_graph
+|   |-- lowering.py   # Universal semantic IR and lowering target specs
+|   |-- schema.py     # Bounded immutable values, parameter specs, port specs
+|   |-- spec.py       # PluginRef, PluginSpec, OperationSpec, CatalogView
+|   `-- wire.py       # Canonical JSON serialization and SHA-256 fingerprinting
+`-- ui/               # retained mock-backed prototype
 ```
 
-The plugin metamodel, catalog, algebra, execution, gateway, durable infrastructure,
-and quantitative plugins below remain future implementation. Exact Python
-signatures, complete wire fields, transport, database, numerical dependencies,
-and isolation choices require their own approved source-stage decisions. S1 does
-not claim a quantitative backend capability.
+Execution, gateway, durable infrastructure, and concrete quantitative plugins
+below remain future implementation stages. S2 provides the universal metamodel
+and catalog; it does not claim strategy execution or live trading.
 
 ## D1. Runtime layers and target folders
 

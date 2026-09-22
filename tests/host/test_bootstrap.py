@@ -6,6 +6,7 @@ import sys
 
 import pytest
 from app.host.bootstrap import create_runtime
+from app.host.catalog import HOST_CATALOG
 from app.host.telemetry import HOST_TELEMETRY
 from app.kernel.capability import CapabilityUnavailableError
 
@@ -25,6 +26,7 @@ logging.basicConfig = forbidden
 os.getenv = forbidden
 threading.Thread.start = forbidden
 import app.host.telemetry
+import app.host.catalog
 import app.host.bootstrap
 """
     completed = subprocess.run(
@@ -41,9 +43,14 @@ def test_create_runtime_is_inactive_until_entered_and_single_use() -> None:
         runtime = create_runtime()
         with pytest.raises(CapabilityUnavailableError):
             runtime.require(HOST_TELEMETRY)
+        with pytest.raises(CapabilityUnavailableError):
+            runtime.require(HOST_CATALOG)
         async with runtime:
-            assert runtime.active_features == ("host.telemetry",)
+            assert set(runtime.active_features) == {"host.catalog", "host.telemetry"}
             assert runtime.require(HOST_TELEMETRY).diagnostics == ()
+            catalog = runtime.require(HOST_CATALOG)
+            assert catalog.is_ready()
+            assert catalog.snapshot().view.entries == ()
         with pytest.raises(RuntimeError, match="single-use"):
             async with runtime:
                 pass

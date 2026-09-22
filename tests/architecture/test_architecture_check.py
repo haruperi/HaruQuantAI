@@ -165,3 +165,31 @@ def test_host_private_module_access_is_rejected(tmp_path: Path, statement: str) 
     source.write_text(statement, encoding="utf-8")
 
     assert "ARCH-011-HOST-PRIVATE" in _rules(check_file(source))
+
+
+def test_plugins_cannot_import_host(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "plugins" / "schema.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "from app.host.telemetry import TelemetryEvent\n", encoding="utf-8"
+    )
+
+    assert "ARCH-013-PLUGIN-PURITY" in _rules(check_file(source))
+
+
+def test_plugins_cannot_import_kernel_runtime(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "plugins" / "spec.py"
+    source.parent.mkdir(parents=True)
+    source.write_text("from app.kernel.bootstrapper import Runtime\n", encoding="utf-8")
+
+    assert "ARCH-013-PLUGIN-PURITY" in _rules(check_file(source))
+
+
+def test_plugin_dag_inversion_is_rejected(tmp_path: Path) -> None:
+    source = tmp_path / "app" / "plugins" / "schema.py"
+    source.parent.mkdir(parents=True)
+    source.write_text(
+        "from app.plugins.wire import parse_strict_json\n", encoding="utf-8"
+    )
+
+    assert "ARCH-014-PLUGIN-DAG" in _rules(check_file(source))

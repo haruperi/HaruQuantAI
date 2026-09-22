@@ -1,8 +1,9 @@
 # HaruQuantAI Project Specification
 
-> **Status:** S1 host foundation implemented on 2026-09-22. The remediated kernel,
-> host composition root, and telemetry owner are present; plugin vocabulary,
-> catalog, execution, durable infrastructure, and integrations remain pending.
+> **Status:** S2 shared plugin metamodel and host catalog implemented on 2026-09-22.
+> The remediated kernel, host composition root, telemetry owner, shared plugin metamodel,
+> and filesystem catalog provider are present; execution engine, durable infrastructure,
+> concrete plugins, and transport gateway remain pending.
 
 ## 1. Product goal
 
@@ -13,8 +14,9 @@ support data acquisition, strategy construction, simulation, optimization,
 robustness analysis, portfolios, exports, and controlled external integrations.
 
 No quantitative backend product capability is currently marked complete. The
-retained UI remains a UX prototype. S1 proves composition and observation
-lifecycle behavior; it does not imply a plugin catalog or execution engine.
+retained UI remains a UX prototype. S1 proved composition and observation
+lifecycle behavior; S2 proves the plugin metamodel, wire projection, and host
+catalog discovery and validation. Execution and durable infrastructure remain pending.
 
 ## 2. Ratified system laws
 
@@ -56,10 +58,10 @@ renderer vocabulary, a new backend plugin requires no frontend source edit.
 |---|---|---|
 | Kernel | S1 implemented | Standard-library typed capabilities, required-edge lifecycle, restricted scopes, transactional startup, and reverse cleanup |
 | UI | Retained prototype | React/TypeScript workstation using frontend mocks and browser-local state |
-| Backend host | S1 foundation | Composition root and bounded telemetry owner; gateway, persistence, jobs, workers, and integrations remain absent |
-| Plugin SDK/catalog | Missing | Metamodel ownership and discovery rules ratified; exact APIs and implementation remain pending |
+| Backend host | S2 foundation | Composition root composing HOST_TELEMETRY and HOST_CATALOG owners; execution, gateway, persistence, jobs, workers, and integrations remain future stages |
+| Plugin SDK/catalog | S2 implemented | Shared metamodel (`schema`, `lowering`, `spec`, `algebra`, `wire`) and host filesystem catalog provider (`HOST_CATALOG`) |
 | Quantitative plugins | Missing | No production indicators, rules, metrics, tasks, or exporters |
-| Algebra AST | Missing | No shared typed strategy/workflow document |
+| Algebra AST | S2 implemented | Versioned algebraic GraphSpec, GraphDocument, Kahn's cycle detection, and catalog validation (`validate_graph`) |
 
 ## 4. Ratified architecture and implementation sequence
 
@@ -86,16 +88,11 @@ The ratified stages and current evidence status are:
 | Stage | Status | Objective | Required exit evidence |
 |---|---|---|---|
 | S1 Kernel | Implemented | Restrict slots, canonicalize ordering, correct lifecycle and event/logging ownership | Failure/cancellation cleanup, provider lifetime, ordering, import purity, and observer-isolation tests |
-| S2 Plugin vocabulary/catalog | Pending | Define exact schema, graph, wire, operation APIs and discovery | Validation, unknown-node round trips, immutable snapshots, and pre-import exclusions |
+| S2 Plugin vocabulary/catalog | Implemented | Define exact schema, graph, wire, operation APIs and discovery | Validation, unknown-node round trips, immutable snapshots, and pre-import exclusions |
 | S3 Execution slice | Pending | Cohesive RSI and comparison; generic execution with supported optimization/export | Numerical goldens, lowering parity, independent indicator/comparison add/remove proof |
 | S4 UI/workspaces | Pending | Generic catalog/schema/graph client and workspace declarations for the proven slice | Shared schema/document, unavailable placeholders, and two-workspace selection/removal |
 | S5 Durable infrastructure | Pending | Jobs, isolated persistence/artifacts, workers and budgets | Recovery, cancellation, resource lifetime, and process-boundary tests |
 | S6 Integrations/families | Pending | Additional algorithms, data sources, brokers, and tasks | Family-specific semantics/effect evidence and separate live-trading authorization |
-
-Each stage requires its own exact-path implementation plan and owner approval.
-Minimal in-process execution can prove S3 before durable infrastructure. Do not
-scaffold every future service or infer complete simulator/exporter behavior from
-a thin slice.
 
 ## 5. System-wide acceptance
 

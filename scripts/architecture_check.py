@@ -1,4 +1,4 @@
-"""Check the architecture invariants of the approved S1 host foundation."""
+"""Check architecture invariants of the approved S2 metamodel and host foundation."""
 
 from __future__ import annotations
 
@@ -16,11 +16,39 @@ APP_ROOT = REPO_ROOT / "app"
 UI_SOURCE_ROOT = APP_ROOT / "ui" / "src"
 
 FRONTEND_SOURCE_SUFFIXES = frozenset({".js", ".jsx", ".ts", ".tsx"})
-CURRENT_APP_ROOTS = frozenset({"__init__.py", "host", "kernel", "ui"})
+CURRENT_APP_ROOTS = frozenset({"__init__.py", "host", "kernel", "plugins", "ui"})
 CURRENT_KERNEL_FILES = frozenset(
     {"__init__.py", "bootstrapper.py", "capability.py", "context.py", "feature.py"}
 )
-CURRENT_HOST_FILES = frozenset({"__init__.py", "bootstrap.py", "telemetry.py"})
+CURRENT_HOST_FILES = frozenset(
+    {"__init__.py", "bootstrap.py", "catalog.py", "telemetry.py"}
+)
+CURRENT_PLUGINS_FILES = frozenset(
+    {
+        "__init__.py",
+        "algebra.py",
+        "lowering.py",
+        "schema.py",
+        "spec.py",
+        "wire.py",
+    }
+)
+_ALLOWED_PLUGIN_IMPORTS: dict[str, tuple[str, ...]] = {
+    "schema.py": (),
+    "lowering.py": ("app.plugins.schema",),
+    "spec.py": ("app.plugins.schema", "app.plugins.lowering"),
+    "algebra.py": (
+        "app.plugins.schema",
+        "app.plugins.lowering",
+        "app.plugins.spec",
+    ),
+    "wire.py": (
+        "app.plugins.schema",
+        "app.plugins.lowering",
+        "app.plugins.spec",
+        "app.plugins.algebra",
+    ),
+}
 FORBIDDEN_APP_ROOTS = frozenset(
     {
         "api",
@@ -98,6 +126,10 @@ class ArchitecturalVisitor(ast.NodeVisitor):
             len(parts) == 3 and parts[1] == "host" and parts[2] == "bootstrap.py"
         )
         self._is_host_owner = len(parts) > 2 and parts[1] == "host"
+        self._is_plugins = len(parts) > 1 and parts[1] == "plugins"
+        self._plugin_module_name = (
+            parts[2] if len(parts) == 3 and parts[1] == "plugins" else None
+        )
         self._host_module_aliases: set[str] = set()
         self.violations: list[ArchitecturalViolation] = []
 
@@ -114,8 +146,46 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                 )
             )
 
+    def _check_plugins_import(self, target: str, line_number: int) -> None:
+        if target.startswith(("app.host.", "app.ui.")):
+            self.violations.append(
+                ArchitecturalViolation(
+                    self.file_path,
+                    line_number,
+                    "ARCH-013-PLUGIN-PURITY",
+                    f"Shared plugin metamodel must not import host or UI: {target}",
+                )
+            )
+        if target.startswith("app.kernel."):
+            is_valid_spec_cap = (
+                self._plugin_module_name == "spec.py"
+                and target == "app.kernel.capability"
+            )
+            if not is_valid_spec_cap:
+                self.violations.append(
+                    ArchitecturalViolation(
+                        self.file_path,
+                        line_number,
+                        "ARCH-013-PLUGIN-PURITY",
+                        f"Metamodel module cannot import kernel: {target}",
+                    )
+                )
+        if target.startswith("app.plugins."):
+            allowed_prefixes = _ALLOWED_PLUGIN_IMPORTS.get(
+                self._plugin_module_name or "", ()
+            )
+            if not target.startswith(allowed_prefixes):
+                self.violations.append(
+                    ArchitecturalViolation(
+                        self.file_path,
+                        line_number,
+                        "ARCH-014-PLUGIN-DAG",
+                        f"{self._plugin_module_name} may not import {target}",
+                    )
+                )
+
     def _check_import(self, target: str, line_number: int) -> None:
-        """Check kernel purity and XML interchange imports."""
+        """Check kernel purity, plugin acyclic DAG, and XML interchange imports."""
         root = target.split(".", maxsplit=1)[0]
         if root in FORBIDDEN_XML_MODULES:
             self.violations.append(
@@ -137,6 +207,8 @@ class ArchitecturalVisitor(ast.NodeVisitor):
                     f"Kernel imports must be standard-library or app.kernel: {target}",
                 )
             )
+        if self._is_plugins:
+            self._check_plugins_import(target, line_number)
 
     @override
     def visit_Import(self, node: ast.Import) -> None:
@@ -155,13 +227,15 @@ class ArchitecturalVisitor(ast.NodeVisitor):
     def visit_ImportFrom(self, node: ast.ImportFrom) -> None:
         """Check every from-import."""
         if node.level:
-            if self._is_kernel:
+            if self._is_kernel or self._is_plugins:
                 self.violations.append(
                     ArchitecturalViolation(
                         self.file_path,
                         node.lineno,
-                        "ARCH-004-KERNEL-PURITY",
-                        "Kernel source must use absolute imports.",
+                        "ARCH-004-KERNEL-PURITY"
+                        if self._is_kernel
+                        else "ARCH-013-PLUGIN-PURITY",
+                        "Application source must use absolute imports.",
                     )
                 )
         else:
@@ -318,6 +392,7 @@ def _current_topology_violations() -> list[ArchitecturalViolation]:
     for directory, expected in (
         (APP_ROOT / "kernel", CURRENT_KERNEL_FILES),
         (APP_ROOT / "host", CURRENT_HOST_FILES),
+        (APP_ROOT / "plugins", CURRENT_PLUGINS_FILES),
     ):
         actual = {path.name for path in directory.glob("*.py")}
         if actual != expected:
