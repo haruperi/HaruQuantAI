@@ -7,7 +7,10 @@ authors = [
     { name = "Haruperi", email = "r.haruperi@hotmail.com" }
 ]
 requires-python = ">=3.14"
-dependencies = []
+dependencies = [
+    "starlette>=1.6.0,<2",
+    "uvicorn>=0.53.0,<1",
+]
 
 [dependency-groups]
 dev = [
@@ -17,6 +20,7 @@ dev = [
     "mypy>=1.15,<2",
     "detect-secrets>=1.5.0",
     "pre-commit>=4.0.0",
+    "httpx2>=2.13.0,<3",
 ]
 
 # ============================================================================
@@ -206,6 +210,9 @@ python_files = [
 ]
 filterwarnings = [
     "error",
+    # starlette 1.6 TestClient -> httpx2 imports the deprecated anyio alias at
+    # import time; ignore only this third-party message, not the category.
+    "ignore:The anyio.abc.BlockingPortal alias is deprecated:DeprecationWarning",
 ]
 addopts = [
     "--import-mode=importlib",
