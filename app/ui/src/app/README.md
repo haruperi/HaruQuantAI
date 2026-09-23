@@ -28,9 +28,14 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
 - The browser shell uses the same-origin `/api/v1` host in a built deployment;
   local Vite development on port 3000 targets the loopback host on port 8000.
   Tokens are not persisted. A 401 returns the shell to its login flow.
-- Only theme, language, and zoom are synchronized with host settings under
-  the `ui` key. Remaining research-workspace settings remain local simulation
-  until their backend owners are implemented.
+- Global Settings menu preferences (Configuration tabs, Remote access flags,
+  non-secret SMTP fields, language, skin, and zoom) are loaded from scoped
+  records in the host database. Each edit updates its owning record fields;
+  the host excludes credential fields from settings responses and events.
+  Browser storage excludes these host-owned settings. Offline or conflicting
+  writes do not claim success. Passwords and license keys are transient.
+  Benchmark, MCP, mail delivery, licensing,
+  remote-server activation, and Exit still lack backend services.
 
 ## Connection rules (spatial composability)
 

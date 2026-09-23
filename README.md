@@ -45,6 +45,10 @@ host issues a passwordless session. If that environment variable is set
 before starting the host, the UI prompts for the password. The browser
 session token stays in memory. Stop each server with Ctrl+C in its terminal.
 
+Global Settings menu preferences are saved by the host in
+`data/database/haruquantai.db` (`host_settings`). Future feature-owned JSON presets belong in
+`data/presets/`.
+
 The default ports can be changed through host configuration, but the
 development UI currently targets port 8000 when served on Vite's port 3000.
 A different backend port requires matching UI deployment or proxy

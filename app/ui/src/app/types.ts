@@ -263,7 +263,7 @@ export interface ConfigurationSettings {
   dontStorePendingOrders: boolean;
   memoryCleanup: boolean;
   cleanupInterval: '5 minutes' | '15 minutes' | '30 minutes' | '1 hour';
-  databankSyncInterval: 'Never' | 'Immediately' | 'Every 5 minutes' | 'Every 15 minutes' | 'Every hour';
+  databankSyncInterval: 'Never' | 'Immediately' | 'Every 5 minutes' | 'Every 10 minutes' | 'Every 15 minutes' | 'Every hour';
   syncDatabanksAfterTask: boolean;
   storeChartData: boolean;
   dontStoreOptimization3d: boolean;

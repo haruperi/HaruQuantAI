@@ -356,10 +356,13 @@ export const useAppStore = create<AppState>()(persist((set) => ({
   }),
 }), {
   name: 'sqx-recreation-v1', version: 1,
-  partialize: s => ({ ...s, notifications: [] }),
+  partialize: s => {
+    const { settings: _hostSettings, ...localState } = s;
+    return { ...localState, notifications: [] };
+  },
   merge: (persisted, current) => {
     const saved = persisted as Partial<AppState>;
     const savedModule = (saved as { module?: unknown }).module;
-    return { ...current, ...saved, module: savedModule === 'improver' ? 'builder' : saved.module ?? current.module, settings: mergeAppSettings(saved.settings) };
+    return { ...current, ...saved, module: savedModule === 'improver' ? 'builder' : saved.module ?? current.module, settings: mergeAppSettings() };
   },
 }));

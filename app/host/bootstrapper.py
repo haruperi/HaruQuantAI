@@ -1,8 +1,8 @@
 """Host process bootstrap: configuration, telemetry, and server lifecycle.
 
 The backend host listens on ``127.0.0.1:8000`` by default (frontend stays on
-3000), writes dated logs under ``data/logs``, persists settings at
-``data/user/settings.json``, jails file exchange to ``data/exchange``,
+3000), writes dated logs under ``data/logs``, persists host settings in
+``data/database/haruquantai.db``, jails file exchange to ``data/exchange``,
 scans for domains under ``app/workspace`` and ``app/plugins``, and serves
 the built UI from ``app/ui/dist`` when present.
 
@@ -28,7 +28,7 @@ from app.host.commands import ExchangeFiles
 from app.host.events import EventBus
 from app.host.lifecycle import LifecycleState
 from app.host.sessions import SessionManager
-from app.host.settings import DEFAULT_SETTINGS_PATH, SettingsStore
+from app.host.settings import DEFAULT_DATABASE_PATH, SettingsStore
 from app.host.telemetry import configure_host_logging
 from app.host.webserver import HostServices, create_app
 
@@ -46,7 +46,7 @@ ENV_ADDRESS = "HARUQUANTAI_HOST_ADDRESS"
 ENV_PORT = "HARUQUANTAI_HOST_PORT"
 ENV_LOG_DIR = "HARUQUANTAI_HOST_LOG_DIR"
 ENV_PASSWORD = "HARUQUANTAI_HOST_PASSWORD"  # pragma: allowlist secret # noqa: S105
-ENV_SETTINGS_PATH = "HARUQUANTAI_SETTINGS_PATH"
+ENV_DATABASE_PATH = "HARUQUANTAI_DATABASE_PATH"
 ENV_EXCHANGE_ROOT = "HARUQUANTAI_EXCHANGE_ROOT"
 ENV_DOMAIN_ROOTS = "HARUQUANTAI_DOMAIN_ROOTS"
 ENV_UI_DIST = "HARUQUANTAI_UI_DIST"
@@ -64,8 +64,8 @@ class HostConfig:
         log_dir: Directory for dated log files (default ``data/logs``).
         password: Required login password (locked mode), or ``None`` for
             documented research mode.
-        settings_path: Settings file location
-            (default ``data/user/settings.json``).
+        database_path: Settings database location
+            (default ``data/database/haruquantai.db``).
         exchange_root: Jail root for sandboxed file exchange
             (default ``data/exchange``).
         domain_roots: Parent directories scanned for domain manifests
@@ -78,7 +78,7 @@ class HostConfig:
     port: int
     log_dir: Path
     password: str | None
-    settings_path: Path
+    database_path: Path
     exchange_root: Path
     domain_roots: tuple[Path, ...]
     ui_dist: Path | None
@@ -127,7 +127,7 @@ def config_from_env(env: Mapping[str, str] | None = None) -> HostConfig:
         port=port,
         log_dir=Path(source.get(ENV_LOG_DIR, str(DEFAULT_LOG_DIR))),
         password=source.get(ENV_PASSWORD) or None,
-        settings_path=Path(source.get(ENV_SETTINGS_PATH, str(DEFAULT_SETTINGS_PATH))),
+        database_path=Path(source.get(ENV_DATABASE_PATH, str(DEFAULT_DATABASE_PATH))),
         exchange_root=Path(source.get(ENV_EXCHANGE_ROOT, str(DEFAULT_EXCHANGE_ROOT))),
         domain_roots=domain_roots,
         ui_dist=ui_dist,
@@ -138,9 +138,8 @@ def config_from_env(env: Mapping[str, str] | None = None) -> HostConfig:
 def build_services(config: HostConfig) -> HostServices:
     """Assemble every host feature service from resolved configuration.
 
-    Pure construction with no I/O side effects beyond reading an existing
-    settings file; tests use this to build isolated service sets from a
-    temporary :class:`HostConfig`.
+    Construction validates the scoped host settings table or initializes it
+    in a new database; tests use isolated temporary databases.
 
     Args:
         config: Fully resolved host configuration.
@@ -152,7 +151,7 @@ def build_services(config: HostConfig) -> HostServices:
     return HostServices(
         sessions=SessionManager(config.password),
         events=EventBus(),
-        settings=SettingsStore(config.settings_path),
+        settings=SettingsStore(config.database_path),
         catalog=CatalogService(config.domain_roots),
         exchange=ExchangeFiles(config.exchange_root),
         lifecycle=LifecycleState(),

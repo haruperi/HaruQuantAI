@@ -242,7 +242,14 @@ without acquiring the meaning of a strategy, project, dataset, result, or
 portfolio. Plugins never execute ad-hoc SQL against another owner or take a
 raw shared connection. Persistence schema, migration, transaction and
 retention need a ratified host capability; no such general quantitative
-persistence service is implied by the current shell settings store.
+persistence service is implied by the shell settings store. Host-owned global
+settings use scoped `(scope, key)` records in the `host_settings` table in
+`data/database/haruquantai.db`, with transactional field updates, conditional
+writes, credential-field redaction, and post-commit change events. The host does
+not read `data/user/settings.json`. Feature-owned app presets use JSON in
+`data/presets/` when their owning features are implemented; this directory is
+not an alternate settings store. Other database tables remain with their
+declared owners.
 
 A project is a saved flow/configuration; a workspace is a user interaction
 surface; a databank is a named collection or view of references. Strategy,

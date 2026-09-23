@@ -17,7 +17,7 @@ def make_config(tmp_path: Path) -> HostConfig:
         port=8000,
         log_dir=tmp_path / "logs",
         password=None,
-        settings_path=tmp_path / "user" / "settings.json",
+        database_path=tmp_path / "database" / "haruquantai.db",
         exchange_root=tmp_path / "exchange",
         domain_roots=(tmp_path / "domains",),
         ui_dist=None,
@@ -31,7 +31,7 @@ def host_config(tmp_path: Path) -> HostConfig:
 
 @pytest.fixture
 def settings_path(tmp_path: Path) -> Path:
-    return tmp_path / "user" / "settings.json"
+    return tmp_path / "database" / "haruquantai.db"
 
 
 @pytest.fixture

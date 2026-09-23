@@ -16,7 +16,7 @@ it knows no domain by name (Law 5: discovery over knowledge).
 | FEAT-GATEWAY-EVENTS | Channel pub/sub live-update hub | `events.py` | implemented (SSE `GET /api/v1/events?channels=…` + publish API; WebSocket may follow without contract change) |
 | FEAT-GATEWAY-CATALOG | Domain/plugin discovery from self-describing manifests; manifest serving | `catalog.py` | implemented (startup snapshot from `app/workspace` + `app/plugins`; `GET /api/v1/catalog` marks each entry as mounted or manifest-only) |
 | FEAT-GATEWAY-TELEMETRY | Dated file logging + per-request access log | `telemetry.py`, `webserver.py` | implemented (`data/logs/log_Y_M_D.log`; access lines carry method, path, status, request id — never payloads) |
-| FEAT-GATEWAY-SETTINGS | Settings service: load, cache, atomic save, push refresh | `settings.py` | implemented (`data/user/settings.json`; every change publishes `settings.changed`) |
+| FEAT-GATEWAY-SETTINGS | Settings service: transactional load/save and push refresh | `settings.py` | implemented (`data/database/haruquantai.db`, scoped `host_settings` records with safe field updates; committed changes publish `settings.changed`) |
 
 ## Module inventory
 
@@ -32,7 +32,7 @@ Every file in this package, so the registry always matches disk truth:
 | `sessions.py` | bearer-token session manager |
 | `events.py` | channel bus, SSE endpoint, publish endpoint |
 | `catalog.py` | manifest model/validation, scanner, catalog endpoint, route mounting |
-| `settings.py` | atomic settings store + endpoints, change events |
+| `settings.py` | SQLite scoped settings store, schema validation, endpoints, change events |
 | `commands.py` | OS-mediation validation + sandboxed exchange files + endpoints |
 | `lifecycle.py` | status probe + graceful shutdown endpoints |
 | `telemetry.py` | dated file logging |
@@ -45,12 +45,12 @@ uv run python -m app.main
 ```
 
 Defaults: `127.0.0.1:8000` (frontend 3000), logs `data/logs`, settings
-`data/user/settings.json`, file-exchange jail `data/exchange`, UI dist
+`data/database/haruquantai.db`, file-exchange jail `data/exchange`, UI dist
 `app/ui/dist`, domain roots `app/workspace,app/plugins`.
 
 Environment overrides: `HARUQUANTAI_HOST_ADDRESS`, `HARUQUANTAI_HOST_PORT`,
 `HARUQUANTAI_HOST_LOG_DIR`, `HARUQUANTAI_HOST_PASSWORD`,
-`HARUQUANTAI_SETTINGS_PATH`, `HARUQUANTAI_EXCHANGE_ROOT`,
+`HARUQUANTAI_DATABASE_PATH`, `HARUQUANTAI_EXCHANGE_ROOT`,
 `HARUQUANTAI_DOMAIN_ROOTS`, `HARUQUANTAI_UI_DIST` (empty disables static
 serving), `HARUQUANTAI_CORS_ORIGINS` (comma-separated allowed origins,
 defaulting to `http://127.0.0.1:3000,http://localhost:3000`). Invalid values
@@ -80,9 +80,12 @@ are exempt to allow CORS preflight.
   records frontend initialization, transitioning `health` from `services.ui = pending`
   to `services.ui = ready`.
 - The browser shell acquires an in-memory bearer session before signaling
-  `app-loaded`. It reads and saves only `ui.theme`, `ui.language`, and `ui.zoom`
-  through the generic settings service and refreshes them on the
-  `settings.changed` channel. Other workspace settings remain local simulation.
+  `app-loaded`. It reads and conditionally saves the editable global Settings
+  menu fields under `ui`; a stale revision receives 409. Commits publish
+  `settings.changed`, prompting clients to re-read. Passwords and license keys
+  are not stored. Workspace settings remain with their workspace owners.
+- The old `data/user/settings.json` is never read or written. JSON app presets
+  belong in `data/presets/` when their owning features are implemented.
 - Evidence basis for each feature is the clean-room ledger
   (`docs/dev/evidence/reimplementation.json`, gateway-domain records).
 

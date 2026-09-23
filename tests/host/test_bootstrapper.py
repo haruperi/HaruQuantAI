@@ -12,17 +12,17 @@ from app.host.bootstrapper import (
     DEFAULT_PORT,
     DEFAULT_UI_DIST,
     ENV_ADDRESS,
+    ENV_DATABASE_PATH,
     ENV_DOMAIN_ROOTS,
     ENV_EXCHANGE_ROOT,
     ENV_LOG_DIR,
     ENV_PASSWORD,
     ENV_PORT,
-    ENV_SETTINGS_PATH,
     ENV_UI_DIST,
     HostConfig,
     config_from_env,
 )
-from app.host.settings import DEFAULT_SETTINGS_PATH
+from app.host.settings import DEFAULT_DATABASE_PATH
 from app.host.telemetry import LOGGER_NAME, configure_host_logging, host_log_path
 
 
@@ -34,14 +34,14 @@ def test_defaults_match_owner_decisions() -> None:
         port=DEFAULT_PORT,
         log_dir=DEFAULT_LOG_DIR,
         password=None,
-        settings_path=DEFAULT_SETTINGS_PATH,
+        database_path=DEFAULT_DATABASE_PATH,
         exchange_root=DEFAULT_EXCHANGE_ROOT,
         domain_roots=(Path("app") / "workspace", Path("app") / "plugins"),
         ui_dist=DEFAULT_UI_DIST,
     )
     assert (DEFAULT_ADDRESS, DEFAULT_PORT) == ("127.0.0.1", 8000)
     assert DEFAULT_LOG_DIR == Path("data") / "logs"
-    assert DEFAULT_SETTINGS_PATH == Path("data") / "user" / "settings.json"
+    assert DEFAULT_DATABASE_PATH == Path("data") / "database" / "haruquantai.db"
     assert DEFAULT_EXCHANGE_ROOT == Path("data") / "exchange"
 
 
@@ -52,7 +52,7 @@ def test_environment_overrides_are_respected(tmp_path: Path) -> None:
             ENV_PORT: "9001",
             ENV_LOG_DIR: str(tmp_path / "logs"),
             ENV_PASSWORD: "s3cret",  # pragma: allowlist secret
-            ENV_SETTINGS_PATH: str(tmp_path / "user" / "settings.json"),
+            ENV_DATABASE_PATH: str(tmp_path / "database" / "haruquantai.db"),
             ENV_EXCHANGE_ROOT: str(tmp_path / "exchange"),
             ENV_DOMAIN_ROOTS: "custom/domains, other/domains",
             ENV_UI_DIST: "",
@@ -63,7 +63,7 @@ def test_environment_overrides_are_respected(tmp_path: Path) -> None:
     assert config.port == 9001
     assert config.log_dir == tmp_path / "logs"
     assert config.password == "s3cret"  # pragma: allowlist secret
-    assert config.settings_path == tmp_path / "user" / "settings.json"
+    assert config.database_path == tmp_path / "database" / "haruquantai.db"
     assert config.exchange_root == tmp_path / "exchange"
     assert config.domain_roots == (Path("custom/domains"), Path("other/domains"))
     assert config.ui_dist is None
