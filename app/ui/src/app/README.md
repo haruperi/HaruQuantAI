@@ -8,6 +8,9 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
 - App shell: `App.tsx` (mount + navigation), `router.tsx`, `store.ts`,
   `HeaderApplications.tsx`, `GlobalSettingsMenu.tsx`, shared `types.ts`.
 - Universal transport: `transport.ts`.
+- Host connection: `HostConnection.tsx` acquires an in-memory session, reports
+  readiness, and handles offline/expired-session states. `hostSettings.ts`
+  validates the shell preference projection and consumes authenticated SSE.
 
 ## Transport boundary law
 
@@ -22,6 +25,12 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
   store and will be replaced by the ratified host contract.
 - Default base URL and domain route bases are provisional until the backend
   host architecture ratifies the mounting scheme.
+- The browser shell uses the same-origin `/api/v1` host in a built deployment;
+  local Vite development on port 3000 targets the loopback host on port 8000.
+  Tokens are not persisted. A 401 returns the shell to its login flow.
+- Only theme, language, and zoom are synchronized with host settings under
+  the `ui` key. Remaining research-workspace settings remain local simulation
+  until their backend owners are implemented.
 
 ## Connection rules (spatial composability)
 
@@ -33,3 +42,10 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
    workspace never edits the host.
 4. UI/backend pairs share contracts, never modules: the boundary is typed
    documents over the transport.
+
+## Feature registry (this domain)
+
+| Feature ID | Feature | Status |
+|---|---|---|
+| FEAT-UI-TRANSPORT | Universal UI-host transport: envelope, error mapping, request IDs, domain-client factory, host session startup, shell preference updates | implemented (`transport.ts`, `HostConnection.tsx`, `hostSettings.ts`) |
+| FEAT-UI-WORKSPACE_INVENTORY | Sixteen workspace surfaces mirroring the SQX 144.2953 navigation inventory (plus normative MTAnalyzer and Live Trading) | implemented (`src/workspace/*`) |

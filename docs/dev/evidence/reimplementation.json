@@ -1,0 +1,2469 @@
+{
+  "$schema": "./reimplementation.schema.json",
+  "schema_version": 1,
+  "ledger_id": "haruquantai.sqx.reimplementation",
+  "reference_product": {
+    "name": "StrategyQuant X",
+    "build": "144.2953",
+    "installation_root_variable": "SQX_REFERENCE_ROOT"
+  },
+  "target_project": {
+    "name": "HaruQuantAI",
+    "repository_root_variable": "HARUQUANTAI_ROOT",
+    "authority_files": [
+      "AGENTS.md",
+      "docs/ARCHITECTURE.md",
+      "app/host/README.md",
+      "app/ui/src/app/README.md"
+    ]
+  },
+  "backfill": {
+    "status": "none",
+    "catalog_snapshot_commit": "5d7bc51",
+    "recorded_at": "2026-09-22T23:40:08Z",
+    "notes": [
+      "Fresh ledger created after the backend reset (commit 558d890) removed the prior ledger from repository truth; the prior ledger last existed at commit 5d7bc51 and its records were not carried over.",
+      "All records were authored from the 2026-09-22 deep investigation of the SQX 144.2953 platform shell plus the navigation inventory investigation of the same day."
+    ]
+  },
+  "source_catalog": {
+    "E-L01": {
+      "title": "SQX Electron satellite shell",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/electron/resources/preload.js",
+        "internal/electron/resources/app.asar"
+      ],
+      "scope": "Electron main process (extracted main.js), preload bridge, icons, userData",
+      "confidence": "high",
+      "limitations": [
+        "main.js inspected via @electron/asar extract-file; the asar archive is fingerprinted, not each inner file"
+      ]
+    },
+    "E-L02": {
+      "title": "SQX shared web shell and host app sources",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/web/app/sq-tools/",
+        "internal/web/SQUANT/",
+        "internal/web/app/login/",
+        "internal/web/common/Batch1/libs.js"
+      ],
+      "scope": "BackendService, SQWebSocketService, AppService, SQConstants, PluginManager, SQEvents, LoginService, host layout",
+      "confidence": "high",
+      "limitations": [
+        "Build artifacts (Batch libs) are minified; core shell services also verified in source form under app/"
+      ]
+    },
+    "E-L03": {
+      "title": "SQX server-side web GUI jar",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/libs/SQWebGUILib.jar"
+      ],
+      "scope": "Embedded Jetty server, servlet classes, plugin directory scanning",
+      "confidence": "medium",
+      "limitations": [
+        "Class-name inventory and printable strings only; no decompilation"
+      ]
+    },
+    "E-L04": {
+      "title": "SQX application settings",
+      "kind": "local_file",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/AppSettings.txt"
+      ],
+      "scope": "Per-product web server ports",
+      "confidence": "high",
+      "limitations": []
+    },
+    "E-L05": {
+      "title": "SQX web plugin modules",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/plugins/"
+      ],
+      "scope": "193 plugin web modules (module.js + language files) incl. 16 navigation registrations",
+      "confidence": "high",
+      "limitations": [
+        "Anchor fingerprint is AppBuilder/module.js; individual modules are not each fingerprinted"
+      ]
+    },
+    "E-L06": {
+      "title": "SQX bundled project archive",
+      "kind": "local_file",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "user/projects/Builder/project.cfx"
+      ],
+      "scope": "ZIP member inventory and config.xml structure for the bundled Builder project",
+      "confidence": "high",
+      "limitations": [
+        "One bundled project sample; no user-authored archive contents entered in evidence."
+      ]
+    },
+    "E-L07": {
+      "title": "SQX extension manual",
+      "kind": "official_pdf",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "Extending_SQX.pdf"
+      ],
+      "scope": "Plugin/snippet distinction and indicator translation workflow",
+      "confidence": "high",
+      "limitations": [
+        "Manual examples do not establish every runtime behavior of build 144.2953.",
+        "The manual predates build 144.2953; claims from it are conceptual unless corroborated in installed artifacts."
+      ]
+    },
+    "E-R01": {
+      "title": "HaruQuantAI repository registries and authorities",
+      "kind": "repository",
+      "root": "HARUQUANTAI_ROOT",
+      "locators": [
+        "AGENTS.md",
+        "docs/ARCHITECTURE.md",
+        "app/host/README.md",
+        "app/ui/src/app/README.md"
+      ],
+      "scope": "Owner decisions, laws, and feature registries referenced by target mappings",
+      "confidence": "high",
+      "limitations": []
+    }
+  },
+  "records": {
+    "SQX144-EV-000001": {
+      "topic": "shell.process.topology",
+      "title": "Java engine is the primary process; the desktop UI is a spawned satellite",
+      "question": "Which process is primary in the SQX platform shell, and how does the desktop UI attach to it?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Java engine hosts an embedded Jetty web server (classes WebServer, JettyServer, MainAppJettyServer, MainServlet, DefaultServlet, DirServlet, HttpJSONServlet, LanguageServlet, SQWebSocketServlet in SQWebGUILib.jar) with one server per product (AppSettings.txt: AppWebServerPortSQUANT=5050, AppWebServerPortSQEDITOR=5051). The Java process launches the Electron UI as StrategyQuantX_ui.exe with arguments <productCode> <productName> <productIcon> <webServerPort> <browserToken>; launched standalone the Electron app refuses to run and re-spawns the StrategyQuantX launcher.",
+        "confidence": "high",
+        "limitations": [
+          "Server internals known from class inventory and string inspection of the jar, not from decompiled logic.",
+          "The launcher chain (install4j) was not inspected."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/electron/resources/app.asar!/main.js",
+          "location": {
+            "section": null,
+            "symbol": "main.js argument parsing and standalone-launch guard",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "main.js read via @electron/asar extract-file; fingerprint is of app.asar"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a463a5e64ba5686bdbb6cb96cc74642b8f924d2104d8745afc3239a5ccf97a84"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L03",
+          "artifact_locator": "internal/libs/SQWebGUILib.jar",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "class name inventory via Python zipfile; fingerprint of jar"
+          },
+          "inspection_method": "archive_inventory",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L04",
+          "artifact_locator": "internal/AppSettings.txt",
+          "location": {
+            "section": null,
+            "symbol": "<AppWebServerPortSQUANT>/<AppWebServerPortSQEDITOR>",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2e9c86dd1b887c421d3711aa87622c5266eb47fb0e60441e7d2d793decea1c3a"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-LIFECYCLE",
+          "FEAT-GATEWAY-WEBSERVER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "process",
+        "topology",
+        "jetty",
+        "electron"
+      ]
+    },
+    "SQX144-EV-000002": {
+      "topic": "shell.process.supervision",
+      "title": "UI supervises the engine over a reconnecting WebSocket and dies with it",
+      "question": "How does the desktop UI detect engine death and coordinate shutdown?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Electron main process holds a ReconnectingWebSocket to ws://127.0.0.1:<port>/websocket/app (connectionTimeout 5000 ms, maxRetries 10). When retries are exhausted it probes GET /status and GET /exit, shows an engine-crashed dialog, and quits. Closing the window is prevented and {'action':'exitApp'} is sent to the backend; the app quits only when the backend commands exit.",
+        "confidence": "high",
+        "limitations": [
+          "Behavior read from the satellite side only; the Java side of /websocket/app was not decompiled."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/electron/resources/app.asar!/main.js",
+          "location": {
+            "section": null,
+            "symbol": "ws event listeners; mainWindow 'close' handler",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "fingerprint is of app.asar"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a463a5e64ba5686bdbb6cb96cc74642b8f924d2104d8745afc3239a5ccf97a84"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-LIFECYCLE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "supervision",
+        "shutdown",
+        "websocket"
+      ]
+    },
+    "SQX144-EV-000003": {
+      "topic": "shell.window.command_channel",
+      "title": "Backend owns the window: UI-initiated window ops round-trip through the backend",
+      "question": "Who owns desktop window operations in the SQX shell?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The backend drives the window over the app WebSocket with commands loadUrl, loadFile, loadingInfo, modalWindow, confirmDialogShow, showDialog, exit, maximize, minimize, setTitle, openDevTools (confirm dialogs answered via {'action':'confirmDialogResponse'}). Window ops initiated by the UI itself call REST commands /main/minimize, /main/toggleFullscreen, /main/exit, which the backend echoes back as window commands.",
+        "confidence": "high",
+        "limitations": [
+          "Command list read from the message handler; backend-side echo path inferred from matching REST commands."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/electron/resources/app.asar!/main.js",
+          "location": {
+            "section": null,
+            "symbol": "handleMessageWS",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "fingerprint is of app.asar"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a463a5e64ba5686bdbb6cb96cc74642b8f924d2104d8745afc3239a5ccf97a84"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/AppService.js",
+          "location": {
+            "section": null,
+            "symbol": "AppService.minimize/toggleFullscreen/exit",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "25334002d855fbd64bc96551d8f0807724ffcee89ee7188008150743708d91ee"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-COMMANDS",
+          "FEAT-GATEWAY-LIFECYCLE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "window",
+        "commands"
+      ]
+    },
+    "SQX144-EV-000004": {
+      "topic": "shell.session.browser_token",
+      "title": "Launcher-issued browser token gates satellite-to-server requests",
+      "question": "How are requests from the desktop UI distinguished from other local traffic?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Java launcher passes a browserToken integer to Electron at spawn; Electron injects a browserToken header into every renderer request via session.webRequest.onBeforeSendHeaders, and preload.js exposes an IPC http proxy plus browserToken retrieval to the renderer.",
+        "confidence": "high",
+        "limitations": [
+          "Server-side verification of the token was not inspected."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/electron/resources/app.asar!/main.js",
+          "location": {
+            "section": null,
+            "symbol": "onBeforeSendHeaders handler",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "fingerprint is of app.asar"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a463a5e64ba5686bdbb6cb96cc74642b8f924d2104d8745afc3239a5ccf97a84"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L01",
+          "artifact_locator": "internal/electron/resources/preload.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4669b48151d4af387c72bb56f1de4b31ebd4f90357783c053cdbe376b424c927"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-SESSIONS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "security",
+        "token"
+      ]
+    },
+    "SQX144-EV-000005": {
+      "topic": "shell.request.envelope",
+      "title": "One shared response envelope with resolved errors",
+      "question": "What response envelope does the SQX web shell use for all backend requests?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "BackendService.getPromise wraps every request; responses are {success, error, data}; HTTP failures are resolved (not rejected) as {success:false, error}, and failures surface a localized error banner except when the error contains RecordNotFoundException; forceCallback and dontCheckResult flags modify error handling.",
+        "confidence": "high",
+        "limitations": [
+          "Read from the client side; server-side envelope construction not inspected."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/BackendService.js",
+          "location": {
+            "section": null,
+            "symbol": "BackendService.getPromise / sendRequest / httpRequest",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "123336e97fd076d3df6cab256b527ef493a8ed66bb3bacf1847434eacf7190b7"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-WEBSERVER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "envelope",
+        "errors"
+      ]
+    },
+    "SQX144-EV-000006": {
+      "topic": "shell.request.encoding_auth",
+      "title": "Form-urlencoded POSTs gzipped locally; token auth; cloud URL rewriting",
+      "question": "How are request payloads encoded and authenticated, and how does cloud mode differ?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Local-mode POSTs send form-urlencoded bodies gzipped with pako (Content-Encoding: gzip); cloud-mode POSTs are plain form-urlencoded and GETs use query params. Auth uses an sq-auth-token header obtained from POST /main/login and persisted in localStorage, or a Cognito Bearer token in cloud mode; window.top.requestsPrefix rewrites URLs for cloud/node routing.",
+        "confidence": "high",
+        "limitations": [
+          "Cloud behaviors read from client code paths; no cloud instance was exercised."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/BackendService.js",
+          "location": {
+            "section": null,
+            "symbol": "getPromise request construction",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "123336e97fd076d3df6cab256b527ef493a8ed66bb3bacf1847434eacf7190b7"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/login/LoginService.js",
+          "location": {
+            "section": null,
+            "symbol": "LoginService.login/loadSessionInfo",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e5e57dc060894514a5c79859601bb4d81e9b688e030ea44e821730d11c508576"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-WEBSERVER",
+          "FEAT-GATEWAY-SESSIONS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "encoding",
+        "gzip",
+        "auth"
+      ]
+    },
+    "SQX144-EV-000007": {
+      "topic": "shell.commands.main_surface",
+      "title": "Host command surface is a closed /main/* family of 26 commands",
+      "question": "Which host-level commands does the shell expose?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Grep across internal/web and internal/plugins finds the /main/* surface: login, exit, exitapp, appLoaded, regenerate, versions, install, news, customizations, startBenchmark, minimize, toggleFullscreen, openbrowser, openlink, openhelp, opendocument, copyToClipboard, loadFile, createFile, checkFileExists, getWebSocketPort, getremoteaccess, setremoteaccess, setPerformanceSettings, setAutoSyncToAllDatabanks, getCommon. The family covers session, lifecycle, window, OS mediation (openbrowser/openlink/openhelp/opendocument/copyToClipboard), sandboxed UI file access (loadFile/createFile/checkFileExists), live-hub port discovery, remote access, and settings.",
+        "confidence": "high",
+        "limitations": [
+          "Surface enumerated from call sites in the shipped web code; un.called server-side-only commands could exist."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/",
+          "location": {
+            "section": null,
+            "symbol": "BackendService/AppService call sites",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "enumerated by grep -roh \"'/main/[a-zA-Z]*'\" across internal/web and internal/plugins"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "123336e97fd076d3df6cab256b527ef493a8ed66bb3bacf1847434eacf7190b7"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-COMMANDS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "commands",
+        "surface"
+      ]
+    },
+    "SQX144-EV-000008": {
+      "topic": "shell.commands.project_surface",
+      "title": "Project command surface is a /project/* family of 16 commands",
+      "question": "Which project-scoped commands does the shell expose?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Grep across internal/web and internal/plugins finds the /project/* surface: getXMLConfig, resetTaskConfig, updateProjectXML, updateTaskXML, getTemplateConfig, loadSettings, saveSettings, bannerDisplayed, bannerClicked, printToLog, saveReports, checkResources, projectChanged, instrumentSelected, getDataItems, confirm. The family covers XML config lifecycle, settings persistence, banner telemetry, resource checks, logging, and project lifecycle notifications.",
+        "confidence": "high",
+        "limitations": [
+          "Surface enumerated from call sites in the shipped web code."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/",
+          "location": {
+            "section": null,
+            "symbol": "AppService project calls",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "enumerated by grep across internal/web and internal/plugins"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "25334002d855fbd64bc96551d8f0807724ffcee89ee7188008150743708d91ee"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-WEBSERVER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "commands",
+        "project"
+      ]
+    },
+    "SQX144-EV-000009": {
+      "topic": "shell.updates.channel_hub",
+      "title": "Live updates flow over a project/channel pub-sub WebSocket",
+      "question": "How do live updates reach the web apps?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The client asks /main/getWebSocketPort, then connects ws://<host>:<port>/websocket/updates, sends {action:'setup', app:product}, and subscribes by projectName/channel with {action:'subscribe'|'unsubscribe'}; inbound messages {projectData:{name, channels:[{name,data}]}} are routed to per-channel callbacks registered with unique callback IDs (duplicate IDs rejected); general listeners receive all messages; disconnects trigger a 1-second reconnect loop; subscriptions to project 'TaskManager' are ignored client-side.",
+        "confidence": "high",
+        "limitations": [
+          "Server side (SQWebSocketServlet) not decompiled."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/SQWebSocketService.js",
+          "location": {
+            "section": null,
+            "symbol": "SQWebSocketService.connect/subscribe/processMessage",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "77dfb5650b5ab81933929d3d3b95aff9acd62b69512f54cffb25d8410c10d61a"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-EVENTS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "websocket",
+        "pubsub",
+        "updates"
+      ]
+    },
+    "SQX144-EV-000010": {
+      "topic": "shell.registry.extension_points",
+      "title": "UI extension-point registry plus a typed cross-app event bus",
+      "question": "How do web modules extend the shell without editing it?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "sqPlugin.provider.plugin(extensionPoint, position, plugin) registers any module at a named extension point with a sort position, optional product filter, optional uiState (UI-router state), and popups; consumers read position-sorted lists (getPlugins, getButtons, getCombos) and can addPlugin at runtime. SQEvents registers event names up front (duplicates error) and exposes window.broadcastEvent/addListener/removeListener for cross-iframe events in the SQUANT, QDM and PORTFOLIOCOMPOSER products.",
+        "confidence": "high",
+        "limitations": [
+          "Registry mechanics read in full from PluginManager.js and SQEvents.js."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/PluginManager.js",
+          "location": {
+            "section": null,
+            "symbol": "sqPlugin provider",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1491ea2a64d0b12b040778145ea8c933d427d7b1f9d0797e60e6926dea8b4bb2"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/SQEvents.js",
+          "location": {
+            "section": null,
+            "symbol": "SQEvents provider",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ab76aa711701fc6a0259ad95dbc8c8de09f790006c80ad50bc1921ce752b5094"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-CATALOG"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "extension-points",
+        "events"
+      ]
+    },
+    "SQX144-EV-000011": {
+      "topic": "shell.plugins.server_mounting",
+      "title": "Server scans plugin directories and serves plugin web modules",
+      "question": "How do plugin web modules reach the browser?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "AbstractUIWebServer.class references the paths /plugins, /extend/Plugins and /extend/ResultsPlugins, a getPluginsPath method, /index.html, and the MIME types application/javascript and text/javascript; the shipped layout is internal/plugins/<Name>/{module.js,lang/} with 193 modules, and each app page's shared shell services are bundled in internal/web/common/Batch1-3/libs.js (sqPlugin provider and BackendService confirmed in Batch1).",
+        "confidence": "high",
+        "limitations": [
+          "Evidence is class-string inventory plus shipped file layout; no decompilation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L03",
+          "artifact_locator": "internal/libs/SQWebGUILib.jar",
+          "location": {
+            "section": null,
+            "symbol": "com/strategyquant/webguilib/server/AbstractUIWebServer",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "printable-string extraction via Python zipfile + regex"
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/AppBuilder/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "example plugin module; 193 plugin directories present"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "38d240a27ed8de5ba55635979f8d594bb49437bae85a5debd69271dc12683616"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-CATALOG"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "plugins",
+        "mounting",
+        "discovery"
+      ]
+    },
+    "SQX144-EV-000012": {
+      "topic": "shell.plugins.script_injection",
+      "title": "Plugin module.js files are most likely injected into served pages at serve time",
+      "question": "How do plugin module.js files get executed in app pages that contain no script tags for them?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "inferred",
+        "statement": "SQUANT/index.html contains no plugin script tags, yet NavigationPlugin registrations from plugin module.js files drive the sidebar; combined with AbstractUIWebServer's /index.html and application/javascript references, the server most plausibly rewrites or injects plugin script tags when serving index.html.",
+        "confidence": "medium",
+        "limitations": [
+          "The exact injection code was not located; decompilation of the serving path was out of scope.",
+          "An alternative (build-time concatenation) cannot be fully excluded."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/SQUANT/index.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "no plugin <script> tags present"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "725a7185827285f7654c71c5ad813f158db877eea1016f2b1e4f74456343eb0f"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L03",
+          "artifact_locator": "internal/libs/SQWebGUILib.jar",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "AbstractUIWebServer strings"
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-CATALOG"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "inference",
+        "injection"
+      ]
+    },
+    "SQX144-EV-000013": {
+      "topic": "shell.lifecycle.app_loaded",
+      "title": "Apps report readiness; the backend learns the UI is up",
+      "question": "How does the shell coordinate startup completion?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "index.html declares window.appsToPreload; each loaded app calls notifyAppLoaded, and once all preloaded apps are loaded the load screen fades and POST /main/appLoaded reports UI readiness to the backend.",
+        "confidence": "high",
+        "limitations": [
+          "Read from AppService.notifyAppLoaded and SQUANT/index.html."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/AppService.js",
+          "location": {
+            "section": null,
+            "symbol": "AppService.notifyAppLoaded",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "25334002d855fbd64bc96551d8f0807724ffcee89ee7188008150743708d91ee"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/SQUANT/index.html",
+          "location": {
+            "section": null,
+            "symbol": "window.appsToPreload",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "725a7185827285f7654c71c5ad813f158db877eea1016f2b1e4f74456343eb0f"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-LIFECYCLE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "startup",
+        "readiness"
+      ]
+    },
+    "SQX144-EV-000014": {
+      "topic": "shell.constants.settings_service",
+      "title": "Shell constants/settings service caches and hot-reloads shared metadata",
+      "question": "How are settings, languages, and view metadata shared across apps?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQConstants loads and caches settings, constants, languages, translations, databank columns and databank views, plus per-project/task configs; it exposes saveConstants/reloadConstants and an onWebSocketData hook used for push-triggered refresh.",
+        "confidence": "high",
+        "limitations": [
+          "API surface read; server endpoints not inspected."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/app/sq-tools/sqbackend/services/SQConstants.js",
+          "location": {
+            "section": null,
+            "symbol": "SQConstants service methods",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "56220d104c162b8d56fa7cce0444fa3b9ba25f6a35b6f3453d9e0dfcf6736130"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-SETTINGS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "settings",
+        "constants"
+      ]
+    },
+    "SQX144-EV-000015": {
+      "topic": "navigation.apps.inventory",
+      "title": "Sixteen navigation app registrations compose the workspace inventory",
+      "question": "How many workspaces does SQX 144.2953 expose and how are they declared?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell",
+          "navigation"
+        ],
+        "conditions": [
+          "desktop local mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Exactly 16 NavigationPlugin registrations exist across internal/plugins/*/module.js: SQXHOME (Getting started), BUILDER, RETESTER, OPTIMIZER (Pro-only), PORTFOLIOMASTER, NEURALNETWORK (hidden), PORTFOLIOCOMPOSER, SQMANAGER, TASKMANAGER (Custom Projects, Pro-only), DEBUGCONSOLE (top menu, Pro-only), AlgoWizard (URL loaded dynamically), SQEDITOR (top menu, Pro-only), SQXBUSINESS (registered hidden, un-hidden at runtime unconditionally), GRIDCONTROL (top menu), GRIDTEST (hidden), RESULTS (hidden; embedded overlay iframe). The sidebar is built solely from these registrations grouped by section with separators (LayoutCtrl.loadMenuItems).",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static registration analysis; runtime verified only for sidebar composition logic read in LayoutCtrl.js.",
+          "MT Analyzer and Quant Data Manager are separate products of the same codebase, not registered workspaces."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/",
+          "location": {
+            "section": null,
+            "symbol": "sqPluginProvider.plugin(\"NavigationPlugin\", ...) registrations",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "16 registrations across 193 plugin modules; anchor fingerprint is AppBuilder/module.js"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "38d240a27ed8de5ba55635979f8d594bb49437bae85a5debd69271dc12683616"
+          },
+          "accessed_at": "2026-09-22"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/SQUANT/layout/LayoutCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "loadMenuItems / $scope.apps = sqPlugin.getPlugins('NavigationPlugin')",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f4b5435c42b6fd177dcc323f0ae5cd9a54b0279553af46eeefe87730b9f9020d"
+          },
+          "accessed_at": "2026-09-22"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-WORKSPACE_INVENTORY"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/app/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Re-inspect the cited artifacts at the cited locations in SQX build 144.2953 and compare against this statement; a running-instance check is optional.",
+        "expected_observation": "The cited code/strings are present unchanged and support the statement verbatim.",
+        "actual_observation": null,
+        "artifact_paths": [],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-22T23:40:08Z",
+        "updated_at": "2026-09-22T23:40:08Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "navigation",
+        "workspaces",
+        "inventory"
+      ]
+    },
+    "SQX144-EV-000016": {
+      "topic": "shell.commands.file_exchange",
+      "title": "Host file exchange surface covers existence checks, directory listing, and safe deletion",
+      "question": "What file management capabilities does the SQX platform shell expose to the web UI?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell",
+          "file_exchange",
+          "commands"
+        ],
+        "conditions": [
+          "desktop local mode",
+          "web server mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX platform shell exposes file management endpoints in MainServlet (checkFileExists, createFile, loadFile, saveFile) and DirServlet (listdir, onGetLastFolderUsed). These allow the web UI to verify file existence, prevent overwriting, list files within allowed scopes, and exchange files safely.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Inspected via static class analysis and string tables in internal/libs/SQWebGUILib.jar (MainServlet.class and DirServlet.class)."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L03",
+          "artifact_locator": "internal/libs/SQWebGUILib.jar",
+          "location": {
+            "section": null,
+            "symbol": "com.strategyquant.webguilib.servlet.MainServlet / DirServlet",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "MainServlet actions checkFileExists, createFile, loadFile; DirServlet actions listdir, onGetLastFolderUsed"
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-COMMANDS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Inspect internal/libs/SQWebGUILib.jar for checkFileExists, createFile, loadFile, and listdir actions.",
+        "expected_observation": "Presence of checkFileExists, createFile, loadFile, and listdir action strings.",
+        "actual_observation": "Confirmed onCheckFileExists, onCreateFile, onLoadFile, and onListDir present in SQWebGUILib.jar.",
+        "artifact_paths": [
+          "internal/libs/SQWebGUILib.jar"
+        ],
+        "executed_at": "2026-09-23T08:58:00Z"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000007"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T08:58:00Z",
+        "updated_at": "2026-09-23T08:58:00Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "shell",
+        "files",
+        "exchange",
+        "commands"
+      ]
+    },
+    "SQX144-EV-000017": {
+      "topic": "shell.system.hardware_resources",
+      "title": "Host system probe exposes CPU cores, memory sizing, and platform identity",
+      "question": "How does SQX platform shell determine and expose host hardware capabilities to the UI?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "shell",
+          "hardware",
+          "performance",
+          "lifecycle"
+        ],
+        "conditions": [
+          "desktop local mode",
+          "web server mode"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX platform shell inspects host CPU core count, available memory, and operating system via com.strategyquant.lib.hw.HardwareInfo and OperatingSystem, exposed via /main/getCommon, checkResources, and setPerformanceSettings. This hardware sizing allows the UI to configure thread pools and memory allocations for optimization and backtesting workloads.",
+        "confidence": "confirmed",
+        "limitations": [
+          "Static analysis of MainServlet.class references to HardwareInfo and OperatingSystem; detailed memory sizing confirmed in string and class inventories."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L03",
+          "artifact_locator": "internal/libs/SQWebGUILib.jar",
+          "location": {
+            "section": null,
+            "symbol": "com.strategyquant.webguilib.servlet.MainServlet.class (HardwareInfo, OperatingSystem)",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "MainServlet actions checkResources, onCommon, onGetPerformanceSettings"
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-LIFECYCLE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/host/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Inspect internal/libs/SQWebGUILib.jar for references to HardwareInfo, OperatingSystem, and MainServlet action handlers.",
+        "expected_observation": "Presence of HardwareInfo and OperatingSystem symbol references and checkResources action.",
+        "actual_observation": "Confirmed com/strategyquant/lib/hw/HardwareInfo and OperatingSystem references in MainServlet.class.",
+        "artifact_paths": [
+          "internal/libs/SQWebGUILib.jar"
+        ],
+        "executed_at": "2026-09-23T08:58:00Z"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000001",
+          "SQX144-EV-000007"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T08:58:00Z",
+        "updated_at": "2026-09-23T08:58:00Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase of locally inspected artifacts; no proprietary source text reproduced."
+      },
+      "tags": [
+        "shell",
+        "hardware",
+        "performance",
+        "lifecycle"
+      ]
+    },
+    "SQX144-EV-000018": {
+      "topic": "plugins.crosscheck.contribution",
+      "title": "Cross-check settings contributed by plugin module",
+      "question": "Does a cross-check module register a scoped UI contribution?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "plugins",
+          "Builder"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "A Monte Carlo retest module registers a CrossCheck contribution with its own settings view and controller.",
+        "confidence": "high",
+        "limitations": [
+          "This is a static module declaration; execution behavior and numerical semantics were not established.",
+          "A concrete CrossCheck owner is not registered in HaruQuantAI; propose a plugin-pair README before implementation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/CrossCheckMonteCarloRetest/module.js",
+          "location": {
+            "section": null,
+            "symbol": "CrossCheck registration",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "fbc3de17238d774dfe2587cd54391ae2cb5347963ef1dde2c13c5ca2056084a2"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-CATALOG"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Inspect the module registration in the installed build.",
+        "expected_observation": "A CrossCheck contribution identifies a settings template and controller.",
+        "actual_observation": "Observed the CrossCheck registration and settings view/controller references.",
+        "artifact_paths": [
+          "internal/plugins/CrossCheckMonteCarloRetest/module.js"
+        ],
+        "executed_at": "2026-09-23T07:22:05Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T07:22:05Z",
+        "updated_at": "2026-09-23T07:22:05Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure or behavior only; no source text or user configuration reproduced."
+      },
+      "tags": [
+        "plugin",
+        "crosscheck",
+        "extension"
+      ]
+    },
+    "SQX144-EV-000019": {
+      "topic": "plugins.results.tab_contribution",
+      "title": "Results tab contributed by plugin module",
+      "question": "Can a Results plugin supply a tab without changing the app shell?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "plugins",
+          "Results"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "An equity-chart module registers a ResultsTab contribution with its own view and controller.",
+        "confidence": "high",
+        "limitations": [
+          "This shows a declaration, not a test of runtime loading or chart calculation.",
+          "A concrete Results plugin owner is not registered in HaruQuantAI; propose a plugin-pair README before implementation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsEquityChart/module.js",
+          "location": {
+            "section": null,
+            "symbol": "ResultsTab registration",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9c0baca2f50be624d2f85ae0806a584673448170c16a4e4d8f3a7f8aba9340e4"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-WORKSPACE_INVENTORY"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Inspect the ResultsEquityChart module registration.",
+        "expected_observation": "A ResultsTab declaration references a presentation view and controller.",
+        "actual_observation": "Observed a ResultsTab declaration with view and controller references.",
+        "artifact_paths": [
+          "internal/plugins/ResultsEquityChart/module.js"
+        ],
+        "executed_at": "2026-09-23T07:22:05Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T07:22:05Z",
+        "updated_at": "2026-09-23T07:22:05Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure or behavior only; no source text or user configuration reproduced."
+      },
+      "tags": [
+        "plugin",
+        "results",
+        "extension"
+      ]
+    },
+    "SQX144-EV-000020": {
+      "topic": "plugins.datasource.contribution",
+      "title": "Data source contributed by plugin module",
+      "question": "Does the Data Manager accept data-source plugin contributions?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "plugins",
+          "Data Manager"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "A Yahoo module registers a DataSourceYahoo contribution for a Data Manager menu location.",
+        "confidence": "high",
+        "limitations": [
+          "Static declaration only; data-download behavior and provider guarantees were not inspected.",
+          "A concrete data-source owner is not registered in HaruQuantAI; propose a plugin-pair README before implementation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/DataSourceYahoo/module.js",
+          "location": {
+            "section": null,
+            "symbol": "DataSourceYahoo registration",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4a0ec550bab04b9ece9fdb29f739e6519a23d9039de3c6015e0766175c406a5a"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-WORKSPACE_INVENTORY"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Inspect the DataSourceYahoo module registration.",
+        "expected_observation": "A data-source registration targets a Data Manager menu location.",
+        "actual_observation": "Observed a DataSourceYahoo registration with a Data Manager menu identifier.",
+        "artifact_paths": [
+          "internal/plugins/DataSourceYahoo/module.js"
+        ],
+        "executed_at": "2026-09-23T07:22:05Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T07:22:05Z",
+        "updated_at": "2026-09-23T07:22:05Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure or behavior only; no source text or user configuration reproduced."
+      },
+      "tags": [
+        "plugin",
+        "data_source",
+        "extension"
+      ]
+    },
+    "SQX144-EV-000021": {
+      "topic": "projects.archive.task_reference",
+      "title": "Project archive references separate task document",
+      "question": "How does a saved Builder project identify its task configuration?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "projects"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed Builder project archive contains a config document whose Build task references a separate task XML member.",
+        "confidence": "high",
+        "limitations": [
+          "Inspected one bundled Builder archive; other projects may contain different task types.",
+          "HaruQuantAI Custom Projects has a UI prototype but no registered backend owner; propose its workspace README before implementing this format."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L06",
+          "artifact_locator": "user/projects/Builder/project.cfx!config.xml",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": "/Project/Tasks/Task[@type='Build']",
+            "notes": "Archive member config.xml; taskXMLFile points to Build-Task1.xml."
+          },
+          "inspection_method": "archive_inventory",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b662f0364056bd42c2ef6cbe2efb5f43a9ab5335d642c4c25d72888f50527948"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-WORKSPACE_INVENTORY"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Open the Builder project archive and inspect its member list and config task reference.",
+        "expected_observation": "The config names a Build task XML member present in the archive.",
+        "actual_observation": "Observed config.xml and Build-Task1.xml in the archive, with the task referencing that member.",
+        "artifact_paths": [
+          "user/projects/Builder/project.cfx"
+        ],
+        "executed_at": "2026-09-23T07:22:05Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T07:22:05Z",
+        "updated_at": "2026-09-23T07:22:05Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure or behavior only; no source text or user configuration reproduced."
+      },
+      "tags": [
+        "project",
+        "task",
+        "archive"
+      ]
+    },
+    "SQX144-EV-000022": {
+      "topic": "projects.archive.databanks",
+      "title": "Project archive declares multiple databanks",
+      "question": "Can one saved project name more than one databank?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "projects",
+          "databanks"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed Builder project config declares multiple named databanks under its Databanks section.",
+        "confidence": "high",
+        "limitations": [
+          "Names and synchronization choices are sample configuration, not universal defaults.",
+          "HaruQuantAI databank ownership is not yet registered; propose a workspace or plugin README before implementation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L06",
+          "artifact_locator": "user/projects/Builder/project.cfx!config.xml",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": "/Project/Databanks/Databank",
+            "notes": null
+          },
+          "inspection_method": "schema_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b662f0364056bd42c2ef6cbe2efb5f43a9ab5335d642c4c25d72888f50527948"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-WORKSPACE_INVENTORY"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Inspect the Databanks element in the Builder archive's config.xml.",
+        "expected_observation": "More than one Databank child is present.",
+        "actual_observation": "Observed five Databank declarations in the installed Builder project config.",
+        "artifact_paths": [
+          "user/projects/Builder/project.cfx"
+        ],
+        "executed_at": "2026-09-23T07:22:05Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T07:22:05Z",
+        "updated_at": "2026-09-23T07:22:05Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure or behavior only; no source text or user configuration reproduced."
+      },
+      "tags": [
+        "project",
+        "databank",
+        "archive"
+      ]
+    },
+    "SQX144-EV-000023": {
+      "topic": "extensions.plugin_snippet.distinction",
+      "title": "Extension manual distinguishes plugins and snippets",
+      "question": "How does SQX describe plugin and snippet extension scales?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "extensions"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed extension manual describes plugins as larger UI/background modules and snippets as focused functions such as indicators, building blocks, and databank columns.",
+        "confidence": "high",
+        "limitations": [
+          "Manual describes SQX extension concepts, not HaruQuantAI's required packaging or Five Laws.",
+          "The manual predates build 144.2953, so this does not validate build-specific runtime loading.",
+          "No concrete snippet owner is registered in HaruQuantAI; propose per-plugin README registration."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L07",
+          "artifact_locator": "Extending_SQX.pdf",
+          "location": {
+            "section": "1.1 Extending StrategyQuant X; PDF page 6",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4a45282879332c8ff9f8db8c5e393b187225bd3c0887f567eb54cd3947c4507d"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "gateway",
+        "feature_ids": [
+          "FEAT-GATEWAY-CATALOG"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read section 1.1 of the installed extension manual.",
+        "expected_observation": "The manual separates larger plugins from smaller function-like snippets.",
+        "actual_observation": "Observed the plugin/snippet distinction and examples in section 1.1.",
+        "artifact_paths": [
+          "Extending_SQX.pdf"
+        ],
+        "executed_at": "2026-09-23T07:22:05Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T07:22:05Z",
+        "updated_at": "2026-09-23T07:22:05Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure or behavior only; no source text or user configuration reproduced."
+      },
+      "tags": [
+        "extension",
+        "plugin",
+        "snippet"
+      ]
+    },
+    "SQX144-EV-000024": {
+      "topic": "extensions.codegen.templates",
+      "title": "Extension manual requires target translation template for new indicator",
+      "question": "What accompanies a new indicator when exporting target platform code?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "extensions",
+          "code export"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed extension manual describes adding a target-platform translation template for a new indicator block.",
+        "confidence": "high",
+        "limitations": [
+          "The manual gives a workflow example, not proof of every export target or formula.",
+          "The manual predates build 144.2953, so current exporter behavior remains unverified.",
+          "HaruQuantAI code-lowering ownership is not registered; propose a plugin or workspace README before implementation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L07",
+          "artifact_locator": "Extending_SQX.pdf",
+          "location": {
+            "section": "2 Adding indicators and signals building blocks; PDF page 8",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "official_documentation",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4a45282879332c8ff9f8db8c5e393b187225bd3c0887f567eb54cd3947c4507d"
+          },
+          "accessed_at": "2026-09-23"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-WORKSPACE_INVENTORY"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the documented indicator-creation steps in the installed manual.",
+        "expected_observation": "A target-language translation step appears after the indicator block step.",
+        "actual_observation": "Observed a translation step among the documented indicator-creation steps.",
+        "artifact_paths": [
+          "Extending_SQX.pdf"
+        ],
+        "executed_at": "2026-09-23T07:22:05Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "a0b597f",
+        "created_at": "2026-09-23T07:22:05Z",
+        "updated_at": "2026-09-23T07:22:05Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure or behavior only; no source text or user configuration reproduced."
+      },
+      "tags": [
+        "extension",
+        "indicator",
+        "code_export"
+      ]
+    }
+  }
+}

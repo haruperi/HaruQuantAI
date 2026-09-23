@@ -7,9 +7,10 @@
   `.agents/logs/<timestamp>_<task>/`.
 - **Scoped authority.** `AGENTS.md` owns workflow and verification;
   `docs/PROJECT.md` owns product scope; `docs/ARCHITECTURE.md` owns structural
-  constraints; `docs/dev/workspace_plugin_implementation_pipeline.md` and
-  `docs/dev/workspace_plugin_implementation_audit.md` own workspace and plugin
-  build and audit standards.
+  constraints. The planned `docs/dev/workspace_plugin_implementation_pipeline.md`
+  and `docs/dev/workspace_plugin_implementation_audit.md` will own detailed
+  workspace/plugin build and audit standards once authored and approved; they
+  are currently absent and their contents must not be inferred.
 - **Five Spatial Composability laws.** All future backend work must preserve:
   locality of behavior, orthogonality, explicit typed capability slots,
   hierarchical/algebraic composition, and schema-driven self-description.
@@ -29,9 +30,11 @@
 - **Honest UI.** `app/ui/` owns presentation and local view state. It must not
   duplicate backend algorithms, durable truth, authorization, or plugin schemas.
 
-The repository is currently at a backend-reset baseline. No backend plugin,
-host, registry, persistence, or gateway implementation may be added until an
-approved architecture plan establishes its paths and public metamodel.
+The host pair is the current backend-reset baseline. Its implementation and
+remaining candidate status are recorded in the owning READMEs and task
+walkthroughs. Each new backend workspace, plugin, quantitative persistence,
+or gateway expansion needs its own approved plan establishing paths, public
+contracts, and verification before implementation.
 
 ## 2. Plan -> Execute -> Walkthrough workflow
 
@@ -61,10 +64,10 @@ iteration and renewed approval when they materially expand scope.
 
 ## 3. Workspace and plugin implementation standard
 
-Once the replacement architecture is ratified, workspace and plugin work must
-follow `docs/dev/workspace_plugin_implementation_pipeline.md` and its companion
-audit. Use the independent workspace track (W) or concrete non-workspace plugin
-track (P), with their shared controls. At minimum, each plugin must provide:
+Workspace and plugin work must follow the replacement architecture and this
+section. Once the planned pipeline and companion audit are authored and
+approved, use their independent workspace track (W) or concrete plugin track
+(P) with shared controls. At minimum, each plugin must provide:
 
 - a stable namespaced ID and explicit compatibility version;
 - immutable, typed inputs/outputs and capability requirements;

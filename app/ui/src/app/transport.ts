@@ -35,18 +35,54 @@ export class ApiClientError extends Error {
   }
 }
 
+let activeAuthToken: string | null = null;
+const authExpiredListeners = new Set<() => void>();
+
+export function setAuthToken(token: string | null): void {
+  activeAuthToken = token;
+}
+
+export function getAuthToken(): string | null {
+  return activeAuthToken;
+}
+
+export function subscribeAuthExpired(listener: () => void): () => void {
+  authExpiredListeners.add(listener);
+  return () => { authExpiredListeners.delete(listener); };
+}
+
 export interface TransportConfig {
   baseUrl?: string;
   fetchFn?: typeof fetch;
+  authToken?: string | (() => string | null);
+  signal?: AbortSignal;
+}
+
+export interface LoginResponse {
+  token: string;
+}
+
+export interface LoginCredentials {
+  username?: string;
+  password?: string;
 }
 
 export interface DomainClient {
   get<T>(path: string): Promise<T>;
   post<T>(path: string, body: unknown): Promise<T>;
+  put<T>(path: string, body: unknown): Promise<T>;
+}
+
+export function hostBaseUrl(): string {
+  if (typeof window !== 'undefined' && window.location.port === '3000' &&
+      ['127.0.0.1', 'localhost'].includes(window.location.hostname)) {
+    return `http://${window.location.hostname}:8000/api/v1`;
+  }
+  return '/api/v1';
 }
 
 export function createDomainClient(routeBase: string, config: TransportConfig = {}): DomainClient {
-  const baseUrl = config.baseUrl ?? '/api/v1';
+  const baseUrl = config.baseUrl ?? hostBaseUrl();
   const fetchFn =
     config.fetchFn ??
     (typeof window !== 'undefined' && window.fetch
@@ -64,8 +100,22 @@ export function createDomainClient(routeBase: string, config: TransportConfig = 
     if (options.body && !headers.has('Content-Type')) {
       headers.set('Content-Type', 'application/json');
     }
+    if (!headers.has('Authorization')) {
+      const resolvedToken =
+        typeof config.authToken === 'function'
+          ? config.authToken()
+          : (config.authToken ?? activeAuthToken);
+      if (resolvedToken) {
+        headers.set('Authorization', `Bearer ${resolvedToken}`);
+      }
+    }
 
-    const response = await fetchFn(url, { ...options, headers });
+    const response = await fetchFn(url, { ...options, headers, signal: config.signal ?? options.signal });
+
+    if (response.status === 401 && routeBase !== '/auth') {
+      setAuthToken(null);
+      for (const listener of authExpiredListeners) listener();
+    }
 
     let json: ApiResponse<T>;
     try {
@@ -88,7 +138,20 @@ export function createDomainClient(routeBase: string, config: TransportConfig = 
   return {
     get: <T>(path: string) => request<T>(path, { method: 'GET' }),
     post: <T>(path: string, body: unknown) => request<T>(path, { method: 'POST', body: JSON.stringify(body) }),
+    put: <T>(path: string, body: unknown) => request<T>(path, { method: 'PUT', body: JSON.stringify(body) }),
   };
+}
+
+export async function login(
+  credentials: LoginCredentials = { username: 'operator' },
+  config: TransportConfig = {},
+): Promise<LoginResponse> {
+  const client = createDomainClient('/auth', config);
+  const data = await client.post<LoginResponse>('/login', credentials);
+  if (data?.token) {
+    setAuthToken(data.token);
+  }
+  return data;
 }
 
 // ---------------------------------------------------------------------------

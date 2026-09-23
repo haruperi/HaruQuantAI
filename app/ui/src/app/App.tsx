@@ -24,6 +24,7 @@ import { GridControlWorkspace } from '../workspace/GridControl/GridControlWorksp
 import { GridTestWorkspace } from '../workspace/GridTest/GridTestWorkspace';
 import { GlobalSettingsMenu } from './GlobalSettingsMenu';
 import { HeaderApplicationActions } from './HeaderApplications';
+import { HostConnectionProvider, useHostConnection } from './HostConnection';
 
 const nav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined; group?: string }[] = [
   { id: 'home', label: 'HaruQuantAI', icon: ChartNoAxesCombined },
@@ -42,8 +43,9 @@ const nav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined; grou
   { id: 'trading', label: 'Live Trading', icon: Activity },
 ];
 
-export function App() {
+function AppShell() {
   const store = useAppStore();
+  const { status: hostStatus } = useHostConnection();
   const navigate = useNavigate();
   const [notifications, setNotifications] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
@@ -128,12 +130,9 @@ export function App() {
 
       <footer className="statusbar">
         <div className="status-metrics">
-          <span>Workers {store.settings.workers}</span>
-          <span>Memory 4.2/{store.settings.memoryGb} GB</span>
-          <span>CPU 34%</span>
-          <span><i className="online" />Backend</span>
-          <span>Latency 12 ms</span>
-          <span><i className="online" />Database</span>
+          <span>Configured workers {store.settings.workers}</span>
+          <span>Configured memory {store.settings.memoryGb} GB</span>
+          <span>Host {hostStatus}</span>
         </div>
         <div className="status-actions">
           <div className="status-bell">
@@ -173,4 +172,8 @@ export function App() {
       </footer>
     </div>
   );
+}
+
+export function App() {
+  return <HostConnectionProvider><AppShell /></HostConnectionProvider>;
 }
