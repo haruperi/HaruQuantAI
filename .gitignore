@@ -177,7 +177,7 @@ blob-report/
 # ============================================================================
 artifacts/logs/
 logs/
-!/.agents/logs/
+.agents/logs/
 *.log
 *.log.*
 log_*.txt
