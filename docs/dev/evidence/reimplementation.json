@@ -7841,6 +7841,1665 @@
         "results",
         "static-observation"
       ]
+    },
+    "SQX144-EV-000065": {
+      "topic": "ui.project.layout.shared_components",
+      "title": "Shared project layout",
+      "question": "Shared project layout?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Builder, Retester and Optimizer layout templates compose the same dashboard-header, card-panels and ProjectDatabanks view/controller.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/BUILDER/layout/views/layout.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "1-20",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2a8766947930f143bdbf445c5990732b1a67d0f9d1575904bef6626ef572e103"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/RETESTER/layout/views/layout.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "1-20",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b5977cdb9613ccfe010d3d841d1bcf6f717a1e55fcc79c4582d69505272ef457"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/OPTIMIZER/layout/views/layout.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "1-20",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c5dcd731d611dea7407bd157ff50e1542d1b2dc33f5bff38b88294afed045b09"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PROJECT_WORKBENCH"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/plugins/project/ProjectWorkbench/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open all three installed workspaces and compare the dashboard header, panel host and databank interactions.",
+        "expected_observation": "Builder, Retester and Optimizer layout templates compose the same dashboard-header, card-panels and ProjectDatabanks view/controller.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/BUILDER/layout/views/layout.html",
+          "SQX_REFERENCE_ROOT/internal/web/RETESTER/layout/views/layout.html",
+          "SQX_REFERENCE_ROOT/internal/web/OPTIMIZER/layout/views/layout.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000066": {
+      "topic": "ui.retester.settings.custom_projects_only",
+      "title": "What to retest eligibility",
+      "question": "What to retest eligibility?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The What to retest settings registration is restricted to custom projects.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsWhatToRetest/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "5-15",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6c3b825d8ce1ec3bb31ffd7343edadead7ab9d6ca3bcbb9e26be889c74a2eefc"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-RETESTER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Retester/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Compare the standalone Retester settings tab list with a Custom Projects Retest task.",
+        "expected_observation": "The What to retest settings registration is restricted to custom projects.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000067": {
+      "topic": "ui.retester.settings.cross_checks",
+      "title": "Retester cross-check eligibility",
+      "question": "Retester cross-check eligibility?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Cross checks settings registration includes Retest and excludes Optimize in its task list.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsCrossChecks/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "5-13",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "75d8a929ba5805e5a7dda8252f597a1f246e2c460f0ffa46d99d1306ceb536b5"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-RETESTER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Retester/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Retester and Optimizer Full settings in the same licensed installation and compare cross-check visibility.",
+        "expected_observation": "The Cross checks settings registration includes Retest and excludes Optimize in its task list.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000068": {
+      "topic": "ui.optimizer.settings.modes",
+      "title": "Optimization mode choices",
+      "question": "Optimization mode choices?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The optimization settings template offers Simple, Sequential, Walk-Forward optimization and Walk-Forward matrix modes.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsOptimization/views/optimization.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "90-135",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "467309eb40fcef7d938a3de5115475271815f2f0ebd6906feb8356ae3534a4c7"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-OPTIMIZER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Optimizer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Select each optimization mode and capture the corresponding settings branches.",
+        "expected_observation": "The optimization settings template offers Simple, Sequential, Walk-Forward optimization and Walk-Forward matrix modes.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization/views/optimization.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000069": {
+      "topic": "ui.optimizer.results.profile_registration",
+      "title": "Optimization profile contribution",
+      "question": "Optimization profile contribution?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Optimization profile result contribution has registry position 11 and is hidden after initialization.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsOptimizationProfile/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "3-8",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3f2753acccba0f400b004eef12f2249f57ad00e8b4bd1b4539b97e22388c14d0"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-OPTIMIZER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Optimizer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inspect result tabs before and after loading an optimization result and record visibility/order.",
+        "expected_observation": "The Optimization profile result contribution has registry position 11 and is hidden after initialization.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000070": {
+      "topic": "ui.optimizer.results.sequential_registration",
+      "title": "Sequential results contribution",
+      "question": "Sequential results contribution?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Sequential Optimization Results contribution has registry position 12 and is hidden after initialization.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsSequentialOptimization/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "3-8",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0938a351d03fa709fa7c00c99b63819795740ecc57cf9492b90ccf5a85ec81fa"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-OPTIMIZER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Optimizer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Load a sequential optimization result and record tab visibility/order.",
+        "expected_observation": "The Sequential Optimization Results contribution has registry position 12 and is hidden after initialization.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000071": {
+      "topic": "ui.retester.progress.statistics",
+      "title": "Retester statistics branch",
+      "question": "Retester statistics branch?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The EnginePanel Retest branch renders retested jobs, time per strategy, throughput, databank counts, failed/passed and elapsed/remaining statistics.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/EnginePanel/engine.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "285-330",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8fe8e966ae58b0ab0619792f2fe2bc96cfae5a7bde8d9cb35818ea17f211feeb"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-RETESTER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Retester/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Capture Retester idle/running/completed progress screens and inspect the statistics labels.",
+        "expected_observation": "The EnginePanel Retest branch renders retested jobs, time per strategy, throughput, databank counts, failed/passed and elapsed/remaining statistics.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/engine.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000072": {
+      "topic": "ui.optimizer.settings.trading_options_visibility",
+      "title": "Optimizer trading options visibility gap",
+      "question": "Optimizer trading options visibility gap?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Retester",
+          "Optimizer",
+          "Shared project UI"
+        ],
+        "conditions": [
+          "Installed static declarations only."
+        ]
+      },
+      "claim": {
+        "classification": "unverified",
+        "statement": "Standalone Optimizer visibility of Trading options remains unverified: SettingsOptions includes the Optimize task but has no OPTIMIZER product annotation.",
+        "confidence": "unverified",
+        "limitations": [
+          "Static inspection does not establish runtime/license-dependent visibility, numerical correctness, defaults or complete visual parity.",
+          "Target preview includes Trading options as a provisional composition choice; this is not an SQX fact."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsOptions/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "1-18",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f49be18483c646cac180719979a8c0e75092a8337e0b0f418bd92a6baf21a857"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-OPTIMIZER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Optimizer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inspect the loaded standalone Optimizer plugin registry and Full settings tab strip to resolve product/task filtering.",
+        "expected_observation": "Establish whether Trading options is present for standalone Optimizer and record the registration path.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsOptions/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T13:23:54.239774Z",
+        "updated_at": "2026-09-25T13:23:54.239774Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "project-workbench",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000073": {
+      "topic": "ui.portfolio.master.shared_shell",
+      "title": "Master shares the project shell",
+      "question": "Master shares the project shell?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioMaster"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Portfolio Master layout composes the shared dashboard header, card panels and ProjectDatabanks view.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/PORTFOLIOMASTER/layout/views/layout.html",
+          "location": {
+            "section": "layout template",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "553554ee72a880206390cc4553e407a90387481b8e882b601db7bf7d731fdf6c"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_MASTER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioMaster/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Portfolio Master and compare its header, three panels and bottom databank with Builder.",
+        "expected_observation": "The Portfolio Master layout composes the shared dashboard header, card panels and ProjectDatabanks view.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/PORTFOLIOMASTER/layout/views/layout.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000074": {
+      "topic": "ui.portfolio.master.settings_registration",
+      "title": "Master task-specific settings",
+      "question": "Master task-specific settings?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioMaster"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Automatic Portfolio Builder registers a settings tab at position 800 for the AutomaticPortfolioBuilder task.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsAutomaticPortfolioBuilder/module.js",
+          "location": {
+            "section": "SettingsTab registration, lines 3-15",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e9a67398eb78581ad1e6b7baa6fcd3401241be1a9baaa0517b5e52ae13737179"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_MASTER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioMaster/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inspect the loaded Portfolio Master settings registry and tab strip for this task.",
+        "expected_observation": "Automatic Portfolio Builder registers a settings tab at position 800 for the AutomaticPortfolioBuilder task.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticPortfolioBuilder/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000075": {
+      "topic": "ui.portfolio.master.genetic_dialog",
+      "title": "Genetic popup immediate edits",
+      "question": "Genetic popup immediate edits?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioMaster"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Genetic popup fields use change handlers and the footer provides Close without a separate Apply action.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsAutomaticPortfolioBuilder/geneticSettingsPopup.html",
+          "location": {
+            "section": "pmGeneticSettingsPopup",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cb310aac19268d90ca461162634c40ac02482a2a58edfd46dcf845f47aa11d93"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_MASTER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioMaster/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Change population in the reference popup, close it and reopen; check whether the changed value persists.",
+        "expected_observation": "Genetic popup fields use change handlers and the footer provides Close without a separate Apply action.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticPortfolioBuilder/geneticSettingsPopup.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000076": {
+      "topic": "ui.portfolio.master.correlation_dialog",
+      "title": "Correlation popup immediate edits",
+      "question": "Correlation popup immediate edits?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioMaster"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Correlation popup fields use change handlers and the footer provides Close without a separate Apply action.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsAutomaticPortfolioBuilder/correlationSettingsPopup.html",
+          "location": {
+            "section": "pmCorrelationSettingsPopup",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1586e76d0be20a39d23ad14d23ba355ede909b5b6f80c81b7f8ff2d0d936a1d4"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_MASTER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioMaster/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Change correlation limit in the reference popup, close it and reopen; check whether the changed value persists.",
+        "expected_observation": "Correlation popup fields use change handlers and the footer provides Close without a separate Apply action.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticPortfolioBuilder/correlationSettingsPopup.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000077": {
+      "topic": "ui.portfolio.composer.dedicated_layout",
+      "title": "Composer dedicated workspace",
+      "question": "Composer dedicated workspace?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioComposer"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Portfolio Composer includes its own workspace directly rather than the shared project card panels and bottom databank.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/PORTFOLIOCOMPOSER/layout/views/layout.html",
+          "location": {
+            "section": "layout template, lines 1-16",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c436e9507fa5cbe9ea3e9539248fb3780b5ba393abe7df61d180a92f2b2f7e6d"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioComposer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Composer and verify its dedicated workspace layout and absence of the shared bottom project databank.",
+        "expected_observation": "Portfolio Composer includes its own workspace directly rather than the shared project card panels and bottom databank.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER/layout/views/layout.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000078": {
+      "topic": "ui.portfolio.composer.settings_tabs",
+      "title": "Composer settings tab declarations",
+      "question": "Composer settings tab declarations?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioComposer"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Composer declares Portfolio composition, Configuration - account, MM, and Automatic computation settings tabs.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/PortfolioComposer/settings/PCSettingsCtrl.js",
+          "location": {
+            "section": "mainTabs, lines 4-23",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9d607b9035748620489bc416acefebe292bbb5e21d997655d302acfb0de68c65"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioComposer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Composer and activate each of these three settings tabs.",
+        "expected_observation": "Composer declares Portfolio composition, Configuration - account, MM, and Automatic computation settings tabs.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/settings/PCSettingsCtrl.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000079": {
+      "topic": "ui.portfolio.composer.weight_validation",
+      "title": "Composer numeric weight guard",
+      "question": "Composer numeric weight guard?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioComposer"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Composer weight editing clamps negative numeric values to zero; a nonnumeric value is replaced by one and reports a numeric-input error.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/PortfolioComposer/settings/composition/CompositionCtrl.js",
+          "location": {
+            "section": "weight editor handler, lines 46-63",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "94c359dc302cde63d3b3e939f5c44b2488f231ec417c07baf35245f06ddb2af7"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioComposer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Edit a reference member weight to negative and nonnumeric inputs; capture resulting values and error message.",
+        "expected_observation": "Composer weight editing clamps negative numeric values to zero; a nonnumeric value is replaced by one and reports a numeric-input error.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/settings/composition/CompositionCtrl.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000080": {
+      "topic": "ui.portfolio.composer.model_option",
+      "title": "Composer model declaration",
+      "question": "Composer model declaration?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioComposer"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The inspected Composer controller declares Markowitz Efficient Frontier as its single model option.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/PortfolioComposer/settings/autocomputation/AutocomputationCtrl.js",
+          "location": {
+            "section": "models declaration, lines 8-12",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8e09ab494809667b81ae1674d59000af1d7fa2c4d06031ef5444125a133e6a86"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioComposer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Automatic computation and inspect the model dropdown for the installed build.",
+        "expected_observation": "The inspected Composer controller declares Markowitz Efficient Frontier as its single model option.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/settings/autocomputation/AutocomputationCtrl.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000081": {
+      "topic": "ui.portfolio.composer.log_registration",
+      "title": "Composer Log result contribution",
+      "question": "Composer Log result contribution?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioComposer"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Composer Log result tab is registered at position 99 with hideAfterInit enabled.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsPortfolioComposerLog/module.js",
+          "location": {
+            "section": "ResultsTab registration, lines 3-8",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "3504c5196902d839c96ec17c16f5316d6de9d8204cc4e23682a98993c6f6ea67"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioComposer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inspect the Composer result registry and compare Log visibility before and after a recomputation.",
+        "expected_observation": "The Composer Log result tab is registered at position 99 with hideAfterInit enabled.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000082": {
+      "topic": "ui.portfolio.composer.simulations_registration",
+      "title": "Composer simulation result contribution",
+      "question": "Composer simulation result contribution?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "PortfolioComposer"
+        ],
+        "conditions": [
+          "Installed static declarations; no donor runtime capture."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Automatic computation simulations is registered at position 999 with hideAfterInit enabled.",
+        "confidence": "high",
+        "limitations": [
+          "Static declarations do not establish runtime rendering, license-dependent behavior, backend algorithms or complete visual parity."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsPortfolioComposerChart/module.js",
+          "location": {
+            "section": "ResultsTab registration, lines 3-8",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0460f8c8062975b9c20936f8e80dd3f6bb8be386b6afaf4c73571fd32cd69cf3"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/PortfolioComposer/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inspect the Composer result registry and compare simulation-tab visibility before and after automatic computation.",
+        "expected_observation": "Automatic computation simulations is registered at position 999 with hideAfterInit enabled.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "74b66e05bb08b9e3f92fe39316cc0b6dac24ac63",
+        "created_at": "2026-09-25T14:11:17.159355Z",
+        "updated_at": "2026-09-25T14:11:17.159355Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased presentation observations; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "portfolio",
+        "static-observation"
+      ]
     }
   }
 }

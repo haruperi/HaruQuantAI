@@ -23,7 +23,7 @@ export const MODULE_ROUTES: Record<ModuleId, string> = {
   gridtest: '/gridtest',
 };
 
-const TAB_CAPABLE_MODULES: ModuleId[] = ['builder', 'retester', 'optimizer', 'projects'];
+const TAB_CAPABLE_MODULES: ModuleId[] = ['builder', 'retester', 'optimizer', 'portfolio', 'projects'];
 
 /**
  * Resolves a URL pathname to the corresponding ModuleId, or null if unknown.

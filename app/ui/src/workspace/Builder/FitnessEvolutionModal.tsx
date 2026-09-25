@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-import type { ReactNode } from 'react';
 import { fitnessIslands } from './fixtures';
 
 /**
@@ -8,47 +6,8 @@ import { fitnessIslands } from './fixtures';
  * matching the donor modal behavior.
  */
 
-export function SqdModal({
-  title,
-  onClose,
-  children,
-  footer,
-  width = 450,
-}: {
-  title: string;
-  onClose: () => void;
-  children: ReactNode;
-  footer?: ReactNode;
-  width?: number;
-}) {
-  useEffect(() => {
-    const close = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
-    };
-    document.addEventListener('keydown', close);
-    return () => document.removeEventListener('keydown', close);
-  }, [onClose]);
-
-  return (
-    <div
-      className="modal-backdrop sqx-dialog-scope sqd-dialog-scope"
-      role="presentation"
-      onMouseDown={e => e.target === e.currentTarget && onClose()}
-    >
-      <div className="modal sqx-modal sqd-modal" role="dialog" aria-modal="true" style={{ width }}>
-        <header>
-          <h2>{title}</h2>
-          <button type="button" className="sqx-modal-close" aria-label="Close" onClick={onClose}>
-            &times;
-          </button>
-        </header>
-        <div className="modal-content">{children}</div>
-        {footer !== undefined && <footer>{footer}</footer>}
-      </div>
-    </div>
-  );
-}
-
+import {SqdModal} from '../../plugins/project/ProjectWorkbench';
+export {SqdModal};
 function LinkClose({ onClose }: { onClose: () => void }) {
   return (
     <button type="button" className="sqd-modal-close-link" onClick={onClose}>

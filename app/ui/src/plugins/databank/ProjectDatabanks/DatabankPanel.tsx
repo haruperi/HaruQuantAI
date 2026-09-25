@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useAppStore } from '../../../app/store';
+import { useAppNavigate } from '../../../app/router';
 import { DatabankToolbar, type ToolbarAction } from './DatabankToolbar';
 import {
   LoadRecordsDialog,
@@ -40,6 +41,7 @@ export function strategyPassesMockChecks(netProfit: number, trades: number, maxD
 
 export function DatabankPanel() {
   const store = useAppStore();
+  const { navigateTo } = useAppNavigate();
   const databankStore = useDatabankStore();
 
   const [dialog, setDialog] = useState<DialogState>({ kind: 'none' });
@@ -187,9 +189,11 @@ export function DatabankPanel() {
             onSelect={store.selectStrategy}
             onRows={store.setRows}
             onActivate={id => {
-              store.selectStrategy(id);
-              if (store.module === 'builder') {
-                store.setTab('results');
+              if (['builder', 'retester', 'optimizer', 'portfolio'].includes(store.module)) {
+                // Commit both route fields together so selection cannot restore a stale tab.
+                navigateTo(store.module, { tab: 'results', strategyId: id });
+              } else {
+                store.selectStrategy(id);
               }
             }}
             activeView={activeView}

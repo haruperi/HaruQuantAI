@@ -161,3 +161,12 @@ chart unit choices retain UI selections but do not perform quantitative conversi
 Source generators produce labelled non-executable previews. Custom analyses remain
 session-local previews. No backend algorithms, database schema or durable plugin
 files were added. These limitations must not be described as 100% parity.
+
+## Shared project presentation
+
+The frame, modal shell, common settings and Results presentation now live in
+`plugins/project/ProjectWorkbench` (FEAT-UI-PROJECT_WORKBENCH). Existing Builder
+paths remain compatibility exports. Builder keeps Build-specific settings,
+progress and fixtures. This extraction adds no Builder feature or parity claim;
+existing limitations above still apply. Retester and Optimizer consume the shared
+public entrypoint without importing Builder private components.
