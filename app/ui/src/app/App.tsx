@@ -7,6 +7,7 @@ import { getPathForModule, useRouteSync } from './router';
 import { DatabankSplitter } from '../plugins/databank/ProjectDatabanks/DatabankSplitter';
 import { HomeScreen } from '../workspace/Home/HomeScreen';
 import { DataManager } from '../workspace/DataManager/DataManager';
+import { ChartWorkspace } from '../workspace/Chart/ChartWorkspace';
 import { BuilderWorkspace } from '../workspace/Builder/BuilderWorkspace';
 import { RetesterWorkspace } from '../workspace/Retester/RetesterWorkspace';
 import { OptimizerWorkspace } from '../workspace/Optimizer/OptimizerWorkspace';
@@ -29,6 +30,7 @@ import { HostConnectionProvider, useHostConnection } from './HostConnection';
 const nav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined; group?: string }[] = [
   { id: 'home', label: 'HaruQuantAI', icon: ChartNoAxesCombined },
   { id: 'datamanager', label: 'Data Manager', icon: Database, group: 'Fundamentals' },
+  { id: 'chart', label: 'Chart', icon: LineChart },
   { id: 'business', label: 'Business', icon: BriefcaseBusiness },
   { id: 'builder', label: 'Builder', icon: WandSparkles, group: 'Development' },
   { id: 'algowizard', label: 'AlgoWizard', icon: Workflow },
@@ -104,6 +106,7 @@ function AppShell() {
             <Route path="/" element={<HomeScreen />} />
             <Route path="/home" element={<HomeScreen />} />
             <Route path="/datamanager" element={<DataManager />} />
+            <Route path="/chart" element={<ChartWorkspace />} />
             <Route path="/business" element={<BusinessWorkspace />} />
             <Route path="/builder" element={<BuilderWorkspace />} />
             <Route path="/algowizard" element={<AlgoWizardWorkspace />} />

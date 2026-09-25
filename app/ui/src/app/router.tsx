@@ -6,6 +6,7 @@ import { useAppStore } from './store';
 export const MODULE_ROUTES: Record<ModuleId, string> = {
   home: '/',
   datamanager: '/datamanager',
+  chart: '/chart',
   business: '/business',
   builder: '/builder',
   algowizard: '/algowizard',

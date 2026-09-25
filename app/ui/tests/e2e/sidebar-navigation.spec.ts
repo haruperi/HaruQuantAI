@@ -48,6 +48,33 @@ test('collapsed icon rail expands as a hover flyout and collapses when the point
   await expect(navigation.getByRole('button', { name: 'Data Manager', exact: true })).toHaveClass(/active/);
 });
 
+test('Chart follows Data Manager and supports navigation, reload and direct links', async ({ page }) => {
+  const navigation = page.getByRole('complementary', { name: 'Applications' });
+  const chart = navigation.getByRole('button', { name: 'Chart', exact: true });
+  const labels = await navigation.getByRole('button').evaluateAll(buttons =>
+    buttons.map(button => button.getAttribute('aria-label')));
+  const dataManagerIndex = labels.indexOf('Data Manager');
+  expect(dataManagerIndex).toBeGreaterThanOrEqual(0);
+  expect(labels.slice(dataManagerIndex, dataManagerIndex + 3)).toEqual(['Data Manager', 'Chart', 'Business']);
+  await expect(chart.locator('svg')).toBeVisible();
+  await expect(chart.locator('span')).toBeHidden();
+  await navigation.hover();
+  await expect(chart.locator('span')).toBeVisible();
+  await chart.click();
+  await expect(page).toHaveURL(/\/chart(?:\?|$)/);
+  await expect(chart).toHaveClass(/active/);
+  await expect(page.getByRole('region', { name: 'Chart', exact: true })).toBeVisible();
+  await expect(page.getByText('SIMULATED DATA', { exact: true })).toBeVisible();
+  await expect(navigation.locator('.nav-flyout')).toHaveCSS('width', '49px');
+  await page.reload();
+  await expect(chart).toHaveClass(/active/);
+  await expect(page.getByRole('region', { name: 'Chart', exact: true })).toBeVisible();
+  await page.goto('/');
+  await page.goto('/chart');
+  await expect(chart).toHaveClass(/active/);
+  await expect(page.getByRole('region', { name: 'Chart', exact: true })).toBeVisible();
+});
+
 test('legacy Improver workspace opens Builder with improve-existing behavior retained', async ({ page }) => {
   await page.evaluate(() => localStorage.setItem('sqx-recreation-v1', JSON.stringify({
     state: { module: 'improver' },
@@ -74,4 +101,6 @@ test('collapsed navigation remains usable with the light skin', async ({ page })
   await expect(navigation).toHaveCSS('background-color', 'rgb(226, 231, 235)');
   await navigation.hover();
   await expect(navigation.locator('.nav-flyout')).toHaveCSS('width', '190px');
+  await navigation.getByRole('button', { name: 'Chart', exact: true }).click();
+  await expect(page.getByRole('region', { name: 'Chart', exact: true })).toBeVisible();
 });
