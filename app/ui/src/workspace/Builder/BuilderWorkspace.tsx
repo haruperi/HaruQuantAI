@@ -1,283 +1,29 @@
-import React, { useMemo, useState } from 'react';
-import { Activity, CircleStop, Layers, Pause, Play, RotateCcw, Settings, ShieldCheck, Sliders } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Layers, Settings, ShieldCheck, Sliders } from 'lucide-react';
 import { useAppStore } from '../../app/store';
-import { Button, Checkbox, Field, ProgressBar, Section, Select, Stat, TextInput } from '../../components/ui';
+import { Button, Checkbox, Field, Section, Select, TextInput } from '../../components/ui';
 import { ResultsWorkspace } from '../Results/ResultsWorkspace';
 import { BuildingBlocksModal } from './BuildingBlocksModal';
 import { ATMConfigModal } from './ATMConfigModal';
 import { RankingSettingsView } from './RankingSettingsView';
 import { BUILDING_BLOCKS_CATALOG } from './BuildingBlocksCatalog';
-import { evaluateStrategyGraph, runBatchTrials } from './builderClient';
+import { ProgressDashboard } from './ProgressDashboard';
+import type { EngineRunStatus } from './fixtures';
 
-function ProgressView() {
-  const store = useAppStore();
-  const job = store.jobs['builder'];
+/**
+ * Builder workspace shell in SQX Progress-tab parity (donor evidence
+ * SQX144-EV-000033): the 51px dashboard header with the clickable project
+ * name and the Progress / Full settings / Results large tabs. Progress is
+ * the initial panel, matching the donor's switch-to-dashboard on load.
+ */
 
-  const start = async () => {
-    store.setJob('builder', {
-      id: `job-builder-${Date.now()}`,
-      kind: 'builder',
-      status: 'running',
-      progress: 0,
-      accepted: 0,
-      rejected: 0,
-      message: 'Evaluating strategy graph via /api/v1/executions/evaluate...',
-      startedAt: new Date().toISOString(),
-    });
-    try {
-      const res = await evaluateStrategyGraph();
-      if (res.success) {
-        store.setLastExecutionResult(res);
-        store.patchJob('builder', {
-          status: 'completed',
-          progress: 100,
-          accepted: 1,
-          rejected: 0,
-          message: `Evaluation completed in ${res.elapsed_seconds.toFixed(3)}s. Reproducibility fingerprint: ${res.reproducibility?.graph_fingerprint?.substring(0, 12) ?? 'confirmed'}...`,
-        });
-        store.notify('Builder execution completed via gateway');
-      } else {
-        store.patchJob('builder', {
-          status: 'failed',
-          progress: 0,
-          message: `Evaluation issues: ${res.issues.map(i => i.message).join('; ')}`,
-        });
-      }
-    } catch (err: any) {
-      store.patchJob('builder', {
-        status: 'failed',
-        progress: 0,
-        message: err.message || 'Execution failed',
-      });
-    }
-  };
+export type BuilderPanel = 'progress' | 'settings' | 'results';
 
-  const startBatch = async () => {
-    store.setJob('builder', {
-      id: `job-builder-batch-${Date.now()}`,
-      kind: 'builder',
-      status: 'running',
-      progress: 0,
-      accepted: 0,
-      rejected: 0,
-      message: 'Executing batch parameter trials via /api/v1/executions/batch...',
-      startedAt: new Date().toISOString(),
-    });
-    try {
-      const batchRes = await runBatchTrials();
-      if (batchRes.success) {
-        store.setLastBatchResult(batchRes);
-        store.patchJob('builder', {
-          status: 'completed',
-          progress: 100,
-          accepted: batchRes.trials.length,
-          rejected: 0,
-          message: `Batch completed ${batchRes.trials.length} trials in ${batchRes.elapsed_seconds.toFixed(3)}s.`,
-        });
-        store.notify('Batch trials completed via gateway');
-      } else {
-        store.patchJob('builder', {
-          status: 'failed',
-          progress: 0,
-          message: `Batch execution issues: ${batchRes.issues.map(i => i.message).join('; ')}`,
-        });
-      }
-    } catch (err: any) {
-      store.patchJob('builder', {
-        status: 'failed',
-        progress: 0,
-        message: err.message || 'Batch execution failed',
-      });
-    }
-  };
-
-  const status = job?.status ?? 'idle';
-  const progress = job?.progress ?? 0;
-  const currentGen = Math.floor(progress / 10);
-
-  // SVG points for dynamic convergence curve
-  const convergencePoints = useMemo(() => {
-    const totalSteps = 12;
-    const currentStep = Math.min(totalSteps, Math.floor((progress / 100) * totalSteps) + 1);
-
-    // Simulated Best fitness and Average fitness curve points
-    const bestBase = [155, 138, 125, 105, 90, 75, 62, 52, 42, 34, 26, 20];
-    const avgBase = [160, 154, 148, 140, 132, 124, 115, 106, 96, 88, 80, 72];
-
-    const bestPts: string[] = [];
-    const avgPts: string[] = [];
-
-    for (let i = 0; i < currentStep; i++) {
-      const x = Math.round((i / (totalSteps - 1)) * 580) + 10;
-      bestPts.push(`${x},${bestBase[i]}`);
-      avgPts.push(`${x},${avgBase[i]}`);
-    }
-
-    return {
-      best: bestPts.join(' '),
-      avg: avgPts.join(' '),
-    };
-  }, [progress]);
-
-  return (
-    <div className="progress-view">
-      <div className="run-toolbar">
-        <Button
-          className="primary"
-          disabled={status === 'running'}
-          onClick={status === 'paused' ? () => store.patchJob('builder', { status: 'running', message: 'Resumed' }) : start}
-        >
-          <Play size={15} />
-          {status === 'paused' ? 'Resume' : 'Evaluate'}
-        </Button>
-        <Button
-          disabled={status === 'running'}
-          onClick={startBatch}
-        >
-          <Layers size={14} />
-          Batch Trials
-        </Button>
-        <Button
-          disabled={status !== 'running'}
-          onClick={() => store.patchJob('builder', { status: 'paused', message: 'Paused by user.' })}
-        >
-          <Pause size={15} />
-          Pause
-        </Button>
-        <Button
-          disabled={!['running', 'paused'].includes(status)}
-          onClick={() => store.patchJob('builder', { status: 'cancelled', message: 'Stopped by user.' })}
-        >
-          <CircleStop size={15} />
-          Stop
-        </Button>
-        <Button
-          onClick={() =>
-            store.setJob('builder', {
-              id: `reset-${Date.now()}`,
-              kind: 'builder',
-              status: 'idle',
-              progress: 0,
-              accepted: 0,
-              rejected: 0,
-              message: 'Ready',
-            })
-          }
-        >
-          <RotateCcw size={14} />
-          Reset progress
-        </Button>
-        <span className={`status status-${status}`}>
-          <i />
-          {status.toUpperCase()}
-        </span>
-      </div>
-      <div style={{ color: 'var(--muted)', fontSize: '0.78rem', margin: '4px 0 10px 4px' }}>
-        Evaluating standard benchmark RSI-14 strategy graph document through gateway. Results available in Execution Results workspace.
-      </div>
-
-      <Section title="Builder progress" description="Synchronous strategy graph evaluation through the execution gateway. Genetic generation is deferred to S6.">
-        <ProgressBar
-          value={job?.progress ?? 0}
-          label={`${Math.round(job?.progress ?? 0)}% · ${job?.message ?? 'Ready to start'}`}
-        />
-        <div className="metric-strip compact">
-          <Stat label="Accepted" value={job?.accepted ?? 0} tone="good" />
-          <Stat label="Rejected" value={job?.rejected ?? 0} tone="bad" />
-          <Stat label="Generation" value={`${currentGen} / 10`} />
-          <Stat label="Strategies / min" value={status === 'running' ? 154 : 0} />
-          <Stat label="Throughput" value={status === 'running' ? '2.5 / sec' : '—'} />
-          <Stat label="Elapsed" value={status === 'idle' ? '—' : '00:14:32'} />
-        </div>
-      </Section>
-
-      <div className="progress-columns">
-        <Section title="Population fitness convergence">
-          <div className="fake-chart" style={{ position: 'relative', height: 180, background: 'var(--bg-card)', borderRadius: 6, padding: '10px 14px' }}>
-            <svg viewBox="0 0 600 180" preserveAspectRatio="none" style={{ width: '100%', height: 140 }}>
-              <defs>
-                <linearGradient id="bestGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="#30b7e8" stopOpacity="0.4" />
-                  <stop offset="100%" stopColor="#30b7e8" stopOpacity="0" />
-                </linearGradient>
-              </defs>
-              {/* Grid lines */}
-              <line x1="10" y1="30" x2="590" y2="30" stroke="var(--border)" strokeDasharray="3,3" opacity="0.6" />
-              <line x1="10" y1="75" x2="590" y2="75" stroke="var(--border)" strokeDasharray="3,3" opacity="0.6" />
-              <line x1="10" y1="120" x2="590" y2="120" stroke="var(--border)" strokeDasharray="3,3" opacity="0.6" />
-
-              {/* Dynamic curves */}
-              {convergencePoints.best && (
-                <polyline
-                  points={convergencePoints.best}
-                  fill="none"
-                  stroke="#30b7e8"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              )}
-              {convergencePoints.avg && (
-                <polyline
-                  points={convergencePoints.avg}
-                  fill="none"
-                  stroke="#e6a23c"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeDasharray="4,2"
-                />
-              )}
-            </svg>
-            <div className="legend" style={{ display: 'flex', gap: 18, fontSize: '0.78rem', justifyContent: 'center' }}>
-              <span className="cyan" style={{ color: '#30b7e8', fontWeight: 600 }}>● Best Fitness (Score: 2.84)</span>
-              <span className="orange" style={{ color: '#e6a23c', fontWeight: 600 }}>● Average Fitness (Score: 1.42)</span>
-            </div>
-          </div>
-        </Section>
-
-        <Section title="Acceptance and dismissal summary">
-          <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-            <div className="donut" style={{ minWidth: 100, height: 100, borderRadius: '50%', border: '8px solid #30b7e8', display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column' }}>
-              <strong style={{ fontSize: '1.25rem', color: 'var(--text)' }}>{job?.accepted ?? 0}</strong>
-              <span style={{ fontSize: '0.68rem', color: 'var(--muted)', textTransform: 'uppercase' }}>Passed</span>
-            </div>
-            <ul className="reason-list" style={{ flex: 1, margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 6 }}>
-              <li style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                <span style={{ color: 'var(--muted)' }}>Low profit factor (&lt; 1.30)</span>
-                <strong>42%</strong>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                <span style={{ color: 'var(--muted)' }}>Insufficient trades (&lt; 80)</span>
-                <strong>28%</strong>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                <span style={{ color: 'var(--muted)' }}>High drawdown (&gt; 25%)</span>
-                <strong>17%</strong>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                <span style={{ color: 'var(--muted)' }}>Correlation filter rejected</span>
-                <strong>8%</strong>
-              </li>
-              <li style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem' }}>
-                <span style={{ color: 'var(--muted)' }}>Cross-check test failed</span>
-                <strong>5%</strong>
-              </li>
-            </ul>
-          </div>
-        </Section>
-      </div>
-
-      <Section title="Engine log">
-        <div className="log" style={{ background: 'var(--bg-card)', padding: '10px 14px', borderRadius: 6, maxHeight: 130, overflowY: 'auto', fontSize: '0.78rem' }}>
-          <p><time style={{ opacity: 0.6, marginRight: 8 }}>12:44:03</time> Project configuration loaded: genetic islands model initialized.</p>
-          <p><time style={{ opacity: 0.6, marginRight: 8 }}>12:44:04</time> Dataset EURUSD H1 loaded (2012-01-01 — 2026-08-31) · 30% OOS reserved.</p>
-          <p><time style={{ opacity: 0.6, marginRight: 8 }}>12:44:04</time> Genetic engine: 4 islands × 100 population · 24 active building blocks.</p>
-          <p><time style={{ opacity: 0.6, marginRight: 8 }}>12:44:05</time> Qualification criteria active: Return/DD ≥ 1.4, trades ≥ 80, Max DD ≤ 25%.</p>
-          {job?.message && <p><time style={{ opacity: 0.6, marginRight: 8 }}>12:56:52</time> {job.message}</p>}
-        </div>
-      </Section>
-    </div>
-  );
-}
+const PANEL_TABS: { id: BuilderPanel; label: string }[] = [
+  { id: 'progress', label: 'Progress' },
+  { id: 'settings', label: 'Full settings' },
+  { id: 'results', label: 'Results' },
+];
 
 function NumberField({
   label,
@@ -381,7 +127,7 @@ function BuilderSettingsView() {
       <Section title="Data and trading engine" description="Symbol, timeframe, backtest precision, and sample split configuration.">
         <div className="form-grid">
           <Field label="Market">
-            <Select value={s.symbol} onChange={(symbol) => update({ symbol })}>
+            <Select value={s.symbol} onChange={(symbol) => update({ symbol: symbol as typeof s.symbol })}>
               <option>EURUSD</option>
               <option>GBPJPY</option>
               <option>XAUUSD</option>
@@ -390,7 +136,7 @@ function BuilderSettingsView() {
             </Select>
           </Field>
           <Field label="Timeframe">
-            <Select value={s.timeframe} onChange={(timeframe) => update({ timeframe })}>
+            <Select value={s.timeframe} onChange={(timeframe) => update({ timeframe: timeframe as typeof s.timeframe })}>
               <option>M15</option>
               <option>M30</option>
               <option>H1</option>
@@ -399,7 +145,7 @@ function BuilderSettingsView() {
             </Select>
           </Field>
           <Field label="Testing precision">
-            <Select value={s.precision} onChange={(precision) => update({ precision })}>
+            <Select value={s.precision} onChange={(precision) => update({ precision: precision as typeof s.precision })}>
               <option>Selected timeframe only</option>
               <option>1 minute data</option>
               <option>Real tick</option>
@@ -534,35 +280,44 @@ function BuilderSettingsView() {
 }
 
 export function BuilderWorkspace() {
-  const tab = useAppStore((s) => s.tab);
-  const setTab = useAppStore((s) => s.setTab);
+  const [panel, setPanel] = useState<BuilderPanel>('progress');
+  const [runStatus, setRunStatus] = useState<EngineRunStatus>('idle');
+
+  const projectNameRunning = runStatus !== 'idle' && panel !== 'progress';
 
   return (
-    <div className="research-project">
-      <div className="project-header">
-        <div>
-          <h1>Builder</h1>
-          <span>Strategy discovery · StrategyQuant X 1-to-1 clone</span>
+    <div className="builder-workspace">
+      <header className="sqd-dashboard-header">
+        <div
+          className={`sqd-project-name${projectNameRunning ? ' sqd-project-name-running' : ''}`}
+          title={projectNameRunning ? 'Project in progress — click to return to Progress' : undefined}
+          onClick={() => setPanel('progress')}
+        >
+          Build
         </div>
-        <nav>
-          {(['progress', 'settings', 'results'] as const).map((x) => (
-            <button
-              key={x}
-              className={tab === x ? 'active' : ''}
-              onClick={() => setTab(x)}
+        <nav className="sqd-tabs-large" aria-label="Builder panels">
+          {PANEL_TABS.map(tab => (
+            <div
+              key={tab.id}
+              role="tab"
+              aria-selected={panel === tab.id}
+              className={panel === tab.id ? 'active' : ''}
+              onClick={() => setPanel(tab.id)}
             >
-              {x === 'settings' ? 'Full settings' : x[0].toUpperCase() + x.slice(1)}
-            </button>
+              {tab.label}
+            </div>
           ))}
         </nav>
-        <div className="engine-state">
-          <Activity size={14} /> Genetic Engine Active
-        </div>
-      </div>
-      <div className="project-content">
-        {tab === 'progress' ? (
-          <ProgressView />
-        ) : tab === 'settings' ? (
+      </header>
+      <div className="sqd-panel-host">
+        {panel === 'progress' ? (
+          <ProgressDashboard
+            runStatus={runStatus}
+            onRunStatusChange={setRunStatus}
+            onOpenFullSettings={() => setPanel('settings')}
+            onOpenResults={() => setPanel('results')}
+          />
+        ) : panel === 'settings' ? (
           <BuilderSettingsView />
         ) : (
           <ResultsWorkspace />

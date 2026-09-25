@@ -161,6 +161,19 @@
       "limitations": [
         "Saved view names are user configuration, not universal defaults; the live default view of a project is named in its project config, which may differ from the available saved files."
       ]
+    },
+    "E-L10": {
+      "title": "SQX shared web directive components",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/web/app/directives/"
+      ],
+      "scope": "Reusable AngularJS directive templates/styles (dashboardHeader, cardPanels, projectControlPanel, simpleDataSettings, simpleCrossCheck, settingsPanel) of the installed build",
+      "confidence": "high",
+      "limitations": [
+        "Directive templates are static HTML; runtime AngularJS linking behavior was not driven during inspection."
+      ]
     }
   },
   "records": {
@@ -3511,6 +3524,980 @@
         "grid",
         "columns",
         "view"
+      ]
+    },
+    "SQX144-EV-000032": {
+      "topic": "ui.builder.progress.layout_columns",
+      "title": "Builder Progress dashboard is a three-column flex of plugin MainPanels with fixed widths",
+      "question": "How is the Builder Progress tab dashboard laid out and which panels compose it?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "progress dashboard"
+        ],
+        "conditions": [
+          "installed build; static inspection; owner idle-state screenshot corroboration"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Builder dashboard pane renders a card-panels host whose dashboard panel loads MainPanel plugins filtered to the BUILDER product, laid out in one flex row with 22px top padding: sqn-engine (fixed 556px, order 1, 12px side padding), sqn-settings (fixed 500px, order 2, 12px side padding), sqn-results (flex 1 1 auto with 318px base width, order 3, 12px side padding). The settings panel is marked active only while the Full-settings panel is shown; engine and results panels are active on the Progress (dashboard) panel. Panel background is the dashboard background (dark skin #292929) and each column top-aligns under the shared dashboard header.",
+        "confidence": "high",
+        "limitations": [
+          "Widths/orders are from stylesheet constants; runtime window sizes below the media-query breakpoints reflow labels.",
+          "The TaskManager product renders a different set (tasksflow panel); this claim is scoped to BUILDER."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/BUILDER/layout/views/layout.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "dashboard-header + card-panels host; databanks pane below"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2a8766947930f143bdbf445c5990732b1a67d0f9d1575904bef6626ef572e103"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/DashboardPanel/dashboard.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "sqn-dasboard-flex-container ng-repeat over MainPanel plugins"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9128e92566eb0f23c6ec581c78c54b878003231620661950cff318671638c4ec"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/DashboardPanel/DashboardCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "DashboardCtrl",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "MainPanel loading with product filter and active-class rules"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2fe274d16916c0d9c0845812eff0672fabfc4a640f5e0d7a923fdc2eb8f85621"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/common/Batch3/styles.css",
+          "location": {
+            "section": ".sqn-engine, .sqn-settings, .sqn-results rules",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "sqn-engine/sqn-settings/sqn-results width, order, padding rules"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "19f042b8ea0d0778f52bb5b0d2515a6b26c8eefb2cf727bcbb467111080a2380"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_PROGRESS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the Builder layout view, the dashboard panel plugin controller, and the flex layout rules in the shared stylesheet batch.",
+        "expected_observation": "Structure, labels, ordering, and styling constants as stated in the claim.",
+        "actual_observation": "Observed the three-column flex with the stated fixed widths, orders, and padding, plus the settings/engine/results active-class switching rules.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/BUILDER/layout/views/layout.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel/dashboard.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/DashboardPanel/DashboardCtrl.js",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch3/styles.css"
+        ],
+        "executed_at": "2026-09-25T07:19:23.618Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f0748a",
+        "created_at": "2026-09-25T07:19:23.618Z",
+        "updated_at": "2026-09-25T07:19:23.618Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, labels, metrics, and styling constants only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "progress",
+        "layout"
+      ]
+    },
+    "SQX144-EV-000033": {
+      "topic": "ui.builder.progress.header_tabs",
+      "title": "Builder dashboard header shows the project name and Progress / Full settings / Results large tabs",
+      "question": "What does the Builder dashboard header contain and how do the main tabs behave?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "progress dashboard"
+        ],
+        "conditions": [
+          "installed build; static inspection; owner idle-state screenshot corroboration"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The dashboard header is a 51px bar containing the clickable project name (18px bold, 26px side padding, min-width 300px; it pulses while a project runs and returns to the dashboard panel on click) followed by three large tabs rendered at 37px height with 15px 600-weight labels, min-width 164px, 11px gap, 1px borders with transparent bottom border, and an active state adding a 4px #5897d4 top bar and the panel background. Tab labels in order: Progress (dashboard panel), Full settings (settings panel), Results (results panel). The Builder layout switches to the dashboard panel on view load. Dark skin: bar #3b3b3b, borders #888888, active tab background #292929, text #cccccc.",
+        "confidence": "high",
+        "limitations": [
+          "The Full settings tab is hidden when the product configuration disables it (showSettingsTab); the installed Builder shows it.",
+          "Pulsate animation observed in source keyframes; its runtime feel was not driven."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L10",
+          "artifact_locator": "internal/web/app/directives/dashboardHeader/dashboardHeader.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "project name div and three tab divs with switchToPanel handlers"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2280c71982157570d1ed9dc06bcee7b20f5ad78d62e574261efce6de84ed811c"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L10",
+          "artifact_locator": "internal/web/app/directives/dashboardHeader/styles.css",
+          "location": {
+            "section": "all rules",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "51px bar, tab metrics, active top bar, pulsate keyframes"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "d24e4d6e3eb22502e02e8f12b2c67c14b1da919a08732a03cdabcb7bb5b04f33"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/BUILDER/layout/LayoutCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "LayoutCtrl",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "AppService.switchToPanel('dashboard') on view content load"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c434f3490c5a4f3927aa71e366430a839b381814b7f9e9efca65aacf9d2492e8"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SkinDark/dark.skin.css",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "dark header bar, active tab background, border colors"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_PROGRESS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the dashboardHeader directive template and stylesheet plus the Builder layout controller's initial panel switch.",
+        "expected_observation": "Structure, labels, ordering, and styling constants as stated in the claim.",
+        "actual_observation": "Observed the stated header structure, tab labels and metrics, initial Progress panel selection, and dark-skin color values.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/dashboardHeader/dashboardHeader.html",
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/dashboardHeader/styles.css",
+          "SQX_REFERENCE_ROOT/internal/web/BUILDER/layout/LayoutCtrl.js",
+          "SQX_REFERENCE_ROOT/internal/plugins/SkinDark/dark.skin.css"
+        ],
+        "executed_at": "2026-09-25T07:19:23.618Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f0748a",
+        "created_at": "2026-09-25T07:19:23.618Z",
+        "updated_at": "2026-09-25T07:19:23.618Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, labels, metrics, and styling constants only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "progress",
+        "header",
+        "tabs"
+      ]
+    },
+    "SQX144-EV-000034": {
+      "topic": "ui.builder.progress.engine_panel",
+      "title": "Engine column composition: control card, infinite progress, task line, log card, and Build stats table",
+      "question": "What does the Builder Progress engine column contain, with which controls, labels, and idle values?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "progress dashboard"
+        ],
+        "conditions": [
+          "installed build; static inspection; owner idle-state screenshot corroboration"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The engine column stacks: (1) a control card with right-floated 29px icon buttons — a save-config dropdown (Save; Save as...), a load-config dropdown (Load from file...; Load Saved config submenu; Reset to default (forex); Reset to default (futures); Reset to default (stockpicker)), and a fitness-evolution icon button opening a modal; and an absolutely positioned top-right Stop / Pause / Start group where Start is a green gradient button, Stop has a red icon and Pause an orange icon, and Start disables while a project runs; (2) a progress bar using the infinite variant for Build tasks (a 25%-wide blue bar sliding via a 2s animation while running); (3) a 'Task: {lastEvent}' line with ellipsis overflow; (4) a log card (bordered scroll area, 11px preformatted text) with a buttons row: Clear log link (left), Clear log on start with a toggle switch (centered), Memory cleanup link (right); (5) a stats table whose Build-variant rows are: Strategies generated with a gear-icon 'No strategies generated?' help link; Time per strategy with a [ Detailed ] link paired with Time per accepted strategy; Rejected with [ Detailed ] paired with Accepted with [ Detailed ]; Strategies per hour paired with Accepted strategies per hour; Running time so far paired with In databank. Values are right-aligned blue spans; idle values are 0, 0 ms., 0 / 0.00 %, and 0.00. The Detailed links open modal grids — dismissal (Reason to dismiss / Count / % of all), accepted (Reason to accept / Count / % of all), duration (Name / Count / Avg. time / Total time / % of all) — which show an N/A empty text until engine statistics arrive. Dark skin: cards #3b3b3b, table label text #888888, value spans and links #4290d8, log background #292929 with #aaaaaa text and #888888 border.",
+        "confidence": "high",
+        "limitations": [
+          "The fitness-evolution inline element renders only its popup host; the visible launcher is the icon button.",
+          "Idle stats values are corroborated by the owner's idle screenshot; runtime values are engine-fed and not claimed.",
+          "The screenshot's full-width striped idle bar is the observed rendering of the infinite variant at rest; the sliding animation is source-observed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/EnginePanel/engine.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "control card, dropdowns, progress, task line, log card, stats table, chart boxes"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8fe8e966ae58b0ab0619792f2fe2bc96cfae5a7bde8d9cb35818ea17f211feeb"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/EnginePanel/EngineCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "EngineCtrl",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "stats model fields, formatting, Detailed popup wiring, log handlers"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "622538c488af5def8729a7030c5268415bd8da4f2b520cce672ccee18e40c268"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/EnginePanel/EnginePanel.css",
+          "location": {
+            "section": "all rules",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "log container/scroll, log buttons, stats table, control panel rules"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b8610fd0c4a6b348236d554657cedfc406b59df5fbac5912bed08d23f04e03d2"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L10",
+          "artifact_locator": "internal/web/app/directives/projectControlPanel/projectControlPanel.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Stop/Pause/Start buttons and infinite build progress strip"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1d5bc9acb22b6316254f25ff78042ba84175df6a7550309af4d93deeb429d258"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/common/Batch1/styles.css",
+          "location": {
+            "section": ".progress-bar.progress-bar-infinite, progress-sq",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "progress-bar-infinite sliding keyframes"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_PROGRESS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the EnginePanel template, controller, stylesheet, the project control panel directive, and the infinite progress keyframes.",
+        "expected_observation": "Structure, labels, ordering, and styling constants as stated in the claim.",
+        "actual_observation": "Observed the stated control inventory, log card, stats rows/links, idle values, Detailed modal grid columns, and dark-skin color constants.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/engine.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineCtrl.js",
+          "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.css",
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/projectControlPanel/projectControlPanel.html",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch1/styles.css"
+        ],
+        "executed_at": "2026-09-25T07:19:23.618Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f0748a",
+        "created_at": "2026-09-25T07:19:23.618Z",
+        "updated_at": "2026-09-25T07:19:23.618Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, labels, metrics, and styling constants only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "progress",
+        "engine",
+        "log",
+        "stats"
+      ]
+    },
+    "SQX144-EV-000035": {
+      "topic": "ui.builder.progress.engine_charts",
+      "title": "Two engine chart cards render side by side with a centered type select that borders on hover",
+      "question": "How are the engine chart panels in the Builder Progress engine column laid out and switched?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "progress dashboard"
+        ],
+        "conditions": [
+          "installed build; static inspection; owner idle-state screenshot corroboration"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Below the stats table, the engine column renders chart instances in boxes sized flex 0 1 50% (two side by side, 5px side margins, 10px bottom margin). Each box is a card (dark skin #3b3b3b, min-height 249px, card shadow) containing a centered type select styled transparent with no border until hover (border plus background then appear) and a chart area below. The donor creates exactly two instances, each remembering its own selected type; the type list itself comes from the engine backend. In the owner's idle screenshot the two instances show the types 'Databank Fitness - IS Training' (a three-line chart with legend Top Strategy (green), Top 10 Avg (blue), All Avg (red), y-axis 0-1.0, x-axis 12AM/12PM/12AM) and 'Heap memory chart' (a green filled area with a red sawtooth line, y-axis 0-7.8 GB labeled Memory, x-axis labeled Time with 9:00am/10:00am).",
+        "confidence": "high",
+        "limitations": [
+          "The full selectable type list is backend-fed (engine/getTypes) and is not present in client source; only the two screenshot-observed selections are claimed.",
+          "Chart series are canvas-rendered from live engine data; only the observable chart kinds and legends are claimed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/EnginePanel/engine.html",
+          "location": {
+            "section": "engine-chart-box repeat",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "engine-container-instances ng-repeat with engine-chart-panel"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "8fe8e966ae58b0ab0619792f2fe2bc96cfae5a7bde8d9cb35818ea17f211feeb"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/EnginePanel/directives/engineChartPanel/engineChartPanel.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "type select plus chart/grid/rows display modes"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9e13472b5b3fbf9745b7e1240933caca2a8e1a5190b8f415dc1640355e07a6a9"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/EnginePanel/EnginePanel.css",
+          "location": {
+            "section": ".engine-chart-panel rules",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "engine-chart-panel card, centered transparent select with hover border"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b8610fd0c4a6b348236d554657cedfc406b59df5fbac5912bed08d23f04e03d2"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/common/Batch3/styles.css",
+          "location": {
+            "section": ".engine-chart-box, .sqn-engine .engine-chart-panel",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "engine-chart-box 50% flex sizing; sqn-engine chart panel min-height 249px"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "19f042b8ea0d0778f52bb5b0d2515a6b26c8eefb2cf727bcbb467111080a2380"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_PROGRESS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the chart panel directive template and the card/box stylesheet rules; corroborated the two visible types and chart looks with the owner screenshot.",
+        "expected_observation": "Structure, labels, ordering, and styling constants as stated in the claim.",
+        "actual_observation": "Observed the two-box 50% layout, hover-border select behavior, and the two chart kinds with their legends and axis captions.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/engine.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/engineChartPanel.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.css",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch3/styles.css"
+        ],
+        "executed_at": "2026-09-25T07:19:23.618Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f0748a",
+        "created_at": "2026-09-25T07:19:23.618Z",
+        "updated_at": "2026-09-25T07:19:23.618Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, labels, metrics, and styling constants only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "progress",
+        "engine",
+        "charts"
+      ]
+    },
+    "SQX144-EV-000036": {
+      "topic": "ui.builder.progress.settings_summary",
+      "title": "Settings summary column: predefined configs, Data rows, Build options rows, and cross-check switch tree",
+      "question": "What does the Builder Progress 'Settings summary' column contain and how do its controls behave?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "progress dashboard"
+        ],
+        "conditions": [
+          "installed build; static inspection; owner idle-state screenshot corroboration"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The center column is the Build task's simple settings view: a 'Settings summary' title (14px, 600 weight, bottom border); a 'Use predefined config' dropdown button whose menu offers Default (forex), Default (futures), Default (stockpicker), Market, Trend following, Mean reversal, Fuzzy, and Daily, each with an info tooltip describing the template; a Data section with an Engine select, a Symbol field with an adjacent timeframe select, and a date-range line with OOS annotation; a Build options table whose rows — What to build, Building blocks, Trading options, Money Management — display computed multi-line value summaries (e.g. 'Simple strategies, SL&PT required, fixed pips' plus a genetic-options line) and whose rows open the Full settings panel on click; and a 'Cross checks (strategy robustness tests)' section with a 'Disable all' switch and category rows FAST, SLOW, VERY SLOW (bold headers) each listing cross-check rows with a toggle switch right-aligned. Cross-check web-module titles are: What If simulations, Monte Carlo trades manipulation, Retest with higher precision, Retest on additional markets, Monte Carlo retest, Sequential Optimization, Opt. Profile / Sys. Param. Permutation, Walk-Forward Optimization, Walk-Forward Matrix (display truncates titles at 32 characters). Toggle switches are 32x19 sprites: off = gray track with white knob left; on = light-blue track with deep-blue knob right; a half state exists for category headers. While a project runs the panel is overlaid with a lock placeholder noting changes apply on next start.",
+        "confidence": "high",
+        "limitations": [
+          "The in-app cross-check list is served by the backend; the installed web module titles are claimed, and the owner screenshot suggested display variants for three items (e.g. 'Backtests on additional markets') that could not be reconciled from client source.",
+          "Value summary strings are config-dependent; the quoted example is the observed default rendering.",
+          "Lock-overlay behavior is source-observed; its runtime rendering was not driven."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/TaskBuild/simpleSettings/simpleSettings.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "title, predefined-config dropdown, simple-data-settings include, build options panel, simple-cross-check include"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f715f05c3dbbb21f2309aaeb8dfe610735054b3c7495abc172bfa7bf79c8bcb2"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/TaskBuild/simpleSettings/SimpleBuildSettingsCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "SimpleBuildSettingsCtrl",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "buildOptions row definitions and click-to-full-settings handler"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "07fffe418e6af88a1e979f709b7b7730f3ba0dec3904dc84a669fb8cdc49b09b"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L10",
+          "artifact_locator": "internal/web/app/directives/simpleDataSettings/simpleDataSettings.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Engine/Symbol/timeframe/date-range rows"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "10a42f77bcb733c40fac7ad8de380b9a02fec7bba306996aa8fe8a6ab70a2667"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L10",
+          "artifact_locator": "internal/web/app/directives/simpleCrossCheck/simpleCrossCheck.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Disable all switch, category rows, per-check switches"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c60d5b2093ca47272a8ea1a0bc18ed906d68ecc5b79a6196a43beb32175e481c"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/TaskBuild/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "summary group composition and row names"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e869ff99f81d2ff806923d7a6f50a2226c142934b601738b1d59654570c7dfb6"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/CrossCheckWhatIf/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "cross-check title registration pattern (title: Ltsq(...))"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0186101cd007b2834340dc4adde06018059c32e1cc2396953ad6731c83148a6b"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_PROGRESS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the TaskBuild simple settings template/controller, the simple data-settings and cross-check directive templates, the task module summary groups, and the nine CrossCheck plugin title registrations; corroborated layout and default values with the owner screenshot.",
+        "expected_observation": "Structure, labels, ordering, and styling constants as stated in the claim.",
+        "actual_observation": "Observed the stated section composition, menu entries, row names, click-through behavior, switch visuals (32x19 sprites sampled by pixel dump), and the nine cross-check titles.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/simpleSettings/simpleSettings.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/simpleSettings/SimpleBuildSettingsCtrl.js",
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/simpleDataSettings/simpleDataSettings.html",
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/simpleCrossCheck/simpleCrossCheck.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/module.js",
+          "SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/module.js"
+        ],
+        "executed_at": "2026-09-25T07:19:23.618Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f0748a",
+        "created_at": "2026-09-25T07:19:23.618Z",
+        "updated_at": "2026-09-25T07:19:23.618Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, labels, metrics, and styling constants only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "progress",
+        "settings-summary",
+        "cross-checks"
+      ]
+    },
+    "SQX144-EV-000037": {
+      "topic": "ui.builder.progress.results_column",
+      "title": "Results column renders up to three best-strategy cards with a shared Sample selector",
+      "question": "What does the Builder Progress results column show and how do its controls behave?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "progress dashboard"
+        ],
+        "conditions": [
+          "installed build; static inspection; owner idle-state screenshot corroboration"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The right column renders result-panel cards (max-width 350px, 20px left gap between cards, card shadow) for rankings 0-2. Each card has a title bar with bottom border — 'Best strategy so far: {name}', '2nd Best strategy so far: {name}', '3rd Best strategy so far: {name}' — and, when a strategy is present, a body with a centered 'Sample' label plus a Full / IS / OOS button group (shared selection across all cards), an overview iframe area, and an equity chart card at the bottom. Cards without a strategy are hidden except ranking 0, whose title shows 'No results so far' with the body hidden. Clicking a card selects the strategy and switches the app to the Results panel. The donor creates three instances; the second card also becomes visible at lower zoom levels.",
+        "confidence": "high",
+        "limitations": [
+          "Overview iframes and equity charts are engine-fed at runtime; only structure and control behavior are claimed.",
+          "Zoom-conditional visibility of the second card is stylesheet-observed; runtime zoom behavior was not driven."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/DashboardResults/dashboardResults.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "sqn-results-wrapper with three result-panel instances"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6b3f829fc1e443098fbcfdf27596862d1dd4ecf0dca94ab886a2826f80144d6d"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/DashboardResults/directives/resultPanel.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "card structure: title, Sample group, iframe container, equity chart wrapper"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "fede32c6580cd8f2cc800da83d6f5223f81029ef7555077fe7af7a735d09f39d"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/DashboardResults/directives/ResultPanelCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "ResultPanelCtrl",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "ranking titles, shared sample type, click-to-results behavior"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f7769ccaf42cedae206b69808d54014f92c7946e5327bd5122d21ee442b1c3a7"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/common/Batch3/styles.css",
+          "location": {
+            "section": ".sqn-results-wrapper .sqn-results-col",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "sqn-results-col sizing, first-child visibility rule, zoom visibility"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "19f042b8ea0d0778f52bb5b0d2515a6b26c8eefb2cf727bcbb467111080a2380"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_PROGRESS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the DashboardResults templates and controller and the results-column stylesheet rules; corroborated the idle 'No results so far' rendering with the owner screenshot.",
+        "expected_observation": "Structure, labels, ordering, and styling constants as stated in the claim.",
+        "actual_observation": "Observed the three-card structure, title strings, idle first-card rule, shared Sample selection, and click-to-results behavior.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/dashboardResults.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/directives/resultPanel.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/DashboardResults/directives/ResultPanelCtrl.js",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch3/styles.css"
+        ],
+        "executed_at": "2026-09-25T07:19:23.618Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "2f0748a",
+        "created_at": "2026-09-25T07:19:23.618Z",
+        "updated_at": "2026-09-25T07:19:23.618Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, labels, metrics, and styling constants only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "progress",
+        "results",
+        "sample"
       ]
     }
   }
