@@ -174,6 +174,21 @@
       "limitations": [
         "Directive templates are static HTML; runtime AngularJS linking behavior was not driven during inspection."
       ]
+    },
+    "E-L11": {
+      "title": "SQX RESULTS overlay web app and results panel plugins",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/web/RESULTS/",
+        "internal/plugins/ProjectResults/",
+        "internal/plugins/Results*"
+      ],
+      "scope": "AngularJS results overlay app (layout, info line, quant-tabs strip, Reload link) and the ResultsTab plugin family incl. ProjectResults host and custom-analysis actions",
+      "confidence": "high",
+      "limitations": [
+        "A newer Vue app exists under internal/web/RESULTS2/ but the reference build runs the AngularJS app per the owner screenshot; RESULTS2 was inspected only for cross-confirmation of labels."
+      ]
     }
   },
   "records": {
@@ -5597,6 +5612,652 @@
         "full-settings",
         "layout",
         "css"
+      ]
+    },
+    "SQX144-EV-000045": {
+      "topic": "ui.builder.results.architecture",
+      "title": "Builder Results tab hosts the RESULTS overlay app; visible tab registry and ordering",
+      "question": "What does the Builder Results tab render and in what order do its tabs appear?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "installed build; static inspection; owner Results screenshot corroboration"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Clicking the Builder's Results tab activates a host overlay iframe (#iframe_results_overlayed) that covers the Builder content below its header; it loads the AngularJS RESULTS app (internal/web/RESULTS) unless the backend settings flag results2 selects the newer Vue app under internal/web/RESULTS2 - the reference build runs the AngularJS app, corroborated by the owner screenshot matching the Angular results toolbar. The overlay app renders a fixed 'Reload' link (top 40px, right 40px) that saves state and reloads. The ProjectResults host shows the info line 'No result chosen - Double-click on result on databank to see the details' above a quant-tabs strip whose built-in tabs register by position: Overview 10, SP overview 11, Optimization profile 11 (hidden), List of trades 20, Equity chart 30, Trade analysis 40, Profile chart 55, Monte Carlo tests 60 (hidden until a result exists, with Stockpicker log and Trades on chart), Strategy config 80, Source Code 100; custom user plugins from user/extend/ResultsPlugins (the reference install ships 'Prop Monte Carlo' and 'Prop analytics') are sorted after all built-ins. A '+ New analysis' control (class databanks-add-btn) follows the tabs when the product is Builder.",
+        "confidence": "high",
+        "limitations": [
+          "The results2 settings flag is backend state; the running variant is claimed from screenshot corroboration, not from a settings dump.",
+          "Exact positions of Stockpicker log and Trades on chart plugins are not asserted beyond hidden-until-result membership."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/web/common/templates.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "overlay iframe choosing RESULTS vs RESULTS2"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "478c59e4bdf44863cbc7f3f68245ca331a1eeeb9a407f253d5286f3293c0e8ac"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/web/RESULTS/layout/layout.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "host template include and fixed Reload link"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "129b1618d762909af95b053b4e6b034466e9c90d41fcb03d3ec3951dff7dcb3b"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/web/RESULTS/layout/LayoutCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "saveAndReload and reloadResultsTabs behavior"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c0beb0e8fd92ed31e6cb9412bdc7b7666e0f8fca299ea965b1d0432612a33df0"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ProjectResults/results.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "info line, quant-tabs instance, + New analysis control"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0119886e9484e1b19165eb9c365fa75d5128e8b4073f98be4e6148a83a434e08"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ProjectResults/ResultsCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "tab loading, custom-last sort, + New analysis control registration"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5b233c5b43300080460c642864ee68d5cd8529e41ed5dc0cbc8bd5d0df533e3c"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/web/app/directives/quantTabs/quantTabs.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "strip rendering, custom puzzle icon, tab menu hook"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5dc9369bf417d1ca54963851bf2c403176a8dd7698b0fc1700bba6b975b92059"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsOverview/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Overview tab position 10"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b743615092006c157f85c03e972a77cf4b9c65065ef87243ef80f26cc7ada5dc"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsSPOverview/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "SP overview position 11"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "430ad4c5e27963667be915d37763255257464a8286ac6c46ef203d5a7a35113e"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsTradeList/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "List of trades position 20"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "7b676c7796bceeac2be7f164f23ada895b263abf20c4b043a8c4383c622f174c"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsEquityChart/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Equity chart position 30"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9c0baca2f50be624d2f85ae0806a584673448170c16a4e4d8f3a7f8aba9340e4"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsTradeAnalysis/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Trade analysis position 40"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "77b533a3f983858dca302d3f4def900dea0fd89c861ae06c2443f586e0fcc1a2"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsProfileChart/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Profile chart position 55"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ac0d142105f21bb9b89f5fbc66af3294764f93de8b63a75421374863616f7663"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Monte Carlo tests position 60, hideAfterInit"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "64f24cc8f5a68b9a4c086758fc6258ba22c765e71aaa8b267c6aa242d0cb3a9f"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsStrategyConfig/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Strategy config position 80"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "a7e8f7034865f509a0a0e08d10d046503122a94518eed39e73885f542ef740d4"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsSourceCode/module.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Source Code position 100"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ecb331159890d92ed12bbde3e9abf68691e46e252956e7d60f4f818f8a0a6818"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the host shell, overlay switching, ProjectResults controller and every ResultsTab registration; compared the strip against the owner Results screenshot.",
+        "expected_observation": "Overlay app with info line, built-in tabs in position order, custom tabs last, + New analysis control, Reload link.",
+        "actual_observation": "Registrations and screenshot match the stated order; Reload link pixels found at x1770-1812 y91-107 of the 1849x1008 screenshot.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/RESULTS/layout/layout.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/ResultsCtrl.js"
+        ],
+        "executed_at": "2026-09-25T10:37:19.000Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "79c77f0",
+        "created_at": "2026-09-25T10:37:19.000Z",
+        "updated_at": "2026-09-25T10:37:19.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased architecture, positions, and labels only; no source text reproduced."
+      },
+      "tags": [
+        "builder",
+        "results",
+        "tabs",
+        "architecture"
+      ]
+    },
+    "SQX144-EV-000046": {
+      "topic": "ui.builder.results.toolbar_states",
+      "title": "Results shared toolbar, per-tab chrome, empty states, and verified colors",
+      "question": "What toolbar and empty-state chrome does each Results tab show when no strategy is selected, with which colors?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "installed build; static inspection; pixel sampling of owner Results screenshot (1849x1008)"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The shared results toolbar renders 'Data' with an (empty when no strategy) select, 'Direction' with segmented L+S/Lng/Shr buttons, and 'Sample' with Full/IS/OOS - in extended mode IS and OOS are split buttons with caret dropdown menus. The Overview tab appends 'Template' with a select defaulting to backend option 'SQ Default' and its empty state renders a horizontally centered 'No strategy selected' heading (14px, normal weight) near the top of the content area. List of trades adds 'View' select, a manage-views gear, an Export button and an 'Include expired' checkbox over an empty grid. Equity chart adds 'X Axis' Trade/Time, a Benchmark dropdown (symbol box, Normalization select with the five normalization labels ending 'off', explanation, Learn more), a refresh icon button and a settings dropdown with Subcharts groups (Drawdown Money/Pct/Pips/Open $/Open %/Off; Volume Auto/Size/Money/Off; Daily chart and Volatility (ATR) enabled only for X-Axis=Time; Line) and Markers groups (Equity Daily/MAE-MFE/Off; Stagnation and Stagnation V2 Full/IS/OOS/Off; Points All/Grow/Off; Crosshair), with empty label 'No strategy selected.'. Trade analysis adds 'Period by' Open Time/Close Time. Strategy config shows 'No strategy selected.'. Source Code shows 'Source code type' select (default Pseudo Code), Save to file and Copy to clipboard buttons, a refresh link, a 'Parameter variables' dropdown (What to parametrize: Recommended parameters / Your own settings with the nine category checkboxes and symmetric-variables toggle / Don't use parameters) and 'MM used' select. Verified colors (dark skin): info line #727272 on #292929; strip background #292929; inactive tabs #3b3b3b with #777777 borders and #cccccc text; active tab #292929 with 3px #777777 top border; segmented buttons #464646 with #555555 edges, active #36648B; content area #3b3b3b; empty-state text ~#cccccc; Reload link #4290D8; '+ New analysis' #207ace; custom tab puzzle icon #28a745 (active #1e7e34).",
+        "confidence": "high",
+        "limitations": [
+          "Sample percentage menu items, MM type options, overview template list beyond SQ Default, and generator list beyond the four names evidenced in templates are backend data shipped as fixtures.",
+          "Light-skin values are taken from stylesheet rules, not a light-skin screenshot."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/web/app/directives/resultsToolbar/toolbar.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Data/Direction toolbar with transclude slot"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1480f0c9856b1c3bd130d27cffc49f119b73daf0493d447fc18d481008949fab"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/web/app/directives/sampleType/sampleType.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "extended split buttons IS/OOS with caret dropdowns"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ca58eec4bd330ff05ddb00851e4c43c46624036cd98b232344fbaee9c78ea1de"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsOverview/overview.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Template select and overview iframe area"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "356523627db3c8abb7ecdbc7226af1597a48c4b7ae8f87c23f9580bce0b30b8c"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsOverview/ResultsOverviewCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "SQDefault template default and No-strategy-selected empty-state HTML"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "14717fa23229c7c2dceef6b2e0be7572117d6e8c34a56ff7d9c0e9e78012bd3d"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the toolbar directives and each tab template; sampled the owner screenshot at tab strip, toolbar, content and link positions.",
+        "expected_observation": "Toolbar labels and per-tab extras as stated; colors as stated at sampled positions.",
+        "actual_observation": "Sampled: active tab #292929, inactive #3b3b3b, borders #777777, segment active #36648B, idle #464646, content #3b3b3b, Reload #4290D8 at x1770-1812 y99, empty-state text mixes to ~#cccccc, info-line mixes to #727272.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/resultsToolbar/toolbar.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/overview.html"
+        ],
+        "executed_at": "2026-09-25T10:37:19.000Z"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "79c77f0",
+        "created_at": "2026-09-25T10:37:19.000Z",
+        "updated_at": "2026-09-25T10:37:19.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased labels, option orders, and measured colors only."
+      },
+      "tags": [
+        "builder",
+        "results",
+        "toolbar",
+        "colors",
+        "empty-states"
+      ]
+    },
+    "SQX144-EV-000047": {
+      "topic": "ui.builder.results.custom_actions",
+      "title": "Custom analysis lifecycle: + New analysis modal, Rename/Delete actions, Reload link",
+      "question": "How are custom analysis tabs created, renamed, deleted and the view refreshed?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "'+ New analysis' opens a modal titled 'Create new Result analysis plugin' (640px) explaining that the tab is a standalone HTML/Javascript application in user/extend/ResultsPlugin/{YourName}, linking the public docs page, with a unique-name input placeholder 'My Analysis' and Close/Create footer; Create registers a new custom plugin tab and reloads the results tabs. Custom tabs carry a menu whose actions register as Rename (position 10, text-cursor icon) and Delete (position 50, trash icon); Rename opens a modal titled \"Rename custom analysis '{name}'\" with a New name field and Close/Rename footer; Delete asks a confirmation titled 'Remove custom analysis' with the message \"Are you sure you want to remove '{name}'?\". The fixed Reload link saves results state and reloads the page.",
+        "confidence": "high",
+        "limitations": [
+          "The rename controller closes over ResultsPluginsService; server-side plugin creation semantics are out of UI scope."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ProjectResults/newCustomPluginModal.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "create modal copy, input, footer"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cad3fa81634142c93719e88e9694dce18ee8d0610050afc5d6f279fda84b1b14"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/CustomResultsPluginActions/rename/renameResultsPluginPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "rename modal structure"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2bc26c9532e1ab33b409f8a1a04c69e21d8cb4a899d6ed73f79f7a77f6edf201"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ProjectResults/ResultsCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "createCustomPlugin wiring and RELOAD_RESULTS emit"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5b233c5b43300080460c642864ee68d5cd8529e41ed5dc0cbc8bd5d0df533e3c"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the three modal/action sources including the CustomResultsPluginAction registrations.",
+        "expected_observation": "Modal titles, labels, placeholders and action order as stated.",
+        "actual_observation": "Titles, placeholders and positions match the templates; delete shows a confirm dialog via showConfirm.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/newCustomPluginModal.html"
+        ],
+        "executed_at": "2026-09-25T10:37:19.000Z"
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "79c77f0",
+        "created_at": "2026-09-25T10:37:19.000Z",
+        "updated_at": "2026-09-25T10:37:19.000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased modal structure and labels only."
+      },
+      "tags": [
+        "builder",
+        "results",
+        "custom-analysis",
+        "modals"
       ]
     }
   }

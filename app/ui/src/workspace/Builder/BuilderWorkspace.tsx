@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ResultsWorkspace } from '../Results/ResultsWorkspace';
+import { ResultsView } from './ResultsView';
 import { ProgressDashboard } from './ProgressDashboard';
 import { FullSettingsView } from './FullSettingsView';
 import type { EngineRunStatus } from './fixtures';
@@ -61,7 +61,7 @@ export function BuilderWorkspace() {
         ) : panel === 'settings' ? (
           <FullSettingsView runStatus={runStatus} onClose={() => setPanel('progress')} />
         ) : (
-          <ResultsWorkspace />
+          <ResultsView />
         )}
       </div>
     </div>

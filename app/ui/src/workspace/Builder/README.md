@@ -84,3 +84,25 @@ page and its modals were removed as superseded.
 | Feature ID | Feature | Status |
 |---|---|---|
 | FEAT-UI-BUILDER_FULLSETTINGS_TAB | Builder Full settings tab SQX parity: Advanced settings shell with the 12 Build tabs, shared donor-look controls, additional-build-config gear popups, lock overlay, and prev/Close/next — fixture-backed | implemented (`FullSettingsView.tsx`, `settings/*Tab.tsx`, `settings/SettingsControls.tsx`, `settings/settingsFixtures.ts`) |
+
+## Results tab parity slice (SQX 144.2953)
+
+The Results panel is the donor RESULTS overlay surface (evidence
+`SQX144-EV-000045..000047`): the "No result chosen" info line, the
+quant-tabs strip (Overview, SP overview, List of trades, Equity chart,
+Trade analysis, Profile chart, Strategy config, Source Code) with the two
+custom analysis tabs (Prop Monte Carlo, Prop analytics; green puzzle icon,
+Rename/Delete menu) sorted last, the "+ New analysis" control with its
+create-plugin modal, the fixed Reload link, and the shared Data /
+Direction / Sample toolbar with per-tab extras (Template, View + manage
+gear + Export + Include expired, X Axis + Benchmark + Subcharts settings,
+Period by, source-code form with Parameter variables menu). Empty states
+match the donor ("No strategy selected"). The donor's page-reload Reload
+is adapted to a view-state reset. Backend-driven option lists (sample
+percentage items, MM types, custom tab content) are labelled fixtures.
+The shared `workspace/Results/ResultsWorkspace.tsx` prototype remains for
+the Optimizer/Retester workspaces.
+
+| Feature ID | Feature | Status |
+|---|---|---|
+| FEAT-UI-BUILDER_RESULTS_TAB | Builder Results tab SQX parity: info line, quant-tabs strip with custom analysis tabs and menus, + New analysis modal, Reload link, shared Data/Direction/Sample toolbar, per-tab chrome and empty states — fixture-backed | implemented (`ResultsView.tsx`, `results/*`) |
