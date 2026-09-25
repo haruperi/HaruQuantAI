@@ -64,3 +64,23 @@ No backend builder/build-engine feature is registered. Live build
 execution, engine channels, log feeds, and best-results streams require an
 approved plan under the future workspace/plugin architecture before any UI
 claim of authority.
+
+## Full settings parity slice (SQX 144.2953)
+
+The Full settings panel is the donor Advanced settings surface (evidence
+`SQX144-EV-000038..043`): the "Advanced settings" title, the 12-tab Build
+strip (What to build, Parts to improve, Genetic options, Data, Trading
+options, Building blocks, ATM, Money management, Custom analysis, Cross
+checks (robustness), Ranking, Notes), per-tab description headers with
+Help links opening the public donor docs, the lock overlay while the mock
+engine runs, and prev/Close/next navigation. Tab controls follow the donor
+templates with defaults from the installed Build task template (genetic:
+100 generations / 100 population / 4 islands; trading options; MM methods;
+119-entry building block catalog). Deep editors (block parameter popups,
+ATM formula editors, fitness formulas, per-check dialogs) are donor-style
+fixture demos — labelled, no engine claims. The old prototype settings
+page and its modals were removed as superseded.
+
+| Feature ID | Feature | Status |
+|---|---|---|
+| FEAT-UI-BUILDER_FULLSETTINGS_TAB | Builder Full settings tab SQX parity: Advanced settings shell with the 12 Build tabs, shared donor-look controls, additional-build-config gear popups, lock overlay, and prev/Close/next — fixture-backed | implemented (`FullSettingsView.tsx`, `settings/*Tab.tsx`, `settings/SettingsControls.tsx`, `settings/settingsFixtures.ts`) |
