@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   AdditionalConfigPopup,
   GearLink,
@@ -9,10 +9,10 @@ import {
   SqdSpinner,
 } from './SettingsControls';
 import {
+  whatToBuildDefaults,
   additionalConfigRowIds,
   additionalConfigRowNames,
   describeAdditionalConfig,
-  whatToBuildDefaults,
   type AdditionalConfigRowId,
   type WhatToBuildState,
 } from './settingsFixtures';
@@ -24,15 +24,24 @@ import {
  * strings. Fixture state only.
  */
 
-export function WhatToBuildTab() {
-  const [state, setState] = useState<WhatToBuildState>(whatToBuildDefaults);
+export function WhatToBuildTab({ state, onChange }: { state: WhatToBuildState; onChange: (state: WhatToBuildState) => void }) {
+  const fileInput = useRef<HTMLInputElement>(null);
+  const [improveFile, setImproveFile] = useState('Strategy 0.1.7.sq4');
+  const [databank, setDatabank] = useState('Initial population');
+  const [fileNotice, setFileNotice] = useState('');
   const [popup, setPopup] = useState<AdditionalConfigRowId | null>(null);
 
-  const patch = (part: Partial<WhatToBuildState>) => setState(current => ({ ...current, ...part }));
+  const patch = (part: Partial<WhatToBuildState>) => onChange({ ...state, ...part });
   const st = state.strategyType;
 
   return (
     <div id="buildTypeContent" className="sqd-tab-content">
+      <input ref={fileInput} hidden type="file" accept=".sq4,.sqx,.json" aria-label="Select strategy file" onChange={e => {
+        const file = e.target.files?.[0];
+        if (file) { if (st === 'template') patch({ templateFile: file.name }); else setImproveFile(file.name); setFileNotice('Local UI preview: file selected; strategy contents are not executed.'); }
+        e.target.value = '';
+      }} />
+      {fileNotice && <p role="status" className="sqd-gen-help">{fileNotice}</p>}
       <SqdFieldset legend="Strategy type">
         <div className="sqd-radio-row">
           <SqdRadio name="StrategyTypeRadio" value="simple" checked={st === 'simple'} onChange={() => patch({ strategyType: 'simple' })}>
@@ -68,8 +77,8 @@ export function WhatToBuildTab() {
           <div className="sqd-multitf-text">
             <p className="sqd-radio-help" style={{ marginTop: 4 }}>Strategy created from the template</p>
             <span className={`sqd-template-file${st === 'template' ? '' : ' hidden'}`}>{state.templateFile}</span>
-            <button type="button" className={`sqd-link-button${st === 'template' ? '' : ' hidden'}`}>Browse</button>
-            <button type="button" className={`sqd-link-button${st === 'template' ? '' : ' hidden'}`} title="Reload selected template">
+            <button type="button" className={`sqd-link-button${st === 'template' ? '' : ' hidden'}`} onClick={() => fileInput.current?.click()}>Browse</button>
+            <button type="button" className={`sqd-link-button${st === 'template' ? '' : ' hidden'}`} title="Reload selected template" onClick={() => setFileNotice("Local UI preview: selected template retained; no engine reload is performed.")}>
               &#8635; Reload
             </button>
           </div>
@@ -86,8 +95,8 @@ export function WhatToBuildTab() {
                 <SqdRadio name="ImproveStrategyRadio" value="strategy" checked={state.improveType === 'strategy'} onChange={() => patch({ improveType: 'strategy' })}>
                   Select strategy file
                 </SqdRadio>
-                <span className={`sqd-template-file${state.improveType === 'strategy' ? '' : ' hidden'}`}>Strategy 0.1.7.sq4</span>
-                <button type="button" className={`sqd-link-button${state.improveType === 'strategy' ? '' : ' hidden'}`}>Browse</button>
+                <span className={`sqd-template-file${state.improveType === 'strategy' ? '' : ' hidden'}`}>{improveFile}</span>
+                <button type="button" className={`sqd-link-button${state.improveType === 'strategy' ? '' : ' hidden'}`} onClick={() => fileInput.current?.click()}>Browse</button>
               </div>
               <div className="sqd-radio-row">
                 <SqdRadio name="ImproveStrategyRadio" value="databank" checked={state.improveType === 'databank'} onChange={() => patch({ improveType: 'databank' })}>
@@ -95,8 +104,8 @@ export function WhatToBuildTab() {
                 </SqdRadio>
                 <SqdSelect
                   ariaLabel="Improve databank"
-                  value="Initial population"
-                  onChange={() => undefined}
+                  value={databank}
+                  onChange={setDatabank}
                   options={[{ value: 'Initial population', label: 'Initial population' }, { value: 'Results', label: 'Results' }]}
                   width={170}
                 />
@@ -128,6 +137,7 @@ export function WhatToBuildTab() {
           onHelp={() => window.open('https://strategyquant.com/doc/strategyquant/what-to-build/', '_blank', 'noopener')}
           onClose={() => setPopup(null)}
           onSave={() => setPopup(null)}
+          onReset={() => patch({ [popup]: structuredClone(whatToBuildDefaults[popup]) })}
         >
           {popup === 'tradingDirections' && <TradingDirectionsEditor state={state} patch={patch} />}
           {popup === 'strategyStyle' && <StrategyStyleEditor state={state} patch={patch} />}

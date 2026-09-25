@@ -46,7 +46,7 @@ export function PartsToImproveTab() {
         <legend className="sqd-pti-sublegend" style={{ marginTop: 10 }}>ATM - advanced exits</legend>
         <div className="sqd-pti-rule">
           <SqdCheckbox checked={state.improveAtm} onChange={improveAtm => patch({ improveAtm })}>Improve / generate (Ultimate version only)</SqdCheckbox>
-          <button type="button" className="sqd-link-button">How it works</button>
+          <button type="button" className="sqd-link-button" onClick={() => window.open("https://strategyquant.com/doc/strategyquant/parts-to-improve/", "_blank", "noopener")}>How it works</button>
         </div>
       </SqdFieldset>
     </div>

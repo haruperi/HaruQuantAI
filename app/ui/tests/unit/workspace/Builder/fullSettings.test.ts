@@ -16,12 +16,13 @@ import {
   oosRangePercents,
   prevTabLabel,
   settingsTabs,
+  visibleSettingsTabs,
   tradingOptionsDefaults,
   whatToBuildDefaults,
 } from '../../../../src/workspace/Builder/settings/settingsFixtures';
 
 describe('Full settings fixtures (donor SQX144-EV-000038..043)', () => {
-  it('registers the twelve Build tabs in the donor strip order', () => {
+  it('registers the eleven eligible Build tabs in the donor strip order', () => {
     expect(settingsTabs.map(t => t.title)).toEqual([
       'What to build',
       'Parts to improve',
@@ -31,7 +32,6 @@ describe('Full settings fixtures (donor SQX144-EV-000038..043)', () => {
       'Building blocks',
       'ATM',
       'Money management',
-      'Custom analysis',
       'Cross checks (robustness)',
       'Ranking',
       'Notes',
@@ -129,5 +129,18 @@ describe('Full settings fixtures (donor SQX144-EV-000038..043)', () => {
   it('offers the fitness method list with the default Return/DD criterion', () => {
     expect(fitnessMethods.map(m => m.value)).toContain('ComputeFromStrategyResult');
     expect(fitnessMethods.map(m => m.value)).toContain('ReturnDDRatio');
+  });
+});
+
+ describe('Builder settings visibility', () => {
+  it('only includes Parts to improve in improve mode and excludes Custom analysis', () => {
+    for (const type of ['simple', 'multiTf', 'template'] as const) {
+      const tabs = visibleSettingsTabs(type);
+      expect(tabs).toHaveLength(10);
+      expect(tabs.some(t => t.id === 'parts-to-improve' || t.id === 'custom-analysis')).toBe(false);
+      expect(nextTabLabel(0, tabs)).toBe('Genetic options >');
+    }
+    expect(visibleSettingsTabs('improve')).toHaveLength(11);
+    expect(nextTabLabel(0, visibleSettingsTabs('improve'))).toBe('Parts to improve >');
   });
 });

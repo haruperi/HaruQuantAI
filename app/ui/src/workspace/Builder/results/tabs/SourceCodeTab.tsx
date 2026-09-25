@@ -1,78 +1,69 @@
+import { downloadText, type ResultDocument } from '../resultsModel';
 import { useEffect, useRef, useState } from 'react';
 import { RefreshCw } from 'lucide-react';
 import { SqrDropdown } from '../ResultsChrome';
 import { SqdCheckbox, SqdRadio } from '../../settings/SettingsControls';
-import {
-  sourceCodeDescriptions,
-  sourceCodeGenerators,
-  sourceCodeMmTypes,
-  sourceCodeParamsDefaults,
-  type SourceCodeParamsConfig,
-} from '../resultsFixtures';
-
+import { sourceCodeDescriptions, sourceCodeGenerators, sourceCodeMmTypes, sourceCodeParamsDefaults, type SourceCodeParamsConfig, } from '../resultsFixtures';
 /** Source Code tab: generator select, save/copy buttons, variables menu, code area. */
-export function SourceCodeTab() {
-  const [type, setType] = useState(sourceCodeGenerators[0]);
-  const [mmType, setMmType] = useState(sourceCodeMmTypes[0].value);
-  const [config, setConfig] = useState<SourceCodeParamsConfig>(sourceCodeParamsDefaults);
-  const [varsOpen, setVarsOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
-  const copyTimer = useRef<number | undefined>(undefined);
-  useEffect(() => () => window.clearTimeout(copyTimer.current), []);
-  const set = <K extends keyof SourceCodeParamsConfig>(key: K, value: SourceCodeParamsConfig[K]) =>
-    setConfig(c => ({ ...c, [key]: value }));
-  const onCopy = () => {
-    setCopied(true);
-    window.clearTimeout(copyTimer.current);
-    copyTimer.current = window.setTimeout(() => setCopied(false), 2500);
-  };
-  return (
-    <div className="sqr-tab sqr-sourcecode">
+export function SourceCodeTab({ result }: {
+    result: ResultDocument | null;
+}) {
+    const [copyError, setCopyError] = useState("");
+    const [revision, setRevision] = useState(0);
+    const [type, setType] = useState(sourceCodeGenerators[0]);
+    const [mmType, setMmType] = useState(sourceCodeMmTypes[0].value);
+    const [config, setConfig] = useState<SourceCodeParamsConfig>(sourceCodeParamsDefaults);
+    const [varsOpen, setVarsOpen] = useState(false);
+    const [copied, setCopied] = useState(false);
+    const copyTimer = useRef<number | undefined>(undefined);
+    useEffect(() => () => window.clearTimeout(copyTimer.current), []);
+    const set = <K extends keyof SourceCodeParamsConfig>(key: K, value: SourceCodeParamsConfig[K]) => setConfig(c => ({ ...c, [key]: value }));
+    const code = result ? `// Local mock preview; not executable trading code
+// ${result.name}
+// Format: ${type}
+// Money management: ${mmType}
+// Parameters: ${JSON.stringify(config)}
+// Revision: ${revision}
+IF fast moving average crosses above slow moving average
+THEN enter long on next bar` : '';
+    const onCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(code);
+            setCopyError('');
+        }
+        catch {
+            setCopyError('Clipboard access unavailable. Select the preview and copy manually.');
+            return;
+        }
+        setCopied(true);
+        window.clearTimeout(copyTimer.current);
+        copyTimer.current = window.setTimeout(() => setCopied(false), 2500);
+    };
+    return (<div className="sqr-tab sqr-sourcecode">
       <div className="sqr-sourcecode-form">
         <label>Source code type</label>
         <span className="sqd-select sqr-sourcecode-select">
           <span>{type}</span>
           <select aria-label="Source code type" value={type} onChange={e => setType(e.target.value)}>
-            {sourceCodeGenerators.map(g => (
-              <option key={g} value={g}>{g}</option>
-            ))}
+            {sourceCodeGenerators.map(g => (<option key={g} value={g}>{g}</option>))}
           </select>
         </span>
-        <button type="button" className="sqd-btn">Save to file</button>
-        <button type="button" className="sqd-btn" onClick={onCopy}>Copy to clipboard</button>
-        <a
-          role="button"
-          tabIndex={0}
-          className="sqr-refresh-link"
-          title="Refresh"
-          aria-label="Refresh source code"
-          onClick={() => undefined}
-          onKeyDown={e => e.key === 'Enter' && undefined}
-        >
-          <RefreshCw size={12} />
+        <button type="button" className="sqd-btn" disabled={!result} onClick={() => downloadText("strategy-preview.txt", code)}>Save to file</button>
+        <button type="button" className="sqd-btn" disabled={!result} onClick={onCopy}>Copy to clipboard</button>
+        <a role="button" tabIndex={0} className="sqr-refresh-link" title="Refresh" aria-label="Refresh source code" onClick={() => setRevision(r => r + 1)} onKeyDown={e => e.key === 'Enter' && setRevision(r => r + 1)}>
+          <RefreshCw size={12}/>
         </a>
         {copied && <span className="sqr-copied">Copied to clipboard</span>}
         <span className="sqr-sourcecode-right">
           <span className="sqr-vars-dd">
-            <a
-              role="button"
-              tabIndex={0}
-              title="Settings"
-              onClick={() => setVarsOpen(v => !v)}
-              onKeyDown={e => e.key === 'Enter' && setVarsOpen(v => !v)}
-            >
+            <a role="button" tabIndex={0} title="Settings" onClick={() => setVarsOpen(v => !v)} onKeyDown={e => e.key === 'Enter' && setVarsOpen(v => !v)}>
               Parameter variables
             </a>
             <SqrDropdown open={varsOpen} onClose={() => setVarsOpen(false)} className="sqr-vars-menu">
               <strong>What to parametrize</strong>
               <div className="sqr-vars-radios">
                 <div className="radio">
-                  <SqdRadio
-                    name="sqr-what-to-parametrize"
-                    value="recommended"
-                    checked={config.parametrizeType === 0}
-                    onChange={() => set('parametrizeType', 0)}
-                  >
+                  <SqdRadio name="sqr-what-to-parametrize" value="recommended" checked={config.parametrizeType === 0} onChange={() => set('parametrizeType', 0)}>
                     <span className="sqr-wradio-line">
                       Recommended parameters
                       <span className="sqr-data-help">
@@ -84,19 +75,13 @@ export function SourceCodeTab() {
                   </SqdRadio>
                 </div>
                 <div className="radio">
-                  <SqdRadio
-                    name="sqr-what-to-parametrize"
-                    value="own"
-                    checked={config.parametrizeType === 1}
-                    onChange={() => set('parametrizeType', 1)}
-                  >
+                  <SqdRadio name="sqr-what-to-parametrize" value="own" checked={config.parametrizeType === 1} onChange={() => set('parametrizeType', 1)}>
                     <span className="sqr-wradio-line">
                       Your own settings
                       <span className="sqr-data-help">Choose your own categories</span>
                     </span>
                   </SqdRadio>
-                  {config.parametrizeType === 1 && (
-                    <div className="sqr-vars-categories">
+                  {config.parametrizeType === 1 && (<div className="sqr-vars-categories">
                       <div className="sqr-vars-col">
                         <SqdCheckbox checked={config.periodParams} onChange={v => set('periodParams', v)}>Periods</SqdCheckbox>
                         <SqdCheckbox checked={config.constantsParams} onChange={v => set('constantsParams', v)}>Constants</SqdCheckbox>
@@ -114,16 +99,10 @@ export function SourceCodeTab() {
                         <hr />
                         <SqdCheckbox checked={config.symmetricVariables} onChange={v => set('symmetricVariables', v)}>Symmetric variables for Long / Short</SqdCheckbox>
                       </div>
-                    </div>
-                  )}
+                    </div>)}
                 </div>
                 <div className="radio">
-                  <SqdRadio
-                    name="sqr-what-to-parametrize"
-                    value="none"
-                    checked={config.parametrizeType === 2}
-                    onChange={() => set('parametrizeType', 2)}
-                  >
+                  <SqdRadio name="sqr-what-to-parametrize" value="none" checked={config.parametrizeType === 2} onChange={() => set('parametrizeType', 2)}>
                     Don&apos;t use parameters
                   </SqdRadio>
                 </div>
@@ -134,15 +113,12 @@ export function SourceCodeTab() {
           <span className="sqd-select">
             <span>{sourceCodeMmTypes.find(m => m.value === mmType)?.label ?? mmType}</span>
             <select aria-label="MM used" value={mmType} onChange={e => setMmType(e.target.value)}>
-              {sourceCodeMmTypes.map(m => (
-                <option key={m.value} value={m.value}>{m.label}</option>
-              ))}
+              {sourceCodeMmTypes.map(m => (<option key={m.value} value={m.value}>{m.label}</option>))}
             </select>
           </span>
         </span>
       </div>
       <div className="sqr-sourcecode-desc">{sourceCodeDescriptions[type] ?? ''}</div>
-      <pre className="sqr-sourcecode-editor" aria-label="Source code" />
-    </div>
-  );
+      {copyError && <p role="alert">{copyError}</p>}<pre className="sqr-sourcecode-editor" aria-label="Source code">{code}</pre>
+    </div>);
 }

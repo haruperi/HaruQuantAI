@@ -37,7 +37,7 @@ export function MoneyManagementTab() {
                 {method.params.map(param => (
                   <span className="sqd-mm-param" key={param.key}>
                     <label className="sqd-label">{param.label}</label>
-                    <span className="sqd-input sqd-mm-value">{param.value}</span>
+                    <input className="sqd-input sqd-mm-value" aria-label={`${method.label} ${param.label}`} value={param.value} disabled={!method.use} onChange={e => patch(method.key, { params: method.params.map(p => p.key === param.key ? {...p, value:e.target.value} : p) })} />
                   </span>
                 ))}
               </div>

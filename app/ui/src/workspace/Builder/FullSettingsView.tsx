@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 import type { EngineRunStatus } from './fixtures';
-import { nextTabLabel, prevTabLabel, settingsTabs } from './settings/settingsFixtures';
+import { nextTabLabel, prevTabLabel, settingsTabs, visibleSettingsTabs, whatToBuildDefaults } from './settings/settingsFixtures';
 import { WhatToBuildTab } from './settings/WhatToBuildTab';
 import { PartsToImproveTab } from './settings/PartsToImproveTab';
 import { GeneticOptionsTab } from './settings/GeneticOptionsTab';
@@ -10,20 +10,18 @@ import { TradingOptionsTab } from './settings/TradingOptionsTab';
 import { BuildingBlocksTab } from './settings/BuildingBlocksTab';
 import { AtmTab } from './settings/AtmTab';
 import { MoneyManagementTab } from './settings/MoneyManagementTab';
-import { CustomAnalysisTab } from './settings/CustomAnalysisTab';
 import { CrossChecksTab } from './settings/CrossChecksTab';
 import { RankingTab } from './settings/RankingTab';
 import { NotesTab } from './settings/NotesTab';
 
 /**
  * SQX-parity Full settings panel (donor evidence SQX144-EV-000038): the
- * "Advanced settings" window with the 12-tab Build strip, per-tab
+ * "Advanced settings" window with conditional Build tabs, per-tab
  * description header with Help, lock overlay while the project runs, and
  * the prev/Close/next navigation. Close returns to the Progress panel.
  */
 
 const TAB_CONTENT: Record<string, ReactNode> = {
-  'what-to-build': <WhatToBuildTab />,
   'parts-to-improve': <PartsToImproveTab />,
   'genetic-options': <GeneticOptionsTab />,
   data: <DataTab />,
@@ -31,7 +29,6 @@ const TAB_CONTENT: Record<string, ReactNode> = {
   'building-blocks': <BuildingBlocksTab />,
   atm: <AtmTab />,
   'money-management': <MoneyManagementTab />,
-  'custom-analysis': <CustomAnalysisTab />,
   'cross-checks': <CrossChecksTab />,
   ranking: <RankingTab />,
   notes: <NotesTab />,
@@ -45,8 +42,10 @@ export function FullSettingsView({
   onClose: () => void;
 }) {
   const [activeId, setActiveId] = useState(settingsTabs[0].id);
-  const index = settingsTabs.findIndex(tab => tab.id === activeId);
-  const active = settingsTabs[index];
+  const [buildState, setBuildState] = useState(whatToBuildDefaults);
+  const tabs = visibleSettingsTabs(buildState.strategyType);
+  const index = tabs.findIndex(tab => tab.id === activeId);
+  const active = tabs[index];
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -64,10 +63,12 @@ export function FullSettingsView({
       <div className="sqd-advanced-title">Advanced settings</div>
       <div className="sqd-settings-tabs">
         <div className="sqd-stabs-header" role="tablist" aria-label="Settings tabs">
-          {settingsTabs.map(tab => (
+          {tabs.map(tab => (
             <div
               key={tab.id}
               role="tab"
+              tabIndex={0}
+              onKeyDown={e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); e.currentTarget.click(); } }}
               aria-selected={tab.id === activeId}
               className={tab.id === activeId ? 'active' : ''}
               onClick={() => setActiveId(tab.id)}
@@ -89,7 +90,7 @@ export function FullSettingsView({
                 className="sqd-btn sqd-btn-help"
                 onClick={() => active && window.open(active.helpUrl, '_blank', 'noopener')}
               >
-                Help
+                <span className="sqd-help-icon" aria-hidden="true">?</span> Help
               </button>
             </div>
             <div className={`sqd-settings-body-inner${locked ? ' disabled-panel' : ''}`}>
@@ -99,18 +100,19 @@ export function FullSettingsView({
                 </svg>
                 <span>Setting changes locked, they will be applied next time you start the project.</span>
               </div>
-              {TAB_CONTENT[activeId]}
+              <div hidden={activeId !== "what-to-build"} inert={locked}><WhatToBuildTab state={buildState} onChange={setBuildState} /></div>
+              {Object.entries(TAB_CONTENT).map(([id, content]) => <div key={id} hidden={id !== activeId} inert={locked}>{content}</div>)}
             </div>
             <div className="sqd-settings-nextbtns">
-              {prevTabLabel(index) !== null && (
-                <button type="button" className="sqd-btn sqd-btn-primary sqd-prevtab" onClick={() => setActiveId(settingsTabs[index - 1].id)}>
-                  {prevTabLabel(index)}
+              {prevTabLabel(index, tabs) !== null && (
+                <button type="button" className="sqd-btn sqd-btn-primary sqd-prevtab" onClick={() => setActiveId(tabs[index - 1].id)}>
+                  {prevTabLabel(index, tabs)}
                 </button>
               )}
               <button type="button" className="sqd-btn sqd-closetab" onClick={onClose}>Close</button>
-              {nextTabLabel(index) !== null && (
-                <button type="button" className="sqd-btn sqd-btn-primary sqd-nexttab" onClick={() => setActiveId(settingsTabs[index + 1].id)}>
-                  {nextTabLabel(index)}
+              {nextTabLabel(index, tabs) !== null && (
+                <button type="button" className="sqd-btn sqd-btn-primary sqd-nexttab" onClick={() => setActiveId(tabs[index + 1].id)}>
+                  {nextTabLabel(index, tabs)}
                 </button>
               )}
             </div>

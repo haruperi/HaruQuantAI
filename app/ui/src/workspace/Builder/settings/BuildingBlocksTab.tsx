@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { blocksSections, buildingBlocksCatalog, type BlockEntry } from './settingsFixtures';
 
 /**
@@ -24,13 +24,13 @@ export function BuildingBlocksTab() {
         {blocksSections.map(section => {
           const opened = openSection === section.id;
           const entries = blocks.filter(b => b.category === section.category);
-          const visible = useMemo(() => {
+          const visible = (() => {
             if (filter.section === section.id) {
               if (filter.key === 'Checked') return entries.filter(b => b.use);
               if (filter.key === 'Unchecked') return entries.filter(b => !b.use);
             }
             return entries;
-          }, [entries, filter, section.id]);
+          })();
           return (
             <div className={`sqd-blocks-col${section.id === 'signals' || section.id === 'indicators' ? ' left' : ''}`} key={section.id}>
               <button

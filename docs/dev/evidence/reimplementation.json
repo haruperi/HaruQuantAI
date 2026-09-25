@@ -4519,7 +4519,7 @@
       "topic": "ui.builder.fullsettings.shell_tabs",
       "title": "Full settings is the SettingsPanel AppPanel with a 12-tab plugin strip and prev/Close/next navigation",
       "question": "How is the Builder Full settings surface structured and which tabs does it contain, in what order?",
-      "record_status": "active",
+      "record_status": "superseded",
       "reference_scope": {
         "build": "144.2953",
         "application_areas": [
@@ -4724,14 +4724,18 @@
       },
       "relationships": {
         "supports_records": [],
-        "contradicts_records": [],
+        "contradicts_records": [
+          "SQX144-EV-000055",
+          "SQX144-EV-000056",
+          "SQX144-EV-000057"
+        ],
         "supersedes_records": [],
-        "superseded_by": null
+        "superseded_by": "SQX144-EV-000055"
       },
       "provenance": {
         "repository_commit": "79c77f0",
         "created_at": "2026-09-25T08:10:19.141Z",
-        "updated_at": "2026-09-25T08:10:19.141Z",
+        "updated_at": "2026-09-25T12:04:51.220633Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -6881,6 +6885,961 @@
         "ui",
         "algowizard",
         "static-inspection"
+      ]
+    },
+    "SQX144-EV-000055": {
+      "topic": "ui.builder.fullsettings.custom_analysis_task",
+      "title": "Custom analysis is not a Build settings tab",
+      "question": "Custom analysis is not a Build settings tab?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Full settings"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection, no donor runtime driven."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed Custom analysis settings plugin declares task CustomAnalysis and product TASKMANAGER, rather than task Build.",
+        "confidence": "high",
+        "limitations": [
+          "Static observation does not establish all runtime overrides, license combinations, or end-to-end parity.",
+          "Corrects only the corresponding fragment of historical record SQX144-EV-000038; its other shell observations are preserved but not revalidated here."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsCustomAnalysis/module.js",
+          "location": {
+            "section": null,
+            "symbol": "SettingsTab registration",
+            "line_range": "1-18",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "594a528245e0e16076cced287c8b314e2984ac3daec1ed347a7efa4edcb0b528"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_FULLSETTINGS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the fingerprinted artifact at the stated lines.",
+        "expected_observation": "The installed Custom analysis settings plugin declares task CustomAnalysis and product TASKMANAGER, rather than task Build.",
+        "actual_observation": "The installed Custom analysis settings plugin declares task CustomAnalysis and product TASKMANAGER, rather than task Build.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsCustomAnalysis/module.js"
+        ],
+        "executed_at": "2026-09-25T12:04:51.220633Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [
+          "SQX144-EV-000038"
+        ],
+        "supersedes_records": [
+          "SQX144-EV-000038"
+        ],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:04:51.220633Z",
+        "updated_at": "2026-09-25T12:04:51.220633Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "full-settings",
+        "correction"
+      ]
+    },
+    "SQX144-EV-000056": {
+      "topic": "ui.builder.fullsettings.parts_visibility",
+      "title": "Parts to improve visibility follows strategy type",
+      "question": "Parts to improve visibility follows strategy type?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Full settings"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection, no donor runtime driven."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The What to build service emits a Parts to improve visibility update with show true only when the configured strategy type is improve.",
+        "confidence": "high",
+        "limitations": [
+          "Static observation does not establish all runtime overrides, license combinations, or end-to-end parity.",
+          "Corrects only the corresponding fragment of historical record SQX144-EV-000038; its other shell observations are preserved but not revalidated here."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/SettingsWhatToBuild/WhatToBuildService.js",
+          "location": {
+            "section": null,
+            "symbol": "updateTabs",
+            "line_range": "55-64",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5f44276bc08338d9bf536c8debf8b84df348333eb932cafc855a0174c8a7536b"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_FULLSETTINGS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the fingerprinted artifact at the stated lines.",
+        "expected_observation": "The What to build service emits a Parts to improve visibility update with show true only when the configured strategy type is improve.",
+        "actual_observation": "The What to build service emits a Parts to improve visibility update with show true only when the configured strategy type is improve.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/WhatToBuildService.js"
+        ],
+        "executed_at": "2026-09-25T12:04:51.220633Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [
+          "SQX144-EV-000038"
+        ],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:04:51.220633Z",
+        "updated_at": "2026-09-25T12:04:51.220633Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "full-settings",
+        "correction"
+      ]
+    },
+    "SQX144-EV-000057": {
+      "topic": "ui.builder.fullsettings.footer_visibility",
+      "title": "Settings footer is hidden by the inspected tab CSS",
+      "question": "Settings footer is hidden by the inspected tab CSS?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Full settings"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection, no donor runtime driven."
+        ]
+      },
+      "claim": {
+        "classification": "inferred",
+        "statement": "Combining the settings template with the inspected quant-tabs CSS implies that the navigation footer is hidden: the footer is a direct tabs-body div without the active class, while the general rule hides such children.",
+        "confidence": "medium",
+        "limitations": [
+          "Static observation does not establish all runtime overrides, license combinations, or end-to-end parity.",
+          "Corrects only the corresponding fragment of historical record SQX144-EV-000038; its other shell observations are preserved but not revalidated here."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L10",
+          "artifact_locator": "internal/web/app/directives/settingsTabs/settingsTabs.html",
+          "location": {
+            "section": null,
+            "symbol": "navigation footer",
+            "line_range": "33-39",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "ab32ec02e88c815e513e9005fd0012fa378e768dfa40aa0dd9d9aa1a825da295"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L10",
+          "artifact_locator": "internal/web/app/directives/quantTabs/styles.css",
+          "location": {
+            "section": null,
+            "symbol": "direct-child display rules",
+            "line_range": "180-188",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c898dccae3cd382a4250758dbb557bf542b8acb6116cc091f31a34368e4064f2"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_FULLSETTINGS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Full settings in the installed SQX runtime and inspect computed display of the footer with the default dark skin.",
+        "expected_observation": "Combining the settings template with the inspected quant-tabs CSS implies that the navigation footer is hidden: the footer is a direct tabs-body div without the active class, while the general rule hides such children.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/settingsTabs/settingsTabs.html",
+          "SQX_REFERENCE_ROOT/internal/web/app/directives/quantTabs/styles.css"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [
+          "SQX144-EV-000038"
+        ],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:04:51.220633Z",
+        "updated_at": "2026-09-25T12:04:51.220633Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "full-settings",
+        "correction"
+      ]
+    },
+    "SQX144-EV-000058": {
+      "topic": "ui.builder.results.tab_visibility",
+      "title": "Selected-result tab visibility",
+      "question": "Selected-result tab visibility?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "With a selected strategy, the Results controller uses the result data noResultItems list to hide unavailable tabs; without a strategy it uses each registration hideAfterInit flag.",
+        "confidence": "high",
+        "limitations": [
+          "Direct observation of installed declarations; donor runtime behavior and complete visual parity were not independently validated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ProjectResults/ResultsCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "refreshContent",
+            "line_range": "148-171",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "5b233c5b43300080460c642864ee68d5cd8529e41ed5dc0cbc8bd5d0df533e3c"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Select strategies with differing noResultItems, then clear selection; inspect tab visibility.",
+        "expected_observation": "With a selected strategy, the Results controller uses the result data noResultItems list to hide unavailable tabs; without a strategy it uses each registration hideAfterInit flag.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/ResultsCtrl.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:45:35.083560Z",
+        "updated_at": "2026-09-25T12:45:35.083560Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "results",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000059": {
+      "topic": "ui.builder.results.chart_tab_position",
+      "title": "Trades on chart registration order",
+      "question": "Trades on chart registration order?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed Trades on chart ResultsTab registration has position 50 and is hidden after initialization.",
+        "confidence": "high",
+        "limitations": [
+          "Direct observation of installed declarations; donor runtime behavior and complete visual parity were not independently validated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsChart/module.js",
+          "location": {
+            "section": null,
+            "symbol": "ResultsTab registration",
+            "line_range": "3-8",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "0b92134dc25c43de576240937ed62807c830fa977f38ddcfa83f9d436ce2d633"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inspect the registration and compare Trades on chart placement between Trade analysis and Profile chart with a chart-enabled result.",
+        "expected_observation": "The installed Trades on chart ResultsTab registration has position 50 and is hidden after initialization.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:45:35.083560Z",
+        "updated_at": "2026-09-25T12:45:35.083560Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "results",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000060": {
+      "topic": "ui.builder.results.stockpicker_tab_position",
+      "title": "Stockpicker log registration order",
+      "question": "Stockpicker log registration order?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed Stockpicker log ResultsTab registration has position 99 and is hidden after initialization.",
+        "confidence": "high",
+        "limitations": [
+          "Direct observation of installed declarations; donor runtime behavior and complete visual parity were not independently validated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsStockpicker/module.js",
+          "location": {
+            "section": null,
+            "symbol": "ResultsTab registration",
+            "line_range": "3-8",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "97bc27d1e8076f4b73d24012e3735b1eead2e766b6862ac92030e11dfd334668"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Inspect the registration and compare Stockpicker log placement before Source Code with a stockpicker result.",
+        "expected_observation": "The installed Stockpicker log ResultsTab registration has position 99 and is hidden after initialization.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/module.js"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:45:35.083560Z",
+        "updated_at": "2026-09-25T12:45:35.083560Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "results",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000061": {
+      "topic": "ui.builder.results.profile_unavailable",
+      "title": "Profile chart unavailable state",
+      "question": "Profile chart unavailable state?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "When chartPaths is empty and loading is false, Profile chart displays a message explaining that no stored profile chart exists.",
+        "confidence": "high",
+        "limitations": [
+          "Direct observation of installed declarations; donor runtime behavior and complete visual parity were not independently validated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsProfileChart/profileChart.html",
+          "location": {
+            "section": null,
+            "symbol": "profile-chart-empty",
+            "line_range": "15-17",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "34e6e0cb5d82c8cab5114b261af3925aa3a027517d746bfec698df89d154c8e9"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Profile chart for a strategy without stored profile paths and wait for loading to finish.",
+        "expected_observation": "When chartPaths is empty and loading is false, Profile chart displays a message explaining that no stored profile chart exists.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/profileChart.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:45:35.083560Z",
+        "updated_at": "2026-09-25T12:45:35.083560Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "results",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000062": {
+      "topic": "ui.builder.results.overview_report_width",
+      "title": "Default overview report width",
+      "question": "Default overview report width?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed SQ Default overview template declares an 820-pixel centered report container.",
+        "confidence": "high",
+        "limitations": [
+          "Direct observation of installed declarations; donor runtime behavior and complete visual parity were not independently validated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsOverview/templates/sqdefault_template.htm",
+          "location": {
+            "section": null,
+            "symbol": "#center",
+            "line_range": "5",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "92462712adad1f6107bc864ae10958e98066efd3dcc571df4ac7316b43fc7815"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Render the SQ Default report and inspect its centered container computed width.",
+        "expected_observation": "The installed SQ Default overview template declares an 820-pixel centered report container.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_template.htm"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:45:35.083560Z",
+        "updated_at": "2026-09-25T12:45:35.083560Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "results",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000063": {
+      "topic": "ui.builder.results.monte_carlo_method",
+      "title": "Monte Carlo method selector",
+      "question": "Monte Carlo method selector?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Monte Carlo Results template shows a Test choice selector when the stored methods list is nonempty.",
+        "confidence": "high",
+        "limitations": [
+          "Direct observation of installed declarations; donor runtime behavior and complete visual parity were not independently validated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsRobustnessTests/robustnessTests.html",
+          "location": {
+            "section": null,
+            "symbol": "toolbar",
+            "line_range": "6-16",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "37bc850329b0d4c7db59c2b360a4ac7a3cac28335ba45adfcbfcc87c554263a1"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Monte Carlo tests for a result with stored methods and inspect the method selector.",
+        "expected_observation": "The Monte Carlo Results template shows a Test choice selector when the stored methods list is nonempty.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/robustnessTests.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:45:35.083560Z",
+        "updated_at": "2026-09-25T12:45:35.083560Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "results",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000064": {
+      "topic": "ui.builder.results.correlation_unavailable",
+      "title": "Nonportfolio correlation state",
+      "question": "Nonportfolio correlation state?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "Results"
+        ],
+        "conditions": [
+          "Installed artifacts; static inspection only."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Portfolio correlation template displays an unavailable-state message when the selected strategy is not a portfolio.",
+        "confidence": "high",
+        "limitations": [
+          "Direct observation of installed declarations; donor runtime behavior and complete visual parity were not independently validated."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L11",
+          "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/portfolioCorrelation.html",
+          "location": {
+            "section": null,
+            "symbol": "notPortfolioLabel",
+            "line_range": "2-4",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "4847402bd54237329a18bc6de0be903b2fd23d0c59cc5698fcad9076a97ab8cb"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-BUILDER_RESULTS_TAB"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/Builder/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Open Portfolio correlation for a nonportfolio strategy and inspect the unavailable state.",
+        "expected_observation": "The Portfolio correlation template displays an unavailable-state message when the selected strategy is not a portfolio.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/portfolioCorrelation.html"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [
+          "SQX144-EV-000045"
+        ],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "59c4401f27abbe3381536300d8f3d57067a35f90",
+        "created_at": "2026-09-25T12:45:35.083560Z",
+        "updated_at": "2026-09-25T12:45:35.083560Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "builder",
+        "results",
+        "static-observation"
       ]
     }
   }

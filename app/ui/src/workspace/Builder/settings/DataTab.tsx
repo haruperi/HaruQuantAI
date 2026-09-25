@@ -10,11 +10,26 @@ import { dataTabDefaults, oosPresets, oosRangePercents, type DataTabState, type 
  */
 export function DataTab() {
   const [state, setState] = useState<DataTabState>(dataTabDefaults);
+  const [precision, setPrecision] = useState("1");
+  const [rangeError, setRangeError] = useState("");
   const [graphShown, setGraphShown] = useState(false);
   const patch = (part: Partial<DataTabState>) => setState(current => ({ ...current, ...part }));
   const percents = oosRangePercents(state.oosRanges);
   const totalDays = Math.round((new Date(state.dateTo).getTime() - new Date(state.dateFrom).getTime()) / 86400000);
 
+  // Local range-editor presentation only, not a backtest sampling algorithm.
+  const applyPreset = (title: string) => {
+    const from = Date.parse(state.dateFrom.replaceAll('.', '-'));
+    const to = Date.parse(state.dateTo.replaceAll('.', '-'));
+    if (!Number.isFinite(from) || !Number.isFinite(to) || to <= from) { setRangeError('Enter a valid date range before applying a preset.'); return; }
+    const parts = title.split(',').map(p => { const [type, weight] = p.trim().split(':'); return {type: type as OosRange['type'], weight: weight ? Number(weight) : null}; });
+    const specified = parts.reduce((total,p) => total+(p.weight??0),0);
+    const missing = parts.filter(p=>p.weight===null).length;
+    let cursor = 0;
+    const format = (percent: number) => new Date(from + (to-from)*percent/100).toISOString().slice(0,10).replaceAll('-','.');
+    patch({oosRanges: parts.map(p => { const start=cursor; cursor += p.weight ?? (100-specified)/missing; return {type:p.type,from:format(start),to:format(cursor)}; })});
+    setRangeError(''); setGraphShown(true);
+  };
   return (
     <span id="builderDataTab" className="sqd-tab-content">
       <SqdFieldset className="sqd-data-setup">
@@ -54,8 +69,8 @@ export function DataTab() {
           <label className="sqd-label fixed">Test precision</label>
           <SqdSelect
             ariaLabel="Test precision"
-            value="1"
-            onChange={() => undefined}
+            value={precision}
+            onChange={setPrecision}
             options={[{ value: '1', label: 'Selected timeframe only' }, { value: '2', label: '1 minute data' }, { value: '3', label: 'Real ticks' }]}
             width={210}
           />
@@ -67,9 +82,10 @@ export function DataTab() {
         <div className="sqd-oos-presets">
           Most used configs:
           {oosPresets.map(preset => (
-            <button key={preset.id} type="button" className={`sqd-oos-preset oos-${preset.id}`} title={preset.title} aria-label={`Apply preset ${preset.title}`} />
+            <button key={preset.id} type="button" className={`sqd-oos-preset oos-${preset.id}`} title={preset.title} aria-label={`Apply preset ${preset.title}`} onClick={() => applyPreset(preset.title)} />
           ))}
         </div>
+        {rangeError && <p role="alert">{rangeError}</p>}
         <div className="sqd-oos-body">
           {graphShown && (
             <div className="sqd-oos-graph" aria-label="Data range chart (demo)">

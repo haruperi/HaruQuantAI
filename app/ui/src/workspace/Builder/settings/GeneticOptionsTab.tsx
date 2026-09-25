@@ -4,6 +4,8 @@ import { geneticOptionsDefaults, type GeneticOptionsState } from './settingsFixt
 
 /** "Genetic options" tab (donor evidence SQX144-EV-000040). */
 export function GeneticOptionsTab() {
+  const [restartType, setRestartType] = useState('bestInIsland');
+  const [conditions, setConditions] = useState([{ metric: 'Net profit', comparison: '>', value: '0' }]);
   const [state, setState] = useState<GeneticOptionsState>(geneticOptionsDefaults);
   const patch = (part: Partial<GeneticOptionsState>) => setState(current => ({ ...current, ...part }));
 
@@ -68,8 +70,13 @@ export function GeneticOptionsTab() {
           <p className="sqd-gen-help">Only strategies that fulfill the conditions below will be accepted</p>
           <div className="sqd-cond-grid-demo" aria-label="Initial population filter conditions (demo)">
             <div className="sqd-cond-grid-head"><span>Left side</span><span>Comparison</span><span>Right side</span></div>
-            <div className="sqd-cond-grid-row"><span>Net profit</span><span>&gt;</span><span>0</span></div>
-            <button type="button" className="sqd-link-button sqd-cond-add">+ Add condition</button>
+            {conditions.map((c,i) => <div className="sqd-cond-grid-row" key={i}>
+              <select aria-label={`Filter metric ${i+1}`} value={c.metric} onChange={e => setConditions(items => items.map((item,j) => i===j ? {...item, metric:e.target.value} : item))}>{['Net profit','Number of trades','Drawdown'].map(v=><option key={v}>{v}</option>)}</select>
+              <select aria-label={`Filter comparison ${i+1}`} value={c.comparison} onChange={e => setConditions(items => items.map((item,j) => i===j ? {...item, comparison:e.target.value} : item))}>{['>','<','>=','<='].map(v=><option key={v}>{v}</option>)}</select>
+              <input aria-label={`Filter value ${i+1}`} value={c.value} onChange={e => setConditions(items => items.map((item,j) => i===j ? {...item, value:e.target.value} : item))}/>
+              <button type="button" aria-label={`Remove filter ${i+1}`} onClick={()=>setConditions(items=>items.filter((_,j)=>j!==i))}>&times;</button>
+            </div>)}
+            <button type="button" className="sqd-link-button sqd-cond-add" onClick={()=>setConditions(items=>[...items,{metric:"Net profit",comparison:">",value:"0"}])}>+ Add condition</button>
           </div>
         </SqdFieldset>
       </div>
@@ -106,8 +113,8 @@ export function GeneticOptionsTab() {
             <SqdCheckbox checked={state.restartOnStagnation} onChange={restartOnStagnation => patch({ restartOnStagnation })}>Restart evolution if fitness of</SqdCheckbox>
             <SqdSelect
               ariaLabel="Fitness restart type"
-              value="bestInIsland"
-              onChange={() => undefined}
+              value={restartType}
+              onChange={setRestartType}
               options={[{ value: 'bestInIsland', label: 'best strategy in island' }, { value: 'average', label: 'average of population' }]}
               width={190}
             />

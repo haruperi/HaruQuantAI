@@ -16,7 +16,7 @@ export interface SettingsTabMeta {
 
 const DOCS = 'https://strategyquant.com/doc/strategyquant';
 
-/** The twelve Build-task settings tabs in donor strip order. */
+/** Build-task settings tabs; Parts to improve is conditional (SQX144-EV-000055..056). */
 export const settingsTabs: SettingsTabMeta[] = [
   { id: 'what-to-build', title: 'What to build', help: 'Choose what kind of strategy to build, its style, build mode, number of conditions in a strategy and Stop Loss + Profit Target ranges.', helpUrl: `${DOCS}/what-to-build/` },
   { id: 'parts-to-improve', title: 'Parts to improve', help: 'Configure which parts of the strategy should be improved. You can further configure if you want to replace the whole part, or add new blocks to it.', helpUrl: `${DOCS}/parts-to-improve/` },
@@ -26,19 +26,22 @@ export const settingsTabs: SettingsTabMeta[] = [
   { id: 'building-blocks', title: 'Building blocks', help: 'Here you can choose the building blocks that will be used to generate every strategy. You can affect the probability of choosing a block by increasing its weight.<br>Every block has also advanced parameter settings that allow you to modify how block parameters are generated or define some predefined parameter sets to choose from.', helpUrl: `${DOCS}/building-blocks/` },
   { id: 'atm', title: 'ATM', help: 'Advanced Trading Management', helpUrl: `${DOCS}/settings-atm/` },
   { id: 'money-management', title: 'Money management', help: 'Configure initial capital and desired position sizing method.', helpUrl: `${DOCS}/money-management/` },
-  { id: 'custom-analysis', title: 'Custom analysis', help: 'Performs the specified custom analysis on all strategies of given databank', helpUrl: `${DOCS}/custom-analysis/` },
   { id: 'cross-checks', title: 'Cross checks (robustness)', help: '', helpUrl: `${DOCS}/cross-checks-automated-strategy-robustness-tests/` },
   { id: 'ranking', title: 'Ranking', help: 'Define how strategy rank is computed and how many strategies to save to databank.<br/>If filtering is available you can configure filters the strategy has to pass before it is saved.', helpUrl: `${DOCS}/ranking-options/` },
   { id: 'notes', title: 'Notes', help: 'Save some notes about this configuration', helpUrl: `${DOCS}/notes/` },
 ];
 
 /** Donor prev/next label rule: "< {title}" and "{title} >". */
-export function prevTabLabel(index: number): string | null {
-  return index > 0 ? `< ${settingsTabs[index - 1].title}` : null;
+export function visibleSettingsTabs(strategyType: StrategyType): SettingsTabMeta[] {
+  return settingsTabs.filter(tab => tab.id !== "parts-to-improve" || strategyType === "improve");
 }
 
-export function nextTabLabel(index: number): string | null {
-  return index < settingsTabs.length - 1 ? `${settingsTabs[index + 1].title} >` : null;
+export function prevTabLabel(index: number, tabs = settingsTabs): string | null {
+  return index > 0 ? `< ${tabs[index - 1].title}` : null;
+}
+
+export function nextTabLabel(index: number, tabs = settingsTabs): string | null {
+  return index < tabs.length - 1 ? `${tabs[index + 1].title} >` : null;
 }
 
 // --- What to build -----------------------------------------------------------

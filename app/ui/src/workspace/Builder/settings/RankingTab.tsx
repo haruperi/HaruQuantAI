@@ -4,6 +4,7 @@ import { fitnessMethods, rankingDefaults, type RankingState } from './settingsFi
 
 /** "Ranking" tab (donor evidence SQX144-EV-000043). */
 export function RankingTab() {
+  const [method, setMethod] = useState("ComputeFromStrategyResult");
   const [state, setState] = useState<RankingState>(rankingDefaults);
   const patch = (part: Partial<RankingState>) => setState(current => ({ ...current, ...part }));
   const stop = state.stopConditionType;
@@ -54,18 +55,18 @@ export function RankingTab() {
             <span role="columnheader" />
           </div>
           {state.fitnessCriteria.map((criterion, index) => (
-            <div className="sqd-fitness-row" role="row" key={criterion.key}>
+            <div className="sqd-fitness-row" role="row" key={index}>
               <SqdSelect
                 ariaLabel="Fitness method"
-                value="ComputeFromStrategyResult"
-                onChange={() => undefined}
+                value={method}
+                onChange={setMethod}
                 options={fitnessMethods.filter(m => m.value !== 'ReturnDDRatio').map(m => ({ value: m.value, label: m.label }))}
                 width={230}
               />
               <SqdSelect
                 ariaLabel="Fitness criterion"
                 value={criterion.key}
-                onChange={() => undefined}
+                onChange={key => patch({fitnessCriteria:state.fitnessCriteria.map((c,i)=> i===index ? {key,label:fitnessMethods.find(m=>m.value===key)?.label ?? key} : c)})}
                 options={fitnessMethods.slice(1).map(m => ({ value: m.value, label: m.label }))}
                 width={200}
               />

@@ -1,3 +1,4 @@
+import { Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -72,6 +73,7 @@ export function SqdSpinner({
       <input
         type="text"
         className="sqd-input"
+        style={{ width: `${Math.max(3, String(value).length) + 1}ch` }}
         value={value}
         disabled={disabled}
         aria-label={ariaLabel}
@@ -215,10 +217,7 @@ export function SqdHelpLink({ url }: { url: string }) {
 export function GearLink({ onClick, title }: { onClick: () => void; title: string }) {
   return (
     <button type="button" className="sqd-gear-link" title={title} aria-label={`Configure ${title}`} onClick={onClick}>
-      <svg width="13" height="13" viewBox="0 0 16 16" aria-hidden="true">
-        <path fill="currentColor" d="M8 4.75A3.25 3.25 0 1 0 8 11.25 3.25 3.25 0 0 0 8 4.75zm0 5a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5z" />
-        <path fill="currentColor" d="M8 1l.9 1.6 1.8-.4.4 1.8 1.7.7-.9 1.6.9 1.6-1.7.7-.4 1.8-1.8-.4L8 15l-.9-1.6-1.8.4-.4-1.8-1.7-.7.9-1.6-.9-1.6 1.7-.7.4-1.8 1.8.4L8 1z" opacity=".55" />
-      </svg>
+      <Settings size={13} aria-hidden="true" />
     </button>
   );
 }
@@ -229,12 +228,14 @@ export function AdditionalConfigPopup({
   onHelp,
   onClose,
   onSave,
+  onReset,
   children,
 }: {
   setting: string;
   onHelp: () => void;
   onClose: () => void;
   onSave: () => void;
+  onReset?: () => void;
   children: ReactNode;
 }) {
   useEffect(() => {
@@ -254,7 +255,7 @@ export function AdditionalConfigPopup({
         <div className="modal-content sqd-acp-body">{children}</div>
         <footer>
           <button type="button" className="sqd-btn" onClick={onHelp}>Help</button>
-          <button type="button" className="sqd-modal-close-link" onClick={onClose}>Reset to default</button>
+          <button type="button" className="sqd-modal-close-link" onClick={onReset} disabled={!onReset}>Reset to default</button>
           <button type="button" className="sqd-modal-close-link" onClick={onClose}>Close</button>
           <button type="button" className="sqd-btn sqd-btn-primary" onClick={onSave}>Save</button>
         </footer>

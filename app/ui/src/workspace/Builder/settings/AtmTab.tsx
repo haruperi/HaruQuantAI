@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { SqdCheckbox, SqdFieldset, SqdSpinner } from './SettingsControls';
+import { SqdModal } from '../FitnessEvolutionModal';
 import { atmDefaults, type AtmMethod } from './settingsFixtures';
 
 /**
@@ -9,6 +10,8 @@ import { atmDefaults, type AtmMethod } from './settingsFixtures';
  * derived from the exit formulas of the Build template.
  */
 export function AtmTab() {
+  const [adding, setAdding] = useState(false);
+  const [selected, setSelected] = useState(atmDefaults[0].key);
   const [methods, setMethods] = useState<AtmMethod[]>(atmDefaults);
 
   const patchMethod = (key: string, part: Partial<AtmMethod>) =>
@@ -53,8 +56,12 @@ export function AtmTab() {
             </div>
           ))}
         </div>
-        <button type="button" className="sqd-btn">Add new exit method</button>
+        <button type="button" className="sqd-btn" onClick={() => setAdding(true)}>Add new exit method</button>
       </SqdFieldset>
+      {adding && <SqdModal title="Add new exit method" onClose={()=>setAdding(false)} footer={<button type="button" className="sqd-btn sqd-btn-primary" onClick={()=>{const method=atmDefaults.find(m=>m.key===selected)!;setMethods(items=>[...items,{...structuredClone(method),key:`local-${Date.now()}`,use:true}]);setAdding(false);}}>Add</button>}>
+        <p className="sqd-gen-help">Local UI demo: choose an exit method from the fixture catalog.</p>
+        <select aria-label="Exit method" value={selected} onChange={e=>setSelected(e.target.value)}>{atmDefaults.map(m=><option key={m.key} value={m.key}>{m.label}</option>)}</select>
+      </SqdModal>}
     </div>
   );
 }
