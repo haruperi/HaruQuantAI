@@ -208,7 +208,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
         </div>
       }
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, minWidth: 620, maxHeight: 540 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: '100%', minWidth: 0, maxHeight: 540 }}>
         {/* Top View Selector Bar */}
         <div
           style={{
@@ -216,13 +216,13 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
             gridTemplateColumns: '1.2fr 1fr 1fr',
             gap: 12,
             padding: 12,
-            background: 'var(--surface-muted, #1a1e24)',
+            background: 'var(--sqx-chrome-bg)',
             borderRadius: 4,
-            border: '1px solid var(--border-color, #2d333b)',
+            border: '1px solid var(--sqx-fieldset-border)',
           }}
         >
           <div>
-            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted, #8b949e)', display: 'block', marginBottom: 4 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--sqx-text-muted)', display: 'block', marginBottom: 4 }}>
               Selected view
             </label>
             <select
@@ -240,7 +240,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
           </div>
 
           <div>
-            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted, #8b949e)', display: 'block', marginBottom: 4 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--sqx-text-muted)', display: 'block', marginBottom: 4 }}>
               Create a new view
             </label>
             <div style={{ display: 'flex', gap: 4 }}>
@@ -258,7 +258,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
           </div>
 
           <div>
-            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--text-muted, #8b949e)', display: 'block', marginBottom: 4 }}>
+            <label style={{ fontSize: 11, fontWeight: 600, color: 'var(--sqx-text-muted)', display: 'block', marginBottom: 4 }}>
               Clone current view
             </label>
             <div style={{ display: 'flex', gap: 4 }}>
@@ -308,7 +308,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
 
           <div
             style={{
-              border: '1px solid var(--border-color, #2d333b)',
+              border: '1px solid var(--sqx-fieldset-border)',
               borderRadius: 4,
               overflowY: 'auto',
               maxHeight: 280,
@@ -317,7 +317,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
           >
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
               <thead>
-                <tr style={{ background: 'var(--surface-muted, #1a1e24)', textAlign: 'left', borderBottom: '1px solid var(--border-color, #2d333b)' }}>
+                <tr style={{ background: 'var(--sqx-chrome-bg)', textAlign: 'left', borderBottom: '1px solid var(--sqx-fieldset-border)' }}>
                   <th style={{ padding: '6px 10px', width: 40 }}>#</th>
                   <th style={{ padding: '6px 10px' }}>Column name</th>
                   <th style={{ padding: '6px 10px', width: 120 }}>Category</th>
@@ -332,15 +332,15 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
                     <tr
                       key={`${c.columnId}-${idx}`}
                       style={{
-                        borderBottom: '1px solid var(--border-subtle, #21262d)',
+                        borderBottom: '1px solid var(--border-subtle, var(--sqx-grid-row-border))',
                         background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.01)',
                       }}
                     >
-                      <td style={{ padding: '6px 10px', color: '#8b949e' }}>{idx + 1}</td>
+                      <td style={{ padding: '6px 10px', color: 'var(--sqx-text-muted)' }}>{idx + 1}</td>
                       <td style={{ padding: '6px 10px', fontWeight: 500 }}>
                         {metric ? metric.name : c.columnId}
                       </td>
-                      <td style={{ padding: '6px 10px', color: '#8b949e' }}>
+                      <td style={{ padding: '6px 10px', color: 'var(--sqx-text-muted)' }}>
                         {metric?.category || 'General'}
                       </td>
                       <td style={{ padding: '6px 10px' }}>
@@ -367,7 +367,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
                             disabled={activeView.isDefault || idx === 0}
                             onClick={() => moveColumn(idx, 'up')}
                             title="Move Up"
-                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid #30363d', borderRadius: 3, cursor: 'pointer', color: '#c9d1d9' }}
+                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid var(--sqx-fieldset-border)', borderRadius: 3, cursor: 'pointer', color: 'var(--sqx-text)' }}
                           >
                             <ChevronUp size={12} />
                           </button>
@@ -376,7 +376,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
                             disabled={activeView.isDefault || idx === editedColumns.length - 1}
                             onClick={() => moveColumn(idx, 'down')}
                             title="Move Down"
-                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid #30363d', borderRadius: 3, cursor: 'pointer', color: '#c9d1d9' }}
+                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid var(--sqx-fieldset-border)', borderRadius: 3, cursor: 'pointer', color: 'var(--sqx-text)' }}
                           >
                             <ChevronDown size={12} />
                           </button>
@@ -384,7 +384,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
                             className="btn btn-sm"
                             onClick={() => setSelectedPropsCol(metric || null)}
                             title="Column Properties"
-                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid #30363d', borderRadius: 3, cursor: 'pointer', color: '#58a6ff' }}
+                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid var(--sqx-fieldset-border)', borderRadius: 3, cursor: 'pointer', color: 'var(--sqx-link)' }}
                           >
                             <Settings size={12} />
                           </button>
@@ -393,7 +393,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
                             disabled={activeView.isDefault}
                             onClick={() => removeColumn(idx)}
                             title="Remove Column"
-                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid #30363d', borderRadius: 3, cursor: 'pointer', color: '#f85149' }}
+                            style={{ padding: '2px 6px', background: 'transparent', border: '1px solid var(--sqx-fieldset-border)', borderRadius: 3, cursor: 'pointer', color: '#f85149' }}
                           >
                             <Trash2 size={12} />
                           </button>
@@ -419,16 +419,16 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
             </Button>
           }
         >
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 500, maxHeight: 420 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, width: '100%', minWidth: 0, maxHeight: 420 }}>
             <div style={{ display: 'flex', gap: 8 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, border: '1px solid #30363d', borderRadius: 4, padding: '4px 8px', background: '#0d1117' }}>
-                <Search size={14} color="#8b949e" />
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, flex: 1, border: '1px solid var(--sqx-fieldset-border)', borderRadius: 4, padding: '4px 8px', background: 'var(--sqx-input-bg)' }}>
+                <Search size={14} color="var(--sqx-text-muted)" />
                 <input
                   type="text"
                   placeholder="Filter 100+ metrics..."
                   value={colSearch}
                   onChange={e => setColSearch(e.target.value)}
-                  style={{ background: 'transparent', border: 'none', color: '#c9d1d9', outline: 'none', width: '100%', fontSize: 12 }}
+                  style={{ background: 'transparent', border: 'none', color: 'inherit', outline: 'none', width: '100%', fontSize: 12 }}
                 />
               </div>
               <select
@@ -448,7 +448,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
 
             <div
               style={{
-                border: '1px solid #30363d',
+                border: '1px solid var(--sqx-fieldset-border)',
                 borderRadius: 4,
                 overflowY: 'auto',
                 maxHeight: 300,
@@ -457,7 +457,7 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
             >
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                 <thead>
-                  <tr style={{ background: '#1a1e24', textAlign: 'left', borderBottom: '1px solid #30363d' }}>
+                  <tr style={{ background: 'var(--sqx-chrome-bg)', textAlign: 'left', borderBottom: '1px solid var(--sqx-fieldset-border)' }}>
                     <th style={{ padding: '6px 10px' }}>Name</th>
                     <th style={{ padding: '6px 10px' }}>Category</th>
                     <th style={{ padding: '6px 10px' }}>Format</th>
@@ -471,16 +471,16 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
                       <tr
                         key={metric.id}
                         style={{
-                          borderBottom: '1px solid #21262d',
+                          borderBottom: '1px solid var(--sqx-grid-row-border)',
                           background: alreadyAdded ? 'rgba(56, 139, 253, 0.05)' : 'transparent',
                         }}
                       >
                         <td style={{ padding: '6px 10px' }}>
                           <div style={{ fontWeight: 500 }}>{metric.name}</div>
-                          <div style={{ fontSize: 10, color: '#8b949e' }}>{metric.description}</div>
+                          <div style={{ fontSize: 10, color: 'var(--sqx-text-muted)' }}>{metric.description}</div>
                         </td>
-                        <td style={{ padding: '6px 10px', color: '#8b949e' }}>{metric.category}</td>
-                        <td style={{ padding: '6px 10px', color: '#8b949e' }}>{metric.format}</td>
+                        <td style={{ padding: '6px 10px', color: 'var(--sqx-text-muted)' }}>{metric.category}</td>
+                        <td style={{ padding: '6px 10px', color: 'var(--sqx-text-muted)' }}>{metric.format}</td>
                         <td style={{ padding: '6px 10px', textAlign: 'right' }}>
                           <Button
                             className={alreadyAdded ? '' : 'primary'}
@@ -510,28 +510,28 @@ export function ManageViewsDialog({ isOpen, onClose }: ManageViewsDialogProps) {
         >
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12, minWidth: 360 }}>
             <div>
-              <label style={{ fontSize: 11, color: '#8b949e', display: 'block' }}>Column ID</label>
-              <div style={{ fontWeight: 600, fontSize: 13, color: '#58a6ff' }}>{selectedPropsCol.id}</div>
+              <label style={{ fontSize: 11, color: 'var(--sqx-text-muted)', display: 'block' }}>Column ID</label>
+              <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--sqx-link)' }}>{selectedPropsCol.id}</div>
             </div>
             <div>
-              <label style={{ fontSize: 11, color: '#8b949e', display: 'block' }}>Name</label>
+              <label style={{ fontSize: 11, color: 'var(--sqx-text-muted)', display: 'block' }}>Name</label>
               <div style={{ fontWeight: 600, fontSize: 14 }}>{selectedPropsCol.name}</div>
             </div>
             <div>
-              <label style={{ fontSize: 11, color: '#8b949e', display: 'block' }}>Category</label>
+              <label style={{ fontSize: 11, color: 'var(--sqx-text-muted)', display: 'block' }}>Category</label>
               <div>{selectedPropsCol.category}</div>
             </div>
             <div>
-              <label style={{ fontSize: 11, color: '#8b949e', display: 'block' }}>Description</label>
-              <div style={{ color: '#8b949e', fontSize: 12 }}>{selectedPropsCol.description}</div>
+              <label style={{ fontSize: 11, color: 'var(--sqx-text-muted)', display: 'block' }}>Description</label>
+              <div style={{ color: 'var(--sqx-text-muted)', fontSize: 12 }}>{selectedPropsCol.description}</div>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div>
-                <label style={{ fontSize: 11, color: '#8b949e', display: 'block' }}>Default Width</label>
+                <label style={{ fontSize: 11, color: 'var(--sqx-text-muted)', display: 'block' }}>Default Width</label>
                 <div>{selectedPropsCol.defaultWidth} px</div>
               </div>
               <div>
-                <label style={{ fontSize: 11, color: '#8b949e', display: 'block' }}>Alignment</label>
+                <label style={{ fontSize: 11, color: 'var(--sqx-text-muted)', display: 'block' }}>Alignment</label>
                 <div style={{ textTransform: 'capitalize' }}>{selectedPropsCol.align}</div>
               </div>
             </div>

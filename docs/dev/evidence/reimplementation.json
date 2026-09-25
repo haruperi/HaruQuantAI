@@ -148,6 +148,19 @@
       "limitations": [
         "Concatenated bundles under internal/web/common/Batch*/ were cross-checked against the standalone copies under internal/web/libs/; runtime rendering was not driven during inspection."
       ]
+    },
+    "E-L09": {
+      "title": "SQX user settings databank view definitions",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "user/settings/views/databanks/"
+      ],
+      "scope": "Saved per-user databank grid view definitions (column classes and order) of the installed build",
+      "confidence": "high",
+      "limitations": [
+        "Saved view names are user configuration, not universal defaults; the live default view of a project is named in its project config, which may differ from the available saved files."
+      ]
     }
   },
   "records": {
@@ -2916,6 +2929,588 @@
         "splitter",
         "controls",
         "icons"
+      ]
+    },
+    "SQX144-EV-000028": {
+      "topic": "ui.databanks.toolbar.inventory",
+      "title": "Databanks toolbar button and menu inventory is plugin-assembled in fixed order",
+      "question": "Which buttons and menus does the Builder databanks toolbar contain, in what order, with which items?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "databanks",
+          "toolbar"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The databanks toolbar assembles its buttons from action plugins at fixed positions: Load (10), Save combo (20), Delete (30), Clear all (40), Retest (50, excluded in Retester tasks), Rename (55), Filter by correlation (56), Portfolio combo (60), Tools combo (70), and an icon-only refresh button (190) plus a right-aligned View combo and a settings gear opening the manage-views dialog. Combo titles are \"Prefix:Option\" strings split on the colon: the Save menu offers saving to SQ X format, HTML report, PDF report, source code, databank contents export, SQ3-format stats, and strategy-trades CSV/XLSX export; the Portfolio menu offers merge, split, merge-WF, move to Portfolio Composer, and move to Portfolio Master; the Tools menu offers nested Edit (Parameters, Strategy) and Select (Passed, Failed) submenus plus Set note, Compare, and Run CA. Delete and Clear all are styled destructive.",
+        "confidence": "high",
+        "limitations": [
+          "Positions and titles are from plugin registration source; runtime license or task states can hide individual items (e.g. source code under broker encryption).",
+          "One owner screenshot appeared to show a \"Find duplicated strategies\" Tools item that does not exist in any installed plugin source; source evidence was followed."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/load/module.js",
+          "location": {
+            "section": null,
+            "symbol": "sqPluginProvider.plugin",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Load at position 10"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "b39d8a4e99ad3b0d8a76740ddd3a46ae404ed66a1f0b389e61d0a6a44508a45e"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/",
+          "location": {
+            "section": "all module.js plugin registrations",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "positions 20-190 and combo subtitle trees for Save/Portfolio/Tools"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankViews/module.js",
+          "location": {
+            "section": null,
+            "symbol": "ViewSelectCtrl",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "View combo at OptionsAction position 110"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/common/Batch1/libs.js",
+          "location": {
+            "section": null,
+            "symbol": "getCombos",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "combo titles split on colon; trailing colon marks a combo"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1d259b32b356369317d50a07b711ac9a3e91c2b57baf5bc0e4fa399f2e6c0182"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK_BUILDER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read every ResultsDatabankActions/* plugin registration (position, title, class, exclusions), the views plugin registration, and the combo title-splitting implementation in the shared bundle.",
+        "expected_observation": "A total ordering of toolbar controls with exact titles and nested menu trees.",
+        "actual_observation": "Observed the inventory stated in the claim, including the colon-split combo mechanism and the Builder-product exclusions.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/",
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch1/libs.js"
+        ],
+        "executed_at": "2026-09-25T05:38:02.502Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3fa2da4",
+        "created_at": "2026-09-25T05:38:02.502Z",
+        "updated_at": "2026-09-25T05:38:02.502Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased titles, structure, and behavior only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "databanks",
+        "toolbar",
+        "menus",
+        "builder"
+      ]
+    },
+    "SQX144-EV-000029": {
+      "topic": "ui.databanks.tabs.builder",
+      "title": "Databanks tabs use light quant-tabs styling without counts or add button in Builder",
+      "question": "How do the databanks bank tabs look and behave in the Builder product?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "databanks",
+          "tabs"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Bank tabs are a left-aligned flex strip of 27px tabs with white background, 1px light-blue (#bddefb) borders open at the bottom, and 3px top corner radius; the active tab gains a 3px blue (#5897d4) top border, bold text, and darker text color; hover outlines tabs in a medium blue. In the Builder product the tab strip shows no add-databank button, no per-tab record counts, and no per-tab context menu; the \"Existing portfolio\" bank carries a help tooltip (\"Fit strategy to existing portfolio.\" with a Learn more link). Record counts are displayed only in the centered Records counter of the toolbar area.",
+        "confidence": "high",
+        "limitations": [
+          "Styling constants come from the installed stylesheets; anti-aliasing and subpixel rendering were not measured.",
+          "The bank list itself is project configuration; the three-bank set is the installed Builder project sample."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ProjectDatabanks/views/databanks.html",
+          "location": {
+            "section": "quant-tabs usage",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "show-number-of-records bound to custom-databanks flag, false in Builder"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c5fcf2668bb1961359c709d68178b56307a683665d2f5b0e9a28368acac6ea95"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "customDatabanksEnabled",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "true only for TaskManager, Retester product, or Portfolio Master"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9c5d0eb2c98f12a0804d2c37cea2069902b340d0e564fa383b1b68b95c071cd0"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L02",
+          "artifact_locator": "internal/web/common/Batch1/styles.css",
+          "location": {
+            "section": ".quant-tabs .tabs-header rules",
+            "symbol": null,
+            "line_range": "7902-7960",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "tab dimensions, colors, active/hover states"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "19f042b8ea0d0778f52bb5b0d2515a6b26c8eefb2cf727bcbb467111080a2380"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK_BUILDER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the databanks tab template and controller flags plus the quant-tabs style rules; cross-check against owner screenshots.",
+        "expected_observation": "Tab geometry/colors as stated and Builder-specific absence of counts, add button, and tab menus.",
+        "actual_observation": "Observed exactly that; owner screenshots corroborate the visual constants.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databanks.html",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch1/styles.css"
+        ],
+        "executed_at": "2026-09-25T05:38:02.502Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3fa2da4",
+        "created_at": "2026-09-25T05:38:02.502Z",
+        "updated_at": "2026-09-25T05:38:02.502Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased titles, structure, and behavior only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "databanks",
+        "tabs",
+        "builder",
+        "styling"
+      ]
+    },
+    "SQX144-EV-000030": {
+      "topic": "ui.databanks.dialogs.texts",
+      "title": "Databanks action dialogs use fixed titles, fields, and message texts",
+      "question": "What dialogs and message texts do the databanks toolbar actions show?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "databanks",
+          "dialogs"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Toolbar actions open fixed dialogs: Load shows a \"Loading records\" modal with a striped progress bar; Retest asks \"Do you want to copy seleted strategies to Retester?\" (sic) with an apply-config checkbox and Cancel / Copy (keep original) / Move (remove from this databank) buttons; Save opens a dialog with directory browse, file-name prefix/suffix, and format radio choices; Rename shows a single Name field for one selection or Prefix/Original/Postfix fields for many, with a Close link and Rename button; Delete and Clear all confirm with \"Removing reports\" plus the respective question texts. With no selection, Delete and Retest show error texts (\"You have to select at least one strategy to delete\" / \"...one strategy\"); successful clear shows \"Databank cleared\" and refresh shows \"Databank reloaded\".",
+        "confidence": "high",
+        "limitations": [
+          "Texts are paraphrase-verified against installed templates; button label capitalization follows the templates exactly, including the donor misspelling in the Retest title.",
+          "Dialog chrome (bootstrap-modal-derived) was inspected for structure; exact padding/shadows come from screenshots."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/load/loadPopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "title, progress bar, footer"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "f3a4662adc01313e7d526df09b157c6833e197f2819b6681994702ab00656f7e"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/retest/retestDialog.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "title, checkbox, three footer buttons"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "52502987c719091962a033395f02ef1e202cbe7b6364059c08c3aa54eb865f47"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/save/savePopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "directory browse, prefix/suffix, format radios, help text"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "6753ad9ba4ac18c3642550bc5440372ca8993cb8e7e8e06ede377b592eecc788"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/DatabankRename/ui/databankRenamePopup.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "single/multi rename fields, footer"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "70ae8b256ba2a4c17a6706266723eba314f04dd505ab56cb3037aeff04b8b541"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/delete/module.js",
+          "location": {
+            "section": null,
+            "symbol": "btnCtrl.onClick",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "confirm and error texts"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9166eb3bed0369c20819e1d4d71e0234109c118287b9869a41970fcba1abc894"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ResultsDatabankActions/clearAll/module.js",
+          "location": {
+            "section": null,
+            "symbol": "btnCtrl.onClick",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "confirm, success texts"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "25c858aa6868b38080ea4eeef3b0594db066b01da990ac35e47a8cb24c274781"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK_BUILDER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read every databanks action dialog template and button controller in the installed plugins, recording titles, fields, buttons, and message strings.",
+        "expected_observation": "The dialog set and texts stated in the claim.",
+        "actual_observation": "Observed the stated dialog structures and texts verbatim across the six sources; owner screenshots corroborate the Load, Retest, and Manage Views dialogs.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/loadPopup.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/retestDialog.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/savePopup.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/databankRenamePopup.html"
+        ],
+        "executed_at": "2026-09-25T05:38:02.502Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3fa2da4",
+        "created_at": "2026-09-25T05:38:02.502Z",
+        "updated_at": "2026-09-25T05:38:02.502Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased titles, structure, and behavior only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "databanks",
+        "dialogs",
+        "texts",
+        "builder"
+      ]
+    },
+    "SQX144-EV-000031": {
+      "topic": "ui.databanks.grid.main_view_columns",
+      "title": "Default Main-data view defines the databanks grid column set with sample suffixes",
+      "question": "Which columns does the default databanks grid view show, and how are sample-scoped columns labeled?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "databanks",
+          "grid"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The saved \"Default - Main data\" style view defines the grid columns in order: Fitness, Symbol, TimeFrame, Net profit, Mini equity chart, # of trades, Profit factor, Sharpe Ratio, R Expectancy, Annual % Return, Stability, Symmetry, Drawdown, Win/Loss ratio, and further metric columns, each declared with a column class, sample type, and display flags; the rendered grid prepends the pinned Strategy Name column and labels in-sample-scoped columns with an \"(IS)\" suffix in the header.",
+        "confidence": "high",
+        "limitations": [
+          "The inspected saved file is the \"Full sample\" variant; a project names its exact view, and the two must not be silently equated.",
+          "The \"(IS)\" suffix rule is observed in rendered screenshots and grid configuration; the suffix text is not stored in the view file itself."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L09",
+          "artifact_locator": "user/settings/views/databanks/Default - Main data - Full sample.vw",
+          "location": {
+            "section": "/View/Columns",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "ordered Column declarations"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "cf4c8ec649ef25009dd2e36245bc5456937869dbb427fdca31925d500fdf0330"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ProjectDatabanks/views/databank.html",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "grid container; Strategy Name is the grid fixed column"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK_BUILDER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Parse the saved view file column declarations and compare the rendered header set in owner screenshots.",
+        "expected_observation": "An ordered metric column set matching the rendered grid, with sample-suffixed headers.",
+        "actual_observation": "Observed the ordered column classes/names in the view file and the matching rendered headers including the (IS) suffixes in the screenshots.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/user/settings/views/databanks/Default - Main data - Full sample.vw"
+        ],
+        "executed_at": "2026-09-25T05:38:02.502Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "3fa2da4",
+        "created_at": "2026-09-25T05:38:02.502Z",
+        "updated_at": "2026-09-25T05:38:02.502Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased titles, structure, and behavior only; no source text, images, or assets reproduced."
+      },
+      "tags": [
+        "databanks",
+        "grid",
+        "columns",
+        "view"
       ]
     }
   }

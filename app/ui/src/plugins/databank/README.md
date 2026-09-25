@@ -19,24 +19,33 @@ backend databank capability exists yet.
 
 ## Donor parity scope (SQX 144.2953)
 
-The splitter reproduces the observed donor mechanism: a three-state
-collapsed/expanded/maximised lower pane, collapsed by default on load, with
-the count bar ("DATABANKS {n} / STRATEGIES: {m}"), the centered chevron
-cluster (maximise, drag-resize, collapse), a 100px expanded minimum, and a
-window resize dispatch on every state change. Chevron-only toggle matches the
-donor's observable behavior (its header click handler is dead code). Evidence:
-`SQX144-EV-000025`, `SQX144-EV-000026`, `SQX144-EV-000027` in
-`docs/dev/evidence/reimplementation.json`.
+Two slices own the parity claim:
 
-Displayed counts are fixture truth (currently 3 / 70), labelled demo. Panel
-content, metrics, and actions are prototype presentation and make no SQX
-metric or parity claim.
+1. **Splitter mechanism** (`DatabankSplitter.tsx`): three-state
+   collapsed/expanded/maximised lower pane, collapsed by default, count bar
+   ("DATABANKS {n} / STRATEGIES: {m}"), centered chevron cluster,
+   drag-resize, 100px expanded minimum, window-resize dispatch on change.
+   Chevron-only toggle matches the donor's observable behavior (its header
+   click handler is dead code). Evidence: `SQX144-EV-000025..027`.
+2. **Panel content** (this slice): donor toolbar inventory with Save /
+   Portfolio / Tools menu trees (including nested Edit and Select
+   submenus), centered Records counter, right-side refresh + View combo +
+   gear, light quant-tabs bank strip without counts/add-button (Builder
+   product), "Default - Main data" grid columns with (IS) suffixes, and
+   the donor dialog set (Load, Retest, Save, Rename, Delete/Clear
+   confirms, Set note, Manage Views, Filter by correlation, Compare) with
+   verbatim texts. Mock flows are truthful: row operations act on fixture
+   data; engine/export operations show explicit deferred toasts. Evidence:
+   `SQX144-EV-000028..031`.
+
+Displayed counts and metrics are fixture truth (currently 3 banks / 70
+strategies), labelled demo. No SQX metric or engine parity is claimed.
 
 ## Feature registry (this domain)
 
 | Feature ID | Feature | Status |
 |---|---|---|
-| FEAT-UI-DATABANK_BUILDER | Shared databanks lower pane for project workspaces: SQX-parity three-state splitter (collapsed count bar, expanded split with drag-resize, maximised) with demo fixture data; panel content styling is prototype, not SQX parity | implemented (`ProjectDatabanks/DatabankSplitter.tsx`, `ProjectDatabanks/DatabankPanel.tsx`, mounted in `src/app/App.tsx` for builder/retester/optimizer/portfolio/projects) |
+| FEAT-UI-DATABANK_BUILDER | Shared databanks lower pane for project workspaces: SQX-parity three-state splitter and full panel content parity (toolbar with Save/Portfolio/Tools menu trees, tabs, Default - Main data grid, donor dialog set) with demo fixture data; engine/export actions are explicit deferred toasts | implemented (`ProjectDatabanks/DatabankSplitter.tsx`, `ProjectDatabanks/DatabankPanel.tsx`, `ProjectDatabanks/DatabankToolbar.tsx`, `ProjectDatabanks/DatabankDialogs.tsx`, mounted in `src/app/App.tsx` for builder/retester/optimizer/portfolio/projects) |
 
 ## Backend ownership gap
 

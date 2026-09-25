@@ -32,6 +32,14 @@ _FINGERPRINT_HASH_LINE_RE = re.compile(
 _REIMPLEMENTATION_FINGERPRINT_LINE_RE = re.compile(
     r'^\s*"value"\s*:\s*"(?P<hash>[a-f0-9]{64})"\s*,?\s*$'
 )
+# Evidence artifact locators under the logical roots. Values are plain
+# repository/donor paths (letters, digits, underscore, dot, slash, dash);
+# long mixed-case paths otherwise trip the base64 entropy heuristic.
+_REIMPLEMENTATION_ARTIFACT_PATH_LINE_RE = re.compile(
+    r'^\s*(?:"artifact_locator"\s*:\s*)?'
+    r'"(?P<path>(?:SQX_REFERENCE_ROOT|HARUQUANTAI_ROOT)/[A-Za-z0-9_./-]+)"'
+    r"\s*,?\s*$"
+)
 
 
 def _repository_relative_path(filename: str) -> str | None:
@@ -99,15 +107,37 @@ def is_valid_repository_fingerprint_evidence(
     return True
 
 
+def is_valid_repository_artifact_path_evidence(
+    filename: str,
+    line: str,
+    secret: str,
+) -> bool:
+    """Filter schema-bound logical-root artifact locator paths in the ledger.
+
+    Long mixed-case donor/repository paths under SQX_REFERENCE_ROOT or
+    HARUQUANTAI_ROOT can trip the base64 entropy heuristic although they are
+    evidence locators, not secrets.
+    """
+    relative_path = _repository_relative_path(filename)
+    if relative_path != _REIMPLEMENTATION_PATH:
+        return False
+    match = _REIMPLEMENTATION_ARTIFACT_PATH_LINE_RE.fullmatch(line)
+    if match is None:
+        return False
+    return match.group("path").rstrip("/") == secret.rstrip("/")
+
+
 def is_valid_repository_evidence(
     filename: str,
     line: str,
     secret: str,
 ) -> bool:
     """Filter supported schema-bound repository evidence identities."""
-    return is_valid_repository_commit_evidence(
-        filename, line, secret
-    ) or is_valid_repository_fingerprint_evidence(filename, line, secret)
+    return (
+        is_valid_repository_commit_evidence(filename, line, secret)
+        or is_valid_repository_fingerprint_evidence(filename, line, secret)
+        or is_valid_repository_artifact_path_evidence(filename, line, secret)
+    )
 
 
 def run_secret_scan(filenames: list[str], baseline_path: Path) -> int:

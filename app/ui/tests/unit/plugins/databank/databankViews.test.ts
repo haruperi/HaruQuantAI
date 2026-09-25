@@ -29,7 +29,7 @@ describe('Databank Views and Metrics Engine', () => {
   it('defines the 5 standard SQX view presets matching donor .vw files', () => {
     expect(DEFAULT_VIEW_PRESETS.length).toBe(5);
     const names = DEFAULT_VIEW_PRESETS.map(v => v.name);
-    expect(names).toContain('Default - Main data - Full sample');
+    expect(names).toContain('Default - Main data');
     expect(names).toContain('Performance');
     expect(names).toContain('Risk & Drawdown');
     expect(names).toContain('Trade Statistics');
