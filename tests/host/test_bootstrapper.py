@@ -22,8 +22,8 @@ from app.host.bootstrapper import (
     HostConfig,
     config_from_env,
 )
+from app.host.logging import LOGGER_NAME, configure_host_logging, host_log_path
 from app.host.settings import DEFAULT_DATABASE_PATH
-from app.host.telemetry import LOGGER_NAME, configure_host_logging, host_log_path
 
 
 def test_defaults_match_owner_decisions() -> None:
