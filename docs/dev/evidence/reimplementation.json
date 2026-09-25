@@ -6259,6 +6259,629 @@
         "custom-analysis",
         "modals"
       ]
+    },
+    "SQX144-EV-000048": {
+      "topic": "ui.algowizard.files.recent_limit",
+      "title": "Recent-file list is capped at ten",
+      "question": "Recent-file list is capped at ten?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard"
+        ],
+        "conditions": [
+          "Installed web bundle; static inspection."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The AlgoWizard header displays at most ten recent file entries.",
+        "confidence": "high",
+        "limitations": [
+          "Static component inspection does not establish complete runtime parity or backend behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/AlgoWizard/assets/index-DgPZlMMb.js",
+          "location": {
+            "section": null,
+            "symbol": "EditorHeader",
+            "line_range": "48838",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Component start; inspect the named computed property or handler."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e7c38ed0532af215340d06b4bdc2784d6a4f5fc76d302e19395e5d8c5e42b642"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-ALGOWIZARD_SHELL"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/AlgoWizard/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the named component in the fingerprinted installed JavaScript bundle.",
+        "expected_observation": "The AlgoWizard header displays at most ten recent file entries.",
+        "actual_observation": "The recentFilesArr computed property slices its collection to ten before mapping display names.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-DgPZlMMb.js"
+        ],
+        "executed_at": "2026-09-25T11:26:33.359360Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "4a3a76593dc2039c9b4c27eb1451fb97be5883f5",
+        "created_at": "2026-09-25T11:26:33.359360Z",
+        "updated_at": "2026-09-25T11:26:33.359360Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "algowizard",
+        "static-inspection"
+      ]
+    },
+    "SQX144-EV-000049": {
+      "topic": "ui.algowizard.history.shortcuts",
+      "title": "Header handles history shortcuts",
+      "question": "Header handles history shortcuts?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard"
+        ],
+        "conditions": [
+          "Installed web bundle; static inspection."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "AlgoWizard handles Ctrl+Z for undo and Ctrl+Y for redo when the corresponding operation is available and history is not processing.",
+        "confidence": "high",
+        "limitations": [
+          "Static component inspection does not establish complete runtime parity or backend behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/AlgoWizard/assets/index-DgPZlMMb.js",
+          "location": {
+            "section": null,
+            "symbol": "EditorHeader",
+            "line_range": "48838",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Component start; inspect the named computed property or handler."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e7c38ed0532af215340d06b4bdc2784d6a4f5fc76d302e19395e5d8c5e42b642"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-ALGOWIZARD_EDITORS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/AlgoWizard/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the named component in the fingerprinted installed JavaScript bundle.",
+        "expected_observation": "AlgoWizard handles Ctrl+Z for undo and Ctrl+Y for redo when the corresponding operation is available and history is not processing.",
+        "actual_observation": "The mounted keyup handler checks Ctrl, KeyZ/KeyY and history availability before dispatch.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-DgPZlMMb.js"
+        ],
+        "executed_at": "2026-09-25T11:26:33.359360Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "4a3a76593dc2039c9b4c27eb1451fb97be5883f5",
+        "created_at": "2026-09-25T11:26:33.359360Z",
+        "updated_at": "2026-09-25T11:26:33.359360Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "algowizard",
+        "static-inspection"
+      ]
+    },
+    "SQX144-EV-000050": {
+      "topic": "ui.algowizard.simple.panels",
+      "title": "Simple editor has two action panels",
+      "question": "Simple editor has two action panels?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard"
+        ],
+        "conditions": [
+          "Installed web bundle; static inspection."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Simple editor renders separate Buy and Sell short action panels.",
+        "confidence": "high",
+        "limitations": [
+          "Static component inspection does not establish complete runtime parity or backend behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/AlgoWizard/assets/index-DgPZlMMb.js",
+          "location": {
+            "section": null,
+            "symbol": "SimpleWizardPanel / SimpleWizardActionPanel",
+            "line_range": "70355",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Component start; inspect the named computed property or handler."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e7c38ed0532af215340d06b4bdc2784d6a4f5fc76d302e19395e5d8c5e42b642"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-ALGOWIZARD_EDITORS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/AlgoWizard/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the named component in the fingerprinted installed JavaScript bundle.",
+        "expected_observation": "The Simple editor renders separate Buy and Sell short action panels.",
+        "actual_observation": "The panel instantiates BUY and SELL child panels with the respective visible titles.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-DgPZlMMb.js"
+        ],
+        "executed_at": "2026-09-25T11:26:33.359360Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "4a3a76593dc2039c9b4c27eb1451fb97be5883f5",
+        "created_at": "2026-09-25T11:26:33.359360Z",
+        "updated_at": "2026-09-25T11:26:33.359360Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "algowizard",
+        "static-inspection"
+      ]
+    },
+    "SQX144-EV-000051": {
+      "topic": "ui.algowizard.settings.tab_inventory",
+      "title": "Settings tabs depend on editor mode",
+      "question": "Settings tabs depend on editor mode?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard"
+        ],
+        "conditions": [
+          "Installed web bundle; static inspection."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Settings lists Data, Trading options, ATM, Money management and Advanced; picker mode filters out ATM.",
+        "confidence": "high",
+        "limitations": [
+          "Static component inspection does not establish complete runtime parity or backend behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/AlgoWizard/assets/index-DgPZlMMb.js",
+          "location": {
+            "section": null,
+            "symbol": "SettingsPopup",
+            "line_range": "65218",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Component start; inspect the named computed property or handler."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e7c38ed0532af215340d06b4bdc2784d6a4f5fc76d302e19395e5d8c5e42b642"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-ALGOWIZARD_SETTINGS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/AlgoWizard/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the named component in the fingerprinted installed JavaScript bundle.",
+        "expected_observation": "Settings lists Data, Trading options, ATM, Money management and Advanced; picker mode filters out ATM.",
+        "actual_observation": "The declared tab array contains these five entries; its computed filter excludes ATM for PICKER.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-DgPZlMMb.js"
+        ],
+        "executed_at": "2026-09-25T11:26:33.359360Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "4a3a76593dc2039c9b4c27eb1451fb97be5883f5",
+        "created_at": "2026-09-25T11:26:33.359360Z",
+        "updated_at": "2026-09-25T11:26:33.359360Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "algowizard",
+        "static-inspection"
+      ]
+    },
+    "SQX144-EV-000052": {
+      "topic": "ui.algowizard.picker.tabs",
+      "title": "Picker tabs depend on single-asset mode",
+      "question": "Picker tabs depend on single-asset mode?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard"
+        ],
+        "conditions": [
+          "Installed web bundle; static inspection."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The picker editor offers Long and Short tabs and adds Position score only when the strategy is not single-asset.",
+        "confidence": "high",
+        "limitations": [
+          "Static component inspection does not establish complete runtime parity or backend behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/AlgoWizard/assets/index-DgPZlMMb.js",
+          "location": {
+            "section": null,
+            "symbol": "PickerEditor",
+            "line_range": "74392",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Component start; inspect the named computed property or handler."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e7c38ed0532af215340d06b4bdc2784d6a4f5fc76d302e19395e5d8c5e42b642"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-ALGOWIZARD_EDITORS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/AlgoWizard/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the named component in the fingerprinted installed JavaScript bundle.",
+        "expected_observation": "The picker editor offers Long and Short tabs and adds Position score only when the strategy is not single-asset.",
+        "actual_observation": "The computed tab list begins with Long and Short and conditionally appends Position score.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-DgPZlMMb.js"
+        ],
+        "executed_at": "2026-09-25T11:26:33.359360Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "4a3a76593dc2039c9b4c27eb1451fb97be5883f5",
+        "created_at": "2026-09-25T11:26:33.359360Z",
+        "updated_at": "2026-09-25T11:26:33.359360Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "algowizard",
+        "static-inspection"
+      ]
+    },
+    "SQX144-EV-000053": {
+      "topic": "ui.algowizard.rules.type_choices",
+      "title": "New-rule dialog offers five types",
+      "question": "New-rule dialog offers five types?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard"
+        ],
+        "conditions": [
+          "Installed web bundle; static inspection."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The new-rule dialog offers If - Then, If - Then - Else, Action only, Signals and Fuzzy Logic Signals.",
+        "confidence": "high",
+        "limitations": [
+          "Static component inspection does not establish complete runtime parity or backend behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/AlgoWizard/assets/index-DgPZlMMb.js",
+          "location": {
+            "section": null,
+            "symbol": "NewRuleModal",
+            "line_range": "70501",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Component start; inspect the named computed property or handler."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e7c38ed0532af215340d06b4bdc2784d6a4f5fc76d302e19395e5d8c5e42b642"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-ALGOWIZARD_EDITORS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/AlgoWizard/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the named component in the fingerprinted installed JavaScript bundle.",
+        "expected_observation": "The new-rule dialog offers If - Then, If - Then - Else, Action only, Signals and Fuzzy Logic Signals.",
+        "actual_observation": "The ruleTypeOptions array declares these five labels.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-DgPZlMMb.js"
+        ],
+        "executed_at": "2026-09-25T11:26:33.359360Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "4a3a76593dc2039c9b4c27eb1451fb97be5883f5",
+        "created_at": "2026-09-25T11:26:33.359360Z",
+        "updated_at": "2026-09-25T11:26:33.359360Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "algowizard",
+        "static-inspection"
+      ]
+    },
+    "SQX144-EV-000054": {
+      "topic": "ui.algowizard.charts.unique_settings",
+      "title": "Chart save checks unique settings",
+      "question": "Chart save checks unique settings?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "AlgoWizard"
+        ],
+        "conditions": [
+          "Installed web bundle; static inspection."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "Saving multiple-chart configuration checks uniqueness and shows an error instead of proceeding when the check fails.",
+        "confidence": "high",
+        "limitations": [
+          "Static component inspection does not establish complete runtime parity or backend behavior."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/AlgoWizard/assets/index-DgPZlMMb.js",
+          "location": {
+            "section": null,
+            "symbol": "ConfigureMultiChartsModal",
+            "line_range": "60312",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Component start; inspect the named computed property or handler."
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "e7c38ed0532af215340d06b4bdc2784d6a4f5fc76d302e19395e5d8c5e42b642"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-ALGOWIZARD_SETTINGS"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/ui/src/workspace/AlgoWizard/README.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the named component in the fingerprinted installed JavaScript bundle.",
+        "expected_observation": "Saving multiple-chart configuration checks uniqueness and shows an error instead of proceeding when the check fails.",
+        "actual_observation": "The saveChanges handler returns after setting showError when checkChartsUnique fails.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-DgPZlMMb.js"
+        ],
+        "executed_at": "2026-09-25T11:26:33.359360Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "4a3a76593dc2039c9b4c27eb1451fb97be5883f5",
+        "created_at": "2026-09-25T11:26:33.359360Z",
+        "updated_at": "2026-09-25T11:26:33.359360Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased UI observations only; no vendor source copied."
+      },
+      "tags": [
+        "ui",
+        "algowizard",
+        "static-inspection"
+      ]
     }
   }
 }
