@@ -134,6 +134,20 @@
       "scope": "Owner decisions, laws, and feature registries referenced by target mappings",
       "confidence": "high",
       "limitations": []
+    },
+    "E-L08": {
+      "title": "SQX per-product web apps and shared web libraries",
+      "kind": "local_directory",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/web/BUILDER/",
+        "internal/web/libs/Batch3/"
+      ],
+      "scope": "Per-product web application layouts and shared web component libraries (Builder split layout, sq-splitter) of the installed build",
+      "confidence": "high",
+      "limitations": [
+        "Concatenated bundles under internal/web/common/Batch*/ were cross-checked against the standalone copies under internal/web/libs/; runtime rendering was not driven during inspection."
+      ]
     }
   },
   "records": {
@@ -2463,6 +2477,445 @@
         "extension",
         "indicator",
         "code_export"
+      ]
+    },
+    "SQX144-EV-000025": {
+      "topic": "ui.builder.databanks_splitter.states",
+      "title": "Builder databanks pane is a three-state splitter starting collapsed",
+      "question": "How does the Builder workspace show, hide, and resize its databanks pane?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "databanks",
+          "layout"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The Builder app layout mounts a two-pane vertical splitter below the workspace dashboard; a small splitter script toggles the lower databanks pane between a collapsed single-bar state, an expanded split state with a 100px minimum pane height, and a maximised state that collapses the workspace pane to zero height. The initial state is collapsed, the state is not persisted across loads, and every toggle or resize dispatches a window resize event.",
+        "confidence": "high",
+        "limitations": [
+          "Static inspection of the installed build; the running donor app was not driven during this task.",
+          "Sibling product apps appear to reuse the same splitter, but only the Builder app was inspected."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/BUILDER/layout/views/layout.html",
+          "location": {
+            "section": "top-level split container",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "two children: dashboard component, databanks component"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "2a8766947930f143bdbf445c5990732b1a67d0f9d1575904bef6626ef572e103"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/libs/Batch3/js/sq-splitter.js",
+          "location": {
+            "section": null,
+            "symbol": "sqSplitter",
+            "line_range": "1-77",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "16bf7cecb95fd89233f7f0236da65dbc611425b49798ac67dc7b429f6209a1ae"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/common/Batch3/libs.js",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "1540-1595",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "bundled copy of sqSplitter; identical toggle and drag logic"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "1d259b32b356369317d50a07b711ac9a3e91c2b57baf5bc0e4fa399f2e6c0182"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK_BUILDER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the sqSplitter implementation in the standalone shared library and in the bundled Batch3 copy, and read the Builder layout view that mounts it.",
+        "expected_observation": "A two-child splitter with class-driven collapsed/active/maximised states, collapsed initial state, no persistence, and a window resize dispatch on state change and drag end.",
+        "actual_observation": "Observed exactly that: the opened flag starts false; the opener control toggles an active class; the maximiser adds and the normaliser removes a maximised class that zeroes the first pane height; mouse drag sets the first pane height in pixels from the pointer position; a resize event is dispatched on every change.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/BUILDER/layout/views/layout.html",
+          "SQX_REFERENCE_ROOT/internal/web/libs/Batch3/js/sq-splitter.js",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch3/libs.js"
+        ],
+        "executed_at": "2026-09-25T05:05:50.028Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "dd05456",
+        "created_at": "2026-09-25T05:05:50.028Z",
+        "updated_at": "2026-09-25T05:05:50.028Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, geometry, and behavior only; no source text or image assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "databanks",
+        "splitter",
+        "layout"
+      ]
+    },
+    "SQX144-EV-000026": {
+      "topic": "ui.builder.databanks_header.collapsed_bar",
+      "title": "Collapsed databanks bar shows bank and strategy counts with dead click handler",
+      "question": "What does the Builder databanks pane look like when collapsed, and where do its counts come from?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "databanks",
+          "header"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "When collapsed, the databanks pane renders only a roughly 19px full-width bar: light-blue background, darker blue top border, centered 11px black text pairing a databank count on the right-aligned left half and a strategy-record count on the left-aligned right half, each padded 30px from center. The counts come from the databanks controller: the bank count is computed from visible bank tabs and the record count is updated from live project engine statistics. The bar markup carries a click handler referencing a function that is not defined in any installed script, so the bar text itself has no observable click behavior; the working toggle is the splitter chevron control.",
+        "confidence": "high",
+        "limitations": [
+          "Geometry and colors are CSS constants from the installed stylesheets; rendered pixels and hover states were not verified on the live app.",
+          "Count semantics (visible banks versus all banks) depend on runtime display flags not exercised in this inspection."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ProjectDatabanks/views/databanks.html",
+          "location": {
+            "section": "sqn-databanks-header",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "two count spans plus click handler"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "c5fcf2668bb1961359c709d68178b56307a683665d2f5b0e9a28368acac6ea95"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L05",
+          "artifact_locator": "internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
+          "location": {
+            "section": null,
+            "symbol": "getDatabanksCount",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "visible-tab count computation and engine record-count updates"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9c5d0eb2c98f12a0804d2c37cea2069902b340d0e564fa383b1b68b95c071cd0"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/common/Batch3/styles.css",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": "794-870",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": ".sqn-databanks and .sqn-databanks-header rules"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "19f042b8ea0d0778f52bb5b0d2515a6b26c8eefb2cf727bcbb467111080a2380"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/ (recursive text search)",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "no definition of the header click handler function exists in any bundled script"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": null,
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK_BUILDER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the databanks header template and controller, the collapsed-bar style rules, and recursively search all installed web scripts for the header click handler function.",
+        "expected_observation": "A two-label count bar with defined geometry and colors, controller-computed counts, and either a defined or absent click handler.",
+        "actual_observation": "Observed the count bar template, visible-tab count function, engine-fed record count updates, the collapsed-bar style block, and zero definitions of the referenced handler function across the installed scripts.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databanks.html",
+          "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
+          "SQX_REFERENCE_ROOT/internal/web/common/Batch3/styles.css"
+        ],
+        "executed_at": "2026-09-25T05:05:50.028Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "dd05456",
+        "created_at": "2026-09-25T05:05:50.028Z",
+        "updated_at": "2026-09-25T05:05:50.028Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, geometry, and behavior only; no source text or image assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "databanks",
+        "header",
+        "collapsed"
+      ]
+    },
+    "SQX144-EV-000027": {
+      "topic": "ui.builder.databanks_splitter.controls",
+      "title": "Databanks splitter exposes chevron opener, drag resizer, and maximiser cluster",
+      "question": "Which controls resize or maximize the Builder databanks pane, and what do they look like?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Builder",
+          "databanks",
+          "splitter"
+        ],
+        "conditions": [
+          "installed build; static inspection"
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "In the expanded state the databanks pane shows a centered 200px-wide cluster of small grayscale controls pinned to its top edge: a maximiser chevron, a drag resizer handle, and a collapse chevron, each about 30x9 px. Dragging the resizer sets the workspace pane height to the pointer vertical position minus the splitter top offset. The maximised state hides all three and shows only a restore chevron. In the collapsed bar the opener chevron points up (31x11 px); when expanded the collapse chevron points down.",
+        "confidence": "high",
+        "limitations": [
+          "Icon shapes and colors come from pixel-level inspection of the installed PNG assets at native size; hover and active visuals were not inspected.",
+          "The drag path has no explicit clamps beyond flexbox minimums; zoom-factor compensation exists for app zoom but was not exercised."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/libs/Batch3/styles/sq-splitter.css",
+          "location": {
+            "section": ".resizer-container rules",
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": null
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "373f9edbe184b4b6303e8a40d88092bb299550f9ed7400d214521d24f0b2fd5d"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/libs/Batch3/js/sq-splitter.js",
+          "location": {
+            "section": null,
+            "symbol": "sqSplitter",
+            "line_range": "23-74",
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "drag formula and control listeners"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "16bf7cecb95fd89233f7f0236da65dbc611425b49798ac67dc7b429f6209a1ae"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/img/databank-opener-open.png",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "pixel-level dump: upward chevron, 31x11, grayscale edges and fills"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "02c8320e2cf81af42f82a7327db4d54b62d59044d3e235ebceef62494914cacd"
+          },
+          "accessed_at": "2026-09-25"
+        },
+        {
+          "catalog_id": "E-L08",
+          "artifact_locator": "internal/web/img/databank-opener-close.png",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "pixel-level dump: downward chevron, 30x9, grayscale"
+          },
+          "inspection_method": "static_text",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9d53a89f07e0245642911f9bc2897fe5d6d3c0616455eadab31bb950c341dc85"
+          },
+          "accessed_at": "2026-09-25"
+        }
+      ],
+      "target_mapping": {
+        "domain": "ui",
+        "feature_ids": [
+          "FEAT-UI-DATABANK_BUILDER"
+        ],
+        "requirement_ids": [],
+        "decision_ids": [],
+        "documentation_targets": [
+          "docs/PROJECT.md",
+          "docs/ARCHITECTURE.md"
+        ]
+      },
+      "validation": {
+        "state": "passed",
+        "procedure": "Read the splitter control style rules and listeners, and pixel-dump the opener and divider PNG assets at native size.",
+        "expected_observation": "A per-state control cluster with defined geometry, a drag formula tied to pointer position, and chevron icons with known pixel shapes.",
+        "actual_observation": "Observed the 200px centered cluster with maximiser, resizer, opener, and normalizer visibility governed by state classes; the drag listener setting pane height from pointer position; and the up-chevron, down-chevron, and two-bar handle pixel shapes in the installed assets.",
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/web/libs/Batch3/styles/sq-splitter.css",
+          "SQX_REFERENCE_ROOT/internal/web/libs/Batch3/js/sq-splitter.js",
+          "SQX_REFERENCE_ROOT/internal/web/img/databank-opener-open.png",
+          "SQX_REFERENCE_ROOT/internal/web/img/databank-opener-close.png"
+        ],
+        "executed_at": "2026-09-25T05:05:50.028Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "dd05456",
+        "created_at": "2026-09-25T05:05:50.028Z",
+        "updated_at": "2026-09-25T05:05:50.028Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased structure, geometry, and behavior only; no source text or image assets reproduced."
+      },
+      "tags": [
+        "builder",
+        "databanks",
+        "splitter",
+        "controls",
+        "icons"
       ]
     }
   }

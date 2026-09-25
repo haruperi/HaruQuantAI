@@ -4,7 +4,7 @@ import { Activity, Bell, BrainCircuit, BriefcaseBusiness, ChartNoAxesCombined, C
 import type { ModuleId } from './types';
 import { useAppStore } from './store';
 import { getPathForModule, useRouteSync } from './router';
-import { DatabankPanel } from '../plugins/databank/ProjectDatabanks/DatabankPanel';
+import { DatabankSplitter } from '../plugins/databank/ProjectDatabanks/DatabankSplitter';
 import { HomeScreen } from '../workspace/Home/HomeScreen';
 import { DataManager } from '../workspace/DataManager/DataManager';
 import { BuilderWorkspace } from '../workspace/Builder/BuilderWorkspace';
@@ -98,8 +98,9 @@ function AppShell() {
       </aside>
 
       <main className="app-main">
-        <div className="module-area">
-          <Routes>
+        <DatabankSplitter showBank={showBank}>
+          <div className="module-area">
+            <Routes>
             <Route path="/" element={<HomeScreen />} />
             <Route path="/home" element={<HomeScreen />} />
             <Route path="/datamanager" element={<DataManager />} />
@@ -120,12 +121,8 @@ function AppShell() {
             <Route path="/gridtest" element={<GridTestWorkspace />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
-        </div>
-        {showBank && (
-          <div className="databank-resize">
-            <DatabankPanel />
           </div>
-        )}
+        </DatabankSplitter>
       </main>
 
       <footer className="statusbar">
