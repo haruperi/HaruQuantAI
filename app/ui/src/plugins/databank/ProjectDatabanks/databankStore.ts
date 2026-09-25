@@ -5,8 +5,10 @@ import {
   type DatabankViewColumn,
 } from './databankColumns';
 
-const STORAGE_KEY_VIEWS = 'sqx-databank-views-v1';
-const STORAGE_KEY_ACTIVE = 'sqx-databank-active-view-id';
+// v2: default preset renamed to the donor view name and reordered (UI-BUILDER-DATABANK-003);
+// bumping the key discards stale v1 presets that lack the new default view.
+const STORAGE_KEY_VIEWS = 'sqx-databank-views-v2';
+const STORAGE_KEY_ACTIVE = 'sqx-databank-active-view-id-v2';
 
 function safeGetItem(key: string): string | null {
   try {

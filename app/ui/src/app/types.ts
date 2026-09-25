@@ -4,6 +4,7 @@ export type ModuleId =
   | 'retester'
   | 'optimizer'
   | 'datamanager'
+  | 'chart'
   | 'algowizard'
   | 'portfolio'
   | 'composer'

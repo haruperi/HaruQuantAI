@@ -8,10 +8,11 @@ describe('HaruQuantAI React Router & Path Routing', () => {
     useAppStore.getState().reset();
   });
 
-  it('maps all 17 workspaces and utility modules to canonical URL paths', () => {
+  it('maps all 18 workspaces and utility modules to canonical URL paths', () => {
     const expectedModules: ModuleId[] = [
       'home',
       'datamanager',
+      'chart',
       'business',
       'builder',
       'algowizard',
@@ -37,6 +38,7 @@ describe('HaruQuantAI React Router & Path Routing', () => {
 
     expect(MODULE_ROUTES.home).toBe('/');
     expect(MODULE_ROUTES.datamanager).toBe('/datamanager');
+    expect(getPathForModule('chart')).toBe('/chart');
     expect(MODULE_ROUTES.builder).toBe('/builder');
     expect(MODULE_ROUTES.codeeditor).toBe('/codeeditor');
     expect(MODULE_ROUTES.business).toBe('/business');
@@ -48,6 +50,8 @@ describe('HaruQuantAI React Router & Path Routing', () => {
     expect(getModuleFromPath('/home')).toBe('home');
     expect(getModuleFromPath('/datamanager')).toBe('datamanager');
     expect(getModuleFromPath('/datamanager/')).toBe('datamanager');
+    expect(getModuleFromPath('/chart')).toBe('chart');
+    expect(getModuleFromPath('/chart/')).toBe('chart');
     expect(getModuleFromPath('/builder')).toBe('builder');
     expect(getModuleFromPath('/portfolio')).toBe('portfolio');
     expect(getModuleFromPath('/codeeditor')).toBe('codeeditor');

@@ -22,6 +22,8 @@ interface StrategyTableProps {
   selectedRows: string[];
   onSelect: (id: string) => void;
   onRows: (ids: string[]) => void;
+  /** Double-click activation (donor: opens the strategy result). */
+  onActivate?: (id: string) => void;
   activeView: DatabankView;
 }
 
@@ -72,6 +74,7 @@ export function StrategyTable({
   selectedRows,
   onSelect,
   onRows,
+  onActivate,
   activeView,
 }: StrategyTableProps) {
   const [sorting, setSorting] = useState<SortingState>([{ id: 'netProfit', desc: true }]);
@@ -132,7 +135,7 @@ export function StrategyTable({
           },
           {
             id: metric.id,
-            header: metric.name,
+            header: metric.name + (metric.displaySuffix ?? ''),
             size: viewCol.width || metric.defaultWidth,
             cell: cellProps => {
               const val = cellProps.getValue();
@@ -209,7 +212,7 @@ export function StrategyTable({
   });
 
   return (
-    <div className="data-grid" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="data-grid sqx-grid" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div className="grid-header" style={{ display: 'flex', flexShrink: 0 }}>
         {table.getHeaderGroups().map(group =>
           group.headers.map(header => (
@@ -260,7 +263,7 @@ export function StrategyTable({
                   height: 30,
                 }}
                 onClick={() => onSelect(row.original.id)}
-                onDoubleClick={() => onSelect(row.original.id)}
+                onDoubleClick={() => onActivate?.(row.original.id)}
               >
                 {row.getVisibleCells().map(cell => (
                   <div

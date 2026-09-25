@@ -16,9 +16,11 @@ function buildStrategy(index: number, bankId: string): Strategy {
   return { id, name: `Strategy ${String(index + 1).padStart(3, '0')}`, symbol: index % 3 === 0 ? 'EURUSD' : index % 3 === 1 ? 'GBPJPY' : 'XAUUSD', timeframe: index % 2 ? 'H1' : 'M30', direction: 'Both', bankId, revision: 1, note: index % 5 === 0 ? 'Promising OOS stability' : '', parameters: { FastPeriod: 12 + index % 9, SlowPeriod: 28 + index % 15, ATRPeriod: 14, StopLoss: 90 + index * 2 }, trades, equity, metrics: { netProfit: Math.round((balance - 100000) * 100) / 100, trades: count, profitFactor: Math.round(wins / Math.max(loss, 1) * 100) / 100, maxDrawdown: Math.round(maxDrawdown * 100) / 100, sharpe: Math.round((.72 + random() * 1.8) * 100) / 100, stability: Math.round((65 + random() * 30) * 10) / 10 } };
 }
 
+// Bank display names follow the installed donor Builder project's three
+// databanks (UI-BUILDER-DATABANK-003 iteration 2; ids and membership unchanged).
 export const databanks: Databank[] = [
   { id: 'results', name: 'Results', strategyIds: Array.from({ length: 40 }, (_, i) => `str-${i + 1}`) },
-  { id: 'retest', name: 'Retest candidates', strategyIds: Array.from({ length: 18 }, (_, i) => `str-${i + 41}`) },
-  { id: 'portfolio', name: 'Portfolio candidates', strategyIds: Array.from({ length: 12 }, (_, i) => `str-${i + 59}`) },
+  { id: 'retest', name: 'Last generation', strategyIds: Array.from({ length: 18 }, (_, i) => `str-${i + 41}`) },
+  { id: 'portfolio', name: 'Existing portfolio', strategyIds: Array.from({ length: 12 }, (_, i) => `str-${i + 59}`) },
 ];
 export const strategies: Strategy[] = Array.from({ length: 70 }, (_, i) => buildStrategy(i, i < 40 ? 'results' : i < 58 ? 'retest' : 'portfolio'));

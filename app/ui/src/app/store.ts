@@ -363,6 +363,12 @@ export const useAppStore = create<AppState>()(persist((set) => ({
   merge: (persisted, current) => {
     const saved = persisted as Partial<AppState>;
     const savedModule = (saved as { module?: unknown }).module;
-    return { ...current, ...saved, module: savedModule === 'improver' ? 'builder' : saved.module ?? current.module, settings: mergeAppSettings() };
+    return {
+      ...current,
+      ...saved,
+      builder: { ...current.builder, ...saved.builder },
+      module: savedModule === 'improver' ? 'builder' : saved.module ?? current.module,
+      settings: mergeAppSettings(),
+    };
   },
 }));

@@ -25,6 +25,8 @@ export interface ColumnDefinition {
   decimals?: number;
   defaultWidth: number;
   align: 'left' | 'right' | 'center';
+  /** Donor-parity header suffix, e.g. " (IS)" for in-sample-scoped columns. */
+  displaySuffix?: string;
   calculate: (strategy: Strategy) => string | number | number[];
 }
 
@@ -122,6 +124,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     description: 'Traded underlying asset or ticker',
     format: 'text',
     defaultWidth: 90,
+    displaySuffix: ' (IS)',
     align: 'center',
     calculate: s => s.symbol,
   },
@@ -132,6 +135,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     description: 'Bar period timeframe (e.g. M15, H1, D1)',
     format: 'text',
     defaultWidth: 70,
+    displaySuffix: ' (IS)',
     align: 'center',
     calculate: s => s.timeframe,
   },
@@ -206,6 +210,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     format: 'currency',
     decimals: 2,
     defaultWidth: 110,
+    displaySuffix: ' (IS)',
     align: 'right',
     calculate: s => s.metrics.netProfit,
   },
@@ -320,6 +325,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     format: 'currency',
     decimals: 2,
     defaultWidth: 95,
+    displaySuffix: ' (IS)',
     align: 'right',
     calculate: s => {
       const wins = getWins(s);
@@ -334,6 +340,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     format: 'currency',
     decimals: 2,
     defaultWidth: 95,
+    displaySuffix: ' (IS)',
     align: 'right',
     calculate: s => {
       const losses = getLosses(s);
@@ -400,6 +407,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     format: 'currency',
     decimals: 2,
     defaultWidth: 100,
+    displaySuffix: ' (IS)',
     align: 'right',
     calculate: s => s.metrics.maxDrawdown,
   },
@@ -736,6 +744,7 @@ export const DATABANK_COLUMNS: ColumnDefinition[] = [
     format: 'percent',
     decimals: 0,
     defaultWidth: 85,
+    displaySuffix: ' (IS)',
     align: 'right',
     calculate: s => s.metrics.stability,
   },
@@ -1342,31 +1351,31 @@ export const DATABANK_METRIC_COLUMNS = DATABANK_COLUMNS;
 export const DEFAULT_VIEW_PRESETS: DatabankView[] = [
   {
     id: 'default-main',
-    name: 'Default - Main data - Full sample',
+    name: 'Default - Main data',
     isDefault: true,
+    // Donor "Default - Main data" view column order (SQX144-EV-000031):
+    // pinned Strategy Name first, then the saved view's metric columns.
     columns: [
-      { columnId: 'fitness', width: 75 },
+      { columnId: 'name', width: 175 },
+      { columnId: 'fitness', width: 70 },
       { columnId: 'symbol', width: 85 },
-      { columnId: 'timeframe', width: 65 },
+      { columnId: 'timeframe', width: 75 },
       { columnId: 'netProfit', width: 105 },
       { columnId: 'miniEquity', width: 110 },
-      { columnId: 'trades', width: 80 },
-      { columnId: 'profitFactor', width: 90 },
+      { columnId: 'trades', width: 70 },
+      { columnId: 'profitFactor', width: 85 },
       { columnId: 'sharpeRatio', width: 90 },
       { columnId: 'expectedPayoff', width: 95 },
-      { columnId: 'cagr', width: 105 },
+      { columnId: 'cagr', width: 100 },
       { columnId: 'stability', width: 80 },
       { columnId: 'symmetry', width: 80 },
       { columnId: 'drawdown', width: 95 },
       { columnId: 'winLossRatio', width: 95 },
-      { columnId: 'returnDDRatio', width: 95 },
-      { columnId: 'cagrDDRatio', width: 105 },
+      { columnId: 'returnDDRatio', width: 90 },
+      { columnId: 'cagrDDRatio', width: 100 },
       { columnId: 'avgWin', width: 90 },
       { columnId: 'avgLoss', width: 90 },
       { columnId: 'avgBarsWin', width: 90 },
-      { columnId: 'avgBarsLoss', width: 90 },
-      { columnId: 'avgBarsInTrade', width: 95 },
-      { columnId: 'exposure', width: 80 },
     ],
   },
   {
