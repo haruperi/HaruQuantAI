@@ -221,3 +221,90 @@ export interface BatchExecutionResult {
   issues: ValidationIssue[];
   elapsed_seconds: number;
 }
+
+
+/** Backend-owned boot outcomes; unavailable contributions never count as successful. */
+export interface BootStage {
+  stage: string;
+  label: string;
+  outcome: 'pending' | 'running' | 'succeeded' | 'unavailable' | 'failed' | 'cancelled';
+  reason: string;
+  elapsed_ms: number;
+}
+export interface BootSnapshot {
+  state: string;
+  sequence: number;
+  stages: BootStage[];
+}
+export interface InitializationData {
+  settings: unknown;
+  boot: BootSnapshot;
+  first_run: boolean;
+  requirements: string[];
+  catalog: { domains: unknown[]; issues: unknown[] };
+}
+export interface BootStream {
+  ready: Promise<void>;
+  close: () => void;
+}
+
+/** Authenticate in the first frame so bearer tokens never enter URLs or logs. */
+export function connectBootStream(
+  signal: AbortSignal,
+  onSnapshot: (snapshot: BootSnapshot) => void,
+  onFailure: (message: string) => void,
+  socketFactory: (url: string) => WebSocket = url => new WebSocket(url),
+): BootStream {
+  const base = new URL(hostBaseUrl(), typeof window === 'undefined' ? 'http://localhost' : window.location.href);
+  base.protocol = base.protocol === 'https:' ? 'wss:' : 'ws:';
+  base.pathname = '/ws/updates';
+  const socket = socketFactory(base.toString());
+  let current: BootSnapshot | null = null;
+  let intentional = false;
+  let settled = false;
+  let resolveReady: () => void;
+  let rejectReady: (error: Error) => void;
+  const ready = new Promise<void>((resolve, reject) => { resolveReady = resolve; rejectReady = reject; });
+  const timer = setTimeout(() => fail('Host handshake timed out'), 10000);
+  const heartbeat = setInterval(() => { if (socket.readyState === 1) socket.send(JSON.stringify({ type: 'ping' })); }, 10000);
+  const close = () => {
+    intentional = true;
+    clearTimeout(timer);
+    clearInterval(heartbeat);
+    signal.removeEventListener('abort', close);
+    socket.close();
+    if (!settled) { settled = true; rejectReady(new Error('Host connection cancelled')); }
+  };
+  const fail = (message: string) => {
+    if (intentional) return;
+    if (!settled) { settled = true; rejectReady(new Error(message)); }
+    onFailure(message);
+    close();
+  };
+  socket.onopen = () => socket.send(JSON.stringify({ token: getAuthToken(), topics: ['boot.progress'] }));
+  socket.onmessage = event => {
+    try {
+      const payload = JSON.parse(String(event.data));
+      if (payload.type === 'resync_required') { fail('Host progress overflow; reconnect'); return; }
+      if (payload.type === 'snapshot') {
+        if (!payload.boot || !Array.isArray(payload.boot.stages)) throw new Error('Invalid boot snapshot');
+        current = payload.boot as BootSnapshot;
+        onSnapshot(current);
+        clearTimeout(timer);
+        settled = true;
+        resolveReady();
+      } else if (payload.channel === 'boot.progress' && current) {
+        current = { ...current, sequence: payload.sequence, stages: current.stages.map(stage => stage.stage === payload.data.stage ? payload.data : stage) };
+        onSnapshot(current);
+      } else if (payload.type === 'heartbeat' && current) {
+        current = { ...current, state: payload.state };
+        onSnapshot(current);
+      }
+    } catch { fail('Invalid host progress response'); }
+  };
+  socket.onerror = () => fail('Host progress connection failed');
+  socket.onclose = () => fail('Host progress connection closed');
+  signal.addEventListener('abort', close, { once: true });
+  if (signal.aborted) close();
+  return { ready, close };
+}

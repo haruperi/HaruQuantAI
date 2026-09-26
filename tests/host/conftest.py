@@ -1,54 +1,48 @@
-"""Shared fixtures for the host test suite."""
+"""Isolated host fixtures; no test opens the shared application database."""
 
-import logging
 from collections.abc import Iterator
 from pathlib import Path
 
 import pytest
-from app.host.bootstrapper import HostConfig, build_services
-from app.host.webserver import HostServices, create_app
+from app.host.bootstrap import BootstrapCoordinator
+from app.host.config import HostSettings
+from app.host.http_server import create_app
 from starlette.testclient import TestClient
 
 
-def make_config(tmp_path: Path) -> HostConfig:
-    """Build an isolated host configuration rooted in ``tmp_path``."""
-    return HostConfig(
-        address="127.0.0.1",
-        port=8000,
-        log_dir=tmp_path / "logs",
-        password=None,
-        database_path=tmp_path / "database" / "haruquantai.db",
-        exchange_root=tmp_path / "exchange",
-        domain_roots=(tmp_path / "domains",),
-        ui_dist=None,
+def make_config(tmp_path: Path) -> HostSettings:
+    return HostSettings(
+        data_dir=tmp_path,
+        roots=(tmp_path / "contributions",),
+        ui_dist=tmp_path / "dist",
     )
 
 
 @pytest.fixture
-def host_config(tmp_path: Path) -> HostConfig:
+def host_config(tmp_path: Path) -> HostSettings:
     return make_config(tmp_path)
 
 
 @pytest.fixture
-def settings_path(tmp_path: Path) -> Path:
-    return tmp_path / "database" / "haruquantai.db"
+def services(host_config: HostSettings) -> BootstrapCoordinator:
+    return BootstrapCoordinator(host_config)
 
 
 @pytest.fixture
-def services(host_config: HostConfig) -> HostServices:
-    return build_services(host_config)
+def settings_path(host_config: HostSettings) -> Path:
+    return host_config.database_path
 
 
 @pytest.fixture
-def client(services: HostServices) -> Iterator[TestClient]:
-    app = create_app(services, logging.getLogger("tests.host"))
-    with TestClient(app) as test_client:
+def client(services: BootstrapCoordinator) -> Iterator[TestClient]:
+    with TestClient(
+        create_app(services), base_url="http://127.0.0.1", client=("127.0.0.1", 50000)
+    ) as test_client:
         yield test_client
 
 
 @pytest.fixture
 def auth_headers(client: TestClient) -> dict[str, str]:
-    response = client.post("/api/v1/auth/login", json={"username": "tester"})
-    assert response.status_code == 200
-    token = response.json()["data"]["token"]
-    return {"Authorization": f"Bearer {token}"}
+    result = client.post("/api/v1/auth/login", json={"username": "operator"})
+    assert result.status_code == 200
+    return {"Authorization": "Bearer " + result.json()["data"]["token"]}

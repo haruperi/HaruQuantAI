@@ -260,7 +260,7 @@ def test_invalid_configuration_has_no_file_effect(tmp_path: Path) -> None:
 
 def test_import_does_not_install_handlers_or_create_files(tmp_path: Path) -> None:
     code = (
-        "import logging; import app.host.telemetry; "
+        "import logging; import app.host.logging; "
         "assert not logging.getLogger('app').handlers; "
         "assert not logging.getLogger('haruquantai').handlers"
     )
@@ -298,7 +298,7 @@ def test_get_logger_resolves_host_hierarchy() -> None:
     assert child.propagate is True
 
 
-def test_get_logger_lazily_configures_console_on_emission(
+def test_get_logger_does_not_implicitly_configure_console(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     stream = io.StringIO()
@@ -307,5 +307,24 @@ def test_get_logger_lazily_configures_console_on_emission(
     root = logging.getLogger("app")
     assert not root.handlers
     logger.info("lazy message")
-    assert root.handlers
-    assert "lazy message" in stream.getvalue()
+    assert not root.handlers
+    assert "lazy message" not in stream.getvalue()
+
+
+def test_early_boot_records_and_uvicorn_are_forwarded(tmp_path: Path) -> None:
+    from app.host.logging import close_host_logging, configure_boot_logging
+
+    close_host_logging()
+    configure_boot_logging()
+    get_logger("app.main").info("B02 early configuration")
+    configure_host_logging(tmp_path, include_console=False)
+    logging.getLogger("uvicorn.error").warning("server diagnostic")
+    close_host_logging()
+    text = host_log_path(tmp_path).read_text()
+    assert "B02 early configuration" in text
+    assert "server diagnostic" in text
+    assert not logging.getLogger("app").handlers
+    assert not any(
+        getattr(handler, "_host_telemetry_owned", False)
+        for handler in logging.getLogger("uvicorn").handlers
+    )

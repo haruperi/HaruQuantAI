@@ -1,6 +1,14 @@
-"""Explicit host logging with redacted text, JSON, and bounded diagnostics."""
+"""Explicit host logging with redacted text, JSON, and bounded diagnostics.
 
-# ruff: noqa: INP001 -- the reset host package has no initializer yet.
+Modules obtain names through get_logger without installing handlers. The process
+entrypoint enables early console/buffer capture, then bootstrap configures the
+rotating file sink and Uvicorn forwarding. close_host_logging releases only
+host-owned handlers, preserving externally installed capture handlers.
+
+Redaction handles known patterns and structured fields; it is not permission to
+log arbitrary credentials. Call sites must omit secrets and unsafe exception
+values. File rotation and finite in-memory buffers bound retained diagnostics.
+"""
 
 from __future__ import annotations
 
@@ -65,6 +73,7 @@ def secret_fingerprint(secret: str) -> str:
 
 
 def _replace_secret(match: re.Match[str]) -> str:
+    """Replace one detected credential with a stable redaction marker."""
     secret = match.group("secret")
     if _MARKER.fullmatch(secret):
         return match.group(0)
@@ -86,6 +95,7 @@ def redact_sensitive(text: str) -> str:
 
 
 def _sanitize_fields(value: object) -> object:
+    """Recursively sanitize supported structured log fields."""
     if isinstance(value, Mapping):
         return {
             str(key): (
@@ -255,42 +265,23 @@ class DiagnosticCaptureHandler(logging.Handler):
             self.release()
 
 
-class HostLogger(logging.Logger):
-    """Host logger ensuring centralized telemetry is configured before emission."""
-
-    def _ensure_configured(self) -> None:
-        root_logger = logging.getLogger(LOGGER_NAME)
-        if not any(
-            getattr(handler, "_host_telemetry_owned", False)
-            for handler in root_logger.handlers
-        ):
-            console_handler = logging.StreamHandler(sys.stderr)
-            console_handler.setFormatter(ColorFormatter(sys.stderr))
-            console_handler.addFilter(SensitiveDataFilter())
-            console_handler.__dict__["_host_telemetry_owned"] = True
-            root_logger.addHandler(console_handler)
-            root_logger.setLevel(logging.INFO)
-            root_logger.propagate = False
-
-    @override
-    def isEnabledFor(self, level: int) -> bool:
-        self._ensure_configured()
-        return super().isEnabledFor(level)
-
-    @override
-    def handle(self, record: logging.LogRecord) -> None:
-        self._ensure_configured()
-        super().handle(record)
-
-
 def host_log_path(log_dir: Path) -> Path:
     """Return the fixed rotating host log path without filesystem access."""
     return log_dir / LOG_FILENAME
 
 
 def get_logger(name: str | None = None) -> logging.Logger:
-    """Return a logger bound to the host logging hierarchy with full module path."""
-    logging.setLoggerClass(HostLogger)
+    """Resolve a module logger beneath the app hierarchy without configuring sinks.
+
+    Does not install handlers, set a global logger class, or create files. The
+    entrypoint must explicitly configure logging before expecting host output.
+
+    Args:
+        name: Module __name__, or None for the app root; __main__ maps to app.main.
+
+    Returns:
+        Standard-library logger with the normalized host-qualified name.
+    """
     if not name or name == LOGGER_NAME:
         return logging.getLogger(LOGGER_NAME)
     if name == "__main__":
@@ -298,6 +289,87 @@ def get_logger(name: str | None = None) -> logging.Logger:
     if name.startswith(f"{LOGGER_NAME}."):
         return logging.getLogger(name)
     return logging.getLogger(f"{LOGGER_NAME}.{name}")
+
+
+class BootBuffer(logging.Handler):
+    """Retain up to 256 early records for transfer to the host file sink.
+
+    The standard handler filter sanitizes records before emit. Oldest records are
+    evicted at capacity. configure_host_logging replays retained records to the file
+    only, avoiding duplicate early console output.
+    """
+
+    def __init__(self) -> None:
+        """Create an empty 256-record ring with the sensitive-data filter.
+
+        No logger is modified and no sink is opened until the caller attaches it.
+        """
+        super().__init__()
+        self.records: deque[logging.LogRecord] = deque(maxlen=256)
+        self.addFilter(SensitiveDataFilter())
+
+    @override
+    def emit(self, record: logging.LogRecord) -> None:
+        """Append a filtered record, evicting the oldest when full.
+
+        Retains the record object rather than copying it; use standard Handler.handle
+        for filtering and lock ownership.
+
+        Args:
+            record: LogRecord already passed through handler filtering.
+        """
+        self.records.append(record)
+
+
+class HostForwardHandler(logging.Handler):
+    """Forward Uvicorn diagnostics through the explicitly configured host sinks."""
+
+    @override
+    def emit(self, record: logging.LogRecord) -> None:
+        """Forward a server record through the configured app handlers.
+
+        Does not create sinks or recursively forward through the Uvicorn hierarchy.
+
+        Args:
+            record: Uvicorn diagnostic record; app sinks apply their own
+                formatting/redaction.
+        """
+        logging.getLogger(LOGGER_NAME).handle(record)
+
+
+def configure_boot_logging() -> None:
+    """Install early stderr and bounded buffering before settings are loaded.
+
+    Returns unchanged when the app logger already has handlers. Otherwise installs
+    INFO-level console and BootBuffer handlers owned by the host and disables
+    propagation. Creates no log directory or file.
+    """
+    root = logging.getLogger(LOGGER_NAME)
+    if root.handlers:
+        return
+    console = logging.StreamHandler(sys.stderr)
+    console.setFormatter(ColorFormatter(sys.stderr))
+    console.addFilter(SensitiveDataFilter())
+    for handler in (console, BootBuffer()):
+        handler.__dict__["_host_telemetry_owned"] = True
+        root.addHandler(handler)
+    root.setLevel(logging.INFO)
+    root.propagate = False
+    root.__dict__.pop("_host_telemetry_config", None)
+
+
+def close_host_logging() -> None:
+    """Detach and close only handlers marked as host-owned.
+
+    Visits app and uvicorn logger hierarchies. Repeated calls are harmless and
+    foreign handlers are preserved; logger levels and propagation are not reset.
+    """
+    for name in (LOGGER_NAME, "uvicorn"):
+        root = logging.getLogger(name)
+        for handler in tuple(root.handlers):
+            if getattr(handler, "_host_telemetry_owned", False):
+                root.removeHandler(handler)
+                handler.close()
 
 
 def configure_host_logging(
@@ -312,7 +384,30 @@ def configure_host_logging(
     max_bytes: int = DEFAULT_MAX_BYTES,
     backup_count: int = DEFAULT_BACKUP_COUNT,
 ) -> logging.Logger:
-    """Explicitly configure the host logger and its bounded local file sink."""
+    """Configure rotating file output and optional console diagnostics.
+
+    Repeated identical configuration reuses owned handlers. Reconfiguration replaces
+    owned sinks only, copies buffered early records into the file, and attaches one
+    Uvicorn forwarder. The caller owns eventual close_host_logging.
+
+    Args:
+        log_dir: Destination directory; None selects DEFAULT_LOG_DIR.
+        level: Standard-library logging threshold.
+        console_stream: Console stream; None selects stderr.
+        include_console: Whether to attach a console sink.
+        console_format: Console representation: text or json.
+        file_format: File representation: text or json.
+        use_color: Explicit console color policy, or None for terminal detection.
+        max_bytes: Positive file rotation threshold in bytes.
+        backup_count: Nonnegative count of rotated files to retain.
+
+    Returns:
+        The configured app logger.
+
+    Raises:
+        ValueError: Rotation limits or format choices are invalid.
+        OSError: Log directory or file creation fails.
+    """
     target_dir = DEFAULT_LOG_DIR if log_dir is None else log_dir
     if max_bytes <= 0:
         raise ValueError("max_bytes must be positive")
@@ -357,6 +452,12 @@ def configure_host_logging(
         console_handler.setFormatter(formatter)
         console_handler.addFilter(SensitiveDataFilter())
         new_handlers.append(console_handler)
+    early = [
+        record
+        for handler in logger.handlers
+        if isinstance(handler, BootBuffer)
+        for record in handler.records
+    ]
     for handler in tuple(logger.handlers):
         if getattr(handler, "_host_telemetry_owned", False):
             logger.removeHandler(handler)
@@ -367,4 +468,27 @@ def configure_host_logging(
     logger.setLevel(level)
     logger.propagate = False
     logger.__dict__["_host_telemetry_config"] = config
+    for record in early:
+        file_handler.handle(record)
+    _forward_server_logging(level)
     return logger
+
+
+def _forward_server_logging(level: int) -> None:
+    """Attach one owned Uvicorn-to-app diagnostic forwarding handler.
+
+    An existing HostForwardHandler is retained; this helper does not add a second
+    formatter stack or update that existing handler configuration.
+
+    Args:
+        level: Logging threshold set when a new forwarding handler is attached.
+    """
+    server_logger = logging.getLogger("uvicorn")
+    if not any(
+        isinstance(handler, HostForwardHandler) for handler in server_logger.handlers
+    ):
+        forward = HostForwardHandler()
+        forward.__dict__["_host_telemetry_owned"] = True
+        server_logger.addHandler(forward)
+        server_logger.setLevel(level)
+        server_logger.propagate = False

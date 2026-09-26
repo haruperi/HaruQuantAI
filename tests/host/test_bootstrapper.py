@@ -1,109 +1,133 @@
-"""Tests for host configuration resolution and telemetry setup."""
+"""Configuration and explicit assembly acceptance for the rebuilt host."""
 
+import asyncio
+import json
 import logging
-from datetime import UTC, datetime
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
-from app.host.bootstrapper import (
-    DEFAULT_ADDRESS,
-    DEFAULT_EXCHANGE_ROOT,
-    DEFAULT_LOG_DIR,
-    DEFAULT_PORT,
-    DEFAULT_UI_DIST,
-    ENV_ADDRESS,
-    ENV_DATABASE_PATH,
-    ENV_DOMAIN_ROOTS,
-    ENV_EXCHANGE_ROOT,
-    ENV_LOG_DIR,
-    ENV_PASSWORD,
-    ENV_PORT,
-    ENV_UI_DIST,
-    HostConfig,
-    config_from_env,
+from app.host.bootstrap import BootstrapCoordinator
+from app.host.config import HostSettings, load_settings
+from app.persistence.host import (
+    HostSettingRecord,
+    HostStore,
+    prepare_boot_database,
+    utc_now_iso,
 )
-from app.host.logging import LOGGER_NAME, configure_host_logging, host_log_path
-from app.host.settings import DEFAULT_DATABASE_PATH
+from pydantic import ValidationError
 
 
-def test_defaults_match_owner_decisions() -> None:
-    config = config_from_env(env={})
-
-    assert config == HostConfig(
-        address=DEFAULT_ADDRESS,
-        port=DEFAULT_PORT,
-        log_dir=DEFAULT_LOG_DIR,
-        password=None,
-        database_path=DEFAULT_DATABASE_PATH,
-        exchange_root=DEFAULT_EXCHANGE_ROOT,
-        domain_roots=(Path("app") / "workspace", Path("app") / "plugins"),
-        ui_dist=DEFAULT_UI_DIST,
+def test_configuration_precedence_and_readonly(tmp_path):
+    path = tmp_path / "database" / "haruquantai.db"
+    prepare_boot_database(path)
+    HostStore(path).upsert_setting(
+        HostSettingRecord(
+            "host", "runtime", json.dumps({"port": 9000}), 1, utc_now_iso()
+        )
     )
-    assert (DEFAULT_ADDRESS, DEFAULT_PORT) == ("127.0.0.1", 8000)
-    assert DEFAULT_LOG_DIR == Path("data") / "logs"
-    assert DEFAULT_DATABASE_PATH == Path("data") / "database" / "haruquantai.db"
-    assert DEFAULT_EXCHANGE_ROOT == Path("data") / "exchange"
-
-
-def test_environment_overrides_are_respected(tmp_path: Path) -> None:
-    config = config_from_env(
-        env={
-            ENV_ADDRESS: "0.0.0.0",
-            ENV_PORT: "9001",
-            ENV_LOG_DIR: str(tmp_path / "logs"),
-            ENV_PASSWORD: "s3cret",  # pragma: allowlist secret
-            ENV_DATABASE_PATH: str(tmp_path / "database" / "haruquantai.db"),
-            ENV_EXCHANGE_ROOT: str(tmp_path / "exchange"),
-            ENV_DOMAIN_ROOTS: "custom/domains, other/domains",
-            ENV_UI_DIST: "",
-        }
+    before = path.read_bytes()
+    assert load_settings({"data_dir": tmp_path}, environment={}).port == 9000
+    assert (
+        load_settings({"data_dir": tmp_path}, environment={"HARU_PORT": "9001"}).port
+        == 9001
     )
-
-    assert config.address == "0.0.0.0"
-    assert config.port == 9001
-    assert config.log_dir == tmp_path / "logs"
-    assert config.password == "s3cret"  # pragma: allowlist secret
-    assert config.database_path == tmp_path / "database" / "haruquantai.db"
-    assert config.exchange_root == tmp_path / "exchange"
-    assert config.domain_roots == (Path("custom/domains"), Path("other/domains"))
-    assert config.ui_dist is None
+    assert (
+        load_settings(
+            {"data_dir": tmp_path, "port": 9002}, environment={"HARU_PORT": "9001"}
+        ).port
+        == 9002
+    )
+    assert path.read_bytes() == before
 
 
-def test_empty_domain_roots_fail_closed() -> None:
-    with pytest.raises(ValueError, match=ENV_DOMAIN_ROOTS):
-        config_from_env(env={ENV_DOMAIN_ROOTS: " , , "})
+def test_fresh_config_does_not_create_database(tmp_path):
+    result = load_settings(environment={"HARU_DATA_DIR": str(tmp_path)})
+    assert not result.database_path.exists()
+    assert result.port == 8000
 
 
-@pytest.mark.parametrize("bad_port", ["not-a-number", "0", "70000", "-1"])
-def test_invalid_port_fails_closed(bad_port: str) -> None:
-    with pytest.raises(ValueError, match=ENV_PORT):
-        config_from_env(env={ENV_PORT: bad_port})
+@pytest.mark.parametrize(
+    "values",
+    [
+        {"port": 0},
+        {"host": "0.0.0.0"},
+        {"host": "example.com"},
+        {"workers": -1},
+        {"password": ""},
+        {"certificate": Path("cert")},
+    ],
+)
+def test_invalid_configuration_fails_closed(values):
+    with pytest.raises(ValidationError):
+        HostSettings(**values)
 
 
-def test_empty_address_fails_closed() -> None:
-    with pytest.raises(ValueError, match=ENV_ADDRESS):
-        config_from_env(env={ENV_ADDRESS: "   "})
+def test_boot_stages_and_logging_are_real(host_config):
+    host = BootstrapCoordinator(host_config)
 
+    async def run() -> None:
+        await host.initialize()
+        await host.initialize()
+        stages = host.startup.results
+        assert stages["I01"].outcome == "succeeded"
+        assert stages["I08"].outcome == "unavailable"
+        pool = host.pool
+        assert pool is not None
+        assert len(stages) == 37
+        await host.close()
+        assert host.pool is None
 
-def test_configure_host_logging_writes_dated_file(tmp_path: Path) -> None:
-    logger = configure_host_logging(tmp_path, also_stderr=False)
-
-    logger.info("hello host")
-
-    expected = host_log_path(tmp_path, datetime.now(tz=UTC))
-    assert expected.exists()
-    assert "hello host" in expected.read_text(encoding="utf-8")
-    assert logger.name == LOGGER_NAME
-
-
-def test_configure_host_logging_is_idempotent(tmp_path: Path) -> None:
-    first = configure_host_logging(tmp_path, also_stderr=False)
-    second = configure_host_logging(tmp_path, also_stderr=False)
-
-    assert first is second
-    file_handlers = [
-        handler
-        for handler in first.handlers
-        if isinstance(handler, logging.FileHandler)
+    asyncio.run(run())
+    events = [
+        json.loads(line)
+        for line in (host_config.log_dir / "haruquantai.log").read_text().splitlines()
     ]
-    assert len(file_handlers) == 1
+    assert any(
+        e.get("fields", {}).get("stage") == "I08"
+        and e["fields"]["outcome"] == "unavailable"
+        for e in events
+    )
+    assert not any(
+        getattr(handler, "_host_telemetry_owned", False)
+        for handler in logging.getLogger("app").handlers
+    )
+
+
+def test_imports_do_not_configure_handlers_or_touch_disk(tmp_path):
+    root = str(Path(__file__).resolve().parents[2])
+    code = f"import sys; sys.path.insert(0, {root!r}); import app.main, app.cli, app.host.bootstrap; import logging; assert not logging.getLogger('app').handlers"
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=tmp_path,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_existing_database_requires_explicit_migration(host_config):
+    from app.persistence.host import HostPersistenceSchemaError, ensure_schema
+
+    ensure_schema(host_config.database_path)
+    before = host_config.database_path.read_bytes()
+    host = BootstrapCoordinator(host_config)
+    with pytest.raises(HostPersistenceSchemaError, match="Migration required"):
+        asyncio.run(host.initialize())
+    assert host.startup.state == "FAILED"
+    assert host_config.database_path.read_bytes() == before
+
+
+def test_missing_auth_schema_has_actionable_diagnostic(tmp_path, caplog):
+    from app.persistence.host import HostPersistenceSchemaError, ensure_schema
+
+    settings = HostSettings(data_dir=tmp_path)
+    ensure_schema(settings.database_path)
+    host = BootstrapCoordinator(settings)
+    with caplog.at_level(logging.ERROR), pytest.raises(HostPersistenceSchemaError):
+        asyncio.run(host.initialize())
+    assert "--migrate-auth-schema" in caplog.text
+    assert host.startup.state == "FAILED"

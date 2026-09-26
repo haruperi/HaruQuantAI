@@ -1,23 +1,32 @@
-"""CRUD operations for the host-owned tables of the unified SQLite database.
+"""SQLite persistence operations for host settings, jobs, and authentication.
 
-This module is the single home for every read and write against the
-``host_*`` tables in ``data/database/haruquantai.db``. It owns no product,
-plugin, scheduling, or presentation logic: callers compose these typed
-primitives. Timestamps are UTC ISO-8601 strings and JSON documents are
-validated and canonically re-encoded before storage. The module uses only
-the Python standard library and performs no I/O at import time.
+This module owns short-lived connections and transactions for host_* tables plus
+users and sessions in the unified application database. Callers inject paths;
+imports perform no I/O. Timestamps on retained host records are UTC ISO strings,
+while session issue/expiry values are Unix seconds.
+
+prepare_boot_database initializes only a new store and verifies existing stores.
+Explicitly authorized migrate_auth_schema backs up and adds absent auth tables.
+Neither operation implements domain strategy/data storage. Settings patches
+preserve private fields and compare revisions before commit; notifications belong
+to callers. AuthStore persists hashes, never plaintext bearer credentials.
 """
 
 from __future__ import annotations
 
 import json
 import sqlite3
-from collections.abc import Generator
+import time
+from collections.abc import Callable, Generator
 from contextlib import closing, contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, NoReturn
+
+from app.host.logging import get_logger
+
+logger = get_logger(__name__)
 
 DEFAULT_DATABASE_PATH = Path("data") / "database" / "haruquantai.db"
 ACTIVE_LEASE_STATE = "active"
@@ -1065,3 +1074,396 @@ class HostStore:
                 "DELETE FROM host_grid_leases WHERE lease_id=?", (lease_id,)
             )
             return cursor.rowcount > 0
+
+
+_AUTH_SCHEMA = (
+    "CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT)",
+    (
+        "CREATE TABLE sessions (token_hash TEXT PRIMARY KEY, "
+        "username TEXT NOT NULL "
+        "REFERENCES users(username), issued_at REAL NOT NULL, "
+        "expires_at REAL NOT NULL, "
+        "revoked INTEGER NOT NULL DEFAULT 0)"
+    ),
+)
+
+
+def _verify_auth_schema(connection: sqlite3.Connection) -> None:
+    """Check auth table types, declared columns, and session foreign-key authority.
+
+    Inspection is read-only. It verifies the declared structural contract; it does
+    not inspect credentials, expire sessions, or repair schema drift.
+
+    Args:
+        connection: Open caller-owned SQLite connection; no connection is opened here.
+
+    Raises:
+        HostPersistenceSchemaError: Auth objects, column shape, or required user
+            reference are incompatible.
+    """
+    objects = connection.execute(
+        "SELECT name, type FROM sqlite_schema "
+        "WHERE name IN ('users', 'sessions') ORDER BY name"
+    ).fetchall()
+    if objects != [("sessions", "table"), ("users", "table")]:
+        raise HostPersistenceSchemaError("Migration required for auth schema")
+    expected = {
+        "users": [("username", "TEXT", 0, 1), ("password_hash", "TEXT", 0, 0)],
+        "sessions": [
+            ("token_hash", "TEXT", 0, 1),
+            ("username", "TEXT", 1, 0),
+            ("issued_at", "REAL", 1, 0),
+            ("expires_at", "REAL", 1, 0),
+            ("revoked", "INTEGER", 1, 0),
+        ],
+    }
+    for table, columns in expected.items():
+        actual = [
+            (row[1], row[2], row[3], row[5])
+            for row in connection.execute(f"PRAGMA table_info({table})")
+        ]
+        if actual != columns:
+            raise HostPersistenceSchemaError("Migration required for auth schema")
+    foreign_keys = connection.execute("PRAGMA foreign_key_list(sessions)").fetchall()
+    if not any(row[2:5] == ("users", "username", "username") for row in foreign_keys):
+        raise HostPersistenceSchemaError("Migration required for session authority")
+
+
+def prepare_boot_database(path: Path) -> None:
+    """Initialize a missing database or verify an existing host/auth schema.
+
+    Existing databases are never migrated here. New-file reservation is exclusive,
+    then host and auth initialization occur in separate transactions. Failure can
+    leave a partially initialized new file; the caller must investigate rather than
+    blindly deleting it. SQLite errors propagate.
+
+    Args:
+        path: Unified database location selected by the host.
+
+    Raises:
+        HostPersistenceSchemaError: An existing host/auth schema is missing or
+            incompatible.
+        OSError: Directory creation or exclusive new-file reservation fails.
+    """
+    if path.exists():
+        verify_schema(path)
+        with _readonly(path) as connection:
+            _verify_auth_schema(connection)
+        logger.info("I01 Existing host schema verified without migration")
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    # Reserve the new path exclusively before any schema creation.
+    with path.open("xb"):
+        pass
+    ensure_schema(path)
+    with _connect(path) as connection, _write_transaction(connection):
+        for statement in _AUTH_SCHEMA:
+            connection.execute(statement)
+    logger.info("I01 New isolated host database initialized")
+
+
+def migrate_auth_schema(path: Path) -> Path | None:
+    """Back up an authorized existing store and add both absent auth tables.
+
+    Holds a reserved write transaction while backing up and adding users/sessions.
+    Partial/conflicting auth schemas fail closed. Existing data is preserved and DDL
+    failures roll back; backup files are retained even after failure. This operation
+    does not provision users, restore backups, or start the server.
+
+    Args:
+        path: Existing unified database approved for maintenance by its owner.
+
+    Returns:
+        Verified recovery-backup path when migrated, or None for an already compatible
+        schema.
+
+    Raises:
+        HostPersistenceSchemaError: Host/auth structure conflicts or backup integrity
+            fails.
+        HostPersistenceError: Backup exceeds its progress-callback deadline.
+        OSError: Exclusive backup creation fails.
+        sqlite3.Error: Lock acquisition or transactional schema creation fails.
+    """
+    verify_schema(path)
+    logger.info("Auth migration: validating existing store")
+    with _connect(path) as connection, _write_transaction(connection):
+        for table in _EXPECTED_COLUMNS:
+            _verify_table(connection, table)
+        objects = connection.execute(
+            "SELECT name FROM sqlite_schema WHERE name IN ('users', 'sessions')"
+        ).fetchall()
+        if objects:
+            _verify_auth_schema(connection)
+            logger.info("Auth migration: already compatible; no changes")
+            return None
+        backup = _backup_auth_database(path)
+        logger.info("Auth migration: verified recovery backup created")
+        for statement in _AUTH_SCHEMA:
+            connection.execute(statement)
+        _verify_auth_schema(connection)
+        logger.info("Auth migration: new schema verified; committing")
+    logger.info("Auth migration: committed successfully")
+    return backup
+
+
+def _backup_auth_database(path: Path) -> Path:
+    """Create an exclusive SQLite recovery copy and verify its integrity.
+
+    Copies in 256-page steps with bounded retry sleeps. Source is read-only. The
+    deadline is checked during backup progress, not an overall bound on filesystem
+    I/O or integrity_check. Failed copies are retained and must not be treated as
+    validated recovery artifacts.
+
+    Args:
+        path: Existing source database; the caller holds the migration write
+            reservation.
+
+    Returns:
+        Timestamped backup path under the database sibling backups directory.
+
+    Raises:
+        HostPersistenceError: The backup progress callback observes a 30-second
+            deadline.
+        HostPersistenceSchemaError: Backup integrity_check does not return ok.
+        OSError: Destination directory/file cannot be created.
+    """
+    folder = path.parent / "backups"
+    folder.mkdir(parents=True, exist_ok=True)
+    stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%S%fZ")
+    backup = folder / f"{path.stem}-pre-auth-{stamp}.db"
+    with backup.open("xb"):
+        pass
+    deadline = time.monotonic() + 30.0
+
+    def progress(_status: int, _remaining: int, _total: int) -> None:
+        """Abort backup once its monotonic progress deadline has elapsed.
+
+        Args:
+            _status: SQLite backup status; unused.
+            _remaining: Remaining page count; unused.
+            _total: Total page count; unused.
+
+        Raises:
+            HostPersistenceError: The configured backup deadline has elapsed.
+        """
+        if time.monotonic() >= deadline:
+            raise HostPersistenceError("Auth migration backup deadline exceeded")
+
+    with _readonly(path) as source, closing(sqlite3.connect(backup)) as target:
+        source.backup(target, pages=256, progress=progress, sleep=0.05)
+        if target.execute("PRAGMA integrity_check").fetchall() != [("ok",)]:
+            raise HostPersistenceSchemaError("Auth migration backup integrity failed")
+    return backup
+
+
+def settings_snapshot(path: Path) -> dict[str, Any]:
+    """Read stored application values and revision in one SQL snapshot.
+
+    Missing revision defaults to zero. Public projection belongs to SettingsStore;
+    this function does not redact the returned application records.
+
+    Args:
+        path: Prepared host database location.
+
+    Returns:
+        Internal mapping with revision and all application values, including private
+        fields.
+
+    Raises:
+        HostPersistenceValueError: A selected record has an unsupported version or
+            revision is invalid.
+        ValueError: Stored JSON cannot be decoded.
+    """
+    with _connect(path) as connection:
+        rows = connection.execute(
+            "SELECT scope,key,value_json,schema_version FROM host_settings "
+            "WHERE scope IN ('application','host')"
+        ).fetchall()
+    values: dict[str, Any] = {}
+    revision = 0
+    for row in rows:
+        if row[3] != 1:
+            raise HostPersistenceValueError("Unsupported settings schema version")
+        if row[0] == "application":
+            values[row[1]] = json.loads(row[2])
+        elif row[1] == "__revision__":
+            revision = json.loads(row[2])
+    if type(revision) is not int or revision < 0:
+        raise HostPersistenceValueError("Invalid settings revision")
+    return {"revision": revision, "values": values}
+
+
+def patch_settings(
+    path: Path,
+    changes: dict[str, Any],
+    expected_revision: int,
+    validate: Callable[[dict[str, Any]], None],
+) -> dict[str, Any]:
+    """Compare revision and merge fields within one write transaction.
+
+    Merges rather than replaces records, preserving omitted private fields. Callback
+    and JSON/SQLite exceptions propagate and roll back pre-commit changes. Publishes
+    no events; callers notify only after this function returns.
+
+    Args:
+        path: Prepared host database location.
+        changes: Record-to-field updates validated by the calling settings layer.
+        expected_revision: Revision that must match storage before any update.
+        validate: Pure validation callback for merged values; raising aborts the
+            transaction.
+
+    Returns:
+        Committed internal snapshot with incremented revision and all application
+        values.
+
+    Raises:
+        HostPersistenceConflictError: Stored revision differs from the expected value.
+        HostPersistenceValueError: An existing patched record is not an object.
+    """
+    with _connect(path) as connection, _write_transaction(connection):
+        row = connection.execute(
+            "SELECT value_json FROM host_settings "
+            "WHERE scope='host' AND key='__revision__'"
+        ).fetchone()
+        current = json.loads(row[0]) if row else 0
+        if type(current) is not int or current != expected_revision:
+            raise HostPersistenceConflictError("Settings revision changed")
+        stamp = utc_now_iso()
+        for key, updates in changes.items():
+            row = connection.execute(
+                "SELECT value_json FROM host_settings "
+                "WHERE scope='application' AND key=?",
+                (key,),
+            ).fetchone()
+            value = json.loads(row[0]) if row else {}
+            if not isinstance(value, dict):
+                raise HostPersistenceValueError("Malformed settings record")
+            value.update(updates)
+            validate({key: value})
+            connection.execute(
+                "INSERT INTO host_settings VALUES ('application',?,?,1,?) "
+                "ON CONFLICT(scope,key) DO UPDATE SET value_json=excluded.value_json, "
+                "updated_at_utc=excluded.updated_at_utc",
+                (key, json.dumps(value, allow_nan=False), stamp),
+            )
+        connection.execute(
+            "INSERT INTO host_settings VALUES ('host','__revision__',?,1,?) "
+            "ON CONFLICT(scope,key) DO UPDATE SET value_json=excluded.value_json, "
+            "updated_at_utc=excluded.updated_at_utc",
+            (str(current + 1), stamp),
+        )
+        rows = connection.execute(
+            "SELECT key,value_json FROM host_settings WHERE scope='application'"
+        ).fetchall()
+        values = {row[0]: json.loads(row[1]) for row in rows}
+        validate(values)
+    logger.info("Settings transaction committed at revision %s", current + 1)
+    return {"revision": current + 1, "values": values}
+
+
+class AuthStore:
+    """Persist users and hashed session identifiers without owning authentication.
+
+    Uses short-lived transactional connections against an already prepared schema.
+    Signing, password derivation, rate limiting, and input validation belong to the
+    session layer; this storage boundary does not authorize callers by itself.
+    """
+
+    def __init__(self, path: Path) -> None:
+        """Retain a prepared auth database path without opening a connection.
+
+        Args:
+            path: Unified database containing users and sessions.
+        """
+        self.path = path
+
+    def provision(self, username: str, password_hash: str | None) -> None:
+        """Insert an identity only if its username does not already exist.
+
+        Existing credentials remain unchanged via INSERT OR IGNORE. This operation
+        does not hash plaintext or enforce the session layer remote-host policy.
+
+        Args:
+            username: Identity key to provision.
+            password_hash: Salted verifier, or None for an unprotected local identity.
+        """
+        with _connect(self.path) as connection, _write_transaction(connection):
+            connection.execute(
+                "INSERT OR IGNORE INTO users VALUES (?,?)", (username, password_hash)
+            )
+
+    def credential(self, username: str) -> tuple[bool, str | None]:
+        """Look up identity existence and its stored password verifier.
+
+        Args:
+            username: Exact identity key.
+
+        Returns:
+            (exists, verifier), distinguishing absent users from existing passwordless
+            users.
+        """
+        with _connect(self.path) as connection:
+            row = connection.execute(
+                "SELECT password_hash FROM users WHERE username=?", (username,)
+            ).fetchone()
+        return (False, None) if row is None else (True, row[0])
+
+    def issue(
+        self, token_hash: str, username: str, issued: float, expires: float
+    ) -> None:
+        """Insert an unrevoked session with a caller-supplied validity interval.
+
+        Does not validate interval ordering or token format; the session layer supplies
+        those values. Other SQLite failures propagate.
+
+        Args:
+            token_hash: Digest of the complete bearer token; never the plaintext token.
+            username: Existing identity referenced by the session.
+            issued: Issue timestamp in Unix seconds.
+            expires: Expiry timestamp in Unix seconds.
+
+        Raises:
+            sqlite3.IntegrityError: Token uniqueness or username foreign-key constraints
+                fail.
+        """
+        with _connect(self.path) as connection, _write_transaction(connection):
+            connection.execute(
+                "INSERT INTO sessions VALUES (?,?,?,?,0)",
+                (token_hash, username, issued, expires),
+            )
+
+    def valid(self, token_hash: str, now: float) -> str | None:
+        """Resolve an unrevoked session whose expiry is later than now.
+
+        Does not check the token signature or issued_at; SessionManager checks process
+        authority before consulting this lookup.
+
+        Args:
+            token_hash: Bearer-token digest used as the lookup key.
+            now: Current Unix time in seconds.
+
+        Returns:
+            Username, or None for a missing, expired, or revoked session.
+        """
+        with _connect(self.path) as connection:
+            row = connection.execute(
+                "SELECT username FROM sessions "
+                "WHERE token_hash=? AND expires_at>? AND revoked=0",
+                (token_hash, now),
+            ).fetchone()
+        return None if row is None else str(row[0])
+
+    def revoke(self, token_hash: str) -> None:
+        """Mark a matching session revoked while retaining its row.
+
+        Repeated calls and missing hashes are harmless. A successful transaction is
+        logged without disclosing the hash; SQLite errors propagate.
+
+        Args:
+            token_hash: Digest identifying the session to revoke.
+        """
+        with _connect(self.path) as connection, _write_transaction(connection):
+            connection.execute(
+                "UPDATE sessions SET revoked=1 WHERE token_hash=?", (token_hash,)
+            )
+        logger.info("Session revoked")

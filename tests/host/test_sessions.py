@@ -1,101 +1,82 @@
-"""Tests for bearer-token sessions and auth enforcement."""
-
-import logging
-import time
-from dataclasses import replace
-from pathlib import Path
+"""Password, peer, runtime-key, expiry and revocation boundaries."""
 
 import pytest
-from app.host.bootstrapper import build_services
+from app.host.config import HostSettings
+from app.host.security import hash_password, is_loopback, verify_password
 from app.host.sessions import SessionError, SessionManager
-from app.host.webserver import create_app
-from starlette.testclient import TestClient
-
-from tests.host.conftest import make_config
+from app.persistence.host import prepare_boot_database
+from pydantic import SecretStr
 
 
-def test_login_and_verify_roundtrip() -> None:
-    manager = SessionManager(None)
-
-    token = manager.login("researcher", None)
-    session = manager.verify(token)
-
-    assert session is not None
-    assert session.username == "researcher"
-    assert session.expires_at > session.issued_at
+def manager(config: HostSettings) -> SessionManager:
+    prepare_boot_database(config.database_path)
+    return SessionManager(config)
 
 
-def test_unknown_token_fails_verification() -> None:
-    assert SessionManager(None).verify("no-such-token") is None
+def test_local_operator_and_durable_revocation(host_config):
+    authority = manager(host_config)
+    token = authority.login("operator", None, peer="127.0.0.1")
+    verified = authority.verify(token)
+    assert verified is not None and verified.username == "operator"
+    assert authority.verify("bad") is None
+    assert authority.verify(token + "x") is None
+    authority.revoke(token)
+    assert authority.verify(token) is None
 
 
-def test_required_password_rejects_wrong_and_missing() -> None:
-    manager = SessionManager("s3cret")
-
-    with pytest.raises(SessionError):
-        manager.login("researcher", "wrong")
-    with pytest.raises(SessionError):
-        manager.login("researcher", None)
-    assert manager.login("researcher", "s3cret")
-
-
-def test_research_mode_issues_without_password() -> None:
-    token = SessionManager(None).login("researcher", None)
-
-    assert token
-
-
-def test_expired_session_is_dropped() -> None:
-    manager = SessionManager(None, ttl_seconds=0)
-    token = manager.login("researcher", None)
-    time.sleep(0.01)
-
-    assert manager.verify(token) is None
-
-
-def test_revoke_removes_session() -> None:
-    manager = SessionManager(None)
-    token = manager.login("researcher", None)
-
-    manager.revoke(token)
-
-    assert manager.verify(token) is None
-
-
-def test_empty_username_is_rejected() -> None:
-    with pytest.raises(SessionError):
-        SessionManager(None).login("   ", None)
-
-
-def test_api_requires_authorization(client: TestClient) -> None:
-    response = client.get("/api/v1/settings")
-
-    assert response.status_code == 401
-    assert response.json()["error"]["code"] == "UNAUTHORIZED"
-
-
-def test_api_accepts_valid_token(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
-    response = client.get("/api/v1/settings", headers=auth_headers)
-
-    assert response.status_code == 200
-
-
-def test_login_rejects_bad_credentials_when_password_set(tmp_path: Path) -> None:
-    config = make_config(tmp_path)
-    locked = replace(config, password="s3cret")  # pragma: allowlist secret
-    app = create_app(build_services(locked), logging.getLogger("tests.host"))
-    strict_client = TestClient(app)
-
-    bad = strict_client.post(
-        "/api/v1/auth/login", json={"username": "u", "password": "no"}
+def test_password_and_retry_limits(host_config):
+    authority = manager(
+        host_config.model_copy(update={"password": SecretStr("example-password")})
     )
-    good = strict_client.post(
-        "/api/v1/auth/login",
-        json={"username": "u", "password": "s3cret"},  # pragma: allowlist secret
-    )
+    with pytest.raises(SessionError):
+        authority.login("operator", "bad", peer="127.0.0.1")
+    token = authority.login("operator", "example-password", peer="127.0.0.1")
+    assert authority.verify(token)
+    for _ in range(6):
+        with pytest.raises(SessionError):
+            authority.login("operator", "bad", peer="127.0.0.2")
+    with pytest.raises(SessionError, match="Retry"):
+        authority.login("operator", "example-password", peer="127.0.0.2")
 
-    assert bad.status_code == 401
-    assert bad.json()["error"]["code"] == "UNAUTHORIZED"
-    assert good.status_code == 200
+
+def test_remote_peer_cannot_auto_login(host_config):
+    authority = manager(host_config)
+    for username, peer in (("operator", "198.51.100.1"), ("unknown", "127.0.0.1")):
+        with pytest.raises(SessionError):
+            authority.login(username, None, peer=peer)
+
+
+def test_expiry_and_restart_invalidate_tokens(host_config, monkeypatch):
+    authority = manager(host_config)
+    token = authority.login("operator", None, peer="127.0.0.1")
+    assert SessionManager(host_config).verify(token) is None
+    monkeypatch.setattr("app.host.sessions.time.time", lambda: 10**12)
+    assert authority.verify(token) is None
+
+
+def test_existing_credentials_cannot_be_silently_replaced(host_config):
+    manager(host_config)
+    with pytest.raises(SessionError):
+        SessionManager(
+            host_config.model_copy(update={"password": SecretStr("new-password")})
+        )
+
+
+def test_hash_round_trip_and_malformed_hash():
+    stored = hash_password("test-pass")
+    assert stored != hash_password("test-pass")
+    assert verify_password("test-pass", stored)
+    assert not verify_password("bad", stored)
+    assert not verify_password("bad", "invalid")
+    assert is_loopback("::1")
+    assert not is_loopback("localhost")
+
+
+def test_auth_endpoints_and_redaction(client, auth_headers):
+    assert client.get("/api/v1/settings").status_code == 401
+    assert client.get("/api/v1/settings", headers=auth_headers).status_code == 200
+    assert client.post("/api/v1/auth/login", json={"username": []}).status_code == 401
+    assert (
+        client.post("/api/v1/auth/login", json={"username": "unknown"}).status_code
+        == 401
+    )

@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import sqlite3
+from contextlib import closing
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
@@ -871,3 +872,129 @@ def test_read_settings_tolerates_absent_other_tables(
     connection.close()
     records = read_settings(database_path)
     assert [r.key for r in records] == ["app.general"]
+
+
+def test_boot_auth_schema_is_verified_without_migration(tmp_path: Path) -> None:
+    from contextlib import closing
+
+    from app.persistence.host import prepare_boot_database
+
+    path = tmp_path / "auth.db"
+    prepare_boot_database(path)
+    before = path.read_bytes()
+    prepare_boot_database(path)
+    assert path.read_bytes() == before
+    with closing(sqlite3.connect(path)) as connection:
+        connection.execute("DROP TABLE sessions")
+        connection.execute(
+            "CREATE TABLE sessions (token_hash TEXT, username TEXT, issued_at REAL, expires_at REAL, revoked INTEGER)"
+        )
+        connection.commit()
+    changed = path.read_bytes()
+    with pytest.raises(HostPersistenceSchemaError, match="Migration required"):
+        prepare_boot_database(path)
+    assert path.read_bytes() == changed
+
+
+@pytest.mark.parametrize("wal", [False, True])
+def test_auth_migration_preserves_legacy_and_backup(tmp_path, wal):
+    from app.persistence.host import migrate_auth_schema, prepare_boot_database
+
+    path = tmp_path / "legacy.db"
+    ensure_schema(path)
+    with closing(sqlite3.connect(path)) as connection, connection:
+        if wal:
+            connection.execute("PRAGMA journal_mode=WAL")
+        connection.execute("CREATE TABLE legacy (id INTEGER PRIMARY KEY, value BLOB)")
+        connection.execute("INSERT INTO legacy VALUES (1, ?)", (b"retained",))
+    backup = migrate_auth_schema(path)
+    assert backup is not None
+    prepare_boot_database(path)
+    with closing(sqlite3.connect(path)) as connection, connection:
+        assert connection.execute("SELECT * FROM legacy").fetchall() == [
+            (1, b"retained")
+        ]
+    with closing(sqlite3.connect(backup)) as connection:
+        assert connection.execute("SELECT * FROM legacy").fetchall() == [
+            (1, b"retained")
+        ]
+        assert connection.execute("PRAGMA table_info(users)").fetchall() == []
+        assert connection.execute("PRAGMA integrity_check").fetchone() == ("ok",)
+    assert migrate_auth_schema(path) is None
+    assert list((tmp_path / "backups").iterdir()) == [backup]
+
+
+@pytest.mark.parametrize(
+    "sql",
+    [
+        "CREATE TABLE users (username TEXT)",
+        "CREATE VIEW users AS SELECT 1 AS username",
+        "CREATE TABLE sessions (token_hash TEXT)",
+    ],
+)
+def test_auth_migration_rejects_conflicts_without_changes(tmp_path, sql):
+    from app.persistence.host import migrate_auth_schema
+
+    path = tmp_path / "legacy.db"
+    ensure_schema(path)
+    with closing(sqlite3.connect(path)) as connection, connection:
+        connection.execute(sql)
+    before = path.read_bytes()
+    with pytest.raises(HostPersistenceSchemaError):
+        migrate_auth_schema(path)
+    assert path.read_bytes() == before
+    assert not (tmp_path / "backups").exists()
+
+
+def test_auth_migration_rolls_back_failed_ddl(tmp_path, monkeypatch):
+    import app.persistence.host as persistence
+
+    path = tmp_path / "legacy.db"
+    ensure_schema(path)
+    monkeypatch.setattr(
+        persistence,
+        "_AUTH_SCHEMA",
+        (
+            persistence._AUTH_SCHEMA[0],
+            "INVALID SQL",
+        ),
+    )
+    with pytest.raises(sqlite3.Error):
+        persistence.migrate_auth_schema(path)
+    with closing(sqlite3.connect(path)) as connection, connection:
+        assert connection.execute("PRAGMA table_info(users)").fetchall() == []
+    assert len(list((tmp_path / "backups").iterdir())) == 1
+
+
+def test_auth_migration_backup_failure_leaves_store_unchanged(tmp_path):
+    from app.persistence.host import migrate_auth_schema
+
+    path = tmp_path / "legacy.db"
+    ensure_schema(path)
+    (tmp_path / "backups").write_text("blocked", encoding="utf-8")
+    before = path.read_bytes()
+    with pytest.raises(OSError):
+        migrate_auth_schema(path)
+    assert path.read_bytes() == before
+
+
+def test_auth_migration_missing_store_is_not_created(tmp_path):
+    from app.persistence.host import migrate_auth_schema
+
+    path = tmp_path / "absent.db"
+    with pytest.raises(HostPersistenceSchemaError):
+        migrate_auth_schema(path)
+    assert not path.exists()
+
+
+def test_auth_migration_lock_failure_is_bounded(tmp_path, monkeypatch):
+    import app.persistence.host as persistence
+
+    path = tmp_path / "legacy.db"
+    ensure_schema(path)
+    monkeypatch.setattr(persistence, "_BUSY_TIMEOUT_MS", 1)
+    with closing(sqlite3.connect(path)) as blocker:
+        blocker.execute("BEGIN IMMEDIATE")
+        with pytest.raises(sqlite3.OperationalError, match="locked"):
+            persistence.migrate_auth_schema(path)
+    assert not (tmp_path / "backups").exists()

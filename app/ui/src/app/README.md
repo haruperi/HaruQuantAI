@@ -54,3 +54,25 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
 |---|---|---|
 | FEAT-UI-TRANSPORT | Universal UI-host transport: envelope, error mapping, request IDs, domain-client factory, host session startup, shell preference updates | implemented (`transport.ts`, `HostConnection.tsx`, `hostSettings.ts`) |
 | FEAT-UI-WORKSPACE_INVENTORY | Sixteen workspace surfaces mirroring the SQX 144.2953 navigation inventory (plus normative MTAnalyzer and Live Trading) | implemented (`src/workspace/*`) |
+
+
+## Host boot integration (2026-09-25)
+
+`HostConnection.tsx` uses the same login, authenticated WebSocket snapshot,
+`GET /api/v1/init-data`, `POST /api/v1/app-loaded`, and readiness wait as `app/cli.py`.
+`BootScreen.tsx` presents all 37 backend stage outcomes; missing providers remain
+unavailable. `FirstRunDialog.tsx` discloses absent research providers. The existing
+workspace navigation still includes mock/prototype surfaces, which do not acquire
+backend capabilities merely because the host is online.
+
+`transport.ts` authenticates WebSockets in the first frame, keeps bearer tokens
+in memory, supports heartbeat and bounded handshake timeout, and reports lost or
+overflowed streams as offline. Settings retain the authenticated SSE transport.
+The host must reach STANDBY or DEGRADED before connection status becomes online;
+FAILED restoration remains an error. Retry and browser reload create new sessions.
+
+| Feature ID | Feature | Status |
+| --- | --- | --- |
+| FEAT-UI-BOOT | Shared host handshake, 37-stage progress, first-run provider disclosure and readiness gating | implemented candidate; tests/unit/app/bootSequence.test.tsx and hostConnection.test.tsx |
+
+No workspace algorithms or durable domain records are implemented in the UI host.

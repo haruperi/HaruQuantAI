@@ -1,163 +1,101 @@
-"""Tests for the wired host application: routing, auth, errors, static UI."""
+"""Real HTTP/ASGI authentication, static delivery and WebSocket lifecycle."""
 
-import logging
-from dataclasses import replace
-from pathlib import Path
+import time
 
-from app.host.bootstrapper import build_services
-from app.host.webserver import HOST_VERSION, create_app
-from starlette.testclient import TestClient
-
-from tests.host.conftest import make_config
+import pytest
+from starlette.websockets import WebSocketDisconnect
 
 
-def test_health_is_public_and_returns_envelope(client: TestClient) -> None:
-    response = client.get("/api/v1/health")
-
-    assert response.status_code == 200
-    body = response.json()
-    assert body["status"] == "success"
-    assert body["data"] == {
-        "status": "ready",
-        "version": HOST_VERSION,
-        "services": {"host": "ready", "ui": "pending"},
-    }
-    assert response.headers["X-Request-Id"] == body["request_id"]
+def test_status_catalog_and_unknown_routes(client, auth_headers):
+    status = client.get("/api/v1/status")
+    assert status.status_code == 200
+    assert status.headers["X-Request-Id"].startswith("req-")
+    assert len(status.json()["data"]["boot"]["stages"]) == 37
+    catalog = client.get("/api/v1/catalog", headers=auth_headers).json()["data"]
+    assert catalog == {"domains": [], "issues": []}
+    assert client.get("/api/v1/unknown", headers=auth_headers).status_code == 404
+    assert client.get("/").status_code == 503
+    assert client.get("/", headers={"host": "evil.example"}).status_code == 400
 
 
-def test_supplied_request_id_is_echoed(client: TestClient) -> None:
-    response = client.get("/api/v1/health", headers={"X-Request-Id": "req-test-1"})
-
-    assert response.status_code == 200
-    assert response.headers["X-Request-Id"] == "req-test-1"
-    assert response.json()["request_id"] == "req-test-1"
-
-
-def test_app_loaded_requires_auth_then_acknowledges(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
-    denied = client.post("/api/v1/app-loaded")
-    allowed = client.post(
-        "/api/v1/app-loaded", json={"product": "web"}, headers=auth_headers
-    )
-
-    assert denied.status_code == 401
-    assert allowed.status_code == 200
-    assert allowed.json()["data"] == {"acknowledged": True}
-
-
-def test_unknown_route_fails_closed_with_not_found_envelope(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
-    response = client.post(
-        "/api/v1/executions/evaluate", json={"graph_document": {}}, headers=auth_headers
-    )
-
-    assert response.status_code == 404
-    body = response.json()
-    assert body["status"] == "error"
-    assert body["error"]["code"] == "NOT_FOUND"
-    assert body["error"]["issues"] == []
-
-
-def test_method_mismatch_returns_405_envelope(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
-    response = client.get("/api/v1/app-loaded", headers=auth_headers)
-
-    assert response.status_code == 405
-    assert response.json()["error"]["code"] == "METHOD_NOT_ALLOWED"
-
-
-def test_malformed_json_returns_400_malformed_request(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
-    response = client.post(
-        "/api/v1/app-loaded",
-        content=b"{not json",
-        headers={**auth_headers, "Content-Type": "application/json"},
-    )
-
-    assert response.status_code == 400
-    assert response.json()["error"]["code"] == "MALFORMED_REQUEST"
-
-
-def test_non_object_json_body_returns_400_malformed_request(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
-    response = client.post(
-        "/api/v1/app-loaded",
-        content=b"[1, 2, 3]",
-        headers={**auth_headers, "Content-Type": "application/json"},
-    )
-
-    assert response.status_code == 400
-    assert response.json()["error"]["code"] == "MALFORMED_REQUEST"
-
-
-def make_static_client(tmp_path: Path) -> TestClient:
-    ui_dist = tmp_path / "dist"
-    ui_dist.mkdir()
-    (ui_dist / "index.html").write_text(
-        "<html><body>HaruQuantAI UI</body></html>", encoding="utf-8"
-    )
-    (ui_dist / "app.css").write_text("body{color:#fff}", encoding="utf-8")
-
-    services = build_services(make_config(tmp_path))
-    static_services = replace(services, ui_dist=ui_dist)
-    return TestClient(create_app(static_services, logging.getLogger("tests.host")))
-
-
-def test_static_ui_is_served_with_spa_fallback(tmp_path: Path) -> None:
-    static_client = make_static_client(tmp_path)
-
-    index = static_client.get("/")
-    spa_route = static_client.get("/builder")
-    asset = static_client.get("/app.css")
-
-    assert index.status_code == 200
-    assert "HaruQuantAI UI" in index.text
-    assert spa_route.status_code == 200
-    assert "HaruQuantAI UI" in spa_route.text
-    assert asset.status_code == 200
-    assert asset.text == "body{color:#fff}"
-
-
-def test_missing_ui_dist_leaves_root_unhandled(client: TestClient) -> None:
-    response = client.get("/")
-
-    assert response.status_code == 404
-    assert response.json()["error"]["code"] == "NOT_FOUND"
-
-
-def test_cors_headers_and_preflight(client: TestClient) -> None:
-    preflight = client.options(
-        "/api/v1/files/exists",
-        headers={
-            "Origin": "http://127.0.0.1:3000",
-            "Access-Control-Request-Method": "POST",
-        },
-    )
-    assert preflight.status_code == 200
+def test_handshake_snapshot_ack_and_standby(client, auth_headers, services):
+    token = auth_headers["Authorization"].removeprefix("Bearer ")
     assert (
-        preflight.headers.get("access-control-allow-origin") == "http://127.0.0.1:3000"
+        client.post("/api/v1/app-loaded", json={}, headers=auth_headers).status_code
+        == 409
     )
-    assert preflight.headers.get("access-control-allow-credentials") == "true"
+    with client.websocket_connect("ws://127.0.0.1/ws/updates") as socket:
+        socket.send_json({"token": token, "topics": ["boot.progress"]})
+        snapshot = socket.receive_json()
+        assert snapshot["type"] == "snapshot"
+        assert len(snapshot["boot"]["stages"]) == 37
+        initial = client.get("/api/v1/init-data", headers=auth_headers).json()["data"]
+        assert initial["first_run"]
+        assert initial["settings"] == {"revision": 0, "values": {}}
+        for _ in range(2):
+            assert client.post(
+                "/api/v1/app-loaded", json={}, headers=auth_headers
+            ).json()["data"] == {"acknowledged": True}
+        for _ in range(100):
+            state = client.get("/api/v1/status").json()["data"]["boot"]["state"]
+            if state == "STANDBY":
+                break
+            time.sleep(0.01)
+        assert state == "STANDBY"
+        socket.send_json({"type": "ping"})
+        for _ in range(100):
+            if socket.receive_json().get("type") == "pong":
+                break
+        else:
+            pytest.fail("no heartbeat response")
+    assert services.events.subscriber_count() == 0
 
-    resp = client.get("/api/v1/health", headers={"Origin": "http://localhost:3000"})
-    assert resp.status_code == 200
-    assert resp.headers.get("access-control-allow-origin") == "http://localhost:3000"
+
+@pytest.mark.parametrize("message", [{}, {"token": "bad"}, {"token": ["bad"]}])
+def test_unauthorized_websocket_closes(client, message):
+    with client.websocket_connect("ws://127.0.0.1/ws/updates") as socket:
+        socket.send_json(message)
+        with pytest.raises(WebSocketDisconnect):
+            socket.receive_json()
 
 
-def test_options_preflight_bypasses_auth(client: TestClient) -> None:
-    preflight = client.options(
-        "/api/v1/settings",
-        headers={
-            "Origin": "http://127.0.0.1:3000",
-            "Access-Control-Request-Method": "PUT",
-        },
-    )
-    assert preflight.status_code == 200
+def test_websocket_origin_and_control_authority(client, auth_headers):
+    with (
+        pytest.raises(WebSocketDisconnect),
+        client.websocket_connect(
+            "ws://127.0.0.1/ws/updates", headers={"origin": "https://evil.example"}
+        ),
+    ):
+        pass
+    token = auth_headers["Authorization"].removeprefix("Bearer ")
+    with client.websocket_connect("ws://127.0.0.1/ws/control") as socket:
+        socket.send_json({"token": token, "topics": ["boot.progress"]})
+        assert socket.receive_json()["type"] == "snapshot"
+        socket.send_json({"type": "execute_arbitrary_code"})
+        with pytest.raises(WebSocketDisconnect):
+            while True:
+                socket.receive_json()
+
+
+def test_payload_failures_unknown_command_and_shutdown(client, auth_headers, services):
+    for content in ("[]", "broken"):
+        assert client.post("/api/v1/auth/login", content=content).status_code == 400
+    result = client.post("/api/v1/commands/builder", json={}, headers=auth_headers)
+    assert result.status_code == 503
+    assert result.json()["error"]["code"] == "MISSING_DEPENDENCY"
+    assert client.post("/api/v1/shutdown", json={}).status_code == 401
     assert (
-        preflight.headers.get("access-control-allow-origin") == "http://127.0.0.1:3000"
+        client.post("/api/v1/shutdown", json={}, headers=auth_headers).status_code
+        == 200
     )
+    assert services.shutdown_event.is_set()
+
+
+def test_static_bundle_is_confined(client, services):
+    root = services.config.ui_dist
+    root.mkdir()
+    (root / "index.html").write_text("<html>shell</html>")
+    (root / "asset.js").write_text("export {}")
+    assert "shell" in client.get("/builder").text
+    assert client.get("/asset.js").text == "export {}"
+    assert client.get("/api/v1/missing").status_code == 401

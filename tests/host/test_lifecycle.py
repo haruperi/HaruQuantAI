@@ -1,118 +1,164 @@
-"""Tests for status probe and graceful shutdown."""
+"""Lifecycle ordering, deadlines, failure isolation and resource cleanup."""
 
-from pathlib import Path
-from unittest.mock import MagicMock
+import asyncio
 
 import pytest
-from app.host.webserver import HOST_VERSION, HostServices
-from starlette.applications import Starlette
-from starlette.testclient import TestClient
+from app.host.contracts import LifecycleHook
+from app.host.events import EventBus
+from app.host.startup import STAGES, Startup
 
 
-def test_status_is_public_and_shaped(client: TestClient) -> None:
-    response = client.get("/api/v1/status")
-
-    assert response.status_code == 200
-    data = response.json()["data"]
-    assert data["status"] == "running"
-    assert data["version"] == HOST_VERSION
-    assert data["ui_ready"] is False
-    assert data["uptime_seconds"] >= 0
-    assert isinstance(data["pid"], int)
-    assert data["cpu_count"] >= 1
-    assert isinstance(data["platform"], str) and data["platform"]
-    assert isinstance(data["system"], str) and data["system"]
-    assert isinstance(data["python_version"], str) and data["python_version"]
-    assert data["memory_total_bytes"] is None or data["memory_total_bytes"] > 0
-    assert data["memory_available_bytes"] is None or data["memory_available_bytes"] > 0
+def test_stage_identity_and_missing_hooks():
+    assert len(STAGES) == len(dict(STAGES)) == 37
+    host = Startup(EventBus())
+    asyncio.run(host.providers("I08"))
+    assert host.results["I08"].outcome == "unavailable"
+    assert [e["data"]["outcome"] for e in host.events.replay()] == [
+        "running",
+        "unavailable",
+    ]
 
 
-def test_ui_readiness_lifecycle_progression(
-    client: TestClient, auth_headers: dict[str, str], services: HostServices
-) -> None:
-    # Initial state before app-loaded
-    assert not services.lifecycle.ui_ready
-    res_status_before = client.get("/api/v1/status")
-    assert res_status_before.status_code == 200
-    assert res_status_before.json()["data"]["ui_ready"] is False
+def test_optional_failure_required_failure_and_timeout():
+    async def fail() -> None:
+        raise RuntimeError("provider failure")
 
-    res_health_before = client.get("/api/v1/health")
-    assert res_health_before.status_code == 200
-    assert res_health_before.json()["data"]["services"] == {
-        "host": "ready",
-        "ui": "pending",
-    }
+    async def wait() -> None:
+        await asyncio.sleep(10)
 
-    # app-loaded requires auth, records readiness
-    res_loaded = client.post(
-        "/api/v1/app-loaded", json={"product": "web"}, headers=auth_headers
+    async def run() -> None:
+        optional = Startup(EventBus(), (LifecycleHook("optional", "I08", fail),))
+        await optional.providers("I08")
+        assert optional.results["I08"].outcome == "failed"
+        required = Startup(
+            EventBus(), (LifecycleHook("required", "I08", fail, required=True),)
+        )
+        with pytest.raises(RuntimeError):
+            await required.providers("I08")
+        assert required.state == "FAILED"
+        timed = Startup(
+            EventBus(), (LifecycleHook("slow", "I08", wait, timeout=0.001),)
+        )
+        await timed.providers("I08")
+        assert timed.results["I08"].outcome == "failed"
+
+    asyncio.run(run())
+
+
+def test_ack_is_per_client_and_restoration_runs_once():
+    calls = []
+
+    async def restore() -> None:
+        calls.append("restore")
+
+    async def run() -> None:
+        host = Startup(EventBus(), (LifecycleHook("restore", "A11", restore),))
+        with pytest.raises(ValueError):
+            host.acknowledge("never-attached")
+        host.connected("one")
+        host.acknowledge("one")
+        host.acknowledge("one")
+        host.connected("two")
+        host.acknowledge("two")
+        await asyncio.sleep(0)
+        assert calls == ["restore"]
+        assert host.state == "STANDBY"
+        await host.close()
+        assert host.snapshot().state == "STOPPED"
+
+    asyncio.run(run())
+
+
+def test_cleanup_reverse_order_and_cancellation():
+    closed = []
+
+    async def run_hook() -> None:
+        pass
+
+    async def close_one() -> None:
+        closed.append("one")
+
+    async def close_two() -> None:
+        closed.append("two")
+
+    async def run() -> None:
+        host = Startup(
+            EventBus(),
+            (
+                LifecycleHook("one", "I08", run_hook, interval=1, close=close_one),
+                LifecycleHook("two", "I08", run_hook, close=close_two),
+            ),
+        )
+        await host.providers("I08")
+        await host.close()
+        assert closed == ["two", "one"]
+
+    asyncio.run(run())
+
+
+def test_deadline_and_invalid_hooks(monkeypatch):
+    host = Startup(EventBus())
+    host.connected("test")
+    host.clients["test"] = (0, False)
+    with pytest.raises(ValueError):
+        host.acknowledge("test")
+    host.connected("test")
+    assert host.clients["test"][0] > 0
+
+    async def noop() -> None:
+        pass
+
+    with pytest.raises(ValueError):
+        Startup(EventBus(), (LifecycleHook("bad", "B01", noop),))
+
+
+def test_fatal_restore_is_observable_without_unhandled_task_error():
+    async def fail() -> None:
+        raise ValueError("failed")
+
+    host = Startup(EventBus(), (LifecycleHook("fatal", "A11", fail, required=True),))
+    asyncio.run(host.restore())
+    assert host.state == "FAILED"
+
+
+@pytest.mark.parametrize("open_browser", [False, True])
+def test_summary_is_complete_and_does_not_execute_or_mutate(caplog, open_browser):
+    calls = []
+
+    async def provider():
+        calls.append("called")
+
+    host = Startup(EventBus(), (LifecycleHook("engine", "I08", provider),))
+    host.state = "SERVER_READY"
+    before = host.snapshot()
+    began = dict(host._began)
+    with caplog.at_level("INFO", logger="app.host.startup"):
+        host.log_summary("server_ready", open_browser=open_browser)
+    assert host.snapshot() == before
+    assert host._began == began
+    assert calls == []
+    for stage, _ in STAGES:
+        assert f"Boot summary [server_ready] {stage} " in caplog.text
+    assert "registered providers=1" in caplog.text
+    assert "strategy scan unavailable: no restoration provider" in caplog.text
+    assert "awaiting client readiness before strategy restoration" in caplog.text
+    assert "0 strategies loaded" not in caplog.text
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_restoration_summary_includes_success_and_failure(caplog, fail):
+    async def restore():
+        if fail:
+            raise RuntimeError("private detail")
+
+    host = Startup(
+        EventBus(), (LifecycleHook("restore", "A11", restore, required=True),)
     )
-    assert res_loaded.status_code == 200
-    assert res_loaded.json()["data"] == {"acknowledged": True}
-    assert bool(services.lifecycle.ui_ready)
-
-    # After app-loaded, status and health reflect ui_ready: True
-    res_status_after = client.get("/api/v1/status")
-    assert res_status_after.status_code == 200
-    assert res_status_after.json()["data"]["ui_ready"] is True
-
-    res_health_after = client.get("/api/v1/health")
-    assert res_health_after.status_code == 200
-    assert res_health_after.json()["data"]["services"] == {
-        "host": "ready",
-        "ui": "ready",
-    }
-
-
-def test_shutdown_requires_auth(client: TestClient) -> None:
-    response = client.post("/api/v1/shutdown")
-
-    assert response.status_code == 401
-
-
-def test_shutdown_sets_the_graceful_flag(
-    client: TestClient, auth_headers: dict[str, str], services: HostServices
-) -> None:
-    response = client.post("/api/v1/shutdown", headers=auth_headers)
-
-    assert response.status_code == 200
-    assert response.json()["data"] == {"shutdown": "requested"}
-    assert services.lifecycle.shutdown_requested is True
-
-
-def test_linux_memory_parsing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    from app.host.lifecycle import _linux_memory
-
-    meminfo = tmp_path / "meminfo"
-    meminfo.write_text(
-        "MemTotal:        16384 kB\nMemAvailable:     8192 kB\n", encoding="utf-8"
-    )
-    monkeypatch.setattr(
-        "app.host.lifecycle.Path",
-        lambda p: meminfo if str(p) == "/proc/meminfo" else Path(p),
-    )
-    total, avail = _linux_memory()
-    assert total == 16384 * 1024
-    assert avail == 8192 * 1024
-
-
-def test_system_memory_unknown_platform(monkeypatch: pytest.MonkeyPatch) -> None:
-    from app.host.lifecycle import _system_memory
-
-    monkeypatch.setattr("platform.system", lambda: "UnknownOS")
-    assert _system_memory() == (None, None)
-
-
-def test_shutdown_with_attached_uvicorn_server(
-    client: TestClient, auth_headers: dict[str, str]
-) -> None:
-    assert isinstance(client.app, Starlette)
-    fake_server = MagicMock()
-    fake_server.should_exit = False
-    client.app.state.uvicorn_server = fake_server
-    try:
-        response = client.post("/api/v1/shutdown", headers=auth_headers)
-        assert response.status_code == 200
-        assert fake_server.should_exit is True
-    finally:
-        del client.app.state.uvicorn_server
+    with caplog.at_level("INFO", logger="app.host.startup"):
+        asyncio.run(host.restore())
+    for stage, _ in STAGES:
+        assert f"Boot summary [client_initialization] {stage} " in caplog.text
+    assert host.state == ("FAILED" if fail else "STANDBY")
+    assert "private detail" not in caplog.text
+    if fail:
+        assert "not reached because boot failed" in caplog.text

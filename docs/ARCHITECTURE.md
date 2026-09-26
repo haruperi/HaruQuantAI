@@ -152,15 +152,13 @@ the owner's versioned wire schema; UI presentation types do not become a
 parallel backend schema. A breaking change needs a new version or explicit
 migration and producer/consumer compatibility evidence.
 
-The current host scans the configured workspace/plugin roots for
-manifest.json at startup. A valid manifest declares identity, kind,
-route base, version, capabilities, and optionally a route module. The
-catalog returned by a running host is the same startup snapshot used to
-mount routes and marks a manifest-only entry as unmounted. New files require
-restart; malformed or conflicting declarations produce issues. This is
-**implemented host behavior**, documented in
-[app/host/README.md](../app/host/README.md). It is not yet a complete
-runtime capability resolver or hot-swap system.
+The rebuilt host inspects bounded literal Python descriptors and JSON manifests
+without importing discovered modules. Its catalog is an immutable startup snapshot
+of metadata and issues; entries remain explicitly unmounted and unavailable until
+trusted runtime providers exist. Lifecycle hooks are supplied through typed,
+explicit injection. This is not a complete runtime capability resolver, arbitrary
+plugin loader, or hot-swap system. The current 37-stage orchestration and domain
+availability boundary are documented in [app/host/README.md](../app/host/README.md).
 
 The current React shell still uses static workspace route imports and
 several direct prototype imports. It does not yet achieve SC-02/SC-05 for

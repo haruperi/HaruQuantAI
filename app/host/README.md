@@ -1,4 +1,181 @@
+ 
+
 # Host boot-sequence reference and target Python specification
+
+## Current implementation and acceptance boundary (2026-09-25)
+
+The rebuilt host implements orchestration for **B01-B11, I01-I13 and A01-A13**.
+It is a host candidate, not an SQX-compatible simulator. Absent quantitative
+providers produce `unavailable`, not successful initialization. Sections 1-6
+below retain the target design and prior donor references; their present-tense
+and parity language must not be read as implementation evidence. Donor claims
+were not independently revalidated by this implementation task.
+
+The approved plan and qualification walkthrough are under
+`.agents/logs/2026-09-25T192000_complete-host-boot/`. All paths here are relative
+to HARUQUANTAI_ROOT unless explicitly rooted at SQX_REFERENCE_ROOT.
+
+### Feature registry and public contracts
+
+| Feature             | Current implementation                                                                                                                                     | Verification owner                                            |
+| ------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| FEAT-HOST-BOOT      | 37 named stage outcomes, monotonic timings, process state separate from client authentication, exactly-once restoration, bounded supervised hooks          | tests/host/test_lifecycle.py, tests/host/test_bootstrapper.py |
+| FEAT-HOST-SESSION   | Loopback operator auto-login; protected sessions use salted PBKDF2-SHA256, signed bearer credentials, durable hashes/expiry/revocation and bounded retries | tests/host/test_sessions.py                                   |
+| FEAT-HOST-TRANSPORT | FastAPI HTTP envelope, updates/control WebSockets, settings SSE, safe static SPA delivery, UI/CLI readiness handshake                                      | tests/host/test_webserver.py, tests/test_main.py              |
+| FEAT-HOST-CATALOG   | Bounded AST/literal or JSON descriptor inspection, SHA-256 identity, defect/duplicate isolation; descriptors are metadata-only and explicitly unavailable  | tests/host/test_catalog.py                                    |
+| FEAT-HOST-SETTINGS  | Public field validation, transactional compare-and-set updates, private-field preservation and post-commit events                                          | tests/host/test_settings.py, tests/persistence/test_host.py   |
+| FEAT-HOST-LOGGING   | Explicit console and bounded early buffer, rotating JSON file, secret redaction, Uvicorn diagnostic forwarding, get_logger(__name__) facade          | tests/host/test_telemetry.py                                  |
+
+`contracts.py` owns universal wire documents. `LifecycleHook` is an explicitly
+injected, trusted async callback with a stage, required/optional flag, finite
+timeout, optional interval and cleanup callback. Runtime behavior does not
+import descriptor-named implementations. Metadata inspection does **not** make
+Python safe to execute. Hot reload, arbitrary extension execution and full
+capability resolution/route mounting remain future work. No concrete plugin
+metadata, math or owner schema is centralized in this host.
+
+`PluginDescriptor` declares a namespaced ID, semantic version, compatibility
+`"1"`, provided/required versioned capabilities, parameter schema and algebraic
+ports. A Python contribution exposes a literal `PLUGIN = {...}` mapping; a
+workspace may provide `manifest.json` with the same schema. Invalid descriptors
+are isolated, duplicate IDs/routes are ambiguous, and all unbound descriptors
+remain `mounted: false`, `available: false`. Adding metadata never executes it.
+Presets are bounded JSON objects with fingerprints; domain-specific schema
+validation is explicitly unavailable without its owner.
+
+### Complete boot logs
+
+FEAT-HOST-BOOT and FEAT-HOST-LOGGING report all 37 stages in a
+`Boot summary [server_ready]` after the listening socket is ready, before any
+client connects. A `Boot summary [client_initialization]` follows deferred
+restoration, including failure. These are read-only snapshots, distinct from
+actual transition logs. They do not run providers or change progress outcomes.
+
+Pending client stages explain what they await, and B06 states whether automatic
+browser launch is disabled or was attempted. Each provider stage shows its
+registered provider count. A11 explicitly reports that strategy scanning is
+unavailable when no restoration provider exists; it does not claim zero saved
+strategies. Preset/catalog totals reflect actual completed inspections, including
+zero. Server readiness therefore does not imply client or strategy readiness.
+
+### Stage implementation coverage
+
+| Stage | Implemented behavior and remaining boundary                                                                                               |
+| ----- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| B01   | Python 3.14+ script/module entry, argument validation, exit code and early diagnostic records.                                            |
+| B02   | Immutable HostSettings; defaults < persisted host/runtime < HARU_* environment < explicit CLI; read-only database loading.                |
+| B03   | Explicit logging setup and runtime directory assembly.                                                                                    |
+| B04   | Async BootstrapCoordinator, fail-closed initialization and reverse cleanup.                                                               |
+| B05   | Single FastAPI application for REST and both WebSocket paths.                                                                             |
+| B06   | Independently launched browser/CLI; optional browser launch after actual server bind.                                                     |
+| B07   | Existing UI view state retained; CLI page/output context; client acknowledgment records completion.                                       |
+| B08   | Authenticated socket attachment and bounded startup snapshot/replay.                                                                      |
+| B09   | CPU, RAM and runtime diagnostics without device fingerprinting.                                                                           |
+| B10   | Operator authentication, per-session authority, retry limits and revocation.                                                              |
+| B11   | React BootScreen and CLI stage JSON progress with explicit outcomes.                                                                      |
+| I01   | New unified database creation or existing schema verification; settings load. No automatic migration of existing stores.                  |
+| I02   | Bounded JSON preset inventory, issue isolation; owner validation remains unavailable.                                                     |
+| I03   | Compiler lifecycle slot. Unavailable without CodeEditor; catalog syntax inspection alone is not compilation/type checking.                |
+| I04   | Bounded, lazily spawned ProcessPoolExecutor and explicit shutdown.                                                                        |
+| I05   | Building-block lifecycle slot activated after discovery. Unavailable without providers.                                                   |
+| I06   | AST/JSON descriptor inspection without module import; metadata-only catalog.                                                              |
+| I07   | Statistics lifecycle slot. No statistics implementations installed.                                                                       |
+| I08   | Engine lifecycle slot. No simulation/execution models installed.                                                                          |
+| I09   | Data catalog lifecycle slot. No implicit benchmark download or market-data initialization.                                                |
+| I10   | Project lifecycle slot. No project graph/queue implementation installed.                                                                  |
+| I11   | Bounded pub/sub with sequence IDs, snapshot replay, heartbeat and overflow signaling.                                                     |
+| I12   | Data-validation lifecycle slot. No host-owned price-series algorithm.                                                                     |
+| I13   | Static bundle check and SPA/transport assembly; reports unavailable if no built bundle. Vite remains usable.                              |
+| A01   | Host REST routes, WebSocket updates/control and static routes; MCP and arbitrary contribution route mounting remain unavailable.          |
+| A02   | Reserve configured port or next ten valid ports; persist selected port only after Uvicorn reports listening.                              |
+| A03   | Optional browser navigation or explicit CLI URL; client acknowledgment records arrival.                                                   |
+| A04   | UI/CLI in-memory session initialization.                                                                                                  |
+| A05   | Both clients attach authenticated updates; control supports authorized heartbeat only.                                                    |
+| A06   | Shared init-data settings/catalog/presets/boot snapshot.                                                                                  |
+| A07   | UI navigation retained; CLI rejects unbound workspaces. Research dispatch is unavailable without command providers.                       |
+| A08   | Backend first-run requirements displayed by UI and CLI init snapshot.                                                                     |
+| A09   | Authenticated app-loaded acknowledgment within 30 seconds of socket attachment.                                                           |
+| A10   | Per-client readiness record and total elapsed boot diagnostics; repeated ACK does not rerun restoration.                                  |
+| A11   | Supervised restoration slot; unavailable without databank owner.                                                                          |
+| A12   | Bounded optional post-load/periodic hooks; no stock/broker/network jobs by default.                                                       |
+| A13   | Host standby; shell commands available, missing research commands return MISSING_DEPENDENCY. No destructive sweeper or autosaver enabled. |
+
+B/I/A numbers identify reference stages, not a forced execution ordering.
+I05 activation waits for I06. Client milestones occur after binding; early stage
+history is replayed to late clients. Host lifecycle is `OFFLINE`, `INITIALIZING`,
+`SERVER_READY`, `RESTORING`, `STANDBY`, `DEGRADED`, `FAILED`, `STOPPED`.
+Authentication/lock/readiness are per-session, never a global lock triggered by
+another client's failed login. No attached client means the host waits in
+SERVER_READY. Optional provider failures are attributed; required failures block
+initialization/restoration. A ready shell is not a ready quantitative engine.
+
+### Running and deployment
+
+```text
+uv run python app/main.py --port 8000 --data-dir <NEW_DATA_DIR>
+npm --prefix app/ui run dev
+uv run python -m app.cli --url http://127.0.0.1:8000 --page=login --json
+```
+
+Without `--data-dir`, the normal root is `data/`. Existing databases missing
+`users`/`sessions` or having incompatible host/auth schemas are rejected with a
+migration-required diagnostic. Shared-store migration was separately authorized
+and completed on 2026-09-26; default startup, local login, and graceful shutdown
+were verified. Future deployments still require explicit migration authorization.
+
+For a legacy store with both auth tables absent, stop competing hosts and schema
+operations, then run `uv run python -m app.main --migrate-auth-schema` (include
+`--data-dir` when using a custom root). This explicit maintenance command verifies
+the host schema, creates and integrity-checks an exclusive SQLite recovery backup
+under `data/database/backups/`, adds both auth tables in one transaction, and exits
+without serving. Existing rows are retained. Already compatible auth schemas are
+no-ops; partial or conflicting schemas require review. Normal startup never
+migrates an existing store automatically. Keep recovery backups private.
+New temporary stores are sufficient for smoke tests. Sessions are stored in the
+single application database, with only token hashes persisted. Signing keys
+are process-local, so restart requires reauthentication. Existing credential
+records are authoritative and never silently replaced by an environment value.
+
+Local auto-login requires both loopback binding and a literal loopback peer;
+forwarded headers are not trusted. Remote binding requires configured password
+and TLS certificate/private key. Secrets come from `HARU_PASSWORD` (host) or
+`HARU_CLIENT_PASSWORD` (CLI); never put them in repository evidence. Runtime
+paths are selected locally, not committed as machine-specific values.
+`HARU_CERTIFICATE`, `HARU_PRIVATE_KEY`, `HARU_HOST`, `HARU_PORT`, `HARU_WORKERS`
+and `HARU_DATA_DIR` supply explicit runtime overrides. In-process callers may
+inject allowed origins through HostSettings; no mutable settings singleton.
+
+HTTP uses the UI envelope `{api_version, request_id, status, data?, error?}`.
+Public status/health contain safe diagnostics. Settings/catalog/init-data,
+app-loaded, shutdown and shell/file commands require a bearer session. WebSocket
+authentication is the first frame within five seconds, never a token query string;
+public topics are `boot.progress` and `settings.changed`. Both clients wait for
+restoration readiness before claiming an online research session. UI navigation
+and mock screens do not establish backend functionality. CLI exits nonzero when
+a workspace has no available backend; full UI/CLI research parity is not claimed.
+
+Loggers are obtained only through `app.host.logging.get_logger(__name__)`.
+Bootstrap explicitly installs console plus rotating JSON output at
+`data/logs/haruquantai.log` (10 MiB, five backups). Early records are buffered
+within a 256-record limit and copied into the file sink once configured. Module
+imports never install handlers. Stage transitions include IDs, outcomes,
+elapsed milliseconds and bounded reason codes; credential-bearing request bodies
+and exception values at public/provider boundaries are omitted.
+
+### Verification and known limits
+
+The walkthrough records exact candidate commands and outcomes. Tests use temporary
+stores, actual loopback host/CLI processes, and UI transport fixtures. The browser
+smoke test uses an isolated data root. The shared database, junctions, tracked
+`data/`/`.vscode/` files, donor installation and Git history are unchanged.
+
+Trusted hooks must cooperate with asyncio cancellation. A timeout does not sandbox
+hostile in-process code. The compute pool is allocated but no quantitative jobs
+are implemented. Dynamic provider loading, real workspace route/command binding,
+full snippet type checking, market data/project/databank semantics, quantitative
+algorithms and optional network integrations require their own approved owners.
+
+---
 
 This document establishes the exhaustive StrategyQuant X (SQX) build **144.2953**
 startup sequence discovered through clean-room reverse engineering and specifies the
@@ -50,6 +227,7 @@ the universal backend host from the client consumer using a standardized two-ter
 2. **Terminal 2 — Client Consumer (UI or CLI):**
 
    - **UI Mode (React Web Shell):**
+
      ```bash
      npm --prefix app/ui run dev
      ```
@@ -57,6 +235,7 @@ the universal backend host from the client consumer using a standardized two-ter
      Runs the Vite dev server at `http://localhost:3000`. The browser navigates to UI
      routes (e.g. `http://localhost:3000/login`, `http://localhost:3000/builder`).
    - **CLI Mode (Direct Script / Command Runner):**
+
      ```bash
      uv run python -m app.cli --page=login --username=operator --password=secret
      uv run python -m app.cli --page=builder --config=strategy_config.json
@@ -69,11 +248,11 @@ the universal backend host from the client consumer using a standardized two-ter
      error shapes (`ApiClientError`), and business logic are 100% identical between UI
      and CLI.
 
-### Structured telemetry, logging, and security redaction (app/host/telemetry.py)
+### Structured telemetry, logging, and security redaction (app/host/logging.py)
 
 HaruQuantAI replaces SQX's unmanaged Log4j configuration, arbitrary console prints, and
 fragmented log files (`StrategyQuant.log`, `derby.log`) with an explicit, secure telemetry
-subsystem in `app/host/telemetry.py`:
+subsystem in `app/host/logging.py`:
 
 1. **Standard library logging engine:** Uses Python's standard `logging` library configured
    during initial host assembly in `app/host/bootstrap.py`. Unifies root host logging,
@@ -186,7 +365,7 @@ the Five Laws of Spatial Composability:
 9. **Managed async supervision:** Unmonitored background threads from SQX are replaced
    with an explicit, async-supervised task manager (`app/host/startup.py`).
 10. **Structured telemetry and secret redaction:** SQX's fragmented loggers (Log4j +
-    `StrategyQuant.log` + console stdout) are unified into `app/host/telemetry.py`, emitting
+    `StrategyQuant.log` + console stdout) are unified into `app/host/logging.py`, emitting
     to stdout and rotated files in `data/logs/haruquantai.log` with active sensitive credential
     redaction, no application `print`, and zero hidden setup.
 11. **Zero-coupling dynamic filesystem discovery:** Plugins live on disk as self-contained
@@ -219,7 +398,7 @@ HARUQUANTAI_ROOT/
 │   │   ├── telemetry.py                  # Structured logging, log rotation (data/logs/), and secret redaction
 │   │   ├── http_server.py                # FastAPI ASGI server mounting APIRouters & WebSockets
 │   │   ├── events.py                     # In-memory async pub/sub event bus & channel hub
-│   │   ├── config.py                     # Single HostSettings model, settings singleton, ensure_directories
+│   │   ├── config.py                     # Single HostSettings model, injected settings projection
 │   │   ├── security.py                   # Authentication guards, password hashing, and token issuance
 │   │   ├── sessions.py                   # Active operator session state management
 │   │   ├── resources.py                  # CPU core profiling and ProcessPoolExecutor sizing
@@ -362,7 +541,7 @@ owns general settings writes and schema creation for the host tables.
 | **B03** | **Runtime bootstrap:** `sqlauncher` uses `github.com/timob/jnigi` to load `j64/bin/server/jvm.dll`; dynamically decrypts core classes via `dynresources.decrypt` and injects custom classloader `embedclassloader.go`. Empty standard classpath (`java.class.path=,`). | `app/host/bootstrap.py`                                                                                 | Native Python runtime startup. Modules loaded via standard Python import machinery; zero proprietary decryption or obfuscation.                                                                                                                                                                                                                                                                                                                                                       | Observed symbols; S1, S2, S11 |
 | **B04** | **Application main entry:** Invokes `SQStarter.main` → `SQApp.main` → `MainAppStandardImpl.startApp`. Instantiates application context.                                                                                                                                    | `app/host/bootstrap.py`                                                                                 | Async bootstrapper`BootstrapCoordinator.initialize()` orchestrates sequential service assembly.                                                                                                                                                                                                                                                                                                                                                                                     | Observed stack; S2            |
 | **B05** | **Control server initialization:** Starts Jetty `MainAppWebServer` on port 5051 (`internal/AppSettings.txt`). Serves `/websocket/app` for desktop control.                                                                                                                   | `app/host/http_server.py`                                                                               | Unified FastAPI ASGI application served by Uvicorn on a single configured port. WebSocket channels (`/ws/updates`, `/ws/control`) and REST routes share one server.                                                                                                                                                                                                                                                                                                               | Observed; S1, S2, S13         |
-| **B06** | **Client launch:** Executes `cmd /c start "" C:/SQX/internal/electron/StrategyQuantX_ui.exe SQUANT StrategyQuantX sq.ico 5051 <browserToken>`.                                                                                                                                   | `app/host/browser.py`, `app/ui/`, `app/cli.py`                                                      | **Two-Terminal client launch:**- *UI Mode:* Terminal 2 runs `npm --prefix app/ui run dev` (Vite dev server on port 3000).- *CLI Mode:* Terminal 2 runs `uv run python -m app.cli --page=<route>`. No Electron wrapper.                                                                                                                                                                                                                                                  | Observed; S2, S4              |
+| **B06** | **Client launch:** Executes `cmd /c start "" SQX_REFERENCE_ROOT/internal/electron/StrategyQuantX_ui.exe SQUANT StrategyQuantX sq.ico 5051 <browserToken>`.                                                                                                                       | `app/host/browser.py`, `app/ui/`, `app/cli.py`                                                      | **Two-Terminal client launch:**- *UI Mode:* Terminal 2 runs `npm --prefix app/ui run dev` (Vite dev server on port 3000).- *CLI Mode:* Terminal 2 runs `uv run python -m app.cli --page=<route>`. No Electron wrapper.                                                                                                                                                                                                                                                  | Observed; S2, S4              |
 | **B07** | **Client layout and window state:** Electron parses CLI args, configures `userData` directory, restores window geometry from `main-window-state.json`, and sets default headers.                                                                                               | `app/ui/src/app/store/layoutStore.ts`, `app/cli.py`                                                   | -*UI:* React frontend manages layout, Dockview docking panels, and active workspaces via Zustand; persists state to browser `localStorage` and syncs with `/api/v1/settings`.- *CLI:* CLI flags configure execution context, output formatting (`--json`, `--table`), and target workspace.                                                                                                                                                                               | Observed; S3, S5              |
 | **B08** | **Client connection handshake:** Electron connects to `ws://127.0.0.1:5051/websocket/app`. Java backend checks readiness up to 15 times with 1-second sleeps.                                                                                                                    | `app/ui/src/app/transport.ts`, `app/host/events.py`, `app/cli.py`                                   | Client connects via WebSocket to`/ws/updates`. Both React SPA and CLI client stream live progress events. Host transitions to `SERVER_READY`.                                                                                                                                                                                                                                                                                                                                     | Observed; S2, S3, S5          |
 | **B09** | **Hardware diagnostics:** Gathers OS, CPU model/cores, RAM, display EDID via OSHI library. Generates Hardware ID `C47DB16BC139`.                                                                                                                                                 | `app/host/resources.py`                                                                                 | Pure Python system inspection using`os.cpu_count()`, `platform`, and `psutil` to configure compute pools. Diagnostic telemetry only; no hardware-locked DRM.                                                                                                                                                                                                                                                                                                                    | Observed; S2                  |
@@ -378,7 +557,7 @@ The 13 stages below represent the exact UI milestone messages emitted by SQX bui
 
 | Step          | Exact SQX stage name                       | Verified SQX build 144.2953 internal operations                                                                                                                                                                                                                           | Target HaruQuantAI owner                                           | Clean-room Python + React + CLI implementation contract                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | :------------ | :----------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :----------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **I01** | `Initializing database & settings...`    | - Opens SQLite database`user/data/data.db` and H2 stores (`data_stock.h2.db`, `data_futures.h2.db`).- Deserializes `user/settings/settings.xml` (paths, skins, ports, compute flags).- Reads `internal/AppSettings.txt` (port 5051).                            | `app/persistence/host.py`                                       | **Unified Database & Settings Bootstrap:**- Opens single SQLite database `HARUQUANTAI_ROOT/data/database/haruquantai.db`.- Verifies and migrates relational schemas for host, auth, and all domain tables.- Deserializes global settings from table `host_settings` into Pydantic models.- Discovers workspace configurations and presets from `HARUQUANTAI_ROOT/data/presets/*.json` (no XML).                                                                                                                                                                                                                                                    |
+| **I01** | `Initializing database & settings...`    | - Opens SQLite database`user/data/data.db` and H2 stores (`data_stock.h2.db`, `data_futures.h2.db`).- Deserializes `user/settings/settings.xml` (paths, skins, ports, compute flags).- Reads `internal/AppSettings.txt` (port 5051).                            | `app/persistence/host.py`                                        | **Unified Database & Settings Bootstrap:**- Opens single SQLite database `HARUQUANTAI_ROOT/data/database/haruquantai.db`.- Verifies and migrates relational schemas for host, auth, and all domain tables.- Deserializes global settings from table `host_settings` into Pydantic models.- Discovers workspace configurations and presets from `HARUQUANTAI_ROOT/data/presets/*.json` (no XML).                                                                                                                                                                                                                                                    |
 | **I02** | `Loading customizations...`              | -`com.strategyquant.lib.customization.Customization` discovers user overrides in `user/settings/` and `user/extend/`.- Counts and validates custom configurations.                                                                                                  | `app/host/customizations.py`                                     | - Discovers user-defined workspace layouts, themes, and configuration overrides from`data/presets/`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
 | **I03** | `Compiling snippets...`                  | -`SnippetsHash` checks MD5 hashes in `user/settings/snippets.txt` across 931 Java files.- `AutoCompiler.compileSQFiles` / `SnippetsCompiler` compiles changed files in `user/extend/Snippets/SQ/` (Blocks, Columns, Utils) into `internal/libs/Snippets.jar`. | `app/workspace/CodeEditor/compiler.py`                           | - In Python, snippets are native modules. Change detection via SHA-256 hash ledger.- Dynamic syntax & AST verification (`ast.parse`); static type/schema checking before registration.                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | **I04** | `Loading performance settings...`        | - Detects CPU topology via OSHI (`CpuInfo`).- Configures `MultithreadComputePerformer` and `ThreadPool` (e.g. 11 executors for 12 logical cores under config `'-1'`).                                                                                             | `app/host/resources.py`                                          | - Profiles host CPU cores (`os.cpu_count()`) and RAM.- Initializes asynchronous I/O event loop and `concurrent.futures.ProcessPoolExecutor` sized for compute-bound backtesting.                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
@@ -406,7 +585,7 @@ The 13 stages below represent the exact UI milestone messages emitted by SQX bui
 | **A06** | **Load initial state:** Frontend invokes `/main/loadInitializationData` retrieving constants, settings, languages, columns, views, and data configs.                             | `app/ui/src/app/HostConnection.tsx`, `app/host/http_server.py`, `app/cli.py` | HTTP endpoint`GET /api/v1/init-data` delivers identical Pydantic-serialized configuration from table `host_settings`, catalog descriptors, and metadata to UI and CLI.                                                                                                                           | Observed; S4, S8 |
 | **A07** | **Assemble navigation and workspaces:** Registers UI routes from plugins (Builder, Retester, Optimizer, Portfolio Master, Data Manager, AlgoWizard).                               | `app/ui/src/app/router.tsx`, `app/cli.py`                                      | **Route Parity:**- *UI:* React Router dispatches URLs (`/builder`, `/retester`, `/optimizer`, `/datamanager`).- *CLI:* CLI parses `--page=builder`, `--page=retester`, `--page=optimizer`, `--page=datamanager`, dispatching to the exact same backend workspace handlers. | Observed; S8, S9 |
 | **A08** | **Introductory checks:** Evaluates first-run settings, display warnings, and setup wizard triggers.                                                                                | `app/ui/src/app/FirstRunDialog.tsx`, `app/cli.py`                              | -*UI:* Renders setup or onboarding modals if unconfigured.- *CLI:* Checks configuration; emits warning or prompts for missing required parameters.                                                                                                                                               | Observed; S9     |
-| **A09** | **Client readiness acknowledgment:** After workspace preload checks pass, client delays 3 seconds, fades loading overlay, and posts to `/main/appLoaded`.                        | `app/ui/src/app/HostConnection.tsx`, `app/cli.py`                              | **Universal Readiness Trigger:**Both React frontend and CLI runner send `POST /api/v1/app-loaded`, signaling that client initialization is complete and triggering the host state transition to `RESTORING`.                                                                               | Observed; S8     |
+| **A09** | **Client readiness acknowledgment:** After workspace preload checks pass, client delays 3 seconds, fades loading overlay, and posts to `/main/appLoaded`.                        | `app/ui/src/app/HostConnection.tsx`, `app/cli.py`                              | **Universal Readiness Trigger:**Both React frontend and CLI runner send`POST /api/v1/app-loaded`, signaling that client initialization is complete and triggering the host state transition to `RESTORING`.                                                                                      | Observed; S8     |
 | **A10** | **Record client-ready milestone:** Server marks `MainApp.AppLoaded = true`, triggers post-GUI listeners, logs total loading time, and announces `APP LOADED`.                  | `app/host/startup.py`                                                            | Host state machine transitions from`CLIENT_READY` to `RESTORING`. Logs boot timing diagnostics.                                                                                                                                                                                                  | Observed; S2, S4 |
 | **A11** | **Restore saved strategies:** Asynchronous thread `ProjectEngine.loadStrategies()` deserializes `.sqx` files into databanks (e.g. `Strategies to optimize`, `Results`).    | `app/plugins/Databank/plugin.py`, `app/host/startup.py`                        | Managed async task hydrations: read persisted strategy models via Pydantic schemas into active databanks with progress events. In CLI mode, completes hydration before executing batch research commands.                                                                                            | Observed; S2, S7 |
 | **A12** | **After-load synchronization:** Spawns asynchronous tasks: `BasketOfStocksManager` syncing stock baskets, `BrokerManager` syncing broker definitions, update checks.           | `app/host/startup.py`, `app/plugins/`                                          | Managed background supervisor executes registered post-load hooks (asset syncing, broker profile checks).                                                                                                                                                                                            | Observed; S2, S4 |

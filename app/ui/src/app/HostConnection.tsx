@@ -3,8 +3,10 @@
 import { createContext, useContext, useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { Button, Field, Modal, TextInput } from '../components/ui';
 import { useAppStore } from './store';
-import { readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences, type HostSettingsSnapshot, type ShellPreferences } from './hostSettings';
-import { ApiClientError, createDomainClient, login, setAuthToken, subscribeAuthExpired } from './transport';
+import { parseHostPreferences, readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences, type HostSettingsSnapshot, type ShellPreferences } from './hostSettings';
+import { BootScreen } from './BootScreen';
+import { FirstRunDialog } from './FirstRunDialog';
+import { connectBootStream, type BootSnapshot, type BootStream, type InitializationData, ApiClientError, createDomainClient, login, setAuthToken, subscribeAuthExpired } from './transport';
 
 export type HostStatus = 'connecting' | 'online' | 'locked' | 'offline';
 export type SaveSettingsResult = { ok: true } | { ok: false; message: string };
@@ -17,6 +19,9 @@ export interface ConnectHostOptions {
   onSettings: (snapshot: HostSettingsSnapshot) => void;
   onCoreCount?: (cores: number) => void;
   onError: (message: string) => void;
+  onBoot?: (snapshot: BootSnapshot) => void;
+  onFirstRun?: (requirements: string[]) => void;
+  bootStream?: typeof connectBootStream;
 }
 
 export async function connectHost(options: ConnectHostOptions): Promise<void> {
@@ -27,22 +32,41 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
     if (!signal.aborted) onSettings(snapshot);
   };
 
+  let stream: BootStream | undefined;
+  let streamFailed = false;
   try {
     await login({ username: 'operator', ...(options.password ? { password: options.password } : {}) }, config);
     if (signal.aborted) return;
-    await refresh();
+    stream = (options.bootStream ?? connectBootStream)(signal, options.onBoot ?? (() => {}), message => { streamFailed = true; if (!signal.aborted) { onStatus('offline'); onError(message); } });
+    await stream.ready;
+    const initial = await createDomainClient('', config).get<InitializationData>('/init-data');
+    onSettings(parseHostPreferences(initial.settings));
+    options.onBoot?.(initial.boot);
+    if (initial.first_run) options.onFirstRun?.(initial.requirements);
     if (options.onCoreCount) {
       const status = await createDomainClient('', config).get<{ cpu_count?: number }>('/status');
       if (!signal.aborted && Number.isInteger(status.cpu_count) && (status.cpu_count ?? 0) > 0) options.onCoreCount(status.cpu_count!);
     }
     await createDomainClient('', config).post('/app-loaded', {});
     if (signal.aborted) return;
+    const deadline = Date.now() + 30000;
+    let ready = false;
+    while (!signal.aborted && Date.now() < deadline) {
+      const snapshot = await createDomainClient('', config).get<{ boot: BootSnapshot }>('/status');
+      options.onBoot?.(snapshot.boot);
+      if (['STANDBY', 'DEGRADED'].includes(snapshot.boot.state)) { ready = true; break; }
+      if (snapshot.boot.state === 'FAILED') throw new Error('Required host initialization failed');
+      await new Promise(resolve => setTimeout(resolve, 100));
+    }
+    if (signal.aborted) return;
+    if (streamFailed) throw new Error('Host progress connection failed; reconnect');
+    if (!ready) throw new Error('Host readiness timed out');
     onStatus('online');
     await watchSettingsChanges({
       signal,
       fetchFn: options.fetchFn,
       onChanged: refresh,
-      onConnection: connected => { if (!signal.aborted) onStatus(connected ? 'online' : 'offline'); },
+      onConnection: connected => { if (!signal.aborted && !connected) onStatus('offline'); },
     });
   } catch (error) {
     if (signal.aborted) return;
@@ -54,7 +78,7 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
       onStatus('offline');
       onError(error instanceof Error ? error.message : 'Host connection failed');
     }
-  }
+  } finally { stream?.close(); }
 }
 
 interface HostConnectionValue {
@@ -71,6 +95,8 @@ export function useHostConnection(): HostConnectionValue {
 }
 
 export function HostConnectionProvider({ children }: { children: ReactNode }) {
+  const [boot, setBoot] = useState<BootSnapshot | null>(null);
+  const [requirements, setRequirements] = useState<string[] | null>(null);
   const [status, setStatus] = useState<HostStatus>('connecting');
   const statusRef = useRef<HostStatus>('connecting');
   const [message, setMessage] = useState('');
@@ -123,6 +149,8 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
           Math.max(1, cores - (configuration.coreUsage === 'reserve-one' ? 1 : 0));
         useAppStore.getState().updateSettings({ configuration, workers });
       },
+      onBoot: setBoot,
+      onFirstRun: setRequirements,
       onError: error => setMessage(error),
     });
     return () => { controller.abort(); setAuthToken(null); };
@@ -208,6 +236,8 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
 
   return <HostConnectionContext.Provider value={{ status, saveSettings }}>
     {children}
+    {status === 'connecting' && boot && <BootScreen snapshot={boot} />}
+    {status === 'online' && requirements && <FirstRunDialog requirements={requirements} onClose={() => setRequirements(null)} />}
     {status === 'locked' && <Modal title="Connect to HaruQuantAI host" onClose={() => updateStatus('offline')} footer={<Button form="host-login" type="submit" className="primary">Connect</Button>}>
       <form id="host-login" onSubmit={submitPassword}>
         <p role="alert">{message || 'Enter the host password to connect.'}</p>

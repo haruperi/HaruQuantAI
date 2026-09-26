@@ -15,6 +15,8 @@ repos:
         stages: [pre-commit]
 
       - id: end-of-file-fixer
+        # Use the pinned module without a generated Windows executable launcher.
+        entry: python -m pre_commit_hooks.end_of_file_fixer
         stages: [pre-commit]
 
       - id: check-yaml
@@ -37,6 +39,7 @@ repos:
         stages: [pre-commit]
 
       - id: debug-statements
+        entry: python -m pre_commit_hooks.debug_statement_hook
         stages: [pre-commit]
 
   # Project development tools

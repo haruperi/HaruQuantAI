@@ -5,6 +5,8 @@ import { createInitialAppSettings } from '../../../src/app/globalSettings';
 import { shellPreferences } from '../../../src/app/hostSettings';
 
 const asFetch = (fn: unknown) => fn as unknown as typeof fetch;
+const boot = { state: 'STANDBY', sequence: 1, stages: [] };
+const bootStream = () => ({ ready: Promise.resolve(), close: vi.fn() });
 const shell = { ...shellPreferences(createInitialAppSettings()), theme: 'light', zoom: 1.1 };
 
 describe('host startup sequence', () => {
@@ -17,16 +19,17 @@ describe('host startup sequence', () => {
         ok: true, status: 200,
         json: async () => ({ status: 'success', data: { token: 'live-session' } }),
       };
-      if (url.endsWith('/settings')) return {
+      if (url.endsWith('/status')) return { ok: true, status: 200, json: async () => ({ status: 'success', data: { boot } }) };
+      if (url.endsWith('/init-data')) return {
         ok: true, status: 200,
-        json: async () => ({ status: 'success', data: { revision: 1, values: { 'app.general': { theme: 'light', language: 'en', zoom: 1.1 } } } }),
+        json: async () => ({ status: 'success', data: { boot, first_run: false, settings: { revision: 1, values: { 'app.general': { theme: 'light', language: 'en', zoom: 1.1 } } } } }),
       };
       return { ok: true, status: 200, json: async () => ({ status: 'success', data: { acknowledged: true } }) };
     });
     const onSettings = vi.fn();
-    await connectHost({ signal: controller.signal, fetchFn: asFetch(fetchFn), onStatus: status, onSettings, onError: vi.fn() });
+    await connectHost({ bootStream, signal: controller.signal, fetchFn: asFetch(fetchFn), onStatus: status, onSettings, onError: vi.fn() });
     expect(fetchFn.mock.calls.map(call => call[0])).toEqual([
-      '/api/v1/auth/login', '/api/v1/settings', '/api/v1/app-loaded',
+      '/api/v1/auth/login', '/api/v1/init-data', '/api/v1/app-loaded', '/api/v1/status',
     ]);
     expect(((fetchFn.mock.calls[2][1] as RequestInit).headers as Headers).get('Authorization')).toBe('Bearer live-session');
     expect(onSettings).toHaveBeenCalledWith({ revision: 1, preferences: shell });
@@ -41,7 +44,7 @@ describe('host startup sequence', () => {
       json: async () => ({ status: 'error', error: { code: 'UNAUTHORIZED', message: 'Invalid credentials' } }),
     });
     const status = vi.fn();
-    await connectHost({ signal: new AbortController().signal, password: 'incorrect', fetchFn: asFetch(fetchFn), onStatus: status, onSettings: vi.fn(), onError: vi.fn() });
+    await connectHost({ bootStream, signal: new AbortController().signal, password: 'incorrect', fetchFn: asFetch(fetchFn), onStatus: status, onSettings: vi.fn(), onError: vi.fn() });
     expect(fetchFn).toHaveBeenCalledTimes(1);
     expect(status).toHaveBeenCalledWith('locked');
     expect(getAuthToken()).toBeNull();
@@ -58,13 +61,14 @@ describe('host startup sequence', () => {
         ok: true, status: 200,
         json: async () => ({ status: 'success', data: { token: 'live-session' } }),
       };
-      if (url.endsWith('/settings')) return {
+      if (url.endsWith('/status')) return { ok: true, status: 200, json: async () => ({ status: 'success', data: { boot } }) };
+      if (url.endsWith('/init-data')) return {
         ok: true, status: 200,
-        json: async () => ({ status: 'success', data: { revision: 1, values: { 'app.general': { theme: 'invalid' } } } }),
+        json: async () => ({ status: 'success', data: { boot, first_run: false, settings: { revision: 1, values: { 'app.general': { theme: 'invalid' } } } } }),
       };
       return { ok: true, status: 200, json: async () => ({ status: 'success', data: {} }) };
     });
-    await connectHost({
+    await connectHost({ bootStream,
       signal: controller.signal,
       fetchFn: asFetch(fetchFn),
       onStatus,
