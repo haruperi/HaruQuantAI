@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { GRID_TEST_COLUMNS, GRID_TEST_MAX_ROWS, buildGridTestRows } from '../../../../src/workspace/GridTest/GridTestWorkspace';
+import { GRID_TEST_COLUMNS, GRID_TEST_MAX_ROWS, buildGridTestRows } from '../../../../app/workspace/GridTest/GridTestWorkspace';
 
 describe('HaruQuantAI grid test workspace', () => {
   it('builds a deterministic seeded row set', () => {

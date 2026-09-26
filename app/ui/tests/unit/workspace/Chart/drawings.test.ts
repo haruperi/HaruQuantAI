@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
-import { tools } from '../../../../src/workspace/Chart/src/tools/catalog';
-import { primitiveHit } from '../../../../src/workspace/Chart/src/tools/geometry';
-import { toolIds, type Drawing } from '../../../../src/workspace/Chart/src/types';
+import { tools } from '../../../../app/workspace/Chart/src/tools/catalog';
+import { primitiveHit } from '../../../../app/workspace/Chart/src/tools/geometry';
+import { toolIds, type Drawing } from '../../../../app/workspace/Chart/src/types';
 it('every requested tool produces finite geometry from market anchors', () => {
   for (const tool of toolIds) {
     const d: Drawing = {

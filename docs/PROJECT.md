@@ -167,7 +167,7 @@ dependencies, and automatic live deployment. Historical simulation and live
 operation have different authority and evidence requirements.
 
 The current candidate baseline has a backend host under [app/host/](../app/host/README.md)
-and a connected UI shell under [app/ui/src/app/](../app/ui/src/app/README.md).
+and a connected UI shell under [app/ui/app/host/](../app/ui/app/host/README.md).
 The backend workspace/plugin directories are not populated with ratified
 quantitative implementations. The retained React UI has workspace folders
 and three top-level plugin groups, but many screens still use fixtures,

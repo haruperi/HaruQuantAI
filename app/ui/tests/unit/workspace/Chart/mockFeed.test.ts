@@ -1,6 +1,6 @@
 import { it, expect, vi } from 'vitest';
-import type { Bar } from '../../../../src/workspace/Chart/src/types';
-import { dayBars, MockFeed } from '../../../../src/workspace/Chart/src/feed/MockFeed';
+import type { Bar } from '../../../../app/workspace/Chart/src/types';
+import { dayBars, MockFeed } from '../../../../app/workspace/Chart/src/feed/MockFeed';
 it('is stable and respects sessions and OHLC invariants', () => {
   const a = dayBars('BTCUSDT', 20000);
   expect(a).toEqual(dayBars('BTCUSDT', 20000));

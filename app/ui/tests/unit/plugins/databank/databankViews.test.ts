@@ -2,9 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   DATABANK_METRIC_COLUMNS,
   DEFAULT_VIEW_PRESETS,
-} from '../../../../src/plugins/databank/ProjectDatabanks/databankColumns';
-import { useDatabankStore } from '../../../../src/plugins/databank/ProjectDatabanks/databankStore';
-import { strategies } from '../../../../src/plugins/databank/fixtures';
+} from '../../../../app/plugins/databank/ProjectDatabanks/databankColumns';
+import { useDatabankStore } from '../../../../app/plugins/databank/ProjectDatabanks/databankStore';
+import { strategies } from '../../../../app/plugins/databank/fixtures';
 
 describe('Databank Views and Metrics Engine', () => {
   beforeEach(() => {

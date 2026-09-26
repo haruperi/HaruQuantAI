@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { builtInCsvFormats, csvArtifacts, exportPreset, exportRange, mt4Manifest, mt5Artifact, parseMt4Properties, renderCsvLine, safeFilename, selectExportTargets, type ExportTarget } from '../../../../../src/plugins/data_source/Export/dataExport';
+import { builtInCsvFormats, csvArtifacts, exportPreset, exportRange, mt4Manifest, mt5Artifact, parseMt4Properties, renderCsvLine, safeFilename, selectExportTargets, type ExportTarget } from '../../../../../app/plugins/data_source/Export/dataExport';
 
 const tick: ExportTarget = { id: 'd3', symbol: 'NQ', instrument: 'NQ', source: 'Futures', timeframe: 'Tick → D1', timezone: 'America/Chicago', from: '2024-01-02', to: '2026-08-31', bars: 1000, category: 'Futures' };
 const bar: ExportTarget = { id: 'd1', symbol: 'EURUSD', instrument: 'EURUSD', source: 'Dukascopy', timeframe: 'M1 → H1', timezone: 'UTC', from: '2025-01-01', to: '2025-12-31', bars: 500, category: 'Forex' };
@@ -50,7 +50,7 @@ describe('Data export contracts', () => {
 async function isolated() {
   vi.resetModules(); const memory = new Map<string, string>();
   vi.stubGlobal('localStorage', { getItem: (key: string) => memory.get(key) ?? null, setItem: (key: string, value: string) => { memory.set(key, value); } });
-  return { store: (await import('../../../../../src/plugins/data_source/Export/dataExportStore')).useDataExports, memory };
+  return { store: (await import('../../../../../app/plugins/data_source/Export/dataExportStore')).useDataExports, memory };
 }
 
 beforeEach(() => vi.unstubAllGlobals());
@@ -60,7 +60,7 @@ it('persists custom formats and a resumable export lifecycle', async () => {
   store.getState().saveFormat({ name: 'Mine', predefined: false, header: 'H', format: '[Close]' });
   store.getState().start('csv', 'CSV mock export', ['d1'], [artifact], { csvFormat: 'Mine' }, false);
   store.getState().advance(); vi.resetModules();
-  const restored = (await import('../../../../../src/plugins/data_source/Export/dataExportStore')).useDataExports;
+  const restored = (await import('../../../../../app/plugins/data_source/Export/dataExportStore')).useDataExports;
   expect(restored.getState().job?.state).toBe('paused'); expect(restored.getState().formats[0].name).toBe('Mine');
   restored.getState().action('resume'); for (let i = 0; i < 10; i += 1) restored.getState().advance();
   expect(restored.getState().job?.state).toBe('completed'); expect(restored.getState().history[0].names).toEqual(['a.csv']);
@@ -72,6 +72,6 @@ it('fails closed on conflicts, duplicate formats and corrupt storage', async () 
   store.getState().saveFormat({ name: 'Mine', predefined: false, header: '', format: '[Close]' });
   expect(() => store.getState().saveFormat({ name: 'Mine', predefined: false, header: '', format: '[Close]' })).toThrow('already exists');
   memory.set('haru-data-export-v1', 'bad'); vi.resetModules();
-  const corrupt = (await import('../../../../../src/plugins/data_source/Export/dataExportStore')).useDataExports;
+  const corrupt = (await import('../../../../../app/plugins/data_source/Export/dataExportStore')).useDataExports;
   expect(corrupt.getState().storageError).toContain('preserved'); expect(memory.get('haru-data-export-v1')).toBe('bad');
 });

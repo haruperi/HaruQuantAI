@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { canonicalInstrument, commissionModels, defaultCommission, newInstrument, validateInstrument, validateName } from '../../../../../src/plugins/data_source/FileImport/fileSymbols';
+import { canonicalInstrument, commissionModels, defaultCommission, newInstrument, validateInstrument, validateName } from '../../../../../app/plugins/data_source/FileImport/fileSymbols';
 describe('file symbol rules', () => {
   it('accepts the donor name pattern and rejects empty, invalid and duplicate names', () => {
     validateName('EURUSD_1@feed.:$', []);

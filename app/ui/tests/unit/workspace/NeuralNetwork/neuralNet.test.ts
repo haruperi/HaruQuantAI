@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { useNeuralNetStore } from '../../../../src/workspace/NeuralNetwork/neuralNetStore';
+import { useNeuralNetStore } from '../../../../app/workspace/NeuralNetwork/neuralNetStore';
 
 describe('Neural Network Trainer Workspace Store (FEAT-UI-NEURAL-NETWORK)', () => {
   beforeEach(() => {

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useAppStore } from '../../../../src/app/store';
-import type { CustomProject, WorkflowTask } from '../../../../src/app/types';
-import { SQX_TASK_TYPES } from '../../../../src/workspace/CustomProjects/NewTaskModal';
+import { useAppStore } from '../../../../app/host/store';
+import type { CustomProject, WorkflowTask } from '../../../../app/host/types';
+import { SQX_TASK_TYPES } from '../../../../app/workspace/CustomProjects/NewTaskModal';
 
 describe('Custom Projects & Pipeline Automation', () => {
   beforeEach(() => {

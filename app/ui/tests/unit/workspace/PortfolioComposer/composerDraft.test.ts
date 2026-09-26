@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {composerDefaults,composerError,moveMembers,parseComposition,serializeComposition,type ComposerDraft} from '../../../../src/workspace/PortfolioComposer/composerModel';
+import {composerDefaults,composerError,moveMembers,parseComposition,serializeComposition,type ComposerDraft} from '../../../../app/workspace/PortfolioComposer/composerModel';
 const draft=():ComposerDraft=>({config:{...composerDefaults},members:[{id:'a',name:'A',symbol:'EURUSD',money:'Fixed size',weight:200,selected:true,equity:[100,105]},{id:'b',name:'B',symbol:'GBPUSD',money:'Fixed size',weight:50,selected:false,equity:[100,102]}]});
 describe('FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE draft',()=>{
  it('retains independent sizing multipliers through export/import',()=>{const d=draft();expect(composerError(d)).toBeUndefined();expect(parseComposition(serializeComposition(d))).toEqual(d);expect(d.members.map(m=>m.weight)).toEqual([200,50]);});

@@ -4,9 +4,9 @@ import {
   SAVE_MENU,
   TOOLS_MENU,
   TOOLBAR_BUTTON_ORDER,
-} from '../../../../src/plugins/databank/ProjectDatabanks/DatabankToolbar';
-import { DEFAULT_VIEW_PRESETS } from '../../../../src/plugins/databank/ProjectDatabanks/databankColumns';
-import { strategyPassesMockChecks } from '../../../../src/plugins/databank/ProjectDatabanks/DatabankPanel';
+} from '../../../../app/plugins/databank/ProjectDatabanks/DatabankToolbar';
+import { DEFAULT_VIEW_PRESETS } from '../../../../app/plugins/databank/ProjectDatabanks/databankColumns';
+import { strategyPassesMockChecks } from '../../../../app/plugins/databank/ProjectDatabanks/DatabankPanel';
 
 describe('Databanks toolbar inventory (donor SQX144-EV-000028)', () => {
   it('orders toolbar buttons exactly as the donor plugin positions', () => {

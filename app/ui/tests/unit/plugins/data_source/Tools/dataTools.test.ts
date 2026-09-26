@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { analyzeQuality, applyReviewMutation, availableReviewTimeframes, createCloneDefinitions, generateReviewRows, reviewKey, selectCloneTargets, selectReviewTarget, validateReviewChange, type CloneSettings, type ToolTarget } from '../../../../../src/plugins/data_source/Tools/dataTools';
+import { analyzeQuality, applyReviewMutation, availableReviewTimeframes, createCloneDefinitions, generateReviewRows, reviewKey, selectCloneTargets, selectReviewTarget, validateReviewChange, type CloneSettings, type ToolTarget } from '../../../../../app/plugins/data_source/Tools/dataTools';
 
 const target: ToolTarget = { id:'d1', symbol:'EURUSD', instrument:'EURUSD', source:'Dukascopy', timeframe:'M1 → H1', timezone:'UTC', from:'2025-01-01', to:'2025-12-31', bars:5000, category:'Forex' };
 const settings: CloneSettings = { postfix:'_{timeframe}_{cloneTime}', timezoneType:'shift', shiftHours:5, timezone:'UTC', removeWeekends:false };
@@ -40,13 +40,13 @@ describe('Data Tools contracts', () => {
 async function isolated() {
   vi.resetModules(); const memory = new Map<string,string>();
   vi.stubGlobal('localStorage', { getItem:(key:string) => memory.get(key) ?? null, setItem:(key:string,value:string) => { memory.set(key,value); } });
-  return { store:(await import('../../../../../src/plugins/data_source/Tools/dataToolsStore')).useDataTools, memory };
+  return { store:(await import('../../../../../app/plugins/data_source/Tools/dataToolsStore')).useDataTools, memory };
 }
 beforeEach(() => vi.unstubAllGlobals());
 
 it('persists clones, restores running work paused, and saves review mutations', async () => {
   const { store } = await isolated(); store.getState().startClone([target], settings, [], false); store.getState().advance(); vi.resetModules();
-  const restored = (await import('../../../../../src/plugins/data_source/Tools/dataToolsStore')).useDataTools; expect(restored.getState().job?.state).toBe('paused');
+  const restored = (await import('../../../../../app/plugins/data_source/Tools/dataToolsStore')).useDataTools; expect(restored.getState().job?.state).toBe('paused');
   restored.getState().action('resume'); for (let i=0;i<10;i++) restored.getState().advance();
   expect(restored.getState().job?.state).toBe('completed'); expect(restored.getState().definitions[0].sourceDataId).toBe('d1');
   const rows = generateReviewRows(target,'M1','No Session',5); restored.getState().saveReview(reviewKey('d1','M1','No Session'),rows,{ [rows[0].id]:{ close:1.2 } },[rows[1].id],false);
@@ -55,6 +55,6 @@ it('persists clones, restores running work paused, and saves review mutations', 
 
 it('fails closed for conflicts and corrupt persisted state', async () => {
   const { store, memory } = await isolated(); expect(() => store.getState().startClone([target],settings,[],true)).toThrow('active');
-  memory.set('haru-data-tools-v1','bad'); vi.resetModules(); const corrupt=(await import('../../../../../src/plugins/data_source/Tools/dataToolsStore')).useDataTools;
+  memory.set('haru-data-tools-v1','bad'); vi.resetModules(); const corrupt=(await import('../../../../../app/plugins/data_source/Tools/dataToolsStore')).useDataTools;
   expect(corrupt.getState().storageError).toContain('preserved'); expect(memory.get('haru-data-tools-v1')).toBe('bad');
 });

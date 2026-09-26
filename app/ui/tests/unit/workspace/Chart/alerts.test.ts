@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
-import { triggered } from '../../../../src/workspace/Chart/src/store/alerts';
-import type { Alert } from '../../../../src/workspace/Chart/src/types';
+import { triggered } from '../../../../app/workspace/Chart/src/store/alerts';
+import type { Alert } from '../../../../app/workspace/Chart/src/types';
 const a: Alert = {
   id: '1',
   symbol: 'XAUUSD',

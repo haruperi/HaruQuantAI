@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { catalogue, categories, filterCatalogue, parseCatalogue } from '../../../../../src/plugins/data_source/Dukascopy/dukascopy';
+import { catalogue, categories, filterCatalogue, parseCatalogue } from '../../../../../app/plugins/data_source/Dukascopy/dukascopy';
 describe('Dukascopy donor catalogue', () => {
   it('loads every symbol in source order and preserves distinct date ranges', () => {
     expect(catalogue).toHaveLength(725);

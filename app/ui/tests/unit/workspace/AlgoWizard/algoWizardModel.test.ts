@@ -11,11 +11,11 @@ import {
   startHistory,
   travel,
   uniqueName,
-} from "../../../../src/workspace/AlgoWizard/algoWizardModel";
+} from "../../../../app/workspace/AlgoWizard/algoWizardModel";
 import {
   exampleDraft,
   examples,
-} from "../../../../src/workspace/AlgoWizard/algoWizardFixtures";
+} from "../../../../app/workspace/AlgoWizard/algoWizardFixtures";
 
 describe("AlgoWizard local draft lifecycle", () => {
   it("keeps histories independent and drops redo after a new edit", () => {

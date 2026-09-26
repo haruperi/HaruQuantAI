@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { generateMondayFriday, parseSessionsJson, serializeSessionsJson, validateElement, validateSession, type SessionDefinition } from '../../../../../../src/plugins/data_source/Catalogs/Sessions/sessions';
+import { generateMondayFriday, parseSessionsJson, serializeSessionsJson, validateElement, validateSession, type SessionDefinition } from '../../../../../../app/plugins/data_source/Catalogs/Sessions/sessions';
 
 const monday = { dayFrom:'Mon',timeFrom:'09:30',dayTo:'Tue',timeTo:'16:00',eod:true } as const;
 describe('session rules',()=>{

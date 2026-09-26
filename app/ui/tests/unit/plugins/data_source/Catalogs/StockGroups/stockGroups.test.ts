@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { activeMemberships, formatStockLines, normalizeGroupName, parseStockGroupsJson, parseStockLines, serializeStockGroupsJson, serializeStockMembersJson, summarizeGroup, type StockGroupDefinition } from '../../../../../../src/plugins/data_source/Catalogs/StockGroups/stockGroups';
+import { activeMemberships, formatStockLines, normalizeGroupName, parseStockGroupsJson, parseStockLines, serializeStockGroupsJson, serializeStockMembersJson, summarizeGroup, type StockGroupDefinition } from '../../../../../../app/plugins/data_source/Catalogs/StockGroups/stockGroups';
 
 const group: StockGroupDefinition = { id:'g1',name:'[Index]',description:'History-aware index',system:false,members:[{ticker:'AAPL'},{ticker:'MSFT',from:'2020-12-01'},{ticker:'OLD',from:'2007-04-15',to:'2015-05-30'}] };
 

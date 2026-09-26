@@ -15,7 +15,7 @@ import {
   sourceCodeGenerators,
   sourceCodeParamsDefaults,
   tradeListViews,
-} from '../../../../src/workspace/Builder/results/resultsFixtures';
+} from '../../../../app/workspace/Builder/results/resultsFixtures';
 
 describe('Results tab fixtures (donor SQX144-EV-000045..000047)', () => {
   it('registers the visible built-in tabs in the donor strip order', () => {

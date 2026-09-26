@@ -93,20 +93,20 @@ The repository is a set of backend/frontend counterparts around one host pair:
 
 ~~~text
 Backend                                  Frontend
-app/host/            <- host pair ->     app/ui/src/app/
+app/host/            <- host pair ->     app/ui/app/host/
   lifecycle, sessions, catalog,            transport, session, router,
   envelope, commands, events,              shell store and views
   telemetry, shell settings                (no quantitative domain names)
   (no quantitative domain names)
 
-app/workspace/<Domain>/  <- pair ->       app/ui/src/workspace/<Domain>/
+app/workspace/<Domain>/  <- pair ->       app/ui/app/workspace/<Domain>/
   workflow, handlers, schema               view, client, local fixtures
 
-app/plugins/<X>/         <- pair ->       app/ui/src/plugins/<X>/
+app/plugins/<X>/         <- pair ->       app/ui/app/plugins/<X>/
   one cohesive concept file,               concept presentation or interaction
   manifest, local tests                    owned with that plugin
 
-app/kernel/                              app/ui/src/components/
+app/kernel/                              app/ui/app/components/
   standard-library-only, neutral           universal presentation primitives
 ~~~
 

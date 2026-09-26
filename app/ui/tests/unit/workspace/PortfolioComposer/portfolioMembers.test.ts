@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { strategies } from '../../../../src/plugins/databank/fixtures';
-import { portfolioMembers } from '../../../../src/workspace/PortfolioComposer/fixtures';
+import { strategies } from '../../../../app/plugins/databank/fixtures';
+import { portfolioMembers } from '../../../../app/workspace/PortfolioComposer/fixtures';
 
 describe('portfolio composer fixtures', () => {
   it('uses stable strategy IDs for portfolio membership', () => {

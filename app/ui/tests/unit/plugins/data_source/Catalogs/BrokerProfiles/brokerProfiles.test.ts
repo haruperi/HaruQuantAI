@@ -1,4 +1,4 @@
-import {describe,expect,it} from 'vitest';import {normalizeBrokerName,parseBrokerStocks,parseBrokersJson,serializeBrokersJson,serializeBrokerStocksJson,validateBroker,type BrokerProfile} from '../../../../../../src/plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
+import {describe,expect,it} from 'vitest';import {normalizeBrokerName,parseBrokerStocks,parseBrokersJson,serializeBrokersJson,serializeBrokerStocksJson,validateBroker,type BrokerProfile} from '../../../../../../app/plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles';
 const profile:BrokerProfile={id:'b1',name:'[Broker]',desc:'Test',postfix:'_b',timezone:'UTC',mtUse:true,stockPickerUse:true,system:false,stocks:['AAPL','TSLA'],instruments:[]};
 describe('broker profiles',()=>{
   it('normalizes and validates broker names',()=>{expect(normalizeBrokerName(' Demo ')).toBe('[Demo]');expect(normalizeBrokerName('[Demo]')).toBe('[Demo]');expect(()=>normalizeBrokerName('')).toThrow("Broker's name must be set");expect(()=>validateBroker({...profile,name:'Broker'},[{...profile,id:'other'}])).toThrow('Name must be unique');});

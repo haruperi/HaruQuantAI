@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { detectExternalFormat, emptyExternalLines, parseExternalData, parseExternalIndicatorsJson, recognizeMq4, serializeExternalIndicatorsJson, validateExternalDefinition, type ExternalIndicatorDefinition } from '../../../../../src/plugins/data_source/Indicators/externalIndicators';
+import { detectExternalFormat, emptyExternalLines, parseExternalData, parseExternalIndicatorsJson, recognizeMq4, serializeExternalIndicatorsJson, validateExternalDefinition, type ExternalIndicatorDefinition } from '../../../../../app/plugins/data_source/Indicators/externalIndicators';
 
 function indicator(name = 'Sentiment'): ExternalIndicatorDefinition { const values = emptyExternalLines(); values[0].name = 'Score'; return { name, type: 2, values, timeframe: '—', dateFrom: '', dateTo: '', totalDays: 0, records: [] }; }
 describe('external indicator rules', () => {

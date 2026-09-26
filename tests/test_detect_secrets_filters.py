@@ -29,7 +29,7 @@ def test_logical_root_artifact_path_is_filtered() -> None:
 
 
 def test_artifact_locator_keyed_line_is_filtered() -> None:
-    path = "HARUQUANTAI_ROOT/app/ui/src/app/App.tsx"
+    path = "HARUQUANTAI_ROOT/app/ui/app/host/App.tsx"
     line = f'"artifact_locator": "{path}",'
     assert is_valid_repository_artifact_path_evidence(LEDGER, line, path)
 

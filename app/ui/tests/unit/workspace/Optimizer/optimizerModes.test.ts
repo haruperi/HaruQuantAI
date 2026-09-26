@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {optimizerDefaults,optimizerDraftError,parameterCombinations} from '../../../../src/workspace/Optimizer/optimizerFixtures';
+import {optimizerDefaults,optimizerDraftError,parameterCombinations} from '../../../../app/workspace/Optimizer/optimizerFixtures';
 describe('FEAT-UI-OPTIMIZER_WORKSPACE editing guards',()=>{
  it('counts enabled fixture ranges and rejects empty/invalid selections',()=>{
   const d=structuredClone(optimizerDefaults);

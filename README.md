@@ -10,7 +10,7 @@ backend algorithms or trading integration.
 [ARCHITECTURE.md](docs/ARCHITECTURE.md) defines the Five Laws of Spatial
 Composability and pair boundaries, and [AGENTS.md](AGENTS.md) defines the
 contributor workflow. See the [backend host](app/host/README.md) and
-[UI host](app/ui/src/app/README.md) READMEs for current feature status.
+[UI host](app/ui/app/host/README.md) READMEs for current feature status.
 
 ## Prerequisites
 

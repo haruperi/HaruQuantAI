@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { discoverTD, validateTD } from '../../../../../src/plugins/data_source/TickDownloader/tickDownloader';
+import { discoverTD, validateTD } from '../../../../../app/plugins/data_source/TickDownloader/tickDownloader';
 describe('TickDownloader discovery and validation', () => {
   it('prefers installation tickdata folders and deduplicates file-backed symbols', () => {
     expect(discoverTD(['TD/tickdata/EURUSD/2020/a.bin', 'TD/tickdata/EURUSD/2020/b.bin', 'TD/tickdata/GBPUSD/a.bin', 'TD/bin/app.exe']).symbols).toEqual(['EURUSD', 'GBPUSD']);

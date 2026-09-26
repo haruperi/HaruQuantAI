@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { resample, bucket, nextBucket } from '../../../../src/workspace/Chart/src/feed/resample';
+import { resample, bucket, nextBucket } from '../../../../app/workspace/Chart/src/feed/resample';
 it('aggregates OHLCV and partial buckets', () => {
   const b = [0, 1, 2, 3].map((i) => ({
     time: i * 60000,

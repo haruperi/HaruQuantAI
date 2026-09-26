@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { createChartStore } from '../../../../src/workspace/Chart/src/store/chartStore';
+import { createChartStore } from '../../../../app/workspace/Chart/src/store/chartStore';
 it('undo and redo restore document changes but not quote-driven orders', () => {
   const s = createChartStore();
   s.getState().settings({ style: 'Line' });

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { csvTrades, demoResult, resultSnapshot, visibleTrades } from '../../../../src/workspace/Builder/results/resultsModel';
+import { csvTrades, demoResult, resultSnapshot, visibleTrades } from '../../../../app/workspace/Builder/results/resultsModel';
 describe('Results presentation documents',()=>{
  const result=demoResult('str-1','First result');
  it('intersects market, direction and sample without mutating the source',()=>{

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { defaultSQConfig, lookupSQ, planSQAdd } from '../../../../../src/plugins/data_source/SQData/sqData';
+import { defaultSQConfig, lookupSQ, planSQAdd } from '../../../../../app/plugins/data_source/SQData/sqData';
 describe('SQ catalogue rules', () => {
   it('combines ticker/name tokens, exchange and exact filters', () => {
     const config = { ...defaultSQConfig(), symbols: 'aapl;Microsoft\nAmazon' };
@@ -26,7 +26,7 @@ async function isolated() {
   vi.resetModules(); const memory = new Map<string, string>();
   const storage = { getItem: (key: string) => memory.get(key) ?? null, setItem: (key: string, value: string) => { memory.set(key, value); } };
   vi.stubGlobal('localStorage', storage);
-  const store = (await import('../../../../../src/plugins/data_source/SQData/sqDataStore')).useSQData;
+  const store = (await import('../../../../../app/plugins/data_source/SQData/sqDataStore')).useSQData;
   return { store, memory, storage };
 }
 describe('SQ add persistence', () => {
@@ -36,7 +36,7 @@ describe('SQ add persistence', () => {
     expect(() => store.getState().start('futures', defaultSQConfig(), ['ES'], true, 'Full', [], false)).toThrow('active');
     for (let i = 0; i < 10; i++) store.getState().advance();
     expect(store.getState().definitions.map(row => row.symbol)).toEqual(['AAPL']);
-    vi.resetModules(); const restored = (await import('../../../../../src/plugins/data_source/SQData/sqDataStore')).useSQData;
+    vi.resetModules(); const restored = (await import('../../../../../app/plugins/data_source/SQData/sqDataStore')).useSQData;
     expect(restored.getState().job?.state).toBe('paused'); restored.getState().advance(); expect(restored.getState().job?.progress).toBe(50);
     restored.getState().action('resume'); for (let i = 0; i < 10; i++) restored.getState().advance();
     expect(restored.getState().definitions.map(row => row.symbol)).toEqual(['AAPL', 'MSFT']); expect(restored.getState().job?.state).toBe('completed');
@@ -48,7 +48,7 @@ describe('SQ add persistence', () => {
     expect(store.getState().definitions.map(row => row.symbol)).toEqual(['ES']);
     storage.setItem = () => { throw new Error('Quota'); };
     expect(() => store.getState().start('equity', defaultSQConfig(), ['AAPL'], true, 'Full', [], false)).toThrow('Unable to save');
-    memory.set('sqx-sq-data-v1', '{bad'); vi.resetModules(); const restored = (await import('../../../../../src/plugins/data_source/SQData/sqDataStore')).useSQData;
+    memory.set('sqx-sq-data-v1', '{bad'); vi.resetModules(); const restored = (await import('../../../../../app/plugins/data_source/SQData/sqDataStore')).useSQData;
     expect(restored.getState().storageError).toContain('preserved'); expect(memory.get('sqx-sq-data-v1')).toBe('{bad');
   });
   it('normalizes legacy product labels before validating persisted data', async () => {
@@ -62,7 +62,7 @@ describe('SQ add persistence', () => {
     legacy.job.definitions[0].source = 'SQ Futures';
     memory.set('sqx-sq-data-v1', JSON.stringify(legacy));
     vi.resetModules();
-    const restored = (await import('../../../../../src/plugins/data_source/SQData/sqDataStore')).useSQData;
+    const restored = (await import('../../../../../app/plugins/data_source/SQData/sqDataStore')).useSQData;
     expect(restored.getState().storageError).toBe('');
     expect(restored.getState().definitions[0]?.source).toBe('Futures');
   });
@@ -70,7 +70,7 @@ describe('SQ add persistence', () => {
 it('reserves SQ names across providers and reports mid-job persistence failure', async () => {
   const { store, storage, memory } = await isolated();
   store.getState().start('equity', defaultSQConfig(), ['AAPL'], true, 'Full', [], false);
-  const { reservedSQDefinitions } = await import('../../../../../src/plugins/data_source/SQData/sqDataStore');
+  const { reservedSQDefinitions } = await import('../../../../../app/plugins/data_source/SQData/sqDataStore');
   expect(reservedSQDefinitions().map(row => row.symbol)).toEqual(['AAPL']);
   const previous = memory.get('sqx-sq-data-v1'); storage.setItem = () => { throw new Error('Quota'); };
   store.getState().advance();

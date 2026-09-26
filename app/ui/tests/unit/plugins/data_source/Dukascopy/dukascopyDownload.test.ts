@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveDownloadModes, downloadStep, eligibleTargets, presetRange, validateDownload, mergeRanges, simulationSummary, type DownloadTarget } from '../../../../../src/plugins/data_source/Dukascopy/dukascopyDownload';
+import { resolveDownloadModes, downloadStep, eligibleTargets, presetRange, validateDownload, mergeRanges, simulationSummary, type DownloadTarget } from '../../../../../app/plugins/data_source/Dukascopy/dukascopyDownload';
 const target: DownloadTarget = { id: 'd1', symbol: 'EURUSD', source: 'Dukascopy', timeframe: 'M1', from: '2010-01-01', to: '2020-01-01', bars: 10 };
 describe('Dukascopy download rules', () => {
   it('filters mixed selection and rejects missing, cloned and active targets', () => {

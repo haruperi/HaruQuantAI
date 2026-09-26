@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseYahooSymbols, yahooDefinitions, yahooDownloadRanges, yahooTargets } from '../../../../../src/plugins/data_source/Yahoo/yahoo';
+import { parseYahooSymbols, yahooDefinitions, yahooDownloadRanges, yahooTargets } from '../../../../../app/plugins/data_source/Yahoo/yahoo';
 
 describe('Yahoo provider rules', () => {
   it('parses supported separators, trims input and creates D1 metadata', () => {
@@ -21,13 +21,13 @@ describe('Yahoo provider rules', () => {
 
 async function isolated() {
   vi.resetModules(); const memory = new Map<string,string>(); const storage = { getItem: (key:string) => memory.get(key) ?? null, setItem: (key:string,value:string) => { memory.set(key,value); } }; vi.stubGlobal('localStorage', storage);
-  const store = (await import('../../../../../src/plugins/data_source/Yahoo/yahooStore')).useYahoo; return { store, memory, storage };
+  const store = (await import('../../../../../app/plugins/data_source/Yahoo/yahooStore')).useYahoo; return { store, memory, storage };
 }
 
 it('persists add/download jobs, restores paused and merges coverage', async () => {
   const { store } = await isolated(); const definitions = yahooDefinitions('AAPL;MSFT', '_Y', []);
   store.getState().startAdd(definitions, false); for (let i=0;i<10;i++) store.getState().advance(); expect(store.getState().definitions).toHaveLength(1);
-  vi.resetModules(); const restored = (await import('../../../../../src/plugins/data_source/Yahoo/yahooStore')).useYahoo; expect(restored.getState().job?.state).toBe('paused'); restored.getState().action('resume'); for (let i=0;i<10;i++) restored.getState().advance(); expect(restored.getState().definitions).toHaveLength(2);
+  vi.resetModules(); const restored = (await import('../../../../../app/plugins/data_source/Yahoo/yahooStore')).useYahoo; expect(restored.getState().job?.state).toBe('paused'); restored.getState().action('resume'); for (let i=0;i<10;i++) restored.getState().advance(); expect(restored.getState().definitions).toHaveLength(2);
   const target = restored.getState().definitions[0], request = { targets: [target], dateFrom: '2025-01-01', dateTo: '2025-01-03', dateType: 'custom' as const, overwrite: false };
   restored.getState().startDownload(request, false); for (let i=0;i<20;i++) restored.getState().advance(); expect(restored.getState().ranges[target.id]).toEqual([{ from: '2025-01-01', to: '2025-01-03' }]);
   restored.getState().startDownload(request, false); for (let i=0;i<20;i++) restored.getState().advance(); expect(restored.getState().ranges[target.id]).toHaveLength(1);
@@ -36,5 +36,5 @@ it('persists add/download jobs, restores paused and merges coverage', async () =
 it('fails closed for active work, quota errors and corrupt storage', async () => {
   const { store, memory, storage } = await isolated(); const definition = yahooDefinitions('AAPL', '_Y', []);
   expect(() => store.getState().startAdd(definition, true)).toThrow('active'); store.getState().startAdd(definition, false); const prior = memory.get('sqx-yahoo-data-v1'); storage.setItem = () => { throw new Error('quota'); }; store.getState().advance(); expect(store.getState().job?.state).toBe('failed'); expect(memory.get('sqx-yahoo-data-v1')).toBe(prior);
-  memory.set('sqx-yahoo-data-v1', 'bad'); vi.resetModules(); const corrupt = (await import('../../../../../src/plugins/data_source/Yahoo/yahooStore')).useYahoo; expect(corrupt.getState().storageError).toContain('preserved'); expect(memory.get('sqx-yahoo-data-v1')).toBe('bad');
+  memory.set('sqx-yahoo-data-v1', 'bad'); vi.resetModules(); const corrupt = (await import('../../../../../app/plugins/data_source/Yahoo/yahooStore')).useYahoo; expect(corrupt.getState().storageError).toContain('preserved'); expect(memory.get('sqx-yahoo-data-v1')).toBe('bad');
 });

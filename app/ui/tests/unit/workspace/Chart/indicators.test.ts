@@ -1,7 +1,7 @@
 import { it, expect } from 'vitest';
-import { indicators } from '../../../../src/workspace/Chart/src/indicators/catalog';
-import { indicatorIds, type Bar, type Indicator } from '../../../../src/workspace/Chart/src/types';
-import { IndicatorRuntime } from '../../../../src/workspace/Chart/src/indicators/renderers';
+import { indicators } from '../../../../app/workspace/Chart/src/indicators/catalog';
+import { indicatorIds, type Bar, type Indicator } from '../../../../app/workspace/Chart/src/types';
+import { IndicatorRuntime } from '../../../../app/workspace/Chart/src/indicators/renderers';
 const config = (kind: Indicator['kind']): Indicator => ({
   id: kind,
   kind,

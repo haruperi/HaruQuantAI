@@ -53,8 +53,8 @@ UI extension. Metadata is not assumed capable of safely producing arbitrary UX.
 not claim that the retained prototype implements it.
 
 - Backend workspaces live under `app/workspace/<Domain>/` and plugins under
-  `app/plugins/<X>/`, paired with `app/ui/src/workspace/<Domain>/` and
-  `app/ui/src/plugins/<X>/`. A workspace selects plugins through public
+  `app/plugins/<X>/`, paired with `app/ui/app/workspace/<Domain>/` and
+  `app/ui/app/plugins/<X>/`. A workspace selects plugins through public
   contributions; it does not install them or own shared infrastructure.
 - The host owns the shared transport envelope and startup catalog. Each
   workspace or plugin owns its public wire contract. The UI consumes typed
