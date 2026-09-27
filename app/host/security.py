@@ -44,6 +44,56 @@ def hash_password(password: str) -> str:
     return salt.hex() + ":" + digest.hex()
 
 
+def hash_credentials(
+    password: str, salt: str | None = None, iterations: int = 100000
+) -> tuple[str, str]:
+    """Create a password verifier and salt for user.access persistence.
+
+    Uses PBKDF2-HMAC-SHA256 with 100,000 iterations by default.
+
+    Args:
+        password: Plaintext password.
+        salt: Optional hexadecimal salt; generated randomly if None.
+        iterations: Number of PBKDF2 iterations.
+
+    Returns:
+        Tuple of (hex_digest, hex_salt).
+    """
+    effective_salt = salt if salt is not None else secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode(), bytes.fromhex(effective_salt), iterations
+    )
+    return digest.hex(), effective_salt
+
+
+def verify_credentials(
+    password: str,
+    stored_hash: str,
+    stored_salt: str,
+) -> bool:
+    """Verify candidate password against stored user.access hash and salt.
+
+    Supports both 100,000 and 600,000 iteration counts for compatibility.
+
+    Args:
+        password: Candidate plaintext password.
+        stored_hash: Hexadecimal hash stored in user.access.
+        stored_salt: Hexadecimal salt stored in user.access.
+
+    Returns:
+        True if matching, False for mismatch or malformed inputs.
+    """
+    try:
+        salt_bytes = bytes.fromhex(stored_salt)
+        for iters in (100000, 600000):
+            digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt_bytes, iters)
+            if hmac.compare_digest(digest.hex(), stored_hash):
+                return True
+        return False
+    except ValueError, TypeError:
+        return False
+
+
 def verify_password(password: str, stored: str) -> bool:
     """Recompute and compare a stored PBKDF2 password verifier.
 
@@ -59,10 +109,7 @@ def verify_password(password: str, stored: str) -> bool:
     """
     try:
         salt, expected = stored.split(":")
-        digest = hashlib.pbkdf2_hmac(
-            "sha256", password.encode(), bytes.fromhex(salt), 600000
-        )
-        return hmac.compare_digest(digest.hex(), expected)
+        return verify_credentials(password, expected, salt)
     except ValueError:
         return False
 

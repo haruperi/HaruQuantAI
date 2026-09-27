@@ -885,9 +885,9 @@ def test_boot_auth_schema_is_verified_without_migration(tmp_path: Path) -> None:
     prepare_boot_database(path)
     assert path.read_bytes() == before
     with closing(sqlite3.connect(path)) as connection:
-        connection.execute("DROP TABLE sessions")
+        connection.execute("DROP TABLE host_sessions")
         connection.execute(
-            "CREATE TABLE sessions (token_hash TEXT, username TEXT, issued_at REAL, expires_at REAL, revoked INTEGER)"
+            "CREATE TABLE host_sessions (token_hash TEXT, username TEXT, issued_at REAL, expires_at REAL, revoked INTEGER)"
         )
         connection.commit()
     changed = path.read_bytes()

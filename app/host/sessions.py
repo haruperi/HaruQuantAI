@@ -69,10 +69,10 @@ class SessionManager:
         self._key = secrets.token_bytes(32)
         self._attempts: OrderedDict[str, tuple[float, int]] = OrderedDict()
         configured = settings.password.get_secret_value() if settings.password else None
-        exists, stored = self.store.credential("operator")
+        exists, stored = self.store.credential("haruquantai")
         if not exists:
             self.store.provision(
-                "operator", hash_password(configured) if configured else None
+                "haruquantai", hash_password(configured) if configured else None
             )
         elif configured is not None and (
             stored is None or not verify_password(configured, stored)

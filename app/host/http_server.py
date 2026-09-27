@@ -13,7 +13,7 @@ values; callers must still avoid placing secrets in ordinary diagnostic text.
 
 import asyncio
 import json
-from collections.abc import AsyncIterator, Awaitable, Callable
+from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import Any
 
@@ -141,7 +141,7 @@ async def login_endpoint(request: Request) -> JSONResponse:
         Token envelope on success or 401 for rejected credentials/retry limits.
     """
     payload = await body(request)
-    username = payload.get("username", "operator")
+    username = payload.get("username", "haruquantai")
     password = payload.get("password")
     if (
         not isinstance(username, str)
@@ -584,7 +584,7 @@ def create_app(host: BootstrapCoordinator) -> FastAPI:
     """
 
     @asynccontextmanager
-    async def lifespan(_app: FastAPI) -> AsyncIterator[None]:
+    async def lifespan(_app: FastAPI) -> AsyncGenerator[None]:
         """Initialize host services and hold them until ASGI shutdown.
 
         Args:

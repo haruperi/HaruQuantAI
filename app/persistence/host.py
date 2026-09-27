@@ -1,9 +1,9 @@
 """SQLite persistence operations for host settings, jobs, and authentication.
 
 This module owns short-lived connections and transactions for host_* tables plus
-users and sessions in the unified application database. Callers inject paths;
-imports perform no I/O. Timestamps on retained host records are UTC ISO strings,
-while session issue/expiry values are Unix seconds.
+host_settings and host_sessions in the unified application database. Callers
+inject paths; imports perform no I/O. Timestamps on retained host records are
+UTC ISO strings, while session issue/expiry values are Unix seconds.
 
 prepare_boot_database initializes only a new store and verifies existing stores.
 Explicitly authorized migrate_auth_schema backs up and adds absent auth tables.
@@ -1077,11 +1077,11 @@ class HostStore:
 
 
 _AUTH_SCHEMA = (
-    "CREATE TABLE users (username TEXT PRIMARY KEY, password_hash TEXT)",
     (
-        "CREATE TABLE sessions (token_hash TEXT PRIMARY KEY, "
-        "username TEXT NOT NULL "
-        "REFERENCES users(username), issued_at REAL NOT NULL, "
+        "CREATE TABLE host_sessions ("
+        "token_hash TEXT PRIMARY KEY, "
+        "username TEXT NOT NULL, "
+        "issued_at REAL NOT NULL, "
         "expires_at REAL NOT NULL, "
         "revoked INTEGER NOT NULL DEFAULT 0)"
     ),
@@ -1089,7 +1089,7 @@ _AUTH_SCHEMA = (
 
 
 def _verify_auth_schema(connection: sqlite3.Connection) -> None:
-    """Check auth table types, declared columns, and session foreign-key authority.
+    """Check host_sessions table structure.
 
     Inspection is read-only. It verifies the declared structural contract; it does
     not inspect credentials, expire sessions, or repair schema drift.
@@ -1098,35 +1098,27 @@ def _verify_auth_schema(connection: sqlite3.Connection) -> None:
         connection: Open caller-owned SQLite connection; no connection is opened here.
 
     Raises:
-        HostPersistenceSchemaError: Auth objects, column shape, or required user
-            reference are incompatible.
+        HostPersistenceSchemaError: Auth objects or column shape are incompatible.
     """
     objects = connection.execute(
         "SELECT name, type FROM sqlite_schema "
-        "WHERE name IN ('users', 'sessions') ORDER BY name"
+        "WHERE name = 'host_sessions' ORDER BY name"
     ).fetchall()
-    if objects != [("sessions", "table"), ("users", "table")]:
+    if objects != [("host_sessions", "table")]:
         raise HostPersistenceSchemaError("Migration required for auth schema")
-    expected = {
-        "users": [("username", "TEXT", 0, 1), ("password_hash", "TEXT", 0, 0)],
-        "sessions": [
-            ("token_hash", "TEXT", 0, 1),
-            ("username", "TEXT", 1, 0),
-            ("issued_at", "REAL", 1, 0),
-            ("expires_at", "REAL", 1, 0),
-            ("revoked", "INTEGER", 1, 0),
-        ],
-    }
-    for table, columns in expected.items():
-        actual = [
-            (row[1], row[2], row[3], row[5])
-            for row in connection.execute(f"PRAGMA table_info({table})")
-        ]
-        if actual != columns:
-            raise HostPersistenceSchemaError("Migration required for auth schema")
-    foreign_keys = connection.execute("PRAGMA foreign_key_list(sessions)").fetchall()
-    if not any(row[2:5] == ("users", "username", "username") for row in foreign_keys):
-        raise HostPersistenceSchemaError("Migration required for session authority")
+    expected = [
+        ("token_hash", "TEXT", 0, 1),
+        ("username", "TEXT", 1, 0),
+        ("issued_at", "REAL", 1, 0),
+        ("expires_at", "REAL", 1, 0),
+        ("revoked", "INTEGER", 1, 0),
+    ]
+    actual = [
+        (row[1], row[2], row[3], row[5])
+        for row in connection.execute("PRAGMA table_info(host_sessions)")
+    ]
+    if actual != expected:
+        raise HostPersistenceSchemaError("Migration required for auth schema")
 
 
 def prepare_boot_database(path: Path) -> None:
@@ -1162,10 +1154,47 @@ def prepare_boot_database(path: Path) -> None:
     logger.info("I01 New isolated host database initialized")
 
 
-def migrate_auth_schema(path: Path) -> Path | None:
-    """Back up an authorized existing store and add both absent auth tables.
+def _check_legacy_auth_conflicts(connection: sqlite3.Connection) -> None:
+    """Verify absence of conflicting views or invalid schemas before migration.
 
-    Holds a reserved write transaction while backing up and adding users/sessions.
+    Raises:
+        HostPersistenceSchemaError: A conflicting view or partial table exists.
+    """
+    views = connection.execute(
+        "SELECT name FROM sqlite_schema WHERE type='view' "
+        "AND name IN ('host_sessions', 'users', 'sessions')"
+    ).fetchall()
+    if views:
+        raise HostPersistenceSchemaError("Conflicting view exists in auth namespace")
+    conflicts = connection.execute(
+        "SELECT name FROM sqlite_schema WHERE type='table' AND name='host_sessions'"
+    ).fetchall()
+    if conflicts:
+        _verify_auth_schema(connection)
+    legacy = connection.execute(
+        "SELECT name FROM sqlite_schema WHERE type='table' "
+        "AND name IN ('users', 'sessions')"
+    ).fetchall()
+    legacy_names = {row[0] for row in legacy}
+    if "users" in legacy_names:
+        user_cols = [row[1] for row in connection.execute("PRAGMA table_info(users)")]
+        if not all(c in user_cols for c in ("username", "password_hash")):
+            raise HostPersistenceSchemaError("Conflicting legacy users table")
+    if "sessions" in legacy_names:
+        session_cols = [
+            row[1] for row in connection.execute("PRAGMA table_info(sessions)")
+        ]
+        if not all(
+            c in session_cols
+            for c in ("token_hash", "username", "issued_at", "expires_at", "revoked")
+        ):
+            raise HostPersistenceSchemaError("Conflicting legacy sessions table")
+
+
+def migrate_auth_schema(path: Path) -> Path | None:
+    """Back up an authorized existing store and ensure host_sessions exists.
+
+    Holds a reserved write transaction while backing up and adding host_sessions.
     Partial/conflicting auth schemas fail closed. Existing data is preserved and DDL
     failures roll back; backup files are retained even after failure. This operation
     does not provision users, restore backups, or start the server.
@@ -1189,8 +1218,9 @@ def migrate_auth_schema(path: Path) -> Path | None:
     with _connect(path) as connection, _write_transaction(connection):
         for table in _EXPECTED_COLUMNS:
             _verify_table(connection, table)
+        _check_legacy_auth_conflicts(connection)
         objects = connection.execute(
-            "SELECT name FROM sqlite_schema WHERE name IN ('users', 'sessions')"
+            "SELECT name FROM sqlite_schema WHERE name = 'host_sessions'"
         ).fetchall()
         if objects:
             _verify_auth_schema(connection)
@@ -1200,6 +1230,22 @@ def migrate_auth_schema(path: Path) -> Path | None:
         logger.info("Auth migration: verified recovery backup created")
         for statement in _AUTH_SCHEMA:
             connection.execute(statement)
+        legacy_sessions = connection.execute(
+            "SELECT name FROM sqlite_schema WHERE type='table' AND name='sessions'"
+        ).fetchall()
+        if legacy_sessions:
+            connection.execute(
+                "INSERT OR IGNORE INTO host_sessions "
+                "(token_hash, username, issued_at, expires_at, revoked) "
+                "SELECT token_hash, username, issued_at, expires_at, revoked "
+                "FROM sessions"
+            )
+            connection.execute("DROP TABLE sessions")
+        legacy_users = connection.execute(
+            "SELECT name FROM sqlite_schema WHERE type='table' AND name='users'"
+        ).fetchall()
+        if legacy_users:
+            connection.execute("DROP TABLE users")
         _verify_auth_schema(connection)
         logger.info("Auth migration: new schema verified; committing")
     logger.info("Auth migration: committed successfully")
@@ -1335,7 +1381,7 @@ def patch_settings(
                 "WHERE scope='application' AND key=?",
                 (key,),
             ).fetchone()
-            value = json.loads(row[0]) if row else {}
+            value: dict[str, Any] = json.loads(row[0]) if row else {}
             if not isinstance(value, dict):
                 raise HostPersistenceValueError("Malformed settings record")
             value.update(updates)
@@ -1362,7 +1408,7 @@ def patch_settings(
 
 
 class AuthStore:
-    """Persist users and hashed session identifiers without owning authentication.
+    """Persist user access credentials and hashed session identifiers.
 
     Uses short-lived transactional connections against an already prepared schema.
     Signing, password derivation, rate limiting, and input validation belong to the
@@ -1373,27 +1419,54 @@ class AuthStore:
         """Retain a prepared auth database path without opening a connection.
 
         Args:
-            path: Unified database containing users and sessions.
+            path: Unified database containing host_settings and host_sessions.
         """
         self.path = path
 
-    def provision(self, username: str, password_hash: str | None) -> None:
-        """Insert an identity only if its username does not already exist.
+    def provision(
+        self,
+        username: str,
+        password_hash: str | None,
+        password_salt: str | None = None,
+    ) -> None:
+        """Insert user.access into host_settings if not already present.
 
-        Existing credentials remain unchanged via INSERT OR IGNORE. This operation
-        does not hash plaintext or enforce the session layer remote-host policy.
+        Existing credentials remain unchanged.
 
         Args:
-            username: Identity key to provision.
+            username: Identity key to provision (default 'haruquantai' or 'operator').
             password_hash: Salted verifier, or None for an unprotected local identity.
+            password_salt: Salt hex string, or None.
         """
         with _connect(self.path) as connection, _write_transaction(connection):
+            row = connection.execute(
+                "SELECT value_json FROM host_settings "
+                "WHERE scope='application' AND key='user.access'"
+            ).fetchone()
+            if row is not None:
+                return
+            salt = password_salt or ""
+            hash_val = password_hash or ""
+            if password_hash and ":" in password_hash:
+                salt, hash_val = password_hash.split(":", 1)
+            payload = {
+                "username": username,
+                "password_hash": hash_val,
+                "password_salt": salt,
+                "require_auth": bool(hash_val),
+                "session_timeout_mins": 1440,
+                "allow_remember_me": True,
+            }
             connection.execute(
-                "INSERT OR IGNORE INTO users VALUES (?,?)", (username, password_hash)
+                "INSERT INTO host_settings VALUES ('application','user.access',?,1,?)",
+                (json.dumps(payload), utc_now_iso()),
             )
 
     def credential(self, username: str) -> tuple[bool, str | None]:
-        """Look up identity existence and its stored password verifier.
+        """Look up user.access credentials and return verifier.
+
+        Resolves if username matches configured username in user.access, or 'operator'
+        alias.
 
         Args:
             username: Exact identity key.
@@ -1404,9 +1477,25 @@ class AuthStore:
         """
         with _connect(self.path) as connection:
             row = connection.execute(
-                "SELECT password_hash FROM users WHERE username=?", (username,)
+                "SELECT value_json FROM host_settings "
+                "WHERE scope='application' AND key='user.access'"
             ).fetchone()
-        return (False, None) if row is None else (True, row[0])
+        if row is None:
+            return (False, None)
+        try:
+            data = json.loads(row[0])
+        except ValueError, TypeError:
+            return (False, None)
+        configured_user = data.get("username", "operator")
+        if username not in (configured_user, "operator"):
+            return (False, None)
+        require_auth = data.get("require_auth", True)
+        hash_val = data.get("password_hash", "")
+        salt_val = data.get("password_salt", "")
+        if not require_auth or not hash_val:
+            return (True, None)
+        verifier = f"{salt_val}:{hash_val}" if salt_val else hash_val
+        return (True, verifier)
 
     def issue(
         self, token_hash: str, username: str, issued: float, expires: float
@@ -1423,12 +1512,11 @@ class AuthStore:
             expires: Expiry timestamp in Unix seconds.
 
         Raises:
-            sqlite3.IntegrityError: Token uniqueness or username foreign-key constraints
-                fail.
+            sqlite3.IntegrityError: Token uniqueness constraint fails.
         """
         with _connect(self.path) as connection, _write_transaction(connection):
             connection.execute(
-                "INSERT INTO sessions VALUES (?,?,?,?,0)",
+                "INSERT INTO host_sessions VALUES (?,?,?,?,0)",
                 (token_hash, username, issued, expires),
             )
 
@@ -1447,7 +1535,7 @@ class AuthStore:
         """
         with _connect(self.path) as connection:
             row = connection.execute(
-                "SELECT username FROM sessions "
+                "SELECT username FROM host_sessions "
                 "WHERE token_hash=? AND expires_at>? AND revoked=0",
                 (token_hash, now),
             ).fetchone()
@@ -1464,6 +1552,6 @@ class AuthStore:
         """
         with _connect(self.path) as connection, _write_transaction(connection):
             connection.execute(
-                "UPDATE sessions SET revoked=1 WHERE token_hash=?", (token_hash,)
+                "UPDATE host_sessions SET revoked=1 WHERE token_hash=?", (token_hash,)
             )
         logger.info("Session revoked")

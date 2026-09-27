@@ -80,3 +80,34 @@ def test_auth_endpoints_and_redaction(client, auth_headers):
         client.post("/api/v1/auth/login", json={"username": "unknown"}).status_code
         == 401
     )
+
+
+def test_haruquantai_and_operator_alias_login(host_config):
+    authority = manager(host_config)
+    token1 = authority.login("haruquantai", None, peer="127.0.0.1")
+    verified1 = authority.verify(token1)
+    assert verified1 is not None and verified1.username == "haruquantai"
+
+    token2 = authority.login("operator", None, peer="127.0.0.1")
+    verified2 = authority.verify(token2)
+    assert verified2 is not None and verified2.username == "operator"
+
+
+def test_credentials_primitives_and_auth_store(tmp_path):
+    from app.host.security import hash_credentials, verify_credentials
+    from app.persistence.host import AuthStore
+
+    path = tmp_path / "auth_test.db"
+    prepare_boot_database(path)
+    store = AuthStore(path)
+
+    hash_val, salt_val = hash_credentials("mypassword")
+    assert verify_credentials("mypassword", hash_val, salt_val)
+    assert not verify_credentials("wrongpassword", hash_val, salt_val)
+    assert not verify_credentials("mypassword", hash_val, "invalid-hex")
+
+    store.provision("custom_user", f"{salt_val}:{hash_val}")
+    store.provision("custom_user", "different_hash")
+    exists, stored = store.credential("custom_user")
+    assert exists is True
+    assert stored == f"{salt_val}:{hash_val}"

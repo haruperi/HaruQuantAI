@@ -35,7 +35,7 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
   let stream: BootStream | undefined;
   let streamFailed = false;
   try {
-    await login({ username: 'operator', ...(options.password ? { password: options.password } : {}) }, config);
+    await login({ username: 'haruquantai', ...(options.password ? { password: options.password } : {}) }, config);
     if (signal.aborted) return;
     stream = (options.bootStream ?? connectBootStream)(signal, options.onBoot ?? (() => {}), message => { streamFailed = true; if (!signal.aborted) { onStatus('offline'); onError(message); } });
     await stream.ready;
@@ -160,7 +160,7 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
     revisionRef.current = null;
     preferencesRef.current = null;
     try {
-      await login({ username: 'operator' });
+      await login({ username: 'haruquantai' });
       applySettings(await readHostPreferences());
       updateStatus('online');
       setMessage('');

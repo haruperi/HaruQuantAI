@@ -143,7 +143,7 @@ export function createDomainClient(routeBase: string, config: TransportConfig = 
 }
 
 export async function login(
-  credentials: LoginCredentials = { username: 'operator' },
+  credentials: LoginCredentials = { username: 'haruquantai' },
   config: TransportConfig = {},
 ): Promise<LoginResponse> {
   const client = createDomainClient('/auth', config);
