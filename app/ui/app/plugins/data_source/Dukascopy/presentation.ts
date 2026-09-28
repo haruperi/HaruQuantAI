@@ -1,9 +1,10 @@
 /** Owner-local presentation/resource documents; no backend execution authority. */
 import { createElement, useEffect } from 'react';
+import { useHostConnection } from '../../../host/HostConnection';
 import { DukascopyAddDialog } from './DukascopyAddDialog';
 import { DukascopyDownloadDialog } from './DukascopyDownloadDialog';
 import { useDukascopyDownloads } from './dukascopyStore';
-import { eligibleTargets, simulationSummary } from './dukascopyDownload';
+import { eligibleTargets } from './dukascopyDownload';
 
 export interface BrokerProfile {
   id: string;
@@ -14,12 +15,21 @@ export interface BrokerProfile {
   instruments: string[];
 }
 
-export { simulationSummary, eligibleTargets };
+export { eligibleTargets };
 export const pluginId = 'dukascopy';
 export const pluginName = 'Dukascopy';
 
 export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
   const state = useDukascopyDownloads();
+  const { status } = useHostConnection();
+  useEffect(() => {
+    if (status === 'online') void useDukascopyDownloads.getState().refresh();
+  }, [status]);
+  useEffect(() => {
+    if (!state.job || !['running', 'paused'].includes(state.job.state)) return;
+    const timer = window.setInterval(() => { void useDukascopyDownloads.getState().poll(); }, 1000);
+    return () => window.clearInterval(timer);
+  }, [state.job?.state]);
   useEffect(() => {
     const active = state.job?.state === 'running' || state.job?.state === 'paused';
     onSync('dukascopy', {
@@ -27,20 +37,33 @@ export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
       ranges: state.ranges,
       storageError: state.storageError,
       active,
+      definitions: state.definitions,
+      backendAvailable: state.definitionsAvailable,
+      reason: state.reason,
     });
   }, [state, onSync]);
   return null;
 }
 
-export function Dialogs({ dialog, contextDocument, selectedDatasetIds, toolRows, onClose, onStarted, onComplete, onAddData }: any) {
+export function Dialogs({ dialog, contextDocument, selectedDatasetIds, toolRows, onClose, onStarted, onComplete }: any) {
+  const state = useDukascopyDownloads();
   if (dialog?.id === 'dukascopy-add') {
-    return createElement(DukascopyAddDialog, { open: true, contextDocument, onClose, onAddData, onComplete });
+    return createElement(DukascopyAddDialog, {
+      open: true,
+      contextDocument: {
+        ...contextDocument,
+        brokers: state.brokers,
+        brokerCatalogStatus: state.brokerCatalogStatus,
+      },
+      onClose, onComplete,
+      available: state.definitionsAvailable,
+      onAddData: state.addData,
+    });
   }
   if (dialog?.id === 'dukascopy-download') {
-    const state = useDukascopyDownloads.getState();
     const selected = (toolRows ?? []).filter((row: any) => selectedDatasetIds.includes(row.id));
-    const eligible = eligibleTargets(selected, state.job).map(row => ({ ...row, ...simulationSummary(row, state.ranges[row.id] ?? []) }));
-    return createElement(DukascopyDownloadDialog, { targets: eligible, onClose, onStarted: () => onStarted('download', 'Dukascopy download started (simulation)') });
+    const eligible = eligibleTargets(selected, state.job);
+    return createElement(DukascopyDownloadDialog, { targets: eligible, onClose, onStarted: () => onStarted('download', 'Dukascopy download submitted') });
   }
   return null;
 }

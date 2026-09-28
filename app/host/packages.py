@@ -23,6 +23,7 @@ IDENTITY = r"^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$"
 VERSION = r"^\d+\.\d+\.\d+$"
 PACKAGE_ROOTS = (
     "app/workspace",
+    "app/plugin",
     "app/plugins",
     "app/ui/app/workspace",
     "app/ui/app/plugins",
@@ -30,7 +31,9 @@ PACKAGE_ROOTS = (
 OWNED_ROOTS = (
     *PACKAGE_ROOTS,
     "tests/workspace",
+    "tests/plugin",
     "tests/plugins",
+    "tests/examples",
     "app/ui/tests/unit/workspace",
     "app/ui/tests/unit/plugins",
     "app/ui/tests/e2e",

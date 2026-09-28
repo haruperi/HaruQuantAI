@@ -4,18 +4,20 @@
   "kind": "plugin",
   "version": "1.0.0",
   "host_contract": "1.0.0",
-  "mode": "ui_only",
+  "mode": "paired",
   "owner_workspace_id": "workspace.data_manager",
   "attachment": {
-    "slot_id": "data_source.presentation",
+    "slot_id": "data_source.acquisition",
     "contract_version": "1.0.0"
   },
-  "backend_entry": null,
+  "backend_entry": "app/plugin/data_source/Dukascopy/dukascopy.py",
   "ui_entry": "app/ui/app/plugins/data_source/Dukascopy/contribution.tsx",
   "owned_paths": {
     "source": [
+      "app/plugin/data_source/Dukascopy/dukascopy.py",
       "app/ui/app/plugins/data_source/Dukascopy/DukascopyAddDialog.tsx",
       "app/ui/app/plugins/data_source/Dukascopy/DukascopyDownloadDialog.tsx",
+      "app/ui/app/plugins/data_source/Dukascopy/backend.ts",
       "app/ui/app/plugins/data_source/Dukascopy/contribution.tsx",
       "app/ui/app/plugins/data_source/Dukascopy/dukascopy.ts",
       "app/ui/app/plugins/data_source/Dukascopy/dukascopyDownload.ts",
@@ -24,6 +26,7 @@
       "app/ui/app/plugins/data_source/Dukascopy/presentation.ts"
     ],
     "tests": [
+      "tests/plugin/data_source/Dukascopy/test_dukascopy.py",
       "app/ui/tests/e2e/data-manager-dukascopy-download.spec.ts",
       "app/ui/tests/e2e/data-manager-dukascopy.spec.ts",
       "app/ui/tests/unit/plugins/data_source/Dukascopy/dukascopy.test.ts",
@@ -33,8 +36,11 @@
       "app/ui/app/plugins/data_source/Dukascopy/dukascopy.css",
       "app/ui/app/plugins/data_source/Dukascopy/dukascopyDownload.css"
     ],
-    "examples": [],
+    "examples": [
+      "tests/examples/dukascopy_offline.py"
+    ],
     "metadata": [
+      "app/plugin/data_source/Dukascopy/README.md",
       "app/ui/app/plugins/data_source/Dukascopy/package.json"
     ]
   }

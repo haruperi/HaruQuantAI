@@ -189,6 +189,19 @@
       "limitations": [
         "A newer Vue app exists under internal/web/RESULTS2/ but the reference build runs the AngularJS app per the owner screenshot; RESULTS2 was inspected only for cross-confirmation of labels."
       ]
+    },
+    "E-L12": {
+      "title": "SQX Dukascopy trading library bytecode",
+      "kind": "local_file",
+      "root": "SQX_REFERENCE_ROOT",
+      "locators": [
+        "internal/libs/SQTradingLib.jar"
+      ],
+      "scope": "DukascopyUtils, DukascopyBinaryMerger and DownloadDispatcher in the installed build",
+      "confidence": "high",
+      "limitations": [
+        "Disassembled JVM instructions identify values and branches but do not prove live service behavior or third-party reuse rights."
+      ]
     }
   },
   "records": {
@@ -9498,6 +9511,285 @@
       "tags": [
         "ui",
         "portfolio",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000083": {
+      "topic": "data.dukascopy.direct.tick_url",
+      "title": "SQX direct tick request uses hourly BI5 URLs",
+      "question": "How does the installed SQX build construct a direct tick request?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Dukascopy data source"
+        ],
+        "conditions": [
+          "Installed static bytecode; no live donor download was driven."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed tick URL builder selects an hourly h_ticks.bi5 object under datafeed.dukascopy.com and embeds a zero-indexed month. Its literal scheme is HTTP.",
+        "confidence": "high",
+        "limitations": [
+          "The observed URL uses HTTP; an HTTPS equivalent and live response need separate validation."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L12",
+          "artifact_locator": "internal/libs/SQTradingLib.jar",
+          "location": {
+            "section": "Dukascopy methods in JVM bytecode",
+            "symbol": "generateTickDukascopyUrl(long,String)",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Inspected with javap -c -p; method-level location."
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3"
+          },
+          "accessed_at": "2026-09-28"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DM-DUKASCOPY_ACQUISITION"
+        ],
+        "requirement_ids": [
+          "FR-DATA-001"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/workspace/DataManager/README.md",
+          "app/plugin/data_source/Dukascopy/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Decode a small independently obtained BI5 fixture and compare request path or volume fields with a documented provider export.",
+        "expected_observation": "The field and path mapping matches the stated installed-bytecode observation for build 144.2953.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/libs/SQTradingLib.jar"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "ccdebe08b1e5b600aa01da106b64877575236072",
+        "created_at": "2026-09-28T07:09:47.405451Z",
+        "updated_at": "2026-09-28T07:09:47.405451Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral summary only; no vendor source text is included."
+      },
+      "tags": [
+        "data",
+        "dukascopy",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000084": {
+      "topic": "data.dukascopy.direct.m1_url",
+      "title": "SQX direct M1 request uses daily bid candles",
+      "question": "How does the installed SQX build construct a direct M1 request?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Dukascopy data source"
+        ],
+        "conditions": [
+          "Installed static bytecode; no live donor download was driven."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed M1 URL builder selects BID_candles_min_1.bi5 under datafeed.dukascopy.com with a zero-indexed month and HTTPS scheme.",
+        "confidence": "high",
+        "limitations": [
+          "Static bytecode does not prove current provider availability or response format."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L12",
+          "artifact_locator": "internal/libs/SQTradingLib.jar",
+          "location": {
+            "section": "Dukascopy methods in JVM bytecode",
+            "symbol": "generateM1DukascopyUrl(long,String)",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Inspected with javap -c -p; method-level location."
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3"
+          },
+          "accessed_at": "2026-09-28"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DM-DUKASCOPY_ACQUISITION"
+        ],
+        "requirement_ids": [
+          "FR-DATA-001"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/workspace/DataManager/README.md",
+          "app/plugin/data_source/Dukascopy/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Decode a small independently obtained BI5 fixture and compare request path or volume fields with a documented provider export.",
+        "expected_observation": "The field and path mapping matches the stated installed-bytecode observation for build 144.2953.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/libs/SQTradingLib.jar"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "ccdebe08b1e5b600aa01da106b64877575236072",
+        "created_at": "2026-09-28T07:09:47.405451Z",
+        "updated_at": "2026-09-28T07:09:47.405451Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral summary only; no vendor source text is included."
+      },
+      "tags": [
+        "data",
+        "dukascopy",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000085": {
+      "topic": "data.dukascopy.decode.tick_volume",
+      "title": "SQX tick decoder selects one side volume",
+      "question": "Which BI5 side volume does the installed SQX tick decoder retain?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Dukascopy data source"
+        ],
+        "conditions": [
+          "Installed static bytecode; no live donor download was driven."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "The installed hourly tick decoder reads two float32 volume fields, discards the first, multiplies the second by 1,000,000 and stores it as its volume value.",
+        "confidence": "high",
+        "limitations": [
+          "The bytecode does not establish that this target should use the same one-side policy; HaruQuantAI has an explicit owner decision to sum both sides."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L12",
+          "artifact_locator": "internal/libs/SQTradingLib.jar",
+          "location": {
+            "section": "Dukascopy methods in JVM bytecode",
+            "symbol": "DukascopyBinaryMerger.handleHourData(ByteBuffer,int,Long)",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Inspected with javap -c -p; method-level location."
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3"
+          },
+          "accessed_at": "2026-09-28"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DM-DUKASCOPY_ACQUISITION"
+        ],
+        "requirement_ids": [
+          "FR-DATA-001"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/workspace/DataManager/README.md",
+          "app/plugin/data_source/Dukascopy/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Decode a small independently obtained BI5 fixture and compare request path or volume fields with a documented provider export.",
+        "expected_observation": "The field and path mapping matches the stated installed-bytecode observation for build 144.2953.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/libs/SQTradingLib.jar"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "ccdebe08b1e5b600aa01da106b64877575236072",
+        "created_at": "2026-09-28T07:09:47.405451Z",
+        "updated_at": "2026-09-28T07:09:47.405451Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral summary only; no vendor source text is included."
+      },
+      "tags": [
+        "data",
+        "dukascopy",
         "static-observation"
       ]
     }

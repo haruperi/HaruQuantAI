@@ -19,11 +19,14 @@ PLUGIN = {
     "compatibility": "1",
     "route_base": "/api/v1/data-manager",
     "requires": [{"id": "host.resources", "version": "1.0.0"}],
-    "slots": [{"id": "data_source.presentation", "version": "1.0.0"}],
+    "slots": [
+        {"id": "data_source.presentation", "version": "1.0.0"},
+        {"id": "data_source.acquisition", "version": "1.0.0"},
+    ],
 }
 
 
-async def prepare(context: HostCapabilities) -> PreparedContribution:
+async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C901 -- small fixed operation dispatcher.
     """Prepare a usable empty workspace with explicit host resource access."""
     resources = context.resources
     if resources is None:
@@ -48,6 +51,22 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:
             }
         if operation == "capabilities":
             return {"providers": [binding.package_id for binding in bindings]}
+        if operation.startswith("sources.dukascopy."):
+            acquisition = next(
+                (
+                    binding
+                    for binding in bindings
+                    if binding.slot_id == "data_source.acquisition"
+                    and binding.package_id == "plugin.data_manager.dukascopy"
+                ),
+                None,
+            )
+            if acquisition is None:
+                raise ValueError("Dukascopy acquisition unavailable")
+            action = operation.removeprefix("sources.dukascopy.")
+            if action not in acquisition.operations:
+                raise ValueError("Missing acquisition operation")
+            return await acquisition.invoke(action, payload)
         raise ValueError("Missing acquisition capability")
 
     async def close() -> None:
@@ -56,5 +75,19 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:
         bindings = ()
 
     return PreparedContribution(
-        ("resources.list", "resources.read", "capabilities"), invoke, close, attach
+        (
+            "resources.list",
+            "resources.read",
+            "capabilities",
+            "sources.dukascopy.catalog",
+            "sources.dukascopy.add",
+            "sources.dukascopy.definitions.add",
+            "sources.dukascopy.download.start",
+            "sources.dukascopy.download.status",
+            "sources.dukascopy.download.cancel",
+            "sources.dukascopy.files.list",
+        ),
+        invoke,
+        close,
+        attach,
     )

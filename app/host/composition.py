@@ -22,6 +22,8 @@ from pydantic import JsonValue
 from app.host.capabilities import (
     HostCapabilities,
     JobAccess,
+    MarketAccess,
+    NetworkAccess,
     ResourceAccess,
     SettingsAccess,
 )
@@ -29,12 +31,21 @@ from app.host.catalog import read_descriptor
 from app.host.contracts import PluginDescriptor
 from app.host.jobs import JobManager
 from app.host.logging import get_logger
+from app.host.market_data import MarketDataStore
+from app.host.network import HistoricalNetwork
 from app.host.packages import Package, PackageInventory, PackageIssue, confined_file
 from app.host.resource_store import ResourceStore
 
 ACTIVATION_TIMEOUT = 5.0
 HOST_SERVICES = frozenset(
-    {"host.resources", "host.jobs", "host.logging", "host.settings"}
+    {
+        "host.resources",
+        "host.jobs",
+        "host.logging",
+        "host.settings",
+        "host.market_data",
+        "host.network",
+    }
 )
 
 
@@ -76,6 +87,11 @@ class Composition:
         self.resources = resources
         self.jobs = jobs
         self.settings = settings
+        data_root = resources.root.parent
+        self.market_data = MarketDataStore(
+            data_root, data_root / "database" / "haruquantai.db"
+        )
+        self.network = HistoricalNetwork()
         self.active: dict[str, PreparedContribution] = {}
         self.issues: list[PackageIssue] = []
         self._modules: dict[str, ModuleType] = {}
@@ -142,6 +158,12 @@ class Composition:
             logger.info if "host.logging" in requirements else None,
             SettingsAccess(package.id, self.settings)
             if "host.settings" in requirements and self.settings is not None
+            else None,
+            market_data=MarketAccess(package.id, self.market_data)
+            if "host.market_data" in requirements
+            else None,
+            network=NetworkAccess(package.id, self.network)
+            if "host.network" in requirements
             else None,
         )
 

@@ -56,6 +56,19 @@ def test_missing_owner_and_incomplete_pair(tmp_path):
     assert result.issues[0].code == "invalid_package"
 
 
+def test_owned_offline_example_is_discoverable(tmp_path):
+    """A declared deterministic example must not exclude its whole package."""
+    doc = make_package(tmp_path, "workspace")
+    example = "tests/examples/offline.py"
+    (tmp_path / example).parent.mkdir(parents=True)
+    (tmp_path / example).write_text("# Deterministic offline example\n")
+    doc["owned_paths"]["examples"] = [example]
+    (tmp_path / doc["owned_paths"]["metadata"][0]).write_text(json.dumps(doc))
+    result = scan_packages(tmp_path)
+    assert not result.issues
+    assert result.packages[0].owned_paths.examples == (example,)
+
+
 def test_duplicate_ownership_rejects_both(tmp_path):
     first = make_package(tmp_path, "first")
     second = make_package(tmp_path, "second")

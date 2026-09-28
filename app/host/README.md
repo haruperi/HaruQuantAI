@@ -4,6 +4,13 @@
 
 ## Current implementation and acceptance boundary (2026-09-25)
 
+`host.market_data@1.0.0` and `host.network@1.0.0` are candidate typed
+capabilities for Data Manager acquisition. The market adapter creates only an
+isolated fresh schema; the active unified database has not received its market
+catalog migration. Polars and DuckDB native libraries are blocked by this
+host's application-control policy, so those reader paths remain unqualified.
+The network adapter permits bounded HTTPS requests to Dukascopy's datafeed.
+
 The rebuilt host implements orchestration for **B01-B11, I01-I13 and A01-A13**.
 It is a host candidate, not an SQX-compatible simulator. Absent quantitative
 providers produce `unavailable`, not successful initialization. Sections 1-6

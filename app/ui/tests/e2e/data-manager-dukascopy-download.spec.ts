@@ -1,133 +1,16 @@
-import { expect, test, type Page } from '@playwright/test';
-async function launch(page: Page) {
+import { expect, test } from '@playwright/test';
+
+test('unqualified Dukascopy modes do not create mock progress or coverage', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
-}
-async function open(page: Page) {
+  await page.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).check();
   await page.getByRole('button', { name: 'Dukascopy data', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Download data for existing symbol', exact: true }).click();
-  return page.getByRole('dialog', { name: /Download Dukascopy data for/ });
-}
-test('selection, presets, disclaimer, simulated lifecycle and persistence', async ({ page }) => {
-  await page.route('**/*', route => ['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort());
-  await launch(page);
-  await open(page);
-  await expect(page.getByRole('dialog')).toHaveCount(0);
-  await expect(page.getByText('You must select at least one Dukascopy record.')).toBeVisible();
-  await page.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).check();
-  await page.getByRole('checkbox', { name: 'Select NQ', exact: true }).check();
-  const dialog = await open(page);
-  await expect(dialog).toHaveAccessibleName("Download Dukascopy data for 'EURUSD'");
-  await expect(dialog.getByRole('radio', { name: /Fast download from HaruQuantAI CDN/ })).toBeChecked();
-  await expect(dialog.getByLabel('From', { exact: true })).toHaveValue('2026-08-31');
-  await dialog.getByRole('button', { name: 'All time', exact: true }).click();
-  await expect(dialog.getByLabel('From', { exact: true })).toHaveValue('2003-05-05');
-  await page.screenshot({ path: 'test-results/dukascopy-download-dark.png' });
-  await dialog.getByRole('button', { name: 'HaruQuantAI CDN data disclaimer' }).click();
-  const disclaimer = page.getByRole('dialog', { name: 'HaruQuantAI CDN Data Disclaimer', exact: true });
-  await expect(disclaimer).toContainText('AS IS');
-  await disclaimer.getByRole('button', { name: 'Close', exact: true }).last().click();
-  await expect(dialog.getByRole('button', { name: 'HaruQuantAI CDN data disclaimer' })).toBeFocused();
-  await dialog.getByRole('button', { name: 'Since last date' }).click();
-  await dialog.getByRole('button', { name: 'Start download' }).click();
-  await page.getByRole('dialog', { name: 'Fast Data Download', exact: true }).getByRole('button', { name: 'OK', exact: true }).click();
-  const status = page.getByLabel('Data Manager progress');
-  await expect(status).toContainText('running');
-  await expect(page.locator('.dukas-job-status')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Pause all', exact: true }).click();
-  await expect(status).toContainText('paused');
-  await page.reload();
-  await expect(status).toContainText('paused');
-  await page.getByRole('button', { name: 'Resume all', exact: true }).click();
-  await expect(status).toContainText('completed', { timeout: 10000 });
-  const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-data-download-v1')!));
-  expect(Object.keys(stored.ranges)).toEqual(['d1']);
-  await page.reload();
-  await expect(status).toContainText('completed');
-});
-test('trial confirmation, date errors, stopping, light and small layout', async ({ page }) => {
-  await launch(page);
-  await page.evaluate(() => { const saved = JSON.parse(localStorage.getItem('sqx-recreation-v1')!); saved.state.settings.profile = 'Starter'; saved.state.settings.theme = 'light'; localStorage.setItem('sqx-recreation-v1', JSON.stringify(saved)); });
-  await page.reload();
-  await page.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).check();
-  await page.getByRole('checkbox', { name: 'Select GBPJPY', exact: true }).check();
-  const dialog = await open(page);
-  await expect(dialog).toHaveAccessibleName('Download Dukascopy data for multiple');
+  const dialog = page.getByRole('dialog', { name: /Download Dukascopy data for/ });
   await expect(dialog.getByRole('radio', { name: 'Standard download - Dukascopy servers' })).toBeChecked();
-  await dialog.getByLabel('From', { exact: true }).fill('2999-01-01');
-  await dialog.getByRole('button', { name: 'Start download' }).click();
-  await expect(dialog.getByRole('alert')).toBeVisible();
-  await dialog.getByRole('button', { name: 'Last year', exact: true }).click();
-  await dialog.getByRole('radio', { name: /Fast download from Hong Kong/ }).check();
-  await page.setViewportSize({ width: 740, height: 650 });
-  await expect(dialog.getByRole('button', { name: 'Start download' })).toBeInViewport();
-  await page.screenshot({ path: 'test-results/dukascopy-download-light.png' });
-  await dialog.getByRole('button', { name: 'Start download' }).click();
-  const confirm = page.getByRole('dialog', { name: 'Fast Data Download', exact: true });
-  await page.screenshot({ path: 'test-results/dukascopy-fast-warning-light.png' });
-  await confirm.getByRole('button', { name: 'OK' }).click();
-  await page.getByRole('button', { name: 'Stop all', exact: true }).click();
-  await expect(page.getByLabel('Data Manager progress')).toContainText('cancelled');
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-data-download-v1')!).ranges)).toEqual({});
-});
-test('storage failure keeps the configuration open', async ({ page }) => {
-  await launch(page);
-  await page.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).check();
-  const dialog = await open(page);
-  await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('quota'); }; });
-  await dialog.getByRole('button', { name: 'Start download' }).click();
-  await page.getByRole('dialog', { name: 'Fast Data Download', exact: true }).getByRole('button', { name: 'OK', exact: true }).click();
-  await expect(dialog.getByRole('alert')).toContainText('No job was started');
-});
-test('running job recovers paused and progress failure preserves coverage', async ({ page }) => {
-  await launch(page);
-  await page.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).check();
-  const dialog = await open(page);
-  await dialog.getByRole('radio', { name: 'Standard download - Dukascopy servers' }).check();
-  await dialog.getByRole('button', { name: 'Start download' }).click();
-  await expect(page.getByRole('dialog', { name: 'Fast Data Download', exact: true })).toHaveCount(0);
-  const status = page.getByLabel('Data Manager progress');
-  await expect(status).toContainText('running');
-  await expect(page.locator('.dukas-job-status')).toHaveCount(0);
-  await page.reload();
-  await expect(status).toContainText('paused');
-  await page.getByRole('button', { name: 'Resume all' }).click();
-  await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('quota'); }; });
-  await expect(status).toContainText('failed');
-  await expect(status).toContainText('Unable to persist mock download progress');
-  expect(await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-data-download-v1')!).ranges)).toEqual({});
-});
-
-test('fast warning cancels safely, traps focus and confirms persisted standard fallback', async ({ page }) => {
-  await launch(page);
-  await page.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).check();
-  const dialog = await open(page);
-  for (const radio of [/Fast download from HaruQuantAI CDN/, /Fast download from Hong Kong/]) {
-    await dialog.getByRole('radio', { name: radio }).check();
-    await dialog.getByRole('button', { name: 'Start download' }).click();
-    const warning = page.getByRole('dialog', { name: 'Fast Data Download', exact: true });
-    await expect(warning).toContainText('not available for all symbols');
-    await expect(warning).toContainText('automatically fall back to standard mode');
-    expect(await page.evaluate(() => localStorage.getItem('sqx-data-download-v1'))).toBeNull();
-    await warning.getByRole('button', { name: 'Cancel' }).click();
-    await expect(dialog.getByRole('button', { name: 'Start download' })).toBeFocused();
-    await expect(dialog.getByRole('radio', { name: radio })).toBeChecked();
-  }
-  await dialog.getByRole('button', { name: 'Start download' }).click();
-  await page.keyboard.press('Escape');
-  await expect(dialog).toBeVisible();
-  await dialog.getByRole('button', { name: 'Start download' }).click();
-  const warning = page.getByRole('dialog', { name: 'Fast Data Download', exact: true });
-  await warning.getByRole('button', { name: 'OK', exact: true }).focus();
-  await page.keyboard.press('Tab');
-  await expect(warning.getByRole('button', { name: 'Close', exact: true })).toBeFocused();
-  await page.screenshot({ path: 'test-results/dukascopy-fast-warning-dark.png' });
-  await warning.getByRole('button', { name: 'OK', exact: true }).click();
-  await page.getByRole('button', { name: 'Pause all', exact: true }).click();
-  await page.reload();
-  const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-data-download-v1')!));
-  expect(saved.job.request.downloadType).toBe('cdn-cn');
-  expect(saved.job.resolvedModes).toEqual({ d1: 'standard' });
-  await page.getByRole('button', { name: 'Resume all', exact: true }).click();
-  await expect(page.getByLabel('Data Manager progress')).toContainText('completed', { timeout: 10000 });
+  await expect(dialog.getByRole('radio', { name: /StrategyQuant CDN/ })).toBeDisabled();
+  await expect(dialog.getByRole('radio', { name: /StrategyQuant Hong Kong CDN/ })).toBeDisabled();
+  await expect(dialog.getByRole('button', { name: 'Start download' })).toBeDisabled();
+  await expect(dialog.getByText('Downloads are unavailable until the market catalog is provisioned.')).toBeVisible();
+  expect(await page.evaluate(() => localStorage.getItem('sqx-data-download-v1'))).toBeNull();
 });

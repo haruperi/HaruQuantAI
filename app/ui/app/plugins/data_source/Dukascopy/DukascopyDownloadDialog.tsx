@@ -15,7 +15,8 @@ export function DukascopyDownloadDialog({ targets, onClose, onStarted }: { targe
   const trial = useAppStore(state => state.settings.profile) === 'Starter';
   const preferred = useDukascopyDownloads(state => state.preferred);
   const start = useDukascopyDownloads(state => state.start);
-  const [mode, setMode] = useState<DownloadMode>(trial ? 'standard' : preferred ?? 'cdn');
+  const available = useDukascopyDownloads(state => state.available);
+  const [mode, setMode] = useState<DownloadMode>('standard');
   const [page, setPage] = useState<'download' | 'disclaimer' | 'confirm'>('download');
   const [error, setError] = useState('');
   const root = useRef<HTMLDivElement>(null);
@@ -25,15 +26,15 @@ export function DukascopyDownloadDialog({ targets, onClose, onStarted }: { targe
   useEffect(() => { (page === 'confirm' ? confirmation : root).current?.querySelector<HTMLButtonElement>('button')?.focus(); }, [page]);
   function back() { const wasConfirm = page === 'confirm'; setPage('download'); window.setTimeout(() => (wasConfirm ? root.current?.querySelector<HTMLButtonElement>('[data-download-start]') : disclaimerButton.current)?.focus(), 0); }
   function choose(value: Preset) { const range = presetRange(value, last, minimum, from, to); setFrom(range.from); setTo(range.to); setPreset(value); setError(''); }
-  function submit(confirmed = false) {
+  async function submit(confirmed = false) {
     const request = { targets, dateFrom: from, dateTo: to, dateType: preset, overwrite, downloadType: mode };
     try {
       validateDownload(request);
       if (mode !== 'standard' && !confirmed) { setPage('confirm'); return; }
-      start(request); onStarted(); onClose();
+      await start(request); onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to start download'); setPage('download'); }
   }
-  const title = page === 'disclaimer' ? 'HaruQuantAI CDN Data Disclaimer' : `Download Dukascopy data for ${targets.length > 1 ? 'multiple' : `'${targets[0].symbol}'`}`;
+  const title = page === 'disclaimer' ? 'StrategyQuant CDN status' : `Download Dukascopy data for ${targets.length > 1 ? 'multiple' : `'${targets[0].symbol}'`}`;
   const presetButton = (value: Preset, label: string) => <Button className={preset === value ? 'primary' : ''} aria-pressed={preset === value} onClick={() => choose(value)}>{label}</Button>;
   return <div className="modal-backdrop dukas-download-overlay"><div ref={root} inert={page === 'confirm'} aria-hidden={page === 'confirm' ? true : undefined} className="modal dukas-download-dialog" role="dialog" aria-modal="true" aria-labelledby="dukas-download-title" onKeyDown={event => {
     if (event.key === 'Escape') { event.stopPropagation(); if (page === 'download') onClose(); else back(); }
@@ -54,14 +55,14 @@ export function DukascopyDownloadDialog({ targets, onClose, onStarted }: { targe
         <fieldset><legend>Redownload options</legend><div className="dukas-redownload"><label><input type="radio" name="dukas-overwrite" checked={!overwrite} onChange={() => setOverwrite(false)}/> Add only missing data</label><label><input type="radio" name="dukas-overwrite" checked={overwrite} onChange={() => setOverwrite(true)}/> Overwrite existing data</label></div></fieldset>
         <fieldset><legend>Fast Data Download</legend><div className="dukas-download-modes">
           <label><input type="radio" name="dukas-mode" checked={mode === 'standard'} onChange={() => setMode('standard')}/> Standard download - Dukascopy servers</label>
-          <label><input type="radio" name="dukas-mode" checked={mode === 'cdn'} onChange={() => setMode('cdn')}/> Fast download from HaruQuantAI CDN (10 x faster download)<small>If on, Dukascopy data will be downloaded from prepared packages on HaruQuantAI CDN servers. Please note that pre-prepared packages are available only for part of the data.</small></label>
-          <label><input type="radio" name="dukas-mode" checked={mode === 'cdn-cn'} onChange={() => setMode('cdn-cn')}/> Fast download from Hong Kong server<small>especially for Asia and China users, it might be more performant than CDN option</small></label>
-          <button ref={disclaimerButton} className="dukas-disclaimer-link" onClick={() => setPage('disclaimer')}>HaruQuantAI CDN data disclaimer</button>
+          <label><input type="radio" name="dukas-mode" checked={mode === 'cdn'} onChange={() => setMode('cdn')} disabled/> StrategyQuant CDN (unavailable)<small>Package format and reuse authorization are under review.</small></label>
+          <label><input type="radio" name="dukas-mode" checked={mode === 'cdn-cn'} onChange={() => setMode('cdn-cn')} disabled/> StrategyQuant Hong Kong CDN (unavailable)</label>
+          <button ref={disclaimerButton} className="dukas-disclaimer-link" onClick={() => setPage('disclaimer')}>CDN availability details</button>
         </div></fieldset>
-      </> : <section className="dukas-download-disclaimer"><h3>Disclaimer</h3><p>In order to provide faster downloads for its clients HaruQuantAI offers pre-packaged Dukascopy data for some of the symbols on its own CDN servers.</p><p>The data available on HaruQuantAI CDN were created from original Dukascopy data obtained from Dukascopy website. HaruQuantAI does not guarantee that the data prepared on its CDN servers exactly match Dukascopy data.</p><p>The data are provided “AS IS”, “AS AVAILABLE”, “WITH ALL ITS FAULTS” and are offered without any covenants or any express, implied or statutory warranties including (without limitation and qualification) any warranties as to accuracy, functionality, performance, merchantability, quiet enjoyment, system integration, data accuracy or fitness for any particular purpose and any warranties arising from trade usage, course of dealing or course of performance.</p></section>}
+      </> : <section className="dukas-download-disclaimer"><h3>Availability</h3><p>StrategyQuant describes its CDN data delivery as a Pro feature. HaruQuantAI has not qualified the package format or reuse terms, so CDN downloads are unavailable.</p></section>}
       {error && page === 'download' && <p className="dukas-download-error" role="alert">{error}</p>}
     </div>
-    <footer><Button onClick={page === 'download' ? onClose : back}>Close</Button>{page !== 'disclaimer' && <Button data-download-start className="primary" onClick={() => submit()}>Start download</Button>}</footer>
+    <footer>{!available && <p role="status">Downloads are unavailable until the market catalog is provisioned.</p>}<Button onClick={page === 'download' ? onClose : back}>Close</Button>{page !== 'disclaimer' && <Button data-download-start className="primary" onClick={() => { void submit(); }} disabled={!available}>Start download</Button>}</footer>
   </div>{page === 'confirm' && <div className="modal-backdrop dukas-fast-overlay"><div ref={confirmation} className="modal dukas-fast-confirm" role="dialog" aria-modal="true" aria-labelledby="dukas-fast-title" aria-describedby="dukas-fast-message" onKeyDown={event => {
     if (event.key === 'Escape') { event.stopPropagation(); back(); }
     if (event.key === 'Tab') {

@@ -4,7 +4,7 @@ export type Preset = 'sinceLast' | 'sixMonths' | 'year' | 'fiveYears' | 'tenYear
 export interface DownloadTarget { id: string; symbol: string; source: string; underlying?: string; instrument?: string; timeframe: string; from: string; to: string; bars: number; sourceDataId?: string; fastDownloadAvailable?: boolean }
 export interface DownloadRequest { targets: DownloadTarget[]; dateFrom: string; dateTo: string; dateType: Preset; overwrite: boolean; downloadType: DownloadMode }
 export interface Interval { from: string; to: string }
-export interface DownloadJob { request: DownloadRequest; state: 'running' | 'paused' | 'cancelled' | 'completed' | 'failed'; progress: number; error?: string; resolvedModes?: Record<string, DownloadMode> }
+export interface DownloadJob { request: DownloadRequest; state: 'running' | 'paused' | 'cancelled' | 'completed' | 'failed'; progress: number; error?: string; resolvedModes?: Record<string, DownloadMode>; jobId?: string; canPause?: boolean }
 export interface DownloadState { job: DownloadJob | null; ranges: Record<string, Interval[]>; preferred: DownloadMode | null }
 export const emptyDownload: DownloadState = { job: null, ranges: {}, preferred: null };
 export function today(): string { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; }

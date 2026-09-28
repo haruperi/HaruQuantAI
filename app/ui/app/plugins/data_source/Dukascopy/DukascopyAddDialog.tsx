@@ -8,6 +8,7 @@ export interface DukascopyContextDocument {
   readonly active: boolean;
   readonly error: string;
   readonly brokers?: readonly BrokerProfile[];
+  readonly brokerCatalogStatus?: 'available' | 'unavailable';
 }
 
 const disclaimer = 'I confirm that I understand the following: Data are provided for free by Dukascopy. HaruQuantAI Data Manager is only a tool to download the data directly to the program. HaruQuantAI is not responsible for quality or availability of the data.';
@@ -17,12 +18,14 @@ export function DukascopyAddDialog({
   onClose,
   onAddData,
   onComplete,
+  available = false,
 }: {
   open: boolean;
   contextDocument?: DukascopyContextDocument;
   onClose: () => void;
-  onAddData?: (request: { symbols: string[]; dataType: 'TICK' | 'M1'; broker: string; postfix: string; instruments: string[] }) => void;
+  onAddData?: (request: { symbols: string[]; dataType: 'TICK' | 'M1'; broker: string; postfix: string; instruments: string[] }) => Promise<void>;
   onComplete: (message: string) => void;
+  available?: boolean;
 }) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
@@ -31,6 +34,7 @@ export function DukascopyAddDialog({
   const [broker, setBroker] = useState('-1');
   const [postfix, setPostfix] = useState('');
   const [confirmed, setConfirmed] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
   const [warning, setWarning] = useState(false);
   const [mapping, setMapping] = useState<Record<string, string> | null>(null);
@@ -46,13 +50,20 @@ export function DukascopyAddDialog({
   useEffect(() => {
     if (!open) return;
     setSelected([]); setConfirmed(false); setError(''); setMapping(null); setWarning(false);
+    setBroker('-1'); setPostfix('');
     const previous = document.activeElement as HTMLElement | null;
     root.current?.querySelector<HTMLButtonElement>('button')?.focus();
     return () => previous?.focus();
   }, [open]);
+  useEffect(() => {
+    if (broker !== '-1' && !brokers.some(item => item.id === broker)) {
+      setBroker('-1'); setPostfix(''); setMapping(null);
+    }
+  }, [broker, brokers]);
   const changeFilter = (text: string, type: string) => { setQuery(text); setCategory(type); setSelected([]); };
   const toggle = (symbols: string[]) => setSelected(current => symbols.every(symbol => current.includes(symbol)) ? current.filter(symbol => !symbols.includes(symbol)) : [...new Set([...current, ...symbols])]);
-  const save = () => {
+  const save = async () => {
+    if (saving || !available) return;
     setError('');
     if (!selected.length) { setError('No symbols selected'); return; }
     if (!confirmed) { setError(disclaimer); return; }
@@ -62,12 +73,14 @@ export function DukascopyAddDialog({
     }
     if (mapping && Object.values(mapping).includes('-1001')) { setError('Select proper instrument or skip the symbol'); return; }
     const symbols = selected.filter(symbol => mapping?.[symbol] !== '-1000');
+    if (!symbols.length) { setError('Choose at least one symbol that is not skipped'); return; }
+    setSaving(true);
     try {
       if (onAddData) {
-        onAddData({ symbols, dataType, broker, postfix, instruments: mapping ? symbols.map(symbol => mapping[symbol]) : [] });
+        await onAddData({ symbols, dataType, broker, postfix, instruments: mapping ? symbols.map(symbol => mapping[symbol]) : [] });
       }
-      onComplete(`${symbols.length} Dukascopy mock dataset definition${symbols.length === 1 ? '' : 's'} added`);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add symbols'); }
+      onComplete(`${symbols.length} Dukascopy dataset definition${symbols.length === 1 ? '' : 's'} added`);
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add symbols'); } finally { setSaving(false); }
   };
   if (!open) return null;
   return <div className="dukas-overlay"><div ref={root} className="dukas-dialog" role="dialog" aria-modal="true" aria-labelledby="dukas-title" onKeyDown={event => {
@@ -83,7 +96,7 @@ export function DukascopyAddDialog({
     <div className="dukas-body">
       {mapping ? <section className="dukas-panel dukas-mapping">
         <strong>You have chosen broker profile {activeBroker?.name}</strong>
-        <p>Downloaded data will be recomputed to this broker timezone.</p>
+        <p>Stored data remain UTC. Broker timezone is applied only in an explicitly selected read-time view.</p>
         <strong>Please select corresponding instrument for added data</strong>
         <p>Select a corresponding broker profile instrument for every symbol. If one is not defined, skip the symbol or use the Default instrument.</p>
         <p>Mass action</p><div>Set all unconfigured symbols to <button onClick={() => setMapping(Object.fromEntries(Object.entries(mapping).map(([key, value]) => [key, value === '-1001' ? '-1' : value])))}>Default instrument</button> <button onClick={() => setMapping(Object.fromEntries(Object.entries(mapping).map(([key, value]) => [key, value === '-1001' ? '-1000' : value])))}>Skip adding the symbol</button></div>
@@ -94,13 +107,15 @@ export function DukascopyAddDialog({
         <div className="dukas-grid"><table aria-label="Available Dukascopy symbols"><colgroup><col style={{ width: 24 }}/><col style={{ width: 150 }}/><col style={{ width: 200 }}/><col style={{ width: 200 }}/><col style={{ width: 200 }}/></colgroup><thead><tr><th><input ref={headerCheck} type="checkbox" aria-label="Select all available symbols" checked={all} disabled={!rows.length} onChange={() => toggle(rows.map(row => row.symbol))}/></th><th>Symbol</th><th>Name</th><th>Available M1 data range</th><th>Available Tick data range</th></tr></thead>
           <tbody>{groups.map(group => <Group key={group.name} group={group} selected={selected} toggle={toggle}/>)}{!rows.length && <tr><td colSpan={5}>No Dukascopy symbols available.</td></tr>}</tbody></table></div>
         <div className="dukas-options"><strong>Data type</strong><label><input type="radio" name="dukas-type" checked={dataType === 'TICK'} onChange={() => setDataType('TICK')}/> Tick data</label><label><input type="radio" name="dukas-type" checked={dataType === 'M1'} onChange={() => setDataType('M1')}/> M1 data</label></div>
-        <div className="dukas-settings"><label><strong>Broker profile *</strong><select aria-label="Broker profile *" value={broker} onChange={event => { const id = event.target.value; setBroker(id); setPostfix(brokers.find(item => item.id === id)?.postfix ?? ''); if (id !== '-1') setWarning(true); }}><option value="-1">Default</option>{brokers.filter(item => item.mtUse).map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label><strong>Data postfix</strong><span><input value={postfix} onChange={event => setPostfix(event.target.value)}/><small>This postfix will be optionally added to the data names created</small></span></label></div>
-        {warning && <p className="dukas-warning" role="status">You have selected a non-default broker. Data will be automatically adjusted to the broker's time zone during download.</p>}
+        <div className="dukas-settings"><label><strong>Broker profile *</strong><select aria-label="Broker profile *" value={broker} onChange={event => { const id = event.target.value; setBroker(id); setPostfix(brokers.find(item => item.id === id)?.postfix ?? ''); setWarning(id !== '-1'); }}><option value="-1">Default</option>{brokers.filter(item => item.mtUse).map(item => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label><label><strong>Data postfix</strong><span><input aria-label="Data postfix" value={postfix} onChange={event => setPostfix(event.target.value)}/><small>This postfix will be optionally added to the data names created</small></span></label></div>
+        {contextDocument?.brokerCatalogStatus === 'unavailable' && <p role="status">Broker profiles are unavailable from the database.</p>}
+        {warning && <p className="dukas-warning" role="status">You have selected a non-default broker. Stored data remain UTC.</p>}
       </section>}
     </div>
     <footer>{!mapping && <label className="dukas-consent"><input role="switch" type="checkbox" checked={confirmed} onChange={event => setConfirmed(event.target.checked)}/><span>{disclaimer}</span></label>}
       {(error || storageError) && <p className="dukas-error" role="alert">{error || storageError}</p>}
-      <div className="dukas-actions"><button className="dukas-link sq-button" onClick={() => { if (mapping) { setMapping(null); setError(''); } else onClose(); }}>{mapping ? '< Back' : 'Close'}</button><button className="dukas-save sq-button primary" onClick={save}>Save</button></div>
+      {!available && <p role="status">Dataset storage is unavailable. Reconnect to the host or check the dataset catalog.</p>}
+      <div className="dukas-actions"><button className="dukas-link sq-button" onClick={() => { if (mapping) { setMapping(null); setError(''); } else onClose(); }}>{mapping ? '< Back' : 'Close'}</button><button className="dukas-save sq-button primary" onClick={() => { void save(); }} disabled={!available || !selected.length || !confirmed || saving || (mapping !== null && Object.values(mapping).every(value => value === '-1000'))}>{saving ? 'Saving...' : 'Save'}</button></div>
     </footer>
   </div></div>;
 }

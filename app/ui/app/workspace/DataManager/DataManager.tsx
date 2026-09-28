@@ -503,7 +503,8 @@ function DatasetTable({ selectedIds, onToggle, onSelect, pluginStates }: {
   const [stockGroup, setStockGroup] = useState('');
 
   const dukasRanges = pluginStates['dukascopy']?.ranges ?? {};
-  const baseDatasets = [...datasets.map(row => ({ ...row, underlying: row.symbol, instrument: row.symbol, brokerName: '—', timezone: '—', category: instruments.find(item => item.symbol === row.symbol)?.type ?? '—' })), ...definitions, ...(pluginStates['td']?.definitions ?? []), ...fileDefinitions].map(row => ({ ...row, ...simulationSummary(row, dukasRanges[row.id] ?? []) }));
+  const backendDukascopy = pluginStates['dukascopy']?.backendAvailable === true;
+  const baseDatasets = [...datasets.filter(row => !backendDukascopy || row.source !== 'Dukascopy').map(row => ({ ...row, underlying: row.symbol, instrument: row.symbol, brokerName: '—', timezone: '—', category: instruments.find(item => item.symbol === row.symbol)?.type ?? '—' })), ...definitions.filter(row => !backendDukascopy || row.source !== 'Dukascopy'), ...(pluginStates['td']?.definitions ?? []), ...fileDefinitions].map(row => ({ ...row, ...simulationSummary(row, dukasRanges[row.id] ?? []) }));
 
   const pluginRows: any[] = Object.values(pluginStates).flatMap(s => s?.definitions ?? s?.records ?? []);
   const fileRecords = pluginStates['file-import']?.records ?? [];
@@ -628,7 +629,7 @@ function getProviderJobLabel(owner: string, states: Record<string, any>): string
   if (owner === 'sq') return states['sq']?.job?.provider === 'futures' ? 'Futures data mock update' : 'Equity data mock update';
   if (owner === 'file') return 'File import';
   if (owner === 'td') return 'TickDownloader mock import';
-  return 'Dukascopy mock download';
+  return 'Dukascopy download unavailable';
 }
 
 export function DataManager() {
@@ -796,10 +797,11 @@ export function DataManager() {
   const toggleDataset = (id: string) => setSelectedDatasetIds(current => current.includes(id) ? current.filter(item => item !== id) : [...current, id]);
 
   const dukasRanges = pluginStates['dukascopy']?.ranges ?? {};
+  const backendDukascopy = pluginStates['dukascopy']?.backendAvailable === true;
   const toolRows: ToolTarget[] = [
     ...stockGroups.generated,
-    ...datasets.map(row => ({ ...row, instrument: row.symbol, timezone: '—', category: instruments.find(item => item.symbol === row.symbol)?.type ?? '—' })),
-    ...definitions.map(row => ({ ...row, ...simulationSummary(row, dukasRanges[row.id] ?? []) })),
+    ...datasets.filter(row => !backendDukascopy || row.source !== 'Dukascopy').map(row => ({ ...row, instrument: row.symbol, timezone: '—', category: instruments.find(item => item.symbol === row.symbol)?.type ?? '—' })),
+    ...definitions.filter(row => !backendDukascopy || row.source !== 'Dukascopy').map(row => ({ ...row, ...simulationSummary(row, dukasRanges[row.id] ?? []) })),
     ...fileDefinitions,
     ...Object.values(pluginStates).flatMap(s => s?.definitions ?? s?.records ?? []),
   ].map(row => ({
@@ -845,7 +847,9 @@ export function DataManager() {
   };
 
   const contextNames = Object.freeze([
-    ...datasets, ...definitions, ...fileDefinitions,
+    ...datasets.filter(row => !backendDukascopy || row.source !== 'Dukascopy'),
+    ...definitions.filter(row => !backendDukascopy || row.source !== 'Dukascopy'),
+    ...fileDefinitions,
     ...Object.values(pluginStates).flatMap(s => s?.definitions ?? s?.records ?? []),
   ].map(row => row.symbol));
   const contextError = workspaceStorageError || instrumentStorageError || Object.values(pluginStates).map(s => s?.storageError).find(Boolean) || '';
@@ -988,7 +992,7 @@ export function DataManager() {
       <Button className="action-save" onClick={()=>{const rows=requireBrokers();if(rows){downloadTextFile('Brokers.json',serializeBrokersJson(rows));notify('Brokers saved.');}}}><Save size={26} aria-hidden="true"/>Save</Button>
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
-  </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (['running', 'paused'].includes(providerJob?.state ?? '')) providerAction(providerJob?.state === 'paused' ? 'resume' : 'pause'); else setOperationState(current => current === 'paused' ? 'running' : 'paused'); }}>{operationState === 'paused' || providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (providerJob && ['running', 'paused'].includes(providerJob.state)) { providerAction('stop'); return; } setOperationState('cancelled'); notify(`${operationLabel} cancelled`); }}>Stop all</Button></div>
+  </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/><Button disabled={providerJob?.canPause === false || (operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? ''))} onClick={() => { setSelectionMessage(''); if (['running', 'paused'].includes(providerJob?.state ?? '')) providerAction(providerJob?.state === 'paused' ? 'resume' : 'pause'); else setOperationState(current => current === 'paused' ? 'running' : 'paused'); }}>{operationState === 'paused' || providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (providerJob && ['running', 'paused'].includes(providerJob.state)) { providerAction('stop'); return; } setOperationState('cancelled'); notify(`${operationLabel} cancelled`); }}>Stop all</Button></div>
   <div className="dm-body">{tab === 'Log' ? <main className="dm-log"><header><strong>Log</strong><button className="clear-log" onClick={() => setLogEntries([])}>Clear log</button></header><div className="dm-log-output" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} pluginStates={pluginStates}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={indicatorDefinitions} selected={selectedExternalNames} job={pluginStates['indicators']?.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/> : <div className="dm-config"><Section title={tab}><div className="cards-list">{Array.from({ length: 6 }, (_, index) => <button key={index}><Database size={22}/><strong>{tab.replace(/s$/, '')} {index + 1}</strong><span>{index % 2 ? 'Configured · mock adapter' : 'Ready for configuration'}</span></button>)}</div></Section></div>}</div>
 
   {plugins.map(p => (

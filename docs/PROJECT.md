@@ -148,6 +148,11 @@ mechanics and verification methods are owned by ARCHITECTURE.md and AGENTS.md.
   risk approval.
 - **Extensibility:** A concept can be added, disabled, upgraded, or removed
   without editing unrelated concepts or corrupting retained artifacts.
+- **FR-DATA-001:** Data Manager shall expose explicit Dukascopy Tick and M1
+  acquisition with source provenance, bounded jobs, verified UTC market-file
+  revisions, honest coverage, and unavailable states when storage or provider
+  authority has not been qualified. Higher timeframes derive from M1 at read
+  time; canonical history uses the approved Parquet schemas.
 
 These are target outcomes. Each owning workspace/plugin README must turn its
 share into concrete requirements, contracts, tests, and status when registered.
