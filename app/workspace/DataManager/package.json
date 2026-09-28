@@ -11,6 +11,16 @@
   "ui_entry": "app/ui/app/workspace/DataManager/contribution.tsx",
   "owned_paths": {
     "source": [
+      "app/ui/app/workspace/DataManager/Actions/CloneTimezoneDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/CsvExportDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/DataReviewChart.tsx",
+      "app/ui/app/workspace/DataManager/Actions/LoadDefinitionsDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/MassDeleteDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/Mt4ExportDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/Mt5ExportDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/SaveDefinitionsDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/ViewAnalyzeDialog.tsx",
+      "app/ui/app/workspace/DataManager/Actions/actionsClient.ts",
       "app/ui/app/workspace/DataManager/Catalogs/BrokerProfiles/BrokerProfileEditorDialog.tsx",
       "app/ui/app/workspace/DataManager/Catalogs/BrokerProfiles/BrokerRecordImportDialog.tsx",
       "app/ui/app/workspace/DataManager/Catalogs/BrokerProfiles/BrokerStocksDialog.tsx",
@@ -43,6 +53,7 @@
       "app/ui/app/workspace/DataManager/documents.ts",
       "app/ui/app/workspace/DataManager/localState.ts",
       "app/workspace/DataManager/__init__.py",
+      "app/workspace/DataManager/actions.py",
       "app/workspace/DataManager/workspace.py"
     ],
     "tests": [
@@ -52,6 +63,7 @@
       "app/ui/tests/e2e/data-manager-sessions.spec.ts",
       "app/ui/tests/e2e/data-manager-source-ribbon.spec.ts",
       "app/ui/tests/e2e/data-manager-stock-groups.spec.ts",
+      "app/ui/tests/unit/workspace/DataManager/Actions/actionsClient.test.ts",
       "app/ui/tests/unit/workspace/DataManager/Catalogs/BrokerProfiles/brokerProfiles.test.ts",
       "app/ui/tests/unit/workspace/DataManager/Catalogs/Instruments/fileSymbols.test.ts",
       "app/ui/tests/unit/workspace/DataManager/Catalogs/Instruments/instruments.test.ts",
@@ -59,9 +71,11 @@
       "app/ui/tests/unit/workspace/DataManager/Catalogs/StockGroups/stockGroups.test.ts",
       "app/ui/tests/unit/workspace/DataManager/Common/dataSourceRibbon.test.ts",
       "tests/workspace/DataManager/__init__.py",
+      "tests/workspace/DataManager/test_actions.py",
       "tests/workspace/DataManager/test_workspace.py"
     ],
     "assets": [
+      "app/ui/app/workspace/DataManager/Actions/actions.css",
       "app/ui/app/workspace/DataManager/Catalogs/BrokerProfiles/brokerProfiles.css",
       "app/ui/app/workspace/DataManager/Catalogs/Instruments/fileSymbols.css",
       "app/ui/app/workspace/DataManager/Catalogs/Instruments/instruments.css",

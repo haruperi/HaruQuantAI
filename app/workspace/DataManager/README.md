@@ -20,6 +20,7 @@ migration. See the current ownership-removal task walkthrough for actual evidenc
 | Feature | Requirement | Contract | Current implementation and qualification |
 | --- | --- | --- | --- |
 | `FEAT-DM-DUKASCOPY_ACQUISITION` | `FR-DATA-001` | `plugin.data_manager.dukascopy` in `data_source.acquisition@1.0.0`; host owns network, jobs and market storage | Isolated fixture direct M1 and Tick jobs pass tests. Adaptive rate throttling, Sunday 19:00 UTC start, and StrategyQuant CDN transport (global and Hong Kong) with fallback to direct download are qualified. Active catalog migration remains required before live downloads execute. |
+| `FEAT-DM-ACTIONS` | `FR-DATA-002` | `actions.*` operations in `app/workspace/DataManager/actions.py` invoked through workspace dispatcher and CLI | 1:1 parity with SQX donor `DataManagerActions` for all 12 actions: `brokerData`, `brokerDataUpdate`, `cloneToTimezone`, `delete`, `exportToCsv`, `exportToMT4`, `exportToMT5`, `load`, `review` (data/chart/quality), `save`, `updateAll`, and `updateSelected`, plus `listDatasets` (`actions.list_datasets`) loading real records directly from `datamgr_datasets`. Fully qualified via offline unit tests, UI integration, and CLI subcommands. |
 
 Canonical target storage is `data/market/dukascopy/` with only `m1/` and
 `ticks/` immediately below that source; current files are one M1 year or Tick

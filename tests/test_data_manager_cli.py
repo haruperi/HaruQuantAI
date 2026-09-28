@@ -37,12 +37,13 @@ def _setup_full_test_db(db_path: Path) -> None:
         conn.execute(
             "CREATE TABLE IF NOT EXISTS datamgr_instruments ("
             "id INTEGER PRIMARY KEY, symbol TEXT NOT NULL, description TEXT, "
+            "broker_id INTEGER DEFAULT 1, decimals INTEGER DEFAULT 5, "
             "point_value REAL, tick_size REAL, default_spread REAL, "
             "min_volume REAL, max_volume REAL, margin_rate REAL, data_type TEXT)"
         )
         conn.execute(
             "INSERT INTO datamgr_instruments VALUES "
-            "(1, 'EURUSD', 'Euro / US Dollar', 100000.0, 0.00001, 0.00010, 0.01, 100.0, 0.05, 'Forex')"
+            "(1, 'EURUSD', 'Euro / US Dollar', 1, 5, 100000.0, 0.00001, 0.00010, 0.01, 100.0, 0.05, 'Forex')"
         )
         conn.execute(
             "CREATE TABLE IF NOT EXISTS datamgr_sessions ("
@@ -448,3 +449,263 @@ def test_dukascopy_source_parity_commands(
     out = capsys.readouterr().out
     assert "Download completed successfully!" in out
     assert "GBPUSD_dukascopy" in out
+
+
+def _seed_cli_test_data(db_path: Path, data_root: Path) -> None:
+    """Helper to publish M1 data and register dataset for action CLI tests."""
+    from app.host.market_data import MarketDataStore
+
+    times = [datetime(2026, 3, 2, 10, i, 0, tzinfo=UTC) for i in range(10)]
+    table = pa.Table.from_pylist(
+        [
+            {
+                "DateTime": dt,
+                "Open": 1.0850 + i * 0.0001,
+                "High": 1.0860 + i * 0.0001,
+                "Low": 1.0845 + i * 0.0001,
+                "Close": 1.0855 + i * 0.0001,
+                "Volume": 100 + i * 10,
+            }
+            for i, dt in enumerate(times)
+        ],
+        schema=M1_SCHEMA,
+    )
+    store = MarketDataStore(data_root, db_path)
+    store.publish(
+        source="dukascopy",
+        kind="m1",
+        symbol="eurusd",
+        period="2026",
+        table=table,
+        coverage=(
+            (int(times[0].timestamp() * 1000), int(times[-1].timestamp() * 1000)),
+        ),
+        provider_mode="test",
+    )
+    with closing(sqlite3.connect(db_path)) as conn, conn:
+        conn.execute(
+            "INSERT OR REPLACE INTO datamgr_datasets ("
+            "id, source, symbol, underlying, instrument, timeframe, "
+            "broker, broker_name, timezone, category, date_from, date_to, "
+            "bars, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                "eur-001",
+                "Dukascopy",
+                "EURUSD_dukascopy",
+                "EURUSD",
+                "EURUSD",
+                "M1",
+                "3",
+                "Dukascopy",
+                "UTC",
+                "Forex",
+                "2026-03-02",
+                "2026-03-02",
+                10,
+                "2026-03-02T00:00:00Z",
+                "2026-03-02T00:00:00Z",
+            ),
+        )
+
+
+def test_cli_actions_broker_and_export(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Validate broker data queries and MT4/MT5/CSV exports."""
+    db_path = tmp_path / "database" / "haruquantai.db"
+    data_root = tmp_path / "data"
+    _setup_full_test_db(db_path)
+    _seed_cli_test_data(db_path, data_root)
+
+    # 1. broker-data
+    ret_bdata = main(
+        [
+            "broker-data",
+            "--query",
+            "EUR",
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_bdata == 0
+    assert "EURUSD" in capsys.readouterr().out
+
+    # 2. broker-data-update
+    ret_bupdate = main(
+        ["broker-data-update", "--db", str(db_path), "--data-dir", str(data_root)]
+    )
+    assert ret_bupdate == 0
+
+    # 3. export-csv
+    csv_file = tmp_path / "eurusd_m5.csv"
+    ret_csv = main(
+        [
+            "export-csv",
+            "EURUSD_dukascopy",
+            "--timeframe",
+            "M5",
+            "--output-path",
+            str(csv_file),
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_csv == 0
+    assert csv_file.is_file()
+
+    # 4. export-mt4
+    mt4_dir = tmp_path / "mt4_out"
+    ret_mt4 = main(
+        [
+            "export-mt4",
+            "EURUSD_dukascopy",
+            "--output-dir",
+            str(mt4_dir),
+            "--timeframe",
+            "M1",
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_mt4 == 0
+    assert (mt4_dir / "EURUSD1.hst").is_file()
+
+    # 5. export-mt5
+    mt5_file = tmp_path / "eurusd_mt5.txt"
+    ret_mt5 = main(
+        [
+            "export-mt5",
+            "EURUSD_dukascopy",
+            "--output-path",
+            str(mt5_file),
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_mt5 == 0
+    assert mt5_file.is_file()
+
+
+def test_cli_actions_definitions_and_review(
+    tmp_path: Path, capsys: pytest.CaptureFixture[str]
+) -> None:
+    """Validate clone, backup/load definitions, review, and update actions."""
+    db_path = tmp_path / "database" / "haruquantai.db"
+    data_root = tmp_path / "data"
+    _setup_full_test_db(db_path)
+    _seed_cli_test_data(db_path, data_root)
+
+    # 1. clone-to-timezone
+    ret_clone = main(
+        [
+            "clone-to-timezone",
+            "EURUSD_dukascopy",
+            "--shift-hours",
+            "2",
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_clone == 0
+    assert "Successfully cloned 1 dataset(s)" in capsys.readouterr().out
+
+    # 2. save-definitions & load-definitions
+    defs_file = tmp_path / "backup_defs.json"
+    ret_save = main(
+        [
+            "save-definitions",
+            "--file-path",
+            str(defs_file),
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_save == 0
+    assert defs_file.is_file()
+
+    ret_load = main(
+        [
+            "load-definitions",
+            str(defs_file),
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_load == 0
+    assert "Restored" in capsys.readouterr().out
+
+    # 3. review (data, chart, quality)
+    ret_rev_data = main(
+        [
+            "review",
+            "EURUSD_dukascopy",
+            "--limit",
+            "5",
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_rev_data == 0
+
+    ret_rev_qual = main(
+        [
+            "review",
+            "EURUSD_dukascopy",
+            "--quality",
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_rev_qual == 0
+    assert "Quality Score" in capsys.readouterr().out
+
+    ret_rev_chart = main(
+        [
+            "review",
+            "EURUSD_dukascopy",
+            "--chart",
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_rev_chart == 0
+    assert "Retrieved" in capsys.readouterr().out
+
+    # 4. update-all & update-selected
+    ret_up_all = main(
+        ["update-all", "--db", str(db_path), "--data-dir", str(data_root)]
+    )
+    assert ret_up_all == 0
+
+    ret_up_sel = main(
+        [
+            "update-selected",
+            "EURUSD_dukascopy",
+            "--db",
+            str(db_path),
+            "--data-dir",
+            str(data_root),
+        ]
+    )
+    assert ret_up_sel == 0

@@ -48,6 +48,7 @@ from app.plugin.DataSource.dukascopy import (
     RateCorrector,
     _fetch_day,
 )
+from app.workspace.DataManager import actions
 
 
 def _workspace_root() -> Path:
@@ -376,6 +377,294 @@ def cmd_clear(db_path: Path, data_root: Path, symbol: str) -> int:
         return 0
     sys.stderr.write(f"Symbol '{symbol}' not found in Data Manager.\n")
     return 1
+
+
+def cmd_clone_to_timezone(
+    args: argparse.Namespace, db_path: Path, data_root: Path
+) -> int:
+    """Clone symbols to a target timezone."""
+    try:
+        res = actions.clone_to_timezone(
+            db_path,
+            data_root,
+            args.symbols,
+            shift_hours=args.shift_hours,
+            timezone_name=args.timezone,
+            postfix=args.postfix,
+            remove_weekends=args.remove_weekends,
+        )
+        sys.stdout.write(f"Successfully cloned {len(res)} dataset(s):\n")
+        for r in res:
+            sym = r["symbol"]
+            cnt = r["records"]
+            tf = r["timeframe"]
+            sys.stdout.write(f"  - {sym}: {cnt} bars/ticks saved ({tf})\n")
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error cloning dataset: {exc}\n")
+        return 1
+
+
+def cmd_delete_datasets(
+    args: argparse.Namespace, db_path: Path, data_root: Path
+) -> int:
+    """Delete symbol definitions or purge files with dependency enforcement."""
+    try:
+        res = actions.delete_datasets(
+            db_path, data_root, args.symbols, mode=getattr(args, "mode", "remove")
+        )
+        sys.stdout.write(
+            f"Successfully processed {res['affected']} symbol(s) "
+            f"(mode: {res['mode']}).\n"
+        )
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error deleting datasets: {exc}\n")
+        return 1
+
+
+def cmd_export_csv(args: argparse.Namespace, db_path: Path, data_root: Path) -> int:
+    """Export dataset to CSV."""
+    try:
+        out = Path(args.output_path) if args.output_path else None
+        res = actions.export_to_csv(
+            db_path,
+            data_root,
+            args.symbol,
+            timeframe=args.timeframe,
+            date_from=args.date_from,
+            date_to=args.date_to,
+            output_path=out,
+            target_timezone=args.target_timezone,
+            header=args.header,
+            include_header=not args.no_header,
+        )
+        sys.stdout.write(
+            f"Successfully exported {res['records']} bars to {res['outputPath']}\n"
+        )
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error exporting to CSV: {exc}\n")
+        return 1
+
+
+def cmd_export_mt4(args: argparse.Namespace, db_path: Path, data_root: Path) -> int:
+    """Export dataset to MT4 .hst and .fxt files."""
+    try:
+        out = Path(args.output_dir) if args.output_dir else None
+        res = actions.export_to_mt4(
+            db_path,
+            data_root,
+            args.symbol,
+            mt4_symbol=args.mt4_symbol,
+            date_from=args.date_from,
+            date_to=args.date_to,
+            output_dir=out,
+            timeframe=args.timeframe,
+            export_mode=args.export_mode,
+            target_timezone=args.target_timezone,
+            server_name=args.server_name,
+            spread=args.spread,
+            digits=args.digits,
+        )
+        sys.stdout.write("Successfully exported MT4 files:\n")
+        for f in res["files"]:
+            sys.stdout.write(f"  - {f}\n")
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error exporting to MT4: {exc}\n")
+        return 1
+
+
+def cmd_export_mt5(args: argparse.Namespace, db_path: Path, data_root: Path) -> int:
+    """Export dataset to MT5 format."""
+    try:
+        out = Path(args.output_path) if args.output_path else None
+        res = actions.export_to_mt5(
+            db_path,
+            data_root,
+            args.symbol,
+            timeframe=args.timeframe,
+            spread_mode=args.spread_mode,
+            spread_points=args.spread_points,
+            date_from=args.date_from,
+            date_to=args.date_to,
+            output_path=out,
+            target_timezone=args.target_timezone,
+        )
+        sys.stdout.write(
+            f"Successfully exported MT5 {res['kind']} to {res['outputPath']} "
+            f"({res['records']} records)\n"
+        )
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error exporting to MT5: {exc}\n")
+        return 1
+
+
+def cmd_save_definitions(
+    args: argparse.Namespace, db_path: Path, data_root: Path
+) -> int:
+    """Save dataset definitions and configurations to JSON."""
+    try:
+        out = Path(args.file_path) if args.file_path else None
+        res = actions.save_definitions(
+            db_path, data_root, symbols=args.symbols, file_path=out
+        )
+        sys.stdout.write(
+            f"Backed up {res['datasetsCount']} datasets and "
+            f"{res['instrumentsCount']} instruments to {res['filePath']}\n"
+        )
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error saving definitions: {exc}\n")
+        return 1
+
+
+def cmd_load_definitions(
+    args: argparse.Namespace, db_path: Path, data_root: Path
+) -> int:
+    """Load and restore dataset definitions from JSON."""
+    try:
+        res = actions.load_definitions(db_path, data_root, file_path=args.file_path)
+        sys.stdout.write(
+            f"Restored {res['loadedDatasets']} datasets and "
+            f"{res['loadedInstruments']} instruments from {args.file_path}\n"
+        )
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error loading definitions: {exc}\n")
+        return 1
+
+
+def cmd_review(args: argparse.Namespace, db_path: Path, data_root: Path) -> int:
+    """Review dataset tabular bars, chart bars, or data quality."""
+    try:
+        if args.quality:
+            res_qual = actions.review_quality(
+                db_path,
+                data_root,
+                args.symbol,
+                timeframe=args.timeframe,
+                session=args.session,
+            )
+            sys.stdout.write(
+                f"Quality Score for {res_qual['symbol']} ({res_qual['timeframe']}): "
+                f"{res_qual['qualityScore']}% (Total bars: {res_qual['totalBars']}, "
+                f"Errors: {res_qual['totalErrors']})\n"
+            )
+            if res_qual.get("problems"):
+                sys.stdout.write(f"Found {len(res_qual['problems'])} problem(s):\n")
+                for p in res_qual["problems"][:10]:
+                    sys.stdout.write(f"  - [{p['date']}] {p['problem']}\n")
+            return 0
+        if args.chart:
+            res_chart = actions.review_chart(
+                db_path,
+                data_root,
+                args.symbol,
+                timeframe=args.timeframe,
+                session=args.session,
+                limit=args.limit,
+            )
+            sys.stdout.write(
+                f"Retrieved {len(res_chart['chart'])} chart bars for "
+                f"{res_chart['symbol']} ({res_chart['timeframe']})\n"
+            )
+            return 0
+
+        res_data = actions.review_data(
+            db_path,
+            data_root,
+            args.symbol,
+            timeframe=args.timeframe,
+            session=args.session,
+            offset=args.offset,
+            limit=args.limit,
+            date_from=args.date_from,
+            date_to=args.date_to,
+        )
+        headers = ["DateTime", "Open", "High", "Low", "Close", "Volume"]
+        rows = [[str(c) for c in r] for r in res_data["rows"]]
+        title = f"{res_data['symbol']} ({res_data['timeframe']}) Bar Data"
+        sys.stdout.write(_format_table(headers, rows, title=title) + "\n")
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error in review: {exc}\n")
+        return 1
+
+
+def cmd_update_all(args: argparse.Namespace, db_path: Path, data_root: Path) -> int:
+    """Scan all datasets and queue updates to current date."""
+    try:
+        res = actions.update_all(db_path, data_root, provider=args.provider)
+        sys.stdout.write(f"{res['message']}\n")
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error in update-all: {exc}\n")
+        return 1
+
+
+def cmd_update_selected(
+    args: argparse.Namespace, db_path: Path, data_root: Path
+) -> int:
+    """Queue incremental updates for selected symbols to current date."""
+    try:
+        res = actions.update_selected(
+            db_path, data_root, args.symbols, provider=args.provider
+        )
+        sys.stdout.write(f"{res['message']}\n")
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error in update-selected: {exc}\n")
+        return 1
+
+
+def cmd_broker_data(args: argparse.Namespace, db_path: Path) -> int:
+    """Query available broker instruments and properties."""
+    try:
+        res = actions.broker_data(db_path, query=args.query, broker_id=args.broker_id)
+        headers = [
+            "Symbol",
+            "Name",
+            "Broker",
+            "Point Value",
+            "Spread",
+            "Margin",
+            "Digits",
+        ]
+        rows = [
+            [
+                r["symbol"],
+                r["name"],
+                r["brokerName"],
+                str(r["pointValue"]),
+                str(r["spread"]),
+                str(r["marginRate"]),
+                str(r["digits"]),
+            ]
+            for r in res
+        ]
+        sys.stdout.write(
+            _format_table(headers, rows, title="Broker Data Instruments") + "\n"
+        )
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error querying broker data: {exc}\n")
+        return 1
+
+
+def cmd_broker_data_update(args: argparse.Namespace, db_path: Path) -> int:
+    """Synchronize broker properties across datasets."""
+    try:
+        res = actions.broker_data_update(
+            db_path, profile_ids=args.profile_ids, symbols=args.symbols
+        )
+        sys.stdout.write(f"{res.get('message', 'Broker data updated')}\n")
+        return 0
+    except Exception as exc:
+        sys.stderr.write(f"Error updating broker data: {exc}\n")
+        return 1
 
 
 async def _run_download_async(  # noqa: PLR0915
@@ -724,7 +1013,7 @@ def cmd_import(
     )
 
 
-def build_parser() -> argparse.ArgumentParser:
+def build_parser() -> argparse.ArgumentParser:  # noqa: PLR0915
     """Build the argument parser for Data Manager CLI."""
     common_parser = argparse.ArgumentParser(add_help=False)
     common_parser.add_argument(
@@ -899,13 +1188,44 @@ def build_parser() -> argparse.ArgumentParser:
         help="Download directly from standard Dukascopy servers",
     )
 
+    # clone-to-timezone subcommand
+    clone_parser = subparsers.add_parser(
+        "clone-to-timezone",
+        aliases=["clone"],
+        help="Clone datasets with timezone shift and weekend removal",
+        parents=[common_parser],
+    )
+    clone_parser.add_argument("symbols", nargs="+", help="Symbol(s) to clone")
+    clone_parser.add_argument(
+        "--shift-hours", type=int, default=0, help="Hour offset (e.g. 2 for +2h)"
+    )
+    clone_parser.add_argument(
+        "--timezone", default="UTC", help="Target timezone identifier (e.g. UTC+2)"
+    )
+    clone_parser.add_argument(
+        "--postfix",
+        default="_{timeframe}_{cloneTime}",
+        help="Naming template postfix (default: _{timeframe}_{cloneTime})",
+    )
+    clone_parser.add_argument(
+        "--remove-weekends",
+        action="store_true",
+        help="Filter out weekend bars outside market opening",
+    )
+
     # delete subcommand
     del_parser = subparsers.add_parser(
         "delete",
-        help="Delete symbol record and purge files",
+        help="Delete symbol record(s) and purge files with dependency check",
         parents=[common_parser],
     )
-    del_parser.add_argument("symbol", help="Symbol to delete")
+    del_parser.add_argument("symbols", nargs="+", help="Symbol(s) to delete")
+    del_parser.add_argument(
+        "--mode",
+        choices=["remove", "clear"],
+        default="remove",
+        help="Mode: 'remove' (purge and delete definition) or 'clear' (purge files)",
+    )
 
     # clear subcommand
     clr_parser = subparsers.add_parser(
@@ -914,6 +1234,183 @@ def build_parser() -> argparse.ArgumentParser:
         parents=[common_parser],
     )
     clr_parser.add_argument("symbol", help="Symbol to clear")
+
+    # export-csv subcommand
+    exp_csv_parser = subparsers.add_parser(
+        "export-csv",
+        help="Export dataset bars to CSV with custom timeframe and timezone",
+        parents=[common_parser],
+    )
+    exp_csv_parser.add_argument("symbol", help="Source symbol to export")
+    exp_csv_parser.add_argument(
+        "--timeframe", default="M1", help="Target timeframe (e.g. M1, M5, H1, D1)"
+    )
+    exp_csv_parser.add_argument("--date-from", help="Start date (YYYY-MM-DD)")
+    exp_csv_parser.add_argument("--date-to", help="End date (YYYY-MM-DD)")
+    exp_csv_parser.add_argument(
+        "--output-path", type=Path, help="Target destination CSV file path"
+    )
+    exp_csv_parser.add_argument(
+        "--target-timezone", help="Timezone shift (e.g. +2h or Original)"
+    )
+    exp_csv_parser.add_argument("--header", help="Custom CSV header string")
+    exp_csv_parser.add_argument(
+        "--no-header", action="store_true", help="Omit column header in CSV"
+    )
+
+    # export-mt4 subcommand
+    exp_mt4_parser = subparsers.add_parser(
+        "export-mt4",
+        help="Export dataset to MetaTrader 4 .hst and .fxt test models",
+        parents=[common_parser],
+    )
+    exp_mt4_parser.add_argument("symbol", help="Source symbol to export")
+    exp_mt4_parser.add_argument("--mt4-symbol", help="MetaTrader symbol name")
+    exp_mt4_parser.add_argument(
+        "--output-dir", type=Path, help="Export output directory"
+    )
+    exp_mt4_parser.add_argument("--timeframe", default="All", help="Timeframe or 'All'")
+    exp_mt4_parser.add_argument(
+        "--export-mode",
+        choices=["All", "hst", "fxt"],
+        default="All",
+        help="Export mode ('All', 'hst', or 'fxt')",
+    )
+    exp_mt4_parser.add_argument("--target-timezone", help="Timezone shift (e.g. +2h)")
+    exp_mt4_parser.add_argument(
+        "--server-name", default="MetaQuotes-Demo", help="Broker server name for FXT"
+    )
+    exp_mt4_parser.add_argument(
+        "--spread", type=int, default=20, help="Fixed spread in points for FXT"
+    )
+    exp_mt4_parser.add_argument("--date-from", help="Start date (YYYY-MM-DD)")
+    exp_mt4_parser.add_argument("--date-to", help="End date (YYYY-MM-DD)")
+    exp_mt4_parser.add_argument(
+        "--digits", type=int, default=5, help="Price decimal digits"
+    )
+
+    # export-mt5 subcommand
+    exp_mt5_parser = subparsers.add_parser(
+        "export-mt5",
+        help="Export dataset to MetaTrader 5 bar or tick format",
+        parents=[common_parser],
+    )
+    exp_mt5_parser.add_argument("symbol", help="Source symbol to export")
+    exp_mt5_parser.add_argument(
+        "--timeframe", default="M1", help="Timeframe (e.g. M1, TICK)"
+    )
+    exp_mt5_parser.add_argument(
+        "--output-path", type=Path, help="Destination file path"
+    )
+    exp_mt5_parser.add_argument(
+        "--spread-mode",
+        choices=["real", "fixed"],
+        default="real",
+        help="Spread mode ('real' or 'fixed')",
+    )
+    exp_mt5_parser.add_argument(
+        "--spread-points",
+        type=int,
+        default=10,
+        help="Spread points if fixed spread",
+    )
+    exp_mt5_parser.add_argument("--date-from", help="Start date (YYYY-MM-DD)")
+    exp_mt5_parser.add_argument("--date-to", help="End date (YYYY-MM-DD)")
+    exp_mt5_parser.add_argument("--target-timezone", help="Target timezone shift")
+
+    # save-definitions subcommand
+    save_parser = subparsers.add_parser(
+        "save-definitions",
+        help="Export and backup dataset definitions to portable JSON",
+        parents=[common_parser],
+    )
+    save_parser.add_argument(
+        "--file-path", type=Path, help="Target JSON backup file path"
+    )
+    save_parser.add_argument(
+        "--symbols", nargs="*", help="Specific symbols to back up (default: all)"
+    )
+
+    # load-definitions subcommand
+    load_parser = subparsers.add_parser(
+        "load-definitions",
+        help="Restore dataset definitions and metadata from JSON",
+        parents=[common_parser],
+    )
+    load_parser.add_argument(
+        "file_path", type=Path, help="Source JSON backup file to load"
+    )
+
+    # review subcommand
+    review_parser = subparsers.add_parser(
+        "review",
+        help="Inspect dataset data table, chart candles, or data quality",
+        parents=[common_parser],
+    )
+    review_parser.add_argument("symbol", help="Symbol to inspect")
+    review_parser.add_argument(
+        "--timeframe", default="M1", help="Bar timeframe (default: M1)"
+    )
+    review_parser.add_argument(
+        "--session", default="Default", help="Trading session profile"
+    )
+    review_parser.add_argument(
+        "--quality",
+        action="store_true",
+        help="Run data quality audit (gaps, spikes, leaks)",
+    )
+    review_parser.add_argument(
+        "--chart", action="store_true", help="Retrieve OHLC candlestick chart series"
+    )
+    review_parser.add_argument(
+        "--offset", type=int, default=0, help="Row pagination offset"
+    )
+    review_parser.add_argument(
+        "--limit", type=int, default=50, help="Row count limit (default: 50)"
+    )
+    review_parser.add_argument("--date-from", help="Filter start date (YYYY-MM-DD)")
+    review_parser.add_argument("--date-to", help="Filter end date (YYYY-MM-DD)")
+
+    # update-all subcommand
+    up_all_parser = subparsers.add_parser(
+        "update-all",
+        help="Scan and queue incremental updates for all datasets to current date",
+        parents=[common_parser],
+    )
+    up_all_parser.add_argument(
+        "--provider", default="dukascopy", help="Data provider (default: dukascopy)"
+    )
+
+    # update-selected subcommand
+    up_sel_parser = subparsers.add_parser(
+        "update-selected",
+        help="Queue incremental updates for selected symbols to current date",
+        parents=[common_parser],
+    )
+    up_sel_parser.add_argument("symbols", nargs="+", help="Symbols to update")
+    up_sel_parser.add_argument(
+        "--provider", default="dukascopy", help="Data provider (default: dukascopy)"
+    )
+
+    # broker-data subcommand
+    b_data_parser = subparsers.add_parser(
+        "broker-data",
+        help="Query available broker instruments and trading specifications",
+        parents=[common_parser],
+    )
+    b_data_parser.add_argument("--query", help="Filter query for symbol or description")
+    b_data_parser.add_argument("--broker-id", help="Filter by broker profile ID")
+
+    # broker-data-update subcommand
+    b_up_parser = subparsers.add_parser(
+        "broker-data-update",
+        help="Synchronize broker properties (spreads, margins) across datasets",
+        parents=[common_parser],
+    )
+    b_up_parser.add_argument(
+        "--profile-ids", nargs="*", help="Specific broker profile IDs to sync"
+    )
+    b_up_parser.add_argument("--symbols", nargs="*", help="Specific symbols to sync")
 
     return parser
 
@@ -959,10 +1456,34 @@ def main(argv: list[str] | None = None) -> int:  # noqa: PLR0911, PLR0912
 
     if args.subcommand == "download":
         return cmd_download(args, db_path, data_root)
+    if args.subcommand in ("clone-to-timezone", "clone"):
+        return cmd_clone_to_timezone(args, db_path, data_root)
     if args.subcommand == "delete":
-        return cmd_delete(db_path, data_root, args.symbol)
+        if len(args.symbols) == 1 and getattr(args, "mode", "remove") == "remove":
+            return cmd_delete(db_path, data_root, args.symbols[0])
+        return cmd_delete_datasets(args, db_path, data_root)
     if args.subcommand == "clear":
         return cmd_clear(db_path, data_root, args.symbol)
+    if args.subcommand == "export-csv":
+        return cmd_export_csv(args, db_path, data_root)
+    if args.subcommand == "export-mt4":
+        return cmd_export_mt4(args, db_path, data_root)
+    if args.subcommand == "export-mt5":
+        return cmd_export_mt5(args, db_path, data_root)
+    if args.subcommand == "save-definitions":
+        return cmd_save_definitions(args, db_path, data_root)
+    if args.subcommand == "load-definitions":
+        return cmd_load_definitions(args, db_path, data_root)
+    if args.subcommand == "review":
+        return cmd_review(args, db_path, data_root)
+    if args.subcommand == "update-all":
+        return cmd_update_all(args, db_path, data_root)
+    if args.subcommand == "update-selected":
+        return cmd_update_selected(args, db_path, data_root)
+    if args.subcommand == "broker-data":
+        return cmd_broker_data(args, db_path)
+    if args.subcommand == "broker-data-update":
+        return cmd_broker_data_update(args, db_path)
 
     parser.print_help()
     return 0
