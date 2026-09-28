@@ -1,0 +1,214 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "scope": {
+      "enum": [
+        "cohort",
+        "release"
+      ]
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "fail",
+        "blocked"
+      ]
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "config_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "lockfiles_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "inventory_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "generated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "tools": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "shipping_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "qualified_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    },
+    "cases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "enum": [
+              "baseline",
+              "plugin_removal",
+              "workspace_cascade",
+              "empty_workspace",
+              "empty_host",
+              "invalid_attachment",
+              "activation_failure",
+              "disable_reinstall",
+              "producer_absence",
+              "unsafe_removal",
+              "negative_gate"
+            ]
+          },
+          "target_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "removed_paths": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "retained_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+            },
+            "minItems": 0,
+            "uniqueItems": true
+          },
+          "checks": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "command": {
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "minItems": 1,
+                  "uniqueItems": true
+                },
+                "exit_code": {
+                  "type": "integer"
+                },
+                "status": {
+                  "enum": [
+                    "pass",
+                    "fail",
+                    "blocked",
+                    "skipped"
+                  ]
+                },
+                "evidence_path": {
+                  "type": "string",
+                  "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+                }
+              },
+              "required": [
+                "id",
+                "command",
+                "exit_code",
+                "status",
+                "evidence_path"
+              ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "fail",
+              "blocked"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "target_ids",
+          "removed_paths",
+          "retained_ids",
+          "checks",
+          "status"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "minItems": 0,
+      "uniqueItems": true
+    }
+  },
+  "required": [
+    "schema_version",
+    "scope",
+    "status",
+    "source_sha256",
+    "config_sha256",
+    "lockfiles_sha256",
+    "inventory_sha256",
+    "generated_at",
+    "tools",
+    "shipping_ids",
+    "qualified_ids",
+    "cases",
+    "blockers"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HaruQuantAI removal qualification evidence v1",
+  "description": "Shape is not proof. CI must recompute fingerprints, required shipping set/cases, verify command artifacts and reject failures/skips/missing evidence. Empty shipping set is valid only for an explicitly tested empty-host artifact."
+}

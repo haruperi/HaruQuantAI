@@ -1,5 +1,4 @@
-/// <reference types="vite/client" />
-import rawCatalogue from '../../../../../../data/market/dukascopy/dukascopy.csv?raw';
+import { rawDukascopyCatalogue as rawCatalogue } from '../../../host/catalogs';
 
 export interface DukasSymbol {
   symbol: string; name: string; category: string; subcategory: string;

@@ -1,34 +1,16 @@
 import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react';
 import { Button, Modal, TextInput } from '../../../components/ui';
-import { useAppStore } from '../../../host/store';
-import { datasets } from '../Common/fixtures';
-import { reservedCrypto, useCrypto } from '../Crypto/cryptoStore';
-import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
-import { reservedDarwinex, useDarwinex } from '../Darwinex/darwinexStore';
-import { activeImport, useFileImports } from '../FileImport/fileImportStore';
-import { useFileSymbols } from '../FileImport/fileSymbolsStore';
+import { useAppStore } from './localState';
 import { discoverMt5Folder, filterMt5Symbols, mt5Definitions, mt5Preset, mt5Symbols, type Mt5Folder } from './mt5Import';
 import { mt5Active, reservedMt5, useMt5Import } from './mt5ImportStore';
-import { reservedSQDefinitions, useSQData } from '../SQData/sqDataStore';
-import { reservedYahoo, useYahoo } from '../Yahoo/yahooStore';
-import { today, type Preset } from '../Dukascopy/dukascopyDownload';
+import { today, type Preset, type BrokerProfile } from './presentation';
 import './mt5Import.css';
 
-function mt5Context() {
-  const data = useDataManagerStore.getState();
-  const td = useTickDownloader.getState();
-  const files = useFileSymbols.getState();
-  const imports = useFileImports.getState();
-  const mt5 = useMt5Import.getState();
-  const error = data.storageError || td.storageError || files.storageError || imports.storageError || mt5.storageError;
-  if (error) throw new Error(error);
-  const rows = [...datasets, ...data.definitions, ...td.definitions, ...files.definitions, ...imports.records,
-    ...reservedSQDefinitions(), ...reservedDarwinex(), ...reservedCrypto(), ...reservedYahoo(), ...reservedMt5(),
-    ...(activeImport(imports.job?.state) ? imports.job!.tasks.map(task => task.record) : [])];
-  const active = [td.job?.state, imports.job?.state, useSQData.getState().job?.state,
-    useDukascopyDownloads.getState().job?.state, useDarwinex.getState().job?.state,
-    useCrypto.getState().job?.state, useYahoo.getState().job?.state].some(mt5Active);
-  return { existing: rows.map(row => row.symbol), active };
+export interface Mt5ContextDocument {
+  readonly existing: readonly string[];
+  readonly active: boolean;
+  readonly error: string;
+  readonly brokers?: readonly BrokerProfile[];
 }
 
 function initialFrom(): string {
@@ -37,9 +19,16 @@ function initialFrom(): string {
   return date.toISOString().slice(0, 10);
 }
 
-export function Mt5ImportDialog({ onClose, onStarted }: { onClose: () => void; onStarted: () => void }) {
+export function Mt5ImportDialog({
+  contextDocument,
+  onClose,
+  onStarted,
+}: {
+  contextDocument?: Mt5ContextDocument;
+  onClose: () => void;
+  onStarted: () => void;
+}) {
   const store = useMt5Import();
-  const data = useDataManagerStore();
   const notify = useAppStore(state => state.notify);
   const picker = useRef<HTMLInputElement>(null);
   const timer = useRef<number | null>(null);
@@ -58,8 +47,8 @@ export function Mt5ImportDialog({ onClose, onStarted }: { onClose: () => void; o
   const [error, setError] = useState('');
   useEffect(() => () => { if (timer.current !== null) window.clearTimeout(timer.current); }, []);
 
-  const brokers = [{ id: '-1', name: 'Default', postfix: '', timezone: 'UTC' },
-    ...data.brokers.filter(item => item.mtUse)];
+  const brokers = [{ id: '-1', name: 'Default', postfix: '', timezone: 'UTC', mtUse: true, instruments: [] },
+    ...(contextDocument?.brokers?.filter(item => item.mtUse) ?? [])];
   const visible = fetched ? filterMt5Symbols(query, category) : [];
   const categories = [...new Set(mt5Symbols.map(row => row.path))];
   const allVisible = visible.length > 0 && visible.every(row => selected.includes(row.name));
@@ -82,8 +71,10 @@ export function Mt5ImportDialog({ onClose, onStarted }: { onClose: () => void; o
       if (!profile) throw new Error('Choose a valid broker profile.');
       const request = { folder: folder.folder, symbols: selected, dateFrom: from, dateTo: to, dateType: preset,
         broker: profile.id, brokerName: profile.name, timezone: profile.timezone, postfix };
-      const context = mt5Context();
-      store.start(request, mt5Definitions(request, context.existing), context.active);
+      if (contextDocument?.error) throw new Error(contextDocument.error);
+      const existing = contextDocument?.existing ? [...contextDocument.existing] : [];
+      const active = contextDocument?.active ?? false;
+      store.start(request, mt5Definitions(request, existing), active);
       onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to start MT5 import.'); }
   }

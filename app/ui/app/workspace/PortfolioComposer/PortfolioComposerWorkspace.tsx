@@ -1,7 +1,8 @@
+import { useProjectWorkbench, type ResultDocument } from './documents';
 import {useEffect,useState} from 'react';
 import {CirclePlay,CircleStop,Zap} from 'lucide-react';
-import {useAppStore} from '../../host/store';
-import {demoResult,downloadText,usePreviewRun,type ResultDocument} from '../../plugins/project/ProjectWorkbench';
+import {useAppStore} from './localState';
+
 import {composerDefaults,composerError,serializeComposition,type ComposerDraft,type ComposerMember} from './composerModel';
 import {PortfolioComposition} from './PortfolioComposition';
 import {PortfolioConfiguration} from './PortfolioConfiguration';
@@ -11,6 +12,8 @@ import {PortfolioCandidatesModal} from './PortfolioCandidatesModal';
 import {BuyHoldDialog,PortfolioComposerConfirm} from './PortfolioComposerDialogs';
 const tabs=['Portfolio composition','Configuration - account, MM','Automatic computation'];
 export function PortfolioComposerWorkspace(){
+const { demoResult, downloadText, usePreviewRun } = useProjectWorkbench();
+
  const strategies=useAppStore(s=>s.strategies),savedMembers=useAppStore(s=>s.portfolio);
  const candidates:ComposerMember[]=strategies.map((s,i)=>({id:s.id,name:s.name,symbol:s.symbol,weight:100,selected:true,equity:s.equity.map(p=>p.value),money:i%3===0?'Risk fixed %':'Fixed size'}));
  const [draft,setDraft]=useState<ComposerDraft>(()=>({config:{...composerDefaults},members:savedMembers.flatMap(m=>{const c=candidates.find(c=>c.id===m.strategyId);return c?[{...c,weight:m.weight,selected:m.enabled}]:[];})}));

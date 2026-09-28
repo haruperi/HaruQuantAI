@@ -18,7 +18,7 @@ import {
   ShieldAlert,
 } from 'lucide-react';
 import { useMTAnalyzerStore } from './mtAnalyzerStore';
-import type { MTStatementTrade } from '../../host/types';
+import type { MTStatementTrade } from './documents';
 
 export const MTAnalyzerWorkspace: React.FC = () => {
   const {

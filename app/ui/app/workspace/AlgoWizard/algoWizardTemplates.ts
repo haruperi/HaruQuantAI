@@ -1,4 +1,4 @@
-import type { RuleNode } from '../../host/types';
+import type { RuleNode } from './documents';
 
 export interface StrategyTemplate {
   id: string;

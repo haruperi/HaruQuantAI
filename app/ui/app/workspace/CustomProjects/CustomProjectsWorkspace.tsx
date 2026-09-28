@@ -20,8 +20,8 @@ import {
   Trash2,
   Workflow,
 } from 'lucide-react';
-import { useAppStore } from '../../host/store';
-import type { CustomProject, WorkflowTask } from '../../host/types';
+import { useAppStore } from './localState';
+import type { CustomProject, WorkflowTask } from './documents';
 import { Button, Checkbox, Field, Modal, Select, TextInput } from '../../components/ui';
 import { NewTaskModal, SQX_TASK_TYPES } from './NewTaskModal';
 

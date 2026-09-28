@@ -75,8 +75,9 @@ automatically SQX workspace equivalents.
 
 Adding a compatible concept should let a user discover its purpose, parameters,
 bounds, outputs, supported contexts, limitations, and provenance without
-editing unrelated workspaces. The same concept should be selectable where its
-declared capability fits. Where generic forms or charts cannot express its
+editing unrelated workspaces. Each plugin has one owning workspace and is
+selectable where that owner's declared attachment contract fits. Where generic
+forms or charts cannot express its
 interaction, a separately reviewed UI extension may supply that interaction.
 A plugin's absence or removal must leave retained research documents
 inspectable and mark the missing behavior explicitly.
@@ -170,7 +171,7 @@ The current candidate baseline has a backend host under [app/host/](../app/host/
 and a connected UI shell under [app/ui/app/host/](../app/ui/app/host/README.md).
 The backend workspace/plugin directories are not populated with ratified
 quantitative implementations. The retained React UI has workspace folders
-and three top-level plugin groups, but many screens still use fixtures,
+and four top-level plugin groups, but many screens still use fixtures,
 browser storage, and static routes. An interactive prototype is not a
 validated simulator, optimizer, data source, or trading system. Exact
 implementation truth belongs to package READMEs and accepted walkthroughs.
@@ -186,9 +187,22 @@ app/workspace/Builder/README.md for generation, and concept-owned READMEs
 under app/plugins/ for databank views, cross-checks, indicators, and code
 lowering. These are proposals, not registered features or implemented
 directories. Each owner and its requirements must be approved before
-implementation. The files currently named in AGENTS.md as the
-workspace/plugin pipeline and audit are absent; their contents must be
-authored and approved separately, not inferred from this charter.
+implementation. The [workspace/plugin pipeline](dev/workspace_plugin_implementation_pipeline.md)
+and [audit standard](dev/workspace_plugin_implementation_audit.md) define admission
+and qualification. Their presence does not establish that migration is complete.
+
+### Resource sharing and independent removal
+
+Workspaces/plugins can share published market data, strategies, results and
+databanks through versioned host-managed resources. They cannot share peer business
+logic, mutable stores or executors. The host supplies universal logging, jobs,
+hardware allocation and custody; it does not absorb quantitative algorithms.
+Removing a workspace includes its exclusively owned plugins. Rebuild/restart removes
+their contributions while preserving stored resources and unrelated functionality.
+An unavailable operation must identify the missing capability. Fresh per-package
+removal evidence is a release condition; discovery alone is insufficient. Qualify
+host and Data Manager before provider expansion; incomplete shipping packages block
+full-app release even when that cohort is qualified.
 
 ## 6. Reference and decision discipline
 

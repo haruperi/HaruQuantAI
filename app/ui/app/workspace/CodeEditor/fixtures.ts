@@ -1,4 +1,4 @@
-import type { ExtensionFile } from '../../host/types';
+import type { ExtensionFile } from './documents';
 
 export const extensionFiles: ExtensionFile[] = [
   {

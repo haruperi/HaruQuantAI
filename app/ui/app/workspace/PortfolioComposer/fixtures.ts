@@ -1,4 +1,52 @@
-import type { PortfolioMember } from '../../host/types';
-import { strategies } from '../../plugins/databank/fixtures';
-
-export const portfolioMembers: PortfolioMember[] = strategies.slice(58, 66).map((s, i) => ({ strategyId: s.id, weight: i < 4 ? 15 : 10, enabled: true, sector: i % 3 === 0 ? 'FX Majors' : i % 3 === 1 ? 'Metals' : 'Indices' }));
+import type { PortfolioMember } from './documents';
+/** Owner-local deterministic preview document, independent of its original producer. */
+export const portfolioMembers: PortfolioMember[] = [
+  {
+    "strategyId": "str-59",
+    "weight": 15,
+    "enabled": true,
+    "sector": "FX Majors"
+  },
+  {
+    "strategyId": "str-60",
+    "weight": 15,
+    "enabled": true,
+    "sector": "Metals"
+  },
+  {
+    "strategyId": "str-61",
+    "weight": 15,
+    "enabled": true,
+    "sector": "Indices"
+  },
+  {
+    "strategyId": "str-62",
+    "weight": 15,
+    "enabled": true,
+    "sector": "FX Majors"
+  },
+  {
+    "strategyId": "str-63",
+    "weight": 10,
+    "enabled": true,
+    "sector": "Metals"
+  },
+  {
+    "strategyId": "str-64",
+    "weight": 10,
+    "enabled": true,
+    "sector": "Indices"
+  },
+  {
+    "strategyId": "str-65",
+    "weight": 10,
+    "enabled": true,
+    "sector": "FX Majors"
+  },
+  {
+    "strategyId": "str-66",
+    "weight": 10,
+    "enabled": true,
+    "sector": "Metals"
+  }
+];

@@ -1,8 +1,8 @@
 import React, { useState, useMemo } from 'react';
-import { useAppStore } from '../../../host/store';
+import { useAppStore } from '../localState';
 import { Button, Modal } from '../../../components/ui';
-import type { Strategy } from '../../../host/types';
-import { calculatePearsonCorrelation, extractReturnsSeries, type CorrelationPeriod } from '../../../plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
+import type { Strategy } from '../documents';
+import { calculatePearsonCorrelation, extractReturnsSeries, type CorrelationPeriod } from '../correlation';
 
 interface PortfolioCorrelationViewProps {
   strategy?: Strategy;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Cpu, HardDrive, Network, Server, Zap } from 'lucide-react';
-import type { ComputeNode } from '../../host/types';
+import type { ComputeNode } from './documents';
 import { Button, Checkbox, Field, Modal, TextInput } from '../../components/ui';
 
 interface AddNodeModalProps {

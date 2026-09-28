@@ -102,6 +102,14 @@ class Port(Document):
     units: str = ""
 
 
+class ExtensionSlot(Document):
+    """Typed versioned extension boundary owned by one workspace."""
+
+    id: str = Field(pattern=r"^[a-z][a-z0-9_]*(?:[.][a-z][a-z0-9_]*)+$")
+    version: str = Field(pattern=r"^\d+\.\d+\.\d+$")
+    maximum: int = Field(default=4096, ge=1, le=4096)
+
+
 class PluginDescriptor(Document):
     """Validated metadata owned by one plugin or workspace contribution.
 
@@ -121,6 +129,10 @@ class PluginDescriptor(Document):
     inputs: tuple[Port, ...] = ()
     outputs: tuple[Port, ...] = ()
     route_base: str | None = Field(default=None, pattern=r"^/api/v1/[a-z][a-z0-9_-]+$")
+    owner_workspace_id: str | None = None
+    slot_id: str | None = None
+    contract_version: str | None = None
+    slots: tuple[ExtensionSlot, ...] = ()
 
 
 @dataclass(frozen=True)

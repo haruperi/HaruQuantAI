@@ -19,7 +19,8 @@ One quantitative concept has one cohesive spatial home. A concrete backend
 plugin keeps its calculation, configuration, parameter schema, defaults,
 bounds, outputs, compatibility, lowering hooks, and presentation metadata in
 one cohesive Python file. Its manifest, README, tests, and optional UI
-counterpart live in that plugin's pair of folders. A workspace owns its
+counterpart live in that plugin's pair of folders or exclusively declared test
+roots. A workspace owns its
 workflow and contracts within one backend/frontend pair of directories.
 Universal metamodels and UI primitives may be shared; concept-specific
 contracts and formulas may not be moved into a global catalog or components
@@ -118,7 +119,10 @@ any, it presents. Shared files are allowed only for universal mechanisms;
 they cannot become a second home for a concrete concept.
 
 The word **workspace** means an interactive workflow owner in HaruQuantAI.
-A **plugin** contributes a narrower capability to one or more workspaces.
+A **plugin** contributes a narrower capability to exactly one owning workspace.
+Its owner ID, slot ID and version determine attachment; matching another workspace's
+slot does not authorize reassignment. A plugin depends on its owner's contract and
+lifetime, without importing its implementation. Empty workspaces remain usable.
 SQX calls some large application surfaces plugins and also has function-like
 snippets; the installed extension manual makes that scale distinction
 ([SQX144-EV-000023](dev/evidence/reimplementation.json)). Our workspace
@@ -127,7 +131,7 @@ this folder model.
 
 | Owner | May own | Must not own |
 | --- | --- | --- |
-| Backend host | Shared envelope, auth/session boundary, command mediation, event hub, catalog and route composition, lifecycle, telemetry, shell settings | A named quantitative workspace, plugin algorithm, strategy meaning, or another owner's durable record |
+| Backend host | Shared envelope, auth/session boundary, command mediation, event hub, catalog and route composition, logging, jobs, hardware allocation, resource custody, lifecycle, telemetry, shell settings | A named quantitative workspace, plugin algorithm, strategy meaning, or another owner's semantic policy |
 | UI host | Navigation shell, universal transport and errors, session state, catalog cache, local view state, generic bounded renderers | Backend formulas, plugin-specific schemas, durable research truth, or special-case imports for each new plugin |
 | Workspace pair | One user workflow, its public commands and local state, its UI client and presentation | The private code or records of plugins and sibling workspaces |
 | Plugin pair | One quantitative or presentation contribution, its typed schema, behavior and tests | A sibling plugin's implementation, host lifecycle, or undeclared external authority |
@@ -137,9 +141,11 @@ this folder model.
 
 The host composes pairs from validated declarations at startup. A pair may
 import universal backend metamodels or frontend primitives and its own files.
-It cannot import a sibling's private implementation. A plugin cannot import
-workspace implementation. A workspace calls another owner's public
-capability through an injected typed slot or the host transport; no package
+It cannot import or invoke a sibling's business implementation, even through a
+public service or host transport. A plugin cannot import workspace implementation.
+Only owning-workspace composition invokes attached children through typed slots;
+plugins do not call one another. Peers share published resources through host
+capabilities. This does not authorize peer business-service calls. No package
 may locate another by scanning paths during an operation. Python package
 initializers are empty or docstring-only, and imports perform no I/O,
 registration, thread creation, or global mutation.
@@ -177,6 +183,13 @@ publishing a usable capability. A missing optional plugin disables its
 operation; a missing required plugin blocks that workspace operation with an
 attributed reason. No provider substitution is inferred from a similar
 name or output shape.
+
+Validate exclusive owner, slot version/cardinality, identity and authority before
+loading trusted code. Prepare a workspace independently, attach accepted children,
+then publish operations. Missing owners prevent child activation. Ordinary child
+failures remain local and partially acquired resources are released. Contexts
+contain scoped host services and owner-local bindings, not a global registry.
+This is not a sandbox against arbitrary native crashes or hostile extension code.
 
 A strategy or analytical document contains typed nodes and ports with stable
 IDs, parameter values, plugin identities and versions, and explicit units,
@@ -268,6 +281,22 @@ algorithms and tolerances belong to the concrete owning plugin/workspace and
 must be independently verified, including against donor outputs if parity is
 ever claimed.
 
+### Shared resources and host services
+
+The host owns universal logging, jobs, cancellation, admission, hardware allocation
+and resource custody. Storage adapters may live in app/persistence while remaining
+host-owned and accessible only through typed capabilities. Resource references carry
+identity, schema/version, immutable revision, digest, media type and provenance.
+Databanks use versioned collections of references. Consumers read published bytes
+and declarative schema snapshots without loading producer code, including after
+producer removal. Authorization remains enforced. Unsupported interpretation is
+explicit; saved results can remain readable when rerunning their strategy cannot.
+
+Quantitative meaning stays local. A resource API cannot expose another owner's
+business service. Uninstall does not purge published bytes, schema snapshots,
+private retained records, history or lineage. Resource purge has separate authority.
+The current shell settings store does not implement this general resource service.
+
 ## 7. Security, lifecycle, and external effects
 
 The host mediates authentication, bounded commands, sandboxed file exchange,
@@ -286,6 +315,22 @@ current host provides startup mount and process lifecycle, not these full
 plugin replacement guarantees; future implementations must prove them.
 Live trading remains disabled by default and needs distinct risk and
 execution authority beyond ordinary plugin admission.
+
+### Package removal boundary
+
+A local package ownership document binds backend, optional UI, tests, examples and
+package assets; it does not duplicate plugin parameter schemas. Validate exclusive
+path ownership and containment. Derived inventories are not hand-maintained plugin
+lists. See the [package schema](dev/schemas/package.schema.json) and
+[pipeline](dev/workspace_plugin_implementation_pipeline.md).
+
+Uninstall includes the complete pair and, for workspaces, all owned plugins. Require
+a stopped installation, current validated inventory, confined paths and recoverable
+journaled moves, followed by UI rebuild and backend restart. A manually missing
+counterpart is invalid, not permission for discovery to delete other files.
+Dependencies never grant deletion authority over peers or shared resources. Missing
+bookmarks and execution references preserve identity and show unavailable behavior.
+Initial qualification promises restart/rebuild removal, not live hot removal.
 
 ## 8. Architecture acceptance
 
@@ -308,8 +353,10 @@ Verification must exercise:
 - actual end-to-end results for any claimed donor compatibility.
 
 Coverage, a passing linter, or a similar screen is not semantic proof. Use
-the commands and owner gates in AGENTS.md. The absent workspace/plugin
-pipeline and audit documents named there are a tracked documentation gap;
-until approved and present, this document and AGENTS.md provide the
-applicable structural and workflow rules. Do not infer a missing file's
-contents or implement a pair without an approved plan.
+the commands and owner gates in AGENTS.md, the
+[pipeline](dev/workspace_plugin_implementation_pipeline.md) and
+[audit](dev/workspace_plugin_implementation_audit.md). Every shipping pair requires
+fresh removal evidence: frontend rebuild, backend restart, unaffected operations
+and retained-data reads. Missing/stale evidence blocks release. The current scanner
+and static UI have not implemented these guarantees. These are approved standards,
+not qualification claims. Implement pairs only under approved exact-path plans.

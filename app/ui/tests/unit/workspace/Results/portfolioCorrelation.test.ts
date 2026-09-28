@@ -2,8 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   calculatePearsonCorrelation,
   extractReturnsSeries,
-} from '../../../../app/plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
-import { strategies } from '../../../../app/plugins/databank/fixtures';
+} from '../../../../app/workspace/Results/correlation';
+import { useAppStore } from '../../../../app/workspace/Results/localState';
+const strategies = useAppStore.getState().strategies;
 
 describe('Portfolio Correlation Engine & Overlapping Trades', () => {
   it('generates a valid symmetric correlation matrix with 1.0 on diagonal', () => {

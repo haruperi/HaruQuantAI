@@ -1,6 +1,6 @@
 import { describe, expect, it, beforeEach } from 'vitest';
 import { useMTAnalyzerStore, computeMetrics, parseMetaTraderHtml } from '../../../../app/workspace/MTAnalyzer/mtAnalyzerStore';
-import type { MTStatementTrade } from '../../../../app/host/types';
+import type { MTStatementTrade } from '../../../../app/workspace/MTAnalyzer/documents';
 
 describe('MetaTrader Statement Analyzer Store (FEAT-UI-MT-ANALYZER)', () => {
   beforeEach(() => {

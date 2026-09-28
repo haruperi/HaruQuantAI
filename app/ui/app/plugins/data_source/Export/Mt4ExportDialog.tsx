@@ -1,9 +1,9 @@
 import { useRef, useState, type InputHTMLAttributes } from 'react';
 import { Button, Field, Modal, Select, TextInput } from '../../../components/ui';
-import { useAppStore } from '../../../host/store';
+import { useAppStore } from './localState';
 import { defaultMt4Properties, exportPreset, exportRange, exportTimezones, mt4Manifest, parseMt4Properties, type ExportTarget } from './dataExport';
 import { useDataExports } from './dataExportStore';
-import type { Preset } from '../Dukascopy/dukascopyDownload';
+import type { Preset } from './presentation';
 import './dataExport.css';
 
 const presets: [Preset, string][] = [['sinceLast', 'Since last date'], ['sixMonths', 'Last 6 months'], ['year', 'Last year'], ['fiveYears', 'Last 5 years'], ['tenYears', 'Last 10 years'], ['allTime', 'All time']];

@@ -1,11 +1,14 @@
+import { useProjectWorkbench } from './documents';
 import {useState} from 'react';
-import {useAppStore} from '../../host/store';
-import {ProjectFrame,demoResult,usePreviewRun} from '../../plugins/project/ProjectWorkbench';
+import {useAppStore} from './localState';
+
 import {OptimizerSettings} from './OptimizerSettings';
 import {OptimizerProgress} from './OptimizerProgress';
 import {OptimizerResults} from './OptimizerResults';
 import {optimizerDefaults} from './optimizerFixtures';
 export function OptimizerWorkspace(){
+const { ProjectFrame, demoResult, usePreviewRun } = useProjectWorkbench();
+
  const panel=useAppStore(s=>s.tab),setPanel=useAppStore(s=>s.setTab);
  const banks=useAppStore(s=>s.databanks),selected=useAppStore(s=>s.strategies.find(v=>v.id===s.selectedStrategyId));
  const [draft,setDraft]=useState(()=>({...structuredClone(optimizerDefaults),sourceBank:banks[0]?.name??'Results',targetBank:banks[1]?.name??'Results'}));

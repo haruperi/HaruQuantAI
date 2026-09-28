@@ -1,6 +1,9 @@
-import {ProjectProgress,type ResultDocument,type usePreviewRun} from '../../plugins/project/ProjectWorkbench';
+import { useProjectWorkbench, type ResultDocument, type usePreviewRun } from './documents';
+
 import {retestRouting,retestStats,type RetestDraft} from './retesterFixtures';
 export function RetesterProgress({run,draft,onChange,banks,result,onResults,onSettings,selectionCount}:{run:ReturnType<typeof usePreviewRun>;draft:RetestDraft;onChange:(v:RetestDraft)=>void;banks:string[];result:ResultDocument|null;onResults:()=>void;onSettings:(section?:string)=>void;selectionCount:number}) {
+const { ProjectProgress } = useProjectWorkbench();
+
  const summary=<><h4>Backtest options</h4><p>Data: local EURUSD / H1 fixture</p><div className="pw-actions">{[["data","Data"],["options","Trading options"],["money","Money management"]].map(([id,label])=><button key={id} className="sqd-link-button" onClick={()=>onSettings(id)}>{label}</button>)}</div><h4>Databanks</h4>
  <label>Source databank <select aria-label="Source databank" value={draft.source} onChange={e=>onChange({...draft,source:e.target.value})}>{banks.map(b=><option key={b}>{b}</option>)}</select></label>
  <label><input type="checkbox" checked={draft.selectedOnly} onChange={e=>onChange({...draft,selectedOnly:e.target.checked})}/> Retest only selected</label>

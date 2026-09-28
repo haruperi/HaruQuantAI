@@ -1,11 +1,19 @@
 import React, { useMemo } from 'react';
 import { Check, Copy, Download } from 'lucide-react';
 import { DockviewReact, type DockviewReadyEvent } from 'dockview';
-import { useAppStore } from '../../host/store';
+import { useAppStore } from './localState';
 import { Button, Section, Stat } from '../../components/ui';
 import { EquityChart } from './EquityChart';
-import { OptimizationSurface } from '../../plugins/optimization/OptimizationSurface';
+import { useOptionalAttachment } from '../../host/composition';
 import { PortfolioCorrelationView } from './views/PortfolioCorrelationView';
+
+interface OptimizationPresentation {
+  OptimizationSurface: React.ComponentType<{ strategyName?: string; initialXParam?: string; initialYParam?: string; initialZMetric?: string }>;
+}
+function OptimizationSurface(props: { strategyName: string }) {
+  const attachment = useOptionalAttachment<OptimizationPresentation>('optimization.presentation');
+  return attachment ? <attachment.OptimizationSurface {...props}/> : <p role="status">Optimization presentation is unavailable. Stored results are retained.</p>;
+}
 
 const views = [
   'Overview',

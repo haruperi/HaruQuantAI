@@ -37,6 +37,7 @@ class HostSettings(Document):
     password: SecretStr | None = Field(default=None, exclude=True, repr=False)
     workers: int = Field(default=0, ge=0, le=61)
     ui_dist: Path = Path("app/ui/dist")
+    installation_root: Path | None = None
     roots: tuple[Path, ...] = (Path("app/workspace"), Path("app/plugins"))
     open_browser: bool = False
     certificate: Path | None = None

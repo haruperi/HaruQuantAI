@@ -17,8 +17,11 @@ from app.host.logging import get_logger
 from app.persistence.host import (
     HostPersistenceConflictError,
     HostPersistenceValueError,
+    HostSettingRecord,
+    HostStore,
     patch_settings,
     settings_snapshot,
+    utc_now_iso,
 )
 
 logger = get_logger(__name__)
@@ -339,3 +342,30 @@ class SettingsStore:
         if bus is not None:
             bus.publish(SETTINGS_CHANNEL, saved["values"])
         return saved
+
+    def get_private(self, owner: str, key: str) -> dict[str, Any] | None:
+        """Read an owner-scoped private settings record without public projection."""
+        store = HostStore(self.path)
+        record = store.get_setting(owner, key)
+        if record is None:
+            return None
+        try:
+            val = json.loads(record.value_json)
+            return val if isinstance(val, dict) else None
+        except TypeError, json.JSONDecodeError:
+            return None
+
+    def set_private(self, owner: str, key: str, value: dict[str, Any]) -> None:
+        """Insert or replace an owner-scoped private settings record."""
+        if not isinstance(value, dict):
+            raise TypeError("Private settings record must be a dict")
+        store = HostStore(self.path)
+        store.upsert_setting(
+            HostSettingRecord(
+                scope=owner,
+                key=key,
+                value_json=json.dumps(value, allow_nan=False),
+                schema_version=1,
+                updated_at_utc=utc_now_iso(),
+            )
+        )

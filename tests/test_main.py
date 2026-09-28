@@ -54,6 +54,9 @@ def test_real_host_cli_handshake_and_shutdown(tmp_path):
         key: value for key, value in os.environ.items() if not key.startswith("HARU_")
     }
     root = Path(__file__).resolve().parents[1]
+    installation = tmp_path / "installation"
+    installation.mkdir(parents=True, exist_ok=True)
+    env["HARU_INSTALLATION_ROOT"] = str(installation)
     with (tmp_path / "host-output.txt").open("w+") as output:
         process = subprocess.Popen(
             [

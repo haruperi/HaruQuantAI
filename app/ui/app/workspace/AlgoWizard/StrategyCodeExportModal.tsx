@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Check, Copy, Download, FileCode } from 'lucide-react';
-import type { RuleNode } from '../../host/types';
+import type { RuleNode } from './documents';
 import { Button, Modal } from '../../components/ui';
 
 interface Props {

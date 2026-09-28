@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { strategies } from '../../../../app/plugins/databank/fixtures';
+import { useAppStore } from '../../../../app/workspace/Results/localState';
+const strategies = useAppStore.getState().strategies;
 
 describe('Trade Analysis Performance Breakdown and Statistics', () => {
   it('aggregates annual statistics from trades accurately', () => {

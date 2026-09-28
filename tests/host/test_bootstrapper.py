@@ -65,7 +65,9 @@ def test_invalid_configuration_fails_closed(values):
 
 
 def test_boot_stages_and_logging_are_real(host_config):
-    host = BootstrapCoordinator(host_config)
+    host = BootstrapCoordinator(
+        host_config, installation_root=host_config.data_dir / "installation"
+    )
 
     async def run() -> None:
         await host.initialize()
@@ -114,7 +116,9 @@ def test_existing_database_requires_explicit_migration(host_config):
 
     ensure_schema(host_config.database_path)
     before = host_config.database_path.read_bytes()
-    host = BootstrapCoordinator(host_config)
+    host = BootstrapCoordinator(
+        host_config, installation_root=host_config.data_dir / "installation"
+    )
     with pytest.raises(HostPersistenceSchemaError, match="Migration required"):
         asyncio.run(host.initialize())
     assert host.startup.state == "FAILED"
@@ -126,7 +130,9 @@ def test_missing_auth_schema_has_actionable_diagnostic(tmp_path, caplog):
 
     settings = HostSettings(data_dir=tmp_path)
     ensure_schema(settings.database_path)
-    host = BootstrapCoordinator(settings)
+    host = BootstrapCoordinator(
+        settings, installation_root=settings.data_dir / "installation"
+    )
     with caplog.at_level(logging.ERROR), pytest.raises(HostPersistenceSchemaError):
         asyncio.run(host.initialize())
     assert "--migrate-auth-schema" in caplog.text

@@ -12,12 +12,14 @@ values; callers must still avoid placing secrets in ordinary diagnostic text.
 """
 
 import asyncio
+import base64
 import json
 from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from typing import Any
 
 from fastapi import FastAPI, Request, WebSocket
+from pydantic import JsonValue, TypeAdapter
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import FileResponse, JSONResponse, Response, StreamingResponse
@@ -28,6 +30,7 @@ from app.host.commands import CommandError, copy_text, open_link
 from app.host.envelope import error_payload, new_request_id, success_payload
 from app.host.events import ChannelError
 from app.host.logging import get_logger
+from app.host.resource_store import ResourceRef
 from app.host.sessions import SessionError
 from app.host.settings import SettingsConflictError, SettingsError
 
@@ -207,6 +210,70 @@ async def settings_endpoint(request: Request) -> JSONResponse:
             request, "Invalid settings", code="INVALID_SETTINGS", status=400
         )
     return response(request, saved)
+
+
+async def resources_endpoint(request: Request) -> JSONResponse:
+    """Read published immutable resources independently of producer installation.
+
+    The browser principal never impersonates a plugin. Private plugin publications
+    are absent unless explicitly granted to host.operator or made public.
+    """
+    store = service(request).resource_store
+    if request.method == "GET":
+        references = await asyncio.to_thread(store.list, "host.operator")
+        return response(request, [ref.model_dump(mode="json") for ref in references])
+    reference = ResourceRef.model_validate(await body(request))
+    try:
+        content, schema = await asyncio.to_thread(
+            store.read, "host.operator", reference
+        )
+    except PermissionError, FileNotFoundError:
+        return response(
+            request, "Resource unavailable", code="RESOURCE_UNAVAILABLE", status=404
+        )
+    return response(
+        request,
+        {"content_base64": base64.b64encode(content).decode("ascii"), "schema": schema},
+    )
+
+
+async def contributions_endpoint(request: Request) -> JSONResponse:
+    """Expose accepted execution capabilities, separately from discovered metadata."""
+    host = service(request)
+    composition = host.composition
+    return response(
+        request,
+        {
+            "packages": [
+                p.model_dump(mode="json") for p in host.package_inventory.packages
+            ],
+            "active": {
+                key: list(item.operations) for key, item in composition.active.items()
+            }
+            if composition
+            else {},
+            "issues": [issue.model_dump(mode="json") for issue in composition.issues]
+            if composition
+            else [],
+        },
+    )
+
+
+async def contribution_operation_endpoint(request: Request) -> JSONResponse:
+    """Dispatch to an activated package without mutating data on missing capability."""
+    composition = service(request).composition
+    owner = request.path_params["owner"]
+    operation = request.path_params["operation"]
+    if (
+        composition is None
+        or owner not in composition.active
+        or operation not in composition.active[owner].operations
+    ):
+        return response(
+            request, "Missing capability", code="MISSING_CAPABILITY", status=503
+        )
+    payload: JsonValue = TypeAdapter(JsonValue).validate_python(await body(request))
+    return response(request, await composition.invoke(owner, operation, payload))
 
 
 async def init_endpoint(request: Request) -> JSONResponse:
@@ -639,6 +706,14 @@ def create_app(host: BootstrapCoordinator) -> FastAPI:
         ("events", sse_endpoint, ["GET"]),
         ("commands/{operation}", command_endpoint, ["POST"]),
         ("files/{operation}", file_endpoint, ["POST"]),
+        ("resources/", resources_endpoint, ["GET"]),
+        ("resources/read", resources_endpoint, ["POST"]),
+        ("contributions", contributions_endpoint, ["GET"]),
+        (
+            "contributions/{owner}/{operation}",
+            contribution_operation_endpoint,
+            ["POST"],
+        ),
     ):
         app.add_api_route("/api/v1/" + path, endpoint, methods=methods)
     app.add_api_websocket_route("/ws/updates", socket_endpoint)

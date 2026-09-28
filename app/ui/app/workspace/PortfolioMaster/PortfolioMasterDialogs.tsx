@@ -1,6 +1,9 @@
-import {SqdModal,SqdFieldset} from '../../plugins/project/ProjectWorkbench';
+import { useProjectWorkbench } from './documents';
+
 import type {MasterDraft} from './portfolioMasterModel';
 export function PortfolioMasterDialogs({kind,draft,onChange,onClose}:{kind:'genetic'|'correlation';draft:MasterDraft;onChange:(v:MasterDraft)=>void;onClose:()=>void}) {
+const { SqdModal, SqdFieldset } = useProjectWorkbench();
+
  const patch=(v:Partial<MasterDraft>)=>onChange({...draft,...v});
  const number=(label:string,key:'population'|'generations'|'stagnation',min=10)=><label className="pf-row"><span>{label}</span><input aria-label={label} type="number" min={min} value={draft[key]} onChange={e=>patch({[key]:Number(e.target.value)})}/></label>;
  const corr=(v:Partial<MasterDraft['correlation']>)=>patch({correlation:{...draft.correlation,...v}});

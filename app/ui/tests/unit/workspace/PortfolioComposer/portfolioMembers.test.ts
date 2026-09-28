@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { strategies } from '../../../../app/plugins/databank/fixtures';
+import { useAppStore } from '../../../../app/workspace/PortfolioComposer/localState';
+const strategies = useAppStore.getState().strategies;
 import { portfolioMembers } from '../../../../app/workspace/PortfolioComposer/fixtures';
 
 describe('portfolio composer fixtures', () => {

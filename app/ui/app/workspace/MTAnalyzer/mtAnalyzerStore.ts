@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { MTStatementTrade, MTAnalysisMetrics, MTFilterOptions } from '../../host/types';
+import type { MTStatementTrade, MTAnalysisMetrics, MTFilterOptions } from './documents';
 
 export interface MTAnalyzerState {
   trades: MTStatementTrade[];

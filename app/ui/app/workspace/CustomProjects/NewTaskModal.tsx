@@ -19,7 +19,7 @@ import {
   Upload,
   Workflow,
 } from 'lucide-react';
-import type { WorkflowTask } from '../../host/types';
+import type { WorkflowTask } from './documents';
 import { Button, Field, Modal, Select, TextInput } from '../../components/ui';
 
 export interface TaskTypeDefinition {

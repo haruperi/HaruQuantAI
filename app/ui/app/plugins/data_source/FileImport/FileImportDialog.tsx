@@ -1,17 +1,26 @@
-import { useDarwinex } from '../Darwinex/darwinexStore';
-import { useCrypto } from '../Crypto/cryptoStore';
-import { useYahoo } from '../Yahoo/yahooStore';
-import { useSQData } from '../SQData/sqDataStore';
-import { useMt5Import } from '../MetaTrader/mt5ImportStore';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Button, Field, Modal, TextInput } from '../../../components/ui';
 import { activeImport, useFileImports } from './fileImportStore';
-import { useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
 import { builtInFormats, columnTypes, customFormat, dateExample, datePatterns, detectFormat, importedRecord, parseImport, previewRows, readImportFile, timeframes, timezones, type ColumnType, type ImportFormat } from './fileImport';
-import type { FileDefinition } from './fileSymbols';
+import type { FileDefinition } from './presentation';
 import './fileImport.css';
 
-export function FileImportDialog({ target, onClose, onStarted }: { target: FileDefinition; onClose: () => void; onStarted: () => void }) {
+export interface FileImportContextDocument {
+  readonly active: boolean;
+  readonly error?: string;
+}
+
+export function FileImportDialog({
+  target,
+  contextDocument,
+  onClose,
+  onStarted,
+}: {
+  target: FileDefinition;
+  contextDocument?: FileImportContextDocument;
+  onClose: () => void;
+  onStarted: () => void;
+}) {
   const store = useFileImports();
   const [format, setFormat] = useState(customFormat);
   const [timezone, setTimezone] = useState(store.timezone);
@@ -33,7 +42,7 @@ export function FileImportDialog({ target, onClose, onStarted }: { target: FileD
       const mapped = { ...format, columns: Array.from({ length: width }, (_, i) => format.columns[i] ?? '') };
       const result = parseImport(text, mapped, timeframe, ignore);
       const record = importedRecord(target, result, timezone, store.records.find(row => row.id === target.id));
-      store.start([{ filename, record, ignored: result.ignored, error: result.error }], timezone, '', 0, [useYahoo.getState().job?.state, useCrypto.getState().job?.state, useDarwinex.getState().job?.state, useSQData.getState().job?.state, useMt5Import.getState().job?.state, useDukascopyDownloads.getState().job?.state, useTickDownloader.getState().job?.state].some(activeImport));
+      store.start([{ filename, record, ignored: result.ignored, error: result.error }], timezone, '', 0, contextDocument?.active ?? false);
       onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to import file.'); }
   }

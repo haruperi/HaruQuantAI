@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.crypto",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.presentation",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/data_source/Crypto/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/data_source/Crypto/CryptoAddDialog.tsx",
+      "app/ui/app/plugins/data_source/Crypto/CryptoDownloadDialog.tsx",
+      "app/ui/app/plugins/data_source/Crypto/contribution.tsx",
+      "app/ui/app/plugins/data_source/Crypto/crypto.ts",
+      "app/ui/app/plugins/data_source/Crypto/cryptoStore.ts",
+      "app/ui/app/plugins/data_source/Crypto/localState.ts",
+      "app/ui/app/plugins/data_source/Crypto/presentation.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-crypto.spec.ts",
+      "app/ui/tests/unit/plugins/data_source/Crypto/crypto.test.ts"
+    ],
+    "assets": [
+      "app/ui/app/plugins/data_source/Crypto/crypto.css"
+    ],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/data_source/Crypto/package.json"
+    ]
+  }
+}

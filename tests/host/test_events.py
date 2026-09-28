@@ -54,7 +54,9 @@ def test_sse_delivers_and_shutdown_releases_without_timeout(host_config):
     from starlette.responses import StreamingResponse
 
     async def run() -> None:
-        host = BootstrapCoordinator(host_config)
+        host = BootstrapCoordinator(
+            host_config, installation_root=host_config.data_dir / "installation"
+        )
         await host.initialize()
         token = host.session_manager().login("operator", None, peer="127.0.0.1")
         app = create_app(host)

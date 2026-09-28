@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Bot, CheckCircle2, Code2, Cpu, Globe, Key, Network, ShieldCheck, Zap } from 'lucide-react';
-import type { McpServerConfig } from '../../host/types';
+import type { McpServerConfig } from './documents';
 import { Button, Checkbox, Field, Modal, Select, TextInput } from '../../components/ui';
 
 interface ConfigureMcpModalProps {

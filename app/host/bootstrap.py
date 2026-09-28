@@ -9,15 +9,20 @@ as unavailable and are never inferred from metadata discovery.
 
 import asyncio
 from concurrent.futures import ProcessPoolExecutor
+from pathlib import Path
 from typing import Any
 
-from app.host.catalog import scan_catalog
 from app.host.commands import ExchangeFiles
+from app.host.composition import Composition
 from app.host.config import HostSettings
 from app.host.contracts import LifecycleHook
 from app.host.customizations import scan_presets
 from app.host.events import EventBus
+from app.host.jobs import JobManager
 from app.host.logging import close_host_logging, configure_host_logging, get_logger
+from app.host.packages import PackageInventory, scan_packages
+from app.host.removal import InstallationLease
+from app.host.resource_store import ResourceStore
 from app.host.resources import create_pool, diagnostics
 from app.host.sessions import SessionManager
 from app.host.settings import SettingsStore
@@ -36,7 +41,11 @@ class BootstrapCoordinator:
     """
 
     def __init__(
-        self, settings: HostSettings, hooks: tuple[LifecycleHook, ...] = ()
+        self,
+        settings: HostSettings,
+        hooks: tuple[LifecycleHook, ...] = (),
+        *,
+        installation_root: Path | None = None,
     ) -> None:
         """Compose unstarted services without creating files or database rows.
 
@@ -44,6 +53,8 @@ class BootstrapCoordinator:
             settings: Immutable runtime configuration shared with owned services.
             hooks: Trusted, preconstructed lifecycle providers with explicit
                 dependencies.
+            installation_root: Explicit code installation boundary; defaults to the
+                installation containing this host. Tests supply isolated directories.
 
         Raises:
             ValueError: Startup rejects duplicate or invalid hook declarations.
@@ -60,6 +71,18 @@ class BootstrapCoordinator:
         self.resources: dict[str, Any] = {}
         self.shutdown_event = asyncio.Event()
         self.initialized = False
+        self.installation_root = (
+            installation_root
+            or settings.installation_root
+            or Path(__file__).resolve().parents[2]
+        )
+        self.installation_lease = InstallationLease(self.installation_root)
+        self.package_inventory = PackageInventory(
+            packages=(), issues=(), fingerprint=""
+        )
+        self.resource_store = ResourceStore(settings.data_dir / "resources")
+        self.jobs: JobManager | None = None
+        self.composition: Composition | None = None
 
     async def initialize(self) -> None:
         """Initialize core host services and inspect optional contributions.
@@ -75,6 +98,7 @@ class BootstrapCoordinator:
             return
         self.startup.state = "INITIALIZING"
         try:
+            self.installation_lease.acquire()
             configure_host_logging(self.config.log_dir)
             # Buffering is represented by finite early milestones, flushed here.
             for stage in ("B01", "B02", "B03", "B04"):
@@ -89,6 +113,14 @@ class BootstrapCoordinator:
             await self.startup.providers("I03")
             self.startup.mark("B09", "running")
             self.resources = diagnostics()
+            self.jobs = JobManager(
+                self.config.workers
+                or min(61, max(1, int(self.resources["cpu_count"]) - 1)),
+                max(1, int(self.resources["memory_available_bytes"]) // 2),
+            )
+            self.composition = Composition(
+                self.installation_root, self.resource_store, self.jobs
+            )
             self.startup.mark("B09")
             self.startup.mark("I04", "running")
             self.pool = create_pool(self.config.workers)
@@ -96,9 +128,9 @@ class BootstrapCoordinator:
             # I05 activation requires the I06 discovery snapshot.
             self.startup.mark("I05", "running", "awaiting_discovery")
             self.startup.mark("I06", "running")
-            self.catalog = scan_catalog(
-                (*self.config.roots, self.config.data_dir / "plugins")
-            )
+            self.package_inventory = scan_packages(self.installation_root)
+            await self.composition.start(self.package_inventory)
+            self.catalog = self.composition.catalog()
             self.startup.mark("I06")
             for stage in ("I05", "I07", "I08", "I09", "I10"):
                 await self.startup.providers(stage)
@@ -175,8 +207,13 @@ class BootstrapCoordinator:
         Cancels queued pool futures; does not remove files or alter persisted sessions.
         """
         await self.startup.close()
+        if self.composition is not None:
+            await self.composition.close()
+        if self.jobs is not None:
+            await self.jobs.close()
         if self.pool is not None:
             self.pool.shutdown(wait=False, cancel_futures=True)
             self.pool = None
             logger.info("Compute pool released")
         close_host_logging()
+        self.installation_lease.release()

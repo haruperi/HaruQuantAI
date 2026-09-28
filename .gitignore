@@ -63,6 +63,7 @@ htmlcov/
 nosetests.xml
 coverage.xml
 removability-report.json
+.package-operation.lock
 *.cover
 *.py,cover
 .hypothesis/

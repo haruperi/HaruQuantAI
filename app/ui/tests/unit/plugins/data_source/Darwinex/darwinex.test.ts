@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { darwinexCatalogue, darwinexDefinitions, darwinexDownloadRanges, discoverDarwinex, parseDarwinex } from '../../../../../app/plugins/data_source/Darwinex/darwinex';
-import { today } from '../../../../../app/plugins/data_source/Dukascopy/dukascopyDownload';
+import { today } from '../../../../../app/plugins/data_source/Darwinex/presentation';
 describe('Darwinex source rules', () => {
   it('parses all donor symbols and rejects invalid dates and duplicate rows', () => {
     expect(darwinexCatalogue).toHaveLength(328); expect(darwinexCatalogue[0]).toMatchObject({ symbol: 'AUDCAD', dateFrom: '2017-10-01' });

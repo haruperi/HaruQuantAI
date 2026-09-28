@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button, Field, Modal, Select, TextInput } from '../../../components/ui';
 import { exportPreset, exportRange, exportTimezones, mt5Artifact, type ExportTarget, type Mt5ExportRequest } from './dataExport';
 import { useDataExports } from './dataExportStore';
-import type { Preset } from '../Dukascopy/dukascopyDownload';
+import type { Preset } from './presentation';
 import './dataExport.css';
 
 const presets: [Preset, string][] = [['sinceLast', 'Since last date'], ['sixMonths', 'Last 6 months'], ['year', 'Last year'], ['fiveYears', 'Last 5 years'], ['tenYears', 'Last 10 years'], ['allTime', 'All time']];

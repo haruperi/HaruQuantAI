@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useAppStore } from '../../../../app/host/store';
-import type { ExtensionFile } from '../../../../app/host/types';
+import { useAppStore } from '../../../../app/workspace/CodeEditor/localState';
+import type { ExtensionFile } from '../../../../app/workspace/CodeEditor/documents';
 
 describe('Code Editor & Extensions Studio', () => {
   beforeEach(() => {

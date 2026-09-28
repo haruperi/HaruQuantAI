@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAppStore } from '../../host/store';
+import { useAppStore } from './localState';
 import { EnginePanel } from './EnginePanel';
 import { SettingsSummary } from './SettingsSummary';
 import { ResultsColumn } from './ResultsColumn';

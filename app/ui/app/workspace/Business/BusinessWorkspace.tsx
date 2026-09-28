@@ -22,8 +22,8 @@ import {
   Users,
   Zap,
 } from 'lucide-react';
-import { useAppStore } from '../../host/store';
-import type { BusinessUser, BusinessWorkspaceItem, ComputeNode, McpServerConfig } from '../../host/types';
+import { useAppStore } from './localState';
+import type { BusinessUser, BusinessWorkspaceItem, ComputeNode, McpServerConfig } from './documents';
 import { Button, Field, Modal, Section, Select, TextInput } from '../../components/ui';
 import { AddNodeModal } from './AddNodeModal';
 import { ConfigureMcpModal } from './ConfigureMcpModal';

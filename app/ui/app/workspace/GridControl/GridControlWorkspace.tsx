@@ -1,8 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { RefreshCw, TriangleAlert } from 'lucide-react';
 import { Button, Modal, Select } from '../../components/ui';
-import { useAppStore } from '../../host/store';
-import type { Job } from '../../host/types';
+import { useAppStore } from './localState';
+import type { Job } from './documents';
 
 export interface GridJobRow { id: string; groupId: string; type: 'Continuous' | 'One time'; status: string; created: string; started: string; duration: string; progress: string; error?: string; }
 export interface GridSections { running: GridJobRow[]; waiting: GridJobRow[]; finished: GridJobRow[]; }

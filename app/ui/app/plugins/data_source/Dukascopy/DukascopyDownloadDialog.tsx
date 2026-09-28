@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button, TextInput } from '../../../components/ui';
-import { useAppStore } from '../../../host/store';
-import { useDukascopyDownloads } from '../Common/dataManagerStore';
+import { useAppStore } from './localState';
+import { useDukascopyDownloads } from './dukascopyStore';
 import { availableStart, presetRange, today, validateDownload, type DownloadMode, type DownloadTarget, type Preset } from './dukascopyDownload';
 import './dukascopyDownload.css';
 

@@ -1,5 +1,17 @@
-import { timezones } from '../FileImport/fileImport';
-import { validateName } from '../FileImport/fileSymbols';
+export const timezones: string[][] = [
+  ["EETUS", "(EST+07) New York Trading hours, US DST"],
+  ["EET", "(UTC+02) European DST"],
+  ["Etc/UCT", "(UTC) Coordinated Universal Time"],
+  ["Europe/London", "(UTC) Dublin, Edinburgh, Lisbon, London"],
+  ["America/New_York", "(UTC-05) New York, US & Canada, EST"],
+  ["UTC", "UTC (application alias)"]
+];
+
+export function validateName(name: string, existing: string[], label = 'Symbol'): void {
+  if (!name || name.length > 128 || !/^[a-zA-Z0-9_@.:$]+$/.test(name)) throw new Error(`${label} name is required (maximum 128 characters); use letters, numbers, or _ @ . : $.`);
+  if (existing.some(item => item.toLowerCase() === name.toLowerCase())) throw new Error(`${label} ${name} already exists.`);
+}
+
 export type SQProvider = 'equity' | 'futures';
 export type SQProfile = 'Full' | 'Starter';
 export interface SQTicker { ticker: string; name: string; exchange: string; type: string; dataFrom: string; timezone: string; continuous: boolean; free: boolean }

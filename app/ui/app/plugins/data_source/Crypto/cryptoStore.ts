@@ -1,7 +1,7 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { cryptoDownloadRanges, validateCryptoName, type CryptoDefinition, type CryptoDownload } from './crypto';
-import { mergeRanges, validDate, type Interval } from '../Dukascopy/dukascopyDownload';
+import { mergeRanges, validDate, type Interval } from './presentation';
 
 export const cryptoActive = (state?: string) => state === 'running' || state === 'paused';
 export const cryptoKey = 'sqx-crypto-data-v1';

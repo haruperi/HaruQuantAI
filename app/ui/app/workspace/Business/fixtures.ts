@@ -1,4 +1,4 @@
-import type { BusinessConfig, ComputeNode } from '../../host/types';
+import type { BusinessConfig, ComputeNode } from './documents';
 
 export const computeNodes: ComputeNode[] = [
   {

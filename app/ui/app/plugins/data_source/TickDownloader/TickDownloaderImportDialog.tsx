@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react';
 import { Button, TextInput } from '../../../components/ui';
 import { discoverTD, type TDManifest } from './tickDownloader';
-import { useTickDownloader } from '../Common/dataManagerStore';
+import { useTickDownloader } from './tickDownloaderStore';
 import './tickDownloader.css';
 
 export function TickDownloaderImportDialog({ onClose, onStarted }: { onClose: () => void; onStarted: () => void }) {

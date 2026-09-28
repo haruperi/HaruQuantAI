@@ -1,4 +1,4 @@
-import type { RuleNode } from '../../host/types';
+import type { RuleNode } from './documents';
 
 export const rules: RuleNode[] = [
   { id: 'r1', depth: 0, kind: 'event', label: 'On Bar Open' }, { id: 'r2', depth: 1, kind: 'if', label: 'IF' },

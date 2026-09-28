@@ -1,10 +1,29 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { categories, filterCatalogue } from './dukascopy';
-import { useDataManagerStore } from '../Common/dataManagerStore';
+import type { BrokerProfile } from './presentation';
 import './dukascopy.css';
 
+export interface DukascopyContextDocument {
+  readonly existing: readonly string[];
+  readonly active: boolean;
+  readonly error: string;
+  readonly brokers?: readonly BrokerProfile[];
+}
+
 const disclaimer = 'I confirm that I understand the following: Data are provided for free by Dukascopy. HaruQuantAI Data Manager is only a tool to download the data directly to the program. HaruQuantAI is not responsible for quality or availability of the data.';
-export function DukascopyAddDialog({ open, onClose, onComplete }: { open: boolean; onClose: () => void; onComplete: (message: string) => void }) {
+export function DukascopyAddDialog({
+  open,
+  contextDocument,
+  onClose,
+  onAddData,
+  onComplete,
+}: {
+  open: boolean;
+  contextDocument?: DukascopyContextDocument;
+  onClose: () => void;
+  onAddData?: (request: { symbols: string[]; dataType: 'TICK' | 'M1'; broker: string; postfix: string; instruments: string[] }) => void;
+  onComplete: (message: string) => void;
+}) {
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('');
   const [selected, setSelected] = useState<string[]>([]);
@@ -15,9 +34,8 @@ export function DukascopyAddDialog({ open, onClose, onComplete }: { open: boolea
   const [error, setError] = useState('');
   const [warning, setWarning] = useState(false);
   const [mapping, setMapping] = useState<Record<string, string> | null>(null);
-  const brokers = useDataManagerStore(state => state.brokers);
-  const storageError = useDataManagerStore(state => state.storageError);
-  const addData = useDataManagerStore(state => state.addData);
+  const brokers = contextDocument?.brokers ?? [];
+  const storageError = contextDocument?.error ?? '';
   const activeBroker = brokers.find(item => item.id === broker);
   const rows = useMemo(() => filterCatalogue(query, category), [query, category]);
   const groups = useMemo(() => Array.from(new Set(rows.map(row => row.fullCategory))).map(name => ({ name, rows: rows.filter(row => row.fullCategory === name) })), [rows]);
@@ -45,7 +63,9 @@ export function DukascopyAddDialog({ open, onClose, onComplete }: { open: boolea
     if (mapping && Object.values(mapping).includes('-1001')) { setError('Select proper instrument or skip the symbol'); return; }
     const symbols = selected.filter(symbol => mapping?.[symbol] !== '-1000');
     try {
-      addData({ symbols, dataType, broker, postfix, instruments: mapping ? symbols.map(symbol => mapping[symbol]) : [] });
+      if (onAddData) {
+        onAddData({ symbols, dataType, broker, postfix, instruments: mapping ? symbols.map(symbol => mapping[symbol]) : [] });
+      }
       onComplete(`${symbols.length} Dukascopy mock dataset definition${symbols.length === 1 ? '' : 's'} added`);
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add symbols'); }
   };

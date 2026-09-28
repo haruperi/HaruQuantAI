@@ -21,8 +21,8 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
-import { useAppStore } from '../../host/store';
-import type { ExtensionFile } from '../../host/types';
+import { useAppStore } from './localState';
+import type { ExtensionFile } from './documents';
 import { Button, TextInput } from '../../components/ui';
 import { IndicatorTesterModal } from './IndicatorTesterModal';
 import { NewExtensionModal } from './NewExtensionModal';

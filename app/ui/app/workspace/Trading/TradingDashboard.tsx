@@ -18,7 +18,7 @@ import {
   TrendingUp,
   XCircle,
 } from 'lucide-react';
-import type { OrderKind, OrderSide } from '../../host/types';
+import type { OrderKind, OrderSide } from './documents';
 import { Button, Field, Modal, Section, Stat, TextInput } from '../../components/ui';
 import { useTradingStore } from './tradingStore';
 

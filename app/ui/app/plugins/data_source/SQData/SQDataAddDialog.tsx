@@ -1,19 +1,27 @@
-import { reservedDarwinex, useDarwinex } from '../Darwinex/darwinexStore';
-import { reservedCrypto, useCrypto } from '../Crypto/cryptoStore';
-import { reservedYahoo, useYahoo } from '../Yahoo/yahooStore';
-import { reservedMt5, useMt5Import } from '../MetaTrader/mt5ImportStore';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAppStore } from '../../../host/store';
+import { useAppStore } from './localState';
 import { Button, Field, Modal, TextInput } from '../../../components/ui';
-import { datasets } from '../Common/fixtures';
-import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
-import { useFileSymbols } from '../FileImport/fileSymbolsStore';
-import { activeImport, useFileImports } from '../FileImport/fileImportStore';
-import { timezones } from '../FileImport/fileImport';
-import { lookupSQ, providerLabel, sqAllowed, sqExchanges, sqSubscription, sqUsageConditions, type SQConfig, type SQProvider, type SQTicker } from './sqData';
+import { lookupSQ, providerLabel, sqAllowed, sqExchanges, sqSubscription, sqUsageConditions, timezones, type SQConfig, type SQProvider, type SQTicker } from './sqData';
 import { useSQData } from './sqDataStore';
 import './sqData.css';
-export function SQDataAddDialog({ provider, onClose, onStarted }: { provider: SQProvider; onClose: () => void; onStarted: () => void }) {
+
+export interface SQDataContextDocument {
+  readonly existing: readonly string[];
+  readonly active: boolean;
+  readonly error: string;
+}
+
+export function SQDataAddDialog({
+  provider,
+  contextDocument,
+  onClose,
+  onStarted,
+}: {
+  provider: SQProvider;
+  contextDocument?: SQDataContextDocument;
+  onClose: () => void;
+  onStarted: () => void;
+}) {
   const store = useSQData(); const profile = useAppStore(state => state.settings.profile); const notify = useAppStore(state => state.notify);
   const [config, setConfig] = useState<SQConfig>(() => ({ ...store.preferred[provider], symbols: '' }));
   const [results, setResults] = useState<SQTicker[]>([]); const [lookedUp, setLookedUp] = useState(false);
@@ -37,10 +45,16 @@ export function SQDataAddDialog({ provider, onClose, onStarted }: { provider: SQ
   }
   function add() {
     try {
-      const data = useDataManagerStore.getState(), td = useTickDownloader.getState(), files = useFileSymbols.getState(), imports = useFileImports.getState();
-      if (data.storageError || td.storageError || files.storageError || imports.storageError) throw new Error(data.storageError || td.storageError || files.storageError || imports.storageError);
-      const existing = [...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedMt5(), ...datasets, ...data.definitions, ...td.definitions, ...files.definitions, ...imports.records, ...(activeImport(imports.job?.state) ? imports.job!.tasks.map(task => task.record) : [])];
-      store.start(provider, config, selected, agreed, useAppStore.getState().settings.profile, existing.map(row => row.symbol), [useYahoo.getState().job?.state, useCrypto.getState().job?.state, useDarwinex.getState().job?.state, useMt5Import.getState().job?.state, td.job?.state, useDukascopyDownloads.getState().job?.state, imports.job?.state].some(activeImport));
+      if (contextDocument?.error) throw new Error(contextDocument.error);
+      store.start(
+        provider,
+        config,
+        selected,
+        agreed,
+        useAppStore.getState().settings.profile,
+        contextDocument?.existing ? [...contextDocument.existing] : [],
+        contextDocument?.active ?? false,
+      );
       onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add symbols.'); }
   }

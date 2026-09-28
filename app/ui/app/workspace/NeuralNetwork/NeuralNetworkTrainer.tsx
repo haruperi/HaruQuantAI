@@ -16,7 +16,7 @@ import {
   Sparkles,
   Trash2,
 } from 'lucide-react';
-import type { NNActivation, NNLossFunction, NNOptimizer } from '../../host/types';
+import type { NNActivation, NNLossFunction, NNOptimizer } from './documents';
 import { Button, Checkbox, Field, Modal, ProgressBar, Section, Select, Stat, TextInput } from '../../components/ui';
 import { availableFeatures, useNeuralNetStore } from './neuralNetStore';
 

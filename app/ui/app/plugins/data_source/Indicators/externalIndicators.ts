@@ -1,4 +1,4 @@
-import { parseDate, splitRows } from '../FileImport/fileImport';
+import { parseDate, splitRows } from './presentation';
 
 export const externalIndicatorTypes = [
   { value: 1, label: 'Indicator value - price' },

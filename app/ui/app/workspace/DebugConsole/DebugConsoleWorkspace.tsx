@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Select, TextInput } from '../../components/ui';
-import { useAppStore } from '../../host/store';
-import type { Job } from '../../host/types';
+import { useAppStore } from './localState';
+import type { Job } from './documents';
 
 export interface DebugLogEntry { id: string; time: string; category: string; message: string; }
 

@@ -1,10 +1,13 @@
+import { useProjectWorkbench } from './documents';
 import {useState} from 'react';
-import {useAppStore} from '../../host/store';
-import {ProjectFrame,ProjectResults,demoResult,usePreviewRun} from '../../plugins/project/ProjectWorkbench';
+import {useAppStore} from './localState';
+
 import {RetesterSettings} from './RetesterSettings';
 import {RetesterProgress} from './RetesterProgress';
 import {retestDefaults} from './retesterFixtures';
 export function RetesterWorkspace(){
+const { ProjectFrame, ProjectResults, demoResult, usePreviewRun } = useProjectWorkbench();
+
  const panel=useAppStore(s=>s.tab),setPanel=useAppStore(s=>s.setTab);
  const banks=useAppStore(s=>s.databanks),selected=useAppStore(s=>s.strategies.find(v=>v.id===s.selectedStrategyId));
  const selectionCount=useAppStore(s=>s.selectedRows.length);

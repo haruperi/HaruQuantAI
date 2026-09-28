@@ -1,1 +1,3 @@
-export * from '../../../../plugins/project/ProjectWorkbench/results/tabs/ConditionalTabs';
+import type { ComponentProps } from 'react';
+import { useProjectWorkbench, type WorkbenchPorts } from '../../documents';
+export function ConditionalTabs(props: ComponentProps<WorkbenchPorts['ConditionalTabs']>) { const View=useProjectWorkbench().ConditionalTabs; return <View {...props}/>; }

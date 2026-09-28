@@ -1,10 +1,13 @@
+import { useProjectWorkbench, type SettingsSection } from './documents';
 import {useRef,useState} from 'react';
-import {ProjectSettings,DataTab,TradingOptionsTab,AtmTab,MoneyManagementTab,RankingTab,NotesTab,SqdFieldset,type SettingsSection} from '../../plugins/project/ProjectWorkbench';
+
 import {OptimizationParameters} from './OptimizationParameters';
 import {OptimizationPresetDialog} from './OptimizationDialogs';
 import {optimizationModes,optimizerDraftError,parameterCombinations,type OptimizerDraft} from './optimizerFixtures';
 
 export function OptimizerSettings({draft,onChange,banks,locked,selectedId,onSelect}:{draft:OptimizerDraft;onChange:(d:OptimizerDraft)=>void;banks:string[];locked:boolean;selectedId:string;onSelect:(id:string)=>void}) {
+const { ProjectSettings, DataTab, TradingOptionsTab, AtmTab, MoneyManagementTab, RankingTab, NotesTab, SqdFieldset } = useProjectWorkbench();
+
  const [preset,setPreset]=useState(false);const file=useRef<HTMLInputElement>(null);
  const patch=(v:Partial<OptimizerDraft>)=>onChange({...draft,...v});
  const wf=draft.mode.includes('Walk'),matrix=draft.mode.endsWith('matrix');

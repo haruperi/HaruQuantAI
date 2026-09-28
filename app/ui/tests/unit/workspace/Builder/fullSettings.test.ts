@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   additionalConfigRowIds,
   additionalConfigRowNames,
@@ -142,5 +142,40 @@ describe('Full settings fixtures (donor SQX144-EV-000038..043)', () => {
     }
     expect(visibleSettingsTabs('improve')).toHaveLength(11);
     expect(nextTabLabel(0, visibleSettingsTabs('improve'))).toBe('Parts to improve >');
+  });
+});
+
+describe('saved Builder settings hydration', () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it('fills fields absent from an older Builder record without replacing saved values', async () => {
+    vi.resetModules();
+    const memory = new Map<string, string>([
+      [
+        'sqx-recreation-v1',
+        JSON.stringify({
+          state: { module: 'builder', tab: 'settings', builder: { population: 250 } },
+          version: 1,
+        }),
+      ],
+    ]);
+    const storage = {
+      getItem: (key: string) => memory.get(key) ?? null,
+      setItem: (key: string, value: string) => memory.set(key, value),
+      removeItem: (key: string) => memory.delete(key),
+    };
+    vi.stubGlobal('window', { localStorage: storage });
+    vi.stubGlobal('localStorage', storage);
+
+    const { useAppStore } = await import('../../../../app/workspace/Builder/localState');
+    await useAppStore.persist.rehydrate();
+    const { builder } = useAppStore.getState();
+
+    expect(builder.population).toBe(250);
+    expect(builder.customBlocks).toEqual({});
+    expect(builder.crossChecks.length).toBeGreaterThan(0);
+    expect(builder.mode).toBe('Genetic evolution');
   });
 });

@@ -1,6 +1,5 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
-import { datasets } from '../Common/fixtures';
-import { validateName } from './fileSymbols';
+import { validateName } from './presentation';
 import { create } from 'zustand';
 import { builtInFormats, limits, timezones, validateFormat, type ImportFormat, type ImportJob, type ImportRecord, type ImportTask } from './fileImport';
 interface Saved { formats: ImportFormat[]; records: ImportRecord[]; groups: { name: string; symbols: string[] }[]; timezone: string; job: ImportJob | null }
@@ -16,7 +15,7 @@ function validateSaved(value: Saved) {
   for (const record of records) {
     if (!record || record.source !== 'File import' || ['id', 'symbol', 'instrument', 'underlying', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(field => typeof (record as unknown as Record<string, unknown>)[field] !== 'string') || !['start', 'end'].includes(record.barType) || !Array.isArray(record.timestamps) || record.timestamps.length > limits.timestamps || !Number.isInteger(record.unknownBars) || record.unknownBars < 0 || record.bars !== record.timestamps.length + record.unknownBars || record.timestamps.some((stamp, i) => !Number.isFinite(stamp) || !Number.isFinite(new Date(stamp).getTime()) || (i > 0 && stamp <= record.timestamps[i - 1]))) throw new Error('Invalid saved records.');
     validateName(record.symbol, []);
-    if (record.id !== `file:${record.symbol}` && !datasets.some(row => row.source === 'File import' && row.id === record.id && row.symbol === record.symbol)) throw new Error('Invalid imported record identity.');
+    if (record.id !== `file:${record.symbol}` && !record.id.startsWith('dataset-')) throw new Error('Invalid imported record identity.');
     if ((record.from || record.to) && (!/^\d{4}-\d{2}-\d{2}$/.test(record.from) || !/^\d{4}-\d{2}-\d{2}$/.test(record.to) || record.from > record.to)) throw new Error('Invalid imported range.');
     count += record.timestamps.length;
   }

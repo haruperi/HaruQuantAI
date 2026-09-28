@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "id": "workspace.code_editor",
+  "kind": "workspace",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": null,
+  "attachment": null,
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/workspace/CodeEditor/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx",
+      "app/ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx",
+      "app/ui/app/workspace/CodeEditor/NewExtensionModal.tsx",
+      "app/ui/app/workspace/CodeEditor/contribution.tsx",
+      "app/ui/app/workspace/CodeEditor/documents.ts",
+      "app/ui/app/workspace/CodeEditor/fixtures.ts",
+      "app/ui/app/workspace/CodeEditor/localState.ts"
+    ],
+    "tests": [
+      "app/ui/tests/unit/workspace/CodeEditor/codeEditor.test.ts"
+    ],
+    "assets": [],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/workspace/CodeEditor/package.json"
+    ]
+  }
+}

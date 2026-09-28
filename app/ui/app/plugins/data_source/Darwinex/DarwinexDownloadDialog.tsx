@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Button, TextInput } from '../../../components/ui';
-import { useAppStore } from '../../../host/store';
+import { useAppStore } from './localState';
 import { DarwinexModal, darwinexContext } from './DarwinexAddDialog';
 import { darwinexStart, type DarwinexDefinition } from './darwinex';
 import { useDarwinex } from './darwinexStore';
-import { today, presetRange, type Preset } from '../Dukascopy/dukascopyDownload';
+import { today, presetRange, type Preset } from './presentation';
 export function DarwinexDownloadDialog({ targets, onClose, onStarted }: { targets: DarwinexDefinition[]; onClose: () => void; onStarted: () => void }) {
   const full = useAppStore(state => state.settings.profile) === 'Full'; const notify = useAppStore(state => state.notify); const store = useDarwinex();
   const minimum = darwinexStart(targets[0]), last = targets[0].to || minimum;

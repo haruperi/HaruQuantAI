@@ -1,7 +1,7 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { yahooDownloadRanges, validateYahooName, type YahooDefinition, type YahooDownload } from './yahoo';
-import { mergeRanges, validDate, type Interval } from '../Dukascopy/dukascopyDownload';
+import { mergeRanges, validDate, type Interval } from './presentation';
 
 export const yahooActive = (state?: string) => state === 'running' || state === 'paused';
 export const yahooKey = 'sqx-yahoo-data-v1';

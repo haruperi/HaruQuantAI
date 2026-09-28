@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { classifyGridJobs } from '../../../../app/workspace/GridControl/GridControlWorkspace';
-import type { Job } from '../../../../app/host/types';
+import type { Job } from '../../../../app/workspace/GridControl/documents';
 
 const job = (status: Job['status'], progress: number, message: string = status): Job => ({ id: `job-${status}`, kind: 'Research', status, progress, accepted: 0, rejected: 0, startedAt: '2026-09-20T12:30:00', message });
 

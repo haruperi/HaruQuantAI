@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import { debugCategories, deriveDebugLog, filterDebugLog } from '../../../../app/workspace/DebugConsole/DebugConsoleWorkspace';
-import type { Job } from '../../../../app/host/types';
+import type { Job } from '../../../../app/workspace/DebugConsole/documents';
 
 const job = (status: Job['status'], progress: number, message: string = status): Job => ({ id: `job-${status}`, kind: 'Research', status, progress, accepted: 0, rejected: 0, startedAt: '2026-09-20T12:30:00', message });
 

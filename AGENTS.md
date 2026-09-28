@@ -7,10 +7,9 @@
   `.agents/logs/<timestamp>_<task>/`.
 - **Scoped authority.** `AGENTS.md` owns workflow and verification;
   `docs/PROJECT.md` owns product scope; `docs/ARCHITECTURE.md` owns structural
-  constraints. The planned `docs/dev/workspace_plugin_implementation_pipeline.md`
-  and `docs/dev/workspace_plugin_implementation_audit.md` will own detailed
-  workspace/plugin build and audit standards once authored and approved; they
-  are currently absent and their contents must not be inferred.
+  constraints. `docs/dev/workspace_plugin_implementation_pipeline.md` and
+  `docs/dev/workspace_plugin_implementation_audit.md` own detailed workspace/plugin
+  build and audit standards. Requirements are not implementation evidence.
 - **Five Spatial Composability laws.** All future backend work must preserve:
   locality of behavior, orthogonality, explicit typed capability slots,
   hierarchical/algebraic composition, and schema-driven self-description.
@@ -36,6 +35,13 @@ walkthroughs. Each new backend workspace, plugin, quantitative persistence,
 or gateway expansion needs its own approved plan establishing paths, public
 contracts, and verification before implementation.
 
+Exclusive ownership applies to backend and UI: each plugin attaches to exactly
+one workspace through a versioned slot. Peers share published resources, never
+business implementations, mutable stores or executors. Universal logging, jobs,
+hardware allocation and resource custody belong to the host. Package removal
+includes backend, UI, owned tests/examples/assets, and a workspace's plugins;
+published resources and historical references remain intact.
+
 ## 2. Plan -> Execute -> Walkthrough workflow
 
 Every development task follows this sequence:
@@ -43,8 +49,9 @@ Every development task follows this sequence:
 1. **Research and audit:** inspect active code, documentation, tests, references,
    dependencies, and working-tree state. Make no source edits.
 2. **Implementation plan:** create or append
-   `.agents/logs/<timestamp>_<task>/implementation-plan.md` using the canonical
-   template and define exact `ALLOWED_WRITE_PATHS`.
+   `.agents/logs/<timestamp>_<task>/implementation-plan.md` using the [canonical
+   template](docs/templates/implementation-plan.md) and define exact
+   `ALLOWED_WRITE_PATHS`.
 3. **Owner approval gate:** stop until the owner explicitly responds
    `APPROVED: EXECUTE` or equivalently approves the documented plan.
 4. **Surgical implementation:** edit only approved paths and record material
@@ -52,7 +59,8 @@ Every development task follows this sequence:
 5. **Focused verification:** run change-scoped tests during development.
 6. **Candidate qualification:** run `uv run python scripts/ci_check.py` after the
    candidate is complete, plus applicable UI commands.
-7. **Walkthrough:** create `walkthrough.md` from the canonical template,
+7. **Walkthrough:** create `walkthrough.md` from the
+   [canonical template](docs/templates/walkthrough.md),
    including changes, exact commands/results, deviations, residual risks,
    `git status`, and a proposed commit message.
 8. **Owner commit gate:** do not commit, merge, push, rebase, or rewrite history
@@ -65,9 +73,10 @@ iteration and renewed approval when they materially expand scope.
 ## 3. Workspace and plugin implementation standard
 
 Workspace and plugin work must follow the replacement architecture and this
-section. Once the planned pipeline and companion audit are authored and
-approved, use their independent workspace track (W) or concrete plugin track
-(P) with shared controls. At minimum, each plugin must provide:
+section, the [pipeline](docs/dev/workspace_plugin_implementation_pipeline.md)
+and [audit](docs/dev/workspace_plugin_implementation_audit.md). Use workspace
+track (W) or concrete plugin track (P) with shared controls. At minimum, each plugin
+must provide:
 
 - a stable namespaced ID and explicit compatibility version;
 - immutable, typed inputs/outputs and capability requirements;
@@ -103,6 +112,13 @@ imports and sibling implementation imports are prohibited.
   `npm --prefix app/ui run build`.
 - Every backend plugin eventually requires a self-contained deterministic usage
   example in the location ratified by the replacement architecture.
+
+Release qualification must include frontend checks, fresh backend restart,
+unaffected-operation checks and producer-independent resource reads after removing
+each shipping pair in isolation. Missing, stale, skipped or failed required
+evidence blocks release. Cohort qualification cannot qualify other shipping
+packages. Enforcement tooling is pending migration; these requirements must not
+be described as already implemented.
 
 ## 5. Security, persistence, and external effects
 

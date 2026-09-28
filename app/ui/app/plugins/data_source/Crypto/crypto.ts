@@ -1,4 +1,4 @@
-import { today, validDate, type Interval, type Preset } from '../Dukascopy/dukascopyDownload';
+import { today, validDate, type Interval, type Preset } from './presentation';
 
 export type CryptoExchangeId = 'Binance' | 'BinanceCoinM' | 'BinanceUsdtM' | 'Bitfinex' | 'Poloniex' | 'Coinbase';
 export interface CryptoExchange {

@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.export",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.presentation",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/data_source/Export/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/data_source/Export/CsvExportDialog.tsx",
+      "app/ui/app/plugins/data_source/Export/Mt4ExportDialog.tsx",
+      "app/ui/app/plugins/data_source/Export/Mt5ExportDialog.tsx",
+      "app/ui/app/plugins/data_source/Export/contribution.tsx",
+      "app/ui/app/plugins/data_source/Export/dataExport.ts",
+      "app/ui/app/plugins/data_source/Export/dataExportStore.ts",
+      "app/ui/app/plugins/data_source/Export/localState.ts",
+      "app/ui/app/plugins/data_source/Export/presentation.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-export.spec.ts",
+      "app/ui/tests/unit/plugins/data_source/Export/dataExport.test.ts"
+    ],
+    "assets": [
+      "app/ui/app/plugins/data_source/Export/dataExport.css"
+    ],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/data_source/Export/package.json"
+    ]
+  }
+}

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { AreaSeries, ColorType, createChart, LineSeries, type Time } from 'lightweight-charts';
-import type { EquityPoint } from '../../host/types';
+import type { EquityPoint } from './documents';
 
 export function EquityChart({ data, height = 280, drawdown = false }: { data: EquityPoint[]; height?: number; drawdown?: boolean }) {
   const ref = useRef<HTMLDivElement>(null);

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "plugin.retester.project_workbench",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.retester",
+  "attachment": {
+    "slot_id": "project.workbench",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/project/Retester/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/project/Retester/ProjectFrame.tsx",
+      "app/ui/app/plugins/project/Retester/ProjectModal.tsx",
+      "app/ui/app/plugins/project/Retester/ProjectProgress.tsx",
+      "app/ui/app/plugins/project/Retester/ProjectResults.tsx",
+      "app/ui/app/plugins/project/Retester/ProjectSettings.tsx",
+      "app/ui/app/plugins/project/Retester/contracts.ts",
+      "app/ui/app/plugins/project/Retester/contribution.tsx",
+      "app/ui/app/plugins/project/Retester/index.ts",
+      "app/ui/app/plugins/project/Retester/localState.ts",
+      "app/ui/app/plugins/project/Retester/presentation.ts",
+      "app/ui/app/plugins/project/Retester/projectFixtures.ts",
+      "app/ui/app/plugins/project/Retester/results/ResultsCharts.tsx",
+      "app/ui/app/plugins/project/Retester/results/ResultsChrome.tsx",
+      "app/ui/app/plugins/project/Retester/results/ResultsModals.tsx",
+      "app/ui/app/plugins/project/Retester/results/resultsFixtures.ts",
+      "app/ui/app/plugins/project/Retester/results/resultsModel.ts",
+      "app/ui/app/plugins/project/Retester/results/tabs/ConditionalTabs.tsx",
+      "app/ui/app/plugins/project/Retester/results/tabs/EquityChartTab.tsx",
+      "app/ui/app/plugins/project/Retester/results/tabs/OverviewTab.tsx",
+      "app/ui/app/plugins/project/Retester/results/tabs/SmallTabs.tsx",
+      "app/ui/app/plugins/project/Retester/results/tabs/SourceCodeTab.tsx",
+      "app/ui/app/plugins/project/Retester/results/tabs/TradeListTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/AtmTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/CrossChecksTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/DataTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/MoneyManagementTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/NotesTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/RankingTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/SettingsControls.tsx",
+      "app/ui/app/plugins/project/Retester/settings/TradingOptionsTab.tsx",
+      "app/ui/app/plugins/project/Retester/settings/sharedSettingsFixtures.ts"
+    ],
+    "tests": [
+      "app/ui/tests/unit/plugins/project/Retester/projectWorkbench.test.ts"
+    ],
+    "assets": [],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/project/Retester/README.md",
+      "app/ui/app/plugins/project/Retester/package.json"
+    ]
+  }
+}

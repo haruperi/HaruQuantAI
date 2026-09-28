@@ -1,6 +1,6 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
-import { mergeRanges, validDate, type Interval } from '../Dukascopy/dukascopyDownload';
+import { mergeRanges, validDate, type Interval } from './presentation';
 import { mt5Definitions, mt5ImportRanges, type Mt5Definition, type Mt5ImportRequest } from './mt5Import';
 
 export const mt5Active = (state?: string) => state === 'running' || state === 'paused';

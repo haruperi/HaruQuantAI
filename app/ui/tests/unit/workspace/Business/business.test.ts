@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useAppStore } from '../../../../app/host/store';
-import type { BusinessUser, BusinessWorkspaceItem, ComputeNode, McpServerConfig } from '../../../../app/host/types';
+import { useAppStore } from '../../../../app/workspace/Business/localState';
+import type { BusinessUser, BusinessWorkspaceItem, ComputeNode, McpServerConfig } from '../../../../app/workspace/Business/documents';
 
 describe('Business, Distributed Compute & MCP Gateways', () => {
   beforeEach(() => {

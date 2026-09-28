@@ -1,7 +1,7 @@
-import raw from '../../../../../../data/market/darwinex/darwinex.csv?raw';
-import { validateName } from '../FileImport/fileSymbols';
-import type { BrokerProfile } from '../Dukascopy/dukascopy';
-import { today, validDate, type Interval, type Preset } from '../Dukascopy/dukascopyDownload';
+import { rawDarwinexCatalogue as raw } from '../../../host/catalogs';
+import { validateName } from './presentation';
+import type { BrokerProfile } from './presentation';
+import { today, validDate, type Interval, type Preset } from './presentation';
 export interface DarwinexSymbol { symbol: string; dateFrom: string; metadata: number[] }
 export function parseDarwinex(text: string): DarwinexSymbol[] {
   const seen = new Set<string>();

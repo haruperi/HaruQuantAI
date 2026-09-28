@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { BrokerAccount, ExecutionLogEntry, OrderKind, OrderSide, PendingOrder, Position } from '../../host/types';
+import type { BrokerAccount, ExecutionLogEntry, OrderKind, OrderSide, PendingOrder, Position } from './documents';
 
 interface TradingState {
   accounts: BrokerAccount[];

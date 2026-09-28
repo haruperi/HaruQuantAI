@@ -1,5 +1,6 @@
-import {ProjectFrame} from '../../plugins/project/ProjectWorkbench';
-import { useAppStore } from '../../host/store';
+import { useProjectWorkbench } from './documents';
+
+import { useAppStore } from './localState';
 import { demoResult } from './results/resultsModel';
 import { useState } from 'react';
 import { ResultsView } from './ResultsView';
@@ -15,6 +16,8 @@ import type { EngineRunStatus } from './fixtures';
  */
 export type BuilderPanel = 'progress' | 'settings' | 'results';
 export function BuilderWorkspace() {
+const { ProjectFrame } = useProjectWorkbench();
+
     const panel = useAppStore(s => s.tab);
     const setPanel = useAppStore(s => s.setTab);
     const strategies = useAppStore(s => s.strategies);

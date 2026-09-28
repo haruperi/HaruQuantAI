@@ -7,7 +7,7 @@ import type {
   NNOptimizer,
   NNTrainingConfig,
   NNTrainingHistoryPoint,
-} from '../../host/types';
+} from './documents';
 
 interface NeuralNetState {
   config: NNTrainingConfig;

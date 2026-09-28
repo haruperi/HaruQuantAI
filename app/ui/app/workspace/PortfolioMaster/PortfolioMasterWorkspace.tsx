@@ -1,11 +1,14 @@
+import { useProjectWorkbench, type ResultDocument } from './documents';
 import {useEffect,useState} from 'react';
-import {useAppStore} from '../../host/store';
-import {ProjectFrame,ProjectResults,demoResult,usePreviewRun,type ResultDocument} from '../../plugins/project/ProjectWorkbench';
+import {useAppStore} from './localState';
+
 import {masterDefaults,type MasterDraft} from './portfolioMasterModel';
 import {masterResult} from './portfolioMasterFixtures';
 import {PortfolioMasterProgress} from './PortfolioMasterProgress';
 import {PortfolioMasterSettings} from './PortfolioMasterSettings';
 export function PortfolioMasterWorkspace(){
+const { ProjectFrame, ProjectResults, demoResult, usePreviewRun } = useProjectWorkbench();
+
  const panel=useAppStore(s=>s.tab),setPanel=useAppStore(s=>s.setTab),banks=useAppStore(s=>s.databanks);
  const strategies=useAppStore(s=>s.strategies),selectedId=useAppStore(s=>s.selectedStrategyId),selectedRows=useAppStore(s=>s.selectedRows);
  const [draft,setDraft]=useState(()=>({...structuredClone(masterDefaults),source:banks[0]?.name??'Results',target:banks[1]?.name??'Results'}));

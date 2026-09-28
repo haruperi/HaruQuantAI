@@ -1,4 +1,4 @@
-import type { EquityPoint } from '../../host/types';
+import type { EquityPoint } from './documents';
 
 export interface PortfolioSimulationResult {
   equity: EquityPoint[];

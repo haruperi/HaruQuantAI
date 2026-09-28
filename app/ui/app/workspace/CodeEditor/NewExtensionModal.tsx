@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Code2, FileCode, Layers, Sliders, Sparkles } from 'lucide-react';
-import type { ExtensionFile } from '../../host/types';
+import type { ExtensionFile } from './documents';
 import { Button, Field, Modal, Select, TextInput } from '../../components/ui';
 
 interface NewExtensionModalProps {

@@ -1,6 +1,6 @@
 import { Activity, BrainCircuit, ChartCandlestick, ChartNoAxesCombined, FlaskConical, BriefcaseBusiness, WandSparkles, Workflow, Code2, GitCompareArrows, Gauge, Database, LineChart } from 'lucide-react';
-import type { ModuleId } from '../../host/types';
-import { useAppStore } from '../../host/store';
+import type { ModuleId } from './documents';
+import { useAppStore } from './localState';
 
 const quickNav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined }[] = [
   { id: 'datamanager', label: 'Data Manager', icon: Database },

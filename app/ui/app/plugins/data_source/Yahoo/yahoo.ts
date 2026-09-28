@@ -1,4 +1,4 @@
-import { today, validDate, type Interval, type Preset } from '../Dukascopy/dukascopyDownload';
+import { today, validDate, type Interval, type Preset } from './presentation';
 
 export interface YahooTicker {
   ticker: string; name: string; exchange: string; category: 'Stocks' | 'ETF' | 'Index' | 'Forex' | 'Crypto'; mockAvailableFrom: string;

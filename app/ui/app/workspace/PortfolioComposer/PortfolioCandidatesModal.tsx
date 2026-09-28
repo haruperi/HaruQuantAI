@@ -1,8 +1,11 @@
+import { useProjectWorkbench } from './documents';
 import {useState,type ChangeEvent} from 'react';
-import {SqdModal} from '../../plugins/project/ProjectWorkbench';
+
 import type {ComposerDraft,ComposerMember} from './composerModel';
 import {parseComposition} from './composerModel';
 export function PortfolioCandidatesModal({candidates,existingIds,onAdd,onImport,onClose}:{candidates:ComposerMember[];existingIds:string[];onAdd:(ids:string[])=>void;onImport:(draft:ComposerDraft)=>void;onClose:()=>void}){
+const { SqdModal } = useProjectWorkbench();
+
  const [query,setQuery]=useState(''),[selected,setSelected]=useState<string[]>([]),[error,setError]=useState('');
  const visible=candidates.filter(m=>!existingIds.includes(m.id)&&(m.name+' '+m.symbol).toLowerCase().includes(query.toLowerCase()));
  const load=async(e:ChangeEvent<HTMLInputElement>)=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>2_000_000)throw new Error('Preview file must be below 2 MB.');onImport(parseComposition(await f.text()));}catch(error){setError(error instanceof Error?error.message:'Unable to read preview file.');}e.target.value='';};

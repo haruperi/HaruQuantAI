@@ -1,6 +1,9 @@
-import { ProjectSettings,DataTab,TradingOptionsTab,AtmTab,MoneyManagementTab,CrossChecksTab,RankingTab,NotesTab,type SettingsSection } from '../../plugins/project/ProjectWorkbench';
+import { useProjectWorkbench, type SettingsSection } from './documents';
+
 import {retestDataDefaults} from './retesterFixtures';
 export function RetesterSettings({locked,selectedId,onSelect}:{locked:boolean;selectedId:string;onSelect:(id:string)=>void}) {
+const { ProjectSettings, DataTab, TradingOptionsTab, AtmTab, MoneyManagementTab, CrossChecksTab, RankingTab, NotesTab } = useProjectWorkbench();
+
  const base='https://strategyquant.com/doc/strategyquant/';
  const sections:SettingsSection[]=[
   {id:'data',title:'Data',help:'Configure trading engine, symbols, timeframes and data ranges.',helpUrl:base+'data/',content:<DataTab initialState={retestDataDefaults}/>},

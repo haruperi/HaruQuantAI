@@ -1,5 +1,5 @@
-import type { FileDefinition, FileInstrument } from './fileSymbols';
-import { validateName } from './fileSymbols';
+import type { FileDefinition, FileInstrument } from './presentation';
+import { validateName } from './presentation';
 
 export const columnTypes = ['', 'Date', 'Time', 'Date & Time', 'Ask', 'Bid', 'Open', 'High', 'Low', 'Close', 'Volume', 'Unused'] as const;
 export type ColumnType = typeof columnTypes[number];

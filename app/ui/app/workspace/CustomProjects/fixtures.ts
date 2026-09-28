@@ -1,4 +1,4 @@
-import type { CustomProject, WorkflowTask } from '../../host/types';
+import type { CustomProject, WorkflowTask } from './documents';
 
 export const workflowTasks: WorkflowTask[] = [
   { id: 'w1', type: 'ClearDatabanks', name: 'Clear temporary candidates', enabled: true, status: 'idle', input: 'Temporary', output: 'Temporary' },

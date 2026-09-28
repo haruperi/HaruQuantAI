@@ -1,0 +1,274 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+    },
+    "kind": {
+      "enum": [
+        "workspace",
+        "plugin"
+      ]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "host_contract": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "mode": {
+      "enum": [
+        "ui_only",
+        "headless",
+        "paired"
+      ]
+    },
+    "owner_workspace_id": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "attachment": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "slot_id": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+            },
+            "contract_version": {
+              "type": "string",
+              "pattern": "^\\d+\\.\\d+\\.\\d+$"
+            }
+          },
+          "required": [
+            "slot_id",
+            "contract_version"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "backend_entry": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "ui_entry": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "owned_paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "tests": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "assets": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "examples": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        },
+        "metadata": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          },
+          "minItems": 0,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "source",
+        "tests",
+        "assets",
+        "examples",
+        "metadata"
+      ]
+    }
+  },
+  "required": [
+    "schema_version",
+    "id",
+    "kind",
+    "version",
+    "host_contract",
+    "mode",
+    "owner_workspace_id",
+    "attachment",
+    "backend_entry",
+    "ui_entry",
+    "owned_paths"
+  ],
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HaruQuantAI package ownership v1",
+  "description": "Packaging only. Semantic schemas live in the concept descriptor. Validator must additionally enforce containment, exclusive ownership, entry membership, complete inventory, protected roots and descriptor agreement.",
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "kind": {
+            "const": "plugin"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "owner_workspace_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+          },
+          "attachment": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "slot_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)+$"
+              },
+              "contract_version": {
+                "type": "string",
+                "pattern": "^\\d+\\.\\d+\\.\\d+$"
+              }
+            },
+            "required": [
+              "slot_id",
+              "contract_version"
+            ]
+          }
+        }
+      },
+      "else": {
+        "properties": {
+          "owner_workspace_id": {
+            "type": "null"
+          },
+          "attachment": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "ui_only"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "backend_entry": {
+            "type": "null"
+          },
+          "ui_entry": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "headless"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "backend_entry": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          },
+          "ui_entry": {
+            "type": "null"
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": {
+          "mode": {
+            "const": "paired"
+          }
+        }
+      },
+      "then": {
+        "properties": {
+          "backend_entry": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          },
+          "ui_entry": {
+            "type": "string",
+            "pattern": "^(?!/)(?!.*(?:^|/)\\.{1,2}(?:/|$))(?!.*[\\\\:*?])[A-Za-z0-9_.@/-]+$"
+          }
+        }
+      }
+    }
+  ]
+}

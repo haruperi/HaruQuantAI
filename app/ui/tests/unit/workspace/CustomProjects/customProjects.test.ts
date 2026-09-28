@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { useAppStore } from '../../../../app/host/store';
-import type { CustomProject, WorkflowTask } from '../../../../app/host/types';
+import { useAppStore } from '../../../../app/workspace/CustomProjects/localState';
+import type { CustomProject, WorkflowTask } from '../../../../app/workspace/CustomProjects/documents';
 import { SQX_TASK_TYPES } from '../../../../app/workspace/CustomProjects/NewTaskModal';
 
 describe('Custom Projects & Pipeline Automation', () => {

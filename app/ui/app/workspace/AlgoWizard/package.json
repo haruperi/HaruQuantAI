@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "id": "workspace.algo_wizard",
+  "kind": "workspace",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": null,
+  "attachment": null,
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/workspace/AlgoWizard/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardAI.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardBlockEditor.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardControls.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardEditor.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardHome.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardResources.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardRuleDialogs.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardSettings.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardToolbar.tsx",
+      "app/ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx",
+      "app/ui/app/workspace/AlgoWizard/NewStrategyModal.tsx",
+      "app/ui/app/workspace/AlgoWizard/StrategyCodeExportModal.tsx",
+      "app/ui/app/workspace/AlgoWizard/StrategyTemplatesModal.tsx",
+      "app/ui/app/workspace/AlgoWizard/algoWizardFixtures.ts",
+      "app/ui/app/workspace/AlgoWizard/algoWizardModel.ts",
+      "app/ui/app/workspace/AlgoWizard/algoWizardTemplates.ts",
+      "app/ui/app/workspace/AlgoWizard/contribution.tsx",
+      "app/ui/app/workspace/AlgoWizard/documents.ts",
+      "app/ui/app/workspace/AlgoWizard/localState.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/algowizard-parity.spec.ts",
+      "app/ui/tests/unit/workspace/AlgoWizard/algoWizardModel.test.ts",
+      "app/ui/tests/unit/workspace/AlgoWizard/algoWizardRules.test.ts"
+    ],
+    "assets": [
+      "app/ui/app/workspace/AlgoWizard/AlgoWizard.css"
+    ],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/workspace/AlgoWizard/README.md",
+      "app/ui/app/workspace/AlgoWizard/package.json"
+    ]
+  }
+}

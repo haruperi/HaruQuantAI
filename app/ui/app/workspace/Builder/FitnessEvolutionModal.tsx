@@ -1,3 +1,4 @@
+import { useProjectWorkbench } from './documents';
 import { fitnessIslands } from './fixtures';
 
 /**
@@ -6,8 +7,8 @@ import { fitnessIslands } from './fixtures';
  * matching the donor modal behavior.
  */
 
-import {SqdModal} from '../../plugins/project/ProjectWorkbench';
-export {SqdModal};
+
+export function SqdModal(props: import('react').ComponentProps<import('./documents').WorkbenchPorts['SqdModal']>) {const View=useProjectWorkbench().SqdModal;return <View {...props}/>;}
 function LinkClose({ onClose }: { onClose: () => void }) {
   return (
     <button type="button" className="sqd-modal-close-link" onClick={onClose}>
@@ -22,6 +23,8 @@ function LinkClose({ onClose }: { onClose: () => void }) {
  * the donor renders live engine fitness charts.
  */
 export function FitnessEvolutionModal({ onClose }: { onClose: () => void }) {
+const { SqdModal } = useProjectWorkbench();
+
   return (
     <SqdModal title="Fitness evolution" onClose={onClose} width={860}>
       <div className="sqd-fitness-table" aria-label="Island generations">

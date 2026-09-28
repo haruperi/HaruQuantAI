@@ -25,7 +25,9 @@ def host_config(tmp_path: Path) -> HostSettings:
 
 @pytest.fixture
 def services(host_config: HostSettings) -> BootstrapCoordinator:
-    return BootstrapCoordinator(host_config)
+    return BootstrapCoordinator(
+        host_config, installation_root=host_config.data_dir / "installation"
+    )
 
 
 @pytest.fixture

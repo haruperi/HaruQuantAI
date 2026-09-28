@@ -1,4 +1,4 @@
-import { presetRange, today, validDate, type Preset } from '../Dukascopy/dukascopyDownload';
+import { presetRange, today, validDate, type Preset } from './presentation';
 
 export type ExportKind = 'csv' | 'mt4' | 'mt5';
 export type ExportJobState = 'running' | 'paused' | 'cancelled' | 'completed' | 'failed';

@@ -1,7 +1,6 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
-import { defaultSQConfig, planSQAdd, sqCatalogues, sourceLabel, validateSQConfig, type SQConfig, type SQDefinition, type SQProfile, type SQProvider } from './sqData';
-import { validateName } from '../FileImport/fileSymbols';
+import { defaultSQConfig, planSQAdd, sqCatalogues, sourceLabel, validateName, validateSQConfig, type SQConfig, type SQDefinition, type SQProfile, type SQProvider } from './sqData';
 export interface SQJob { provider: SQProvider; definitions: SQDefinition[]; state: 'running' | 'paused' | 'cancelled' | 'failed' | 'completed'; progress: number; completed: number; error?: string }
 interface Saved { definitions: SQDefinition[]; preferred: Record<SQProvider, SQConfig>; job: SQJob | null }
 interface Store extends Saved { storageError: string; start: (provider: SQProvider, config: SQConfig, tickers: string[], agreed: boolean, profile: SQProfile, existing: string[], externalActive: boolean) => void; advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void }

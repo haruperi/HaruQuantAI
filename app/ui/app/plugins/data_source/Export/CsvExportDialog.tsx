@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { Button, Checkbox, Field, Modal, Select, TextInput } from '../../../components/ui';
 import { builtInCsvFormats, csvArtifacts, csvTokens, exportPreset, exportRange, exportSessions, exportTimezones, type CsvFormat, type ExportTarget } from './dataExport';
 import { useDataExports } from './dataExportStore';
-import type { Preset } from '../Dukascopy/dukascopyDownload';
+import type { Preset } from './presentation';
 import './dataExport.css';
 
 const presets: [Preset, string][] = [['sinceLast', 'Since last date'], ['sixMonths', 'Last 6 months'], ['year', 'Last year'], ['fiveYears', 'Last 5 years'], ['tenYears', 'Last 10 years'], ['allTime', 'All time']];

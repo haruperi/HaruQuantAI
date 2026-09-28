@@ -1,8 +1,8 @@
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { darwinexDownloadRanges, type DarwinexDefinition, type DarwinexDownload } from './darwinex';
-import { mergeRanges, validDate, type Interval } from '../Dukascopy/dukascopyDownload';
-import { validateName } from '../FileImport/fileSymbols';
+import { mergeRanges, validDate, type Interval } from './presentation';
+import { validateName } from './presentation';
 export const darwinexActive = (state?: string) => state === 'running' || state === 'paused';
 export const darwinexKey = 'sqx-darwinex-v1';
 export interface DarwinexJob { kind: 'add' | 'import' | 'download'; definitions: DarwinexDefinition[]; request?: DarwinexDownload; state: 'running' | 'paused' | 'completed' | 'cancelled' | 'failed'; progress: number; completed: number; error?: string }

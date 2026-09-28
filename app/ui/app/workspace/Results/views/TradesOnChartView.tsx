@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
-import type { Strategy, Trade } from '../../../host/types';
+import type { Strategy, Trade } from '../documents';
 
 interface TradesOnChartViewProps {
   strategy?: Strategy;

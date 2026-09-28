@@ -1,37 +1,19 @@
+import { navigation } from './contributions';
 import { useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import type { ModuleId, ProjectTab } from './types';
 import { useAppStore } from './store';
 
-export const MODULE_ROUTES: Record<ModuleId, string> = {
-  home: '/',
-  datamanager: '/datamanager',
-  chart: '/chart',
-  business: '/business',
-  builder: '/builder',
-  algowizard: '/algowizard',
-  codeeditor: '/codeeditor',
-  neuralnet: '/neuralnet',
-  retester: '/retester',
-  optimizer: '/optimizer',
-  mtanalyzer: '/mtanalyzer',
-  projects: '/projects',
-  portfolio: '/portfolio',
-  composer: '/composer',
-  trading: '/trading',
-  debugconsole: '/debugconsole',
-  gridcontrol: '/gridcontrol',
-  gridtest: '/gridtest',
-};
-
-const TAB_CAPABLE_MODULES: ModuleId[] = ['builder', 'retester', 'optimizer', 'portfolio', 'projects'];
+export const MODULE_ROUTES: Record<ModuleId, string> = Object.fromEntries(navigation.map(item => [item.id, item.path]));
+const TAB_CAPABLE_MODULES = navigation.filter(item => item.tabs?.length).map(item => item.id);
 
 /**
  * Resolves a URL pathname to the corresponding ModuleId, or null if unknown.
  */
 export function getModuleFromPath(pathname: string): ModuleId | null {
   const normalized = pathname.replace(/\/+$/, '') || '/';
-  if (normalized === '/' || normalized === '/home') return 'home';
+  const alias = navigation.find(item => item.path === normalized || item.aliases?.includes(normalized));
+  if (alias) return alias.id;
 
   const entry = Object.entries(MODULE_ROUTES).find(([_, path]) => {
     if (path === '/') return false;
@@ -45,7 +27,7 @@ export function getModuleFromPath(pathname: string): ModuleId | null {
  * Returns the canonical URL path for a given ModuleId.
  */
 export function getPathForModule(module: ModuleId): string {
-  return MODULE_ROUTES[module] ?? '/';
+  return MODULE_ROUTES[module] ?? `/unavailable/${encodeURIComponent(module)}`;
 }
 
 /**

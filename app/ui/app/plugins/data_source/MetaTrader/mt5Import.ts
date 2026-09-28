@@ -1,4 +1,4 @@
-import { presetRange, simulationSummary, today, validDate, type Interval, type Preset } from '../Dukascopy/dukascopyDownload';
+import { presetRange, simulationSummary, today, validDate, type Interval, type Preset } from './presentation';
 
 export interface Mt5Symbol {
   name: string;

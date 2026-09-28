@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.darwinex",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.presentation",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/data_source/Darwinex/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/data_source/Darwinex/DarwinexAddDialog.tsx",
+      "app/ui/app/plugins/data_source/Darwinex/DarwinexDownloadDialog.tsx",
+      "app/ui/app/plugins/data_source/Darwinex/DarwinexImportDialog.tsx",
+      "app/ui/app/plugins/data_source/Darwinex/contribution.tsx",
+      "app/ui/app/plugins/data_source/Darwinex/darwinex.ts",
+      "app/ui/app/plugins/data_source/Darwinex/darwinexStore.ts",
+      "app/ui/app/plugins/data_source/Darwinex/localState.ts",
+      "app/ui/app/plugins/data_source/Darwinex/presentation.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-darwinex.spec.ts",
+      "app/ui/tests/unit/plugins/data_source/Darwinex/darwinex.test.ts"
+    ],
+    "assets": [
+      "app/ui/app/plugins/data_source/Darwinex/darwinex.css"
+    ],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/data_source/Darwinex/package.json"
+    ]
+  }
+}

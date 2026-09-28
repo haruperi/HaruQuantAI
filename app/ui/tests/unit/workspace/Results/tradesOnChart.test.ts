@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { strategies } from '../../../../app/plugins/databank/fixtures';
+import { useAppStore } from '../../../../app/workspace/Results/localState';
+const strategies = useAppStore.getState().strategies;
 
 describe('Trades On Chart Computations and Layout', () => {
   it('maps strategy trades with entry and exit prices and direction', () => {

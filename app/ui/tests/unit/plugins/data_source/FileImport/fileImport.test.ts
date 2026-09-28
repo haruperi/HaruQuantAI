@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { builtInFormats, detectFormat, emptyFileRecord, importedRecord, massSymbol, parseDate, parseImport, previewRows, splitRows, validateFormat } from '../../../../../app/plugins/data_source/FileImport/fileImport';
-import { newInstrument } from '../../../../../app/plugins/data_source/FileImport/fileSymbols';
+import { newInstrument } from '../../../../../app/plugins/data_source/FileImport/presentation';
 const csv = 'Date,Open,High,Low,Close,Volume\n2026-09-18,1,3,0,2,4\n2026-09-19,2,4,1,3,5';
 describe('file import rules', () => {
   it('detects headers and delimiters; handles quoted fields, CRLF and malformed quotes', () => {

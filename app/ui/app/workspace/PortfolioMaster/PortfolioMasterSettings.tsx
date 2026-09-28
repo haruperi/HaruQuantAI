@@ -1,9 +1,12 @@
+import { useProjectWorkbench } from './documents';
 import {useState} from 'react';
 import {Settings} from 'lucide-react';
-import {ProjectSettings} from '../../plugins/project/ProjectWorkbench';
+
 import {PortfolioMasterDialogs} from './PortfolioMasterDialogs';
 import {masterError,type MasterDraft} from './portfolioMasterModel';
 export function PortfolioMasterSettings({draft,onChange,banks,available,locked}:{draft:MasterDraft;onChange:(v:MasterDraft)=>void;banks:string[];available:number;locked:boolean}) {
+const { ProjectSettings } = useProjectWorkbench();
+
  const [dialog,setDialog]=useState<'genetic'|'correlation'|null>(null);
  const patch=(v:Partial<MasterDraft>)=>onChange({...draft,...v});
  const number=(label:string,key:'min'|'max'|'limit'|'sectorLimit'|'capital'|'inSample',min=0)=><label className="pf-row"><span>{label}</span><input type="number" aria-label={label} min={min} value={draft[key]} onChange={e=>patch({[key]:Number(e.target.value)})}/></label>;
