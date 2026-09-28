@@ -9569,7 +9569,7 @@
         "decision_ids": [],
         "documentation_targets": [
           "app/workspace/DataManager/README.md",
-          "app/plugin/data_source/Dukascopy/README.md"
+          "app/plugin/DataSource/README.md"
         ]
       },
       "validation": {
@@ -9662,7 +9662,7 @@
         "decision_ids": [],
         "documentation_targets": [
           "app/workspace/DataManager/README.md",
-          "app/plugin/data_source/Dukascopy/README.md"
+          "app/plugin/DataSource/README.md"
         ]
       },
       "validation": {
@@ -9755,7 +9755,7 @@
         "decision_ids": [],
         "documentation_targets": [
           "app/workspace/DataManager/README.md",
-          "app/plugin/data_source/Dukascopy/README.md"
+          "app/plugin/DataSource/README.md"
         ]
       },
       "validation": {
@@ -9790,6 +9790,288 @@
       "tags": [
         "data",
         "dukascopy",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000086": {
+      "topic": "data.dukascopy.throttle.adaptive_rate",
+      "title": "SQX uses dynamic backoff and speedup in DownloadRateCorrector",
+      "question": "How does SQX adjust inter-download delay when acquiring Dukascopy data?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Dukascopy data source"
+        ],
+        "conditions": [
+          "Installed static bytecode; static decompilation."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX uses DownloadRateCorrector with a 1ms minimal delay. On a single download failure or error, delay is multiplied by 1.25 (+25% backoff). After 100 consecutive successful downloads without error, delay is multiplied by 0.75 (-25% reduction).",
+        "confidence": "high",
+        "limitations": [
+          "Bytecode specifies client-side delay logic; external provider rate limit responses may vary over time."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L12",
+          "artifact_locator": "internal/libs/SQTradingLib.jar",
+          "location": {
+            "section": "Dukascopy methods in JVM bytecode",
+            "symbol": "com.strategyquant.tradinglib.dukascopy.job.DownloadRateCorrector",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Inspected with javap -c -p; method-level location."
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3"
+          },
+          "accessed_at": "2026-09-28"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DM-DUKASCOPY_ACQUISITION"
+        ],
+        "requirement_ids": [
+          "FR-DATA-001"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/workspace/DataManager/README.md",
+          "app/plugin/DataSource/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Simulate download failures and successes against mock network to verify 1.25x backoff and 0.75x speedup.",
+        "expected_observation": "Delay increases by 25% on failure and decreases by 25% after 100 successes.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/libs/SQTradingLib.jar"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "98d5e3f14ed4fa4ea59f3000b1f007b25fdc3f74",
+        "created_at": "2026-09-28T10:30:00.000000Z",
+        "updated_at": "2026-09-28T10:30:00.000000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased behavioral algorithm only; no vendor source code."
+      },
+      "tags": [
+        "data",
+        "dukascopy",
+        "rate-limit",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000087": {
+      "topic": "data.dukascopy.schedule.sunday_open",
+      "title": "SQX starts Sunday tick acquisition at 19:00 UTC",
+      "question": "At what hour does SQX begin tick acquisition on Sundays?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Dukascopy data source"
+        ],
+        "conditions": [
+          "Installed static bytecode; static decompilation."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "In DownloadDukascopySymbolJob, when weekend filtering is active and day of week is Sunday (dayOfWeek == 7), the hourly download loop initializes the starting hour to 19 (19:00 UTC), reflecting global forex market opening.",
+        "confidence": "high",
+        "limitations": [
+          "Only applies when weekend filtering is active."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L12",
+          "artifact_locator": "internal/libs/SQTradingLib.jar",
+          "location": {
+            "section": "Dukascopy methods in JVM bytecode",
+            "symbol": "DownloadDukascopySymbolJob.generateDownloadJobs()",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Inspected with javap -c -p; method-level location."
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3"
+          },
+          "accessed_at": "2026-09-28"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DM-DUKASCOPY_ACQUISITION"
+        ],
+        "requirement_ids": [
+          "FR-DATA-001"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/workspace/DataManager/README.md",
+          "app/plugin/DataSource/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Verify that Sunday hourly requests begin at hour 19 without requesting hours 00-18.",
+        "expected_observation": "Tick hours 00-18 are skipped on Sundays.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/libs/SQTradingLib.jar"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "98d5e3f14ed4fa4ea59f3000b1f007b25fdc3f74",
+        "created_at": "2026-09-28T10:30:00.000000Z",
+        "updated_at": "2026-09-28T10:30:00.000000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased behavior only."
+      },
+      "tags": [
+        "data",
+        "dukascopy",
+        "schedule",
+        "static-observation"
+      ]
+    },
+    "SQX144-EV-000088": {
+      "topic": "data.dukascopy.cdn.transport_structure",
+      "title": "SQX fast download queries CDN ZIP archives and metadata descriptors",
+      "question": "How does SQX construct fast CDN download requests?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "144.2953",
+        "application_areas": [
+          "Data Manager",
+          "Dukascopy data source"
+        ],
+        "conditions": [
+          "Installed static bytecode; static decompilation."
+        ]
+      },
+      "claim": {
+        "classification": "observed",
+        "statement": "SQX queries https://cdn.strategyquantcdn.com/data/dukascopy/ (or cdn005 for China) for metadata.dat containing checksums, and downloads {symbol}/{YYYY}.zip or {symbol}/{YYYY}_{MM}.zip archives containing proprietary .bin files.",
+        "confidence": "high",
+        "limitations": [
+          "Third-party reuse terms and access credentials require owner authorization."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-L12",
+          "artifact_locator": "internal/libs/SQTradingLib.jar",
+          "location": {
+            "section": "Dukascopy methods in JVM bytecode",
+            "symbol": "DownloadDispatcher.getDukascopyBaseUrl(ImportInfo)",
+            "line_range": null,
+            "json_pointer": null,
+            "xpath": null,
+            "notes": "Inspected with javap -c -p; method-level location."
+          },
+          "inspection_method": "symbol_inspection",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3"
+          },
+          "accessed_at": "2026-09-28"
+        }
+      ],
+      "target_mapping": {
+        "domain": "data",
+        "feature_ids": [
+          "FEAT-DM-DUKASCOPY_ACQUISITION"
+        ],
+        "requirement_ids": [
+          "FR-DATA-001"
+        ],
+        "decision_ids": [],
+        "documentation_targets": [
+          "app/workspace/DataManager/README.md",
+          "app/plugin/DataSource/README.md"
+        ]
+      },
+      "validation": {
+        "state": "planned",
+        "procedure": "Verify CDN URL templates against build 144.2953 bytecode.",
+        "expected_observation": "URL patterns match the observed static strings.",
+        "actual_observation": null,
+        "artifact_paths": [
+          "SQX_REFERENCE_ROOT/internal/libs/SQTradingLib.jar"
+        ],
+        "executed_at": null
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "98d5e3f14ed4fa4ea59f3000b1f007b25fdc3f74",
+        "created_at": "2026-09-28T10:30:00.000000Z",
+        "updated_at": "2026-09-28T10:30:00.000000Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Paraphrased URL patterns only."
+      },
+      "tags": [
+        "data",
+        "dukascopy",
+        "cdn",
         "static-observation"
       ]
     }

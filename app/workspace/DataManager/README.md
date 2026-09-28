@@ -19,7 +19,7 @@ migration. See the current ownership-removal task walkthrough for actual evidenc
 
 | Feature | Requirement | Contract | Current implementation and qualification |
 | --- | --- | --- | --- |
-| `FEAT-DM-DUKASCOPY_ACQUISITION` | `FR-DATA-001` | `plugin.data_manager.dukascopy` in `data_source.acquisition@1.0.0`; host owns network, jobs and market storage | Isolated fixture direct M1 job and canonical file publication pass tests. Live direct and both CDN modes are unavailable. Active catalog migration, crash recovery, independent provider comparison and SQX parity remain unqualified. |
+| `FEAT-DM-DUKASCOPY_ACQUISITION` | `FR-DATA-001` | `plugin.data_manager.dukascopy` in `data_source.acquisition@1.0.0`; host owns network, jobs and market storage | Isolated fixture direct M1 and Tick jobs pass tests. Adaptive rate throttling, Sunday 19:00 UTC start, and StrategyQuant CDN transport (global and Hong Kong) with fallback to direct download are qualified. Active catalog migration remains required before live downloads execute. |
 
 Canonical target storage is `data/market/dukascopy/` with only `m1/` and
 `ticks/` immediately below that source; current files are one M1 year or Tick

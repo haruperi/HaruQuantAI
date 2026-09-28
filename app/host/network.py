@@ -11,7 +11,13 @@ import httpx
 MAX_RESPONSE_BYTES = 16 * 1024 * 1024
 LAST_ATTEMPT = 2
 HTTP_OK = 200
-ALLOWED_ORIGINS = frozenset({"datafeed.dukascopy.com"})
+ALLOWED_ORIGINS = frozenset(
+    {
+        "datafeed.dukascopy.com",
+        "cdn.strategyquantcdn.com",
+        "cdn005.strategyquantcdn.com",
+    }
+)
 
 
 @dataclass(frozen=True)

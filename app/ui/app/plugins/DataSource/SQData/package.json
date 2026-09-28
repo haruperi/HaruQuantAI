@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.s_q_data",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.presentation",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/DataSource/SQData/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/DataSource/SQData/SQDataAddDialog.tsx",
+      "app/ui/app/plugins/DataSource/SQData/contribution.tsx",
+      "app/ui/app/plugins/DataSource/SQData/localState.ts",
+      "app/ui/app/plugins/DataSource/SQData/presentation.ts",
+      "app/ui/app/plugins/DataSource/SQData/sqData.ts",
+      "app/ui/app/plugins/DataSource/SQData/sqDataStore.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-sq-data.spec.ts",
+      "app/ui/tests/unit/plugins/DataSource/SQData/sqData.test.ts"
+    ],
+    "assets": [
+      "app/ui/app/plugins/DataSource/SQData/sqData.css"
+    ],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/DataSource/SQData/package.json"
+    ]
+  }
+}

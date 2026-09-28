@@ -6,10 +6,10 @@ from datetime import UTC, datetime
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-import pyarrow as pa
+import pyarrow as pa  # type: ignore[import-untyped]
 from app.host.market_data import TICK_SCHEMA, MarketDataStore
 from app.persistence.market import create_isolated_schema
-from app.plugin.data_source.Dukascopy.dukascopy import decode_ticks
+from app.plugin.DataSource.dukascopy import decode_ticks
 
 
 def main() -> None:

@@ -3,8 +3,8 @@
 from datetime import UTC, datetime
 from pathlib import Path
 
-import pyarrow as pa
-import pyarrow.parquet as pq
+import pyarrow as pa  # type: ignore[import-untyped]
+import pyarrow.parquet as pq  # type: ignore[import-untyped]
 import pytest
 from app.host.capabilities import MarketAccess
 from app.host.market_data import TICK_SCHEMA, MarketDataStore

@@ -118,8 +118,8 @@ generic schema renderer. A UI-only view must state which backend truth, if
 any, it presents. Shared files are allowed only for universal mechanisms;
 they cannot become a second home for a concrete concept.
 The Data Manager Dukascopy pair uses the owner-approved singular backend path
-`app/plugin/data_source/Dukascopy/` and the existing UI path
-`app/ui/app/plugins/data_source/Dukascopy/`. Both package roots are discovered;
+`app/plugin/DataSource/dukascopy.py` and the existing UI path
+`app/ui/app/plugins/DataSource/Dukascopy/`. Both package roots are discovered;
 the one package manifest declares exclusive file ownership.
 
 The word **workspace** means an interactive workflow owner in HaruQuantAI.

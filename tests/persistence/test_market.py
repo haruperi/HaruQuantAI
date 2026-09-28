@@ -8,9 +8,16 @@ import pytest
 from app.persistence.market import (
     BrokerSchemaUnavailableError,
     MarketSchemaUnavailableError,
+    clear_datamgr_log,
+    clear_market_symbol,
     create_isolated_schema,
+    delete_market_symbol,
+    log_datamgr_operation,
+    migrate_market_schema,
     open_market_catalog,
+    preseed_native_sqx_datasets,
     read_broker_profiles,
+    read_datamgr_log,
 )
 
 
@@ -67,3 +74,172 @@ def test_missing_broker_table_fails_without_creation(tmp_path: Path) -> None:
     with closing(sqlite3.connect(path)) as connection:
         names = connection.execute("SELECT name FROM sqlite_master").fetchall()
     assert names == []
+
+
+def test_migrate_market_schema_creates_backup_and_tables(tmp_path: Path) -> None:
+    """Authorized migration creates a recovery backup and provisions catalog tables."""
+    path = tmp_path / "database" / "haruquantai.db"
+    path.parent.mkdir(parents=True)
+    with closing(sqlite3.connect(path)) as connection, connection:
+        connection.execute("CREATE TABLE dummy (id INTEGER)")
+    backup = migrate_market_schema(path)
+    assert backup is not None
+    assert backup.is_file()
+    with closing(open_market_catalog(path)) as connection:
+        names = {
+            r[0]
+            for r in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+        assert {
+            "datamgr_datasets",
+            "market_files",
+            "market_ingestions",
+            "dummy",
+        }.issubset(names)
+    # Subsequent migration on already provisioned DB returns None
+    assert migrate_market_schema(path) is None
+
+
+def test_preseed_native_sqx_datasets(tmp_path: Path) -> None:
+    """Preseeding from donor CSV populates datamgr_datasets and is idempotent."""
+    db_path = tmp_path / "database" / "haruquantai.db"
+    create_isolated_schema(db_path)
+
+    csv_path = tmp_path / "donor.csv"
+    csv_path.write_text(
+        "EURUSD;Euro / US Dollar;Forex;Major\n"
+        "GBPUSD;British Pound / US Dollar;Forex;Major\n"
+        "INVALID_ROW\n",
+        encoding="latin-1",
+    )
+
+    inserted = preseed_native_sqx_datasets(db_path, csv_path)
+    assert inserted == 2
+
+    # Second call should insert 0 (idempotent)
+    second_insert = preseed_native_sqx_datasets(db_path, csv_path)
+    assert second_insert == 0
+
+    with closing(sqlite3.connect(db_path)) as conn:
+        rows = conn.execute(
+            "SELECT symbol, underlying, category, timeframe FROM datamgr_datasets ORDER BY symbol"
+        ).fetchall()
+        assert len(rows) == 2
+        assert rows[0] == ("EURUSD_dukascopy", "EURUSD", "Forex", "M1")
+        assert rows[1] == ("GBPUSD_dukascopy", "GBPUSD", "Forex", "M1")
+
+    # Absent CSV returns 0 without error
+    assert preseed_native_sqx_datasets(db_path, tmp_path / "nonexistent.csv") == 0
+
+
+def test_delete_and_clear_market_symbol(tmp_path: Path) -> None:
+    """Clear resets dates/bars and deletes parquet; delete purges definition entirely."""
+    db_path = tmp_path / "database" / "haruquantai.db"
+    data_root = tmp_path / "data"
+    create_isolated_schema(db_path)
+
+    fake_file = data_root / "market" / "dukascopy" / "m1" / "eurusd" / "2024.parquet"
+    fake_file.parent.mkdir(parents=True, exist_ok=True)
+    fake_file.write_text("dummy-parquet-content")
+
+    with closing(sqlite3.connect(db_path)) as conn, conn:
+        conn.execute(
+            "INSERT INTO datamgr_datasets ("
+            "id, source, symbol, underlying, instrument, timeframe, "
+            "broker, broker_name, timezone, category, date_from, date_to, "
+            "bars, created_at, updated_at"
+            ") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                "ds-001",
+                "Dukascopy",
+                "EURUSD_dukascopy",
+                "EURUSD",
+                "EURUSD",
+                "M1",
+                "3",
+                "Dukascopy",
+                "UTC",
+                "Forex",
+                "2024-01-01",
+                "2024-01-10",
+                5000,
+                "2024-01-01T00:00:00Z",
+                "2024-01-01T00:00:00Z",
+            ),
+        )
+        conn.execute(
+            "INSERT INTO market_files VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (
+                "dukascopy",
+                "m1",
+                "eurusd",
+                "2024",
+                "market/dukascopy/m1/eurusd/2024.parquet",
+                1,
+                "abc",
+                100,
+                5000,
+                1000,
+                2000,
+                "[]",
+                "cdn",
+                "2024-01-01T00:00:00Z",
+            ),
+        )
+
+    assert fake_file.is_file()
+
+    # Clear symbol
+    assert clear_market_symbol(db_path, data_root, "EURUSD_dukascopy") is True
+    assert not fake_file.is_file()
+
+    with closing(sqlite3.connect(db_path)) as conn:
+        ds = conn.execute(
+            "SELECT date_from, date_to, bars FROM datamgr_datasets WHERE symbol='EURUSD_dukascopy'"
+        ).fetchone()
+        assert ds == ("", "", 0)
+        file_count = conn.execute("SELECT count(*) FROM market_files").fetchone()[0]
+        assert file_count == 0
+
+    # Clear non-existent symbol returns False
+    assert clear_market_symbol(db_path, data_root, "NONEXISTENT") is False
+
+    # Delete symbol removes definition from datamgr_datasets
+    assert delete_market_symbol(db_path, data_root, "EURUSD_dukascopy") is True
+    with closing(sqlite3.connect(db_path)) as conn:
+        count = conn.execute("SELECT count(*) FROM datamgr_datasets").fetchone()[0]
+        assert count == 0
+
+    # Delete non-existent symbol returns False
+    assert delete_market_symbol(db_path, data_root, "EURUSD_dukascopy") is False
+
+
+def test_datamgr_operation_log(tmp_path: Path) -> None:
+    """Operational progress events are recorded, read in order, and cleared."""
+    db_path = tmp_path / "database" / "haruquantai.db"
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+
+    # Initial read with no table returns empty list
+    assert read_datamgr_log(db_path) == []
+    assert clear_datamgr_log(db_path) == 0
+
+    log_datamgr_operation(
+        db_path, "EURUSD_dukascopy", "download", "succeeded", "Downloaded 5 days"
+    )
+    log_datamgr_operation(
+        db_path, "EURUSD_dukascopy", "clear", "succeeded", "Cleared history"
+    )
+
+    events = read_datamgr_log(db_path)
+    assert len(events) == 2
+    assert events[0]["symbol"] == "EURUSD_dukascopy"
+    assert events[0]["operation"] == "download"
+    assert events[0]["status"] == "succeeded"
+    assert events[0]["message"] == "Downloaded 5 days"
+    assert events[1]["operation"] == "clear"
+
+    cleared = clear_datamgr_log(db_path)
+    assert cleared == 2
+    assert read_datamgr_log(db_path) == []

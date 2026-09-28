@@ -86,6 +86,8 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
             "sources.dukascopy.download.status",
             "sources.dukascopy.download.cancel",
             "sources.dukascopy.files.list",
+            "sources.dukascopy.delete",
+            "sources.dukascopy.clear",
         ),
         invoke,
         close,

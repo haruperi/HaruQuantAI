@@ -9,6 +9,7 @@ from typing import Any, cast
 from app.host.jobs import Budget, Job, JobManager
 from app.host.market_data import (
     DefinitionRequest,
+    Kind,
     MarketBroker,
     MarketDataset,
     MarketDataStore,
@@ -151,7 +152,10 @@ class MarketAccess:
         if self.owner != "plugin.data_manager.dukascopy" or kind not in ("ticks", "m1"):
             raise PermissionError("Market source ownership denied")
         return self._store.register_dataset(
-            source="dukascopy", symbol=symbol, kind=kind, instrument=instrument
+            source="dukascopy",
+            symbol=symbol,
+            kind=cast("Kind", kind),
+            instrument=instrument,
         )
 
     def get_dataset(self, dataset_id: str) -> Any:
@@ -166,13 +170,25 @@ class MarketAccess:
             raise PermissionError("Market source ownership denied")
         return self._store.list_datasets("dukascopy")
 
+    def delete_dataset(self, symbol: str) -> bool:
+        """Purge files and delete dataset definition for an owned symbol."""
+        if self.owner != "plugin.data_manager.dukascopy":
+            raise PermissionError("Market source ownership denied")
+        return self._store.delete_dataset(symbol)
+
+    def clear_dataset(self, symbol: str) -> bool:
+        """Purge files and reset dataset coverage for an owned symbol."""
+        if self.owner != "plugin.data_manager.dukascopy":
+            raise PermissionError("Market source ownership denied")
+        return self._store.clear_dataset(symbol)
+
     def list_files(self, source: str, kind: str, symbol: str) -> tuple[Any, ...]:
         """List committed revisions for a validated identity."""
         if source != "dukascopy" or self.owner != "plugin.data_manager.dukascopy":
             raise PermissionError("Market source ownership denied")
         if kind not in ("ticks", "m1"):
             raise ValueError("Invalid market kind")
-        return self._store.list_files(source, kind, symbol)
+        return self._store.list_files(source, cast("Kind", kind), symbol)
 
     def publish(
         self,
@@ -187,9 +203,10 @@ class MarketAccess:
         """Publish only this plugin's source under host custody."""
         if self.owner != "plugin.data_manager.dukascopy" or kind not in ("ticks", "m1"):
             raise PermissionError("Market source ownership denied")
+        clean_kind = cast("Kind", kind)
         return self._store.publish(
             source="dukascopy",
-            kind=kind,
+            kind=clean_kind,
             symbol=symbol,
             period=period,
             table=table,
@@ -211,9 +228,10 @@ class MarketAccess:
         """Replace one owned interval without exposing a writable path or SQL."""
         if self.owner != "plugin.data_manager.dukascopy" or kind not in ("ticks", "m1"):
             raise PermissionError("Market source ownership denied")
+        clean_kind = cast("Kind", kind)
         return self._store.replace_interval(
             source="dukascopy",
-            kind=kind,
+            kind=clean_kind,
             symbol=symbol,
             period=period,
             incoming=incoming,

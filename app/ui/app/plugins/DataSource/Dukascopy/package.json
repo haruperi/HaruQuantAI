@@ -1,0 +1,48 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.dukascopy",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "paired",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.acquisition",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": "app/plugin/DataSource/dukascopy.py",
+  "ui_entry": "app/ui/app/plugins/DataSource/Dukascopy/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/plugin/DataSource/dukascopy.py",
+      "app/ui/app/plugins/DataSource/Dukascopy/add.tsx",
+      "app/ui/app/plugins/DataSource/Dukascopy/backend.ts",
+      "app/ui/app/plugins/DataSource/Dukascopy/contribution.tsx",
+      "app/ui/app/plugins/DataSource/Dukascopy/disclaimer.tsx",
+      "app/ui/app/plugins/DataSource/Dukascopy/dukascopy.ts",
+      "app/ui/app/plugins/DataSource/Dukascopy/dukascopyDownload.ts",
+      "app/ui/app/plugins/DataSource/Dukascopy/dukascopyStore.ts",
+      "app/ui/app/plugins/DataSource/Dukascopy/import.tsx",
+      "app/ui/app/plugins/DataSource/Dukascopy/localState.ts",
+      "app/ui/app/plugins/DataSource/Dukascopy/presentation.ts"
+    ],
+    "tests": [
+      "tests/plugin/DataSource/test_dukascopy.py",
+      "app/ui/tests/e2e/data-manager-dukascopy-download.spec.ts",
+      "app/ui/tests/e2e/data-manager-dukascopy.spec.ts",
+      "app/ui/tests/unit/plugins/DataSource/Dukascopy/dukascopy.test.ts",
+      "app/ui/tests/unit/plugins/DataSource/Dukascopy/dukascopyDownload.test.ts"
+    ],
+    "assets": [
+      "app/ui/app/plugins/DataSource/Dukascopy/dukascopy.css",
+      "app/ui/app/plugins/DataSource/Dukascopy/dukascopyDownload.css"
+    ],
+    "examples": [
+      "tests/examples/dukascopy_offline.py"
+    ],
+    "metadata": [
+      "app/plugin/DataSource/README.md",
+      "app/ui/app/plugins/DataSource/Dukascopy/package.json"
+    ]
+  }
+}

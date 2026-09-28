@@ -17,10 +17,12 @@ from tempfile import NamedTemporaryFile
 from typing import Any, Literal
 from uuid import uuid4
 
-import pyarrow as pa
-import pyarrow.parquet as pq
+import pyarrow as pa  # type: ignore[import-untyped]
+import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
 from app.persistence.market import (
+    clear_market_symbol,
+    delete_market_symbol,
     open_definition_catalog,
     open_market_catalog,
     read_broker_profiles,
@@ -310,20 +312,27 @@ class MarketDataStore:
                 "FROM datamgr_datasets WHERE source=? ORDER BY symbol,id",
                 ("Dukascopy",),
             ).fetchall()
+        file_stats: dict[tuple[str, str], tuple[int | None, int | None, int]] = {}
+        if self.available():
+            with closing(open_market_catalog(self.database_path)) as m_conn:
+                f_rows = m_conn.execute(
+                    "SELECT kind, lower(symbol), min(first_ms), max(last_ms), "
+                    "sum(row_count) FROM market_files WHERE source=? "
+                    "GROUP BY kind, lower(symbol)",
+                    (source,),
+                ).fetchall()
+                for f_kind, f_sym, f_first, f_last, f_bars in f_rows:
+                    file_stats[(f_kind, f_sym)] = (f_first, f_last, f_bars or 0)
         result: list[dict[str, Any]] = []
         for row in rows:
             kind: Kind = "m1" if row["timeframe"] == "M1" else "ticks"
             if row["timeframe"] not in ("M1", "TICK"):
                 continue
-            files = (
-                self.list_files(
-                    source, kind, (row["underlying"] or row["symbol"]).lower()
-                )
-                if self.available()
-                else ()
-            )
-            first = min((item.first_ms for item in files), default=None)
-            last = max((item.last_ms for item in files), default=None)
+            sym_key = (kind, (row["underlying"] or row["symbol"]).lower())
+            stat = file_stats.get(sym_key)
+            first = stat[0] if stat else None
+            last = stat[1] if stat else None
+            bars = stat[2] if stat else 0
             result.append(
                 {
                     "id": row["id"],
@@ -344,10 +353,18 @@ class MarketDataStore:
                     "to": datetime.fromtimestamp(last / 1000, tz=UTC).date().isoformat()
                     if last is not None
                     else "",
-                    "bars": sum(item.row_count for item in files),
+                    "bars": bars,
                 }
             )
         return tuple(result)
+
+    def delete_dataset(self, symbol: str) -> bool:
+        """Purge market files and delete dataset definition."""
+        return delete_market_symbol(self.database_path, self.data_root, symbol)
+
+    def clear_dataset(self, symbol: str) -> bool:
+        """Purge market files and reset coverage, retaining dataset definition."""
+        return clear_market_symbol(self.database_path, self.data_root, symbol)
 
     def path(self, source: str, kind: Kind, symbol: str, period: str) -> Path:
         """Construct one canonical relative path from checked components."""
@@ -662,8 +679,8 @@ class MarketDataStore:
             ):
                 raise ValueError("Staged market file verification failed")
             digest = hashlib.sha256()
-            with staged.open("rb") as stream:
-                for block in iter(lambda: stream.read(1024 * 1024), b""):
+            with staged.open("rb") as staged_file:
+                for block in iter(lambda: staged_file.read(1024 * 1024), b""):
                     digest.update(block)
             revision = previous.revision + 1 if previous else 1
             if previous:

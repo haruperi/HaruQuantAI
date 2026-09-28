@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.meta_trader",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.presentation",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/DataSource/MetaTrader/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/DataSource/MetaTrader/Mt5ImportDialog.tsx",
+      "app/ui/app/plugins/DataSource/MetaTrader/contribution.tsx",
+      "app/ui/app/plugins/DataSource/MetaTrader/localState.ts",
+      "app/ui/app/plugins/DataSource/MetaTrader/mt5Import.ts",
+      "app/ui/app/plugins/DataSource/MetaTrader/mt5ImportStore.ts",
+      "app/ui/app/plugins/DataSource/MetaTrader/presentation.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-mt5-import.spec.ts",
+      "app/ui/tests/unit/plugins/DataSource/MetaTrader/mt5Import.test.ts"
+    ],
+    "assets": [
+      "app/ui/app/plugins/DataSource/MetaTrader/assets/metatrader5.png",
+      "app/ui/app/plugins/DataSource/MetaTrader/mt5Import.css"
+    ],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/DataSource/MetaTrader/package.json"
+    ]
+  }
+}
