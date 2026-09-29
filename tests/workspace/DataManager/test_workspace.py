@@ -149,3 +149,23 @@ def test_real_workspace_restart_removal_retains_resources(tmp_path):
             ).status_code
             == 200
         )
+
+
+def test_workspace_logging(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    """Workspace operations emit expected structured log messages."""
+    store = ResourceStore(tmp_path)
+
+    async def run() -> None:
+        context = HostCapabilities(
+            ResourceAccess("workspace.data_manager", "1.0.0", store), None, None
+        )
+        with caplog.at_level("INFO", logger="app.workspace.DataManager.workspace"):
+            owner = await prepare(context)
+            await owner.invoke("capabilities", None)
+            await owner.close()
+
+        assert "Preparing Data Manager workspace" in caplog.text
+        assert "Data Manager invoking: capabilities" in caplog.text
+        assert "Data Manager workspace closed" in caplog.text
+
+    asyncio.run(run())

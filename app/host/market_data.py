@@ -20,6 +20,7 @@ from uuid import uuid4
 import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
+from app.host.logging import get_logger
 from app.persistence.market import (
     clear_market_symbol,
     delete_market_symbol,
@@ -27,6 +28,8 @@ from app.persistence.market import (
     open_market_catalog,
     read_broker_profiles,
 )
+
+logger = get_logger(__name__)
 
 Kind = Literal["ticks", "m1"]
 SYMBOL = re.compile(r"^[a-z0-9_]{2,40}$")
@@ -212,6 +215,7 @@ class MarketDataStore:
                     ),
                 )
                 datasets.append(dataset)
+        logger.info("Registered %d dataset definitions", len(datasets))
         return tuple(datasets)
 
     def register_dataset(
@@ -271,6 +275,13 @@ class MarketDataStore:
                     now,
                 ),
             )
+        logger.info(
+            "Registered dataset %s/%s (%s, broker=%s)",
+            source,
+            symbol,
+            kind,
+            broker,
+        )
         return dataset
 
     def get_dataset(self, dataset_id: str) -> MarketDataset:
@@ -360,10 +371,12 @@ class MarketDataStore:
 
     def delete_dataset(self, symbol: str) -> bool:
         """Purge market files and delete dataset definition."""
+        logger.info("MarketDataStore deleting dataset: %s", symbol)
         return delete_market_symbol(self.database_path, self.data_root, symbol)
 
     def clear_dataset(self, symbol: str) -> bool:
         """Purge market files and reset coverage, retaining dataset definition."""
+        logger.info("MarketDataStore clearing dataset: %s", symbol)
         return clear_market_symbol(self.database_path, self.data_root, symbol)
 
     def path(self, source: str, kind: Kind, symbol: str, period: str) -> Path:
@@ -560,6 +573,15 @@ class MarketDataStore:
                         now,
                     ),
                 )
+            logger.info(
+                "MarketDataStore published file %s/%s/%s period=%s (%d rows, %d bytes)",
+                source,
+                kind,
+                symbol,
+                period,
+                table.num_rows,
+                len(data),
+            )
             return MarketFile(
                 source,
                 kind,
@@ -595,6 +617,17 @@ class MarketDataStore:
         schema = TICK_SCHEMA if kind == "ticks" else M1_SCHEMA
         if not incoming.schema.equals(schema) or start_ms > end_ms:
             raise ValueError("Invalid market interval")
+        logger.info(
+            "MarketDataStore replacing interval %s/%s/%s period=%s "
+            "[%d - %d ms] with %d rows",
+            source,
+            kind,
+            symbol,
+            period,
+            start_ms,
+            end_ms,
+            incoming.num_rows,
+        )
 
         def stamp(row: dict[str, Any]) -> int:
             return int(row["DateTime"].timestamp() * 1000)

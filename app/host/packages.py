@@ -16,6 +16,9 @@ from typing import Literal, Self
 from pydantic import Field, model_validator
 
 from app.host.contracts import Document
+from app.host.logging import get_logger
+
+logger = get_logger(__name__)
 
 MAX_MANIFEST_BYTES = 262144
 MAX_PACKAGES = 4096
@@ -234,6 +237,12 @@ def scan_packages(root: Path) -> PackageInventory:
             digest.update(name.encode())
             digest.update(hashlib.sha256((root / name).read_bytes()).digest())
     digest.update(json.dumps([i.model_dump() for i in issues], sort_keys=True).encode())
+    logger.debug(
+        "Scanned packages in %s: %d accepted, %d issue(s)",
+        root,
+        len(accepted),
+        len(issues),
+    )
     return PackageInventory(
         packages=tuple(accepted), issues=tuple(issues), fingerprint=digest.hexdigest()
     )

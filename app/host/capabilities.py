@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import Any, cast
 
 from app.host.jobs import Budget, Job, JobManager
+from app.host.logging import get_logger
 from app.host.market_data import (
     DefinitionRequest,
     Kind,
@@ -16,6 +17,8 @@ from app.host.market_data import (
 )
 from app.host.network import HistoricalNetwork, NetworkResult
 from app.host.resource_store import ResourceRef, ResourceStore
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True)
@@ -32,6 +35,11 @@ class ResourceAccess:
 
     def read(self, reference: ResourceRef) -> tuple[bytes, str]:
         """Read immutable bytes/schema with access checks and digest verification."""
+        logger.debug(
+            "ResourceAccess reading resource %s (owner=%s)",
+            reference.id,
+            self.owner,
+        )
         return self._store.read(self.owner, reference)
 
     def publish(
@@ -46,7 +54,7 @@ class ResourceAccess:
         previous: ResourceRef | None = None,
     ) -> ResourceRef:
         """Publish without allowing the caller to impersonate another producer."""
-        return self._store.publish(
+        ref = self._store.publish(
             self.owner,
             self.version,
             content,
@@ -57,6 +65,14 @@ class ResourceAccess:
             readers=readers,
             previous=previous,
         )
+        logger.info(
+            "ResourceAccess published resource %s revision %d (schema=%s, owner=%s)",
+            ref.id,
+            ref.revision,
+            schema_id,
+            self.owner,
+        )
+        return ref
 
 
 @dataclass(frozen=True)

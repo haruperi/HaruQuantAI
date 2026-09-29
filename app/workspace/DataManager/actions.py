@@ -31,6 +31,7 @@ from typing import Any, Literal
 import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
+from app.host.logging import get_logger
 from app.host.market_data import (
     M1_SCHEMA,
     TICK_SCHEMA,
@@ -42,6 +43,8 @@ from app.persistence.market import (
     delete_market_symbol,
     open_definition_catalog,
 )
+
+logger = get_logger(__name__)
 
 Timeframe = Literal["TICK", "M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN1"]
 
@@ -366,6 +369,12 @@ def broker_data(
                 "digits": int(r_dict.get("decimals") or 5),
             }
         )
+    logger.debug(
+        "Querying broker data (query=%s, broker_id=%s, count=%d)",
+        query,
+        broker_id,
+        len(result),
+    )
     return result
 
 
@@ -380,6 +389,11 @@ def broker_data_update(
     symbols: list[str] | None = None,
 ) -> dict[str, Any]:
     """Synchronize broker properties (spread, point value, margin) across datasets."""
+    logger.info(
+        "Updating broker data for symbols=%s, profile_ids=%s",
+        symbols,
+        profile_ids,
+    )
     if not db_path.is_file():
         return {"success": False, "updated": 0, "error": "Database not found"}
 
@@ -441,6 +455,7 @@ def broker_data_update(
             updated_count += res.rowcount
         conn.commit()
 
+    logger.info("Broker data update completed (updated=%d)", updated_count)
     return {
         "success": True,
         "updated": updated_count,
@@ -464,6 +479,15 @@ def clone_to_timezone(  # noqa: C901, PLR0912, PLR0915
     remove_weekends: bool = False,
 ) -> list[dict[str, Any]]:
     """Clone datasets to a target timezone with timestamp shift and weekend filter."""
+    logger.info(
+        "Cloning %d symbol(s) to timezone %s (shift=%dh, postfix=%s, "
+        "remove_weekends=%s)",
+        len(symbols),
+        timezone_name,
+        shift_hours,
+        postfix,
+        remove_weekends,
+    )
     if not symbols:
         raise ValueError("You have to select some symbol.")
     if not postfix:
@@ -626,6 +650,7 @@ def clone_to_timezone(  # noqa: C901, PLR0912, PLR0915
                 }
             )
 
+    logger.info("Successfully cloned %d symbol(s)", len(cloned_results))
     return cloned_results
 
 
@@ -638,6 +663,12 @@ def delete_datasets(
     db_path: Path, data_root: Path, symbols: list[str], mode: str = "remove"
 ) -> dict[str, Any]:
     """Mass delete symbol definitions and/or stored files with dependency check."""
+    logger.info(
+        "Deleting datasets for %d symbol(s) (mode=%s, symbols=%s)",
+        len(symbols),
+        mode,
+        symbols,
+    )
     if not symbols:
         raise ValueError("You have to select a symbol.")
 
@@ -675,6 +706,7 @@ def delete_datasets(
             deleted.append(sym)
 
     affected = len(deleted)
+    logger.info("Delete datasets completed (affected=%d, mode=%s)", affected, mode)
     return {
         "success": True,
         "affected": affected,
@@ -710,6 +742,14 @@ def export_to_csv(  # noqa: C901
     _ = session
     _ = format_name
     _ = format_tokens
+    logger.info(
+        "Exporting %s (%s) to CSV (date_from=%s, date_to=%s, output_path=%s)",
+        symbol,
+        timeframe,
+        date_from,
+        date_to,
+        output_path,
+    )
     store = MarketDataStore(data_root, db_path)
     records = read_market_rows(
         store,
@@ -786,6 +826,11 @@ def export_to_csv(  # noqa: C901
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(content, encoding="utf-8")
 
+    logger.info(
+        "Exported %d record(s) to CSV for %s",
+        len(lines) - (1 if include_header else 0),
+        symbol,
+    )
     return {
         "success": True,
         "symbol": symbol,
@@ -820,6 +865,15 @@ def export_to_mt4(  # noqa: C901, PLR0915
 ) -> dict[str, Any]:
     """Export to MetaTrader 4 binary .hst bar files and .fxt test models."""
     target_sym = mt4_symbol
+    logger.info(
+        "Exporting %s to MT4 (target_sym=%s, timeframe=%s, "
+        "export_mode=%s, output_dir=%s)",
+        sq_symbol,
+        target_sym,
+        timeframe,
+        export_mode,
+        output_dir,
+    )
     if not target_sym:
         with (
             contextlib.suppress(sqlite3.Error, OSError),
@@ -972,6 +1026,12 @@ def export_to_mt4(  # noqa: C901, PLR0915
 
         generated_files.append(str(fxt_path))
 
+    logger.info(
+        "Exported %d MT4 file(s) for %s to %s",
+        len(generated_files),
+        target_sym,
+        out_directory,
+    )
     return {
         "success": True,
         "symbol": target_sym,
@@ -1001,6 +1061,13 @@ def export_to_mt5(
 ) -> dict[str, Any]:
     """Export to MetaTrader 5 tick or M1 bar format."""
     _ = spread_mode
+    logger.info(
+        "Exporting %s to MT5 (timeframe=%s, spread_mode=%s, output_path=%s)",
+        symbol,
+        timeframe,
+        spread_mode,
+        output_path,
+    )
     store = MarketDataStore(data_root, db_path)
     is_tick = timeframe.upper() == "TICK"
     kind: Kind = "ticks" if is_tick else "m1"
@@ -1060,6 +1127,7 @@ def export_to_mt5(
         out_file.parent.mkdir(parents=True, exist_ok=True)
         out_file.write_text(content, encoding="utf-8")
 
+    logger.info("Exported %d record(s) to MT5 for %s", len(lines) - 1, symbol)
     return {
         "success": True,
         "symbol": symbol,
@@ -1132,6 +1200,11 @@ def save_definitions(
         target.parent.mkdir(parents=True, exist_ok=True)
         target.write_text(text, encoding="utf-8")
 
+    logger.info(
+        "Saved %d dataset definitions to %s",
+        len(datasets),
+        file_path or "memory",
+    )
     return {
         "success": True,
         "datasetsCount": len(datasets),
@@ -1146,6 +1219,7 @@ def load_definitions(
 ) -> dict[str, Any]:
     """Restore dataset definitions and configurations from JSON."""
     _ = data_root
+    logger.info("Loading definitions from %s", file_path)
     src = Path(file_path)
     if not src.is_file():
         raise ValueError(f"Definition file '{file_path}' does not exist.")
@@ -1186,6 +1260,12 @@ def load_definitions(
             loaded_datasets += 1
         conn.commit()
 
+    logger.info(
+        "Loaded %d dataset definitions and %d instruments from %s",
+        loaded_datasets,
+        len(instruments),
+        file_path,
+    )
     return {
         "success": True,
         "loadedDatasets": loaded_datasets,
@@ -1263,6 +1343,14 @@ def review_data(
                 ]
             )
 
+    logger.debug(
+        "Reviewing data for %s (%s, offset=%d, limit=%d, total=%d)",
+        symbol,
+        timeframe,
+        offset,
+        limit,
+        total_records,
+    )
     return {
         "symbol": symbol,
         "timeframe": timeframe,
@@ -1311,6 +1399,13 @@ def review_chart(
         }
         for b in selected
     ]
+    logger.debug(
+        "Reviewing chart for %s (%s, limit=%d, total_bars=%d)",
+        symbol,
+        timeframe,
+        limit,
+        total_bars,
+    )
     return {"symbol": symbol, "timeframe": timeframe, "chart": candles}
 
 
@@ -1444,6 +1539,13 @@ def review_quality(
         else 100.0
     )
 
+    logger.debug(
+        "Reviewing quality for %s (%s, total_bars=%d, errors=%d)",
+        symbol,
+        timeframe,
+        total_bars,
+        error_count,
+    )
     return {
         "symbol": symbol,
         "timeframe": timeframe,
@@ -1469,6 +1571,13 @@ def save_data_changes(
     _ = timeframe
     _ = session
     _ = changes
+    logger.info(
+        "Saving data changes for %s (%s, session=%s, changes=%d)",
+        symbol,
+        timeframe,
+        session,
+        len(changes),
+    )
     return {
         "success": True,
         "symbol": symbol,
@@ -1503,6 +1612,12 @@ def update_all(
                 }
             )
 
+    logger.info(
+        "Updating all datasets via provider %s (eligible=%d, queued=%d)",
+        provider,
+        len(datasets),
+        len(queued),
+    )
     return {
         "success": True,
         "provider": provider,
@@ -1538,6 +1653,12 @@ def update_selected(
                 }
             )
 
+    logger.info(
+        "Updating %d selected dataset(s) via provider %s (queued=%d)",
+        len(symbols),
+        provider,
+        len(queued),
+    )
     return {
         "success": True,
         "provider": provider,
@@ -1587,4 +1708,5 @@ def list_datasets(
                     "status": "Ready",
                 }
             )
+        logger.debug("Listing datasets from %s (count=%d)", db_path, len(result))
         return result

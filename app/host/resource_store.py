@@ -18,6 +18,9 @@ from uuid import uuid4
 from pydantic import Field
 
 from app.host.contracts import Document
+from app.host.logging import get_logger
+
+logger = get_logger(__name__)
 
 MAX_RESOURCE_BYTES = 16 * 1024 * 1024
 MAX_RESOURCE_RECORDS = 4096
@@ -107,6 +110,12 @@ class ResourceStore:
             raise ValueError("Resource content limit")
         if hashlib.sha256(content).hexdigest() != reference.digest:
             raise ValueError("Resource checksum mismatch")
+        logger.debug(
+            "ResourceStore read resource %s revision %d (principal=%s)",
+            reference.id,
+            reference.revision,
+            principal,
+        )
         return content, record.schema_document
 
     def publish(
@@ -195,4 +204,10 @@ class ResourceStore:
             temporary.replace(target)
         finally:
             temporary.unlink(missing_ok=True)
+        logger.info(
+            "ResourceStore committed revision %d for resource %s (producer=%s)",
+            record.reference.revision,
+            record.reference.id,
+            record.reference.producer_id,
+        )
         return record.reference

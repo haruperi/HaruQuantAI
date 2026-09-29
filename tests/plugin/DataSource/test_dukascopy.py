@@ -457,3 +457,30 @@ def test_disclaimer_operation(tmp_path: Path) -> None:
         await contribution.close()
 
     asyncio.run(scenario())
+
+
+def test_dukascopy_logging(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> None:
+    """Plugin emits expected info logs during lifecycle and operations."""
+
+    async def scenario() -> None:
+        db_path = tmp_path / "haruquantai.db"
+        create_isolated_schema(db_path)
+        store = MarketDataStore(tmp_path, db_path)
+        market = MarketAccess("plugin.data_manager.dukascopy", store)
+        context = HostCapabilities(
+            resources=None,
+            jobs=JobAccess("plugin.data_manager.dukascopy", JobManager(1, 1024 * 1024)),
+            log=None,
+            market_data=market,
+            network=NetworkAccess("plugin.data_manager.dukascopy", HistoricalNetwork()),
+        )
+        with caplog.at_level("INFO", logger="app.plugin.DataSource.dukascopy"):
+            contribution = await prepare(context)
+            await contribution.invoke("disclaimer", {})
+            await contribution.close()
+
+        assert "Preparing Dukascopy data source plugin" in caplog.text
+        assert "Dukascopy plugin invoking operation: disclaimer" in caplog.text
+        assert "Dukascopy data source plugin closed" in caplog.text
+
+    asyncio.run(scenario())

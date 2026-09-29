@@ -8,7 +8,10 @@ from pathlib import Path
 from uuid import uuid4
 
 from app.host.contracts import Document
+from app.host.logging import get_logger
 from app.host.packages import PackageInventory, confined_file, scan_packages
+
+logger = get_logger(__name__)
 
 
 class RemovalPlan(Document):
@@ -109,6 +112,12 @@ def apply_removal(root: Path, plan: RemovalPlan) -> Path:
     """
     lease = InstallationLease(root)
     lease.acquire()
+    logger.info(
+        "Executing removal for %d package(s): %s (%d files)",
+        len(plan.target_ids),
+        plan.target_ids,
+        len(plan.files),
+    )
     try:
         current = scan_packages(root)
         if current.fingerprint != plan.fingerprint or current.issues:
@@ -133,6 +142,11 @@ def apply_removal(root: Path, plan: RemovalPlan) -> Path:
             moved += (name,)
             _write_journal(journal, plan, moved, "applying")
         _write_journal(journal, plan, moved, "removed")
+        logger.info(
+            "Removal completed for targets: %s (quarantine journal=%s)",
+            plan.target_ids,
+            journal,
+        )
         return journal
     finally:
         lease.release()
@@ -144,6 +158,7 @@ def restore_removal(root: Path, journal: Path) -> None:
     Recovery validates the journal, all destinations and content hashes first.
     Repeated recovery is safe when a file was already restored with the same bytes.
     """
+    logger.info("Restoring package removal from journal: %s", journal)
     lease = InstallationLease(root)
     lease.acquire()
     try:
@@ -187,3 +202,8 @@ def _restore_locked(root: Path, journal: Path) -> None:
         destination.parent.mkdir(parents=True, exist_ok=True)
         source.rename(destination)
     _write_journal(journal, plan, (), "restored")
+    logger.info(
+        "Package restoration completed for plan targets: %s (%d files)",
+        plan.target_ids,
+        len(pairs),
+    )

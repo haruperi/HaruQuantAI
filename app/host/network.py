@@ -8,6 +8,10 @@ from urllib.parse import urlsplit
 
 import httpx
 
+from app.host.logging import get_logger
+
+logger = get_logger(__name__)
+
 MAX_RESPONSE_BYTES = 16 * 1024 * 1024
 LAST_ATTEMPT = 2
 HTTP_OK = 200
@@ -57,9 +61,22 @@ class HistoricalNetwork:
                             response.status_code in (429, 503)
                             and attempt < LAST_ATTEMPT
                         ):
+                            logger.warning(
+                                "Historical network status %d from %s; "
+                                "retrying in %ds (attempt %d/3)",
+                                response.status_code,
+                                url,
+                                1 << attempt,
+                                attempt + 1,
+                            )
                             await asyncio.sleep(1 << attempt)
                             continue
                         if response.status_code != HTTP_OK:
+                            logger.debug(
+                                "Historical network status %d from %s",
+                                response.status_code,
+                                url,
+                            )
                             return NetworkResult(response.status_code, b"")
                         blocks: list[bytes] = []
                         size = 0
@@ -70,8 +87,20 @@ class HistoricalNetwork:
                                     "Historical data response exceeds limit"
                                 )
                             blocks.append(block)
-                            return NetworkResult(HTTP_OK, b"".join(blocks))
-                except httpx.ConnectError, httpx.ReadTimeout:
+                            payload = b"".join(blocks)
+                            logger.debug(
+                                "Historical network retrieved %s (%d bytes)",
+                                url,
+                                len(payload),
+                            )
+                            return NetworkResult(HTTP_OK, payload)
+                except (httpx.ConnectError, httpx.ReadTimeout) as error:
+                    logger.warning(
+                        "Historical network transport error for %s on attempt %d/3: %s",
+                        url,
+                        attempt + 1,
+                        type(error).__name__,
+                    )
                     if attempt == LAST_ATTEMPT:
                         raise ValueError(
                             "Historical data transport unavailable"

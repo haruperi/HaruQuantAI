@@ -14,6 +14,7 @@ from pydantic import JsonValue
 
 from app.host.capabilities import HostCapabilities
 from app.host.composition import Binding, PreparedContribution
+from app.host.logging import get_logger
 from app.host.resource_store import ResourceRef
 from app.workspace.DataManager.actions import (
     broker_data,
@@ -33,6 +34,8 @@ from app.workspace.DataManager.actions import (
     update_all,
     update_selected,
 )
+
+logger = get_logger(__name__)
 
 PLUGIN = {
     "id": "workspace.data_manager",
@@ -61,6 +64,7 @@ def _invoke_action(  # noqa: C901, PLR0911, PLR0912, PLR0915
     data_root: Path,
 ) -> JsonValue:
     """Execute Data Manager actions and return JSON-compatible values."""
+    logger.info("Executing Data Manager action: %s", operation)
     target_db = Path(payload_dict["db_path"]) if "db_path" in payload_dict else db_path
     target_data_root = (
         Path(payload_dict["data_root"]) if "data_root" in payload_dict else data_root
@@ -298,6 +302,7 @@ def _invoke_action(  # noqa: C901, PLR0911, PLR0912, PLR0915
             list_datasets(target_db, target_data_root),
         )
 
+    logger.warning("Unknown Data Manager action: %s", operation)
     raise ValueError(f"Unknown workspace action: {operation}")
 
 
@@ -310,14 +315,25 @@ async def prepare(  # noqa: C901
         raise ValueError("Missing host.resources capability")
     bindings: tuple[Binding, ...] = ()
     db_path, data_root = _resolve_paths()
+    logger.info(
+        "Preparing Data Manager workspace (db_path=%s, data_root=%s)",
+        db_path,
+        data_root,
+    )
 
     async def attach(children: tuple[Binding, ...]) -> None:
         """Retain immutable accepted child handles supplied only by the host."""
         nonlocal bindings
         bindings = children
+        logger.info(
+            "Data Manager attached %d child binding(s): %s",
+            len(children),
+            [binding.package_id for binding in children],
+        )
 
     async def invoke(operation: str, payload: JsonValue) -> JsonValue:
         """Inspect published resources or execute workspace actions."""
+        logger.info("Data Manager invoking: %s", operation)
         if operation == "resources.list":
             return [reference.model_dump(mode="json") for reference in resources.list()]
         if operation == "resources.read":
@@ -347,18 +363,24 @@ async def prepare(  # noqa: C901
                 None,
             )
             if acquisition is None:
+                logger.warning(
+                    "Dukascopy acquisition unavailable for operation: %s", operation
+                )
                 raise ValueError("Dukascopy acquisition unavailable")
             action = operation.removeprefix("sources.dukascopy.")
             if action not in acquisition.operations:
+                logger.warning("Missing Dukascopy acquisition operation: %s", action)
                 raise ValueError("Missing acquisition operation")
             return await acquisition.invoke(action, payload)
 
+        logger.warning("Missing capability for operation: %s", operation)
         raise ValueError("Missing acquisition capability")
 
     async def close() -> None:
         """Release local attachment handles; host retains published resources."""
         nonlocal bindings
         bindings = ()
+        logger.info("Data Manager workspace closed")
 
     return PreparedContribution(
         (

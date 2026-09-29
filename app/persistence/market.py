@@ -7,6 +7,10 @@ from contextlib import closing, suppress
 from datetime import UTC, datetime
 from pathlib import Path
 
+from app.host.logging import get_logger
+
+logger = get_logger(__name__)
+
 
 class MarketSchemaUnavailableError(ValueError):
     """The active database has not received an approved market migration."""
@@ -122,6 +126,7 @@ def create_isolated_schema(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with closing(sqlite3.connect(path)) as connection:
         connection.executescript(SCHEMA)
+    logger.info("Created isolated market schema at %s", path)
 
 
 DATASET_TABLE_SCHEMA = """
@@ -212,6 +217,7 @@ def migrate_market_schema(path: Path) -> Path | None:
         connection.executescript(DATASET_TABLE_SCHEMA)
         connection.executescript(MARKET_TABLES_SCHEMA)
 
+    logger.info("Migrated market catalog schema for %s (backup=%s)", path, backup_path)
     return backup_path
 
 
@@ -354,6 +360,11 @@ def preseed_native_sqx_datasets(
             if cursor.rowcount > 0:
                 inserted += 1
                 existing.add(ds_symbol.lower())
+    logger.info(
+        "Pre-seeded native SQX datasets at %s (inserted=%d)",
+        database_path,
+        inserted,
+    )
     return inserted
 
 
@@ -400,6 +411,12 @@ def delete_market_symbol(database_path: Path, data_root: Path, symbol: str) -> b
             "DELETE FROM datamgr_datasets WHERE lower(symbol)=? OR lower(underlying)=?",
             (sym_lower, underlying),
         )
+    logger.info(
+        "Deleted market symbol %s from %s (files_removed=%d)",
+        symbol,
+        database_path,
+        len(file_paths),
+    )
     return True
 
 
@@ -449,6 +466,12 @@ def clear_market_symbol(database_path: Path, data_root: Path, symbol: str) -> bo
             "WHERE lower(symbol)=? OR lower(underlying)=?",
             (now_iso, sym_lower, underlying),
         )
+    logger.info(
+        "Cleared market symbol %s from %s (files_removed=%d)",
+        symbol,
+        database_path,
+        len(file_paths),
+    )
     return True
 
 
@@ -478,6 +501,13 @@ def log_datamgr_operation(
             "VALUES (?, ?, ?, ?, ?)",
             (now_iso, symbol, operation, status, message),
         )
+    logger.info(
+        "Data Manager DB audit log: operation=%s, symbol=%s, status=%s, message=%s",
+        operation,
+        symbol,
+        status,
+        message,
+    )
 
 
 def read_datamgr_log(database_path: Path) -> list[dict[str, str]]:

@@ -9,6 +9,10 @@ from dataclasses import dataclass, replace
 from typing import Literal
 from uuid import uuid4
 
+from app.host.logging import get_logger
+
+logger = get_logger(__name__)
+
 MAX_JOBS = 4096
 SHUTDOWN_SECONDS = 5.0
 
@@ -76,6 +80,15 @@ class JobManager:
         self.records[job.id] = job
         self.tasks[job.id] = loop.create_task(self._run(job, operation))
         self.tasks[job.id].add_done_callback(lambda _task: self._finished(job))
+        logger.info(
+            "Host job submitted: id=%s, owner=%s, budget=(workers=%d, "
+            "mem=%dMB, timeout=%.1fs)",
+            job.id,
+            owner,
+            budget.workers,
+            budget.memory_bytes // (1024 * 1024),
+            budget.timeout_seconds,
+        )
         return job
 
     def _finished(self, job: Job) -> None:
@@ -91,18 +104,28 @@ class JobManager:
     async def _run(self, job: Job, operation: Callable[[], Awaitable[None]]) -> None:
         """Run one trusted cooperative body and record only attributed safe outcomes."""
         self.records[job.id] = replace(job, state="running")
+        logger.debug("Host job started: id=%s, owner=%s", job.id, job.owner)
         try:
             async with asyncio.timeout(job.budget.timeout_seconds):
                 await operation()
         except TimeoutError:
             self.records[job.id] = replace(job, state="timed_out")
+            logger.warning(
+                "Host job timed out: id=%s, owner=%s (timeout=%.1fs)",
+                job.id,
+                job.owner,
+                job.budget.timeout_seconds,
+            )
         except asyncio.CancelledError:
             self.records[job.id] = replace(job, state="cancelled")
+            logger.info("Host job cancelled: id=%s, owner=%s", job.id, job.owner)
             raise
-        except Exception:  # noqa: BLE001 -- isolate trusted task failures without leaking content.
+        except Exception:
             self.records[job.id] = replace(job, state="failed")
+            logger.exception("Host job failed: id=%s, owner=%s", job.id, job.owner)
         else:
             self.records[job.id] = replace(job, state="succeeded")
+            logger.info("Host job succeeded: id=%s, owner=%s", job.id, job.owner)
 
     def status(self, owner: str, job_id: str) -> Job:
         """Read only the caller's job, without granting peer execution authority."""
@@ -114,6 +137,7 @@ class JobManager:
     def cancel(self, owner: str, job_id: str) -> None:
         """Request cooperative cancellation of an owned job."""
         self.status(owner, job_id)
+        logger.info("Host job cancel requested: id=%s, owner=%s", job_id, owner)
         task = self.tasks.get(job_id)
         if task is not None:
             task.cancel()

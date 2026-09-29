@@ -24,6 +24,7 @@ import pyarrow as pa  # type: ignore[import-untyped]
 from app.host.capabilities import HostCapabilities, NetworkAccess
 from app.host.composition import PreparedContribution
 from app.host.jobs import Budget
+from app.host.logging import get_logger
 from app.host.market_data import (
     M1_SCHEMA,
     TICK_SCHEMA,
@@ -31,6 +32,8 @@ from app.host.market_data import (
     MarketDataset,
 )
 from pydantic import JsonValue
+
+logger = get_logger(__name__)
 
 PLUGIN = {
     "id": "plugin.data_manager.dukascopy",
@@ -252,11 +255,20 @@ class RateCorrector:
         if self._consecutive_successes >= self._success_threshold:
             self._delay = max(self._min_delay, self._delay * 0.75)
             self._consecutive_successes = 0
+            logger.debug(
+                "Dukascopy rate throttle delay reduced to %.3fs after %d successes",
+                self._delay,
+                self._success_threshold,
+            )
 
     def record_failure(self) -> None:
         """Record rate-limit or transient error and apply multiplicative backoff."""
         self._consecutive_successes = 0
         self._delay = min(self._max_delay, max(self._min_delay, self._delay * 1.25))
+        logger.warning(
+            "Dukascopy rate throttle backoff triggered; increased delay to %.3fs",
+            self._delay,
+        )
 
     async def throttle(self) -> None:
         """Wait for the active inter-request delay duration."""
@@ -491,6 +503,7 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
     jobs = context.jobs
     results: dict[str, dict[str, JsonValue]] = {}
     request_by_job: dict[str, str] = {}
+    logger.info("Preparing Dukascopy data source plugin")
 
     async def run_download(
         request_id: str, spec: DownloadSpec, dataset: MarketDataset
@@ -500,6 +513,16 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
         days = (spec.last - spec.first).days + 1
         corrector = RateCorrector()
         effective_mode: Literal["standard", "cdn", "cdn-cn"] = spec.mode
+        logger.info(
+            "Starting Dukascopy download for %s (%s) from %s to %s "
+            "[mode=%s, overwrite=%s]",
+            dataset.symbol,
+            dataset.kind,
+            spec.first,
+            spec.last,
+            spec.mode,
+            spec.overwrite,
+        )
 
         if spec.mode in ("cdn", "cdn-cn"):
             try:
@@ -511,6 +534,14 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
                     effective_mode = "standard"
             except ValueError, OSError, TimeoutError, ConnectionError:
                 effective_mode = "standard"
+
+        if spec.mode in ("cdn", "cdn-cn") and effective_mode == "standard":
+            logger.warning(
+                "CDN mode %s unavailable for %s; "
+                "falling back to direct standard download",
+                spec.mode,
+                dataset.symbol,
+            )
 
         result["effective_mode"] = effective_mode
 
@@ -562,8 +593,20 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
             result["completed_days"] = offset + 1
             result["progress"] = (offset + 1) / days
 
+        logger.info(
+            "Completed Dukascopy download for %s (%s): %d published, "
+            "%d skipped, %d missing out of %d days",
+            dataset.symbol,
+            dataset.kind,
+            result.get("published_days", 0),
+            result.get("skipped_days", 0),
+            result.get("missing_days", 0),
+            days,
+        )
+
     async def invoke(operation: str, payload: JsonValue) -> JsonValue:  # noqa: C901, PLR0911, PLR0912, PLR0915
         """Dispatch dataset, job and catalog requests through owner capabilities."""
+        logger.info("Dukascopy plugin invoking operation: %s", operation)
         if operation == "catalog":
             try:
                 brokers: list[JsonValue] = [
@@ -633,6 +676,12 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
                         instrument,
                     )
                 )
+            logger.info(
+                "Registering %d Dukascopy dataset definitions (kind=%s, broker=%s)",
+                len(requests),
+                kind,
+                broker,
+            )
             return {
                 "ids": [row.id for row in market.register_definitions(tuple(requests))]
             }
@@ -651,6 +700,7 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
                 raise ValueError("Invalid Dukascopy data kind")
             k: Literal["ticks", "m1"] = "ticks" if kind == "ticks" else "m1"
             ds = market.register_dataset(symbol.lower(), k, instrument)
+            logger.info("Adding Dukascopy dataset %s (%s)", symbol, k)
             return {
                 "id": ds.id,
                 "source": ds.source,
@@ -692,6 +742,12 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
                 body,
             )
             request_by_job[job.id] = request_id
+            logger.info(
+                "Submitted Dukascopy download job %s for dataset %s (request_id=%s)",
+                job.id,
+                spec.dataset_id,
+                request_id,
+            )
             return {
                 "job_id": job.id,
                 "request_id": request_id,
@@ -708,6 +764,7 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
                 raise ValueError("Dukascopy job unavailable")
             if operation == "download.cancel":
                 jobs.cancel(job_id_val)
+                logger.info("Cancelled Dukascopy download job %s", job_id_val)
             job = jobs.status(job_id_val)
             return {
                 "job_id": job.id,
@@ -732,6 +789,7 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
             if not isinstance(sym, str):
                 raise ValueError("Invalid delete payload")
             deleted = market.delete_dataset(sym)
+            logger.info("Deleting Dukascopy dataset %s (deleted=%s)", sym, deleted)
             return {"deleted": deleted, "symbol": sym}
         if operation == "clear":
             if not isinstance(payload, dict):
@@ -740,13 +798,16 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
             if not isinstance(sym, str):
                 raise ValueError("Invalid clear payload")
             cleared = market.clear_dataset(sym)
+            logger.info("Clearing Dukascopy dataset %s (cleared=%s)", sym, cleared)
             return {"cleared": cleared, "symbol": sym}
+        logger.warning("Missing Dukascopy operation: %s", operation)
         raise ValueError("Missing Dukascopy operation")
 
     async def close() -> None:
         """Release local result references; the host owns task cancellation."""
         results.clear()
         request_by_job.clear()
+        logger.info("Dukascopy data source plugin closed")
 
     return PreparedContribution(
         (
