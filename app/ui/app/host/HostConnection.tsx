@@ -11,6 +11,34 @@ import { connectBootStream, type BootSnapshot, type BootStream, type Initializat
 export type HostStatus = 'connecting' | 'online' | 'locked' | 'offline';
 export type SaveSettingsResult = { ok: true } | { ok: false; message: string };
 
+export const HOST_PASSWORD_KEY = 'haruquantai.host.password.v1'; // pragma: allowlist secret
+export const DEFAULT_HOST_PASSWORD = 'haruquantai'; // pragma: allowlist secret
+
+let memoryPassword = DEFAULT_HOST_PASSWORD;
+
+export function getSavedHostPassword(): string {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      return localStorage.getItem(HOST_PASSWORD_KEY) ?? DEFAULT_HOST_PASSWORD;
+    }
+  } catch {
+    /* Storage unavailable in some test/sandbox environments. */
+  }
+  return memoryPassword;
+}
+
+export function saveHostPassword(password: string): void {
+  try {
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem(HOST_PASSWORD_KEY, password);
+      return;
+    }
+  } catch {
+    /* Storage unavailable */
+  }
+  memoryPassword = password;
+}
+
 export interface ConnectHostOptions {
   signal: AbortSignal;
   password?: string;
@@ -35,7 +63,8 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
   let stream: BootStream | undefined;
   let streamFailed = false;
   try {
-    await login({ username: 'haruquantai', ...(options.password ? { password: options.password } : {}) }, config);
+    const password = options.password !== undefined ? options.password : getSavedHostPassword();
+    await login({ username: 'haruquantai', ...(password ? { password } : {}) }, config);
     if (signal.aborted) return;
     stream = (options.bootStream ?? connectBootStream)(signal, options.onBoot ?? (() => {}), message => { streamFailed = true; if (!signal.aborted) { onStatus('offline'); onError(message); } });
     await stream.ready;
@@ -100,8 +129,8 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<HostStatus>('connecting');
   const statusRef = useRef<HostStatus>('connecting');
   const [message, setMessage] = useState('');
-  const [password, setPassword] = useState('');
-  const credentialRef = useRef<string | undefined>(undefined);
+  const [password, setPassword] = useState(getSavedHostPassword);
+  const credentialRef = useRef<string | undefined>(getSavedHostPassword());
   const [attempt, setAttempt] = useState(0);
   const writeQueue = useRef<Promise<void>>(Promise.resolve());
   const revisionRef = useRef<number | null>(null);
@@ -132,7 +161,7 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const controller = new AbortController();
-    const credential = credentialRef.current;
+    const credential = credentialRef.current ?? getSavedHostPassword();
     credentialRef.current = undefined;
     updateStatus('connecting');
     void connectHost({
@@ -153,14 +182,15 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
       onFirstRun: setRequirements,
       onError: error => setMessage(error),
     });
-    return () => { controller.abort(); setAuthToken(null); };
+    return () => { controller.abort(); };
   }, [attempt]);
 
   const recoverSession = async (): Promise<boolean> => {
     revisionRef.current = null;
     preferencesRef.current = null;
+    const currentPassword = getSavedHostPassword();
     try {
-      await login({ username: 'haruquantai' });
+      await login({ username: 'haruquantai', ...(currentPassword ? { password: currentPassword } : {}) });
       applySettings(await readHostPreferences());
       updateStatus('online');
       setMessage('');
@@ -224,8 +254,12 @@ export function HostConnectionProvider({ children }: { children: ReactNode }) {
   };
 
   const retry = (submittedPassword?: string) => {
-    credentialRef.current = submittedPassword;
-    setPassword('');
+    const nextPassword = submittedPassword ?? getSavedHostPassword();
+    if (submittedPassword !== undefined) {
+      saveHostPassword(submittedPassword);
+    }
+    credentialRef.current = nextPassword;
+    setPassword(nextPassword);
     setMessage('');
     setAttempt(value => value + 1);
   };

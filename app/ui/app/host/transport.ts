@@ -35,11 +35,33 @@ export class ApiClientError extends Error {
   }
 }
 
-let activeAuthToken: string | null = null;
+const AUTH_TOKEN_KEY = 'haruquantai.host.token.v1';
+
+let activeAuthToken: string | null = ((): string | null => {
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      return sessionStorage.getItem(AUTH_TOKEN_KEY);
+    }
+  } catch {
+    /* Storage unavailable in some test/sandbox environments. */
+  }
+  return null;
+})();
 const authExpiredListeners = new Set<() => void>();
 
 export function setAuthToken(token: string | null): void {
   activeAuthToken = token;
+  try {
+    if (typeof sessionStorage !== 'undefined') {
+      if (token) {
+        sessionStorage.setItem(AUTH_TOKEN_KEY, token);
+      } else {
+        sessionStorage.removeItem(AUTH_TOKEN_KEY);
+      }
+    }
+  } catch {
+    /* Storage unavailable */
+  }
 }
 
 export function getAuthToken(): string | null {

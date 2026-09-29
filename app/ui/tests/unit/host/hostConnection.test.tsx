@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { connectHost } from '../../../app/host/HostConnection';
+import { connectHost, getSavedHostPassword, saveHostPassword, HOST_PASSWORD_KEY } from '../../../app/host/HostConnection';
 import { getAuthToken, setAuthToken } from '../../../app/host/transport';
 import { createInitialAppSettings } from '../../../app/host/globalSettings';
 import { shellPreferences } from '../../../app/host/hostSettings';
@@ -80,5 +80,64 @@ describe('host startup sequence', () => {
     expect(onStatus).toHaveBeenCalledWith('offline');
     expect(onStatus).not.toHaveBeenCalledWith('online');
     setAuthToken(null);
+  });
+
+  it('auto-fills default and saved host password on login', async () => {
+    setAuthToken(null);
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(HOST_PASSWORD_KEY);
+    expect(getSavedHostPassword()).toBe('haruquantai');
+
+    saveHostPassword('my-saved-pass'); // pragma: allowlist secret
+    expect(getSavedHostPassword()).toBe('my-saved-pass');
+
+    const controller = new AbortController();
+    let loginBody: Record<string, unknown> | null = null;
+    const fetchFn = vi.fn().mockImplementation(async (url: string, init?: RequestInit) => {
+      if (url.endsWith('/auth/login')) {
+        loginBody = JSON.parse(String(init?.body));
+        return {
+          ok: true, status: 200,
+          json: async () => ({ status: 'success', data: { token: 'auto-session' } }),
+        };
+      }
+      if (url.endsWith('/status')) return { ok: true, status: 200, json: async () => ({ status: 'success', data: { boot } }) };
+      if (url.endsWith('/init-data')) return {
+        ok: true, status: 200,
+        json: async () => ({ status: 'success', data: { boot, first_run: false, settings: { revision: 1, values: { 'app.general': { theme: 'light', language: 'en', zoom: 1.1 } } } } }),
+      };
+      return { ok: true, status: 200, json: async () => ({ status: 'success', data: { acknowledged: true } }) };
+    });
+    const status = vi.fn().mockImplementation(val => { if (val === 'online') controller.abort(); });
+    await connectHost({ bootStream, signal: controller.signal, fetchFn: asFetch(fetchFn), onStatus: status, onSettings: vi.fn(), onError: vi.fn() });
+    expect(loginBody).toEqual({ username: 'haruquantai', password: 'my-saved-pass' }); // pragma: allowlist secret
+    expect(getAuthToken()).toBe('auto-session');
+    if (typeof localStorage !== 'undefined') localStorage.removeItem(HOST_PASSWORD_KEY);
+    setAuthToken(null);
+  });
+
+  it('reads and writes password and token with localStorage and sessionStorage', () => {
+    const memory = new Map<string, string>();
+    const storage = {
+      getItem: (key: string) => memory.get(key) ?? null,
+      setItem: (key: string, value: string) => { memory.set(key, value); },
+      removeItem: (key: string) => { memory.delete(key); },
+      clear: () => { memory.clear(); },
+    };
+    vi.stubGlobal('localStorage', storage);
+    vi.stubGlobal('sessionStorage', storage);
+
+    expect(getSavedHostPassword()).toBe('haruquantai');
+    saveHostPassword('persisted-pass'); // pragma: allowlist secret
+    expect(memory.get(HOST_PASSWORD_KEY)).toBe('persisted-pass');
+    expect(getSavedHostPassword()).toBe('persisted-pass');
+
+    setAuthToken('token-123');
+    expect(memory.get('haruquantai.host.token.v1')).toBe('token-123');
+    expect(getAuthToken()).toBe('token-123');
+    setAuthToken(null);
+    expect(memory.has('haruquantai.host.token.v1')).toBe(false);
+    expect(getAuthToken()).toBeNull();
+
+    vi.unstubAllGlobals();
   });
 });
