@@ -96,6 +96,7 @@ LOG_FILENAME = "haruquantai.log"
 DEFAULT_LOG_DIR = Path("data/logs")
 DEFAULT_MAX_BYTES = 10 * 1024 * 1024
 DEFAULT_BACKUP_COUNT = 5
+DEFAULT_LOG_LEVEL = logging.DEBUG
 
 _CORRELATION: ContextVar[str | None] = ContextVar("host_correlation", default=None)
 _MARKER = re.compile(r"\[REDACTED:[0-9a-f]{12}\]")
@@ -405,7 +406,7 @@ def configure_boot_logging() -> None:
     """Install early stderr and bounded buffering before settings are loaded.
 
     Returns unchanged when the app logger already has handlers. Otherwise installs
-    INFO-level console and BootBuffer handlers owned by the host and disables
+    DEBUG-level console and BootBuffer handlers owned by the host and disables
     propagation. Creates no log directory or file.
     """
     root = logging.getLogger(LOGGER_NAME)
@@ -417,7 +418,7 @@ def configure_boot_logging() -> None:
     for handler in (console, BootBuffer()):
         handler.__dict__["_host_telemetry_owned"] = True
         root.addHandler(handler)
-    root.setLevel(logging.INFO)
+    root.setLevel(DEFAULT_LOG_LEVEL)
     root.propagate = False
     root.__dict__.pop("_host_telemetry_config", None)
 
@@ -439,7 +440,7 @@ def close_host_logging() -> None:
 def configure_host_logging(
     log_dir: Path | None = None,
     *,
-    level: int = logging.INFO,
+    level: int = DEFAULT_LOG_LEVEL,
     console_stream: TextIO | None = None,
     include_console: bool = True,
     console_format: str = "text",

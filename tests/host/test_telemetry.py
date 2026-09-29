@@ -328,3 +328,21 @@ def test_early_boot_records_and_uvicorn_are_forwarded(tmp_path: Path) -> None:
         getattr(handler, "_host_telemetry_owned", False)
         for handler in logging.getLogger("uvicorn").handlers
     )
+
+
+def test_default_log_level_is_debug(tmp_path: Path) -> None:
+    from app.host.logging import (
+        DEFAULT_LOG_LEVEL,
+        close_host_logging,
+        configure_boot_logging,
+    )
+
+    assert DEFAULT_LOG_LEVEL == logging.DEBUG
+    close_host_logging()
+    configure_boot_logging()
+    assert logging.getLogger("app").level == logging.DEBUG
+
+    logger = configure_host_logging(tmp_path, include_console=False)
+    assert logger.level == logging.DEBUG
+    assert logging.getLogger("uvicorn").level == logging.DEBUG
+    close_host_logging()
