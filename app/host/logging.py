@@ -96,7 +96,7 @@ LOG_FILENAME = "haruquantai.log"
 DEFAULT_LOG_DIR = Path("data/logs")
 DEFAULT_MAX_BYTES = 10 * 1024 * 1024
 DEFAULT_BACKUP_COUNT = 5
-DEFAULT_LOG_LEVEL = logging.DEBUG
+DEFAULT_LOG_LEVEL = logging.INFO
 
 _CORRELATION: ContextVar[str | None] = ContextVar("host_correlation", default=None)
 _MARKER = re.compile(r"\[REDACTED:[0-9a-f]{12}\]")

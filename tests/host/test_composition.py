@@ -2,6 +2,7 @@
 
 import asyncio
 import json
+import sys
 from pathlib import Path
 
 import pytest
@@ -124,5 +125,72 @@ def test_empty_workspace_and_empty_installation(tmp_path):
                 file.unlink()
         await composition.start(scan_packages(tmp_path))
         assert not composition.active
+
+    asyncio.run(run())
+
+
+def test_dynamically_loaded_module_name_and_logger_identity(
+    tmp_path: Path, caplog: pytest.LogCaptureFixture
+) -> None:
+    folder = "app/workspace/logger_test"
+    path = tmp_path / folder
+    path.mkdir(parents=True)
+    descriptor = {
+        "id": "test.logger",
+        "version": "1.0.0",
+        "compatibility": "1",
+        "kind": "workspace",
+        "slots": [],
+        "requires": [{"id": "host.resources", "version": "1.0.0"}],
+    }
+    source = f"""PLUGIN = {descriptor!r}
+from app.host.logging import get_logger
+from app.host.packages import PreparedContribution
+
+logger = get_logger(__name__)
+
+async def prepare(context):
+    logger.info("Workspace activated with logger: %s", __name__)
+    async def invoke(operation, payload):
+        return payload
+    async def close():
+        return None
+    return PreparedContribution(('echo',), invoke, close)
+"""
+    (path / "entry.py").write_text(source)
+    metadata = {
+        "schema_version": 1,
+        "id": descriptor["id"],
+        "kind": descriptor["kind"],
+        "version": "1.0.0",
+        "host_contract": "1.0.0",
+        "mode": "headless",
+        "backend_entry": folder + "/entry.py",
+        "ui_entry": None,
+        "owned_paths": {
+            "source": [folder + "/entry.py"],
+            "metadata": [folder + "/package.json"],
+        },
+    }
+    (path / "package.json").write_text(json.dumps(metadata))
+
+    async def run() -> None:
+        composition = Composition(
+            tmp_path, ResourceStore(tmp_path / "data"), JobManager(1, 1024)
+        )
+        with caplog.at_level("INFO", logger="app.workspace.logger_test.entry"):
+            await composition.start(scan_packages(tmp_path))
+            assert "test.logger" in composition.active
+            mod = composition._modules["test.logger"]
+            assert mod.__name__ == "app.workspace.logger_test.entry"
+            assert sys.modules.get("app.workspace.logger_test.entry") is mod
+            assert (
+                "Workspace activated with logger: app.workspace.logger_test.entry"
+                in caplog.text
+            )
+
+        await composition.close()
+        assert not composition.active
+        assert "app.workspace.logger_test.entry" not in sys.modules
 
     asyncio.run(run())

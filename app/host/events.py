@@ -170,7 +170,7 @@ class EventBus:
             tuple(validate_channel(c) for c in channels), asyncio.Queue(self.capacity)
         )
         self._subscribers.append(subscriber)
-        logger.debug("Event subscriber admitted")
+        logger.info("Event subscriber admitted")
         return subscriber
 
     def unsubscribe(self, subscriber: Subscriber) -> None:
@@ -182,7 +182,7 @@ class EventBus:
         """
         if subscriber in self._subscribers:
             self._subscribers.remove(subscriber)
-        logger.debug("Event subscriber released")
+        logger.info("Event subscriber released")
 
     def publish(self, channel: str, data: Any) -> int:
         """Snapshot a payload and enqueue independent copies without waiting.
@@ -222,7 +222,7 @@ class EventBus:
             except asyncio.QueueFull:
                 subscriber.overflow = True
                 logger.warning("Event subscriber overflow; snapshot required")
-        logger.debug(
+        logger.info(
             "Event published: channel=%s, seq=%d, delivered=%d",
             channel,
             self.sequence,
@@ -245,7 +245,7 @@ class EventBus:
             for item in self._history
             if json.loads(item)["sequence"] > after
         ]
-        logger.debug(
+        logger.info(
             "Event replay requested: after=%d, returned=%d",
             after,
             len(replayed),

@@ -31,11 +31,11 @@ Key Capabilities:
         "resource %s (producer=%s)")
     - FR-PERSIST-RESOURCES-READ: Reads and validates stored payload bytes against
       SHA-256 digest and access control grants via ResourceStore.read().
-      * Verified via: logger.debug("ResourceStore read resource %s revision %d "
+      * Verified via: logger.info("ResourceStore read resource %s revision %d "
         "(principal=%s)")
     - FR-PERSIST-RESOURCES-LIST: Discovers resource revisions visible to a
       requesting principal or published globally via ResourceStore.list().
-      * Verified via: logger.debug("ResourceStore listed %d resources for "
+      * Verified via: logger.info("ResourceStore listed %d resources for "
         "principal %s")
 
 Python API Usage:
@@ -150,7 +150,7 @@ class ResourceStore:
             for record in self._records()
             if principal in record.readers or "*" in record.readers
         )
-        logger.debug(
+        logger.info(
             "ResourceStore listed %d resources for principal %s",
             len(results),
             principal,
@@ -176,7 +176,7 @@ class ResourceStore:
             raise ValueError("Resource content limit")
         if hashlib.sha256(content).hexdigest() != reference.digest:
             raise ValueError("Resource checksum mismatch")
-        logger.debug(
+        logger.info(
             "ResourceStore read resource %s revision %d (principal=%s)",
             reference.id,
             reference.revision,

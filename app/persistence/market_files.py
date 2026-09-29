@@ -32,10 +32,10 @@ Key Capabilities:
     - FR-PERSIST-MARKET-FILES-PATH: Computes canonical partitioned paths for tick
       and M1 datasets while preventing symlink attacks and path traversal via
       resolve_market_path().
-      * Verified via: logger.debug("Resolved canonical market path: %s")
+      * Verified via: logger.info("Resolved canonical market path: %s")
     - FR-PERSIST-MARKET-FILES-VERIFY: Streams SHA-256 checksums to verify disk
       file integrity and catalog consistency via verify_market_file().
-      * Verified via: logger.debug("Verified market file integrity: %s "
+      * Verified via: logger.info("Verified market file integrity: %s "
         "(digest=%s)")
 
 Python API Usage:
@@ -166,7 +166,7 @@ def resolve_market_path(
     path = data_root / relative
     if any(item.is_symlink() or item.is_junction() for item in (path, *path.parents)):
         raise ValueError("Linked market path")
-    logger.debug("Resolved canonical market path: %s", path)
+    logger.info("Resolved canonical market path: %s", path)
     return path
 
 
@@ -183,7 +183,7 @@ def verify_market_file(data_root: Path, record: MarketFile) -> Path:
             digest.update(block)
     if digest.hexdigest() != record.sha256:
         raise ValueError("Market file digest mismatch")
-    logger.debug(
+    logger.info(
         "Verified market file integrity: %s (digest=%s)",
         path,
         record.sha256,

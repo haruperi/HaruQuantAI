@@ -56,7 +56,7 @@ Key Capabilities:
       * Verified via: logger.info("Triggered historical update for %d symbols")
     - FR-WORKSPACE-DATAMANAGER-DATASETS: Lists active registered datasets and
       underlying symbol properties via list_datasets().
-      * Verified via: logger.debug("Listing datasets from %s (count=%d)")
+      * Verified via: logger.info("Listing datasets from %s (count=%d)")
 
 Python API Usage:
     ```python
@@ -1405,7 +1405,7 @@ def review_data(
                 ]
             )
 
-    logger.debug(
+    logger.info(
         "Reviewing data for %s (%s, offset=%d, limit=%d, total=%d)",
         symbol,
         timeframe,
@@ -1461,7 +1461,7 @@ def review_chart(
         }
         for b in selected
     ]
-    logger.debug(
+    logger.info(
         "Reviewing chart for %s (%s, limit=%d, total_bars=%d)",
         symbol,
         timeframe,
@@ -1601,7 +1601,7 @@ def review_quality(
         else 100.0
     )
 
-    logger.debug(
+    logger.info(
         "Reviewing quality for %s (%s, total_bars=%d, errors=%d)",
         symbol,
         timeframe,
@@ -1770,5 +1770,5 @@ def list_datasets(
                     "status": "Ready",
                 }
             )
-        logger.debug("Listing datasets from %s (count=%d)", db_path, len(result))
+        logger.info("Listing datasets from %s (count=%d)", db_path, len(result))
         return result

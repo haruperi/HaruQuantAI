@@ -132,7 +132,7 @@ class HistoricalNetwork:
                             await asyncio.sleep(1 << attempt)
                             continue
                         if response.status_code != HTTP_OK:
-                            logger.debug(
+                            logger.info(
                                 "Historical network status %d from %s",
                                 response.status_code,
                                 url,
@@ -148,7 +148,7 @@ class HistoricalNetwork:
                                 )
                             blocks.append(block)
                             payload = b"".join(blocks)
-                            logger.debug(
+                            logger.info(
                                 "Historical network retrieved %s (%d bytes)",
                                 url,
                                 len(payload),

@@ -256,7 +256,7 @@ class Startup:
             self.state,
             (time.monotonic() - self.started_at) * 1000,
         )
-        logger.debug("Boot snapshot: %s", self.snapshot().model_dump())
+        logger.info("Boot snapshot: %s", self.snapshot().model_dump())
 
     def listening(self) -> None:
         """Publish readiness after the server confirms its listening socket."""

@@ -464,7 +464,7 @@ def load_settings(
     values.update(explicit)
     values["data_dir"] = root
     result = HostSettings.model_validate(values)
-    logger.debug("Runtime configuration validated")
+    logger.info("Runtime configuration validated")
     return result
 
 
@@ -498,7 +498,7 @@ class SettingsStore:
         """
         try:
             snap = _public(settings_snapshot(self.path))
-            logger.debug(
+            logger.info(
                 "Settings snapshot loaded: revision=%d",
                 snap["revision"],
             )

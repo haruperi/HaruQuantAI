@@ -347,7 +347,7 @@ def scan_packages(root: Path) -> PackageInventory:
             digest.update(name.encode())
             digest.update(hashlib.sha256((root / name).read_bytes()).digest())
     digest.update(json.dumps([i.model_dump() for i in issues], sort_keys=True).encode())
-    logger.debug(
+    logger.info(
         "Scanned packages in %s: %d accepted, %d issue(s)",
         root,
         len(accepted),
@@ -645,7 +645,8 @@ class Composition:
         if package.backend_entry is None:
             raise ValueError("No backend entry")
         path = confined_file(self.root, package.backend_entry)
-        spec = importlib.util.spec_from_file_location("_haru_" + uuid4().hex, path)
+        module_name = package.backend_entry.removesuffix(".py").replace("/", ".")
+        spec = importlib.util.spec_from_file_location(module_name, path)
         if spec is None or spec.loader is None:
             raise ValueError("Invalid backend loader")
         module = importlib.util.module_from_spec(spec)
@@ -793,7 +794,7 @@ class Composition:
         runtime = self.active.get(owner)
         if runtime is None or operation not in runtime.operations:
             raise ValueError("Missing capability")
-        logger.debug("Dispatching operation '%s' to owner '%s'", operation, owner)
+        logger.info("Dispatching operation '%s' to owner '%s'", operation, owner)
         async with asyncio.timeout(ACTIVATION_TIMEOUT):
             return await runtime.invoke(operation, payload)
 

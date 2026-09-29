@@ -101,7 +101,7 @@ def safe_files(root: Path, pattern: str) -> list[Path]:
             found.append(path)
         if len(found) > MAX_ENTRIES:
             raise ValueError("Discovery file limit exceeded")
-    logger.debug(
+    logger.info(
         "Safe file scan in %s: %d file(s) matched pattern %s",
         root,
         len(found),
@@ -147,9 +147,7 @@ def read_descriptor(path: Path) -> tuple[PluginDescriptor, str]:
             raise ValueError("Expected one literal PLUGIN descriptor")
         raw = ast.literal_eval(values[0])
     descriptor = PluginDescriptor.model_validate(raw)
-    logger.debug(
-        "Descriptor parsed: %s (version=%s)", descriptor.id, descriptor.version
-    )
+    logger.info("Descriptor parsed: %s (version=%s)", descriptor.id, descriptor.version)
     return descriptor, hashlib.sha256(content).hexdigest()
 
 

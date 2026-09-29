@@ -38,7 +38,7 @@ Key Capabilities:
     - FR-PERSIST-HOST-SETTINGS: Atomically queries, inserts, updates, and deletes
       scoped configuration settings via HostStore settings CRUD and
       patch_settings().
-      * Verified via: logger.debug("Persisted host setting: scope=%s, key=%s")
+      * Verified via: logger.info("Persisted host setting: scope=%s, key=%s")
     - FR-PERSIST-HOST-JOBS: Queues, monitors, updates progress, checkpoints, and
       transitions durable background jobs via HostStore job operations.
       * Verified via: logger.info("Persisted host job queued: job_id=%s, ...")
@@ -633,7 +633,7 @@ class HostStore:
                     record.updated_at_utc,
                 ),
             )
-        logger.debug(
+        logger.info(
             "Persisted host setting: scope=%s, key=%s",
             record.scope,
             record.key,
@@ -771,7 +771,7 @@ class HostStore:
             )
             updated = cursor.rowcount > 0
         if updated:
-            logger.debug(
+            logger.info(
                 "Updated host job progress: job_id=%s, percent=%.1f",
                 job_id,
                 percent,
@@ -788,7 +788,7 @@ class HostStore:
             )
             updated = cursor.rowcount > 0
         if updated:
-            logger.debug("Updated host job checkpoint: job_id=%s", job_id)
+            logger.info("Updated host job checkpoint: job_id=%s", job_id)
         return updated
 
     def transition_job(
@@ -906,7 +906,7 @@ class HostStore:
                 )
             except sqlite3.IntegrityError as error:
                 _raise_for_integrity(error, context="Job attempt")
-        logger.debug(
+        logger.info(
             "Created host job attempt: attempt_id=%s, job_id=%s",
             record.attempt_id,
             record.job_id,
@@ -993,7 +993,7 @@ class HostStore:
                 )
             except sqlite3.IntegrityError as error:
                 _raise_for_integrity(error, context="Job event")
-        logger.debug(
+        logger.info(
             "Recorded host job event: event_id=%s, job_id=%s, %s->%s",
             record.event_id,
             record.job_id,
@@ -1034,7 +1034,7 @@ class HostStore:
                     record.last_heartbeat_utc,
                 ),
             )
-        logger.debug(
+        logger.info(
             "Upserted host grid node: node_id=%s, state=%s",
             record.node_id,
             record.state,

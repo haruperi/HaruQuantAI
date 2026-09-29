@@ -973,7 +973,7 @@ async def socket_endpoint(socket: WebSocket) -> None:
     except ValueError, TimeoutError, ChannelError:
         await socket.close(code=1008)
     except asyncio.CancelledError, WebSocketDisconnect:
-        logger.debug("Client socket disconnected")
+        logger.info("Client socket disconnected")
     finally:
         if subscriber is not None:
             host.events.unsubscribe(subscriber)
@@ -1028,7 +1028,7 @@ async def _socket_stream(
                 await asyncio.gather(event, return_exceptions=True)
         await socket.close(code=1008)
     except asyncio.CancelledError:
-        logger.debug("Socket stream cancelled")
+        logger.info("Socket stream cancelled")
     finally:
         receive.cancel()
         await asyncio.gather(receive, return_exceptions=True)

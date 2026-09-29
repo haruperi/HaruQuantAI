@@ -190,7 +190,7 @@ def read_broker_profiles(path: Path) -> tuple[tuple[int, str, str, str], ...]:
         ):
             raise BrokerSchemaUnavailableError("Broker catalog row is invalid")
         result.append((broker_id, name, clean_postfix, clean_timezone))
-    logger.debug("Read %d eligible broker profiles from %s", len(result), path)
+    logger.info("Read %d eligible broker profiles from %s", len(result), path)
     return tuple(result)
 
 

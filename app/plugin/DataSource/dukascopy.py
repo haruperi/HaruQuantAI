@@ -41,7 +41,7 @@ Key Capabilities:
     - FR-PLUGIN-DATASOURCE-DUKASCOPY-DECODE: Decompresses LZMA streams and
       unpacks binary struct records for price, bid/ask, and volume via
       decode_ticks() and decode_m1().
-      * Verified via: logger.debug("Decoded %d tick records for %s")
+      * Verified via: logger.info("Decoded %d tick records for %s")
     - FR-PLUGIN-DATASOURCE-DUKASCOPY-CATALOG: Registers dataset definitions,
       queries supported instruments, and lists partition files via
       register_dataset() and register_definitions().
@@ -318,7 +318,7 @@ class RateCorrector:
         if self._consecutive_successes >= self._success_threshold:
             self._delay = max(self._min_delay, self._delay * 0.75)
             self._consecutive_successes = 0
-            logger.debug(
+            logger.info(
                 "Dukascopy rate throttle delay reduced to %.3fs after %d successes",
                 self._delay,
                 self._success_threshold,

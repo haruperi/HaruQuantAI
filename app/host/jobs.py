@@ -233,7 +233,7 @@ class JobManager:
     async def _run(self, job: Job, operation: Callable[[], Awaitable[None]]) -> None:
         """Run one trusted cooperative body and record only attributed safe outcomes."""
         self.records[job.id] = replace(job, state="running")
-        logger.debug("Host job started: id=%s, owner=%s", job.id, job.owner)
+        logger.info("Host job started: id=%s, owner=%s", job.id, job.owner)
         try:
             async with asyncio.timeout(job.budget.timeout_seconds):
                 await operation()

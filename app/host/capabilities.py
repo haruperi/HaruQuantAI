@@ -107,7 +107,7 @@ class ResourceAccess:
 
     def read(self, reference: ResourceRef) -> tuple[bytes, str]:
         """Read immutable bytes/schema with access checks and digest verification."""
-        logger.debug(
+        logger.info(
             "ResourceAccess reading resource %s (owner=%s)",
             reference.id,
             self.owner,
@@ -179,7 +179,7 @@ class SettingsAccess:
 
     def get(self, key: str) -> dict[str, Any] | None:
         """Read a private settings record for this owner."""
-        logger.debug("Settings accessed: owner=%s key=%s", self.owner, key)
+        logger.info("Settings accessed: owner=%s key=%s", self.owner, key)
         if hasattr(self._store, "get_private"):
             result = self._store.get_private(self.owner, key)
             return cast("dict[str, Any] | None", result)
@@ -357,5 +357,5 @@ class NetworkAccess:
         """Fetch one allowlisted provider object."""
         if self.owner != "plugin.data_manager.dukascopy":
             raise PermissionError("Historical transport ownership denied")
-        logger.debug("Historical network request: owner=%s url=%s", self.owner, url)
+        logger.info("Historical network request: owner=%s url=%s", self.owner, url)
         return await self._network.get(url)
