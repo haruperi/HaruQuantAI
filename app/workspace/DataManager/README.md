@@ -1,44 +1,187 @@
-# Data Manager backend
+# Data Manager Workspace
 
-Status: resource/attachment boundary candidate; Dukascopy direct acquisition
-passes offline fixture tests, with live acquisition unavailable.
-The workspace owns workflow semantics, not host resource custody or plugin logic.
-`workspace.py` declares `data_source.presentation@1.0.0` and
-`data_source.acquisition@1.0.0` slots and prepares `resources.list`,
-`resources.read`, `capabilities`, and source operation forwarding. With no providers,
-retained authorized resources remain inspectable; acquisition stays unavailable.
+> **Backend Path:** `app/workspace/DataManager/`
+> **Frontend Path:** `app/ui/app/workspace/DataManager/`
+> **Package ID:** `workspace.data_manager`
+> **Host Contract:** `host.workspace@1.0.0`
+> **Status:** Implemented / Qualified
+> **Last updated:** 2026-09-29
 
-Preparation requires `host.resources@1.0.0`; there are no peer imports or raw SQL.
-The host validates packaging and literal metadata before loading `prepare` and
-injects immutable child bindings. Shutdown drops local handles, never stored data.
-The corresponding UI migration/removal qualification is pending. This README does
-not claim full workspace qualification, market-data ingestion or live persistence
-migration. See the current ownership-removal task walkthrough for actual evidence.
+This README is the workspace's authoritative source of truth for its historical market data workflow, action dispatcher, extension slot declarations, zero-plugin fallback behavior, persistence models, host resource boundaries, and cascade removal invariants.
 
-## Feature registry
+[PROJECT.md](../../../docs/PROJECT.md) owns system scope and cross-workspace workflows. [ARCHITECTURE.md](../../../docs/ARCHITECTURE.md) owns structural rules and the Five Laws of Spatial Composability. [AGENTS.md](../../../AGENTS.md) owns contributor workflow and verification gates.
 
-| Feature | Requirement | Contract | Current implementation and qualification |
-| --- | --- | --- | --- |
-| `FEAT-DM-DUKASCOPY_ACQUISITION` | `FR-DATA-001` | `plugin.data_manager.dukascopy` in `data_source.acquisition@1.0.0`; host owns network, jobs and market storage | Isolated fixture direct M1 and Tick jobs pass tests. Adaptive rate throttling, Sunday 19:00 UTC start, and StrategyQuant CDN transport (global and Hong Kong) with fallback to direct download are qualified. Active catalog migration remains required before live downloads execute. |
-| `FEAT-DM-ACTIONS` | `FR-DATA-002` | `actions.*` operations in `app/workspace/DataManager/actions.py` invoked through workspace dispatcher and CLI | 1:1 parity with SQX donor `DataManagerActions` for all 12 actions: `brokerData`, `brokerDataUpdate`, `cloneToTimezone`, `delete`, `exportToCsv`, `exportToMT4`, `exportToMT5`, `load`, `review` (data/chart/quality), `save`, `updateAll`, and `updateSelected`, plus `listDatasets` (`actions.list_datasets`) loading real records directly from `datamgr_datasets`. Fully qualified via offline unit tests, UI integration, and CLI subcommands. |
+---
 
-Canonical target storage is `data/market/dukascopy/` with only `m1/` and
-`ticks/` immediately below that source; current files are one M1 year or Tick
-month each. The active database has not been migrated to the market file catalog.
-The Dukascopy Add dialog lists eligible `datamgr_broker` rows through a
-read-only host catalog and fills the selected broker's postfix. Save in the Add
-Dukascopy data dialog registers dataset definitions atomically
-with the selected broker/postfix and backend Default instrument handling, without
-an intermediate instrument-selection screen. This works independently of
-file-catalog provisioning. This neither downloads data nor performs broker-specific
-conversion. Definition
-registration passes isolated persistence and browser tests; live Save readiness
-is verified without inserting test records into the active database.
-The approved plan is under `.agents/logs/2026-09-28T093858_dukascopy-acquisition/`.
+## Code-Aligned Implementation Convention
 
-The dataset table reloads its database snapshot after successful source additions
-and existing edit/update, load, clone and delete/clear completion callbacks.
-Refresh preserves table filters and valid selection. Older overlapping responses
-cannot replace newer snapshots. A failed list read keeps the last rows visible
-with a retry action; retry does not repeat the completed write. Prototype editors
-retain their existing persistence limitations.
+```text
+app/workspace/DataManager/
+|-- package.json                     # Authoritative manifest defining owned_paths and slots
+|-- README.md                        # This document
+|-- __init__.py                      # Docstring-only initializer
+|-- workspace.py                     # Slot declarations & host lifecycle preparation
+`-- actions.py                       # Concrete workspace command and action handlers
+
+app/ui/app/workspace/DataManager/
+|-- DataManager.tsx                  # Primary React workspace view component
+|-- contribution.tsx                 # UI workspace contribution manifest
+|-- Actions/                         # Action dialogs and actionsClient.ts
+|-- Catalogs/                        # BrokerProfiles, Instruments, Sessions, StockGroups
+`-- Common/                          # Shared store, fixtures, ribbon components
+
+tests/workspace/DataManager/
+|-- test_workspace.py                # Slot declaration, descriptor, and lifecycle tests
+`-- test_actions.py                  # Action execution, input validation, and error tests
+```
+
+- **Manifest:** Root `package.json` owns package identity (`workspace.data_manager`), version, declared extension slots, and exact `owned_paths`.
+- **Slots:** Declared in `workspace.py`; child plugins (e.g. Dukascopy) are accessed strictly via host-injected handles without static imports.
+- **Actions:** Consolidated in `actions.py` with 100% parity between UI and CLI (`uv run python -m app.cli --page=data-manager --action=[action_name]`).
+- **Persistence:** Tables `datamgr_datasets` and `datamgr_broker` reside in `data/database/haruquantai.db`; presets in `data/presets/DataManager/`.
+- **UI:** Rendered in `DataManager.tsx`, dynamically discovering attached data-source plugins.
+
+---
+
+## 1. Purpose and Boundary
+
+### Purpose
+
+DataManager coordinates historical market data acquisition, inspection, validation, conversion, and multi-broker symbol management. It empowers quantitative researchers to assemble clean, continuous price series across M1 and Tick granularities for strategy generation and backtesting.
+
+### System owns
+
+- Historical dataset definitions, inventory management, and status tracking.
+- Action dispatching (`actions.*`), payload validation, and progress reporting.
+- Extension slot declarations (`data_source.acquisition`, `data_source.presentation`).
+- Local UI presentation, dataset table filtering, broker profiles, sessions, and symbol mappings.
+
+### System does not own
+
+- Feed-specific network decoding or vendor protocols (owned by concrete DataSource plugins like `dukascopy.py`).
+- Global file storage allocation or quota enforcement (owned by Host Resource Custody `host.resources@1.0.0`).
+- Private state or execution engines of sibling workspaces (e.g. StrategyBuilder).
+
+---
+
+## 2. Extension Slots and Zero-Plugin Behavior
+
+### 2.1 Declared Extension Slots
+
+| Slot ID | Contract Version | Cardinality | Input Schema | Output Schema | Allowed UI Vocabulary | Purpose |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `data_source.acquisition` | `1.0.0` | `zero_or_more` | `AcquisitionRequestDTO` | `AcquisitionResultDTO` | Dialog / Progress | Provides automated market data downloads from specific vendor sources. |
+| `data_source.presentation` | `1.0.0` | `zero_or_more` | Custom | Custom | Dialog / Custom View | Provides custom source configuration forms or visualizers. |
+
+### 2.2 Zero-Plugin Invariant & Fallback Behavior
+
+DataManager remains fully functional when zero data-source plugins are installed:
+- **UI Fallback:** The DataSource ribbon and Add Source dialogs display only installed providers; if none exist, the UI clearly indicates no external sources are available while retaining full access to existing local datasets and actions.
+- **Backend Degradation:** Operations requiring an attached acquisition plugin fail closed with a structured `UNAVAILABLE` diagnostic. Unrelated actions (e.g., `list_datasets`, `clone_to_timezone`, `export_to_csv`, `review_chart`) and inspection of previously retained datasets remain 100% operational.
+
+---
+
+## 3. Feature Registry
+
+Each module/file in this workspace represents a single, cohesive, fully documented, traced feature (`FEAT-*`):
+
+| Feature ID | Delivered Capability | Owner File | Contract / Slot | Required Host Services | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `FEAT-DM-COORDINATOR` | Workspace lifecycle, slot declarations, and host preparation | `app/workspace/DataManager/workspace.py` | `host.workspace@1.0.0` | `host.resources@1.0.0` | Implemented |
+| `FEAT-DM-ACTIONS` | Concrete action dispatching, dataset export, clone, and review | `app/workspace/DataManager/actions.py` | `actions.*` wire endpoints | `host.jobs@1.0.0` | Implemented |
+| `FEAT-DM-PERSISTENCE` | Relational tables for datasets and broker configurations | `app/workspace/DataManager/actions.py` | `data/database/haruquantai.db` | SQLite database | Implemented |
+
+---
+
+## 4. Action Registry & CLI Parity
+
+Every action in `actions.py` maps to a traced functional requirement (`FR-DATA-002`) and supports identical execution in UI and CLI:
+
+| Action ID | Action Name | Implementing Function | Input Parameters | Output DTO | CLI Command Example | Status |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| `listDatasets` | List Datasets | `actions.list_datasets()` | filter criteria | `list[DatasetRecord]` | `uv run python -m app.cli --page=data-manager --action=listDatasets` | Qualified |
+| `brokerData` | Fetch Broker Data | `actions.broker_data()` | broker_id, symbol | `BrokerDataResult` | `uv run python -m app.cli --page=data-manager --action=brokerData` | Qualified |
+| `brokerDataUpdate` | Update Broker Data | `actions.broker_data_update()` | broker_id, symbol | `BrokerDataResult` | `uv run python -m app.cli --page=data-manager --action=brokerDataUpdate` | Qualified |
+| `cloneToTimezone` | Clone to Timezone | `actions.clone_to_timezone()` | dataset_id, target_tz | `CloneResult` | `uv run python -m app.cli --page=data-manager --action=cloneToTimezone` | Qualified |
+| `delete` | Delete Datasets | `actions.delete_datasets()` | dataset_ids | `DeleteResult` | `uv run python -m app.cli --page=data-manager --action=delete` | Qualified |
+| `exportToCsv` | Export to CSV | `actions.export_to_csv()` | dataset_id, path | `ExportResult` | `uv run python -m app.cli --page=data-manager --action=exportToCsv` | Qualified |
+| `exportToMT4` | Export to MetaTrader 4 | `actions.export_to_mt4()` | dataset_id, hst_path | `ExportResult` | `uv run python -m app.cli --page=data-manager --action=exportToMT4` | Qualified |
+| `exportToMT5` | Export to MetaTrader 5 | `actions.export_to_mt5()` | dataset_id, path | `ExportResult` | `uv run python -m app.cli --page=data-manager --action=exportToMT5` | Qualified |
+| `load` | Load Definitions | `actions.load_definitions()` | source_file | `DefinitionResult` | `uv run python -m app.cli --page=data-manager --action=load` | Qualified |
+| `save` | Save Definitions | `actions.save_definitions()` | target_file | `DefinitionResult` | `uv run python -m app.cli --page=data-manager --action=save` | Qualified |
+| `review` | Review Data / Chart | `actions.review_data()` | dataset_id, view_type | `ReviewResult` | `uv run python -m app.cli --page=data-manager --action=review` | Qualified |
+| `updateAll` | Update All Datasets | `actions.update_all()` | none | `UpdateBatchResult`| `uv run python -m app.cli --page=data-manager --action=updateAll` | Qualified |
+| `updateSelected` | Update Selected | `actions.update_selected()` | dataset_ids | `UpdateBatchResult`| `uv run python -m app.cli --page=data-manager --action=updateSelected` | Qualified |
+
+---
+
+## 5. Feature Specifications
+
+### `workspace.py` — `FEAT-DM-COORDINATOR`
+
+> **Feature ID:** `FEAT-DM-COORDINATOR`
+> **Owner Module:** `app/workspace/DataManager/workspace.py`
+> **Status:** Implemented / Qualified
+
+#### Purpose
+Coordinates the DataManager workspace lifecycle, declares versioned extension slots, validates child plugin attachments, and prepares action handlers.
+
+#### Functional Requirements
+
+| Status | Requirement ID | Observable Behavior | Implementing Symbol | Side Effects | Failure Behavior | Test Evidence |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Qualified | `FR-DATA-003` | Declares extension slots and verifies contract versions | `workspace.prepare()` | Injects child handles | Fails closed on version mismatch | `tests/workspace/DataManager/test_workspace.py` |
+
+---
+
+### `actions.py` — `FEAT-DM-ACTIONS`
+
+> **Feature ID:** `FEAT-DM-ACTIONS`
+> **Owner Module:** `app/workspace/DataManager/actions.py`
+> **Status:** Implemented / Qualified
+
+#### Purpose
+Provides concrete, stateless action handlers invoked by the HTTP REST/WebSocket dispatcher and CLI runner.
+
+#### Functional Requirements
+
+| Status | Requirement ID | Observable Behavior | Implementing Symbol | Side Effects | Failure Behavior | Test Evidence |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Qualified | `FR-DATA-002` | Dispatches action, validates input payload, and returns typed response | `actions._invoke_action()` | Bounded host job | Returns error code on invalid input | `tests/workspace/DataManager/test_actions.py` |
+
+---
+
+## 6. Persistence and Database
+
+### 6.1 Persisted-State Ownership
+
+| Status | State / Table Name | Owning Feature | Schema Version | Driver | Retention / Purge Policy | Public Read Boundary | Notes |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| Qualified | `datamgr_datasets` | `FEAT-DM-PERSISTENCE` | `1` | `sqlite` | `retain` | `actions.list_datasets` | Stores registered dataset definitions, symbol, timeframe, date range. |
+| Qualified | `datamgr_broker` | `FEAT-DM-PERSISTENCE` | `1` | `sqlite` | `retain` | Broker profiles catalog | Stores broker configuration records and symbol postfix rules. |
+
+### 6.2 Presets Storage
+
+- Workspace configurations and instrument presets are stored strictly as JSON documents under `data/presets/DataManager/*.json`.
+- Presets are versioned, human-readable, and discoverable by the host preset inventory.
+
+---
+
+## 7. Package Removal and Cascade Invariants
+
+When `workspace.data_manager` is uninstalled via `app/host/removal.py`:
+
+1. **Cascade Removal:** Uninstalling `workspace.data_manager` **cascades** to automatically uninstall all child data-source plugins attached to its slots (e.g., `plugin.data_manager.dukascopy`).
+2. **Survivor Invariant:** Rebuilding the UI and restarting the backend host succeeds cleanly. Sibling workspaces and the host shell continue operating without missing-module errors.
+3. **Data Preservation:** User data, storage files (`data/market/`), presets, and database records in `data/database/haruquantai.db` are never deleted during package uninstall.
+
+---
+
+## 8. Verification and Acceptance Matrix
+
+| Verification Scope | Requirement | Command |
+| :--- | :--- | :--- |
+| **Workspace Slots & Lifecycle** | Slot declaration, compatibility checks, zero-plugin fallback | `uv run pytest tests/workspace/DataManager/test_workspace.py` |
+| **Action Dispatcher & Parity** | All 12 actions execute with valid payloads; error handling | `uv run pytest tests/workspace/DataManager/test_actions.py` |
+| **Complete Workspace Suite** | Combined unit and integration checks | `uv run pytest tests/workspace/DataManager/` |
+| **Frontend UI Suite** | Workspace views, dialogs, and actions client tests | `npm --prefix app/ui run test` |

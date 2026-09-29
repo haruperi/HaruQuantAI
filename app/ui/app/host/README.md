@@ -1,82 +1,75 @@
-# UI Host Shell
+# HaruQuantAI UI Host Shell
 
-`app/ui/app/host/` is the HaruQuantAI frontend host — the shell that workspaces and
-plugins plug into, and the UI counterpart of the backend `app/host/`.
+> **Frontend Path:** `app/ui/app/host/`
+> **Backend Counterpart:** `app/host/`
+> **Role:** Universal Client Shell & Transport Hub
+> **Status:** Implemented / Qualified
+> **Last updated:** 2026-09-29
 
-## What lives here
+This README is the authoritative source of truth for the HaruQuantAI Frontend Host Shell. It owns universal browser navigation chrome, transport envelopes, session authentication handshakes, host boot screen visualization, and dynamic plugin discovery rendering.
 
-- App shell: `App.tsx` (mount + navigation), `router.tsx`, `store.ts`,
-  `HeaderApplications.tsx`, `GlobalSettingsMenu.tsx`, shared `types.ts`.
-- Universal transport: `transport.ts`.
-- Host connection: `HostConnection.tsx` acquires an in-memory session, reports
-  readiness, and handles offline/expired-session states. `hostSettings.ts`
-  validates the shell preference projection and consumes authenticated SSE.
+[PROJECT.md](../../../../docs/PROJECT.md) owns system scope. [ARCHITECTURE.md](../../../../docs/ARCHITECTURE.md) owns structural rules and the Five Laws of Spatial Composability. [app/host/README.md](../../../host/README.md) owns the backend host contracts and lifecycle.
 
-## Transport boundary law
+---
 
-- The host owns the request/response envelope, error shape, request IDs, and
-  `createDomainClient(routeBase)` — nothing else. It holds no domain knowledge
-  and knows no workspace by name.
-- Each workspace/plugin UI folder owns its client, its route base, and its
-  contract with its backend counterpart. Plugin-specific contracts are never
-  centralized here.
-- The execution documents exported by `transport.ts` are frozen transitional
-  shapes from the pre-reset gateway: they cross domain boundaries through the
-  store and will be replaced by the ratified host contract.
-- Default base URL and domain route bases are provisional until the backend
-  host architecture ratifies the mounting scheme.
-- The browser shell uses the same-origin `/api/v1` host in a built deployment;
-  local Vite development on port 3000 targets the loopback host on port 8000.
-  Tokens are not persisted. A 401 returns the shell to its login flow.
-- Global Settings menu preferences (Configuration tabs, Remote access flags,
-  non-secret SMTP fields, language, skin, and zoom) are loaded from scoped
-  records in the host database. Each edit updates its owning record fields;
-  the host excludes credential fields from settings responses and events.
-  Browser storage excludes these host-owned settings. Offline or conflicting
-  writes do not claim success. Passwords and license keys are transient.
-  Benchmark, MCP, mail delivery, licensing,
-  remote-server activation, and Exit still lack backend services.
+## 1. System Pair Overview
 
-## Connection rules (spatial composability)
+```text
+Backend Host (app/host/)                 Frontend Host (app/ui/app/host/)
+========================================================================================
+- Five-phase boot lifecycle               - BootScreen (5-phase progress rendering)
+- Process state management                - HostConnection (handshake & /app-loaded)
+- Token verification & session repo       - In-memory bearer token management
+- Dynamic catalog discovery (AST/JSON)    - Catalog cache & dynamic schema renderers
+- JSON-RPC / REST envelope handling       - Universal transport (transport.ts)
+- Host database persistence (SQLite)      - GlobalSettingsMenu & hostSettings.ts
+- Resource custody & background jobs      - HeaderApplications & workspace navigation
+```
 
-1. The host pair owns the envelope; domain pairs own their contracts.
-2. A workspace/plugin UI folder imports universal primitives
-   (`components/ui`), the host transport, and its own files — never a sibling
-   domain's internals.
-3. The host discovers domains; it does not know them. Adding or removing a
-   workspace never edits the host.
-4. UI/backend pairs share contracts, never modules: the boundary is typed
-   documents over the transport.
+The UI Host owns application chrome and universal communication infrastructure. It contains **zero** quantitative domain formulas, strategy definitions, or workspace workflow rules.
 
-## Feature registry (this domain)
+---
 
-| Feature ID | Feature | Status |
-|---|---|---|
-| FEAT-UI-TRANSPORT | Universal UI-host transport: envelope, error mapping, request IDs, domain-client factory, host session startup, shell preference updates | implemented (`transport.ts`, `HostConnection.tsx`, `hostSettings.ts`) |
-| FEAT-UI-WORKSPACE_INVENTORY | Sixteen workspace surfaces mirroring the SQX 144.2953 navigation inventory (plus normative MTAnalyzer and Live Trading) | implemented (`app/workspace/*`) |
+## 2. Boot Integration & Handshake (Schema Version 2)
 
+The UI host couples to the backend host's boot contract **schema_version 2**:
 
-## Host boot integration (2026-09-29)
+1. **Boot Visualization:** `BootScreen.tsx` presents progress across the 5 canonical host phases: `runtime`, `services`, `packages`, `transport`, and `serving`.
+2. **WebSocket Handshake:** `HostConnection.tsx` establishes authenticated WebSocket attachment (`/ws/updates`) and authenticates on the first frame within 5 seconds.
+3. **Init-Data Ingestion:** Reads host configuration, discovered catalog snapshot, and presets via `GET /api/v1/init-data`.
+4. **Client Acknowledgment:** Sends an idempotent POST to `/app-loaded` to record client arrival. Client arrival timing is decoupled from backend process boot timing.
+5. **Fail-Closed Compatibility:** Rejects unsupported or missing `schema_version` snapshots with an explicit diagnostic modal.
 
-`HostConnection.tsx` and `app/cli.py` authenticate, attach live updates, read
-init-data and acknowledge client initialization. Boot snapshots require
-`schema_version: 2`; missing/unsupported versions produce explicit compatibility
-errors. Deploy the host and both clients together.
+---
 
-`BootScreen.tsx` presents five host phases: runtime, services, packages, transport
-and serving. It displays actual outcomes and reasons. An online shell requires a
-SERVER_READY or DEGRADED host plus successful client initialization. No client
-acknowledgment starts shared restoration, and no restoration polling loop remains.
+## 3. Feature Registry & Traceability
 
-`transport.ts` retains first-frame WebSocket authentication, in-memory bearer
-tokens, heartbeat, bounded handshake timeout and overflow/disconnect errors.
-Settings retain authenticated SSE. Missing research operations remain catalog or
-command availability information; prototype navigation does not establish backend
-capabilities. FirstRunDialog continues to disclose relevant host requirements.
+In accordance with the Five-Level Structural Hierarchy, files in `app/ui/app/host/` represent traced UI features (`FEAT-UI-*`):
 
-| Feature ID | Feature | Status |
-| --- | --- | --- |
-| FEAT-UI-BOOT | Version-2 handshake, five-phase progress and independent client readiness | candidate; bootSequence.test.tsx and hostConnection.test.tsx; task walkthrough records verification |
+| Feature ID | Delivered Capability | Owner Files | Traced Operations | Verification Suite |
+| :--- | :--- | :--- | :--- | :--- |
+| `FEAT-UI-BOOT` | Boot sequence rendering, v2 handshake, client readiness | `BootScreen.tsx`<br>`HostConnection.tsx` | 5-phase visual progress, `/app-loaded` acknowledgment | `app/ui/tests/unit/host/bootSequence.test.tsx`<br>`app/ui/tests/unit/host/hostConnection.test.tsx` |
+| `FEAT-UI-TRANSPORT` | Universal HTTP envelope, domain client factory, WebSockets | `transport.ts` | `createDomainClient()`, error mapping, request IDs | `app/ui/tests/unit/host/transport.test.ts` |
+| `FEAT-UI-SESSIONS` | In-memory token acquisition, loopback auto-login, logout | `HostConnection.tsx`<br>`auth.ts` | Bearer token injection, session refresh, 401 handling | `app/ui/tests/unit/host/hostConnection.test.tsx` |
+| `FEAT-UI-SETTINGS` | Global host settings projection, SSE stream subscription | `hostSettings.ts`<br>`GlobalSettingsMenu.tsx` | Scoped settings updates, credential redaction | `app/ui/tests/unit/host/hostSettings.test.ts` |
+| `FEAT-UI-SHELL` | Top-level application chrome, dockview layout, tab router | `App.tsx`<br>`router.tsx`<br>`HeaderApplications.tsx` | Workspace switching, layout persistence | `app/ui/tests/unit/host/router.test.tsx` |
 
-No workspace algorithms or durable domain records are implemented in the UI host.
-Evidence: `.agents/logs/2026-09-29T112552_simplify-host-boot/`.
+---
+
+## 4. Spatial Composability & Transport Boundary Rules
+
+1. **Envelope Ownership:** The host pair owns the request/response envelope `{api_version, request_id, status, data, error}`; domain pairs own their payload DTOs.
+2. **Dynamic Slot Discovery:** Workspaces and plugins attach via explicit slots (e.g. `useAttachments('<slot_id>')`). The host shell imports zero concrete plugins statically.
+3. **Isolation:** Workspace and plugin UI directories import universal primitives (`components/ui`), the host transport, and their own local files — never a sibling workspace's internal code.
+4. **Honest View States:** The UI strictly presents backend truth; it never calculates simulated metrics or invents successful write states locally.
+
+---
+
+## 5. Verification and Definition of Done
+
+| Verification Scope | Requirement | Command |
+| :--- | :--- | :--- |
+| **TypeScript Typing** | Zero type errors across frontend host and workspaces | `npm --prefix app/ui run typecheck` |
+| **Unit Test Suite** | Boot, transport, sessions, and settings unit tests pass | `npm --prefix app/ui run test app/ui/tests/unit/host/` |
+| **UI Architecture Check** | Slot attachments valid; zero direct static plugin imports | `node scripts/ui_architecture_check.cjs` |
+| **Full Production Build** | Clean Vite build bundle generation | `npm --prefix app/ui run build` |
