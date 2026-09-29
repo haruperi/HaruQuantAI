@@ -7,8 +7,11 @@ import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 import pytest
 from app.host.capabilities import MarketAccess
-from app.host.market_data import TICK_SCHEMA, MarketDataStore
-from app.persistence.market import create_isolated_schema
+from app.persistence.market import (
+    TICK_SCHEMA,
+    MarketDataStore,
+    create_isolated_schema,
+)
 
 
 def test_tick_month_publish_scan_and_query(tmp_path: Path) -> None:
@@ -153,8 +156,7 @@ def test_definition_batch_without_price_catalog(tmp_path):
     import sqlite3
     from contextlib import closing
 
-    from app.host.market_data import DefinitionRequest
-    from app.persistence.market import SCHEMA
+    from app.persistence.market import SCHEMA, DefinitionRequest
 
     database = tmp_path / "definitions.db"
     with closing(sqlite3.connect(database)) as connection, connection:

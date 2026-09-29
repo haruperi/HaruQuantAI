@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pytest
 from app.host.bootstrap import BootstrapCoordinator
-from app.host.config import HostSettings
-from app.host.http_server import create_app
+from app.host.settings import HostSettings
+from app.host.transport import create_app
 from starlette.testclient import TestClient
 
 

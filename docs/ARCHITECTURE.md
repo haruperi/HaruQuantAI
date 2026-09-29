@@ -147,7 +147,7 @@ Traceability from system boundary down to individual acceptance tests is structu
      "contract_version": "1.0.0"
    }
    ```
-3. **Host Discovery & Composition:** At startup, `app/host/catalog.py` validates identity, version agreement, and path containment without executing plugin module code.
+3. **Host Discovery & Composition:** At startup, `app/host/discovery.py` and `app/host/packages.py` validate identity, version agreement, and path containment without executing plugin module code.
 4. **Dynamic Invocation:** The workspace accesses attached plugins dynamically via host-injected slot handles.
 
 ### 4.2 Zero-Plugin Invariant
@@ -257,4 +257,5 @@ An architectural contribution is accepted only when all verification criteria ar
 | **Static Code Quality** | Ruff lint/format clean; Mypy strict mode clean; zero TypeScript errors | `uv run python scripts/ci_check.py`<br>`npm --prefix app/ui run typecheck` |
 | **Test Coverage** | Unit and integration test pass; $\ge 80\%$ branch coverage across retained code | `uv run pytest tests/` |
 | **Offline Examples** | Deterministic, offline usage example executes and passes | `uv run python tests/examples/dukascopy_offline_example.py` |
+| **Module Standards & Telemetry** | Top-of-file docstring (5 sections), descriptive FR labels, zero silent FR executions (`docs/templates/PYTHON_MODULE.md`) | `uv run ruff check`<br>`uv run pytest tests/` |
 | **Package Removal** | Full removal cascade passes in isolation; surviving tests pass 100% | `uv run python scripts/release_check.py` |

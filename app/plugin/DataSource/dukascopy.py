@@ -1,9 +1,72 @@
-"""Dukascopy acquisition contracts, adaptive rate throttling, and CDN transport.
+"""Dukascopy Acquisition Plugin, Adaptive Rate Throttling, and Feed Decoding.
 
-Supports Direct download from Dukascopy datafeed with SQX-compatible adaptive rate
-throttling (+25% backoff on 429/503, -25% delay reduction after 100 consecutive
-successes), Sunday 19:00 UTC market opening hour handling, and StrategyQuant CDN
-transport with seamless fallback to direct download.
+Description:
+    Implements the Dukascopy historical market data acquisition plugin, providing
+    automated downloading, decompaction, rate throttling, and ingestion of tick
+    and minute bar datasets into host Parquet storage.
+
+    External relations and workflows:
+    - Workspace attachment: Discovered and attached dynamically to
+      `workspace.data_manager` under slot `data_source.acquisition`
+      (`app.workspace.DataManager.workspace`).
+    - Host capabilities: Requires `host.market_data` (`MarketAccess`) for
+      dataset registration and partition storage, `host.network`
+      (`NetworkAccess`) for HTTP chunk fetching, and `host.jobs` (`JobAccess`)
+      for background task supervision.
+    - Upstream feeds: Connects to official Dukascopy bi5 LZMA-compressed feeds
+      or StrategyQuant CDN mirrors with automatic fallback.
+
+    Internal coordination:
+    - RateCorrector: Implements SQX-compatible adaptive throttling (+25%
+      backoff on 429/503 HTTP responses, -25% delay reduction after 100
+      consecutive successes).
+    - Binary decoders: `decode_ticks` and `decode_m1` parse big-endian binary
+      bi5 blocks, adjusting for point values, volumes, and Sunday 19:00 UTC
+      market open hours.
+    - Lifecycle hooks: `prepare`, `invoke`, `close` managing operations
+      (`catalog`, `definitions.add`, `add`, `download.start`, `download.status`,
+      `download.cancel`, `import`, `disclaimer`, `files.list`, `delete`,
+      `clear`).
+
+Purpose:
+    FEAT-PLUGIN-DATASOURCE-DUKASCOPY: Automated historical market data
+    acquisition from Dukascopy and CDN mirrors with adaptive throttling and
+    direct Parquet ingestion.
+
+Key Capabilities:
+    - FR-PLUGIN-DATASOURCE-DUKASCOPY-ACQUIRE: Downloads historical ticks and M1
+      bars via direct Dukascopy bi5 feeds or CDN archives with adaptive
+      throttling via run_download().
+      * Verified via: logger.info("Starting Dukascopy download for %s (%s)...")
+    - FR-PLUGIN-DATASOURCE-DUKASCOPY-DECODE: Decompresses LZMA streams and
+      unpacks binary struct records for price, bid/ask, and volume via
+      decode_ticks() and decode_m1().
+      * Verified via: logger.debug("Decoded %d tick records for %s")
+    - FR-PLUGIN-DATASOURCE-DUKASCOPY-CATALOG: Registers dataset definitions,
+      queries supported instruments, and lists partition files via
+      register_dataset() and register_definitions().
+      * Verified via: logger.info("Registering %d Dukascopy dataset "
+        "definitions...")
+    - FR-PLUGIN-DATASOURCE-DUKASCOPY-LIFECYCLE: Attaches to DataManager
+      acquisition slot, binds host network/jobs/market services, and cleans up
+      on close via prepare() and close().
+      * Verified via: logger.info("Preparing Dukascopy data source plugin")
+
+Python API Usage:
+    ```python
+    from app.host.capabilities import HostCapabilities
+    from app.plugin.DataSource.dukascopy import prepare
+
+    plugin = await prepare(capabilities)
+    status = await plugin.invoke("catalog", {})
+    await plugin.close()
+    ```
+
+CLI Usage:
+    ```bash
+    # Run offline deterministic usage example:
+    uv run python -m tests.examples.dukascopy_offline
+    ```
 """
 # ruff: noqa: INP001 -- owner-approved singular backend root is a namespace package.
 
@@ -22,10 +85,10 @@ from uuid import uuid4
 
 import pyarrow as pa  # type: ignore[import-untyped]
 from app.host.capabilities import HostCapabilities, NetworkAccess
-from app.host.composition import PreparedContribution
 from app.host.jobs import Budget
 from app.host.logging import get_logger
-from app.host.market_data import (
+from app.host.packages import PreparedContribution
+from app.persistence.market import (
     M1_SCHEMA,
     TICK_SCHEMA,
     DefinitionRequest,

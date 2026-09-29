@@ -1,9 +1,74 @@
-"""Process-local, bounded event delivery for boot and settings updates.
+"""Process-Local Publish/Subscribe Event Bus and Replay Buffer.
 
-Producers publish JSON snapshots on the owning event loop. Subscribers receive
-independent copies through finite asyncio queues; slow consumers are marked for
-resynchronization rather than blocking publishers. History is an in-memory ring,
-not a durable log. Transport code owns subscription cleanup and reconnect policy.
+Description:
+    This module provides in-process, non-blocking publish/subscribe event
+    distribution, bounded subscriber queues, and an in-memory ring buffer for
+    historical event replay. It exists to decouple state-changing host services
+    from real-time event consumers (UI WebSocket streams, SSE endpoints, testing
+    probes) without permitting slow or stalling consumers to block event-loop
+    execution. Externally, it participates in three major workflows: (1)
+    `Startup.mark()` in `app.host.bootstrap` publishes `boot.progress` lifecycle
+    events; (2) `SettingsStore.patch()` in `app.host.settings` publishes
+    `settings.changed` updates; and (3) The transport layer (`app.host.transport`)
+    subscribes to channels for SSE and WebSocket connections, replaying missed
+    events to reconnecting clients via `replay()`. Internally, `validate_channel()`
+    enforces topic namespace syntax; `Subscriber` encapsulates a bounded queue with
+    overflow detection; and `EventBus` manages monotonic sequence numbers, circular
+    history, and non-blocking subscriber fan-out.
+
+Purpose:
+    FEAT-HOST-EVENTS: In-Process Pub/Sub Event Bus and Replay Buffer.
+    Provides namespaced topic filtering, non-blocking fan-out delivery, circular
+    replay buffering, and overflow-guarded subscriber queues.
+
+Key Capabilities:
+    - FR-HOST-EVENTS-TOPIC-VALIDATION: Namespaced Channel Validation
+      Associated: `validate_channel()`
+      Logging: Enforces syntax and length limits on channel strings with
+      ChannelError validation.
+    - FR-HOST-EVENTS-SUBSCRIPTION-MANAGEMENT: Bounded Subscription Lifecycle
+      Associated: `EventBus.subscribe()`, `EventBus.unsubscribe()`
+      Logging: Emits debug log when subscribers are admitted or released,
+      enforcing max subscriber limits.
+    - FR-HOST-EVENTS-NONBLOCKING-PUBLISH: Event Fan-Out & Sequencing
+      Associated: `EventBus.publish()`
+      Logging: Emits debug log on event publication with sequence number and
+      delivered count, and emits warning log on subscriber queue overflow.
+    - FR-HOST-EVENTS-RING-REPLAY: Circular Historical Event Replay
+      Associated: `EventBus.replay()`
+      Logging: Emits debug log with event count upon historical event replay
+      request.
+
+Python API Usage:
+    ```python
+    from app.host.events import EventBus
+
+    # 1. Instantiate process event bus
+    bus = EventBus(queue_size=256)
+
+    # 2. Subscribe to topics
+    subscriber = bus.subscribe(["boot.progress", "settings.changed"])
+
+    # 3. Publish an event
+    delivered = bus.publish("settings.changed", {"theme": "dark"})
+
+    # 4. Replay missed events after reconnect
+    missed = bus.replay(after=10)
+
+    # 5. Clean up subscription
+    bus.unsubscribe(subscriber)
+    ```
+
+CLI Usage:
+    The event bus is verified via host lifecycle and event delivery test
+    suites:
+    ```bash
+    # Run in-process event bus tests
+    uv run pytest tests/host/test_events.py
+
+    # Test full lifecycle and event delivery integration
+    uv run pytest tests/host/test_lifecycle.py
+    ```
 """
 
 import asyncio
@@ -157,6 +222,12 @@ class EventBus:
             except asyncio.QueueFull:
                 subscriber.overflow = True
                 logger.warning("Event subscriber overflow; snapshot required")
+        logger.debug(
+            "Event published: channel=%s, seq=%d, delivered=%d",
+            channel,
+            self.sequence,
+            delivered,
+        )
         return delivered
 
     def replay(self, after: int = 0) -> list[dict[str, Any]]:
@@ -169,11 +240,17 @@ class EventBus:
             Independent decoded event dictionaries in publication order; older evicted
             events are unavailable.
         """
-        return [
+        replayed = [
             json.loads(item)
             for item in self._history
             if json.loads(item)["sequence"] > after
         ]
+        logger.debug(
+            "Event replay requested: after=%d, returned=%d",
+            after,
+            len(replayed),
+        )
+        return replayed
 
     def subscriber_count(self) -> int:
         """Count currently admitted subscriptions.

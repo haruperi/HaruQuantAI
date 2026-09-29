@@ -1,9 +1,66 @@
-"""Terminal entrypoint for the host server and explicit auth maintenance.
+"""HaruQuantAI Host Server Process Entrypoint, Port Reservation, and Lifecycle.
 
-main resolves configuration and early logging. Normal execution reserves a TCP
-socket, creates the ASGI host, and serves until signal or authenticated shutdown.
-The separate --migrate-auth-schema mode performs an authorized storage migration
-and exits without serving. Importing this module starts neither mode.
+Description:
+    Provides the primary process entrypoint and service launcher for the
+    HaruQuantAI universal backend host server.
+
+    External relations and workflows:
+    - Host bootstrap: Instantiates `BootstrapCoordinator` (`app.host.bootstrap`)
+      to manage phase supervision, directory creation, and lifecycle state.
+    - ASGI transport: Initializes the ASGI web application through
+      `app.host.transport.create_app` and hosts it using an embedded Uvicorn
+      server.
+    - Persistence: Invokes `load_settings` (`app.host.settings`) and handles
+      authorized offline database migrations (`migrate_auth_schema`) via
+      `app.persistence.host`.
+    - Browser integration: Detects port binding and optionally launches the
+      platform web browser to connect to the active host server URL.
+
+    Internal coordination:
+    - arguments: Extracts command-line options (`--host`, `--port`, `--data-dir`,
+      `--open-browser`, `--migrate-auth-schema`).
+    - bind_socket: Reserves a non-blocking TCP socket across fallback port ranges
+      before database write initialization to eliminate port collision races.
+    - HostServer: Custom Uvicorn adapter that commits the selected port to
+      `host_settings`, notifies the coordinator of listening readiness, and
+      launches the browser.
+    - run_host: Asynchronous server supervisor monitoring the coordinator's
+      shutdown event and closing sockets cleanly upon exit.
+    - main: Top-level entrypoint configuring boot logging, handling errors
+      closed without credential leakage, and cleaning up log handlers.
+
+Purpose:
+    FEAT-MAIN-ENTRYPOINT: Top-level application server entrypoint, socket
+    reservation, ASGI server initialization, and lifecycle termination.
+
+Key Capabilities:
+    - FR-MAIN-ENTRYPOINT-SOCKET: Reserves non-blocking TCP listening sockets
+      across port fallback ranges without port collision races via bind_socket().
+      * Verified via: logger.info("Port reserved: %s")
+    - FR-MAIN-ENTRYPOINT-SERVE: Hosts the ASGI application via Uvicorn adapter,
+      commits bound port to persistent settings, and reports listening readiness
+      via HostServer.startup() and run_host().
+      * Verified via: logger.info("Port reserved: %s") and BootstrapCoordinator
+    - FR-MAIN-ENTRYPOINT-BROWSER: Automatically launches system default browser
+      pointing to the active host URL via launch().
+      * Verified via: logger.info("Browser launch outcome: %s")
+    - FR-MAIN-ENTRYPOINT-MAINTENANCE: Executes authorized database auth
+      migrations and exits without launching network listeners via main().
+      * Verified via: logger.info("HaruQuantAI entrypoint starting in %s mode")
+
+Python API Usage:
+    ```python
+    from app.host.settings import load_settings
+    from app.main import run_host
+
+    settings = load_settings({"port": 8000})
+    await run_host(settings)
+    ```
+
+CLI Usage:
+    ```bash
+    uv run python -m app.main --host 127.0.0.1 --port 8000
+    ```
 """
 
 import argparse
@@ -14,6 +71,7 @@ import socket
 import sqlite3
 import sys
 import time
+import webbrowser
 from pathlib import Path
 from typing import Any, override
 
@@ -23,10 +81,9 @@ if __name__ == "__main__" and not __package__:
 import uvicorn
 
 from app.host.bootstrap import BootstrapCoordinator
-from app.host.browser import launch
-from app.host.config import HostSettings, load_settings
-from app.host.http_server import create_app
 from app.host.logging import close_host_logging, configure_boot_logging, get_logger
+from app.host.settings import HostSettings, load_settings
+from app.host.transport import create_app
 from app.persistence.host import (
     HostPersistenceError,
     HostSettingRecord,
@@ -37,6 +94,27 @@ from app.persistence.host import (
 
 logger = get_logger(__name__)
 WINDOWS_ADDRESS_IN_USE = 10048
+
+
+def launch(url: str) -> bool:
+    """Ask the system browser to open the supplied host URL.
+
+    Logs the launch outcome without logging the URL. A False result does not stop
+    the backend; unrelated exceptions propagate to the caller.
+
+    Args:
+        url: Host address assembled by the caller after successful binding.
+
+    Returns:
+        The browser API acceptance flag, or False on webbrowser.Error.
+    """
+    try:
+        opened = webbrowser.open(url)
+    except webbrowser.Error:
+        logger.warning("Browser launch failed")
+        return False
+    logger.info("Browser launch outcome: %s", opened)
+    return opened
 
 
 def bind_socket(settings: HostSettings) -> socket.socket:
@@ -229,6 +307,10 @@ def main(argv: list[str] | None = None) -> int:
         options = arguments(argv)
         maintenance = options.pop("migrate_auth_schema", False)
         settings = load_settings(options)
+        logger.info(
+            "HaruQuantAI entrypoint starting in %s mode",
+            "maintenance" if maintenance else "server",
+        )
         if maintenance:
             migrate_auth_schema(settings.database_path)
             return 0

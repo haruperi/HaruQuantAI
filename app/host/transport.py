@@ -1,22 +1,94 @@
-"""HTTP and WebSocket adapters for one explicitly assembled host.
+"""Unified ASGI Application Factory, Wire Protocol Envelopes, and Command Mediation.
 
-create_app installs routes, CORS/trusted-host middleware, and an HTTP guard.
-The lifespan delegates resource acquisition and cleanup to BootstrapCoordinator.
-Protected routes share session authority across browser and CLI; WebSockets
-use first-frame credentials rather than query-string tokens. Handlers adapt
-host services and never implement quantitative workspace algorithms.
+Description:
+    This module provides the HTTP and WebSocket wire protocol adaptation layer
+    for the HaruQuantAI host process. It exists to guarantee uniform API envelope
+    packaging, request correlation tracing, sandboxed command execution, jailed
+    file exchange, and resilient real-time WebSocket communication. Externally,
+    it mediates all communications between client interfaces (browser UI, CLI
+    tools, testing harnesses) and the backend host subsystems (`BootstrapCoordinator`,
+    `SessionManager`, `SettingsStore`, `ResourceStore`, and `EventBus`). During
+    startup, `app.main` passes the initialized `BootstrapCoordinator` to
+    `create_app()`, and the resulting FastAPI ASGI application's lifespan manages
+    the asynchronous boot and graceful teardown sequences. Internally, `request_guard()`
+    assigns unique `X-Request-Id` tracing headers and verifies bearer sessions;
+    standardized envelope builders (`success()`, `failure()`, `render_error()`)
+    enforce wire schema consistency; `ExchangeFiles` enforces path jail confinement
+    for file exchanges; and `handle_command()` dispatches mediated system commands.
 
-Application API responses use the shared envelope. Framework middleware/static
-responses can have other shapes. Public failures omit request and credential
-values; callers must still avoid placing secrets in ordinary diagnostic text.
+Purpose:
+    FEAT-HOST-TRANSPORT: Uniform API Envelopes, Command Mediation, and ASGI Transport.
+    Provides standard JSON API envelopes, request correlation tracing, jailed
+    file exchange, sandboxed command dispatch, and WebSocket event streaming.
+
+Key Capabilities:
+    - FR-HOST-TRANSPORT-UNIFORM-ENVELOPE: Standardized JSON Wire Envelopes
+      Associated: `success()`, `failure()`, `render_error()`, `response()`
+      Logging: Emits debug log on response rendering and warning log on
+      validation or error response packaging.
+    - FR-HOST-TRANSPORT-REQUEST-TRACING: Correlation Tracing and Request Guard
+      Associated: `request_guard()`, `new_request_id()`
+      Logging: Emits debug log with correlation ID on request arrival and
+      warning log on unauthorized access or authentication rejection.
+    - FR-HOST-TRANSPORT-COMMAND-MEDIATION: Sandboxed Command Dispatch
+      Associated: `handle_command()`, `COMMAND_HANDLERS`
+      Logging: Emits info log on command dispatch completion and warning
+      log on command validation or execution error.
+    - FR-HOST-TRANSPORT-JAILED-EXCHANGE: Confined Filesystem File Exchange
+      Associated: `ExchangeFiles.read()`, `ExchangeFiles.write()`,
+      `ExchangeFiles.delete()`
+      Logging: Emits info log when exchange files are written or deleted
+      within the storage jail.
+    - FR-HOST-TRANSPORT-WEBSOCKET-STREAM: Authenticated Live Event Streaming
+      Associated: `socket_endpoint()`, `_socket_stream()`
+      Logging: Emits debug logs on socket connection, subscription dispatch,
+      and graceful client disconnection.
+    - FR-HOST-TRANSPORT-LIFESPAN-MANAGEMENT: ASGI Lifecycle Coordination
+      Associated: `_lifespan()`, `create_app()`
+      Logging: Emits info logs during ASGI lifespan startup and shutdown
+      transitions.
+
+Python API Usage:
+    ```python
+    from app.host.bootstrap import BootstrapCoordinator
+    from app.host.settings import HostSettings
+    from app.host.transport import create_app
+
+    # 1. Instantiate coordinator and create ASGI application
+    settings = HostSettings()
+    coordinator = BootstrapCoordinator(settings)
+    app = create_app(coordinator)
+
+    # 2. Run via ASGI server (e.g. Uvicorn)
+    # uvicorn.run(app, host=settings.host, port=settings.port)
+    ```
+
+CLI Usage:
+    The transport layer is activated when running the main application:
+    ```bash
+    # Launch ASGI web server
+    uv run python -m app.main --host 127.0.0.1 --port 8000
+
+    # Test API health endpoint via curl
+    curl -s http://127.0.0.1:8000/health
+    ```
 """
+
+from __future__ import annotations
 
 import asyncio
 import base64
 import json
-from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable
+import secrets
+import time
+from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable, Sequence
 from contextlib import asynccontextmanager
-from typing import Any
+from dataclasses import dataclass
+from datetime import UTC, datetime
+from pathlib import Path
+from tempfile import NamedTemporaryFile
+from typing import TYPE_CHECKING, Any
+from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request, WebSocket
 from pydantic import JsonValue, TypeAdapter
@@ -25,16 +97,369 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from starlette.websockets import WebSocketDisconnect
 
-from app.host.bootstrap import BootstrapCoordinator
-from app.host.commands import CommandError, copy_text, open_link
-from app.host.envelope import error_payload, new_request_id, success_payload
 from app.host.events import ChannelError
 from app.host.logging import get_logger
-from app.host.resource_store import ResourceRef
 from app.host.sessions import SessionError
 from app.host.settings import SettingsConflictError, SettingsError
+from app.persistence.resources import ResourceRef
+
+if TYPE_CHECKING:
+    from app.host.bootstrap import BootstrapCoordinator
 
 logger = get_logger(__name__)
+
+# --- API Envelope Contracts ---
+
+API_VERSION = "1.0"
+
+
+@dataclass(frozen=True)
+class ValidationIssue:
+    """A single structured validation problem tied to a payload location.
+
+    Attributes:
+        path: JSON-Pointer-like location of the problem (for example
+            ``$.nodes`` for documents, or the offending field name).
+        code: Stable machine-readable problem code (for example ``required``,
+            ``invalid``, ``too_large``).
+        message: Human-readable explanation safe to show to a user.
+    """
+
+    path: str
+    code: str
+    message: str
+
+    def to_json(self) -> dict[str, str]:
+        """Return the wire representation of this issue.
+
+        Returns:
+            A fresh ``{"path", "code", "message"}`` object.
+        """
+        return {"path": self.path, "code": self.code, "message": self.message}
+
+
+@dataclass(frozen=True)
+class ErrorBody:
+    """The error half of the envelope, mirroring the UI ``ApiClientError``.
+
+    Attributes:
+        code: Stable machine-readable error code (for example ``NOT_FOUND``,
+            ``UNAUTHORIZED``, ``MALFORMED_REQUEST``).
+        message: Human-readable error text safe to display.
+        issues: Optional structured validation detail; empty when the error
+            is not tied to specific payload locations.
+    """
+
+    code: str
+    message: str
+    issues: tuple[ValidationIssue, ...] = ()
+
+    def to_json(self) -> dict[str, Any]:
+        """Return the wire representation of this error body.
+
+        Returns:
+            A fresh object with ``code``, ``message``, and a list of
+            serialized :class:`ValidationIssue` entries.
+        """
+        return {
+            "code": self.code,
+            "message": self.message,
+            "issues": [issue.to_json() for issue in self.issues],
+        }
+
+
+def new_request_id() -> str:
+    """Generate a timestamped diagnostic request identifier.
+
+    Uses wall-clock nanoseconds and random entropy to reduce collisions. It is a
+    correlation label, not an authentication token or a uniqueness guarantee.
+
+    Returns:
+        req-<timestamp-nanos>-<hex> with four random bytes encoded as hex.
+    """
+    return f"req-{time.time_ns()}-{secrets.token_hex(4)}"
+
+
+def success_payload(request_id: str, data: Any) -> dict[str, Any]:
+    """Build a success envelope body carrying ``data``.
+
+    Args:
+        request_id: The request id echoed into the envelope.
+        data: Any JSON-serializable payload to return to the caller.
+
+    Returns:
+        The envelope object with ``status: "success"``.
+    """
+    return {
+        "api_version": API_VERSION,
+        "request_id": request_id,
+        "status": "success",
+        "data": data,
+    }
+
+
+def error_payload(
+    request_id: str,
+    code: str,
+    message: str,
+    issues: Sequence[ValidationIssue] = (),
+) -> dict[str, Any]:
+    """Build an error envelope body carrying a structured error.
+
+    Args:
+        request_id: The request id echoed into the envelope.
+        code: Stable machine-readable error code.
+        message: Human-readable error text safe to display.
+        issues: Optional structured validation detail.
+
+    Returns:
+        The envelope object with ``status: "error"``.
+    """
+    body_obj = ErrorBody(code=code, message=message, issues=tuple(issues))
+    return {
+        "api_version": API_VERSION,
+        "request_id": request_id,
+        "status": "error",
+        "error": body_obj.to_json(),
+    }
+
+
+# --- Command Mediation and File Exchange ---
+
+MAX_TEXT_BYTES = 8 * 1024
+MAX_LIST_ENTRIES = 4096
+MAX_FILE_BYTES = 10 * 1024 * 1024
+ALLOWED_LINK_SCHEMES = ("http", "https")
+
+
+class CommandError(Exception):
+    """Signal rejected command input or a wrapped exchange-file failure.
+
+    The HTTP guard emits a generic COMMAND_REJECTED response rather than exposing
+    raw filesystem exception text. Direct callers may inspect the exception but
+    must avoid forwarding sensitive path details into public diagnostics.
+    """
+
+
+def open_link(url: str) -> str:
+    """Validate ``url`` as an openable http/https link and return it.
+
+    Args:
+        url: Candidate URL supplied by the client.
+
+    Returns:
+        The same URL when it carries an allowed scheme and a host.
+
+    Raises:
+        CommandError: When the scheme is not http/https or the host is
+            empty.
+    """
+    parts = urlsplit(url)
+    if parts.scheme not in ALLOWED_LINK_SCHEMES or not parts.netloc:
+        raise CommandError("Only http/https URLs with a host can be opened")
+    return url
+
+
+def copy_text(text: str) -> str:
+    """Validate length-capped copy text and return it.
+
+    Args:
+        text: Text the client intends to place on its clipboard.
+
+    Returns:
+        The same text when within the byte cap.
+
+    Raises:
+        CommandError: When the UTF-8 encoded text exceeds
+            ``MAX_TEXT_BYTES``.
+    """
+    if len(text.encode("utf-8")) > MAX_TEXT_BYTES:
+        raise CommandError(f"Copy text exceeds {MAX_TEXT_BYTES} bytes")
+    return text
+
+
+@dataclass(frozen=True)
+class ExchangeFiles:
+    """Read/write file access jailed to one root directory.
+
+    The jail is enforced by construction: every path is resolved against
+    ``root`` and must land inside it (checked after resolution, so symlinks
+    and ``..`` segments cannot smuggle paths out). Subdirectories are
+    created on write; reads of missing files fail closed.
+    """
+
+    root: Path
+
+    def _resolve(self, relative: str) -> Path:
+        """Resolve an exchange-relative path and enforce current containment.
+
+        Resolution follows file links before confinement checks. This does not reserve
+        the path against concurrent replacement by another filesystem actor.
+
+        Args:
+            relative: Relative path without a drive, colon, or parent traversal
+                component.
+
+        Returns:
+            Resolved path inside the configured root; existence is not required.
+
+        Raises:
+            CommandError: The path is absolute, contains forbidden components, or
+                resolves outside root.
+        """
+        candidate = Path(relative)
+        if (
+            candidate.is_absolute()
+            or candidate.drive
+            or ":" in relative
+            or ".." in candidate.parts
+        ):
+            raise CommandError(
+                "Path must be relative and stay inside the exchange root"
+            )
+        resolved = (self.root / candidate).resolve()
+        root_resolved = self.root.resolve()
+        if resolved != root_resolved and root_resolved not in resolved.parents:
+            raise CommandError("Path escapes the exchange root")
+        return resolved
+
+    def read(self, relative: str) -> str:
+        """Read a UTF-8 text file inside the jail.
+
+        Args:
+            relative: Jail-relative path of the file.
+
+        Returns:
+            The file's text content.
+
+        Raises:
+            CommandError: If the path escapes the jail, the file is missing,
+                it exceeds ``MAX_FILE_BYTES``, or it cannot be decoded.
+        """
+        target = self._resolve(relative)
+        if not target.is_file():
+            raise CommandError("File does not exist in the exchange root")
+        if target.stat().st_size > MAX_FILE_BYTES:
+            raise CommandError(f"File exceeds {MAX_FILE_BYTES} bytes")
+        try:
+            return target.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError) as err:
+            raise CommandError(f"Cannot read file: {err}") from err
+
+    def write(self, relative: str, content: str) -> int:
+        """Atomically write a UTF-8 text file inside the jail.
+
+        Args:
+            relative: Jail-relative destination path (parents created).
+            content: Text to write.
+
+        Returns:
+            The number of UTF-8 bytes written.
+
+        Raises:
+            CommandError: If the content exceeds ``MAX_FILE_BYTES`` or the
+                path escapes the jail.
+        """
+        if len(content.encode("utf-8")) > MAX_FILE_BYTES:
+            raise CommandError(f"Content exceeds {MAX_FILE_BYTES} bytes")
+        target = self._resolve(relative)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with NamedTemporaryFile(
+            mode="w", dir=target.parent, encoding="utf-8", delete=False
+        ) as stream:
+            temp_path = Path(stream.name)
+            stream.write(content)
+        try:
+            temp_path.replace(target)
+        finally:
+            temp_path.unlink(missing_ok=True)
+        logger.info("Exchange file written")
+        return len(content.encode("utf-8"))
+
+    def exists(self, relative: str) -> dict[str, Any]:
+        """Check whether a file exists inside the jail.
+
+        Args:
+            relative: Jail-relative candidate path.
+
+        Returns:
+            Dict with ``exists`` (bool) and ``size_bytes`` (int | None).
+
+        Raises:
+            CommandError: If the path escapes the exchange jail.
+        """
+        target = self._resolve(relative)
+        if target.is_file():
+            return {"exists": True, "size_bytes": target.stat().st_size}
+        return {"exists": False, "size_bytes": None}
+
+    def list_files(self, prefix: str = "") -> list[dict[str, Any]]:
+        """List regular files beneath an exchange-relative directory.
+
+        Args:
+            prefix: Jail-relative directory path (empty for root); files are not
+                prefix-matched.
+
+        Returns:
+            List of dicts with ``path`` (relative), ``size_bytes``,
+            and ``modified_at`` (UTC ISO 8601 string). A missing or non-directory
+            prefix returns an empty list; enumeration order is not guaranteed.
+
+        Raises:
+            CommandError: If ``prefix`` escapes the jail or the listing exceeds
+                MAX_LIST_ENTRIES.
+            OSError: Filesystem enumeration or metadata access fails.
+        """
+        target_dir = self._resolve(prefix) if prefix else self.root.resolve()
+        if not target_dir.is_dir():
+            return []
+        results: list[dict[str, Any]] = []
+        root_resolved = self.root.resolve()
+        for path in target_dir.rglob("*", recurse_symlinks=False):
+            if len(results) >= MAX_LIST_ENTRIES:
+                raise CommandError("File listing exceeds limit")
+            if path.is_file() and path.resolve().is_relative_to(root_resolved):
+                rel = path.relative_to(root_resolved).as_posix()
+                st = path.stat()
+                results.append(
+                    {
+                        "path": rel,
+                        "size_bytes": st.st_size,
+                        "modified_at": datetime.fromtimestamp(
+                            st.st_mtime, tz=UTC
+                        ).isoformat(),
+                    }
+                )
+        return results
+
+    def delete(self, relative: str) -> bool:
+        """Delete a file inside the jail if present (idempotent).
+
+        Args:
+            relative: Jail-relative path.
+
+        Returns:
+            ``True`` if the file existed and was removed, ``False`` if
+            missing.
+
+        Raises:
+            CommandError: If the path escapes the jail or deletion fails.
+        """
+        target = self._resolve(relative)
+        if not target.exists():
+            return False
+        if not target.is_file():
+            raise CommandError("Path is not a regular file")
+        try:
+            target.unlink()
+            logger.info("Exchange file deleted")
+            return True
+        except OSError as err:
+            raise CommandError(f"Cannot delete file: {err}") from err
+
+
+# --- HTTP and WebSocket Handlers ---
+
 MAX_USERNAME = 100
 MAX_CREDENTIAL = 1024
 MAX_AUTH_FRAME = 2048
@@ -232,7 +657,10 @@ async def resources_endpoint(request: Request) -> JSONResponse:
         )
     return response(
         request,
-        {"content_base64": base64.b64encode(content).decode("ascii"), "schema": schema},
+        {
+            "content_base64": base64.b64encode(content).decode("ascii"),
+            "schema": schema,
+        },
     )
 
 
@@ -398,17 +826,17 @@ async def file_endpoint(request: Request) -> JSONResponse:
     domain storage. ExchangeFiles validates confinement and size constraints.
 
     Args:
-        request: Authenticated POST selecting read, write, exists, delete, or list.
+        request: Authenticated POST with an exchange operation in the path.
 
     Returns:
-        Operation-specific envelope, or 404 for an unknown operation.
+        Operation outcome envelope, or 404 for an unknown file operation.
 
     Raises:
-        CommandError: Path or text arguments are missing or invalid.
+        CommandError: Confinement, size, or path validation fails.
     """
-    payload = await body(request)
-    operation = request.path_params["operation"]
     exchange = service(request).exchange
+    operation = request.path_params["operation"]
+    payload = await body(request)
     path = payload.get("prefix", "") if operation == "list" else payload.get("path")
     if not isinstance(path, str):
         raise CommandError("Expected relative path")
@@ -544,7 +972,7 @@ async def socket_endpoint(socket: WebSocket) -> None:
         await _socket_stream(socket, host, subscriber, token)
     except ValueError, TimeoutError, ChannelError:
         await socket.close(code=1008)
-    except WebSocketDisconnect:
+    except asyncio.CancelledError, WebSocketDisconnect:
         logger.debug("Client socket disconnected")
     finally:
         if subscriber is not None:
@@ -599,6 +1027,8 @@ async def _socket_stream(
                 event.cancel()
                 await asyncio.gather(event, return_exceptions=True)
         await socket.close(code=1008)
+    except asyncio.CancelledError:
+        logger.debug("Socket stream cancelled")
     finally:
         receive.cancel()
         await asyncio.gather(receive, return_exceptions=True)

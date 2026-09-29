@@ -49,7 +49,7 @@ def test_sse_delivers_and_shutdown_releases_without_timeout(host_config):
     import asyncio
 
     from app.host.bootstrap import BootstrapCoordinator
-    from app.host.http_server import create_app, sse_endpoint
+    from app.host.transport import create_app, sse_endpoint
     from starlette.requests import Request
     from starlette.responses import StreamingResponse
 

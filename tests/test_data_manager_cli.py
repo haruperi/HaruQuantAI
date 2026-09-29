@@ -11,8 +11,8 @@ from unittest.mock import AsyncMock
 
 import pyarrow as pa  # type: ignore[import-untyped]
 import pytest
-from app.host.market_data import M1_SCHEMA
 from app.persistence.market import (
+    M1_SCHEMA,
     create_isolated_schema,
     log_datamgr_operation,
 )
@@ -453,7 +453,7 @@ def test_dukascopy_source_parity_commands(
 
 def _seed_cli_test_data(db_path: Path, data_root: Path) -> None:
     """Helper to publish M1 data and register dataset for action CLI tests."""
-    from app.host.market_data import MarketDataStore
+    from app.persistence.market import MarketDataStore
 
     times = [datetime(2026, 3, 2, 10, i, 0, tzinfo=UTC) for i in range(10)]
     table = pa.Table.from_pylist(

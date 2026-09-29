@@ -23,9 +23,15 @@ from typing import Any
 if __package__ in {None, ""}:
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.host.packages import PackageInventory, scan_packages
-from app.host.removal import apply_removal, plan_removal, restore_removal
-from app.host.resource_store import ResourceStore
+from app.host.packages import (
+    Composition,
+    PackageInventory,
+    apply_removal,
+    plan_removal,
+    restore_removal,
+    scan_packages,
+)
+from app.persistence.resources import ResourceStore
 from scripts.package_inventory import source_fingerprint, unowned_files
 
 TIMEOUT = 1800
@@ -256,7 +262,6 @@ def _scenario_activation_failure() -> None:
     """Verify failing package activation is isolated in composition."""
     import asyncio
 
-    from app.host.composition import Composition
     from app.host.jobs import JobManager
     from tests.host.test_composition import package
 

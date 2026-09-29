@@ -1,8 +1,68 @@
-"""Host custody of immutable resource revisions, independent of producer code.
+"""Host Custody of Quantitative Resources, Revision Envelopes, and Artifacts.
 
-Each revision is one atomically published envelope. An exclusive publication lock
-serializes writers across processes; abandoned locks fail closed for explicit
-recovery. Reads never deserialize executable objects or import producer modules.
+Description:
+    Provides durable, host-owned custody for immutable quantitative resource
+    revisions and artifacts independently of producer runtime code.
+
+    External relations and workflows:
+    - Host capabilities: Injected into workspace plugins via ResourceAccess
+      capability slots (app.host.capabilities) allowing plugins to publish
+      models, backtest results, and datasets under strict custody.
+    - Isolation boundary: Revisions survive plugin removal; readers verify
+      declarative JSON schemas without importing or executing producer code.
+
+    Internal coordination:
+    - ResourceRef: Defines immutable identity, semantic revision, content digest,
+      media type, and provenance metadata.
+    - ResourceRecord: Bounded JSON envelope encapsulating raw payload (base64)
+      and explicit reader authorization lists.
+    - ResourceStore: Enforces exclusive filesystem lock serialization, atomic
+      fsync-tempfile-rename writes, and SHA-256 integrity validation.
+
+Purpose:
+    FEAT-PERSIST-RESOURCES: Durable custody, publication, and retrieval of
+    immutable quantitative artifacts with cryptographic integrity verification.
+
+Key Capabilities:
+    - FR-PERSIST-RESOURCES-PUBLISH: Atomically publishes an immutable resource
+      revision envelope with schema validation, digest verification, and
+      exclusive writer locking via ResourceStore.publish().
+      * Verified via: logger.info("ResourceStore committed revision %d for "
+        "resource %s (producer=%s)")
+    - FR-PERSIST-RESOURCES-READ: Reads and validates stored payload bytes against
+      SHA-256 digest and access control grants via ResourceStore.read().
+      * Verified via: logger.debug("ResourceStore read resource %s revision %d "
+        "(principal=%s)")
+    - FR-PERSIST-RESOURCES-LIST: Discovers resource revisions visible to a
+      requesting principal or published globally via ResourceStore.list().
+      * Verified via: logger.debug("ResourceStore listed %d resources for "
+        "principal %s")
+
+Python API Usage:
+    ```python
+    from pathlib import Path
+
+    from app.persistence.resources import ResourceStore
+
+    store = ResourceStore(Path("data/resources"))
+    ref = store.publish(
+        producer_id="plugin.strategy.builder",
+        producer_version="1.0.0",
+        content=b"strategy_weights_payload",
+        schema_id="schema.weights",
+        schema_version="1.0.0",
+        schema_json='{"type": "object"}',
+        media_type="application/octet-stream",
+        readers=("operator",),
+    )
+    data, schema = store.read(principal="operator", reference=ref)
+    ```
+
+CLI Usage:
+    ```bash
+    # Verified through host resource tests:
+    uv run python -m pytest tests/host/test_resource_store.py
+    ```
 """
 
 from __future__ import annotations
@@ -85,11 +145,17 @@ class ResourceStore:
 
     def list(self, principal: str) -> tuple[ResourceRef, ...]:
         """Return only revisions explicitly readable by the caller or published."""
-        return tuple(
+        results = tuple(
             record.reference
             for record in self._records()
             if principal in record.readers or "*" in record.readers
         )
+        logger.debug(
+            "ResourceStore listed %d resources for principal %s",
+            len(results),
+            principal,
+        )
+        return results
 
     def read(self, principal: str, reference: ResourceRef) -> tuple[bytes, str]:
         """Read verified bytes and declarative schema without producer presence.

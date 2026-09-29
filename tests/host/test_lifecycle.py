@@ -4,9 +4,9 @@ import asyncio
 from typing import Literal, cast
 
 import pytest
+from app.host.bootstrap import STAGES, Startup
 from app.host.contracts import LifecycleHook
 from app.host.events import EventBus
-from app.host.startup import STAGES, Startup
 
 
 def test_empty_hooks_are_normal_and_do_not_invent_events():
@@ -55,7 +55,7 @@ def test_optional_failure_required_failure_and_timeout():
 
 def test_ack_is_per_client_and_has_no_process_effect(monkeypatch, caplog):
     clock = [100.0]
-    monkeypatch.setattr("app.host.startup.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr("app.host.bootstrap.time.monotonic", lambda: clock[0])
     host = Startup(EventBus(), runtime_started_at=0)
     host.listening()
     before = host.snapshot()
@@ -65,7 +65,7 @@ def test_ack_is_per_client_and_has_no_process_effect(monkeypatch, caplog):
     clock[0] = 101.0
     host.connected("two")
     clock[0] = 102.0
-    with caplog.at_level("INFO", logger="app.host.startup"):
+    with caplog.at_level("INFO", logger="app.host.bootstrap"):
         host.acknowledge("one")
         host.acknowledge("one")
         assert not host.clients["two"][1]
@@ -108,8 +108,8 @@ def test_cleanup_reverse_order_and_cancellation():
 
 def test_deadline_reconnect_capacity_and_invalid_hooks(monkeypatch):
     clock = [100.0]
-    monkeypatch.setattr("app.host.startup.time.monotonic", lambda: clock[0])
-    monkeypatch.setattr("app.host.startup.MAX_CLIENTS", 1)
+    monkeypatch.setattr("app.host.bootstrap.time.monotonic", lambda: clock[0])
+    monkeypatch.setattr("app.host.bootstrap.MAX_CLIENTS", 1)
     host = Startup(EventBus())
     host.connected("test")
     with pytest.raises(ValueError, match="capacity"):
@@ -135,10 +135,10 @@ def test_deadline_reconnect_capacity_and_invalid_hooks(monkeypatch):
 
 def test_summary_is_concise_readonly_and_uses_process_clock(monkeypatch, caplog):
     host = Startup(EventBus(), runtime_started_at=10)
-    monkeypatch.setattr("app.host.startup.time.monotonic", lambda: 11.5)
+    monkeypatch.setattr("app.host.bootstrap.time.monotonic", lambda: 11.5)
     host.listening()
     before = host.snapshot()
-    with caplog.at_level("INFO", logger="app.host.startup"):
+    with caplog.at_level("INFO", logger="app.host.bootstrap"):
         host.log_summary("ready")
     assert host.snapshot() == before
     assert "elapsed_ms=1500.000" in caplog.text

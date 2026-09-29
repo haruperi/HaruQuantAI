@@ -1,15 +1,71 @@
-"""SQLite persistence operations for host settings, jobs, and authentication.
+"""Host SQLite Persistence Operations, Schema Lifecycle, and Auth Storage.
 
-This module owns short-lived connections and transactions for host_* tables plus
-host_settings and host_sessions in the unified application database. Callers
-inject paths; imports perform no I/O. Timestamps on retained host records are
-UTC ISO strings, while session issue/expiry values are Unix seconds.
+Description:
+    Provides direct, ACID-compliant SQLite persistence operations for core host
+    records including configuration settings, durable jobs, background attempts,
+    lifecycle state transitions, distributed grid computing nodes, execution
+    leases, and hashed session authentication credentials.
 
-prepare_boot_database initializes only a new store and verifies existing stores.
-Explicitly authorized migrate_auth_schema backs up and adds absent auth tables.
-Neither operation implements domain strategy/data storage. Settings patches
-preserve private fields and compare revisions before commit; notifications belong
-to callers. AuthStore persists hashes, never plaintext bearer credentials.
+    External relations and workflows:
+    - Host bootstrap: `prepare_boot_database` and `verify_schema` are called by
+      `app.host.bootstrap` to guarantee a valid, non-corrupt database before
+      any network, service, or job workers initialize.
+    - Host settings: Backs `app.host.settings.SettingsManager` for transactional
+      settings revisions, snapshots, and optimistic CAS updates.
+    - Host job manager: Backs `app.host.jobs.JobManager` for job admission,
+      execution leases, worker heartbeat tracking, and progress reporting.
+    - Session authentication: Backs `app.host.sessions.SessionManager` for user
+      credential verification, bearer token issuance, and revocations.
+
+    Internal coordination:
+    - Records: Immutable dataclasses (`HostSettingRecord`, `HostJobRecord`,
+      `HostJobAttemptRecord`, `HostJobEventRecord`, `HostGridNodeRecord`,
+      `HostGridLeaseRecord`) strictly modeling underlying table schemas.
+    - HostStore: Multi-table CRUD repository managing short-lived connection
+      contexts, busy timeouts, and atomic write transactions.
+    - AuthStore: Dedicated authentication storage isolating hashed bearer
+      tokens and salted user verifiers without storing plaintext secrets.
+
+Purpose:
+    FEAT-PERSIST-HOST: Core SQLite database schema management, atomic host
+    records persistence, background jobs queue, and secure auth storage.
+
+Key Capabilities:
+    - FR-PERSIST-HOST-SCHEMA: Verifies database schema integrity and initializes
+      or migrates host tables via prepare_boot_database(), ensure_schema(), and
+      migrate_auth_schema().
+      * Verified via: logger.info("New isolated host database initialized")
+    - FR-PERSIST-HOST-SETTINGS: Atomically queries, inserts, updates, and deletes
+      scoped configuration settings via HostStore settings CRUD and
+      patch_settings().
+      * Verified via: logger.debug("Persisted host setting: scope=%s, key=%s")
+    - FR-PERSIST-HOST-JOBS: Queues, monitors, updates progress, checkpoints, and
+      transitions durable background jobs via HostStore job operations.
+      * Verified via: logger.info("Persisted host job queued: job_id=%s, ...")
+    - FR-PERSIST-HOST-GRID: Registers compute nodes and manages bounded execution
+      leases via HostStore grid operations.
+      * Verified via: logger.info("Inserted host grid lease: lease_id=%s, ...")
+    - FR-PERSIST-HOST-AUTH: Provisions credentials, verifies salted verifiers,
+      issues unrevoked sessions, and revokes tokens via AuthStore.
+      * Verified via: logger.info("Issued session for user %s with validity ...")
+
+Python API Usage:
+    ```python
+    from pathlib import Path
+
+    from app.persistence.host import HostStore, prepare_boot_database
+
+    db_path = Path("data/database/haruquantai.db")
+    prepare_boot_database(db_path)
+    store = HostStore(db_path)
+    setting = store.get_setting("application", "theme")
+    ```
+
+CLI Usage:
+    ```bash
+    # Verified through host persistence test suite:
+    uv run python -m pytest tests/persistence/test_host.py
+    ```
 """
 
 from __future__ import annotations
@@ -577,6 +633,11 @@ class HostStore:
                     record.updated_at_utc,
                 ),
             )
+        logger.debug(
+            "Persisted host setting: scope=%s, key=%s",
+            record.scope,
+            record.key,
+        )
 
     def delete_setting(self, scope: str, key: str) -> bool:
         """Remove one settings record; return False when it is absent."""
@@ -584,7 +645,10 @@ class HostStore:
             cursor = connection.execute(
                 "DELETE FROM host_settings WHERE scope=? AND key=?", (scope, key)
             )
-            return cursor.rowcount > 0
+            deleted = cursor.rowcount > 0
+        if deleted:
+            logger.info("Deleted host setting: scope=%s, key=%s", scope, key)
+        return deleted
 
     # -- host_jobs ---------------------------------------------------------
 
@@ -626,6 +690,11 @@ class HostStore:
                 )
             except sqlite3.IntegrityError as error:
                 _raise_for_integrity(error, context="Job")
+        logger.info(
+            "Persisted host job queued: job_id=%s, operation=%s",
+            record.job_id,
+            record.operation,
+        )
 
     def get_job(self, job_id: str) -> HostJobRecord | None:
         """Return one job, or None when the identifier is absent."""
@@ -700,7 +769,14 @@ class HostStore:
                 "WHERE job_id=?",
                 (percent, progress_message, job_id),
             )
-            return cursor.rowcount > 0
+            updated = cursor.rowcount > 0
+        if updated:
+            logger.debug(
+                "Updated host job progress: job_id=%s, percent=%.1f",
+                job_id,
+                percent,
+            )
+        return updated
 
     def update_job_checkpoint(self, job_id: str, *, checkpoint_json: str) -> bool:
         """Replace the job checkpoint; return False when the job is absent."""
@@ -710,7 +786,10 @@ class HostStore:
                 "UPDATE host_jobs SET checkpoint_json=? WHERE job_id=?",
                 (checkpoint, job_id),
             )
-            return cursor.rowcount > 0
+            updated = cursor.rowcount > 0
+        if updated:
+            logger.debug("Updated host job checkpoint: job_id=%s", job_id)
+        return updated
 
     def transition_job(
         self,
@@ -750,6 +829,12 @@ class HostStore:
                 "terminal_reason=COALESCE(?, terminal_reason) WHERE job_id=?",
                 (to_state, started_at_utc, completed_at_utc, terminal_reason, job_id),
             )
+            logger.info(
+                "Transitioned host job: job_id=%s from %s to %s",
+                job_id,
+                from_state,
+                to_state,
+            )
             return HostJobRecord(
                 job_id=row[0],
                 group_id=row[1],
@@ -788,6 +873,7 @@ class HostStore:
             connection.execute("DELETE FROM host_job_events WHERE job_id=?", (job_id,))
             connection.execute("DELETE FROM host_grid_leases WHERE job_id=?", (job_id,))
             connection.execute("DELETE FROM host_jobs WHERE job_id=?", (job_id,))
+        logger.info("Deleted host job and cascades: job_id=%s", job_id)
         return True
 
     # -- host_job_attempts --------------------------------------------------
@@ -820,6 +906,11 @@ class HostStore:
                 )
             except sqlite3.IntegrityError as error:
                 _raise_for_integrity(error, context="Job attempt")
+        logger.debug(
+            "Created host job attempt: attempt_id=%s, job_id=%s",
+            record.attempt_id,
+            record.job_id,
+        )
 
     def get_attempt(self, attempt_id: str) -> HostJobAttemptRecord | None:
         """Return one attempt, or None when the identifier is absent."""
@@ -902,6 +993,13 @@ class HostStore:
                 )
             except sqlite3.IntegrityError as error:
                 _raise_for_integrity(error, context="Job event")
+        logger.debug(
+            "Recorded host job event: event_id=%s, job_id=%s, %s->%s",
+            record.event_id,
+            record.job_id,
+            record.from_state,
+            record.to_state,
+        )
 
     def list_events(self, job_id: str) -> list[HostJobEventRecord]:
         """Return a job's events ordered by creation time then identifier."""
@@ -936,6 +1034,11 @@ class HostStore:
                     record.last_heartbeat_utc,
                 ),
             )
+        logger.debug(
+            "Upserted host grid node: node_id=%s, state=%s",
+            record.node_id,
+            record.state,
+        )
 
     def get_node(self, node_id: str) -> HostGridNodeRecord | None:
         """Return one grid node, or None when the identifier is absent."""
@@ -1008,6 +1111,12 @@ class HostStore:
                 )
             except sqlite3.IntegrityError as error:
                 _raise_for_integrity(error, context="Grid lease")
+        logger.info(
+            "Inserted host grid lease: lease_id=%s, node_id=%s, job_id=%s",
+            record.lease_id,
+            record.node_id,
+            record.job_id,
+        )
 
     def get_lease(self, lease_id: str) -> HostGridLeaseRecord | None:
         """Return one lease, or None when the identifier is absent."""
@@ -1044,7 +1153,14 @@ class HostStore:
                 "UPDATE host_grid_leases SET state=? WHERE lease_id=?",
                 (state, lease_id),
             )
-            return cursor.rowcount > 0
+            released = cursor.rowcount > 0
+        if released:
+            logger.info(
+                "Released host grid lease: lease_id=%s, state=%s",
+                lease_id,
+                state,
+            )
+        return released
 
     def expire_leases(self, *, now_utc: str) -> list[HostGridLeaseRecord]:
         """Flip active leases whose expiry strictly passed to expired.
@@ -1065,6 +1181,11 @@ class HostStore:
                 "AND expires_at_utc < ?",
                 (EXPIRED_LEASE_STATE, ACTIVE_LEASE_STATE, now_utc),
             )
+        logger.info(
+            "Expired %d host grid leases against cutoff %s",
+            len(rows),
+            now_utc,
+        )
         return [_lease_record(row) for row in rows]
 
     def delete_lease(self, lease_id: str) -> bool:
@@ -1461,6 +1582,7 @@ class AuthStore:
                 "INSERT INTO host_settings VALUES ('application','user.access',?,1,?)",
                 (json.dumps(payload), utc_now_iso()),
             )
+        logger.info("Provisioned user access for %s", username)
 
     def credential(self, username: str) -> tuple[bool, str | None]:
         """Look up user.access credentials and return verifier.
@@ -1519,6 +1641,11 @@ class AuthStore:
                 "INSERT INTO host_sessions VALUES (?,?,?,?,0)",
                 (token_hash, username, issued, expires),
             )
+        logger.info(
+            "Issued session for user %s with validity %.1fs",
+            username,
+            expires - issued,
+        )
 
     def valid(self, token_hash: str, now: float) -> str | None:
         """Resolve an unrevoked session whose expiry is later than now.

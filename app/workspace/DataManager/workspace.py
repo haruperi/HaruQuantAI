@@ -1,7 +1,63 @@
-"""Data Manager's resource-facing workflow and versioned extension boundary.
+"""DataManager Workspace Lifecycle, Extension Boundary, and Action Router.
 
-Acquisition providers are not implemented here. The workspace can inspect retained
-resources with zero attached providers and never imports another owner's code.
+Description:
+    Provides the central composition root, lifecycle coordination, and action
+    routing boundary for the Data Manager workspace (`workspace.data_manager`).
+
+    External relations and workflows:
+    - Host composition: Discovered by host catalog (`app.host.discovery`),
+      instantiated and initialized by `prepare(HostCapabilities)` where
+      `HostCapabilities.resources` is injected.
+    - Workspace router & actions: Invocations matching `actions.*` are mapped
+      to internal action executors (`app.workspace.DataManager.actions`).
+    - Acquisition plugin delegation: Subordinate acquisition plugins attaching
+      to `data_source.acquisition` (such as Dukascopy acquisition) are dispatched
+      via `sources.dukascopy.*` routes.
+
+    Internal coordination:
+    - PLUGIN: Manifest dictionary defining workspace ID, version, contract
+      version, route base, required host capabilities (`host.resources`), and
+      extension slots (`data_source.presentation`, `data_source.acquisition`).
+    - prepare: Asynchronous lifecycle hook setting up local binding state and
+      returning a `PreparedContribution`.
+    - attach: Dynamic slot attachment hook for child acquisition plugins.
+    - invoke: Operation dispatcher for resource inspection, capabilities
+      queries, and DataManager action routing.
+    - close: Clean teardown hook releasing child bindings.
+
+Purpose:
+    FEAT-WORKSPACE-DATAMANAGER: Data Manager workspace composition, lifecycle
+    orchestration, host capability binding, and plugin extension boundary.
+
+Key Capabilities:
+    - FR-WORKSPACE-DATAMANAGER-LIFECYCLE: Prepares workspace contribution, binds
+      explicit host resource access, and manages dynamic child plugin
+      attachments via prepare(), attach(), and close().
+      * Verified via: logger.info("Preparing Data Manager workspace...")
+    - FR-WORKSPACE-DATAMANAGER-DISPATCH: Dispatches operations to DataManager
+      actions, inspects retained resources, and delegates acquisition requests
+      to attached plugins via invoke() and _invoke_action().
+      * Verified via: logger.info("Data Manager invoking: %s")
+    - FR-WORKSPACE-DATAMANAGER-RESOURCES: Reads and lists retained host-level
+      quantitative resources via resources.list and resources.read operations
+      under explicit capability boundaries.
+      * Verified via: logger.info("Data Manager invoking: %s")
+
+Python API Usage:
+    ```python
+    from app.host.capabilities import HostCapabilities
+    from app.workspace.DataManager.workspace import prepare
+
+    contribution = await prepare(capabilities)
+    result = await contribution.invoke("actions.list_datasets", {})
+    await contribution.close()
+    ```
+
+CLI Usage:
+    ```bash
+    # Verified through DataManager workspace test suite:
+    uv run python -m pytest tests/workspace/DataManager/test_workspace.py
+    ```
 """
 
 from __future__ import annotations
@@ -13,9 +69,9 @@ from typing import Any, cast
 from pydantic import JsonValue
 
 from app.host.capabilities import HostCapabilities
-from app.host.composition import Binding, PreparedContribution
 from app.host.logging import get_logger
-from app.host.resource_store import ResourceRef
+from app.host.packages import Binding, PreparedContribution
+from app.persistence.resources import ResourceRef
 from app.workspace.DataManager.actions import (
     broker_data,
     broker_data_update,

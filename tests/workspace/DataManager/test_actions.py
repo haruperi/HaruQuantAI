@@ -12,16 +12,14 @@ from pathlib import Path
 import pyarrow as pa  # type: ignore[import-untyped]
 import pytest
 from app.host.capabilities import HostCapabilities, ResourceAccess
-from app.host.market_data import (
+from app.persistence.market import (
     M1_SCHEMA,
     TICK_SCHEMA,
     MarketDataStore,
-)
-from app.host.resource_store import ResourceStore
-from app.persistence.market import (
     create_isolated_schema,
     preseed_native_sqx_datasets,
 )
+from app.persistence.resources import ResourceStore
 from app.workspace.DataManager.actions import (
     broker_data,
     broker_data_update,

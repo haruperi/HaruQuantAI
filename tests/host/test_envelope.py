@@ -1,6 +1,6 @@
 """Tests for the shared host envelope."""
 
-from app.host.envelope import (
+from app.host.transport import (
     API_VERSION,
     ValidationIssue,
     error_payload,

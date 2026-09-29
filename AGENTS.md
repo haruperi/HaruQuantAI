@@ -98,6 +98,12 @@ imports and sibling implementation imports are prohibited.
 ## 4. Coding and verification baseline
 
 - Ruff formatting: four spaces, 88-character lines, Google-style docstrings.
+- Standardized top-of-file docstrings and non-silent requirement logging: every
+  concrete Python module must follow `docs/templates/PYTHON_MODULE.md` declaring
+  `Description:` (business logic and internal/external workflows), `Purpose:`
+  (`FEAT-*`), `Key Capabilities:` (descriptive kebab-case `FR-*` labels, never
+  numbered, with zero silent executions and explicit log verification), `Python API
+  Usage:`, and `CLI Usage:`.
 - Mypy strict mode with all public signatures explicitly typed.
 - No bare `except`, silent failures, application `print`, hidden logging setup,
   or secret-bearing diagnostics.

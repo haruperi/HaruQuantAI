@@ -1,18 +1,79 @@
-"""Core implementation of Data Manager Actions.
+"""Data Manager Action Executors, Bar Resampling, and Export Implementations.
 
-Implements all 12 functional requirements for Data Manager actions:
-- brokerData
-- brokerDataUpdate
-- cloneToTimezone
-- delete
-- exportToCsv
-- exportToMT4
-- exportToMT5
-- load
-- review (data, chart, quality, save_changes)
-- save
-- updateAll
-- updateSelected
+Description:
+    Implements all core business operations for the Data Manager workspace,
+    including broker profile mapping, timezone cloning, binary MetaTrader and
+    CSV exports, definition persistence, data inspection, quality scoring,
+    and bulk historical updates.
+
+    External relations and workflows:
+    - Workspace router: Dispatched from `app.workspace.DataManager.workspace`
+      upon receipt of `actions.*` requests from the frontend UI or CLI tools.
+    - Market persistence: Queries and writes to `app.persistence.market`
+      (`MarketDataStore`, `open_definition_catalog`, `delete_market_symbol`)
+      to manage underlying Parquet partitions and SQLite catalog records.
+    - CLI tools: Invoked directly by `scripts.data_manager_cli` to perform
+      headless exports, dataset audits, and timezone cloning operations.
+
+    Internal coordination:
+    - Data models: `BarRecord` and `TickRecord` provide immutable in-memory
+      representations of price action.
+    - Export builders: Binary struct formatters for MetaTrader 4 HST/FXT and
+      MetaTrader 5 custom tick/bar exports.
+    - Resampling engines: Accurate timeframe synthesis (TICK -> M1 -> higher
+      intervals) and session-aware quality metrics calculators.
+
+Purpose:
+    FEAT-WORKSPACE-DATAMANAGER-ACTIONS: Complete suite of Data Manager action
+    handlers for catalog management, timezone cloning, exports, and data review.
+
+Key Capabilities:
+    - FR-WORKSPACE-DATAMANAGER-BROKER: Queries and updates broker profile
+      configurations and symbol mappings via broker_data() and
+      broker_data_update().
+      * Verified via: logger.info("Broker data update completed (updated=%d)")
+    - FR-WORKSPACE-DATAMANAGER-CLONE: Clones datasets to shifted timezones with
+      calendar adjustments and weekend filtering via clone_to_timezone().
+      * Verified via: logger.info("Successfully cloned %d symbol(s)")
+    - FR-WORKSPACE-DATAMANAGER-DELETE: Purges physical parquet files and removes
+      dataset catalog definitions via delete_datasets().
+      * Verified via: logger.info("Delete datasets completed (affected=%d...)")
+    - FR-WORKSPACE-DATAMANAGER-EXPORT: Transforms market bars and ticks into CSV,
+      MetaTrader 4 (.hst), and MetaTrader 5 formats via export_to_csv(),
+      export_to_mt4(), and export_to_mt5().
+      * Verified via: logger.info("Exported %d record(s) to MT5 for %s")
+    - FR-WORKSPACE-DATAMANAGER-DEFINITIONS: Serializes and imports symbol and
+      dataset definitions to and from JSON files via save_definitions() and
+      load_definitions().
+      * Verified via: logger.info("Saved %d definitions to %s")
+    - FR-WORKSPACE-DATAMANAGER-REVIEW: Inspects tabular data, candlestick charts,
+      and data quality metrics, and commits bar edits via review_data(),
+      review_chart(), review_quality(), and save_data_changes().
+      * Verified via: logger.info("Saved %d manual bar changes for %s")
+    - FR-WORKSPACE-DATAMANAGER-UPDATE: Triggers bulk or selective historical
+      downloads across data source providers via update_all() and
+      update_selected().
+      * Verified via: logger.info("Triggered historical update for %d symbols")
+    - FR-WORKSPACE-DATAMANAGER-DATASETS: Lists active registered datasets and
+      underlying symbol properties via list_datasets().
+      * Verified via: logger.debug("Listing datasets from %s (count=%d)")
+
+Python API Usage:
+    ```python
+    from pathlib import Path
+
+    from app.workspace.DataManager.actions import list_datasets
+
+    db_path = Path("data/database/haruquantai.db")
+    data_root = Path("data")
+    datasets = list_datasets(db_path, data_root)
+    ```
+
+CLI Usage:
+    ```bash
+    # Run through data manager CLI script:
+    uv run python scripts/data_manager_cli.py list-datasets
+    ```
 """
 
 from __future__ import annotations
@@ -32,13 +93,11 @@ import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
 from app.host.logging import get_logger
-from app.host.market_data import (
+from app.persistence.market import (
     M1_SCHEMA,
     TICK_SCHEMA,
     Kind,
     MarketDataStore,
-)
-from app.persistence.market import (
     clear_market_symbol,
     delete_market_symbol,
     open_definition_catalog,
@@ -205,6 +264,7 @@ def read_market_rows(  # noqa: C901, PLR0912
                     )
 
     records.sort(key=lambda r: int(r["DateTime"]))
+    logger.info("Read %d records from %s %s %s", len(records), source, kind, symbol)
     return records
 
 
@@ -285,6 +345,8 @@ def resample_m1_bars(
                 volume=b_vol,
             )
         )
+
+    logger.info("Resampled %d records to %s", len(resampled), target_timeframe)
 
     return resampled
 
@@ -369,7 +431,7 @@ def broker_data(
                 "digits": int(r_dict.get("decimals") or 5),
             }
         )
-    logger.debug(
+    logger.info(
         "Querying broker data (query=%s, broker_id=%s, count=%d)",
         query,
         broker_id,

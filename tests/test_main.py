@@ -16,8 +16,8 @@ from pathlib import Path
 
 import pytest
 from app.cli import Client
-from app.host.config import HostSettings
-from app.host.startup import STAGES
+from app.host.bootstrap import STAGES
+from app.host.settings import HostSettings
 from app.main import arguments, bind_socket
 
 
@@ -146,7 +146,7 @@ def test_optional_browser_launch_failure_is_nonfatal(monkeypatch):
     """Convert browser rejection or webbrowser.Error into a nonfatal False result."""
     import webbrowser
 
-    from app.host.browser import launch
+    from app.main import launch
 
     monkeypatch.setattr(webbrowser, "open", lambda url: False)
     assert not launch("http://127.0.0.1:8000")

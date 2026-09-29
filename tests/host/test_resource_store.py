@@ -3,7 +3,7 @@
 import json
 
 import pytest
-from app.host.resource_store import ResourceRef, ResourceStore
+from app.persistence.resources import ResourceRef, ResourceStore
 
 
 def publish(

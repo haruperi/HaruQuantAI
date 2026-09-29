@@ -1,12 +1,12 @@
 """Actual package removal in temporary stores preserves unrelated code and data."""
 
 import pytest
-from app.host.packages import scan_packages
-from app.host.removal import (
+from app.host.packages import (
     InstallationLease,
     apply_removal,
     plan_removal,
     restore_removal,
+    scan_packages,
 )
 
 from tests.host.test_packages import make_package

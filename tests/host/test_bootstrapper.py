@@ -9,7 +9,7 @@ from pathlib import Path
 
 import pytest
 from app.host.bootstrap import BootstrapCoordinator
-from app.host.config import HostSettings, load_settings
+from app.host.settings import HostSettings, load_settings
 from app.persistence.host import (
     HostSettingRecord,
     HostStore,

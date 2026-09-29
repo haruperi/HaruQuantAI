@@ -69,34 +69,275 @@ The host process transitions through the following lifecycle states:
 
 ---
 
-## 3. Host Feature Registry & Traceability
+## 3. Host Logical Architecture & Class Diagram
 
-In accordance with the Five-Level Structural Hierarchy, each file in `app/host/` represents a traced feature (`FEAT-HOST-*`) containing traced functional requirements:
+The host system is organized into decoupled, specialized components coordinated by the `BootstrapCoordinator`:
 
-| Feature Identifier | Implementation File | Primary Responsibilities | Traced Operations (`FR-*`) | Verification Test Suite |
-| :--- | :--- | :--- | :--- | :--- |
-| `FEAT-HOST-BOOT` | `bootstrap.py`<br>`startup.py` | Phase coordination, lifecycle hooks, monotonic boot timing, and clean shutdown. | 5 boot phases, graceful SIGINT/SIGTERM handling, process state reporting. | `tests/host/test_lifecycle.py`<br>`tests/host/test_bootstrapper.py` |
-| `FEAT-HOST-SESSION` | `sessions.py`<br>`security.py` | Operator authentication, PBKDF2-SHA256 password hashing, signed bearer tokens, revocation. | Loopback auto-login, session expiry, token verification, brute-force rate limits. | `tests/host/test_sessions.py` |
-| `FEAT-HOST-TRANSPORT` | `http_server.py`<br>`envelope.py`<br>`contracts.py` | FastAPI application, uniform `{api_version, request_id, status, data, error}` envelope, WebSockets. | Request ID tracing, structured error responses, connection heartbeat. | `tests/host/test_webserver.py`<br>`tests/host/test_envelope.py` |
-| `FEAT-HOST-CATALOG` | `catalog.py`<br>`packages.py`<br>`composition.py` | AST and JSON descriptor discovery, slot validation, composition graph, zero-plugin fallback. | Dynamic package discovery, slot matching, contract version checks. | `tests/host/test_catalog.py`<br>`tests/host/test_packages.py`<br>`tests/host/test_composition.py` |
-| `FEAT-HOST-SETTINGS` | `settings.py` | Strongly typed host configuration, compare-and-set updates, change event broadcast. | Transactional updates, schema validation, secret masking. | `tests/host/test_settings.py` |
-| `FEAT-HOST-LOGGING` | `logging.py` | Rotating JSON log file, early buffer replay, console output, secret redaction. | Secret masking, structured log format, log level filtering. | `tests/host/test_telemetry.py` |
-| `FEAT-HOST-RESOURCES` | `resource_store.py`<br>`resources.py` | Shared Host Resource Custody (`host.resources@1.0.0`), digest verification, retention. | Immutable artifact storage, SHA-256 validation, uncoupled reads. | `tests/host/test_resource_store.py` |
-| `FEAT-HOST-JOBS` | `jobs.py` | Background job execution, bounded concurrency, cancellation, task status tracking. | Task enqueue, task cancellation, progress reporting. | `tests/host/test_jobs.py` |
-| `FEAT-HOST-REMOVAL` | `removal.py` | Reversible package uninstallation, quarantine journaling, dependency cascade calculation. | Atomic quarantine move, survivor validation, uninstallation rollback. | `tests/host/test_removal.py` |
-| `FEAT-HOST-EVENTS` | `events.py` | In-process pub/sub event bus with sequence numbering and topic filtering. | Event publishing, subscription dispatch, buffer replay. | `tests/host/test_events.py` |
-| `FEAT-HOST-COMMANDS` | `commands.py` | Typed command mediation and handler dispatch. | Bounded command execution, authorization checks. | `tests/host/test_commands.py` |
+```mermaid
+classDiagram
+    direction TB
 
-### 3.1 Host Capabilities
+    class BootstrapCoordinator {
+        +HostSettings config
+        +EventBus events
+        +JobManager jobs
+        +Startup startup
+        +SettingsStore settings
+        +ExchangeFiles exchange
+        +ResourceStore resource_store
+        +MarketDataStore market_data
+        +PackageInventory package_inventory
+        +Composition composition
+        +initialize()
+        +session_manager() SessionManager
+        +database_connection() Connection
+        +log_boot_summary()
+        +close()
+    }
+
+    class Startup {
+        +str state
+        +dict results
+        +mark(stage, outcome, reason)
+        +record(stage, duration)
+        +hook(stage, callback)
+        +dispatch(stage)
+        +listening()
+        +connected(session_key)
+        +acknowledge(session_key)
+        +snapshot() BootSnapshot
+    }
+
+    class HostSettings {
+        +str host
+        +int port
+        +Path data_dir
+        +Path database_path
+        +frozenset origins
+        +str log_level
+        +Path ui_dist
+    }
+
+    class SessionManager {
+        +Path db_path
+        +login(username, password, peer) str
+        +verify(token) Session
+        +revoke(token)
+        +prune()
+    }
+
+    class Session {
+        +str key
+        +str username
+        +str peer
+        +str created_at
+        +str expires_at
+    }
+
+    class EventBus {
+        +publish(channel, data)
+        +subscribe(channels) Subscriber
+        +unsubscribe(subscriber)
+        +replay() list
+        +subscriber_count() int
+    }
+
+    class JobManager {
+        +int max_workers
+        +diagnose_cpu() CpuSnapshot
+        +submit(fn, *args) Future
+        +cancel(job_id) bool
+        +close()
+    }
+
+    class SettingsStore {
+        +Path db_path
+        +snapshot() dict
+        +patch(changes, revision, bus) dict
+    }
+
+    class PackageInventory {
+        +list packages
+        +list issues
+        +str fingerprint
+        +find(package_id) Package
+    }
+
+    class Composition {
+        +dict active
+        +list issues
+        +start(inventory, capabilities)
+        +invoke(owner, operation, payload) Any
+        +dispatch(owner, operation, params) Any
+        +close()
+    }
+
+    class HostCapabilities {
+        +MarketAccess market
+        +JobAccess jobs
+        +NetworkAccess network
+        +ResourceAccess resources
+        +SettingsAccess settings
+    }
+
+    class ExchangeFiles {
+        +Path root
+        +read(path) str
+        +write(path, content) int
+        +exists(path) dict
+        +list_files(prefix) list
+        +delete(path) bool
+    }
+
+    class HistoricalNetwork {
+        +get(url) NetworkResult
+    }
+
+    BootstrapCoordinator --> Startup : owns
+    BootstrapCoordinator --> HostSettings : config
+    BootstrapCoordinator --> EventBus : owns
+    BootstrapCoordinator --> JobManager : owns
+    BootstrapCoordinator --> SettingsStore : owns
+    BootstrapCoordinator --> ExchangeFiles : owns
+    BootstrapCoordinator --> PackageInventory : discovers
+    BootstrapCoordinator --> Composition : composes
+    BootstrapCoordinator ..> SessionManager : creates
+    BootstrapCoordinator ..> HostCapabilities : injects
+
+    SessionManager --> Session : issues
+    Composition --> HostCapabilities : provides
+```
+
+---
+
+## 4. Host File Roles, Feature Registry & Traceability
+
+In accordance with the Five-Level Structural Hierarchy, each cohesive file in `app/host/` represents a traced feature (`FEAT-HOST-*`) with explicit operational responsibilities and verification boundaries:
+
+| Feature Identifier | Implementation File | Role & Primary Responsibilities | Key Classes & Functions | Traced Operations (`FR-*`) | Verification Test Suite |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| `FEAT-HOST-BOOT` | `bootstrap.py` | Lifecycle Coordinator & Boot Engine; 5 boot phases, monotonic timing, graceful shutdown. | `BootstrapCoordinator`, `Startup`, `StageResult`, `BootSnapshot` | 5 boot phases, graceful SIGINT/SIGTERM handling, process state reporting. | `tests/host/test_lifecycle.py`<br>`tests/host/test_bootstrapper.py` |
+| `FEAT-HOST-SESSION` | `sessions.py` | Operator Auth & Session Tokens; PBKDF2 hashing, HMAC bearer tokens, revocation. | `SessionManager`, `Session`, `hash_password()`, `verify_credentials()`, `sign()` | Loopback auto-login, session expiry, token verification, brute-force rate limits. | `tests/host/test_sessions.py` |
+| `FEAT-HOST-TRANSPORT` | `transport.py` | Wire Protocol & ASGI Application; uniform API envelope, WebSockets, mediated commands/files. | `create_app()`, `request_guard()`, `ExchangeFiles`, `ValidationIssue`, `ErrorBody` | Request ID tracing, structured error responses, connection heartbeat, command mediation. | `tests/host/test_webserver.py`<br>`tests/host/test_envelope.py`<br>`tests/host/test_commands.py` |
+| `FEAT-HOST-DISCOVERY` | `discovery.py` | AST & Manifest Inspection; non-executing descriptor and preset discovery without importing code. | `read_descriptor()`, `scan_presets()` | Dynamic package discovery, slot matching, contract version checks. | `tests/host/test_discovery.py` |
+| `FEAT-HOST-PACKAGES` | `packages.py` | Package Inventory & Composition Graph; slot bindings, installation leases, cascading removal. | `PackageInventory`, `Composition`, `InstallationLease`, `RemovalPlan`, `scan_packages()`, `plan_removal()` | Path containment verification, runtime slot bindings, atomic quarantine moves, rollback. | `tests/host/test_packages.py`<br>`tests/host/test_composition.py`<br>`tests/host/test_removal.py` |
+| `FEAT-HOST-CAPABILITIES` | `capabilities.py` | Capability Slot Facades; sandboxed, typed capability facades injected into workspaces. | `HostCapabilities`, `MarketAccess`, `JobAccess`, `NetworkAccess`, `ResourceAccess`, `SettingsAccess` | Typed workspace capability injection, capability isolation. | `tests/host/test_capabilities.py` |
+| `FEAT-HOST-SETTINGS` | `settings.py` | Typed Configuration & CAS Store; compare-and-set updates, change event broadcast. | `HostSettings`, `load_settings()`, `SettingsStore`, `SettingsError`, `SettingsConflictError` | Transactional updates, schema validation, secret masking. | `tests/host/test_settings.py` |
+| `FEAT-HOST-LOGGING` | `logging.py` | Structured JSON Logging & Redaction; rotating JSON log file, early buffer replay, secret masking. | `configure_boot_logging()`, `get_logger()`, `RedactingFilter` | Secret masking, structured log format, log level filtering. | `tests/host/test_telemetry.py` |
+| `FEAT-HOST-JOBS` | `jobs.py` | Hardware Diagnostics & Compute Pool; CPU topology detection, background job admission/cancellation. | `JobManager`, `JobRecord`, `CpuSnapshot` | Compute pool construction, task enqueue, task cancellation, progress reporting. | `tests/host/test_jobs.py` |
+| `FEAT-HOST-EVENTS` | `events.py` | In-Process Pub/Sub Event Bus; sequence numbering, topic filtering, replay buffer. | `EventBus`, `Event`, `Subscriber`, `ChannelError` | Event publishing, subscription dispatch, buffer replay. | `tests/host/test_events.py` |
+| `FEAT-HOST-NETWORK` | `network.py` | Allowlisted Historical HTTPS Retrieval; bounded, rate-limited downloads for data providers. | `HistoricalNetwork`, `NetworkResult` | Bounded HTTPS retrieval, origin allowlist enforcement, retry policy. | `tests/plugin/DataSource/test_dukascopy.py` |
+| `FEAT-HOST-CONTRACTS` | `contracts.py` | Host Structural Metamodels; shared lifecycle protocols and algebraic strategy node ports. | `LifecycleHook`, `ContributionDescriptor`, `HostSnapshot`, `Port`, `Node` | Structural descriptor schema, algebraic port validation. | `tests/host/test_lifecycle.py` |
+| `—` | `__init__.py` | Architectural Package Boundary; empty/docstring-only package marker. | Docstring only | Zero runtime imports or side effects. | `scripts/architecture_check.py` |
+
+### 4.1 Detailed File Roles and Responsibilities
+
+1. **`app/host/__init__.py`**
+   - **Role:** Declares `app.host` as an architectural boundary.
+   - **Functions:** Contains docstring documentation only. In accordance with the Spatial Composability laws, it performs zero runtime imports, side effects, or central registrations.
+
+2. **`app/host/bootstrap.py`**
+   - **Role:** Owns system startup, 5-phase lifecycle execution, and graceful host shutdown.
+   - **Key Components:**
+     - `BootstrapCoordinator`: The single composition root for the backend host runtime. Owns service initialization, database connections, and coordinating shutdown hooks across all resources.
+     - `Startup`: Tracks monotonic boot progression through the 5 stages (`runtime`, `services`, `packages`, `transport`, `serving`), records execution durations, invokes registered `LifecycleHook` callbacks, and tracks client acknowledgment deadlines (30-second window).
+     - `StageResult` & `BootSnapshot`: Immutable telemetry DTOs capturing startup stage outcomes and elapsed timing.
+
+3. **`app/host/capabilities.py`**
+   - **Role:** Constructs typed, isolated capability slots exposed to workspaces during composition.
+   - **Key Components:**
+     - `HostCapabilities`: Aggregate bundle injected into active workspace plugins.
+     - `MarketAccess`: Sandboxed access to historical market datasets (`datasets`, `range`, `scan`) without exposing database handles.
+     - `JobAccess`: Bounded compute task offloading interface (`enqueue`, `cancel`).
+     - `NetworkAccess`: Allowlisted HTTPS retrieval facade (`get`).
+     - `ResourceAccess`: Custody artifact storage facade (`publish`, `read`, `list`).
+     - `SettingsAccess`: Scoped configuration snapshot and transactional patch facade (`snapshot`, `patch`).
+
+4. **`app/host/contracts.py`**
+   - **Role:** Defines structural metamodels, algebraic ports, and lifecycle protocols shared across the host boundary.
+   - **Key Components:**
+     - `LifecycleHook`: Protocol for asynchronous stage listeners.
+     - `ContributionDescriptor`: Structural manifest model for discovered plugins and workspaces.
+     - `Port` & `Node`: Algebraic input/output declarations for composable strategy tree execution graphs.
+     - `HostSnapshot`: System status representation.
+
+5. **`app/host/discovery.py`**
+   - **Role:** Inspects file trees and discovers contribution descriptors and presets without executing third-party code.
+   - **Key Components:**
+     - `read_descriptor(path)`: Static AST/JSON parser that extracts metadata and capabilities from package manifests without importing modules.
+     - `scan_presets(root)`: Non-executing directory scanner indexing workspace configuration documents.
+
+6. **`app/host/events.py`**
+   - **Role:** In-process publish/subscribe message bus.
+   - **Key Components:**
+     - `EventBus`: High-throughput async message distributor supporting channel filtering (`boot.progress`, `settings.changed`, `*`), bounded queues, and historical event replay buffers.
+     - `Subscriber`: Queue-backed subscriber instance with overflow detection.
+     - `Event`: Immutable sequence-numbered event envelope.
+
+7. **`app/host/jobs.py`**
+   - **Role:** Hardware capacity detection and worker pool lifecycle.
+   - **Key Components:**
+     - `JobManager`: Manages process/thread worker pools, admits background compute jobs, tracks task progress, and enforces cancellations.
+     - `diagnose_cpu()`: Inspects system hardware topology (physical cores, logical threads, clock frequencies, available RAM).
+     - `JobRecord` & `CpuSnapshot`: Diagnostic data structures for job and hardware states.
+
+8. **`app/host/logging.py`**
+   - **Role:** Universal host logging, formatting, and security redaction.
+   - **Key Components:**
+     - `configure_boot_logging()`: Initializes rotating JSON structured logs (`data/logs/haruquantai.log`) with early memory buffer replay.
+     - `RedactingFilter`: Sanitizes log streams by automatically masking tokens, passwords, private endpoints, and sensitive credentials.
+     - `get_logger()`: Standardized logger factory.
+
+9. **`app/host/network.py`**
+   - **Role:** Sandboxed, allowlisted outbound HTTP/HTTPS retrieval for data plugins.
+   - **Key Components:**
+     - `HistoricalNetwork`: HTTP client enforcing an explicit host allowlist (`datafeed.dukascopy.com`, `cdn.strategyquantcdn.com`), strict timeouts, size limits (16 MB), and exponential backoff retry.
+     - `NetworkResult`: Uniform status and byte payload response.
+
+10. **`app/host/packages.py`**
+    - **Role:** Package inventory management, slot composition graph, and reversible uninstallation cascade.
+    - **Key Components:**
+      - `scan_packages()`: Reads and validates `package.json` manifests across workspace and plugin roots.
+      - `PackageInventory`: In-memory index of discovered packages with path confinement and validation issue tracking.
+      - `Composition`: Evaluates slot compatibility, binds plugins to workspace slots, and provides typed operation dispatch (`invoke`, `dispatch`).
+      - `InstallationLease`: File lock preventing concurrent package modifications.
+      - `RemovalPlan`, `apply_removal()`, `restore_removal()`: Calculates dependency cascade closures and executes atomic, journaled uninstallation into quarantine.
+
+11. **`app/host/sessions.py`**
+    - **Role:** Operator identity, authentication, password verification, and session tokens.
+    - **Key Components:**
+      - `SessionManager`: Manages bearer token issuance, verification, revocation, and automated expired session pruning.
+      - `is_loopback()`: Validates whether a network interface represents a local loopback address (`127.0.0.1`, `::1`).
+      - `hash_password()` & `verify_password()`: Secure PBKDF2-HMAC-SHA256 password hashing.
+      - `sign()` & `token_hash()`: HMAC-SHA256 cryptographic signatures and search hashes for bearer tokens.
+
+12. **`app/host/settings.py`**
+    - **Role:** Immutable runtime configuration and transactional compare-and-set settings store.
+    - **Key Components:**
+      - `HostSettings`: Frozen model holding parsed command-line flags and environment overrides.
+      - `load_settings()`: Resolves CLI arguments and environment variables with safe defaults.
+      - `SettingsStore`: Provides atomic compare-and-set updates against `host_settings` in SQLite, enforcing revision monotonicity and firing change events.
+
+13. **`app/host/transport.py`**
+    - **Role:** Wire protocol serialization, API envelopes, mediated shell commands, jailed file exchange, and ASGI/WebSocket application assembly.
+    - **Key Components:**
+      - `create_app()`: Assembles the FastAPI application with lifespan management, CORS, and trusted-host middleware.
+      - `request_guard()`: Middleware assigning diagnostic request IDs and enforcing authentication on protected `/api/v1/` routes.
+      - `ExchangeFiles`: Confined filesystem sandbox (`data/exchange/`) for safe text file exchange.
+      - API Envelopes: `success_payload()`, `error_payload()`, `ValidationIssue`, `ErrorBody`.
+      - Route Handlers: `status_endpoint`, `login_endpoint`, `settings_endpoint`, `resources_endpoint`, `contributions_endpoint`, `contribution_operation_endpoint`, `init_endpoint`, `catalog_endpoint`, `command_endpoint`, `file_endpoint`, `sse_endpoint`, `socket_endpoint`, `spa_endpoint`.
+
+### 4.2 Host Capabilities
 
 The host exposes explicitly typed capability slots to attached workspaces:
 
-- `host.market_data@1.0.0` (`market_data.py`): Typed access to historical dataset registries and timeseries partition reading without exposing raw database handles.
+- `host.market_data@1.0.0` (`app/persistence/market.py`): Typed access to historical dataset registries and timeseries partition reading without exposing raw database handles.
+- `host.resources@1.0.0` (`app/persistence/resources.py`): Shared Host Resource Custody, digest verification, retention, and uncoupled artifact reads.
 - `host.network@1.0.0` (`network.py`): Bounded, rate-limited HTTP/HTTPS requests with retry policies, timeouts, and credential redaction for data-source plugins.
 
 ---
 
-## 4. Multi-Level Persistence: Host Level
+## 5. Multi-Level Persistence: Host Level
 
 Host-level persistence is managed exclusively via `app/persistence/host.py` in the unified relational database:
 
@@ -109,7 +350,7 @@ data/database/
     `-- audit_log              # Security events, administrative modifications
 ```
 
-### 4.1 Host Persistence Invariants
+### 5.1 Host Persistence Invariants
 
 1. **Transactional Field Updates:** Settings updates perform atomic compare-and-set operations with post-commit event broadcasts (`settings.changed`).
 2. **Secret Redaction:** Fields marked sensitive are redacted from diagnostic logs, export dumps, and API responses.
@@ -118,9 +359,9 @@ data/database/
 
 ---
 
-## 5. Deployment and Execution
+## 6. Deployment and Execution
 
-### 5.1 Starting the System
+### 6.1 Starting the System
 
 ```bash
 # Start Backend Host
@@ -133,7 +374,7 @@ npm --prefix app/ui run dev
 uv run python -m app.cli --url http://127.0.0.1:8000 --page=login --json
 ```
 
-### 5.2 Environment Configuration Overrides
+### 6.2 Environment Configuration Overrides
 
 | Environment Variable | Description | Default |
 | :--- | :--- | :--- |
@@ -145,14 +386,14 @@ uv run python -m app.cli --url http://127.0.0.1:8000 --page=login --json
 
 ---
 
-## 6. Verification and Acceptance Matrix
+## 7. Verification and Acceptance Matrix
 
 | Verification Scope | Requirement | Command |
 | :--- | :--- | :--- |
 | **Host Lifecycle & Boot** | 5-phase boot execution and state transitions | `uv run pytest tests/host/test_lifecycle.py tests/host/test_bootstrapper.py` |
 | **Authentication & Sessions** | Token hashing, session expiration, loopback login | `uv run pytest tests/host/test_sessions.py` |
 | **Transport & Endpoints** | REST API envelope, WebSockets, error schemas | `uv run pytest tests/host/test_webserver.py tests/host/test_envelope.py` |
-| **Catalog & Discovery** | AST parsing, manifest inspection, slot composition | `uv run pytest tests/host/test_catalog.py tests/host/test_packages.py tests/host/test_composition.py` |
+| **Catalog & Discovery** | AST parsing, manifest inspection, slot composition | `uv run pytest tests/host/test_discovery.py tests/host/test_packages.py tests/host/test_composition.py` |
 | **Settings & Persistence** | Host SQLite settings, migrations, transactional updates | `uv run pytest tests/host/test_settings.py tests/persistence/test_host.py` |
 | **Telemetry & Redaction** | Rotating JSON log, secret filtering, early buffering | `uv run pytest tests/host/test_telemetry.py` |
 | **Resource Custody** | Shared artifact storage, digest verification | `uv run pytest tests/host/test_resource_store.py` |

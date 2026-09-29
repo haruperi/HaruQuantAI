@@ -8,10 +8,14 @@ from pathlib import Path
 import pytest
 from app.host.bootstrap import BootstrapCoordinator
 from app.host.capabilities import HostCapabilities, ResourceAccess
-from app.host.http_server import create_app
-from app.host.packages import scan_packages
-from app.host.removal import apply_removal, plan_removal, restore_removal
-from app.host.resource_store import ResourceStore
+from app.host.packages import (
+    apply_removal,
+    plan_removal,
+    restore_removal,
+    scan_packages,
+)
+from app.host.transport import create_app
+from app.persistence.resources import ResourceStore
 from app.workspace.DataManager.workspace import prepare
 from starlette.testclient import TestClient
 from tests.host.conftest import make_config

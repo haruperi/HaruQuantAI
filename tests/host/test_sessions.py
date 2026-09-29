@@ -1,9 +1,14 @@
 """Password, peer, runtime-key, expiry and revocation boundaries."""
 
 import pytest
-from app.host.config import HostSettings
-from app.host.security import hash_password, is_loopback, verify_password
-from app.host.sessions import SessionError, SessionManager
+from app.host.sessions import (
+    SessionError,
+    SessionManager,
+    hash_password,
+    is_loopback,
+    verify_password,
+)
+from app.host.settings import HostSettings
 from app.persistence.host import prepare_boot_database
 from pydantic import SecretStr
 
@@ -94,7 +99,7 @@ def test_haruquantai_and_operator_alias_login(host_config):
 
 
 def test_credentials_primitives_and_auth_store(tmp_path):
-    from app.host.security import hash_credentials, verify_credentials
+    from app.host.sessions import hash_credentials, verify_credentials
     from app.persistence.host import AuthStore
 
     path = tmp_path / "auth_test.db"

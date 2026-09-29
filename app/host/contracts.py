@@ -1,10 +1,82 @@
-"""Shared typed documents for host lifecycle and contribution metadata.
+"""Shared Typed Documents, Structural Metamodels, and Lifecycle Protocols.
 
-Pydantic documents reject unknown fields and prevent attribute reassignment.
-Nested mappings are not recursively frozen; producers must avoid mutating
-published data. These contracts describe host transport and capability slots,
-not centralized plugin-specific algorithms or schemas. LifecycleHook supplies
-explicit trusted callbacks; descriptors alone never load executable providers.
+Description:
+    This module defines the authoritative typed contracts, data transfer models,
+    and lifecycle protocols for the HaruQuantAI host runtime. It exists to guarantee
+    strict schema immutability, prevent attribute mutation, validate syntactic
+    plugin/workspace identities, declare algebraic port structures, and standardize
+    wire communication payloads. Externally, these contracts are shared across all
+    host boundaries: `bootstrap.py` uses `StageResult`, `BootSnapshot`, and
+    `LifecycleHook` to track boot progress and execute provider hooks; `packages.py`
+    and `discovery.py` consume `PluginDescriptor`, `ExtensionSlot`, and
+    `CapabilityRequirement` to inspect manifests and bind plugin slots; and
+    `transport.py` serializes snapshots for the `/api/v1/lifecycle` and
+    `/api/v1/catalog` endpoints. Internally, `Document` establishes a frozen,
+    extra-forbidden Pydantic base configuration; `StageResult` and
+    `BootSnapshot` model monotonic progress; `PluginDescriptor` encapsulates
+    namespaced contribution metadata; and `LifecycleHook` standardizes
+    trusted asynchronous lifecycle callbacks.
+
+Purpose:
+    FEAT-HOST-CONTRACTS: Structural Metamodels, Ports, and Lifecycle Protocols.
+    Provides immutable Pydantic schemas, algebraic node port declarations,
+    descriptor metadata structures, and lifecycle hook callback protocols.
+
+Key Capabilities:
+    - FR-HOST-CONTRACTS-IMMUTABLE-DOCUMENT: Schema-Enforced Frozen Document Base
+      Associated: `Document`
+      Logging: Enforces strict immutable attribute assignment and forbids
+      unrecognized fields at model validation time.
+    - FR-HOST-CONTRACTS-LIFECYCLE-TELEMETRY: Boot Progression Telemetry Models
+      Associated: `StageResult`, `StageEvent`, `BootSnapshot`
+      Logging: Structures wire payloads for lifecycle stage outcomes, monotonic
+      durations, and event bus sequence counters.
+    - FR-HOST-CONTRACTS-CONTRIBUTION-DESCRIPTOR: Package Descriptor Schema
+      Associated: `PluginDescriptor`, `ExtensionSlot`,
+      `CapabilityRequirement`, `Port`
+      Logging: Validates syntactic identities, capability dependencies, and
+      algebraic ports for dynamic catalog discovery.
+    - FR-HOST-CONTRACTS-LIFECYCLE-HOOK: Trusted Asynchronous Lifecycle Callback
+      Associated: `LifecycleHook`
+      Logging: Structures hook timeouts, repeat intervals, execution callables,
+      and reverse-order disposal handlers.
+
+Python API Usage:
+    ```python
+    from app.host.contracts import BootSnapshot, LifecycleHook, StageResult
+
+    # 1. Instantiate immutable lifecycle stage result
+    result = StageResult(
+        stage="runtime", label="Configure runtime", outcome="succeeded"
+    )
+
+    # 2. Build immutable boot snapshot
+    snapshot = BootSnapshot(
+        schema_version=2,
+        state="SERVER_READY",
+        sequence=42,
+        stages=(result,),
+    )
+
+    # 3. Declare trusted provider lifecycle hook
+    hook = LifecycleHook(
+        id="provider.cache",
+        stage="services",
+        run=lambda: None,
+        timeout=10.0,
+    )
+    ```
+
+CLI Usage:
+    Contract schemas and validation constraints are verified via host test
+    suites:
+    ```bash
+    # Verify contract schemas and serialization rules
+    uv run pytest tests/host/test_lifecycle.py
+
+    # Verify static typing compliance across contracts
+    uv run mypy app/host/contracts.py
+    ```
 """
 
 from collections.abc import Awaitable, Callable

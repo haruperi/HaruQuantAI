@@ -18,9 +18,12 @@ from app.host.capabilities import (
     NetworkAccess,
 )
 from app.host.jobs import JobManager
-from app.host.market_data import MarketDataset, MarketDataStore
 from app.host.network import HistoricalNetwork, NetworkResult
-from app.persistence.market import create_isolated_schema
+from app.persistence.market import (
+    MarketDataset,
+    MarketDataStore,
+    create_isolated_schema,
+)
 from app.plugin.DataSource.dukascopy import (
     RateCorrector,
     _fetch_day,

@@ -1,4 +1,64 @@
-"""Host-owned bounded HTTPS retrieval for declared historical-data origins."""
+"""Bounded HTTPS Retrieval for Declared Historical-Data Origins.
+
+Description:
+    This module provides secure, rate-limited, and origin-bounded HTTPS retrieval
+    for historical market data feeds. It exists to prevent Server-Side Request
+    Forgery (SSRF), redirect poisoning, credential leakage, and unbounded memory
+    consumption from external endpoints. Externally, it participates in data
+    acquisition workflows: `Composition` initializes `HistoricalNetwork` and injects
+    it into data source plugins (such as `plugin.data_manager.dukascopy`) via the
+    `NetworkAccess` capability facade. Data plugins invoke `get()` to download
+    historical tick chunks, M1 bar data, and broker symbol specifications.
+    Internally, `HistoricalNetwork` verifies URLs against a frozen host allowlist
+    (`ALLOWED_ORIGINS`), disables HTTP redirects, caps response payloads to 16 MB,
+    and applies a 3-attempt exponential backoff retry policy for rate-limiting
+    (429/503) and network socket timeouts.
+
+Purpose:
+    FEAT-HOST-NETWORK: Bounded Allowlisted Historical HTTPS Retrieval.
+    Provides allowlisted domain validation, bounded response streaming, and
+    exponential backoff retry policies for external historical market data providers.
+
+Key Capabilities:
+    - FR-HOST-NETWORK-ORIGIN-ALLOWLIST: Strict Origin Allowlist Verification
+      Associated: `HistoricalNetwork.get()`
+      Logging: Rejects non-allowlisted domains, credentials, or custom ports
+      with explicit ValueError validation.
+    - FR-HOST-NETWORK-BOUNDED-STREAMING: Size-Bounded Response Streaming
+      Associated: `HistoricalNetwork.get()`, `NetworkResult`
+      Logging: Emits debug log on successful retrieval with byte length and
+      raises ValueError when response exceeds the 16MB buffer bound.
+    - FR-HOST-NETWORK-EXPONENTIAL-RETRY: Resilient Transient Error Retry Policy
+      Associated: `HistoricalNetwork.get()`
+      Logging: Emits warning log on rate limits (429), service unavailability
+      (503), or transport timeouts before exponential sleep retry.
+
+Python API Usage:
+    ```python
+    from app.host.network import HistoricalNetwork, NetworkResult
+
+    # 1. Instantiate historical network client
+    network = HistoricalNetwork()
+
+    # 2. Fetch allowlisted market data file
+    url = "https://datafeed.dukascopy.com/datafeed/EURUSD/2026/01/01/00h_ticks.bi5"
+    result: NetworkResult = await network.get(url)
+
+    if result.status == 200:
+        raw_bytes = result.body
+    ```
+
+CLI Usage:
+    Network retrieval capabilities are exercised through data manager CLI and
+    plugin verification tests:
+    ```bash
+    # Test network retrieval and origin isolation
+    uv run pytest tests/plugin/DataSource/test_dukascopy.py
+
+    # Verify historical data acquisition offline runner
+    uv run python tests/examples/dukascopy_offline.py
+    ```
+"""
 
 from __future__ import annotations
 

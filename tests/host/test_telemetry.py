@@ -289,12 +289,12 @@ def test_get_logger_resolves_host_hierarchy() -> None:
     assert get_logger("").name == "app"
     assert get_logger("app").name == "app"
     assert get_logger("__main__").name == "app.main"
-    assert get_logger("app.host.config").name == "app.host.config"
+    assert get_logger("app.host.settings").name == "app.host.settings"
     assert get_logger("app.host.hardware").name == "app.host.hardware"
     assert get_logger("app.workspace.data").name == "app.workspace.data"
-    assert get_logger("host.config").name == "app.host.config"
+    assert get_logger("host.settings").name == "app.host.settings"
     assert get_logger("hardware").name == "app.hardware"
-    child = get_logger("app.host.config")
+    child = get_logger("app.host.settings")
     assert child.propagate is True
 
 

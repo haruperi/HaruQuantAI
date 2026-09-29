@@ -30,11 +30,9 @@ from typing import Literal
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.host.market_data import (
-    MarketDataStore,
-)
 from app.host.network import HistoricalNetwork
 from app.persistence.market import (
+    MarketDataStore,
     clear_datamgr_log,
     clear_market_symbol,
     delete_market_symbol,

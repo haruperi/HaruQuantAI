@@ -1,27 +1,95 @@
-"""Session authority combining process signatures and durable revocation.
+"""Session Authority, Credential Hashing, Rate-Limiting, and Token Revocation.
 
-SessionManager owns a fresh process key and bounded per-peer retry accounting.
-AuthStore owns database reads/writes; plaintext bearer credentials are returned
-to clients but only their hashes are persisted. Restarting changes the signing
-key and invalidates old tokens. Construction can provision an absent operator,
-so callers must initialize the schema and explicitly schedule this I/O.
+Description:
+    This module provides cryptographic operator authentication, bearer token
+    issuance, rate-limiting, and revocation management for the HaruQuantAI host.
+    It exists to prevent unauthorized remote execution, protect against brute-force
+    credential attacks, isolate ephemeral signing keys in process memory, and
+    maintain durable session states across SQLite storage. Externally, it
+    participates in three key workflows: (1) `BootstrapCoordinator` provisions
+    default credentials and verifies operator configuration during host
+    initialization (`_database`); (2) The ASGI transport layer (`app.host.transport`)
+    invokes `SessionManager.verify()` within `request_guard()` and `socket_endpoint`
+    to protect HTTP routes and WebSocket channels; and (3) Authentication routes
+    (`/api/v1/auth/login`, `/logout`) call `login()` to generate HMAC-signed bearer
+    tokens and `revoke()` to durably invalidate active sessions. Internally,
+    PBKDF2-HMAC-SHA256 helpers (`hash_password`, `verify_credentials`) manage salted
+    credentials; `sign()` and `token_hash()` generate tamper-evident bearer tokens
+    without storing raw credentials; and `SessionManager` enforces a 60-second
+    sliding-window retry limit per network peer.
+
+Purpose:
+    FEAT-HOST-SESSION: Operator Authentication, Ephemeral Tokens, and Revocation.
+    Provides salted PBKDF2 credential verification, HMAC-signed bearer token
+    issuance, sliding-window rate limiting, and durable SQLite token revocation.
+
+Key Capabilities:
+    - FR-HOST-SESSION-CREDENTIAL-VERIFICATION: Salted PBKDF2 Password Hashing
+      Associated: `hash_password()`, `verify_password()`, `verify_credentials()`
+      Logging: Emits warning log on invalid credential presentation during
+      authentication attempts.
+    - FR-HOST-SESSION-TOKEN-ISSUANCE: Ephemeral HMAC Bearer Token Generation
+      Associated: `SessionManager.login()`, `sign()`, `token_hash()`
+      Logging: Emits info log when client authenticates and bearer token is
+      successfully issued.
+    - FR-HOST-SESSION-RATE-LIMITING: Sliding-Window Per-Peer Retry Throttling
+      Associated: `SessionManager.login()`
+      Logging: Emits warning log when a peer exceeds max authentication
+      attempts (5 within 60s).
+    - FR-HOST-SESSION-TOKEN-VERIFICATION: Signature & Persistence Validation
+      Associated: `SessionManager.verify()`
+      Logging: Emits debug log on session verification and failed token
+      resolution.
+    - FR-HOST-SESSION-DURABLE-REVOCATION: Immediate Database Token Revocation
+      Associated: `SessionManager.revoke()`
+      Logging: Emits info log when session token is durably revoked in the
+      auth store.
+
+Python API Usage:
+    ```python
+    from app.host.sessions import SessionManager
+    from app.host.settings import HostSettings
+
+    # 1. Initialize session authority with host settings
+    settings = HostSettings()
+    manager = SessionManager(settings)
+
+    # 2. Authenticate credentials from a network peer
+    token = manager.login("haruquantai", "password123", peer="127.0.0.1")
+
+    # 3. Verify bearer token on incoming requests
+    session = manager.verify(token)
+    if session is not None:
+        user = session.username
+
+    # 4. Invalidate session token on logout
+    manager.revoke(token)
+    ```
+
+CLI Usage:
+    Session credentials and schema initialization are configured via CLI
+    flags:
+    ```bash
+    # Supply operator password at server launch
+    uv run python -m app.main --password "secret"
+
+    # Pre-migrate authentication schema in isolated database
+    uv run python -m app.main --migrate-auth-schema --data-dir ./data
+    ```
 """
 
+from __future__ import annotations
+
+import hashlib
 import hmac
+import ipaddress
 import secrets
 import time
 from collections import OrderedDict
 from dataclasses import dataclass
 
-from app.host.config import HostSettings
 from app.host.logging import get_logger
-from app.host.security import (
-    hash_password,
-    is_loopback,
-    sign,
-    token_hash,
-    verify_password,
-)
+from app.host.settings import HostSettings
 from app.persistence.host import AuthStore
 
 logger = get_logger(__name__)
@@ -29,6 +97,133 @@ RETRY_WINDOW = 60
 MAX_PEERS = 1024
 MAX_ATTEMPTS = 5
 MAX_TOKEN_LENGTH = 256
+
+
+def is_loopback(host: str) -> bool:
+    """Recognize a literal IPv4 or IPv6 loopback address.
+
+    Args:
+        host: Peer or bind address; DNS names and forwarding headers are not resolved.
+
+    Returns:
+        True for loopback literals; False for invalid addresses or hostnames.
+    """
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
+def hash_password(password: str) -> str:
+    """Create a password verifier with a fresh 32-byte random salt.
+
+    Uses 600,000 PBKDF2-HMAC-SHA256 iterations. This CPU-bound operation does
+    not store or log the password; callers own persistence and scheduling.
+
+    Args:
+        password: Plaintext password, encoded as UTF-8 without normalization.
+
+    Returns:
+        Hex salt and hex digest separated by a colon.
+    """
+    salt = secrets.token_bytes(32)
+    digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 600000)
+    return salt.hex() + ":" + digest.hex()
+
+
+def hash_credentials(
+    password: str, salt: str | None = None, iterations: int = 100000
+) -> tuple[str, str]:
+    """Create a password verifier and salt for user.access persistence.
+
+    Uses PBKDF2-HMAC-SHA256 with 100,000 iterations by default.
+
+    Args:
+        password: Plaintext password.
+        salt: Optional hexadecimal salt; generated randomly if None.
+        iterations: Number of PBKDF2 iterations.
+
+    Returns:
+        Tuple of (hex_digest, hex_salt).
+    """
+    effective_salt = salt if salt is not None else secrets.token_hex(16)
+    digest = hashlib.pbkdf2_hmac(
+        "sha256", password.encode(), bytes.fromhex(effective_salt), iterations
+    )
+    return digest.hex(), effective_salt
+
+
+def verify_credentials(
+    password: str,
+    stored_hash: str,
+    stored_salt: str,
+) -> bool:
+    """Verify candidate password against stored user.access hash and salt.
+
+    Supports both 100,000 and 600,000 iteration counts for compatibility.
+
+    Args:
+        password: Candidate plaintext password.
+        stored_hash: Hexadecimal hash stored in user.access.
+        stored_salt: Hexadecimal salt stored in user.access.
+
+    Returns:
+        True if matching, False for mismatch or malformed inputs.
+    """
+    try:
+        salt_bytes = bytes.fromhex(stored_salt)
+        for iters in (100000, 600000):
+            digest = hashlib.pbkdf2_hmac("sha256", password.encode(), salt_bytes, iters)
+            if hmac.compare_digest(digest.hex(), stored_hash):
+                return True
+        return False
+    except ValueError, TypeError:
+        return False
+
+
+def verify_password(password: str, stored: str) -> bool:
+    """Recompute and compare a stored PBKDF2 password verifier.
+
+    Digest comparison uses compare_digest. The expensive derivation is synchronous;
+    callers must apply their own request limits.
+
+    Args:
+        password: Candidate plaintext password.
+        stored: Colon-separated hex salt and digest from hash_password.
+
+    Returns:
+        Whether the digest matches; malformed verifier encodings return False.
+    """
+    try:
+        salt, expected = stored.split(":")
+        return verify_credentials(password, expected, salt)
+    except ValueError:
+        return False
+
+
+def token_hash(token: str) -> str:
+    """Produce the database lookup key for a bearer token.
+
+    Args:
+        token: Complete bearer credential, including its signature.
+
+    Returns:
+        SHA-256 hexadecimal digest; token validity is not checked here.
+    """
+    return hashlib.sha256(token.encode()).hexdigest()
+
+
+def sign(message: str, key: bytes) -> str:
+    """Compute a message authentication code with an injected secret.
+
+    Args:
+        message: Opaque token identifier encoded as UTF-8.
+        key: Process-owned signing bytes; never persisted by this helper.
+
+    Returns:
+        Hexadecimal HMAC-SHA256 signature.
+    """
+    return hmac.new(key, message.encode(), "sha256").hexdigest()
 
 
 class SessionError(ValueError):
@@ -151,7 +346,11 @@ class SessionManager:
             return None
         hashed = token_hash(token)
         username = self.store.valid(hashed, time.time())
-        return None if username is None else Session(username, hashed)
+        if username is None:
+            logger.debug("Session token verification failed")
+            return None
+        logger.debug("Session verified: username=%s", username)
+        return Session(username, hashed)
 
     def revoke(self, token: str) -> None:
         """Persist revocation for the supplied bearer credential.
@@ -163,3 +362,4 @@ class SessionManager:
             token: Full credential to hash before updating storage.
         """
         self.store.revoke(token_hash(token))
+        logger.info("Session revoked")

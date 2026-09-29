@@ -73,8 +73,8 @@ def test_cli_rejects_malformed_version_two_snapshot():
 def test_cli_initialization_has_no_restoration_wait(monkeypatch):
     from io import StringIO
 
+    from app.host.bootstrap import Startup
     from app.host.events import EventBus
-    from app.host.startup import Startup
 
     startup = Startup(EventBus())
     startup.listening()

@@ -3,7 +3,7 @@
 from pathlib import Path
 
 import pytest
-from app.host.commands import CommandError, ExchangeFiles, copy_text, open_link
+from app.host.transport import CommandError, ExchangeFiles, copy_text, open_link
 from starlette.testclient import TestClient
 
 

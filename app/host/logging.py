@@ -1,13 +1,77 @@
-"""Explicit host logging with redacted text, JSON, and bounded diagnostics.
+"""Structured JSON Logging, ANSI Color Console, and Credential Redaction.
 
-Modules obtain names through get_logger without installing handlers. The process
-entrypoint enables early console/buffer capture, then bootstrap configures the
-rotating file sink and Uvicorn forwarding. close_host_logging releases only
-host-owned handlers, preserving externally installed capture handlers.
+Description:
+    This module provides the central telemetry and logging engine for the
+    HaruQuantAI host process. It exists to guarantee that sensitive credentials,
+    bearer tokens, and authorization parameters are systematically redacted before
+    emission, while delivering structured JSON-lines telemetry for machine analysis
+    and colored console logs for developer diagnostics. Externally, it participates
+    in three key workflows: (1) `app.main` calls `configure_boot_logging()` at the
+    earliest phase of process boot to capture startup events in memory before
+    storage is initialized; (2) `BootstrapCoordinator` calls `configure_host_logging()`
+    to open the rotating file sink, replay buffered early boot events, and attach
+    Uvicorn server log forwarding, subsequently calling `close_host_logging()` on
+    shutdown; and (3) Host, workspace, and plugin modules obtain logger handles via
+    `get_logger(__name__)` and attach structured context fields without configuring
+    handlers. Internally, `SensitiveDataFilter` scrubs sensitive patterns via regex;
+    `bind_correlation()` manages request tracing contexts; and `JsonLinesFormatter`
+    and `ColorFormatter` serialize records for disk and terminal output.
 
-Redaction handles known patterns and structured fields; it is not permission to
-log arbitrary credentials. Call sites must omit secrets and unsafe exception
-values. File rotation and finite in-memory buffers bound retained diagnostics.
+Purpose:
+    FEAT-HOST-LOGGING: Structured Logging, Credential Redaction, and Early Boot Replay.
+    Provides structured JSON and color console logging, automated credential
+    masking, request correlation context, and early boot buffer replay.
+
+Key Capabilities:
+    - FR-HOST-LOGGING-CREDENTIAL-REDACTION: Automatic Secret Masking & Redaction
+      Associated: `SensitiveDataFilter`, `redact_sensitive()`,
+      `secret_fingerprint()`
+      Logging: Replaces detected passwords, tokens, and authorization
+      headers with deterministic hash fingerprints in all emitted records.
+    - FR-HOST-LOGGING-BOOT-BUFFER: Early Startup Memory Buffer & Replay
+      Associated: `BootBuffer`, `configure_boot_logging()`
+      Logging: Captures log events in memory prior to disk readiness and
+      replays them into the rotating file handler upon initialization.
+    - FR-HOST-LOGGING-ROTATING-SINK: Bounded Rotating File Telemetry
+      Associated: `configure_host_logging()`, `close_host_logging()`
+      Logging: Binds rotating JSON log file, enforces size limits, and
+      replays early buffered boot records to disk.
+    - FR-HOST-LOGGING-CORRELATION-TRACING: Request Context Correlation
+      Associated: `bind_correlation()`
+      Logging: Injects contextual correlation IDs into structured record
+      metadata for end-to-end request tracing.
+
+Python API Usage:
+    ```python
+    from pathlib import Path
+    from app.host.logging import (
+        bind_correlation,
+        close_host_logging,
+        configure_host_logging,
+        get_logger,
+    )
+
+    # 1. Configure rotating log sink
+    logger = configure_host_logging(Path("data/logs"))
+
+    # 2. Log with structured metadata and request correlation
+    app_logger = get_logger("app.workspace")
+    with bind_correlation("req-123"):
+        app_logger.info("Processing task", extra={"fields": {"task_id": "t1"}})
+
+    # 3. Release handlers at shutdown
+    close_host_logging()
+    ```
+
+CLI Usage:
+    Logging behavior and output sinks are controlled via entrypoint CLI flags:
+    ```bash
+    # Run host with custom log directory
+    uv run python -m app.main --data-dir ./data
+
+    # Inspect rotating JSON log lines
+    tail -f data/logs/haruquantai.log
+    ```
 """
 
 from __future__ import annotations

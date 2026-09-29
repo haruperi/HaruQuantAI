@@ -1,9 +1,63 @@
-"""Synchronous terminal client for the same host lifecycle used by the UI.
+"""Synchronous CLI Host Client, Protocol Handshake, and Command Dispatcher.
 
-Client logs in over HTTP, authenticates the updates WebSocket in its first frame,
-fetches initial state, and acknowledges readiness before commands. Credentials
-remain in memory; progress goes to the caller's stream. main renders command
-results to stdout and uses stderr for boot progress. No connection opens on import.
+Description:
+    Provides a synchronous terminal client for communicating with a running
+    HaruQuantAI universal backend host server, adhering to the same boot
+    protocol, authentication workflow, and readiness milestones used by the web
+    frontend.
+
+    External relations and workflows:
+    - Host transport: Connects to HTTP `/api/v1` routes (`/auth/login`,
+      `/init-data`, `/app-loaded`, `/status`, `/commands/*`) and WebSocket
+      `/ws/updates` provided by `app.host.transport`.
+    - Host contracts: Validates incoming `BootSnapshot` payloads against
+      `app.host.contracts.BootSnapshot` to ensure version compatibility and
+      server operational readiness.
+    - Operator CLI: Enables scriptable interactions, headless execution, CI
+      smoke tests, and workspace command dispatch without requiring a browser.
+
+    Internal coordination:
+    - ClientError: Specific domain exception stopping client execution on
+      transport, validation, or protocol failures.
+    - Client: Encapsulates target host URL validation (enforcing HTTPS for
+      remote endpoints), synchronous HTTP POST/GET methods with size limits,
+      and WebSocket boot progress subscription.
+    - _boot: Validates incoming boot snapshot dictionaries against schema version
+      rules.
+    - main: Parses command-line arguments, authenticates credentials, verifies
+      server readiness, executes targeted workspace actions, and renders
+      structured JSON or tabular output.
+
+Purpose:
+    FEAT-CLI-CLIENT: Synchronous terminal client for server authentication,
+    boot progression validation, and remote workspace command mediation.
+
+Key Capabilities:
+    - FR-CLI-CLIENT-CONNECT: Enforces valid URL schemes, loopback policies, and
+      authenticated HTTP request exchanges via Client.__init__() and
+      Client.request().
+      * Verified via: logger.info("CLI client authenticated for user: %s")
+    - FR-CLI-CLIENT-HANDSHAKE: Connects to WebSocket /ws/updates, tracks boot
+      progress snapshots, and signals client readiness via Client.initialize().
+      * Verified via: logger.info("CLI client handshake completed successfully")
+    - FR-CLI-CLIENT-COMMAND: Dispatches workspace commands and outputs JSON or
+      tab-separated formatting to stdout via main().
+      * Verified via: logger.info("CLI client command executed: action=%s")
+
+Python API Usage:
+    ```python
+    from io import StringIO
+
+    from app.cli import Client
+
+    client = Client("http://127.0.0.1:8000")
+    data = client.initialize("operator", "secret", output=StringIO())
+    ```
+
+CLI Usage:
+    ```bash
+    uv run python -m app.cli --url http://127.0.0.1:8000 --page login
+    ```
 """
 
 import argparse
@@ -22,7 +76,7 @@ from websockets.sync.client import connect
 
 from app.host.contracts import BootSnapshot
 from app.host.logging import get_logger
-from app.host.security import is_loopback
+from app.host.sessions import is_loopback
 
 logger = get_logger(__name__)
 MAX_RESPONSE_BYTES = 1048576
@@ -121,6 +175,7 @@ class Client:
         if password is not None:
             payload["password"] = password
         self.token = self.request("/auth/login", payload)["token"]
+        logger.info("CLI client authenticated for user: %s", username)
         ws_url = (
             ("wss" if self.url.startswith("https:") else "ws")
             + self.url[self.url.index(":") :]
@@ -143,6 +198,7 @@ class Client:
             current = self._boot(self.request("/status").get("boot"))
             if current.state not in ("SERVER_READY", "DEGRADED"):
                 raise ClientError("Host is not ready")
+            logger.info("CLI client handshake completed successfully")
             return initial
 
     @staticmethod
@@ -207,6 +263,7 @@ def main(argv: list[str] | None = None) -> int:
                 else {}
             )
             result = client.request("/commands/" + args.action, payload)
+            logger.info("CLI client command executed: action=%s", args.action)
         else:
             result = {"ready": True, "catalog": initial["catalog"]}
         sys.stdout.write(

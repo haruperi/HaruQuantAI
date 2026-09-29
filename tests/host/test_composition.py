@@ -5,10 +5,9 @@ import json
 from pathlib import Path
 
 import pytest
-from app.host.composition import Composition
 from app.host.jobs import JobManager
-from app.host.packages import scan_packages
-from app.host.resource_store import ResourceStore
+from app.host.packages import Composition, scan_packages
+from app.persistence.resources import ResourceStore
 
 
 def package(
@@ -34,7 +33,7 @@ def package(
         "requires": [{"id": "host.resources", "version": "1.0.0"}],
     }
     source = f"""PLUGIN = {descriptor!r}
-from app.host.composition import PreparedContribution
+from app.host.packages import PreparedContribution
 async def prepare(context):
     assert context.resources.owner == {descriptor["id"]!r}
     assert context.jobs is None

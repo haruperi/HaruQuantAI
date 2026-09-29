@@ -7,12 +7,11 @@ from typing import Any
 
 import pytest
 from app.host.capabilities import HostCapabilities, SettingsAccess
-from app.host.composition import Composition
 from app.host.jobs import JobManager
-from app.host.packages import scan_packages
-from app.host.resource_store import ResourceStore
+from app.host.packages import Composition, scan_packages
 from app.host.settings import SettingsStore
 from app.persistence.host import prepare_boot_database
+from app.persistence.resources import ResourceStore
 
 
 class DummyStore:
@@ -83,7 +82,7 @@ async def test_composition_supplies_settings_capability(tmp_path: Path) -> None:
     "slots": [],
     "requires": [{"id": "host.settings", "version": "1.0.0"}],
 }
-from app.host.composition import PreparedContribution
+from app.host.packages import PreparedContribution
 
 async def prepare(context):
     assert context.settings is not None
