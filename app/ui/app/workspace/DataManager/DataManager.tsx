@@ -670,20 +670,34 @@ export function DataManager() {
 
   const [dbDatasets, setDbDatasets] = useState<DatasetRow[]>([]);
   const [dbDatasetsLoaded, setDbDatasetsLoaded] = useState(false);
+  const [dbDatasetsError, setDbDatasetsError] = useState('');
+  const [dbDatasetsLoading, setDbDatasetsLoading] = useState(false);
+  const databaseRequest = useRef(0);
+  const databaseIds = useRef(new Set<string>());
   const loadDatabaseDatasets = useCallback(() => {
-    actionsClient
-      .listDatasets()
-      .then(rows => {
-        if (Array.isArray(rows)) {
-          setDbDatasets(rows);
-          setDbDatasetsLoaded(true);
-        }
-      })
-      .catch(() => {});
+    const request = ++databaseRequest.current;
+    setDbDatasetsLoading(true);
+    actionsClient.listDatasets().then(rows => {
+      if (request !== databaseRequest.current) return;
+      if (!Array.isArray(rows)) throw new Error('Invalid dataset list response');
+      const nextIds = new Set(rows.map(row => row.id));
+      const removedIds = new Set([...databaseIds.current].filter(id => !nextIds.has(id)));
+      databaseIds.current = nextIds;
+      setSelectedDatasetIds(current => current.filter(id => !removedIds.has(id)));
+      setDbDatasets(rows);
+      setDbDatasetsLoaded(true);
+      setDbDatasetsError('');
+    }).catch(() => {
+      if (request !== databaseRequest.current) return;
+      setDbDatasetsError('Unable to refresh datasets. Displayed rows may be out of date.');
+    }).finally(() => {
+      if (request === databaseRequest.current) setDbDatasetsLoading(false);
+    });
   }, []);
 
   useEffect(() => {
     loadDatabaseDatasets();
+    return () => { databaseRequest.current += 1; };
   }, [loadDatabaseDatasets]);
 
   const fileDefinitions = useFileSymbols(state => state.definitions);
@@ -1112,6 +1126,7 @@ export function DataManager() {
       <Button className="action-load" onClick={()=>setBrokerDialog({kind:'load'})}><FolderOpen size={26} aria-hidden="true"/>Load</Button>
     </div>}
   </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={operationState === 'idle' && providerJob ? providerJob.progress : progress} label={progressText}/><Button disabled={providerJob?.canPause === false || (operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? ''))} onClick={() => { setSelectionMessage(''); if (['running', 'paused'].includes(providerJob?.state ?? '')) providerAction(providerJob?.state === 'paused' ? 'resume' : 'pause'); else setOperationState(current => current === 'paused' ? 'running' : 'paused'); }}>{operationState === 'paused' || providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={operationState !== 'running' && operationState !== 'paused' && !['running', 'paused'].includes(providerJob?.state ?? '')} onClick={() => { setSelectionMessage(''); if (providerJob && ['running', 'paused'].includes(providerJob.state)) { providerAction('stop'); return; } setOperationState('cancelled'); notify(`${operationLabel} cancelled`); }}>Stop all</Button></div>
+  {dbDatasetsError && <div role="alert" className="selection-message">{dbDatasetsError} <Button disabled={dbDatasetsLoading} onClick={loadDatabaseDatasets}>{dbDatasetsLoading ? 'Refreshing datasets...' : 'Retry dataset refresh'}</Button></div>}
   <div className="dm-body">{tab === 'Log' ? <main className="dm-log"><header><strong>Log</strong><button className="clear-log" onClick={() => setLogEntries([])}>Clear log</button></header><div className="dm-log-output" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} pluginStates={pluginStates} dbDatasets={dbDatasets} dbDatasetsLoaded={dbDatasetsLoaded}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={indicatorDefinitions} selected={selectedExternalNames} job={pluginStates['indicators']?.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item=>openSessionDelete([item])} brokers={sessionBrokers}/> : <div className="dm-config"><Section title={tab}><div className="cards-list">{Array.from({ length: 6 }, (_, index) => <button key={index}><Database size={22}/><strong>{tab.replace(/s$/, '')} {index + 1}</strong><span>{index % 2 ? 'Configured · mock adapter' : 'Ready for configuration'}</span></button>)}</div></Section></div>}</div>
 
   {plugins.map(p => (
@@ -1144,40 +1159,41 @@ export function DataManager() {
       }}
       onComplete={(msg: string) => {
         notify(msg);
+        loadDatabaseDatasets();
         closeDialog();
       }}
       onNotify={(msg: string) => notify(msg)}
-      onSaved={() => setSelectedExternalNames([])}
+      onSaved={() => { setSelectedExternalNames([]); loadDatabaseDatasets(); }}
       onAddData={(req: any) => useDataManagerStore.getState().addData(req, [...contextNames])}
     />
   ))}
 
-  {dialog?.id === 'file-add' && <FileSymbolDialog onClose={closeDialog} onSaved={() => notify('File symbol added')}/>}
+  {dialog?.id === 'file-add' && <FileSymbolDialog onClose={closeDialog} onSaved={() => { notify('File symbol added'); loadDatabaseDatasets(); }}/>}
   {instrumentDialog?.kind === 'editor' && (
-    <InstrumentEditorDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+    <InstrumentEditorDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>
   )}
   {instrumentDialog?.kind === 'clone' && (
-    <CloneInstrumentDialog source={instrumentDialog.source} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+    <CloneInstrumentDialog source={instrumentDialog.source} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>
   )}
   {instrumentDialog?.kind === 'transfer' && (
-    <InstrumentTransferDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} all={instrumentRows} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => notify(message)}/>
+    <InstrumentTransferDialog mode={instrumentDialog.mode} selected={instrumentDialog.selected} all={instrumentRows} brokers={instrumentBrokers} onClose={() => setInstrumentDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>
   )}
   {instrumentDialog?.kind === 'delete' && <div className="instruments-flow"><Modal title={instrumentDialog.selected.length === 1 ? 'Remove instrument' : 'Remove instruments'} width={520} onClose={() => { setInstrumentDialog(null); setInstrumentError(''); }} footer={<><Button onClick={() => { setInstrumentDialog(null); setInstrumentError(''); }}>No</Button><Button className="primary" onClick={removeSelectedInstruments}>Yes</Button></>}>
     {instrumentError && <p role="alert" className="instrument-error">{instrumentError}</p>}
     <p>{instrumentDialog.selected.length === 1 ? `Do you really want to delete instrument '${instrumentDialog.selected[0].symbol}'?` : `Do you really want to delete ${instrumentDialog.selected.length} selected instruments?`}</p>
   </Modal></div>}
-  {sessionDialog?.kind==='editor'&&<SessionTemplateDialog mode={sessionDialog.mode} source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
-  {sessionDialog?.kind==='clone'&&<CloneSessionDialog source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
-  {sessionDialog?.kind==='transfer'&&<SessionTransferDialog mode={sessionDialog.mode} selected={sessionDialog.selected} all={sessionRows} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>notify(message)}/>}
+  {sessionDialog?.kind==='editor'&&<SessionTemplateDialog mode={sessionDialog.mode} source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>{notify(message);loadDatabaseDatasets();}}/>}
+  {sessionDialog?.kind==='clone'&&<CloneSessionDialog source={sessionDialog.source} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>{notify(message);loadDatabaseDatasets();}}/>}
+  {sessionDialog?.kind==='transfer'&&<SessionTransferDialog mode={sessionDialog.mode} selected={sessionDialog.selected} all={sessionRows} brokers={sessionBrokers} onClose={()=>setSessionDialog(null)} onSaved={message=>{notify(message);loadDatabaseDatasets();}}/>}
   {sessionDialog?.kind==='delete'&&<div className="sessions-flow"><Modal title="Removing sessions" width={520} onClose={()=>{setSessionDialog(null);setSessionError('');}} footer={<><Button onClick={()=>{setSessionDialog(null);setSessionError('');}}>No</Button><Button className="primary" onClick={removeSelectedSessions}>Yes</Button></>}>{sessionError&&<p role="alert" className="session-error">{sessionError}</p>}<p>Are you sure you want to remove selected sessions ({sessionDialog.selected.length})?</p></Modal></div>}
-  {stockGroupDialog?.kind === 'editor' && <StockGroupEditorDialog mode={stockGroupDialog.mode} source={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={(message,item) => { setSelectedStockGroupIds([item.id]); notify(message); }}/>}
-  {stockGroupDialog?.kind === 'stocks' && <StockGroupStocksDialog group={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
-  {stockGroupDialog?.kind === 'load' && <StockGroupTransferDialog onClose={() => setStockGroupDialog(null)} onSaved={message => notify(message)}/>}
+  {stockGroupDialog?.kind === 'editor' && <StockGroupEditorDialog mode={stockGroupDialog.mode} source={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={(message,item) => { setSelectedStockGroupIds([item.id]); notify(message); loadDatabaseDatasets(); }}/>}
+  {stockGroupDialog?.kind === 'stocks' && <StockGroupStocksDialog group={stockGroupDialog.source} onClose={() => setStockGroupDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>}
+  {stockGroupDialog?.kind === 'load' && <StockGroupTransferDialog onClose={() => setStockGroupDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>}
   {stockGroupDialog?.kind === 'delete' && <div className="stock-groups-flow"><Modal title={stockGroupDialog.selected.length === 1 ? 'Remove group' : 'Remove groups'} width={520} onClose={() => { setStockGroupDialog(null); setStockGroupError(''); }} footer={<><Button onClick={() => { setStockGroupDialog(null); setStockGroupError(''); }}>No</Button><Button className="primary" onClick={() => { try { const ids=stockGroupDialog.selected.map(item=>item.id);useStockGroups.getState().remove(ids);setSelectedStockGroupIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Group removed':'Groups removed');setStockGroupDialog(null);setStockGroupError(''); } catch(cause){setStockGroupError(cause instanceof Error?cause.message:'Unable to remove groups.');} }}>Yes</Button></>}>{stockGroupError&&<p role="alert" className="stock-group-error">{stockGroupError}</p>}<p>Are you sure you want to remove selected groups ({stockGroupDialog.selected.length})?</p></Modal></div>}
-  {brokerDialog?.kind==='editor'&&<BrokerProfileEditorDialog mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source||(!instrumentRows.some(row=>row.broker===brokerDialog.source!.id)&&!sessionRows.some(row=>row.broker===brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source||(!definitions.some(row=>row.broker===brokerDialog.source!.id)&&!fileDefinitions.some(row=>row.broker===brokerDialog.source!.id))} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
-  {brokerDialog?.kind==='stocks'&&<BrokerStocksDialog profile={brokerDialog.source} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
-  {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
-  {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
+  {brokerDialog?.kind==='editor'&&<BrokerProfileEditorDialog mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source||(!instrumentRows.some(row=>row.broker===brokerDialog.source!.id)&&!sessionRows.some(row=>row.broker===brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source||(!definitions.some(row=>row.broker===brokerDialog.source!.id)&&!fileDefinitions.some(row=>row.broker===brokerDialog.source!.id))} onClose={()=>setBrokerDialog(null)} onSaved={message=>{notify(message);loadDatabaseDatasets();}}/>}
+  {brokerDialog?.kind==='stocks'&&<BrokerStocksDialog profile={brokerDialog.source} onClose={()=>setBrokerDialog(null)} onSaved={message=>{notify(message);loadDatabaseDatasets();}}/>}
+  {brokerDialog?.kind==='import'&&<BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={()=>setBrokerDialog(null)} onSaved={message=>{notify(message);loadDatabaseDatasets();}}/>}
+  {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>{notify(message);loadDatabaseDatasets();}}/>}
   {exportDialog?.kind === 'csv' && (
     <CsvExportDialog
       targets={exportDialog.targets}

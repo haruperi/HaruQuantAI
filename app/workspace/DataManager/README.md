@@ -26,9 +26,19 @@ Canonical target storage is `data/market/dukascopy/` with only `m1/` and
 `ticks/` immediately below that source; current files are one M1 year or Tick
 month each. The active database has not been migrated to the market file catalog.
 The Dukascopy Add dialog lists eligible `datamgr_broker` rows through a
-read-only host catalog and fills the selected broker's postfix. Dataset definitions can now be saved atomically with broker/postfix and explicit
-Default instrument mapping, independently of file-catalog provisioning. This
-neither downloads data nor performs broker-specific conversion. Definition
+read-only host catalog and fills the selected broker's postfix. Save in the Add
+Dukascopy data dialog registers dataset definitions atomically
+with the selected broker/postfix and backend Default instrument handling, without
+an intermediate instrument-selection screen. This works independently of
+file-catalog provisioning. This neither downloads data nor performs broker-specific
+conversion. Definition
 registration passes isolated persistence and browser tests; live Save readiness
 is verified without inserting test records into the active database.
 The approved plan is under `.agents/logs/2026-09-28T093858_dukascopy-acquisition/`.
+
+The dataset table reloads its database snapshot after successful source additions
+and existing edit/update, load, clone and delete/clear completion callbacks.
+Refresh preserves table filters and valid selection. Older overlapping responses
+cannot replace newer snapshots. A failed list read keeps the last rows visible
+with a retry action; retry does not repeat the completed write. Prototype editors
+retain their existing persistence limitations.
