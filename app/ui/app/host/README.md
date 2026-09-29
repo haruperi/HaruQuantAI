@@ -56,23 +56,27 @@ plugins plug into, and the UI counterpart of the backend `app/host/`.
 | FEAT-UI-WORKSPACE_INVENTORY | Sixteen workspace surfaces mirroring the SQX 144.2953 navigation inventory (plus normative MTAnalyzer and Live Trading) | implemented (`app/workspace/*`) |
 
 
-## Host boot integration (2026-09-25)
+## Host boot integration (2026-09-29)
 
-`HostConnection.tsx` uses the same login, authenticated WebSocket snapshot,
-`GET /api/v1/init-data`, `POST /api/v1/app-loaded`, and readiness wait as `app/cli.py`.
-`BootScreen.tsx` presents all 37 backend stage outcomes; missing providers remain
-unavailable. `FirstRunDialog.tsx` discloses absent research providers. The existing
-workspace navigation still includes mock/prototype surfaces, which do not acquire
-backend capabilities merely because the host is online.
+`HostConnection.tsx` and `app/cli.py` authenticate, attach live updates, read
+init-data and acknowledge client initialization. Boot snapshots require
+`schema_version: 2`; missing/unsupported versions produce explicit compatibility
+errors. Deploy the host and both clients together.
 
-`transport.ts` authenticates WebSockets in the first frame, keeps bearer tokens
-in memory, supports heartbeat and bounded handshake timeout, and reports lost or
-overflowed streams as offline. Settings retain the authenticated SSE transport.
-The host must reach STANDBY or DEGRADED before connection status becomes online;
-FAILED restoration remains an error. Retry and browser reload create new sessions.
+`BootScreen.tsx` presents five host phases: runtime, services, packages, transport
+and serving. It displays actual outcomes and reasons. An online shell requires a
+SERVER_READY or DEGRADED host plus successful client initialization. No client
+acknowledgment starts shared restoration, and no restoration polling loop remains.
+
+`transport.ts` retains first-frame WebSocket authentication, in-memory bearer
+tokens, heartbeat, bounded handshake timeout and overflow/disconnect errors.
+Settings retain authenticated SSE. Missing research operations remain catalog or
+command availability information; prototype navigation does not establish backend
+capabilities. FirstRunDialog continues to disclose relevant host requirements.
 
 | Feature ID | Feature | Status |
 | --- | --- | --- |
-| FEAT-UI-BOOT | Shared host handshake, 37-stage progress, first-run provider disclosure and readiness gating | implemented candidate; tests/unit/host/bootSequence.test.tsx and hostConnection.test.tsx |
+| FEAT-UI-BOOT | Version-2 handshake, five-phase progress and independent client readiness | candidate; bootSequence.test.tsx and hostConnection.test.tsx; task walkthrough records verification |
 
 No workspace algorithms or durable domain records are implemented in the UI host.
+Evidence: `.agents/logs/2026-09-29T112552_simplify-host-boot/`.

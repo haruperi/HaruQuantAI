@@ -1,7 +1,5 @@
 """Real HTTP/ASGI authentication, static delivery and WebSocket lifecycle."""
 
-import time
-
 import pytest
 from starlette.websockets import WebSocketDisconnect
 
@@ -10,7 +8,7 @@ def test_status_catalog_and_unknown_routes(client, auth_headers):
     status = client.get("/api/v1/status")
     assert status.status_code == 200
     assert status.headers["X-Request-Id"].startswith("req-")
-    assert len(status.json()["data"]["boot"]["stages"]) == 37
+    assert len(status.json()["data"]["boot"]["stages"]) == 5
     catalog = client.get("/api/v1/catalog", headers=auth_headers).json()["data"]
     assert catalog == {"domains": [], "issues": []}
     assert client.get("/api/v1/unknown", headers=auth_headers).status_code == 404
@@ -18,7 +16,9 @@ def test_status_catalog_and_unknown_routes(client, auth_headers):
     assert client.get("/", headers={"host": "evil.example"}).status_code == 400
 
 
-def test_handshake_snapshot_ack_and_standby(client, auth_headers, services):
+def test_handshake_snapshot_ack_does_not_change_process_state(
+    client, auth_headers, services
+):
     token = auth_headers["Authorization"].removeprefix("Bearer ")
     assert (
         client.post("/api/v1/app-loaded", json={}, headers=auth_headers).status_code
@@ -28,7 +28,7 @@ def test_handshake_snapshot_ack_and_standby(client, auth_headers, services):
         socket.send_json({"token": token, "topics": ["boot.progress"]})
         snapshot = socket.receive_json()
         assert snapshot["type"] == "snapshot"
-        assert len(snapshot["boot"]["stages"]) == 37
+        assert len(snapshot["boot"]["stages"]) == 5
         initial = client.get("/api/v1/init-data", headers=auth_headers).json()["data"]
         assert initial["first_run"]
         assert initial["settings"] == {"revision": 0, "values": {}}
@@ -36,12 +36,8 @@ def test_handshake_snapshot_ack_and_standby(client, auth_headers, services):
             assert client.post(
                 "/api/v1/app-loaded", json={}, headers=auth_headers
             ).json()["data"] == {"acknowledged": True}
-        for _ in range(100):
-            state = client.get("/api/v1/status").json()["data"]["boot"]["state"]
-            if state == "STANDBY":
-                break
-            time.sleep(0.01)
-        assert state == "STANDBY"
+        assert services.startup.snapshot().state == "INITIALIZING"
+        assert services.startup.results["serving"].outcome == "running"
         socket.send_json({"type": "ping"})
         for _ in range(100):
             if socket.receive_json().get("type") == "pong":

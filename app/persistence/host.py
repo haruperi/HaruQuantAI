@@ -1141,7 +1141,7 @@ def prepare_boot_database(path: Path) -> None:
         verify_schema(path)
         with _readonly(path) as connection:
             _verify_auth_schema(connection)
-        logger.info("I01 Existing host schema verified without migration")
+        logger.info("Existing host schema verified without migration")
         return
     path.parent.mkdir(parents=True, exist_ok=True)
     # Reserve the new path exclusively before any schema creation.
@@ -1151,7 +1151,7 @@ def prepare_boot_database(path: Path) -> None:
     with _connect(path) as connection, _write_transaction(connection):
         for statement in _AUTH_SCHEMA:
             connection.execute(statement)
-    logger.info("I01 New isolated host database initialized")
+    logger.info("New isolated host database initialized")
 
 
 def _check_legacy_auth_conflicts(connection: sqlite3.Connection) -> None:

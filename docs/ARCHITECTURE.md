@@ -167,8 +167,11 @@ without importing discovered modules. Its catalog is an immutable startup snapsh
 of metadata and issues; entries remain explicitly unmounted and unavailable until
 trusted runtime providers exist. Lifecycle hooks are supplied through typed,
 explicit injection. This is not a complete runtime capability resolver, arbitrary
-plugin loader, or hot-swap system. The current 37-stage orchestration and domain
+plugin loader, or hot-swap system. The five-phase boot contract (snapshot schema version 2) and domain
 availability boundary are documented in [app/host/README.md](../app/host/README.md).
+Host readiness follows confirmed listening and is independent of client attachment.
+Client acknowledgments do not initialize shared quantitative services or restore
+strategies; domain operations retain their own readiness and ownership boundaries.
 
 The current React shell still uses static workspace route imports and
 several direct prototype imports. It does not yet achieve SC-02/SC-05 for

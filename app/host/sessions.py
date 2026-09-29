@@ -80,7 +80,7 @@ class SessionManager:
             raise SessionError("Configured credentials differ from stored operator")
         if not is_loopback(settings.host) and stored is None and exists:
             raise SessionError("Remote host requires a protected operator")
-        logger.info("B10 Session authority initialized")
+        logger.info("Session authority initialized")
 
     def login(self, username: str, password: str | None, *, peer: str) -> str:
         """Authenticate credentials and persist a signed token hash.
@@ -111,7 +111,7 @@ class SessionManager:
         if len(self._attempts) > MAX_PEERS:
             self._attempts.popitem(last=False)
         if count >= MAX_ATTEMPTS:
-            logger.warning("B10 Authentication retry limit reached")
+            logger.warning("Authentication retry limit reached")
             raise SessionError("Retry limit")
         exists, stored = self.store.credential(username)
         local = is_loopback(self.settings.host) and is_loopback(peer)
@@ -120,7 +120,7 @@ class SessionManager:
             or (stored is not None and verify_password(password or "", stored))
         )
         if not valid:
-            logger.warning("B10 Authentication rejected")
+            logger.warning("Authentication rejected")
             raise SessionError("Invalid credentials or retry limit")
         self._attempts.pop(peer, None)
         identifier = secrets.token_urlsafe(32)
@@ -128,7 +128,7 @@ class SessionManager:
         self.store.issue(
             token_hash(token), username, now, now + self.settings.session_seconds
         )
-        logger.info("B10 Client authenticated")
+        logger.info("Client authenticated")
         return token
 
     def verify(self, token: str) -> Session | None:

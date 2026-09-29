@@ -43,7 +43,7 @@ def test_port_fallback_retains_reserved_socket(tmp_path):
 def test_real_host_cli_handshake_and_shutdown(tmp_path):
     """Verify complete boot logs and real CLI readiness against an isolated host.
 
-    Asserts all 37 stages before client attachment and after deferred restoration,
+    Asserts all five phases before client attachment and independent client readiness,
     then requests authenticated shutdown and checks exit status. A finally block
     terminates only the test-owned subprocess if the normal lifecycle fails.
     """
@@ -88,12 +88,15 @@ def test_real_host_cli_handshake_and_shutdown(tmp_path):
             else:
                 pytest.fail("Host readiness deadline")
             boot_log = (tmp_path / "host-output.txt").read_text()
-            for stage, _ in STAGES:
-                assert f"Boot summary [server_ready] {stage} " in boot_log
-            assert "browser auto-launch disabled" in boot_log
-            assert "strategy scan unavailable: no restoration provider" in boot_log
+            for stage, label in STAGES:
+                assert f"{stage} {label}: succeeded" in boot_log
+            assert "Host ready: state=SERVER_READY" in boot_log
             assert "Boot scan totals: presets=0; catalog descriptors=0" in boot_log
-            assert "Boot summary [client_initialization]" not in boot_log
+            assert "Client initialized" not in boot_log
+            assert "no_registered_provider" not in boot_log
+            snapshot = client.request("/status")["boot"]
+            assert snapshot["schema_version"] == 2
+            assert all(s["outcome"] == "succeeded" for s in snapshot["stages"])
             result = subprocess.run(
                 [
                     sys.executable,
@@ -119,9 +122,9 @@ def test_real_host_cli_handshake_and_shutdown(tmp_path):
             assert client.request("/shutdown", {})["shutdown"] == "requested"
             assert process.wait(timeout=15) == 0
             boot_log = (tmp_path / "host-output.txt").read_text()
-            for stage, _ in STAGES:
-                assert f"Boot summary [client_initialization] {stage} " in boot_log
-            assert "0 strategies loaded" not in boot_log
+            assert "Client initialized after" in boot_log
+            assert boot_log.count("Host ready: state=SERVER_READY") == 1
+            assert "Boot summary" not in boot_log
         finally:
             if process.poll() is None:
                 process.terminate()
@@ -190,3 +193,38 @@ def test_maintenance_command_migrates_without_starting_server(tmp_path):
         assert "Auth migration:" in result.stderr
         assert "Port reserved" not in result.stderr
         prepare_boot_database(path)
+
+
+def test_listening_summary_precedes_optional_browser_launch(tmp_path, monkeypatch):
+    import asyncio
+
+    import uvicorn
+    from app.host.bootstrap import BootstrapCoordinator
+    from app.main import HostServer
+
+    settings = HostSettings(data_dir=tmp_path, open_browser=True)
+    host = BootstrapCoordinator(settings, installation_root=tmp_path / "installation")
+    order = []
+
+    async def fake_startup(
+        server: uvicorn.Server, sockets: list[socket.socket] | None = None
+    ) -> None:
+        server.started = True
+
+    monkeypatch.setattr(uvicorn.Server, "startup", fake_startup)
+    monkeypatch.setattr(host, "log_boot_summary", lambda: order.append("ready"))
+    monkeypatch.setattr("app.main.launch", lambda url: order.append("browser"))
+    server = HostServer(uvicorn.Config("unused:app"), host)
+
+    async def run() -> None:
+        await host.initialize()
+        try:
+            with socket.socket() as bound:
+                bound.bind(("127.0.0.1", 0))
+                await server.startup([bound])
+            assert order == ["ready", "browser"]
+            assert host.startup.snapshot().state == "SERVER_READY"
+        finally:
+            await host.close()
+
+    asyncio.run(run())

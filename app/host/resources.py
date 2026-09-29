@@ -1,7 +1,7 @@
 """Host hardware observations and compute-pool construction.
 
-The bootstrap coordinator calls diagnostics during B09 and owns the pool
-returned during I04. Importing this module performs no hardware probe and
+The bootstrap coordinator owns diagnostics and the pool during service setup.
+Importing this module performs no hardware probe and
 starts no workers. A pool provides execution capacity, not research engines.
 """
 
@@ -29,7 +29,7 @@ def diagnostics() -> dict[str, Any]:
         version.
     """
     memory = psutil.virtual_memory()
-    logger.info("B09 Hardware diagnostics collected")
+    logger.info("Hardware diagnostics collected")
     return {
         "cpu_count": os.cpu_count() or 1,
         "memory_total_bytes": memory.total,
@@ -56,5 +56,5 @@ def create_pool(workers: int) -> ProcessPoolExecutor:
         ValueError: The executor rejects a nonpositive explicit worker count.
     """
     count = workers or min(61, max(1, (os.cpu_count() or 1) - 1))
-    logger.info("I04 Compute pool allocated with %s workers", count)
+    logger.info("Compute pool allocated with %s workers", count)
     return ProcessPoolExecutor(max_workers=count)

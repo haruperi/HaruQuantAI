@@ -55,6 +55,6 @@ def scan_presets(root: Path) -> dict[str, Any]:
             )
         except OSError, ValueError, TypeError:
             issues.append({"path": locator, "code": "invalid_preset"})
-            logger.warning("I02 Invalid preset isolated")
-    logger.info("I02 Presets inspected: %s documents", len(entries))
+            logger.warning("Invalid preset isolated")
+    logger.info("Presets inspected: %s documents", len(entries))
     return {"entries": entries, "issues": issues}

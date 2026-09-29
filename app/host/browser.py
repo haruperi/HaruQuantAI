@@ -27,7 +27,7 @@ def launch(url: str) -> bool:
     try:
         opened = webbrowser.open(url)
     except webbrowser.Error:
-        logger.warning("B06 Browser launch failed")
+        logger.warning("Browser launch failed")
         return False
-    logger.info("B06 Browser launch outcome: %s", opened)
+    logger.info("Browser launch outcome: %s", opened)
     return opened

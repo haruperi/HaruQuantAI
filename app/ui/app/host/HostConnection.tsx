@@ -6,7 +6,7 @@ import { useAppStore } from './store';
 import { parseHostPreferences, readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences, type HostSettingsSnapshot, type ShellPreferences } from './hostSettings';
 import { BootScreen } from './BootScreen';
 import { FirstRunDialog } from './FirstRunDialog';
-import { connectBootStream, type BootSnapshot, type BootStream, type InitializationData, ApiClientError, createDomainClient, login, setAuthToken, subscribeAuthExpired } from './transport';
+import { validateBootSnapshot, connectBootStream, type BootSnapshot, type BootStream, type InitializationData, ApiClientError, createDomainClient, login, setAuthToken, subscribeAuthExpired } from './transport';
 
 export type HostStatus = 'connecting' | 'online' | 'locked' | 'offline';
 export type SaveSettingsResult = { ok: true } | { ok: false; message: string };
@@ -69,27 +69,23 @@ export async function connectHost(options: ConnectHostOptions): Promise<void> {
     stream = (options.bootStream ?? connectBootStream)(signal, options.onBoot ?? (() => {}), message => { streamFailed = true; if (!signal.aborted) { onStatus('offline'); onError(message); } });
     await stream.ready;
     const initial = await createDomainClient('', config).get<InitializationData>('/init-data');
+    validateBootSnapshot(initial.boot);
     onSettings(parseHostPreferences(initial.settings));
     options.onBoot?.(initial.boot);
     if (initial.first_run) options.onFirstRun?.(initial.requirements);
     if (options.onCoreCount) {
-      const status = await createDomainClient('', config).get<{ cpu_count?: number }>('/status');
+      const status = await createDomainClient('', config).get<{ cpu_count?: number; boot: BootSnapshot }>('/status');
+      validateBootSnapshot(status.boot);
       if (!signal.aborted && Number.isInteger(status.cpu_count) && (status.cpu_count ?? 0) > 0) options.onCoreCount(status.cpu_count!);
     }
     await createDomainClient('', config).post('/app-loaded', {});
     if (signal.aborted) return;
-    const deadline = Date.now() + 30000;
-    let ready = false;
-    while (!signal.aborted && Date.now() < deadline) {
-      const snapshot = await createDomainClient('', config).get<{ boot: BootSnapshot }>('/status');
-      options.onBoot?.(snapshot.boot);
-      if (['STANDBY', 'DEGRADED'].includes(snapshot.boot.state)) { ready = true; break; }
-      if (snapshot.boot.state === 'FAILED') throw new Error('Required host initialization failed');
-      await new Promise(resolve => setTimeout(resolve, 100));
-    }
+    const snapshot = await createDomainClient('', config).get<{ boot: BootSnapshot }>('/status');
+    const boot = validateBootSnapshot(snapshot.boot);
+    options.onBoot?.(boot);
     if (signal.aborted) return;
     if (streamFailed) throw new Error('Host progress connection failed; reconnect');
-    if (!ready) throw new Error('Host readiness timed out');
+    if (!['SERVER_READY', 'DEGRADED'].includes(boot.state)) throw new Error('Host is not ready');
     onStatus('online');
     await watchSettingsChanges({
       signal,

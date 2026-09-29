@@ -5,7 +5,7 @@ import { createInitialAppSettings } from '../../../app/host/globalSettings';
 import { shellPreferences } from '../../../app/host/hostSettings';
 
 const asFetch = (fn: unknown) => fn as unknown as typeof fetch;
-const boot = { state: 'STANDBY', sequence: 1, stages: [] };
+const boot = { schema_version: 2, state: 'SERVER_READY', sequence: 1, stages: [] };
 const bootStream = () => ({ ready: Promise.resolve(), close: vi.fn() });
 const shell = { ...shellPreferences(createInitialAppSettings()), theme: 'light', zoom: 1.1 };
 
@@ -139,5 +139,23 @@ describe('host startup sequence', () => {
     expect(getAuthToken()).toBeNull();
 
     vi.unstubAllGlobals();
+  });
+});
+
+
+describe('host initialization compatibility', () => {
+  it.each(['/init-data', '/status'])('rejects an incompatible %s document without becoming online', async incompatiblePath => {
+    const onStatus = vi.fn();
+    const onError = vi.fn();
+    const fetchFn = vi.fn().mockImplementation(async (url: string) => {
+      const snapshot = url.endsWith(incompatiblePath) ? { ...boot, schema_version: 1 } : boot;
+      const data = url.endsWith('/auth/login') ? { token: 'test-session' }
+        : url.endsWith('/init-data') ? { boot: snapshot, settings: { revision: 0, values: {} }, first_run: false }
+        : { boot: snapshot };
+      return { ok: true, status: 200, json: async () => ({ status: 'success', data }) };
+    });
+    await connectHost({ bootStream, signal: new AbortController().signal, fetchFn: asFetch(fetchFn), onStatus, onError, onSettings: vi.fn() });
+    expect(onError).toHaveBeenCalledWith('Incompatible host boot schema; version 2 required');
+    expect(onStatus).not.toHaveBeenCalledWith('online');
   });
 });

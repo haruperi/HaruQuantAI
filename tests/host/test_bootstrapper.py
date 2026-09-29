@@ -73,11 +73,13 @@ def test_boot_stages_and_logging_are_real(host_config):
         await host.initialize()
         await host.initialize()
         stages = host.startup.results
-        assert stages["I01"].outcome == "succeeded"
-        assert stages["I08"].outcome == "unavailable"
+        assert stages["services"].outcome == "succeeded"
+        assert stages["packages"].outcome == "succeeded"
+        assert stages["serving"].outcome == "pending"
+        assert host.startup.state == "INITIALIZING"
         pool = host.pool
         assert pool is not None
-        assert len(stages) == 37
+        assert len(stages) == 5
         await host.close()
         assert host.pool is None
 
@@ -87,8 +89,8 @@ def test_boot_stages_and_logging_are_real(host_config):
         for line in (host_config.log_dir / "haruquantai.log").read_text().splitlines()
     ]
     assert any(
-        e.get("fields", {}).get("stage") == "I08"
-        and e["fields"]["outcome"] == "unavailable"
+        e.get("fields", {}).get("stage") == "services"
+        and e["fields"]["outcome"] == "succeeded"
         for e in events
     )
     assert not any(
@@ -137,3 +139,36 @@ def test_missing_auth_schema_has_actionable_diagnostic(tmp_path, caplog):
         asyncio.run(host.initialize())
     assert "--migrate-auth-schema" in caplog.text
     assert host.startup.state == "FAILED"
+
+
+@pytest.mark.parametrize("cancelled", [False, True])
+def test_failed_service_hook_releases_partial_services_and_lease(
+    host_config, cancelled
+):
+    from app.host.contracts import LifecycleHook
+
+    cleaned = []
+
+    async def fail() -> None:
+        if cancelled:
+            raise asyncio.CancelledError
+        raise ValueError("private hook error")
+
+    async def cleanup() -> None:
+        cleaned.append(True)
+
+    host = BootstrapCoordinator(
+        host_config,
+        (LifecycleHook("required", "services", fail, required=True, close=cleanup),),
+        installation_root=host_config.data_dir / "installation",
+    )
+    with pytest.raises(asyncio.CancelledError if cancelled else RuntimeError):
+        asyncio.run(host.initialize())
+    assert host.startup.snapshot().state == "FAILED"
+    assert host.pool is None
+    assert not host.installation_lease.held
+    assert cleaned == [True]
+    assert host.startup.results["serving"].outcome == "pending"
+    assert host.startup.results["services"].reason == (
+        "cancelled" if cancelled else "required_provider_failed"
+    )

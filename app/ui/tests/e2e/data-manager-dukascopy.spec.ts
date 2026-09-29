@@ -22,7 +22,7 @@ for (const scenario of [
 test(`broker catalog and direct save: ${scenario.name}`, async ({ page }) => {
   let finishLogin!: () => void;
   const loginReady = new Promise<void>(resolve => { finishLogin = resolve; });
-  const boot = { state: 'STANDBY', stages: [], sequence: 0 };
+  const boot = { schema_version: 2, state: 'SERVER_READY', stages: [], sequence: 0 };
   await page.routeWebSocket('**/ws/updates', socket => {
     socket.onMessage(() => socket.send(JSON.stringify({ type: 'snapshot', boot })));
   });
@@ -139,7 +139,7 @@ test(`broker catalog and direct save: ${scenario.name}`, async ({ page }) => {
 }
 
 test('Delete refreshes the panel when the Dukascopy catalog still has the removed row', async ({ page }) => {
-  const boot = { state: 'STANDBY', stages: [], sequence: 0 };
+  const boot = { schema_version: 2, state: 'SERVER_READY', stages: [], sequence: 0 };
   const dataset = {
     id: 'saved-dataset', symbol: 'USDJPY_dukascopy', source: 'Dukascopy',
     underlying: 'USDJPY', instrument: 'USDJPY', timeframe: 'M1', broker: '3',
@@ -200,7 +200,7 @@ test('Delete refreshes the panel when the Dukascopy catalog still has the remove
 
 
 test('dataset updates preserve filters, reject stale reads and recover refresh without repeating writes', async ({ page }) => {
-  const boot = { state: 'STANDBY', stages: [], sequence: 0 };
+  const boot = { schema_version: 2, state: 'SERVER_READY', stages: [], sequence: 0 };
   const dataset = { id: 'usd', symbol: 'USDJPY', source: 'Dukascopy', underlying: 'USDJPY', instrument: 'USDJPY', timeframe: 'M1', broker: '-1', brokerName: 'Default', timezone: 'UTC', category: 'Forex', from: '', to: '', bars: 1 };
   let rows = [dataset, { ...dataset, id: 'aud', symbol: 'AUDCAD' }];
   let listCalls = 0;

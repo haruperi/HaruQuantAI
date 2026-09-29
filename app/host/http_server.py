@@ -135,7 +135,7 @@ async def login_endpoint(request: Request) -> JSONResponse:
     """Validate bounded credentials and issue a session token.
 
     Uses the transport peer address, not forwarding headers. Successful login
-    marks B10; malformed bodies are handled by the outer request guard.
+    does not change boot phases; malformed bodies use the outer request guard.
 
     Args:
         request: POST request with optional username/password JSON fields.
@@ -167,7 +167,6 @@ async def login_endpoint(request: Request) -> JSONResponse:
             code="UNAUTHORIZED",
             status=401,
         )
-    host.startup.mark("B10")
     return response(request, {"token": token})
 
 
@@ -277,7 +276,7 @@ async def contribution_operation_endpoint(request: Request) -> JSONResponse:
 
 
 async def init_endpoint(request: Request) -> JSONResponse:
-    """Return the shared browser/CLI initialization payload and mark A06.
+    """Return the shared browser/CLI initialization payload.
 
     first_run reflects whether any catalog entry is available, not whether the
     database is empty or whether the user has previously opened the UI.
@@ -289,7 +288,6 @@ async def init_endpoint(request: Request) -> JSONResponse:
         Settings, catalog, presets, boot snapshot, and research setup requirements.
     """
     host = service(request)
-    host.startup.mark("A06")
     return response(
         request,
         {
@@ -320,8 +318,8 @@ async def catalog_endpoint(request: Request) -> JSONResponse:
 async def loaded_endpoint(request: Request) -> JSONResponse:
     """Acknowledge readiness for a previously attached session.
 
-    Triggers shared restoration through Startup. HTTP success means acknowledgment
-    was accepted, not that asynchronous restoration has finished.
+    Records per-session initialization only. HTTP success means acknowledgment
+    was accepted; it does not start shared work or change host readiness.
 
     Args:
         request: Authenticated POST with session authority attached by the guard.
@@ -661,24 +659,23 @@ def create_app(host: BootstrapCoordinator) -> FastAPI:
         Yields:
             None once initialization and static-bundle inspection have completed.
 
-        Marks B05/A01/I13 before serving. After yielding, always closes the coordinator;
+        Completes transport preparation before serving, then closes the coordinator;
         initialization failures use the coordinator's own cleanup path and propagate.
         """
         await host.initialize()
-        for stage in ("B05", "A01"):
-            host.startup.mark(stage, reason="routes_assembled")
         host.startup.mark(
-            "I13",
-            "succeeded"
+            "transport",
+            reason="routes_assembled"
             if (host.config.ui_dist / "index.html").is_file()
-            else "unavailable",
-            "static_bundle_checked",
+            else "ui_bundle_unavailable",
         )
+        host.startup.mark("serving", "running")
         try:
             yield
         finally:
             await host.close()
 
+    host.startup.mark("transport", "running")
     app = FastAPI(lifespan=lifespan, docs_url=None, redoc_url=None)
     app.state.services = host
 

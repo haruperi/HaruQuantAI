@@ -29,10 +29,10 @@ describe('boot WebSocket transport', () => {
     socket.onopen?.();
     expect(factory.mock.calls[0]).not.toContain('ephemeral');
     expect(JSON.parse(socket.send.mock.calls[0][0]).token).toBe('ephemeral');
-    socket.onmessage?.({ data: JSON.stringify({ type: 'snapshot', boot: { state: 'SERVER_READY', sequence: 1, stages: [{ stage: 'I08', outcome: 'pending' }] } }) });
+    socket.onmessage?.({ data: JSON.stringify({ type: 'snapshot', boot: { schema_version: 2, state: 'SERVER_READY', sequence: 1, stages: [{ stage: 'services', outcome: 'pending' }] } }) });
     await stream.ready;
-    socket.onmessage?.({ data: JSON.stringify({ channel: 'boot.progress', sequence: 2, data: { stage: 'I08', outcome: 'unavailable', reason: 'no_registered_provider' } }) });
-    expect(snapshots.mock.calls.at(-1)?.[0].stages[0].outcome).toBe('unavailable');
+    socket.onmessage?.({ data: JSON.stringify({ channel: 'boot.progress', sequence: 2, data: { stage: 'services', outcome: 'failed', reason: 'optional_provider_failed' } }) });
+    expect(snapshots.mock.calls.at(-1)?.[0].stages[0].outcome).toBe('failed');
     controller.abort();
     expect(socket.close).toHaveBeenCalled();
     setAuthToken(null);
@@ -45,6 +45,17 @@ describe('boot WebSocket transport', () => {
     socket.onmessage?.({ data: 'malformed' });
     await expect(stream.ready).rejects.toThrow('Invalid host progress response');
     expect(failed).toHaveBeenCalled();
+    expect(socket.close).toHaveBeenCalled();
+  });
+});
+
+
+describe('boot schema compatibility', () => {
+  it.each([undefined, 1, 3, '2'])('rejects version %s explicitly and closes the socket', async version => {
+    const socket = new Socket();
+    const stream = connectBootStream(new AbortController().signal, vi.fn(), vi.fn(), () => socket as unknown as WebSocket);
+    socket.onmessage?.({ data: JSON.stringify({ type: 'snapshot', boot: { schema_version: version, state: 'SERVER_READY', sequence: 0, stages: [] } }) });
+    await expect(stream.ready).rejects.toThrow('Incompatible host boot schema; version 2 required');
     expect(socket.close).toHaveBeenCalled();
   });
 });

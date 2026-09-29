@@ -130,7 +130,7 @@ def scan_catalog(roots: tuple[Path, ...]) -> dict[str, Any]:
                 )
             except OSError, ValueError, SyntaxError, TypeError, RecursionError:
                 issues.append({"code": "invalid_descriptor", "path": locator})
-                logger.warning("I06 Invalid contribution isolated")
+                logger.warning("Invalid contribution isolated")
     ids = [entry["id"] for entry in entries]
     routes = [entry["route_base"] for entry in entries if entry["route_base"]]
     for entry in entries:
@@ -142,6 +142,6 @@ def scan_catalog(roots: tuple[Path, ...]) -> dict[str, Any]:
         if entry["requires"]:
             entry["reason"] = "unbound_capabilities"
     logger.info(
-        "I06 Catalog inspected: %s descriptors, %s issues", len(entries), len(issues)
+        "Catalog inspected: %s descriptors, %s issues", len(entries), len(issues)
     )
     return {"domains": entries, "issues": issues}

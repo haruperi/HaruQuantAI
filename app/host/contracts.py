@@ -20,8 +20,6 @@ State = Literal[
     "OFFLINE",
     "INITIALIZING",
     "SERVER_READY",
-    "RESTORING",
-    "STANDBY",
     "DEGRADED",
     "FAILED",
     "STOPPED",
@@ -41,7 +39,8 @@ class Document(BaseModel):
 class StageResult(Document):
     """Latest recorded outcome for one reference stage.
 
-    stage is the B/I/A identifier and label is its display description. outcome starts
+    stage is the stable host phase identifier; label is its display description.
+    outcome starts
     pending; reason explains unavailable, failure, or milestone details. elapsed_ms
     is monotonic elapsed time measured by Startup, not wall-clock execution evidence
     for an unimplemented provider.
@@ -72,6 +71,7 @@ class BootSnapshot(Document):
     imply client readiness or availability of research providers.
     """
 
+    schema_version: Literal[2]
     state: State
     sequence: int
     stages: tuple[StageResult, ...]
@@ -153,7 +153,7 @@ class LifecycleHook:
     """
 
     id: str
-    stage: str
+    stage: Literal["services", "packages"]
     run: Callable[[], Awaitable[None]]
     required: bool = False
     timeout: float = 30

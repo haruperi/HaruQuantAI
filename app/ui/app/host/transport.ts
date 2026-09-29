@@ -254,9 +254,21 @@ export interface BootStage {
   elapsed_ms: number;
 }
 export interface BootSnapshot {
+  schema_version: 2;
   state: string;
   sequence: number;
   stages: BootStage[];
+}
+/** Reject mismatched hosts explicitly before interpreting their lifecycle. */
+export function validateBootSnapshot(value: unknown): BootSnapshot {
+  if (!value || typeof value !== 'object' || !('schema_version' in value) || value.schema_version !== 2) {
+    throw new Error('Incompatible host boot schema; version 2 required');
+  }
+  const snapshot = value as BootSnapshot;
+  if (!Array.isArray(snapshot.stages) || typeof snapshot.state !== 'string' || typeof snapshot.sequence !== 'number') {
+    throw new Error('Invalid host boot snapshot');
+  }
+  return snapshot;
 }
 export interface InitializationData {
   settings: unknown;
@@ -309,8 +321,7 @@ export function connectBootStream(
       const payload = JSON.parse(String(event.data));
       if (payload.type === 'resync_required') { fail('Host progress overflow; reconnect'); return; }
       if (payload.type === 'snapshot') {
-        if (!payload.boot || !Array.isArray(payload.boot.stages)) throw new Error('Invalid boot snapshot');
-        current = payload.boot as BootSnapshot;
+        current = validateBootSnapshot(payload.boot);
         onSnapshot(current);
         clearTimeout(timer);
         settled = true;
@@ -322,7 +333,7 @@ export function connectBootStream(
         current = { ...current, state: payload.state };
         onSnapshot(current);
       }
-    } catch { fail('Invalid host progress response'); }
+    } catch (error) { fail(error instanceof Error && error.message.startsWith('Incompatible host boot schema') ? error.message : 'Invalid host progress response'); }
   };
   socket.onerror = () => fail('Host progress connection failed');
   socket.onclose = () => fail('Host progress connection closed');

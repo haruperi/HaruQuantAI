@@ -1,8 +1,8 @@
-"""Track the 37 boot milestones and supervise injected lifecycle providers.
+"""Track five host phases and supervise injected lifecycle providers.
 
-Startup owns process progress, per-session readiness deadlines, and one shared
-restoration task. It publishes real transitions through EventBus and prints
-read-only summaries separately. Stage IDs preserve the reference vocabulary;
+Startup tracks per-session readiness separately from process progress.
+It publishes real transitions through EventBus and reports
+read-only summaries separately. Stage IDs identify host responsibilities;
 they do not imply sequential execution or implementation of research features.
 Call lifecycle methods on the owning event loop and close before releasing it.
 """
@@ -21,69 +21,14 @@ logger = get_logger(__name__)
 MAX_CLIENTS = 256
 READINESS_SECONDS = 30
 
-# These are universal lifecycle stages, not a registry of quantitative concepts.
 STAGES: tuple[tuple[str, str], ...] = (
-    ("B01", "Native process launch"),
-    ("B02", "Runtime configuration"),
-    ("B03", "Runtime bootstrap"),
-    ("B04", "Application main entry"),
-    ("B05", "Control server initialization"),
-    ("B06", "Client launch"),
-    ("B07", "Client layout and window state"),
-    ("B08", "Client connection handshake"),
-    ("B09", "Hardware diagnostics"),
-    ("B10", "Session authentication & User login"),
-    ("B11", "Initialization progress display"),
-    ("I01", "Initializing database & settings..."),
-    ("I02", "Loading customizations..."),
-    ("I03", "Compiling snippets..."),
-    ("I04", "Loading performance settings..."),
-    ("I05", "Initializing building blocks..."),
-    ("I06", "Loading plugins..."),
-    ("I07", "Initializing stats computer..."),
-    ("I08", "Initializing engines..."),
-    ("I09", "Loading data..."),
-    ("I10", "Loading projects..."),
-    ("I11", "Initializing communication channels..."),
-    ("I12", "Checking data..."),
-    ("I13", "Loading GUI..."),
-    ("A01", "Assemble application handlers"),
-    ("A02", "Bind application server"),
-    ("A03", "Navigate client"),
-    ("A04", "Initialize client session"),
-    ("A05", "Connect live updates"),
-    ("A06", "Load initial state"),
-    ("A07", "Assemble navigation and workspaces"),
-    ("A08", "Introductory checks"),
-    ("A09", "Client readiness acknowledgment"),
-    ("A10", "Record client-ready milestone"),
-    ("A11", "Restore saved strategies"),
-    ("A12", "After-load synchronization"),
-    ("A13", "Interactive standby and execution"),
+    ("runtime", "Configure runtime"),
+    ("services", "Initialize host services"),
+    ("packages", "Discover and compose packages"),
+    ("transport", "Prepare transport"),
+    ("serving", "Start serving"),
 )
-PROVIDER_STAGES = frozenset(
-    ("I03", "I05", "I07", "I08", "I09", "I10", "I12", "A11", "A12")
-)
-
-
-_PENDING_REASONS = {
-    "B06": "awaiting client launch",
-    "B07": "awaiting client layout acknowledgment",
-    "B08": "awaiting client connection handshake",
-    "B10": "session authority ready; awaiting client login",
-    "B11": "awaiting client progress-display acknowledgment",
-    "A03": "awaiting client navigation",
-    "A04": "awaiting client session initialization",
-    "A05": "awaiting authenticated live-update connection",
-    "A06": "awaiting client initial-state request",
-    "A07": "awaiting client navigation/workspace acknowledgment",
-    "A08": "awaiting client introductory-check acknowledgment",
-    "A09": "awaiting client readiness acknowledgment",
-    "A10": "awaiting client-ready milestone",
-    "A11": "awaiting client readiness before strategy restoration",
-    "A12": "awaiting strategy restoration before after-load synchronization",
-    "A13": "awaiting deferred restoration before interactive standby",
-}
+PROVIDER_STAGES = frozenset(("services", "packages"))
 
 
 class Startup:
@@ -95,13 +40,20 @@ class Startup:
     stage IDs and serialize lifecycle operations on the host loop.
     """
 
-    def __init__(self, events: EventBus, hooks: tuple[LifecycleHook, ...] = ()) -> None:
+    def __init__(
+        self,
+        events: EventBus,
+        hooks: tuple[LifecycleHook, ...] = (),
+        *,
+        runtime_started_at: float | None = None,
+    ) -> None:
         """Validate hooks and create pending stage records without running work.
 
         Args:
+            runtime_started_at: Monotonic entrypoint start, or this construction time.
             events: Event bus owned by the same host/event loop.
             hooks: Unique named hooks for allowed provider stages; empty means
-                unavailable.
+                normal.
 
         Raises:
             ValueError: Hook IDs, stage slots, timeout, or repeat intervals are invalid.
@@ -115,17 +67,18 @@ class Startup:
             for h in hooks
         ):
             raise ValueError("Invalid lifecycle hooks")
-        self.started_at = time.monotonic()
+        self.started_at = (
+            time.monotonic() if runtime_started_at is None else runtime_started_at
+        )
         self.events = events
         self.hooks = hooks
         self.state: State = "OFFLINE"
         self.results = {
             key: StageResult(stage=key, label=label) for key, label in STAGES
         }
-        self._began: dict[str, float] = {}
+        self._began: dict[str, float] = {"runtime": self.started_at}
         self._opened: list[LifecycleHook] = []
         self._tasks: set[asyncio.Task[None]] = set()
-        self._restore: asyncio.Task[None] | None = None
         self.clients: dict[str, tuple[float, bool]] = {}
 
     def mark(
@@ -133,7 +86,7 @@ class Startup:
     ) -> None:
         """Replace one stage result, log it, and publish a progress event.
 
-        A non-running outcome first emits running when necessary. Running resets the
+        Only actual transitions are emitted. Running starts the
         monotonic timer; elapsed_ms records milliseconds since that start. This method
         is a transition operation, not a read-only reporting call.
 
@@ -145,8 +98,6 @@ class Startup:
         Raises:
             KeyError: stage is not registered.
         """
-        if outcome != "running" and self.results[stage].outcome != "running":
-            self.mark(stage, "running")
         now = time.monotonic()
         if outcome == "running":
             self._began[stage] = now
@@ -158,7 +109,8 @@ class Startup:
             }
         )
         self.results[stage] = result
-        logger.info(
+        log = logger.debug if outcome == "running" else logger.info
+        log(
             "%s %s: %s",
             stage,
             result.label,
@@ -174,58 +126,24 @@ class Startup:
         )
         self.events.publish("boot.progress", result.model_dump())
 
-    def log_summary(self, milestone: str, *, open_browser: bool | None = None) -> None:
-        """Log all stage results without changing progress or running providers.
-
-        Includes pending reasons and registered provider counts. Missing restoration
-        providers produce scan-unavailable wording, never a fabricated strategy count.
-        Does not reset timers, change outcomes, or publish events.
-
-        Args:
-            milestone: Caller-supplied log label, normally server_ready or
-                client_initialization.
-            open_browser: Whether auto-launch was attempted; None omits browser launch
-                policy.
-        """
+    def log_summary(self, milestone: str) -> None:
+        """Report one concise summary without mutating progress."""
         logger.info(
-            "Boot summary [%s]: state=%s; stages=%d",
+            "Host %s: state=%s; elapsed_ms=%.3f",
             milestone,
             self.state,
-            len(self.results),
+            (time.monotonic() - self.started_at) * 1000,
         )
-        for stage, result in self.results.items():
-            reason = result.reason.replace("_", " ") or "completed"
-            if result.outcome == "pending":
-                reason = (
-                    "not reached because boot failed"
-                    if self.state == "FAILED"
-                    else _PENDING_REASONS.get(stage, "awaiting stage execution")
-                )
-            elif result.outcome == "running":
-                reason = result.reason.replace("_", " ") or "in progress"
-            if stage == "B06" and open_browser is not None:
-                reason += (
-                    "; browser auto-launch attempted"
-                    if open_browser
-                    else "; browser auto-launch disabled"
-                )
-            if stage in PROVIDER_STAGES:
-                count = sum(hook.stage == stage for hook in self.hooks)
-                reason += f"; registered providers={count}"
-                if not count:
-                    reason += (
-                        "; strategy scan unavailable: no restoration provider"
-                        if stage == "A11"
-                        else "; no implementation registered"
-                    )
-            logger.info(
-                "Boot summary [%s] %s %s: %s - %s",
-                milestone,
-                stage,
-                result.label,
-                result.outcome,
-                reason,
-            )
+        logger.debug("Boot snapshot: %s", self.snapshot().model_dump())
+
+    def listening(self) -> None:
+        """Publish readiness after the server confirms its listening socket."""
+        self.state = (
+            "DEGRADED"
+            if any(r.outcome == "failed" for r in self.results.values())
+            else "SERVER_READY"
+        )
+        self.mark("serving", reason="listening")
 
     def snapshot(self) -> BootSnapshot:
         """Build an immutable wire snapshot of current lifecycle state.
@@ -235,6 +153,7 @@ class Startup:
             results.
         """
         return BootSnapshot(
+            schema_version=2,
             state=self.state,
             sequence=self.events.sequence,
             stages=tuple(self.results.values()),
@@ -261,10 +180,12 @@ class Startup:
             self.mark(stage, "cancelled", "cancelled")
             raise
         except Exception:
-            self.mark(stage, "failed", "operation_failed")
+            if self.results[stage].outcome != "failed":
+                self.mark(stage, "failed", "operation_failed")
             self.state = "FAILED"
             raise
-        self.mark(stage)
+        if self.results[stage].outcome == "running":
+            self.mark(stage)
         return result
 
     async def providers(self, stage: str) -> None:
@@ -273,29 +194,16 @@ class Startup:
         Optional failures mark the stage failed but allow remaining hooks to run.
         Successful interval hooks get supervised repeat tasks. Hooks are tracked before
         execution so partial acquisition can be cleaned up. Cancellation propagates.
-        Calling this method again runs the hooks again; restore owns once-only
-        scheduling.
+        The coordinator invokes each slot once during initialization.
 
         Args:
-            stage: Provider stage to run; absence is logged as unavailable.
+            stage: Host phase whose injected hooks should run.
 
         Raises:
             RuntimeError: A required provider fails or times out; its raw error text is
                 suppressed.
         """
         selected = [hook for hook in self.hooks if hook.stage == stage]
-        self.mark(stage, "running")
-        if not selected:
-            logger.info(
-                "%s %s: registered providers=0; %s",
-                stage,
-                self.results[stage].label,
-                "strategy scan unavailable: no restoration provider"
-                if stage == "A11"
-                else "no implementation registered",
-            )
-            self.mark(stage, "unavailable", "no_registered_provider")
-            return
         failed = False
         for hook in selected:
             self._opened.append(hook)
@@ -321,11 +229,8 @@ class Startup:
                     task = asyncio.create_task(self._periodic(hook))
                     self._tasks.add(task)
                     task.add_done_callback(self._tasks.discard)
-        self.mark(
-            stage,
-            "failed" if failed else "succeeded",
-            "optional_provider_failed" if failed else "",
-        )
+        if failed:
+            self.mark(stage, "failed", "optional_provider_failed")
 
     async def _periodic(self, hook: LifecycleHook) -> None:
         """Repeat a successful hook until cancellation or its first failure.
@@ -345,7 +250,8 @@ class Startup:
             except asyncio.CancelledError:
                 raise
             except Exception:  # noqa: BLE001 -- optional task failure is observable, never silent.
-                self.state = "DEGRADED"
+                if self.state in ("SERVER_READY", "DEGRADED"):
+                    self.state = "DEGRADED"
                 logger.warning("%s Periodic provider %s failed", hook.stage, hook.id)
                 self.mark(hook.stage, "failed", "periodic_provider_failed")
                 return
@@ -354,7 +260,7 @@ class Startup:
         """Track an authenticated session and mark its update channel connected.
 
         Starts a readiness deadline for new clients; an expired unready entry can
-        reconnect. Marks B08/A05 without treating connection as application readiness.
+        reconnect. Does not change process readiness.
 
         Args:
             key: Internal session key, not the plaintext bearer credential.
@@ -381,58 +287,18 @@ class Startup:
                 if len(self.clients) >= MAX_CLIENTS:
                     raise ValueError("Client capacity exceeded")
             self.clients[key] = (time.monotonic(), False)
-        for stage in ("B08", "A05"):
-            self.mark(stage)
 
     def acknowledge(self, key: str) -> None:
-        """Accept client readiness and schedule shared restoration once.
-
-        Marks acknowledged client milestones and retains ready status across repeated
-        acknowledgments. Creates the restoration task only when none has been created;
-        requires a running event loop.
-
-        Args:
-            key: Session key previously registered through connected.
-
-        Raises:
-            ValueError: An unready client missed the readiness deadline or never
-                attached.
-        """
-        started, ready = self.clients.get(key, (0, False))
-        if not ready and time.monotonic() - started > READINESS_SECONDS:
+        """Record client initialization without changing process readiness."""
+        if key not in self.clients:
+            raise ValueError("Client must connect before acknowledgment")
+        started, ready = self.clients[key]
+        if ready:
+            return
+        if time.monotonic() - started > READINESS_SECONDS:
             raise ValueError("Client readiness deadline expired; reconnect")
         self.clients[key] = (started, True)
-        for stage in ("B06", "B07", "B11", "A03", "A04", "A07", "A08", "A09", "A10"):
-            self.mark(stage, reason="client_acknowledged")
-        logger.info(
-            "A10 Client ready after %.3f seconds", time.monotonic() - self.started_at
-        )
-        if self._restore is None:
-            self._restore = asyncio.create_task(self.restore())
-
-    async def restore(self) -> None:
-        """Run strategy restoration and after-load providers, then report readiness.
-
-        Executes A11/A12 and sets STANDBY or DEGRADED before A13. Required failures
-        leave FAILED and produce a complete summary without an unhandled task error.
-        Cancellation propagates. Once-only invocation is enforced by acknowledge, not
-        by direct calls to this coroutine.
-        """
-        self.state = "RESTORING"
-        try:
-            await self.providers("A11")
-            await self.providers("A12")
-        except Exception:  # noqa: BLE001 -- task boundary preserves fatal state without unobserved exceptions.
-            self.state = "FAILED"
-            self.log_summary("client_initialization")
-            return
-        self.state = (
-            "DEGRADED"
-            if any(result.outcome == "failed" for result in self.results.values())
-            else "STANDBY"
-        )
-        self.mark("A13", reason="host_ready_provider_availability_separate")
-        self.log_summary("client_initialization")
+        logger.info("Client initialized after %.3f seconds", time.monotonic() - started)
 
     async def close(self) -> None:
         """Cancel supervised work and close acquired providers in reverse order.
@@ -442,8 +308,6 @@ class Startup:
         STOPPED. Does not close the shared event loop or persistence store.
         """
         tasks = list(self._tasks)
-        if self._restore is not None:
-            tasks.append(self._restore)
         for task in tasks:
             task.cancel()
         await asyncio.gather(*tasks, return_exceptions=True)

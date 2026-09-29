@@ -13,6 +13,7 @@ import json
 import socket
 import sqlite3
 import sys
+import time
 from pathlib import Path
 from typing import Any, override
 
@@ -62,7 +63,7 @@ def bind_socket(settings: HostSettings) -> socket.socket:
         try:
             bound.bind((settings.host, port))
             bound.setblocking(False)
-            logger.info("A02 Port reserved: %s", port)
+            logger.info("Port reserved: %s", port)
             return bound
         except OSError as error:
             bound.close()
@@ -71,7 +72,7 @@ def bind_socket(settings: HostSettings) -> socket.socket:
                 and getattr(error, "winerror", None) != WINDOWS_ADDRESS_IN_USE
             ):
                 raise
-            logger.warning("A02 Port occupied: %s", port)
+            logger.warning("Port occupied: %s", port)
     raise OSError("No available port in configured fallback range")
 
 
@@ -96,9 +97,9 @@ class HostServer(uvicorn.Server):
     async def startup(self, sockets: list[socket.socket] | None = None) -> None:
         """Start transports, record the selected port, and report server readiness.
 
-        After successful Uvicorn startup, persists host/bound_port, marks A02,
-        optionally
-        launches the browser, and logs all stage outcomes. If startup did not complete
+        After successful Uvicorn startup, persists host/bound_port and completes
+        the serving phase. Optionally launches the browser and reports readiness.
+        If startup did not complete
         or no sockets were provided, host readiness is not marked here.
 
         Args:
@@ -115,22 +116,19 @@ class HostServer(uvicorn.Server):
                 "host", "bound_port", json.dumps({"port": port}), 1, utc_now_iso()
             )
         )
-        self.host.startup.state = "SERVER_READY"
-        self.host.startup.mark("A02", reason="listening")
+        self.host.startup.listening()
+        self.host.log_boot_summary()
         if self.host.config.open_browser:
             scheme = "https" if self.host.config.certificate else "http"
             address = self.host.config.host
             if ":" in address:
                 address = f"[{address}]"
-            opened = launch(f"{scheme}://{address}:{port}/")
-            self.host.startup.mark(
-                "B06", "succeeded" if opened else "failed", "browser_launch"
-            )
-
-        self.host.log_boot_summary()
+            launch(f"{scheme}://{address}:{port}/")
 
 
-async def run_host(settings: HostSettings) -> None:
+async def run_host(
+    settings: HostSettings, *, runtime_started_at: float | None = None
+) -> None:
     """Serve the configured host and release its reserved socket on exit.
 
     The HTTP lifespan owns coordinator initialization and cleanup. A watcher turns
@@ -138,6 +136,7 @@ async def run_host(settings: HostSettings) -> None:
     and awaited and the socket closed in finally; server exceptions propagate.
 
     Args:
+        runtime_started_at: Monotonic entrypoint start for accurate boot timing.
         settings: Validated runtime configuration with TLS, UI, and persistence
             locations.
 
@@ -145,7 +144,7 @@ async def run_host(settings: HostSettings) -> None:
         RuntimeError: Uvicorn returns without starting the server.
         OSError: No socket can be reserved or transport setup fails.
     """
-    host = BootstrapCoordinator(settings)
+    host = BootstrapCoordinator(settings, runtime_started_at=runtime_started_at)
     app = create_app(host)
     # Reserve before initialization so a bind failure cannot mutate settings.
     bound = bind_socket(settings)
@@ -223,22 +222,18 @@ def main(argv: list[str] | None = None) -> int:
         Zero on normal completion; one for handled configuration, storage, or runtime
         failures.
     """
+    runtime_started_at = time.monotonic()
     configure_boot_logging()
-    stage = "B01"
+    stage = "runtime"
     try:
-        logger.info("B01 Native process launch: running")
         options = arguments(argv)
         maintenance = options.pop("migrate_auth_schema", False)
-        logger.info("B01 Native process launch: succeeded")
-        stage = "B02"
-        logger.info("B02 Runtime configuration: running")
         settings = load_settings(options)
-        logger.info("B02 Runtime configuration: succeeded")
         if maintenance:
             migrate_auth_schema(settings.database_path)
             return 0
-        stage = "B04"
-        asyncio.run(run_host(settings))
+        stage = "initialization"
+        asyncio.run(run_host(settings, runtime_started_at=runtime_started_at))
     except OSError, ValueError, RuntimeError, sqlite3.Error, HostPersistenceError:
         # No exception text: configuration errors may contain credential values.
         logger.error(  # noqa: TRY400 -- exception values may contain secrets.

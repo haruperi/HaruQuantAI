@@ -139,5 +139,5 @@ def load_settings(
     values.update(explicit)
     values["data_dir"] = root
     result = HostSettings.model_validate(values)
-    logger.debug("B02 Runtime configuration validated")
+    logger.debug("Runtime configuration validated")
     return result

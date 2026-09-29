@@ -2,7 +2,67 @@
 
 # Host boot-sequence reference and target Python specification
 
-## Current implementation and acceptance boundary (2026-09-25)
+## Current boot contract (2026-09-29)
+
+The host uses boot snapshot **schema_version 2**, with five phases:
+`runtime` (configuration, logging, lease and port reservation), `services`
+(storage verification, sessions, events, resources, jobs and budgets), `packages`
+(validated discovery and composition), `transport` (routes/static availability),
+and `serving` (confirmed listening and bound-port bookkeeping).
+Phase timestamps describe actual work; ASGI route construction can overlap earlier
+phases. Server readiness is published only after the listening gate succeeds.
+
+`GET /api/v1/status`, authenticated init-data and WebSocket snapshots expose
+`{schema_version: 2, state, sequence, stages}`. Stage results retain `stage`,
+`label`, `outcome`, `reason` and `elapsed_ms`. `boot.progress` carries the five
+phase IDs, using the existing event sequence/replay mechanism. The API envelope
+and endpoint paths remain unchanged. UI and CLI reject missing/unsupported boot
+versions explicitly. Deploy the matched host and clients together; legacy clients
+and legacy B/I/A lifecycle hook IDs are not supported by this boot contract.
+
+Process states are OFFLINE, INITIALIZING, SERVER_READY, DEGRADED, FAILED and
+STOPPED. SERVER_READY/DEGRADED describe a listening usable host. An absent
+quantitative plugin does not degrade the host; availability remains in the catalog
+and operation boundary. Required host failures block boot. Optional injected
+host-service failures yield DEGRADED only after listening succeeds. A missing
+built UI bundle is reported in the transport reason; CLI and Vite remain usable.
+
+Clients authenticate, attach live updates, read initial state and acknowledge
+initialization through `/app-loaded`. Acknowledgments are bounded, per-session,
+idempotent, and require prior connection. They never schedule restoration or
+mutate global boot state. Client initialization timing starts at authenticated
+socket attachment, separate from process launch-to-listening timing. UI and CLI
+validate readiness without waiting for a global restoration transition.
+
+LifecycleHook retains explicit trusted callbacks, required/optional policy,
+finite timeouts, optional periodic supervision and reverse cleanup. Its typed
+slots are now `services` and `packages`, called after each phase's core work.
+Empty hook collections are normal. No compiler, strategy restoration, engine,
+data-validation or synchronization placeholder runs at boot. Future domain work
+requires owner-specific plans and operations. Existing preset inspection and
+lazy worker spawning are preserved.
+
+INFO logs show phase completions, concise host readiness/counts and client timing.
+DEBUG retains detailed transitions and snapshots. Errors and optional failures
+remain attributed and redacted; rotating logs and bounded early buffering remain.
+No database schema, security policy, quantitative algorithm or package ownership
+change is part of this lifecycle revision.
+
+Plan and verification evidence:
+`.agents/logs/2026-09-29T112552_simplify-host-boot/`. This is a host candidate;
+see its walkthrough for actual checks and release limitations. Donor observations
+below were not revalidated by this task.
+
+## Historical baseline and superseded boot target
+
+**The remainder of this document preserves the earlier host baseline and SQX
+reference material. All 37-stage/B-I-A boot mappings, client-triggered restoration,
+STANDBY readiness and corresponding target implementation prescriptions below are
+superseded by the version-2 contract above. They are historical evidence, not
+current lifecycle requirements or current implementation claims. Unrelated
+capability and security descriptions retain their own verification boundaries.**
+
+## Historical implementation and acceptance boundary (2026-09-25)
 
 `host.market_data@1.0.0` and `host.network@1.0.0` are candidate typed
 capabilities for Data Manager acquisition. The market adapter creates only an

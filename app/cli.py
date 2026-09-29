@@ -10,21 +10,23 @@ import argparse
 import json
 import os
 import sys
-import time
 from pathlib import Path
 from typing import Any, TextIO
 from urllib.error import HTTPError
 from urllib.parse import urlsplit
 from urllib.request import Request, urlopen
 
+from pydantic import ValidationError
 from websockets.exceptions import WebSocketException
 from websockets.sync.client import connect
 
+from app.host.contracts import BootSnapshot
 from app.host.logging import get_logger
 from app.host.security import is_loopback
 
 logger = get_logger(__name__)
 MAX_RESPONSE_BYTES = 1048576
+BOOT_SCHEMA_VERSION = 2
 
 
 class ClientError(ValueError):
@@ -109,28 +111,11 @@ class Client:
     def initialize(
         self, username: str, password: str | None, *, output: TextIO
     ) -> dict[str, Any]:
-        """Authenticate, attach updates, and wait for shared host restoration.
+        """Authenticate, validate host readiness and acknowledge this client.
 
-        Stores the issued token in memory and sends it in the first WebSocket frame,
-        never in the URL. Closes the socket on completion/failure. STANDBY or DEGRADED
-        ends the wait; the returned initial snapshot is not refreshed to that final
-        state.
-        HTTP/JSON failures propagate from request.
-
-        Args:
-            username: Identity sent to the login endpoint.
-            password: Optional plaintext password; omitted from the request when None.
-            output: Writable text stream receiving JSON stage snapshots and progress
-                events.
-
-        Returns:
-            Initial settings/catalog/boot snapshot fetched before readiness
-            acknowledgment.
-
-        Raises:
-            ClientError: Handshake, restoration, or readiness protocol fails.
-            TimeoutError: A bounded socket wait expires.
-            WebSocketException: WebSocket connection or framing fails.
+        Credentials stay in memory and the first WebSocket frame. The connection
+        has bounded timeouts and closes on failure or completion. Initial settings
+        and catalog are returned; no restoration work is scheduled by the client.
         """
         payload: dict[str, Any] = {"username": username}
         if password is not None:
@@ -148,21 +133,30 @@ class Client:
             snapshot = json.loads(socket.recv(timeout=10))
             if snapshot.get("type") != "snapshot":
                 raise ClientError("Host handshake rejected")
+            self._boot(snapshot.get("boot"))
             initial: dict[str, Any] = self.request("/init-data")
+            self._boot(initial.get("boot"))
             output.writelines(
                 json.dumps(stage) + "\n" for stage in initial["boot"]["stages"]
             )
             self.request("/app-loaded", {})
-            deadline = time.monotonic() + 30
-            while time.monotonic() < deadline:
-                current = self.request("/status")["boot"]
-                if current["state"] in ("STANDBY", "DEGRADED"):
-                    return initial
-                if current["state"] == "FAILED":
-                    raise ClientError("Required restoration failed")
-                event = json.loads(socket.recv(timeout=10))
-                output.write(json.dumps(event) + "\n")
-        raise ClientError("Client readiness timed out")
+            current = self._boot(self.request("/status").get("boot"))
+            if current.state not in ("SERVER_READY", "DEGRADED"):
+                raise ClientError("Host is not ready")
+            return initial
+
+    @staticmethod
+    def _boot(value: Any) -> BootSnapshot:
+        """Validate the versioned boot document before interpreting readiness."""
+        if (
+            not isinstance(value, dict)
+            or value.get("schema_version") != BOOT_SCHEMA_VERSION
+        ):
+            raise ClientError("Incompatible host boot schema; version 2 required")
+        try:
+            return BootSnapshot.model_validate(value)
+        except ValidationError:
+            raise ClientError("Invalid host boot snapshot") from None
 
 
 def main(argv: list[str] | None = None) -> int:

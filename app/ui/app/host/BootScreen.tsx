@@ -15,11 +15,11 @@ export function BootScreen({ snapshot }: { snapshot: BootSnapshot }) {
   const finished = snapshot.stages.filter(stage => !['pending', 'running'].includes(stage.outcome)).length;
   return <section role="status" aria-label="Host startup" className="fixed inset-0 z-50 overflow-auto bg-slate-950 p-8 text-slate-100">
     <h1>Starting HaruQuantAI</h1>
-    <p>{snapshot.state} · {finished} / {snapshot.stages.length} stages reported</p>
+    <p>{snapshot.state} · {finished} / {snapshot.stages.length} phases reported</p>
     <progress value={finished} max={snapshot.stages.length} aria-label="Boot progress" />
     <ul>{snapshot.stages.map(stage => <li key={stage.stage}>
-      <strong>{stage.stage}</strong> {stage.label} — {stage.outcome}
-      {stage.reason === 'no_registered_provider' && ' (provider not installed)'}
+      <strong>{stage.label}</strong> — {stage.outcome}
+      {stage.reason && ` (${stage.reason.replaceAll('_', ' ')})`}
     </li>)}</ul>
   </section>;
 }
