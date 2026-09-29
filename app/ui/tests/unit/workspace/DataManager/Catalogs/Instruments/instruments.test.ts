@@ -14,9 +14,10 @@ const brokers: InstrumentBroker[] = [
 ];
 
 describe('instrument management rules', () => {
-  it('composes seed overrides, custom instruments, and removals', () => {
+  it('composes saved overrides, custom instruments, and removals', () => {
     const custom = { ...newInstrument('Stock'), symbol: 'CUSTOM', name: 'Custom' };
-    const seed = effectiveInstruments([], {}, [])[0];
+    const seed = { ...newInstrument(), symbol: 'EURUSD', name: 'Saved customization' };
+    expect(effectiveInstruments([], {}, [])).toEqual([]);
     const overridden = { ...seed, spread: seed.spread + 2 };
     const result = effectiveInstruments([custom], { [seed.symbol]: overridden }, ['GBPJPY']);
     expect(result.find(item => item.symbol === seed.symbol)?.spread).toBe(overridden.spread);

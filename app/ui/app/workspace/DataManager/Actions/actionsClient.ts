@@ -320,6 +320,6 @@ export const actionsClient = {
   brokerData: (params: BrokerDataParams = {}): Promise<BrokerDataResult> =>
     client.post('/actions.broker_data', params),
 
-  brokerDataUpdate: (): Promise<BrokerDataUpdateResult> =>
-    client.post('/actions.broker_data_update', {}),
+  brokerDataUpdate: (params: { profile_ids?: string[] } = {}): Promise<BrokerDataUpdateResult> =>
+    client.post('/actions.broker_data_update', params),
 };

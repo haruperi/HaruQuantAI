@@ -4,12 +4,44 @@
 > **Frontend Path:** `app/ui/app/workspace/DataManager/`
 > **Package ID:** `workspace.data_manager`
 > **Host Contract:** `host.workspace@1.0.0`
-> **Status:** Implemented / Qualified
+> **Status:** Mixed backend/local implementation; runtime-mock cleanup candidate, qualification pending
 > **Last updated:** 2026-09-29
 
 This README is the workspace's authoritative source of truth for its historical market data workflow, action dispatcher, extension slot declarations, zero-plugin fallback behavior, persistence models, host resource boundaries, and cascade removal invariants.
 
 [PROJECT.md](../../../docs/PROJECT.md) owns system scope and cross-workspace workflows. [ARCHITECTURE.md](../../../docs/ARCHITECTURE.md) owns structural rules and the Five Laws of Spatial Composability. [AGENTS.md](../../../AGENTS.md) owns contributor workflow and verification gates.
+
+---
+
+## Current UI data boundary (2026-09-29)
+
+The DataManager dataset inventory, counts, export/tool targets and duplicate-name
+context come only from `actions.list_datasets`. Successful empty responses remain
+empty. Initial failures show an error and retry; refresh failures retain the last
+backend snapshot with a stale-data warning and block data actions until refreshed.
+Browser/plugin definitions, generated stock-group datasets, simulated coverage
+and simulated completion statuses are not merged into this inventory.
+
+Runtime seed datasets, instruments and sessions, synthetic acquisition timers and
+stock-group data generators have been removed. Connected provider operations use
+the existing positive `backendAvailable` presentation signal and backend checks;
+missing readiness produces an unavailable message. The workspace no longer calls
+provider `advance` timers. Dukascopy's own backend polling remains active, with
+inventory refresh when a backend job completes. Backend update responses are
+reported as submissions, not as proof that downloads completed.
+
+Instruments, sessions, stock groups and broker profiles remain browser-local
+configuration. Explicit saved customizations (including old seed overrides) remain
+editable. Legacy mock fields remain preserved in storage but are not runtime data;
+this cleanup performs no database or browser-storage reset or migration. New
+provider wiring and backend catalog persistence require separate approved work.
+File dataset creation and stock-group acquisition are unavailable until connected;
+plugin implementations outside this workspace are not removed by this change.
+
+Qualification claims in the older registry below describe earlier backend work;
+they do not qualify all UI workflows or the current shipping set. Source-backed
+cleanup verification and remaining release gates are recorded in
+`.agents/logs/20260929_182123_datamanager_remove_mocks/walkthrough.md`.
 
 ---
 
@@ -28,7 +60,7 @@ app/ui/app/workspace/DataManager/
 |-- contribution.tsx                 # UI workspace contribution manifest
 |-- Actions/                         # Action dialogs and actionsClient.ts
 |-- Catalogs/                        # BrokerProfiles, Instruments, Sessions, StockGroups
-`-- Common/                          # Shared store, fixtures, ribbon components
+`-- Common/                          # Local configuration store, ribbon components
 
 tests/workspace/DataManager/
 |-- test_workspace.py                # Slot declaration, descriptor, and lifecycle tests

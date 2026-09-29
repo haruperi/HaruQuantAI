@@ -4,25 +4,6 @@ export interface SessionElement { dayFrom: SessionDay; timeFrom: string; dayTo: 
 export interface SessionDefinition { name: string; broker: string; brokerName: string; elements: SessionElement[] }
 export interface SessionBroker { id: string; name: string; postfix: string }
 
-const weekday = (day: SessionDay, next: SessionDay, eod = true): SessionElement => ({ dayFrom: day, timeFrom: '00:00', dayTo: next, timeTo: '00:00', eod });
-export const seedSessions: SessionDefinition[] = [
-  { name: 'Forex 24/5', broker: '-1', brokerName: 'Default', elements: [weekday('Mon','Tue'),weekday('Tue','Wed'),weekday('Wed','Thu'),weekday('Thu','Fri'),weekday('Fri','Sat')] },
-  { name: 'Metals', broker: '-1', brokerName: 'Default', elements: [
-    { dayFrom:'Mon',timeFrom:'01:00',dayTo:'Mon',timeTo:'23:59',eod:true },
-    { dayFrom:'Tue',timeFrom:'01:00',dayTo:'Tue',timeTo:'23:59',eod:true },
-    { dayFrom:'Wed',timeFrom:'01:00',dayTo:'Wed',timeTo:'23:59',eod:true },
-    { dayFrom:'Thu',timeFrom:'01:00',dayTo:'Thu',timeTo:'23:59',eod:true },
-    { dayFrom:'Fri',timeFrom:'01:00',dayTo:'Fri',timeTo:'22:00',eod:true },
-  ] },
-  { name: 'CME Equity', broker: '-1', brokerName: 'Default', elements: [
-    { dayFrom:'Mon',timeFrom:'17:00',dayTo:'Tue',timeTo:'16:00',eod:true },
-    { dayFrom:'Tue',timeFrom:'17:00',dayTo:'Wed',timeTo:'16:00',eod:true },
-    { dayFrom:'Wed',timeFrom:'17:00',dayTo:'Thu',timeTo:'16:00',eod:true },
-    { dayFrom:'Thu',timeFrom:'17:00',dayTo:'Fri',timeTo:'16:00',eod:true },
-    { dayFrom:'Sun',timeFrom:'17:00',dayTo:'Mon',timeTo:'16:00',eod:true },
-  ] },
-];
-
 function validTime(value: string): boolean { return /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(value); }
 export function validateElement(value: SessionElement): void {
   if (!sessionDays.includes(value.dayFrom) || !sessionDays.includes(value.dayTo) || !validTime(value.timeFrom) || !validTime(value.timeTo) || typeof value.eod !== 'boolean') throw new Error('Invalid session element.');
@@ -51,7 +32,7 @@ export function generateMondayFriday(elements: SessionElement[]): SessionElement
   return [...generated, ...elements.filter(row => row.dayFrom === 'Sat' || row.dayFrom === 'Sun')];
 }
 export function effectiveSessions(custom: SessionDefinition[], overrides: Record<string,SessionDefinition>, removed: string[]): SessionDefinition[] {
-  const removedSet = new Set(removed); return [...seedSessions.filter(row => !removedSet.has(row.name)).map(row => overrides[row.name] ?? row), ...custom].map(row => structuredClone(row));
+  const removedSet = new Set(removed); return [...Object.values(overrides).filter(row => !custom.some(item => item.name === row.name)), ...custom].filter(row => !removedSet.has(row.name)).map(row => overrides[row.name] ?? row).map(row => structuredClone(row));
 }
 interface SessionsJson { version:1;kind:'sessions';sessions:SessionDefinition[] }
 function jsonObject(value:unknown):value is Record<string,unknown>{return Boolean(value)&&typeof value==='object'&&!Array.isArray(value);}

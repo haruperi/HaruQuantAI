@@ -37,8 +37,6 @@
 .data-source-dropdown button:hover, .data-source-dropdown button:focus, .nested-dropdown button:hover, .nested-dropdown button:focus { background:#284b62; outline:1px solid var(--accent); }
 .nested-menu { position:relative; }
 .nested-dropdown { top:0; left:calc(100% + 5px); min-width:205px; }
-.mock-symbol-list { display:flex; flex-direction:column; gap:5px; min-height:55px; padding:9px; border:1px solid var(--line); background:var(--bg); }
-.mock-symbol-list span { color:var(--muted); }
 
 .dataset-grid table { width:100%; min-width:1450px; }
 .dataset-grid th { white-space:nowrap; font-weight:400; }

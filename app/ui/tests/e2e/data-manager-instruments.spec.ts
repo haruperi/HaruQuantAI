@@ -1,6 +1,8 @@
+import { installDataManagerBackend, dataset, savedConfiguration } from '../unit/workspace/DataManager/Common/browserHarness';
 import { expect, test, type Page } from '@playwright/test';
 import { selectLightSkin } from './shellTestUtils';
 
+test.beforeEach(async ({ page }) => { await installDataManagerBackend(page, [dataset('EURUSD')]); });
 async function launch(page: Page) {
   await page.goto('/');
   await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
@@ -65,6 +67,7 @@ test('add, edit, clone, mass edit, delete, help, and reload instruments', async 
 });
 
 test('selection rules, JSON save/load conflicts, and referenced deletion are explicit', async ({ page }) => {
+  await savedConfiguration(page);
   await launch(page);
   const actions = page.getByLabel('Instrument operations');
   await actions.getByRole('button', { name: 'Clone Instrument', exact: true }).click();

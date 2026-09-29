@@ -114,7 +114,7 @@ export function summarizeGroup(group: StockGroupDefinition, datasets: DatasetSum
   const ranges = matching.filter((row): row is DatasetSummaryInput => Boolean(row?.from && row?.to));
   const from = ranges.map(row => row.from!).sort()[0] ?? '';
   const to = ranges.map(row => row.to!).sort().at(-1) ?? '';
-  return { active: activeMemberships(group).length, total: group.members.length, numberOfSymbols, downloaded, ready: group.members.length > 0 && downloaded >= group.members.length - 3, from, to };
+  return { active: activeMemberships(group).length, total: group.members.length, numberOfSymbols, downloaded, ready: group.members.length > 0 && downloaded === group.members.length, from, to };
 }
 
 interface StockGroupsJson{version:1;kind:'stock-groups';groups:Array<{name:string;description:string;members:StockMembership[]}>}
@@ -130,10 +130,3 @@ export function parseStockGroupsJson(json:string):StockGroupDefinition[]{
     const group:StockGroupDefinition={id:`import:${index}:${name}`,name,description:source.description,system:false,members};validateGroup(group);names.push(name);return group;});
 }
 export function serializeStockMembersJson(members:StockMembership[]):string{return JSON.stringify({version:1,kind:'stock-group-members',stocks:structuredClone(members)},null,2);}
-
-export function makeGeneratedDataset(ticker: string): StockGroupDataset {
-  let hash = 0; for (const char of ticker) hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
-  return { id: `stock-group:${ticker}`, source: 'Equity', symbol: ticker, instrument: ticker, underlying: ticker,
-    broker: '-1', brokerName: 'Default', timeframe: 'D1', timezone: 'UTC', category: 'Stocks', from: `${2000 + hash % 12}-01-03`,
-    to: new Date().toISOString().slice(0, 10), bars: 2_500 + hash % 4_500, barType: 'start' };
-}

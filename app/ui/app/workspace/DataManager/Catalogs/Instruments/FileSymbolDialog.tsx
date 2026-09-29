@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Button, Field, Modal, TextInput } from '../../../../components/ui';
-import { datasets } from '../../Common/fixtures';
 import { useDataManagerStore } from '../../Common/dataManagerStore';
 import { useFileSymbols } from './fileSymbolsStore';
 import { commissionModels, dataTypes, days, defaultCommission, effectiveInstruments, newInstrument, validateName, type CommissionModel, type FileInstrument, type Swap } from './fileSymbols';
@@ -67,7 +66,7 @@ export function FileSymbolDialog({ onClose, onSaved }: { onClose: () => void; on
         focusTarget.current = '[data-add-instrument]'; setPage('symbol'); setError('');
       } else {
         if (!item) throw new Error('Choose an instrument.');
-        file.addSymbol(symbol, item, barType, [...datasets, ...data.definitions].map(row => row.symbol));
+        file.addSymbol(symbol, item, barType, []);
         onSaved(); onClose();
       }
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save.'); }

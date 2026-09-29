@@ -13,7 +13,6 @@ export {
   days,
   defaultCommission,
   newInstrument,
-  seedInstruments,
   effectiveInstruments,
   validateName,
   validateInstrument,

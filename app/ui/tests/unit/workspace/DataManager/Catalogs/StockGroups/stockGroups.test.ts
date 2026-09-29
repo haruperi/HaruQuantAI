@@ -19,9 +19,9 @@ describe('stock groups', () => {
     expect(activeMemberships(group, '2026-01-01').map(row => row.ticker)).toEqual(['AAPL','MSFT']);
   });
 
-  it('calculates downloaded counts and the within-three readiness threshold', () => {
+  it('requires data for every member before reporting readiness', () => {
     const summary = summarizeGroup(group, [{symbol:'AAPL',from:'2010-01-01',to:'2026-01-01',bars:4000}]);
-    expect(summary).toMatchObject({active:2,total:3,numberOfSymbols:1,downloaded:1,ready:true,from:'2010-01-01',to:'2026-01-01'});
+    expect(summary).toMatchObject({active:2,total:3,numberOfSymbols:1,downloaded:1,ready:false,from:'2010-01-01',to:'2026-01-01'});
     expect(summarizeGroup({...group,members:[]},[]).ready).toBe(false);
   });
 

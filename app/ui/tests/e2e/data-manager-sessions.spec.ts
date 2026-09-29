@@ -1,6 +1,8 @@
+import { installDataManagerBackend, dataset, savedConfiguration } from '../unit/workspace/DataManager/Common/browserHarness';
 import { expect, test, type Page } from '@playwright/test';
 import { selectLightSkin } from './shellTestUtils';
 
+test.beforeEach(async ({ page }) => { await installDataManagerBackend(page, [dataset('EURUSD')]); });
 async function launch(page:Page){await page.goto('/');await page.getByRole('button',{name:'Data Manager',exact:true}).click();await page.getByRole('button',{name:'Sessions',exact:true}).click();}
 function sessionRow(page:Page,name:string){return page.getByRole('table',{name:'Sessions',exact:true}).getByRole('row').filter({has:page.getByRole('checkbox',{name:`Select session ${name}`,exact:true})});}
 
@@ -30,7 +32,7 @@ test('add, edit, clone, delete, and reload sessions',async({page})=>{
   await expect(sessionRow(page,'TestSessionClone')).toHaveCount(0);await page.reload();await page.getByRole('button',{name:'Sessions',exact:true}).click();await expect(sessionRow(page,'TestSession')).toBeVisible();
 });
 
-test('selection, JSON save/load conflicts, filters, and referenced deletion',async({page})=>{
+test('selection, JSON save/load conflicts, filters, and referenced deletion',async({page})=>{await savedConfiguration(page);
   await launch(page);const actions=page.getByLabel('Session operations');
   await actions.getByRole('button',{name:'Clone Session',exact:true}).click();await expect(page.getByLabel('Data Manager progress')).toContainText('select some session');
   const row=sessionRow(page,'Forex 24/5');await row.getByRole('checkbox').check();await selectLightSkin(page);const downloadPromise=page.waitForEvent('download');await actions.getByRole('button',{name:'Save',exact:true}).click();

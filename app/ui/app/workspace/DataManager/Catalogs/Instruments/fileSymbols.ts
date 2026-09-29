@@ -1,4 +1,3 @@
-import { instruments } from '../../Common/fixtures';
 export const dataTypes = ['Stock', 'Futures', 'Forex', 'CFD'] as const;
 export const commissionModels = ['None', 'Per trade', 'Size based', 'Percentage based', 'Stockpicker'] as const;
 export type CommissionModel = typeof commissionModels[number];
@@ -29,11 +28,9 @@ export function newInstrument(type = 'Forex'): FileInstrument {
     spread: type === 'Stock' || type === 'Futures' ? 0 : 1, slippage: 0, minDistance: 0, multiplier: 1, sizeStep: 1,
     commission: defaultCommission(), swap: { use: false, type: 'money', long: 0, short: 0, tripleSwapOn: 'WEDNESDAY', rolloutHour: '23:00' } };
 }
-// Existing fixture values are preserved; missing specification fields use documented mock defaults.
-export const seedInstruments: FileInstrument[] = instruments.map(item => ({ ...newInstrument(item.type), ...item }));
 export function effectiveInstruments(custom: FileInstrument[], overrides: Record<string, FileInstrument> = {}, removed: string[] = []): FileInstrument[] {
   const hidden = new Set(removed.map(name => name.toLowerCase()));
-  return [...seedInstruments, ...custom].filter(item => !hidden.has(item.symbol.toLowerCase()))
+  return [...Object.values(overrides).filter(item => !custom.some(row => row.symbol === item.symbol)), ...custom].filter(item => !hidden.has(item.symbol.toLowerCase()))
     .map(item => structuredClone(overrides[item.symbol] ?? item));
 }
 export function validateName(name: string, existing: string[], label = 'Symbol'): void {

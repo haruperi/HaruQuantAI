@@ -47,7 +47,6 @@
       "app/ui/app/workspace/DataManager/Catalogs/StockGroups/stockGroupsStore.ts",
       "app/ui/app/workspace/DataManager/Common/dataManagerStore.ts",
       "app/ui/app/workspace/DataManager/Common/dataSourceRibbon.ts",
-      "app/ui/app/workspace/DataManager/Common/fixtures.ts",
       "app/ui/app/workspace/DataManager/DataManager.tsx",
       "app/ui/app/workspace/DataManager/contribution.tsx",
       "app/ui/app/workspace/DataManager/documents.ts",
@@ -69,7 +68,9 @@
       "app/ui/tests/unit/workspace/DataManager/Catalogs/Instruments/instruments.test.ts",
       "app/ui/tests/unit/workspace/DataManager/Catalogs/Sessions/sessions.test.ts",
       "app/ui/tests/unit/workspace/DataManager/Catalogs/StockGroups/stockGroups.test.ts",
+      "app/ui/tests/unit/workspace/DataManager/Common/browserHarness.ts",
       "app/ui/tests/unit/workspace/DataManager/Common/dataSourceRibbon.test.ts",
+      "app/ui/tests/unit/workspace/DataManager/Common/localConfiguration.test.ts",
       "tests/workspace/DataManager/__init__.py",
       "tests/workspace/DataManager/test_actions.py",
       "tests/workspace/DataManager/test_workspace.py"
