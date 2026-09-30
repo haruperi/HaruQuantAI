@@ -79,7 +79,6 @@ import re
 import struct
 from dataclasses import dataclass
 from datetime import UTC, date, datetime, timedelta
-from decimal import ROUND_HALF_EVEN, Decimal
 from typing import Any, Literal
 from uuid import uuid4
 
@@ -210,8 +209,11 @@ HTTP_OK = 200
 HTTP_MISSING = 404
 HTTP_RATE_LIMIT = 429
 HTTP_UNAVAILABLE = 503
+SATURDAY_WEEKDAY = 5
 SUNDAY_WEEKDAY = 6
 SUNDAY_START_HOUR = 19
+MAX_RATE_LIMIT_RETRIES = 3
+INITIAL_RATE_BACKOFF_SECONDS = 0.5
 
 DUKASCOPY_DISCLAIMER_TEXT = (
     "The Dukascopy Trading Tools include different financial information. "
@@ -269,14 +271,14 @@ def point_value(symbol: str) -> int:
 
 
 def standard_url(symbol: str, day: datetime, kind: str, hour: int = 0) -> str:
-    """Build SQX's date-indexed HTTPS provider URL for one BI5 object."""
+    """Build SQX's date-indexed HTTP provider URL for one BI5 object."""
     point_value(symbol)
     if day.tzinfo is None or day.utcoffset() != timedelta(0):
         raise ValueError("Provider date must be UTC")
     if not 0 <= hour < HOURS_PER_DAY or kind not in ("ticks", "m1"):
         raise ValueError("Invalid BI5 request")
     parent = (
-        f"https://datafeed.dukascopy.com/datafeed/{symbol}/"
+        f"http://datafeed.dukascopy.com/datafeed/{symbol}/"
         f"{day.year:04d}/{day.month - 1:02d}/{day.day:02d}"
     )
     suffix = f"/{hour:02d}h_ticks.bi5" if kind == "ticks" else "/BID_candles_min_1.bi5"
@@ -376,18 +378,13 @@ def _decompress(payload: bytes, record_size: int) -> bytes:
 
 
 def _volume(value: float) -> int:
-    """Convert float32 millions to integer units within half a unit tolerance.
-
-    The small tolerance accounts only for float32 representation error. A source
-    quantity genuinely between integer units is rejected; no volume is clamped.
-    """
+    """Convert float32 millions to integer base units with standard rounding."""
     if not math.isfinite(value) or value < 0:
         raise ValueError("Invalid provider volume")
-    units = Decimal(value) * 1_000_000
-    nearest = units.to_integral_value(rounding=ROUND_HALF_EVEN)
-    if abs(units - nearest) >= Decimal("0.05") or nearest > UINT64_MAX:
-        raise ValueError("Provider volume is not integral in base units")
-    return int(nearest)
+    units = round(float(f"{value:.7g}") * 1_000_000)
+    if units > UINT64_MAX:
+        raise ValueError("Provider volume exceeds canonical range")
+    return int(units)
 
 
 def decode_ticks(
@@ -528,19 +525,30 @@ async def _fetch_day(
         url = standard_url(symbol, midnight, dataset.kind, hour)
         await corrector.throttle()
         response = await network.get(url)
+        for attempt in range(MAX_RATE_LIMIT_RETRIES):
+            if response.status not in (HTTP_RATE_LIMIT, HTTP_UNAVAILABLE):
+                break
+            corrector.record_failure()
+            backoff_sleep = max(
+                INITIAL_RATE_BACKOFF_SECONDS * (2**attempt), corrector.delay
+            )
+            logger.warning(
+                "Dukascopy status %d for %s; cooling down for %.2fs (attempt %d/%d)",
+                response.status,
+                url,
+                backoff_sleep,
+                attempt + 1,
+                MAX_RATE_LIMIT_RETRIES,
+            )
+            await asyncio.sleep(backoff_sleep)
+            response = await network.get(url)
         if response.status == HTTP_MISSING:
             missing_hours += 1
             corrector.record_success()
             continue
         if response.status in (HTTP_RATE_LIMIT, HTTP_UNAVAILABLE):
-            corrector.record_failure()
-            await corrector.throttle()
-            response = await network.get(url)
-            if response.status in (HTTP_RATE_LIMIT, HTTP_UNAVAILABLE):
-                raise ValueError("Dukascopy rate limit reached")
-            if response.status != HTTP_OK:
-                raise ValueError("Dukascopy provider request failed")
-        elif response.status != HTTP_OK:
+            raise ValueError("Dukascopy rate limit reached")
+        if response.status != HTTP_OK:
             corrector.record_failure()
             raise ValueError("Dukascopy provider request failed")
         corrector.record_success()
@@ -610,6 +618,12 @@ async def prepare(context: HostCapabilities) -> PreparedContribution:  # noqa: C
 
         for offset in range(days):
             day = spec.first + timedelta(days=offset)
+            if day.weekday() == SATURDAY_WEEKDAY:
+                val = result.get("skipped_days", 0)
+                result["skipped_days"] = (val if isinstance(val, int) else 0) + 1
+                result["completed_days"] = offset + 1
+                result["progress"] = (offset + 1) / days
+                continue
             start_ms = int(
                 datetime(day.year, day.month, day.day, tzinfo=UTC).timestamp() * 1000
             )

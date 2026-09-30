@@ -48,7 +48,7 @@ def test_hourly_tick_uses_both_side_volumes() -> None:
     rows = decode_ticks(payload, instant, "EURUSD")
     assert rows == ((int(instant.timestamp() * 1000) + 17, 1100020, 1100000, 30000),)
     assert standard_url("EURUSD", instant, "ticks") == (
-        "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/15/00h_ticks.bi5"
+        "http://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/15/00h_ticks.bi5"
     )
 
 
@@ -65,19 +65,102 @@ def test_m1_bid_candle_field_order() -> None:
     )
 
 
-def test_corrupt_and_fractional_volume_fail() -> None:
-    """Malformed records and non-integral unit amounts cannot be published."""
+def test_corrupt_and_invalid_volume_fail() -> None:
+    """Malformed records and negative or non-finite volume cannot be published."""
     instant = datetime(2024, 1, 15, tzinfo=UTC)
     with pytest.raises(ValueError):
         decode_ticks(b"not bi5", instant, "EURUSD")
     payload = lzma.compress(
-        struct.pack(">IIIff", 0, 110002, 110000, 0.0000015, 0.0),
+        struct.pack(">IIIff", 0, 110002, 110000, -0.01, 0.0),
         format=lzma.FORMAT_ALONE,
     )
-    with pytest.raises(ValueError):
+    with pytest.raises(ValueError, match="Invalid provider volume"):
         decode_ticks(payload, instant, "EURUSD")
     with pytest.raises(ValueError, match="supported FX"):
         standard_url("XAUUSD", instant, "ticks")
+
+
+def test_real_world_float32_volume_decoding() -> None:
+    """Float32 candle volume from real Dukascopy feeds decodes without precision drift."""
+    instant = datetime(2024, 1, 15, tzinfo=UTC)
+    # 157.14 in float32 has exact value 157.1399993896484375
+    payload = lzma.compress(
+        struct.pack(">IIIIIf", 60, 110000, 110010, 109990, 110020, 157.14),
+        format=lzma.FORMAT_ALONE,
+    )
+    rows = decode_m1(payload, instant, "EURUSD")
+    assert rows == (
+        (
+            int(instant.timestamp() * 1000) + 60000,
+            1.1,
+            1.1002,
+            1.0999,
+            1.1001,
+            157140000,
+        ),
+    )
+
+
+def test_saturday_forex_is_skipped(tmp_path: Path) -> None:
+    """Saturday forex acquisition is recognized as weekend and skipped."""
+    database = tmp_path / "database" / "haruquantai.db"
+    create_isolated_schema(database)
+
+    class CountingNetwork(HistoricalNetwork):
+        def __init__(self) -> None:
+            self.requests: list[str] = []
+
+        async def get(self, url: str) -> NetworkResult:
+            self.requests.append(url)
+            return NetworkResult(404, b"")
+
+    async def scenario() -> None:
+        owner = "plugin.data_manager.dukascopy"
+        jobs = JobManager(1, 256 * 1024 * 1024)
+        market = MarketAccess(owner, MarketDataStore(tmp_path, database))
+        net = CountingNetwork()
+        context = HostCapabilities(
+            resources=None,
+            jobs=JobAccess(owner, jobs),
+            log=None,
+            market_data=market,
+            network=NetworkAccess(owner, net),
+        )
+        contribution = await prepare(context)
+        dataset = await contribution.invoke(
+            "add", {"symbol": "EURUSD", "kind": "m1", "instrument": "EURUSD"}
+        )
+        assert isinstance(dataset, dict)
+        # 2024-01-13 was a Saturday
+        started = await contribution.invoke(
+            "download.start",
+            {
+                "dataset_id": dataset["id"],
+                "date_from": "2024-01-13",
+                "date_to": "2024-01-13",
+                "mode": "standard",
+                "overwrite": False,
+            },
+        )
+        assert isinstance(started, dict)
+        status: Any = {}
+        for _ in range(100):
+            status = await contribution.invoke(
+                "download.status", {"job_id": started["job_id"]}
+            )
+            assert isinstance(status, dict)
+            if status["state"] in ("succeeded", "failed", "cancelled"):
+                break
+            await asyncio.sleep(0.01)
+
+        assert isinstance(status, dict)
+        assert status["state"] == "succeeded", status
+        assert status["skipped_days"] == 1
+        assert len(net.requests) == 0
+        await contribution.close()
+        await jobs.close()
+
+    asyncio.run(scenario())
 
 
 def test_missing_tick_hour_cannot_claim_day_coverage() -> None:
@@ -487,3 +570,49 @@ def test_dukascopy_logging(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> 
         assert "Dukascopy data source plugin closed" in caplog.text
 
     asyncio.run(scenario())
+
+
+def test_fetch_day_transient_rate_limit_retry(monkeypatch: pytest.MonkeyPatch) -> None:
+    """_fetch_day retries on transient 429 and succeeds when endpoint recovers."""
+    from app.persistence.market import MarketDataset
+    from app.plugin.DataSource.dukascopy import _fetch_day
+
+    # Speed up backoff sleep for tests
+    monkeypatch.setattr(
+        "app.plugin.DataSource.dukascopy.INITIAL_RATE_BACKOFF_SECONDS", 0.001
+    )
+
+    instant = datetime(2024, 1, 15, tzinfo=UTC)
+    payload = lzma.compress(
+        struct.pack(">IIIIIf", 60, 110000, 110010, 109990, 110020, 0.05),
+        format=lzma.FORMAT_ALONE,
+    )
+
+    call_count = 0
+
+    class TransientRateLimitNetwork(HistoricalNetwork):
+        async def get(self, url: str) -> NetworkResult:
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                return NetworkResult(429, b"")
+            return NetworkResult(200, payload)
+
+    dataset = MarketDataset("id", "dukascopy", "eurusd", "m1", "EURUSD", "-1", "UTC")
+    network = NetworkAccess(
+        "plugin.data_manager.dukascopy", TransientRateLimitNetwork()
+    )
+    table = asyncio.run(_fetch_day(network, dataset, instant.date()))
+    assert table.num_rows == 1
+    assert call_count == 2
+
+    # Persistent 429 raises ValueError
+    class PersistentRateLimitNetwork(HistoricalNetwork):
+        async def get(self, url: str) -> NetworkResult:
+            return NetworkResult(429, b"")
+
+    persistent_network = NetworkAccess(
+        "plugin.data_manager.dukascopy", PersistentRateLimitNetwork()
+    )
+    with pytest.raises(ValueError, match="rate limit reached"):
+        asyncio.run(_fetch_day(persistent_network, dataset, instant.date()))
