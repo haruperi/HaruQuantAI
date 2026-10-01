@@ -1,4 +1,3 @@
-import { rawDarwinexCatalogue as raw } from '../../../host/catalogs';
 import { validateName } from './presentation';
 import type { BrokerProfile } from './presentation';
 import { today, validDate, type Interval, type Preset } from './presentation';
@@ -12,24 +11,23 @@ export function parseDarwinex(text: string): DarwinexSymbol[] {
     seen.add(symbol); return { symbol, dateFrom, metadata: values.map(Number) };
   });
 }
-export const darwinexCatalogue = parseDarwinex(raw);
-export interface DarwinexDefinition { id: string; symbol: string; underlying: string; instrument: string; source: 'Darwinex'; timeframe: 'TICK'; broker: string; brokerName: string; timezone: string; category: string; from: string; to: string; bars: number; sourceDataId?: string }
+export const darwinexCatalogue: DarwinexSymbol[] = [];
+export interface DarwinexDefinition { id: string; symbol: string; underlying: string; instrument: string; source: 'Darwinex'; timeframe: 'TICK'; broker: string; brokerName: string; timezone: string; category: string; from: string; to: string; bars: number; sourceDataId?: string; availableFrom?: string }
 export interface DarwinexManifest { folder: string; symbols: string[]; fileCount: number }
 export function discoverDarwinex(paths: string[]): DarwinexManifest {
   if (!paths.length || paths.length > 20000) throw new Error('Select a folder containing at most 20,000 files.');
   const parts = paths.map(path => { const fields = path.split('/'); if (path.length > 1024 || fields.length < 2 || fields.some(value => !value || value === '.' || value === '..' || /[\\:\x00-\x1f]/.test(value))) throw new Error('Invalid folder structure.'); return fields; });
   const folder = parts[0][0]; if (parts.some(row => row[0] !== folder)) throw new Error('Select one Darwinex data folder.');
   let symbols = [...new Set(parts.filter(row => row.length === 3 && row[2].endsWith('log.gz')).map(row => row[1]))];
-  if (!symbols.length && darwinexCatalogue.some(row => row.symbol === folder) && parts.some(row => row.length === 2 && row[1].endsWith('log.gz'))) symbols = [folder];
+  if (!symbols.length && parts.some(row => row.length === 2 && row[1].endsWith('log.gz'))) symbols = [folder];
   if (symbols.length > 1000) throw new Error('Select at most 1,000 symbols.');
   return { folder, symbols, fileCount: paths.length };
 }
-export function darwinexDefinitions(symbols: string[], postfix: string, existing: string[], broker?: BrokerProfile, mappings: Record<string, string> = {}, requireCatalogue = true): DarwinexDefinition[] {
+export function darwinexDefinitions(symbols: string[], postfix: string, existing: string[], broker?: BrokerProfile, mappings: Record<string, string> = {}, _requireCatalogue = true): DarwinexDefinition[] {
   if (!symbols.length) throw new Error('No symbols selected');
   if (symbols.length > 1000 || new Set(symbols).size !== symbols.length || postfix.length > 64) throw new Error('Invalid selection or postfix.');
   const names = [...existing];
   return symbols.flatMap(symbol => {
-    if (requireCatalogue && !darwinexCatalogue.some(row => row.symbol === symbol)) throw new Error('Unknown Darwinex symbol.');
     const mapping = broker ? mappings[symbol] : '-1';
     if (mapping === '-1000') return [];
     if (broker && mapping !== '-1' && (!mapping || mapping.startsWith('[') || !broker.instruments.includes(mapping))) throw new Error('Select proper instrument or skip the symbol');
@@ -38,7 +36,7 @@ export function darwinexDefinitions(symbols: string[], postfix: string, existing
   });
 }
 export interface DarwinexDownload { targets: DarwinexDefinition[]; dateFrom: string; dateTo: string; dateType: Preset; overwrite: boolean }
-export function darwinexStart(row: DarwinexDefinition): string { return darwinexCatalogue.find(item => item.symbol === row.underlying)?.dateFrom ?? (row.from || today()); }
+export function darwinexStart(row: DarwinexDefinition): string { return row.availableFrom || row.from || '2000-01-01'; }
 export function darwinexTargets(rows: DarwinexDefinition[]): DarwinexDefinition[] {
   const targets = rows.filter(row => row.source === 'Darwinex');
   if (!targets.length) throw new Error('You must select at least one Darwinex record.');

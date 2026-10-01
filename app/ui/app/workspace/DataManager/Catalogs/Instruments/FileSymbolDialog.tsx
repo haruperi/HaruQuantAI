@@ -61,12 +61,12 @@ export function FileSymbolDialog({ onClose, onSaved }: { onClose: () => void; on
         validateName(draft.symbol, [], 'Instrument');
         const profile = brokers.find(row => row.id === draft.broker);
         const value = { ...draft, symbol: draft.symbol + (profile?.postfix ?? ''), brokerName: profile?.name ?? '' };
-        file.addInstrument(value, brokers.map(row => row.id));
+        await file.addInstrument(value, brokers.map(row => row.id));
         setBroker(''); setSelected(value.symbol); setSwapDraft(structuredClone(value.swap));
         focusTarget.current = '[data-add-instrument]'; setPage('symbol'); setError('');
       } else {
         if (!item) throw new Error('Choose an instrument.');
-        file.addSymbol(symbol, item, barType, []);
+        await file.addSymbol(symbol, item, barType, []);
         onSaved(); onClose();
       }
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save.'); }

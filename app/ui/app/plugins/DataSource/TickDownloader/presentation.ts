@@ -8,11 +8,13 @@ export const pluginName = 'TickDownloader';
 
 export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
   const state = useTickDownloader();
+  useEffect(() => { void useTickDownloader.getState().refresh(); const timer = window.setInterval(() => { void useTickDownloader.getState().poll(); }, 1000); return () => window.clearInterval(timer); }, []);
   useEffect(() => {
-    const active = state.job?.state === 'running' || state.job?.state === 'paused';
+    const active = state.job?.state === 'running';
     onSync('td', {
       definitions: state.definitions,
       job: state.job,
+      backendAvailable: state.backendAvailable,
       storageError: state.storageError,
       active,
     });
@@ -22,7 +24,7 @@ export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
 
 export function Dialogs({ dialog, onClose, onStarted }: any) {
   if (dialog?.id === 'tickdownloader-import') {
-    return createElement(TickDownloaderImportDialog, { onClose, onStarted: () => onStarted('td', 'TickDownloader import started (simulation)') });
+    return createElement(TickDownloaderImportDialog, { onClose, onStarted: () => onStarted('td', 'TickDownloader import started') });
   }
   return null;
 }

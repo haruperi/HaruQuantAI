@@ -53,7 +53,12 @@
       "app/ui/app/workspace/DataManager/localState.ts",
       "app/workspace/DataManager/__init__.py",
       "app/workspace/DataManager/actions.py",
-      "app/workspace/DataManager/workspace.py"
+      "app/workspace/DataManager/workspace.py",
+      "app/workspace/DataManager/operations.py",
+      "app/workspace/DataManager/catalogs.py",
+      "app/ui/app/workspace/DataManager/Common/catalogClient.ts",
+      "app/ui/app/workspace/DataManager/Actions/UpdateDataDialog.tsx",
+      "scripts/data_manager_cli.py"
     ],
     "tests": [
       "app/ui/tests/e2e/data-manager-broker-profiles.spec.ts",
@@ -73,7 +78,10 @@
       "app/ui/tests/unit/workspace/DataManager/Common/localConfiguration.test.ts",
       "tests/workspace/DataManager/__init__.py",
       "tests/workspace/DataManager/test_actions.py",
-      "tests/workspace/DataManager/test_workspace.py"
+      "tests/workspace/DataManager/test_workspace.py",
+      "tests/workspace/DataManager/test_catalogs.py",
+      "tests/workspace/DataManager/test_retained_operations.py",
+      "tests/test_data_manager_cli.py"
     ],
     "assets": [
       "app/ui/app/workspace/DataManager/Actions/actions.css",

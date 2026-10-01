@@ -1,39 +1,46 @@
 """Deterministic offline BI5 examples, with no provider request."""
 
 import asyncio
+import io
 import lzma
 import re
 import sqlite3
 import struct
+import zipfile
 from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
+import httpx
 import pytest
 from app.host.capabilities import (
     HostCapabilities,
     JobAccess,
     MarketAccess,
     NetworkAccess,
+    ResourceAccess,
 )
 from app.host.jobs import JobManager
-from app.host.network import HistoricalNetwork, NetworkResult
+from app.host.network import HistoricalNetwork, NetworkResult, SourceNetwork
 from app.persistence.market import (
     MarketDataset,
     MarketDataStore,
     create_isolated_schema,
 )
+from app.persistence.resources import ResourceStore
 from app.plugin.DataSource.dukascopy import (
     RateCorrector,
+    _cdn_archive_url,
+    _cdn_base_url,
+    _cdn_metadata_url,
+    _decode_m1,
+    _decode_ticks,
     _fetch_day,
-    cdn_archive_url,
-    cdn_base_url,
-    cdn_metadata_url,
-    decode_m1,
-    decode_ticks,
-    prepare,
-    standard_url,
+    _fetch_day_result,
+    _prepare,
+    _source_archive,
+    _standard_url,
 )
 from pydantic import JsonValue
 
@@ -45,10 +52,10 @@ def test_hourly_tick_uses_both_side_volumes() -> None:
         struct.pack(">IIIff", 17, 110002, 110000, 0.01, 0.02),
         format=lzma.FORMAT_ALONE,
     )
-    rows = decode_ticks(payload, instant, "EURUSD")
+    rows = _decode_ticks(payload, instant, "EURUSD")
     assert rows == ((int(instant.timestamp() * 1000) + 17, 1100020, 1100000, 30000),)
-    assert standard_url("EURUSD", instant, "ticks") == (
-        "http://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/15/00h_ticks.bi5"
+    assert _standard_url("EURUSD", instant, "ticks") == (
+        "https://datafeed.dukascopy.com/datafeed/EURUSD/2024/00/15/00h_ticks.bi5"
     )
 
 
@@ -59,7 +66,7 @@ def test_m1_bid_candle_field_order() -> None:
         struct.pack(">IIIIIf", 60, 110000, 110010, 109990, 110020, 0.05),
         format=lzma.FORMAT_ALONE,
     )
-    rows = decode_m1(payload, instant, "EURUSD")
+    rows = _decode_m1(payload, instant, "EURUSD")
     assert rows == (
         (int(instant.timestamp() * 1000) + 60000, 1.1, 1.1002, 1.0999, 1.1001, 50000),
     )
@@ -69,15 +76,14 @@ def test_corrupt_and_invalid_volume_fail() -> None:
     """Malformed records and negative or non-finite volume cannot be published."""
     instant = datetime(2024, 1, 15, tzinfo=UTC)
     with pytest.raises(ValueError):
-        decode_ticks(b"not bi5", instant, "EURUSD")
+        _decode_ticks(b"not bi5", instant, "EURUSD")
     payload = lzma.compress(
         struct.pack(">IIIff", 0, 110002, 110000, -0.01, 0.0),
         format=lzma.FORMAT_ALONE,
     )
     with pytest.raises(ValueError, match="Invalid provider volume"):
-        decode_ticks(payload, instant, "EURUSD")
-    with pytest.raises(ValueError, match="supported FX"):
-        standard_url("XAUUSD", instant, "ticks")
+        _decode_ticks(payload, instant, "EURUSD")
+    assert "/XAUUSD/" in _standard_url("XAUUSD", instant, "ticks")
 
 
 def test_real_world_float32_volume_decoding() -> None:
@@ -88,7 +94,7 @@ def test_real_world_float32_volume_decoding() -> None:
         struct.pack(">IIIIIf", 60, 110000, 110010, 109990, 110020, 157.14),
         format=lzma.FORMAT_ALONE,
     )
-    rows = decode_m1(payload, instant, "EURUSD")
+    rows = _decode_m1(payload, instant, "EURUSD")
     assert rows == (
         (
             int(instant.timestamp() * 1000) + 60000,
@@ -108,6 +114,7 @@ def test_saturday_forex_is_skipped(tmp_path: Path) -> None:
 
     class CountingNetwork(HistoricalNetwork):
         def __init__(self) -> None:
+            super().__init__()
             self.requests: list[str] = []
 
         async def get(self, url: str) -> NetworkResult:
@@ -120,33 +127,46 @@ def test_saturday_forex_is_skipped(tmp_path: Path) -> None:
         market = MarketAccess(owner, MarketDataStore(tmp_path, database))
         net = CountingNetwork()
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess(owner, jobs),
             log=None,
             market_data=market,
             network=NetworkAccess(owner, net),
         )
-        contribution = await prepare(context)
-        dataset = await contribution.invoke(
-            "add", {"symbol": "EURUSD", "kind": "m1", "instrument": "EURUSD"}
+        contribution = await _prepare(context)
+        dataset = cast(
+            "Any",
+            await contribution.invoke(
+                "add", {"symbol": "EURUSD", "kind": "m1", "instrument": "EURUSD"}
+            ),
         )
         assert isinstance(dataset, dict)
         # 2024-01-13 was a Saturday
-        started = await contribution.invoke(
-            "download.start",
-            {
-                "dataset_id": dataset["id"],
-                "date_from": "2024-01-13",
-                "date_to": "2024-01-13",
-                "mode": "standard",
-                "overwrite": False,
-            },
+        started = cast(
+            "Any",
+            await contribution.invoke(
+                "download.start",
+                {
+                    "dataset_id": dataset["id"],
+                    "date_from": "2024-01-13",
+                    "date_to": "2024-01-13",
+                    "mode": "standard",
+                    "overwrite": False,
+                },
+            ),
         )
         assert isinstance(started, dict)
         status: Any = {}
         for _ in range(100):
-            status = await contribution.invoke(
-                "download.status", {"job_id": started["job_id"]}
+            status = cast(
+                "Any",
+                await contribution.invoke(
+                    "download.status", {"job_id": started["job_id"]}
+                ),
             )
             assert isinstance(status, dict)
             if status["state"] in ("succeeded", "failed", "cancelled"):
@@ -163,8 +183,54 @@ def test_saturday_forex_is_skipped(tmp_path: Path) -> None:
     asyncio.run(scenario())
 
 
+@pytest.mark.parametrize("monthly_available", [True, False])
+def test_cdn_monthly_first_annual_fallback_filters_request(
+    monthly_available: bool,
+) -> None:
+    from datetime import date
+
+    content = io.BytesIO()
+    with zipfile.ZipFile(content, "w") as archive:
+        archive.writestr("EURUSD/2024/00/02/BID_candles_min_1.bi5", b"selected")
+        archive.writestr("EURUSD/2024/00/03/BID_candles_min_1.bi5", b"outside")
+        archive.writestr("EURUSD/2024/00/02/readme.bi5", b"wrong-kind")
+    calls: list[str] = []
+
+    def response(request: httpx.Request) -> httpx.Response:
+        calls.append(request.url.path)
+        if "2024_01.zip" in request.url.path and not monthly_available:
+            return httpx.Response(404)
+        return httpx.Response(200, content=content.getvalue())
+
+    async def scenario() -> None:
+        network = HistoricalNetwork()
+        source = SourceNetwork(
+            ("https://cdn.strategyquantcdn.com",),
+            client=httpx.AsyncClient(transport=httpx.MockTransport(response)),
+        )
+        dataset = MarketDataset(
+            "id", "dukascopy", "eurusd", "m1", "EURUSD", "-1", "UTC"
+        )
+        result = await _source_archive(
+            NetworkAccess("plugin.data_manager.dukascopy", network),
+            dataset,
+            2024,
+            "cdn",
+            archive_network=source,
+            first=date(2024, 1, 2),
+            last=date(2024, 1, 2),
+        )
+        assert result == {datetime(2024, 1, 2, tzinfo=UTC): b"selected"}
+        assert calls[0].endswith("2024_01.zip")
+        assert any(path.endswith("2024.zip") for path in calls) is not monthly_available
+        await source.close()
+        await network.aclose()
+
+    asyncio.run(scenario())
+
+
 def test_missing_tick_hour_cannot_claim_day_coverage() -> None:
-    """A mixed 200/404 hourly day is incomplete and cannot be published."""
+    """The owner script keeps available hours without claiming missing coverage."""
     payload = lzma.compress(
         struct.pack(">IIIff", 0, 110002, 110000, 0.01, 0.02),
         format=lzma.FORMAT_ALONE,
@@ -176,10 +242,14 @@ def test_missing_tick_hour_cannot_claim_day_coverage() -> None:
 
     dataset = MarketDataset("id", "dukascopy", "eurusd", "ticks", "EURUSD", "-1", "UTC")
     net_access = NetworkAccess("plugin.data_manager.dukascopy", PartialNetwork())
-    with pytest.raises(ValueError, match="Incomplete Dukascopy tick day"):
-        asyncio.run(
-            _fetch_day(net_access, dataset, datetime(2020, 4, 2, tzinfo=UTC).date())
-        )
+    fetched = asyncio.run(
+        _fetch_day_result(net_access, dataset, datetime(2020, 4, 2, tzinfo=UTC).date())
+    )
+    assert fetched.table.num_rows == 23
+    missing = int(datetime(2020, 4, 2, 1, tzinfo=UTC).timestamp() * 1000)
+    assert not any(
+        first <= missing <= last for first, last in fetched.received_intervals
+    )
 
 
 def test_unprovisioned_market_is_truthfully_unavailable(tmp_path: Path) -> None:
@@ -188,7 +258,11 @@ def test_unprovisioned_market_is_truthfully_unavailable(tmp_path: Path) -> None:
     async def scenario() -> None:
         owner = "plugin.data_manager.dukascopy"
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess(owner, JobManager(1, 1024)),
             log=None,
             market_data=MarketAccess(
@@ -197,8 +271,8 @@ def test_unprovisioned_market_is_truthfully_unavailable(tmp_path: Path) -> None:
             ),
             network=NetworkAccess(owner, HistoricalNetwork()),
         )
-        contribution = await prepare(context)
-        catalog = await contribution.invoke("catalog", {})
+        contribution = await _prepare(context)
+        catalog = cast("Any", await contribution.invoke("catalog", {}))
         assert isinstance(catalog, dict)
         assert catalog["modes"] == {
             "standard": "unavailable",
@@ -208,7 +282,7 @@ def test_unprovisioned_market_is_truthfully_unavailable(tmp_path: Path) -> None:
         assert catalog["brokers"] == []
         assert catalog["broker_catalog_status"] == "unavailable"
         with pytest.raises(ValueError, match="migration is required"):
-            await contribution.invoke("download.start", {})
+            cast("Any", await contribution.invoke("download.start", {}))
         await contribution.close()
 
     asyncio.run(scenario())
@@ -230,14 +304,18 @@ def test_broker_catalog_is_available_without_market_migration(tmp_path: Path) ->
     async def scenario() -> None:
         owner = "plugin.data_manager.dukascopy"
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess(owner, JobManager(1, 1024)),
             log=None,
             market_data=MarketAccess(owner, MarketDataStore(tmp_path, database)),
             network=NetworkAccess(owner, HistoricalNetwork()),
         )
-        contribution = await prepare(context)
-        catalog = await contribution.invoke("catalog", {})
+        contribution = await _prepare(context)
+        catalog = cast("Any", await contribution.invoke("catalog", {}))
         assert isinstance(catalog, dict)
         modes = catalog["modes"]
         assert isinstance(modes, dict)
@@ -270,26 +348,33 @@ def test_definition_operation_without_file_tables(tmp_path: Path) -> None:
     async def scenario() -> None:
         owner = "plugin.data_manager.dukascopy"
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess(owner, JobManager(1, 1024)),
             log=None,
             market_data=MarketAccess(owner, MarketDataStore(tmp_path, database)),
             network=NetworkAccess(owner, HistoricalNetwork()),
         )
-        contribution = await prepare(context)
-        result = await contribution.invoke(
-            "definitions.add",
-            {
-                "symbols": ["USDJPY", "EURUSD"],
-                "kind": "m1",
-                "postfix": "_research",
-            },
+        contribution = await _prepare(context)
+        result = cast(
+            "Any",
+            await contribution.invoke(
+                "definitions.add",
+                {
+                    "symbols": ["USDJPY", "EURUSD"],
+                    "kind": "m1",
+                    "postfix": "_research",
+                },
+            ),
         )
         assert isinstance(result, dict)
         ids = result["ids"]
         assert isinstance(ids, list)
         assert len(ids) == 2
-        catalog = await contribution.invoke("catalog", {})
+        catalog = cast("Any", await contribution.invoke("catalog", {}))
         assert isinstance(catalog, dict)
         assert catalog["definitions_available"] is True
         modes = catalog["modes"]
@@ -305,7 +390,7 @@ def test_definition_operation_without_file_tables(tmp_path: Path) -> None:
         ]
         for payload in bad_payloads:
             with pytest.raises((ValueError, TypeError)):
-                await contribution.invoke("definitions.add", payload)
+                cast("Any", await contribution.invoke("definitions.add", payload))
         await contribution.close()
 
     asyncio.run(scenario())
@@ -330,32 +415,45 @@ def test_direct_m1_job_publishes_from_offline_provider(tmp_path: Path) -> None:
         jobs = JobManager(1, 256 * 1024 * 1024)
         market = MarketAccess(owner, MarketDataStore(tmp_path, database))
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess(owner, jobs),
             log=None,
             market_data=market,
             network=NetworkAccess(owner, FixtureNetwork()),
         )
-        contribution = await prepare(context)
-        dataset = await contribution.invoke(
-            "add", {"symbol": "EURUSD", "kind": "m1", "instrument": "EURUSD"}
+        contribution = await _prepare(context)
+        dataset = cast(
+            "Any",
+            await contribution.invoke(
+                "add", {"symbol": "EURUSD", "kind": "m1", "instrument": "EURUSD"}
+            ),
         )
         assert isinstance(dataset, dict)
-        started = await contribution.invoke(
-            "download.start",
-            {
-                "dataset_id": dataset["id"],
-                "date_from": "2020-04-02",
-                "date_to": "2020-04-02",
-                "mode": "standard",
-                "overwrite": False,
-            },
+        started = cast(
+            "Any",
+            await contribution.invoke(
+                "download.start",
+                {
+                    "dataset_id": dataset["id"],
+                    "date_from": "2020-04-02",
+                    "date_to": "2020-04-02",
+                    "mode": "standard",
+                    "overwrite": False,
+                },
+            ),
         )
         assert isinstance(started, dict)
         status: Any = {}
         for _ in range(100):
-            status = await contribution.invoke(
-                "download.status", {"job_id": started["job_id"]}
+            status = cast(
+                "Any",
+                await contribution.invoke(
+                    "download.status", {"job_id": started["job_id"]}
+                ),
             )
             assert isinstance(status, dict)
             if status["state"] in ("succeeded", "failed", "cancelled"):
@@ -397,8 +495,8 @@ def test_rate_corrector_backoff_and_recovery() -> None:
     assert abs(corrector.delay - 0.75) < 1e-6
 
 
-def test_sunday_forex_ticks_starts_at_19_utc() -> None:
-    """Sunday tick acquisition ignores closed hours 0-18 and begins at hour 19."""
+def test_sunday_ticks_follow_script_full_day_request() -> None:
+    """The authoritative owner script requests every Sunday hour."""
     instant = datetime(2024, 1, 14, tzinfo=UTC)  # 2024-01-14 is a Sunday
     assert instant.weekday() == 6
     payload = lzma.compress(
@@ -417,31 +515,30 @@ def test_sunday_forex_ticks_starts_at_19_utc() -> None:
     dataset = MarketDataset("id", "dukascopy", "eurusd", "ticks", "EURUSD", "-1", "UTC")
     network = NetworkAccess("plugin.data_manager.dukascopy", SundayNetwork())
     table = asyncio.run(_fetch_day(network, dataset, instant.date()))
-    # Hours 0..18 must not be requested at all on Sunday
-    assert requested_hours == list(range(19, 24))
-    assert table.num_rows == 5
+    assert requested_hours == list(range(24))
+    assert table.num_rows == 24
 
 
 def test_cdn_url_builders() -> None:
     """Global and China CDN URLs format descriptors and archive paths."""
     assert (
-        cdn_base_url("cdn", "m1")
+        _cdn_base_url("cdn", "m1")
         == "https://cdn.strategyquantcdn.com/data/dukascopy/m1"
     )
     assert (
-        cdn_base_url("cdn-cn", "tick")
+        _cdn_base_url("cdn-cn", "tick")
         == "https://cdn005.strategyquantcdn.com/data/dukascopy/tick"
     )
     assert (
-        cdn_metadata_url("cdn", "m1", "EURUSD")
+        _cdn_metadata_url("cdn", "m1", "EURUSD")
         == "https://cdn.strategyquantcdn.com/data/dukascopy/m1/EURUSD/metadata.dat"
     )
     assert (
-        cdn_archive_url("cdn", "m1", "EURUSD", "2020")
+        _cdn_archive_url("cdn", "m1", "EURUSD", "2020")
         == "https://cdn.strategyquantcdn.com/data/dukascopy/m1/EURUSD/2020.zip"
     )
     assert (
-        cdn_archive_url("cdn-cn", "ticks", "EURUSD", "2020-04")
+        _cdn_archive_url("cdn-cn", "ticks", "EURUSD", "2020-04")
         == "https://cdn005.strategyquantcdn.com/data/dukascopy/tick/EURUSD/2020_04.zip"
     )
 
@@ -456,6 +553,17 @@ def test_cdn_mode_with_automatic_fallback(tmp_path: Path) -> None:
     )
 
     class FallbackNetwork(HistoricalNetwork):
+        def source_session(self, origins: tuple[str, ...], *, owner: str = "") -> Any:
+            import httpx
+            from app.host.network import SourceNetwork
+
+            client = httpx.AsyncClient(
+                transport=httpx.MockTransport(
+                    lambda request: httpx.Response(404, request=request)
+                )
+            )
+            return SourceNetwork(origins, client=client)
+
         async def get(self, url: str) -> NetworkResult:
             if "metadata.dat" in url:
                 return NetworkResult(404, b"")
@@ -468,39 +576,52 @@ def test_cdn_mode_with_automatic_fallback(tmp_path: Path) -> None:
         jobs = JobManager(1, 256 * 1024 * 1024)
         market = MarketAccess(owner, MarketDataStore(tmp_path, database))
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess(owner, jobs),
             log=None,
             market_data=market,
             network=NetworkAccess(owner, FallbackNetwork()),
         )
-        contribution = await prepare(context)
-        catalog = await contribution.invoke("catalog", {})
+        contribution = await _prepare(context)
+        catalog = cast("Any", await contribution.invoke("catalog", {}))
         assert isinstance(catalog, dict)
         modes = catalog["modes"]
         assert isinstance(modes, dict)
         assert modes["cdn"] == "available"
         assert modes["cdn-cn"] == "available"
 
-        dataset = await contribution.invoke(
-            "add", {"symbol": "EURUSD", "kind": "m1", "instrument": "EURUSD"}
+        dataset = cast(
+            "Any",
+            await contribution.invoke(
+                "add", {"symbol": "EURUSD", "kind": "m1", "instrument": "EURUSD"}
+            ),
         )
         assert isinstance(dataset, dict)
-        started = await contribution.invoke(
-            "download.start",
-            {
-                "dataset_id": dataset["id"],
-                "date_from": "2020-04-02",
-                "date_to": "2020-04-02",
-                "mode": "cdn",
-                "overwrite": False,
-            },
+        started = cast(
+            "Any",
+            await contribution.invoke(
+                "download.start",
+                {
+                    "dataset_id": dataset["id"],
+                    "date_from": "2020-04-02",
+                    "date_to": "2020-04-02",
+                    "mode": "cdn",
+                    "overwrite": False,
+                },
+            ),
         )
         assert isinstance(started, dict)
         status: Any = {}
         for _ in range(100):
-            status = await contribution.invoke(
-                "download.status", {"job_id": started["job_id"]}
+            status = cast(
+                "Any",
+                await contribution.invoke(
+                    "download.status", {"job_id": started["job_id"]}
+                ),
             )
             assert isinstance(status, dict)
             if status["state"] in ("succeeded", "failed", "cancelled"):
@@ -527,14 +648,18 @@ def test_disclaimer_operation(tmp_path: Path) -> None:
         store = MarketDataStore(tmp_path, db_path)
         market = MarketAccess("plugin.data_manager.dukascopy", store)
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess("plugin.data_manager.dukascopy", JobManager(1, 1024 * 1024)),
             log=None,
             market_data=market,
             network=NetworkAccess("plugin.data_manager.dukascopy", HistoricalNetwork()),
         )
-        contribution = await prepare(context)
-        res = await contribution.invoke("disclaimer", {})
+        contribution = await _prepare(context)
+        res = cast("Any", await contribution.invoke("disclaimer", {}))
         assert isinstance(res, dict)
         assert isinstance(res["dukascopy_disclaimer"], str)
         assert "Dukascopy Bank SA" in res["dukascopy_disclaimer"]
@@ -554,15 +679,19 @@ def test_dukascopy_logging(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> 
         store = MarketDataStore(tmp_path, db_path)
         market = MarketAccess("plugin.data_manager.dukascopy", store)
         context = HostCapabilities(
-            resources=None,
+            resources=ResourceAccess(
+                "plugin.data_manager.dukascopy",
+                "1.0.0",
+                ResourceStore(tmp_path / "resources"),
+            ),
             jobs=JobAccess("plugin.data_manager.dukascopy", JobManager(1, 1024 * 1024)),
             log=None,
             market_data=market,
             network=NetworkAccess("plugin.data_manager.dukascopy", HistoricalNetwork()),
         )
         with caplog.at_level("INFO", logger="app.plugin.DataSource.dukascopy"):
-            contribution = await prepare(context)
-            await contribution.invoke("disclaimer", {})
+            contribution = await _prepare(context)
+            cast("Any", await contribution.invoke("disclaimer", {}))
             await contribution.close()
 
         assert "Preparing Dukascopy data source plugin" in caplog.text
@@ -606,7 +735,7 @@ def test_fetch_day_transient_rate_limit_retry(monkeypatch: pytest.MonkeyPatch) -
     assert table.num_rows == 1
     assert call_count == 2
 
-    # Persistent 429 raises ValueError
+    # Persistent 429 is an unavailable chunk, rather than loss of the whole job.
     class PersistentRateLimitNetwork(HistoricalNetwork):
         async def get(self, url: str) -> NetworkResult:
             return NetworkResult(429, b"")
@@ -614,5 +743,110 @@ def test_fetch_day_transient_rate_limit_retry(monkeypatch: pytest.MonkeyPatch) -
     persistent_network = NetworkAccess(
         "plugin.data_manager.dukascopy", PersistentRateLimitNetwork()
     )
-    with pytest.raises(ValueError, match="rate limit reached"):
-        asyncio.run(_fetch_day(persistent_network, dataset, instant.date()))
+    from app.plugin.DataSource.dukascopy import _fetch_day_result
+
+    fetched = asyncio.run(
+        _fetch_day_result(persistent_network, dataset, instant.date())
+    )
+    assert fetched.table.num_rows == 0
+    assert fetched.failed_chunks == 1
+    assert fetched.received_intervals == ()
+
+
+def test_repaired_bi5_header_preserves_source_decode() -> None:
+    raw = struct.pack(">iiiiif", 60, 110000, 110010, 109990, 110020, 0.05)
+    complete = lzma.compress(raw, format=lzma.FORMAT_ALONE)
+    properties_only = complete[:5] + complete[13:]
+    instant = datetime(2020, 4, 2, tzinfo=UTC)
+    assert _decode_m1(properties_only, instant, "EURUSD") == _decode_m1(
+        complete, instant, "EURUSD"
+    )
+
+
+def test_partial_tick_job_retains_rows_and_retries_only_missing_hours(
+    tmp_path: Path,
+) -> None:
+    database = tmp_path / "catalog.db"
+    create_isolated_schema(database)
+    payload = lzma.compress(
+        struct.pack(">iii ff", 0, 110002, 110000, 0.01, 0.02), format=lzma.FORMAT_ALONE
+    )
+
+    class PartialNetwork(HistoricalNetwork):
+        def __init__(self) -> None:
+            super().__init__()
+            self.requests: list[Any] = []
+            self.missing = True
+
+        async def get(self, url: Any) -> Any:
+            self.requests.append(url)
+            if self.missing and url.endswith("01h_ticks.bi5"):
+                return NetworkResult(404, b"")
+            return NetworkResult(200, payload)
+
+    async def scenario() -> None:
+        owner = "plugin.data_manager.dukascopy"
+        manager = JobManager(1, 256 * 1024 * 1024)
+        store = MarketDataStore(tmp_path, database)
+        network = PartialNetwork()
+        contribution = await _prepare(
+            HostCapabilities(
+                ResourceAccess(
+                    "plugin.data_manager.dukascopy",
+                    "1.0.0",
+                    ResourceStore(tmp_path / "resources"),
+                ),
+                JobAccess(owner, manager),
+                None,
+                market_data=MarketAccess(owner, store),
+                network=NetworkAccess(owner, network),
+            )
+        )
+        dataset = cast(
+            "Any",
+            await contribution.invoke("add", {"symbol": "EURUSD", "kind": "ticks"}),
+        )
+
+        async def download() -> Any:
+            started = cast(
+                "Any",
+                await contribution.invoke(
+                    "download.start",
+                    {
+                        "dataset_id": dataset["id"],
+                        "date_from": "2020-04-02",
+                        "date_to": "2020-04-02",
+                    },
+                ),
+            )
+            for _ in range(200):
+                status = cast(
+                    "Any",
+                    await contribution.invoke(
+                        "download.status", {"job_id": started["job_id"]}
+                    ),
+                )
+                if status["state"] in ("succeeded", "failed", "cancelled"):
+                    assert status["state"] == "succeeded", status
+                    return
+                await asyncio.sleep(0.01)
+            pytest.fail("Acquisition failed to finish")
+
+        await download()
+        first = store.list_files("dukascopy", "ticks", "eurusd")[0]
+        assert first.row_count == 23
+        assert len(first.coverage) == 23
+        network.requests.clear()
+        network.missing = False
+        await download()
+        second = store.list_files("dukascopy", "ticks", "eurusd")[0]
+        assert second.row_count == 24
+        assert len(second.coverage) == 24
+        assert len(network.requests) == 1
+        assert network.requests[0].endswith("01h_ticks.bi5")
+        await contribution.close()
+        assert (
+            store.list_files("dukascopy", "ticks", "eurusd")[0].sha256 == second.sha256
+        )
+
+    asyncio.run(scenario())

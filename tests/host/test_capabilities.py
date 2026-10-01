@@ -127,3 +127,54 @@ async def prepare(context):
     # Check that settings were persisted under test.workspace
     access = SettingsAccess("test.workspace", settings_store)
     assert access.get("initial") == {"ok": True}
+
+
+def test_terminal_worker_is_historical_only_and_reaped_on_cancellation(
+    monkeypatch: Any,
+) -> None:
+    import asyncio
+
+    from app.host.capabilities import TerminalAccess
+
+    worker = "import sys,time\nfor line in sys.stdin:\n time.sleep(120)\n"
+    monkeypatch.setattr("app.host.capabilities._TERMINAL_WORKER", worker)
+
+    async def scenario() -> None:
+        terminal = TerminalAccess("plugin.test")
+        with pytest.raises(ValueError, match="Unsupported"):
+            await terminal.call("order_send", {})
+        task = asyncio.create_task(terminal.call("connect", {}))
+        for _ in range(100):
+            if terminal._process is not None:
+                break
+            await asyncio.sleep(0.01)
+        process = terminal._process
+        assert process is not None
+        task.cancel()
+        with pytest.raises(asyncio.CancelledError):
+            await task
+        assert process.returncode is not None
+        assert terminal._process is None
+
+    asyncio.run(scenario())
+
+
+def test_terminal_worker_failure_does_not_return_synthetic_history(
+    monkeypatch: Any,
+) -> None:
+    import asyncio
+
+    from app.host.capabilities import TerminalAccess
+
+    monkeypatch.setattr(
+        "app.host.capabilities._TERMINAL_WORKER",
+        'import sys\nsys.stdin.readline()\nsys.stdout.write(\'{"error":"failure"}\\n\')\nsys.stdout.flush()\n',
+    )
+
+    async def scenario() -> None:
+        terminal = TerminalAccess("plugin.test")
+        with pytest.raises(ValueError, match="Terminal operation failed"):
+            await terminal.call("history", {})
+        assert terminal._process is None
+
+    asyncio.run(scenario())

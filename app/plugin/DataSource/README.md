@@ -1,182 +1,60 @@
-# Dukascopy Data Source Plugin
+# Data source plugin registry
 
-> **Backend Path:** `app/plugin/DataSource/dukascopy.py`
-> **Frontend Path:** `app/ui/app/plugins/DataSource/Dukascopy/`
-> **Package ID:** `plugin.data_manager.dukascopy`
-> **Owner Workspace:** `workspace.data_manager`
-> **Attachment Slot:** `data_source.acquisition@1.0.0`
-> **Mode:** `paired`
-> **Host Contract:** `1.0.0`
-> **Status:** Qualified
-> **Last updated:** 2026-09-29
+Dukascopy's Python user API exports only `add_symbol`, `download_data`, and
+`show_disclaimer`, matching its three UI dropdown actions and the reference script.
+Other module-defined functions are internal. The host-only `prepare` lifecycle
+alias is excluded from `__all__`; CLI commands continue through internal helpers.
 
-This README is the plugin's authoritative source of truth for the Dukascopy data acquisition concept, BI5 decoding algorithms, parameter schema, dual transport policies, and single-package removal invariants.
+Status: integration candidate, 2026-09-30. The prior README's Qualified assertions
+are historical and do not qualify the current candidate. Source code was absent
+at the audited baseline; this integration is being independently verified.
 
-[PROJECT.md](../../../docs/PROJECT.md) owns system scope and cross-workspace workflows. [ARCHITECTURE.md](../../../docs/ARCHITECTURE.md) owns structural rules and the Five Laws of Spatial Composability. [app/workspace/DataManager/README.md](../../workspace/DataManager/README.md) owns the slot contract and workspace workflow coordination.
+The owner-written implementations under `SQX_REFERENCE_ROOT/scripts/` take
+precedence for provider behavior. Host capabilities own transport, jobs and data
+custody; one cohesive Python file owns each source. No independent SQX parity
+claim is made.
 
----
+| Feature | Owning module | Current implementation |
+| --- | --- | --- |
+| `FEAT-DM-DUKASCOPY_ACQUISITION` / `FR-DATA-001` | `dukascopy.py` | Direct acquisition, script numeric decoding/header repair, annual CDN decode, partial hourly publication; candidate |
+| `FEAT-DM-YAHOO_ACQUISITION` | `yahoo.py` | Real chart/session acquisition and custody; see [Yahoo registry](manifests/yahoo/README.md) |
+| `FEAT-DM-FILE_IMPORT` | `file_import.py` | Real parser/import jobs; [registry](manifests/file_import/README.md) |
+| `FEAT-DM-CRYPTO_ACQUISITION` | `crypto.py` | Six exchanges and real jobs; [registry](manifests/crypto/README.md) |
+| `FEAT-DM-MT5_ACQUISITION` | `mt5.py` | Historical terminal worker and custody; [registry](manifests/mt5/README.md) |
+| `FEAT-DM-TICK_DOWNLOADER` | `tick_downloader_import.py` | Actual BI5 upload/import; [registry](manifests/tick_downloader/README.md) |
+| `FEAT-DM-SQ_EQUITY` | `sq_equity.py` | Actual authenticated acquisition and custody; [registry](manifests/sq_equity/README.md) |
+| `FEAT-DM-SQ_FUTURES` | `sq_futures.py` | Actual authenticated acquisition and Open Interest; [registry](manifests/sq_futures/README.md) |
+| `FEAT-DM-EXTERNAL_INDICATORS` | `external_indicators.py` | Real uploaded values, immutable revisions and durable definitions; candidate |
+| `FEAT-DM-DARWINEX_ACQUISITION` | `darwinex.py` | DAT/CDN and bid/ask log jobs; [registry](manifests/darwinex/README.md) |
 
-## Code-Aligned Implementation Convention
+Paired provider manifests remain beside their UI contributions and own their
+backend files. SQ headless manifests remain under `manifests/`.
+Tick decoding preserves the source NumPy price scaling and float32 side-volume
+rounding; canonical storage combines both side volumes. All Sunday hours are
+requested. Missing hours do not discard received rows or acquire false coverage.
+Subsequent missing-mode runs request unreceived chunks. CDN members are decoded
+from bounded host-spooled ZIPs; individual absent chunks fall back to direct retrieval.
 
-```text
-app/plugin/DataSource/
-|-- dukascopy.py                     # One cohesive concept file (FEAT-DM-DUKASCOPY_ACQUISITION)
-`-- README.md                        # This document
+The module retains legacy host-facing acquisition glue and its complete source
+catalog. Bounded original/adapted numerical comparisons and live acquisition passed;
+these do not certify every retry, catalog or format combination. Cohort removal,
+fresh backend reads and UI rebuilds passed in isolated installations. Complete
+per-case browser evidence and final source-bound release qualification remain
+outstanding. Parameters live in the module, not in a duplicated table here.
 
-app/ui/app/plugins/DataSource/Dukascopy/
-|-- package.json                     # Authoritative manifest defining owned_paths and slot attachment
-|-- contribution.tsx                 # Slot attachment and UI extension entrypoint
-|-- add.tsx                          # Add symbol modal component
-|-- import.tsx                       # Download / acquisition modal component
-|-- disclaimer.tsx                   # Mandatory vendor legal disclaimer modal
-`-- [helpers]/                       # dukascopy.ts, dukascopyDownload.ts, dukascopyStore.ts
+Focused commands:
 
-tests/plugin/DataSource/
-`-- test_dukascopy.py                # Unit, boundary, numerical, schema, and rate throttling tests
-
-tests/examples/
-`-- dukascopy_offline.py             # Deterministic, offline usage example
-```
-
-- **Manifest:** `app/ui/app/plugins/DataSource/Dukascopy/package.json` declares package identity, owner workspace (`workspace.data_manager`), slot attachment (`data_source.acquisition@1.0.0`), and exact `owned_paths`.
-- **Cohesion (SC-01):** Decoding algorithm, parameter schema, network transport, throttling, and storage logic stay together in `dukascopy.py`.
-- **Zero Sibling Imports:** Sibling plugins and workspace internal implementation are never imported directly.
-
----
-
-## 1. Purpose and Capability Boundary
-
-### Purpose
-
-Acquires high-precision historical Forex and CFD market data from Dukascopy Bank SA. Decodes binary LZMA-compressed `.bi5` tick and minute records into standardized, UTC-aligned Apache Arrow and Parquet tables.
-
-### System owns
-
-- Binary decompression and integer-to-float decoding of Dukascopy `.bi5` chunks.
-- Parameter schema for symbol addition and range download operations.
-- Adaptive network rate throttling and StrategyQuant Fast CDN failover logic.
-- Verbatim regulatory and copyright disclaimer presentation.
-
-### System does not own
-
-- Dataset inventory cataloging or workspace table filtering (owned by DataManager).
-- Direct raw database manipulation (uses host market data capabilities).
-- Execution scheduling or background process management (delegated to `host.jobs@1.0.0`).
-
----
-
-## 2. Feature Specification & Traceability
-
-This single Python file represents one cohesive, fully documented, traced feature (`FEAT-DM-DUKASCOPY_ACQUISITION`).
-Every method inside this file represents one or more traced functional requirements:
-
-### `dukascopy.py` — `FEAT-DM-DUKASCOPY_ACQUISITION`
-
-> **Feature ID:** `FEAT-DM-DUKASCOPY_ACQUISITION`
-> **Owner File:** `app/plugin/DataSource/dukascopy.py`
-> **Status:** Qualified
-> **Attached Slot:** `data_source.acquisition@1.0.0`
-
-#### Functional Requirements Table
-
-| Status | Requirement ID | Observable Behavior | Implementing Method | Side Effects | Failure Behavior | Verification Oracle |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| Qualified | `FR-DATA-001` | Decodes `.bi5` LZMA payloads into PyArrow tables with dual-side volume | `dukascopy.decode_ticks()`<br>`dukascopy.decode_bi5()` | None | Raises `ValueError` on malformed bytes | `tests/plugin/DataSource/test_dukascopy.py` |
-| Qualified | `FR-DATA-001` | Executes adaptive throttling with +25% backoff on 429/503 and -25% recovery | `DownloadRateCorrector.correct_delay()` | Updates delay | Reaches capped max delay on sustained 429s | `tests/plugin/DataSource/test_dukascopy.py` |
-| Qualified | `FR-DATA-001` | Downloads range via Fast CDN with transparent fallback to Direct Dukascopy | `dukascopy.acquire()` | Network requests | Falls back cleanly; errors if all endpoints fail | `tests/plugin/DataSource/test_dukascopy.py` |
-
----
-
-## 3. Parameter Schema
-
-Configuration is represented by the JSON parameter schema declared in `PLUGIN["parameter_schema"]`:
-
-| Operation Key | Parameter | Type | Required | Description | Constraints / Validation |
-| :--- | :--- | :--- | :--- | :--- | :--- |
-| `add` | `symbol` | `string` | Yes | 6-character currency pair | Pattern: `^[A-Z]{6}$` (e.g. `EURUSD`) |
-| `add` | `kind` | `string` | No | Data timeframe | Enum: `["m1", "ticks"]`, Default: `"m1"` |
-| `add` | `instrument` | `string` | No | Instrument classification | Max length: 80 characters |
-| `definitions.add` | `symbols` | `array` | Yes | List of target symbols | Min items: 1, Max items: 725 |
-| `definitions.add` | `broker` | `string` | No | Broker profile association | Default: `"-1"` (Default broker) |
-| `definitions.add` | `postfix` | `string` | No | Broker symbol suffix | Pattern: `^[A-Za-z0-9_.-]{0,40}$` |
-| `download.start` | `dataset_id` | `string` | Yes | Registered dataset identifier | 32-character hex hash |
-| `download.start` | `date_from` | `string` | Yes | Acquisition start date | ISO date string (`YYYY-MM-DD`) |
-| `download.start` | `date_to` | `string` | Yes | Acquisition end date | ISO date string (`YYYY-MM-DD`) |
-| `download.start` | `mode` | `string` | No | Transport mode | Enum: `["standard", "cdn", "cdn-cn"]` |
-
----
-
-## 4. Technical Policies
-
-### 4.1 BI5 Decoder
-- Decompresses raw `.bi5` chunks using pure Python standard library `lzma.decompress()`.
-- Unpacks big-endian 32-bit integer structures (`>IIIff`).
-- Reconstructs microsecond-level UTC timestamps from hourly file baselines.
-- Computes prices via point-value division (e.g. $10^5$ for Forex 5-digit quotes).
-
-### 4.2 Tick Volume Policy
-- **Dual Volume Sum:** Total volume is computed as `ask_volume + bid_volume` after converting provider lots to currency units.
-- This explicit HaruQuantAI architectural choice provides true traded volume representation, whereas SQX legacy decoders historically parsed bid volume only.
-
-### 4.3 Adaptive Rate Throttling
-- Implements StrategyQuant's `DownloadRateCorrector` pattern:
-  - Multiplies inter-request delay by $1.25$ (+25% backoff) on HTTP 429 (Too Many Requests) or 503 (Service Unavailable).
-  - Multiplies inter-request delay by $0.75$ (-25% acceleration) after 100 consecutive successful requests.
-  - Delay is bounded within $[10\,\text{ms}, 5000\,\text{ms}]$.
-
-### 4.4 Sunday Market Opening Handling
-- Forex markets open Sunday at 17:00 NY time (19:00 UTC during daylight saving).
-- Acquisition sets the Sunday tick start boundary to 19:00 UTC, preventing false-positive missing data warnings during weekend market closure.
-
-### 4.5 Dual Transport Modes
-1. **Direct Dukascopy:** Downloads hourly `.bi5` chunks directly from `https://datafeed.dukascopy.com/datafeed/{symbol}/{year}/{month:02d}/{day:02d}/{hour:02d}h_ticks.bi5`.
-2. **StrategyQuant Fast CDN:** Downloads pre-aggregated daily ZIP archives from `https://cdn.strategyquantcdn.com` (Global) or `https://cdn005.strategyquantcdn.com` (China/HK). Automatically falls back to Direct Dukascopy if a CDN chunk is missing.
-
----
-
-## 5. Persistence and Storage
-
-- **Target Filesystem Storage:** Data is persisted under `data/market/dukascopy/` structured into `m1/` and `ticks/` subdirectories.
-- **Partitioning:** M1 files are partitioned into yearly Parquet tables; Tick files into monthly Parquet tables.
-- **Timestamp Standard:** All persisted timestamps are strictly UTC.
-
----
-
-## 6. Deterministic Offline Usage Example
-
-The plugin includes a self-contained offline usage example:
-
-- **Path:** `tests/examples/dukascopy_offline.py`
-- **Execution:**
-  ```bash
-  uv run python -m tests.examples.dukascopy_offline
-  ```
-- **Verification:** Runs with zero network access using a synthetic LZMA binary fixture, decodes ticks into PyArrow tables, verifies schema compliance, and exits with code `0`.
-
----
-
-## 7. Verification and Definition of Done
-
-### Focused Verification Commands
-
-```bash
-# Plugin unit, numerical, and rate throttling tests
-uv run pytest tests/plugin/DataSource/test_dukascopy.py --no-cov
-
-# Deterministic offline example
+```sh
+uv run pytest tests/plugin/DataSource/test_dukascopy.py tests/plugin/DataSource/test_yahoo.py --no-cov
 uv run python -m tests.examples.dukascopy_offline
-
-# UI component unit tests
-npm --prefix app/ui run test app/ui/tests/unit/plugins/DataSource/Dukascopy/
 ```
 
-### Definition of Done Checklist
+Dukascopy now also has a host-backed provider CLI, idempotent definition addition,
+HTTP fallback after HTTPS failure, and bounded multi-year/concurrent acquisition.
+Its [registry](manifests/dukascopy/README.md) records explicit raw result resources,
+canonical compatibility, and the host-backed general Data Manager CLI.
+The new work does not qualify the other providers or assert complete source parity.
 
-- [x] All decoding, schema, rate throttling, and transport reside in **one cohesive Python file** (`dukascopy.py`).
-- [x] Authoritative `package.json` with valid manifest schema and exact `owned_paths`.
-- [x] File represents traced feature `FEAT-DM-DUKASCOPY_ACQUISITION`.
-- [x] Every method maps to traced functional requirement `FR-DATA-001`.
-- [x] Zero imports of sibling plugins, workspace internal implementation, or global singletons.
-- [x] Parameter schema with explicit validation, types, and constraints.
-- [x] Fully verified technical policies (BI5 decoder, dual volume, adaptive throttling, Sunday hours).
-- [x] Deterministic offline example passes without network dependencies.
+Historical repository versions and task evidence remain in Git and
+`.agents/logs/`. Current execution evidence is maintained under
+`.agents/logs/20260930_datamanager_script_integration/`.

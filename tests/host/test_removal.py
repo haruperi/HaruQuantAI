@@ -54,3 +54,24 @@ def test_restore_refuses_overwrite(tmp_path):
     (tmp_path / doc["ui_entry"]).write_text("new installation")
     with pytest.raises(ValueError, match="overwrite"):
         restore_removal(tmp_path, journal)
+
+
+def test_stale_installation_fence_is_reclaimed(tmp_path, caplog):
+    lock_file = tmp_path / ".package-operation.lock"
+    lock_file.write_text("abandoned-token-from-dead-process", encoding="utf-8")
+    lease = InstallationLease(tmp_path)
+    with caplog.at_level("WARNING"):
+        lease.acquire()
+    assert lease.held
+    assert "Reclaimed stale installation fence" in caplog.text
+    lease.release()
+    assert not lock_file.exists()
+
+
+def test_installation_lease_lifecycle_and_invariants(tmp_path):
+    lease = InstallationLease(tmp_path)
+    lease.acquire()
+    with pytest.raises(ValueError, match="already held"):
+        lease.acquire()
+    lease.release()
+    lease.release()

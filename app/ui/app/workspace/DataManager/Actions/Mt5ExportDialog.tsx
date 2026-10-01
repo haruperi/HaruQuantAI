@@ -36,6 +36,7 @@ export function Mt5ExportDialog({
     setError('');
     try {
       const res = await actionsClient.exportToMt5({
+        dataset_id: target.id,
         symbol: target.symbol,
         timeframe,
         spread_mode: spreadMode,

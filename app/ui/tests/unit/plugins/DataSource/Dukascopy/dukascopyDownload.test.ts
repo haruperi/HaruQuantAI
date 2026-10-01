@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { resolveDownloadModes, downloadStep, eligibleTargets, presetRange, validateDownload, mergeRanges, simulationSummary, type DownloadTarget } from '../../../../../app/plugins/DataSource/Dukascopy/dukascopyDownload';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { scheduleFinishedDownloadClear, type DownloadJob, resolveDownloadModes, downloadStep, eligibleTargets, presetRange, validateDownload, mergeRanges, simulationSummary, type DownloadTarget } from '../../../../../app/plugins/DataSource/Dukascopy/dukascopyDownload';
 const target: DownloadTarget = { id: 'd1', symbol: 'EURUSD', source: 'Dukascopy', timeframe: 'M1', from: '2010-01-01', to: '2020-01-01', bars: 10 };
 describe('Dukascopy download rules', () => {
   it('filters mixed selection and rejects missing, cloned and active targets', () => {
@@ -38,4 +38,53 @@ it('resolves each fast target independently and uses standard speed for unsuppor
     expect(downloadStep({ request: supported, state: 'running', progress: 0 })).toBe(downloadType === 'cdn' ? 10 : 8);
     expect(resolveDownloadModes({ ...supported, downloadType: 'standard' })).toEqual({ supported: 'standard' });
   }
+});
+
+
+describe('finished download display lifecycle', () => {
+  afterEach(() => vi.useRealTimers());
+  const request = { targets: [target], dateFrom: '2020-01-01', dateTo: '2020-01-02', dateType: 'custom' as const, overwrite: false, downloadType: 'standard' as const };
+  for (const [state, outcome] of [
+    ['completed', 'complete'], ['completed', 'partial'], ['completed', 'empty'],
+    ['failed', undefined], ['cancelled', undefined],
+  ] as const) {
+    it(`retains ${state}/${outcome} for ten seconds then clears`, () => {
+      vi.useFakeTimers();
+      let job: DownloadJob | null = { request, state, outcome, progress: 100 };
+      scheduleFinishedDownloadClear(job, () => job, () => { job = null; });
+      vi.advanceTimersByTime(9999);
+      expect(job?.state).toBe(state);
+      vi.advanceTimersByTime(1);
+      expect(job).toBeNull();
+    });
+  }
+  it('never clears running or paused operations', () => {
+    vi.useFakeTimers();
+    for (const state of ['running', 'paused'] as const) {
+      const job: DownloadJob = { request, state, progress: 50 };
+      const clear = vi.fn();
+      scheduleFinishedDownloadClear(job, () => job, clear);
+      vi.advanceTimersByTime(20000);
+      expect(clear).not.toHaveBeenCalled();
+    }
+  });
+  it('protects a replacement job even if the old timer fires', () => {
+    vi.useFakeTimers();
+    let job: DownloadJob = { request, state: 'completed', progress: 100 };
+    const clear = vi.fn();
+    scheduleFinishedDownloadClear(job, () => job, clear);
+    vi.advanceTimersByTime(5000);
+    job = { request, state: 'running', progress: 0 };
+    vi.advanceTimersByTime(10000);
+    expect(clear).not.toHaveBeenCalled();
+  });
+  it('cancels its timeout on cleanup', () => {
+    vi.useFakeTimers();
+    const job: DownloadJob = { request, state: 'completed', progress: 100 };
+    const clear = vi.fn();
+    const cleanup = scheduleFinishedDownloadClear(job, () => job, clear);
+    cleanup();
+    vi.advanceTimersByTime(10000);
+    expect(clear).not.toHaveBeenCalled();
+  });
 });

@@ -3,10 +3,12 @@
 import sqlite3
 from contextlib import closing
 from pathlib import Path
+from typing import Any
 
 import pytest
 from app.persistence.market import (
     BrokerSchemaUnavailableError,
+    MarketDataStore,
     MarketSchemaUnavailableError,
     clear_datamgr_log,
     clear_market_symbol,
@@ -19,6 +21,93 @@ from app.persistence.market import (
     read_broker_profiles,
     read_datamgr_log,
 )
+
+
+def test_script_partition_preserves_values_and_revisions(tmp_path: Path) -> None:
+    """Different bar granularities and fractional volumes survive custody unchanged."""
+    import hashlib
+    from datetime import UTC, datetime
+
+    import pyarrow as pa  # type: ignore[import-untyped]
+
+    database = tmp_path / "isolated.db"
+    create_isolated_schema(database)
+    store = MarketDataStore(tmp_path, database)
+    identity: dict[str, Any] = {
+        "source": "Crypto",
+        "symbol": "BTCUSDT",
+        "underlying": "BTCUSDT",
+        "instrument": "BTCUSDT",
+        "timeframe": "H4",
+        "timezone": "UTC",
+        "broker": "-1",
+        "options": {"exchange": "binance", "adjusted": False},
+    }
+    first = store.register_source("plugin.crypto", **identity)
+    assert store.register_source("plugin.crypto", **identity) == first
+    second = store.register_source("plugin.other", **identity)
+    assert first != second
+    with pytest.raises(ValueError, match="unavailable"):
+        store.source_definition("plugin.other", first)
+    table = pa.table(
+        {
+            "DateTime": pa.array(
+                [datetime(2024, 1, 1, tzinfo=UTC)], type=pa.timestamp("ms", tz="UTC")
+            ),
+            "Open": [42000.123456789],
+            "High": [43000.0],
+            "Low": [41000.0],
+            "Close": [42500.0],
+            "Volume": [0.00000017],
+        }
+    )
+    record = store.publish_source("plugin.crypto", first, "2024", table)
+    assert store.read_source_partition(record).equals(table)
+    path = tmp_path / record["relative_path"]
+    old_bytes = path.read_bytes()
+    assert hashlib.sha256(old_bytes).hexdigest() == record["sha256"]
+    assert store.source_definition("plugin.crypto", first)["bars"] == 1
+    assert (
+        store.publish_source("plugin.crypto", first, "2024", table, expected_revision=1)
+        == record
+    )
+    with pytest.raises(ValueError, match="changed"):
+        store.publish_source("plugin.crypto", first, "2024", table)
+    changed = table.set_column(5, "Volume", pa.array([0.125]))
+    new = store.publish_source(
+        "plugin.crypto", first, "2024", changed, expected_revision=1
+    )
+    assert new["revision"] == 2
+    assert store.source_partitions(first) == (new,)
+    assert path.read_bytes() == old_bytes
+    assert store.read_source_partition(record).equals(table)
+    assert store.source_definition("plugin.crypto", first)["bars"] == 1
+    path.write_bytes(b"corrupt")
+    with pytest.raises(ValueError, match="digest mismatch"):
+        store.read_source_partition(record)
+
+
+def test_source_catalog_never_provisions_existing_database(tmp_path: Path) -> None:
+    database = tmp_path / "existing.db"
+    with closing(sqlite3.connect(database)) as connection:
+        connection.execute("CREATE TABLE unrelated (value TEXT)")
+    store = MarketDataStore(tmp_path, database)
+    before = database.read_bytes()
+    assert not store.source_available()
+    assert database.read_bytes() == before
+    with pytest.raises(MarketSchemaUnavailableError):
+        store.register_source(
+            "owner",
+            source="Yahoo",
+            symbol="AAPL",
+            underlying="AAPL",
+            instrument="AAPL",
+            timeframe="D1",
+            timezone="UTC",
+            broker="-1",
+            options={},
+        )
+    assert database.read_bytes() == before
 
 
 def test_market_schema_is_explicit_and_rejects_existing_store(tmp_path: Path) -> None:
@@ -100,6 +189,41 @@ def test_migrate_market_schema_creates_backup_and_tables(tmp_path: Path) -> None
         }.issubset(names)
     # Subsequent migration on already provisioned DB returns None
     assert migrate_market_schema(path) is None
+
+
+def test_explicit_source_migration_preserves_original_and_refuses_partial_schema(
+    tmp_path: Path,
+) -> None:
+    from app.persistence.market import MarketDataStore, migrate_source_schema
+
+    path = tmp_path / "catalog.db"
+    with closing(sqlite3.connect(path)) as connection, connection:
+        connection.execute("CREATE TABLE existing_resource (value TEXT)")
+        connection.execute("INSERT INTO existing_resource VALUES ('retained')")
+    migrate_market_schema(path)
+    backup = migrate_source_schema(path)
+    assert backup is not None
+    assert MarketDataStore(tmp_path, path).source_available()
+    assert migrate_source_schema(path) is None
+    with closing(sqlite3.connect(backup)) as connection:
+        assert (
+            connection.execute("SELECT value FROM existing_resource").fetchone()[0]
+            == "retained"
+        )
+        assert (
+            connection.execute(
+                "SELECT name FROM sqlite_master WHERE name='source_datasets'"
+            ).fetchone()
+            is None
+        )
+    with closing(sqlite3.connect(path)) as connection, connection:
+        assert (
+            connection.execute("SELECT value FROM existing_resource").fetchone()[0]
+            == "retained"
+        )
+        connection.execute("DROP TABLE source_partitions")
+    with pytest.raises(ValueError, match="incompatible"):
+        migrate_source_schema(path)
 
 
 def test_preseed_native_sqx_datasets(tmp_path: Path) -> None:

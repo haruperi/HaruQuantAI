@@ -5,10 +5,12 @@ import './actions.css';
 
 export function SaveDefinitionsDialog({
   selectedSymbols,
+  selectedDatasetIds,
   onClose,
   onComplete,
 }: {
   selectedSymbols: string[];
+  selectedDatasetIds?: string[];
   onClose: () => void;
   onComplete: (message: string) => void;
 }) {
@@ -22,7 +24,7 @@ export function SaveDefinitionsDialog({
     setError('');
     try {
       const symbolsToSave = scope === 'selected' && selectedSymbols.length ? selectedSymbols : undefined;
-      const res = await actionsClient.saveDefinitions({ symbols: symbolsToSave });
+      const res = await actionsClient.saveDefinitions({ symbols: symbolsToSave, dataset_ids: scope === 'selected' ? selectedDatasetIds : undefined });
       if (res.content) {
         downloadBlob(filename, res.content, 'application/json');
       }

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.sq_equity",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "headless",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.acquisition",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": "app/plugin/DataSource/sq_equity.py",
+  "owned_paths": {
+    "source": [
+      "app/plugin/DataSource/sq_equity.py"
+    ],
+    "tests": [
+      "tests/plugin/DataSource/test_sq_equity.py"
+    ],
+    "assets": [],
+    "examples": [
+      "tests/examples/data_manager/sq_equity_offline.py"
+    ],
+    "metadata": [
+      "app/plugin/DataSource/manifests/sq_equity/package.json",
+      "app/plugin/DataSource/manifests/sq_equity/README.md"
+    ]
+  }
+}

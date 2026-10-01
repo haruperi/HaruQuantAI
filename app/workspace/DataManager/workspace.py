@@ -12,7 +12,7 @@ Description:
       to internal action executors (`app.workspace.DataManager.actions`).
     - Acquisition plugin delegation: Subordinate acquisition plugins attaching
       to `data_source.acquisition` (such as Dukascopy acquisition) are dispatched
-      via `sources.dukascopy.*` routes.
+      via discovered `sources.<provider>.*` routes.
 
     Internal coordination:
     - PLUGIN: Manifest dictionary defining workspace ID, version, contract
@@ -36,7 +36,7 @@ Key Capabilities:
       * Verified via: logger.info("Preparing Data Manager workspace...")
     - FR-WORKSPACE-DATAMANAGER-DISPATCH: Dispatches operations to DataManager
       actions, inspects retained resources, and delegates acquisition requests
-      to attached plugins via invoke() and _invoke_action().
+      to attached plugins via explicit bindings and retained custody.
       * Verified via: logger.info("Data Manager invoking: %s")
     - FR-WORKSPACE-DATAMANAGER-RESOURCES: Reads and lists retained host-level
       quantitative resources via resources.list and resources.read operations
@@ -63,7 +63,7 @@ CLI Usage:
 from __future__ import annotations
 
 import base64
-from pathlib import Path
+from datetime import UTC, datetime
 from typing import Any, cast
 
 from pydantic import JsonValue
@@ -73,23 +73,10 @@ from app.host.logging import get_logger
 from app.host.packages import Binding, PreparedContribution
 from app.persistence.resources import ResourceRef
 from app.workspace.DataManager.actions import (
-    broker_data,
-    broker_data_update,
-    clone_to_timezone,
-    delete_datasets,
-    export_to_csv,
-    export_to_mt4,
-    export_to_mt5,
-    list_datasets,
-    load_definitions,
-    review_chart,
-    review_data,
-    review_quality,
-    save_data_changes,
-    save_definitions,
-    update_all,
-    update_selected,
+    inspect_source,
 )
+from app.workspace.DataManager.catalogs import broker_operation, catalog_operation
+from app.workspace.DataManager.operations import execute
 
 logger = get_logger(__name__)
 
@@ -99,7 +86,11 @@ PLUGIN = {
     "version": "1.0.0",
     "compatibility": "1",
     "route_base": "/api/v1/data-manager",
-    "requires": [{"id": "host.resources", "version": "1.0.0"}],
+    "requires": [
+        {"id": "host.resources", "version": "1.0.0"},
+        {"id": "host.market_data", "version": "1.0.0", "required": False},
+        {"id": "host.settings", "version": "1.0.0", "required": False},
+    ],
     "slots": [
         {"id": "data_source.presentation", "version": "1.0.0"},
         {"id": "data_source.acquisition", "version": "1.0.0"},
@@ -107,262 +98,7 @@ PLUGIN = {
 }
 
 
-def _resolve_paths() -> tuple[Path, Path]:
-    """Resolve database path and data root from working directory."""
-    root = Path.cwd()
-    return root / "data" / "database" / "haruquantai.db", root / "data"
-
-
-def _invoke_action(  # noqa: C901, PLR0911, PLR0912, PLR0915
-    operation: str,
-    payload_dict: dict[str, Any],
-    db_path: Path,
-    data_root: Path,
-) -> JsonValue:
-    """Execute Data Manager actions and return JSON-compatible values."""
-    logger.info("Executing Data Manager action: %s", operation)
-    target_db = Path(payload_dict["db_path"]) if "db_path" in payload_dict else db_path
-    target_data_root = (
-        Path(payload_dict["data_root"]) if "data_root" in payload_dict else data_root
-    )
-    if operation == "actions.broker_data":
-        query = payload_dict.get("query")
-        broker_id = payload_dict.get("broker_id")
-        return cast(
-            "JsonValue", broker_data(target_db, query=query, broker_id=broker_id)
-        )
-
-    if operation == "actions.broker_data_update":
-        profile_ids = payload_dict.get("profile_ids")
-        symbols = payload_dict.get("symbols")
-        return cast(
-            "JsonValue",
-            broker_data_update(target_db, profile_ids=profile_ids, symbols=symbols),
-        )
-
-    if operation == "actions.clone_to_timezone":
-        symbols = payload_dict.get("symbols", [])
-        shift_hours = int(payload_dict.get("shift_hours", 0))
-        timezone_name = str(payload_dict.get("timezone", "UTC"))
-        postfix = str(payload_dict.get("postfix", "_{timeframe}_{cloneTime}"))
-        remove_weekends = bool(payload_dict.get("remove_weekends", False))
-        return cast(
-            "JsonValue",
-            clone_to_timezone(
-                target_db,
-                target_data_root,
-                symbols,
-                shift_hours=shift_hours,
-                timezone_name=timezone_name,
-                postfix=postfix,
-                remove_weekends=remove_weekends,
-            ),
-        )
-
-    if operation == "actions.delete":
-        symbols = payload_dict.get("symbols", [])
-        mode = str(payload_dict.get("mode", "remove"))
-        return cast(
-            "JsonValue",
-            delete_datasets(target_db, target_data_root, symbols, mode=mode),
-        )
-
-    if operation == "actions.export_to_csv":
-        symbol = str(payload_dict.get("symbol", ""))
-        timeframe = str(payload_dict.get("timeframe", "M1"))
-        date_from = payload_dict.get("date_from")
-        date_to = payload_dict.get("date_to")
-        output_path = payload_dict.get("output_path")
-        target_timezone = payload_dict.get("target_timezone")
-        header = payload_dict.get("header")
-        include_header = bool(payload_dict.get("include_header", True))
-        return cast(
-            "JsonValue",
-            export_to_csv(
-                target_db,
-                target_data_root,
-                symbol,
-                timeframe=timeframe,
-                date_from=date_from,
-                date_to=date_to,
-                output_path=output_path,
-                target_timezone=target_timezone,
-                header=header,
-                include_header=include_header,
-            ),
-        )
-
-    if operation == "actions.export_to_mt4":
-        sq_symbol = str(payload_dict.get("sq_symbol", payload_dict.get("symbol", "")))
-        mt4_symbol = payload_dict.get("mt4_symbol")
-        output_dir = payload_dict.get("output_dir")
-        timeframe = str(payload_dict.get("timeframe", "All"))
-        export_mode = str(payload_dict.get("export_mode", "All"))
-        target_timezone = payload_dict.get("target_timezone")
-        server_name = str(payload_dict.get("server_name", "MetaQuotes-Demo"))
-        spread = int(payload_dict.get("spread", 20))
-        digits = int(payload_dict.get("digits", 5))
-        return cast(
-            "JsonValue",
-            export_to_mt4(
-                target_db,
-                target_data_root,
-                sq_symbol,
-                mt4_symbol=mt4_symbol,
-                output_dir=output_dir,
-                timeframe=timeframe,
-                export_mode=export_mode,
-                target_timezone=target_timezone,
-                server_name=server_name,
-                spread=spread,
-                digits=digits,
-            ),
-        )
-
-    if operation == "actions.export_to_mt5":
-        symbol = str(payload_dict.get("symbol", ""))
-        timeframe = str(payload_dict.get("timeframe", "M1"))
-        spread_mode = str(payload_dict.get("spread_mode", "real"))
-        spread_points = int(payload_dict.get("spread_points", 10))
-        date_from = payload_dict.get("date_from")
-        date_to = payload_dict.get("date_to")
-        output_path = payload_dict.get("output_path")
-        target_timezone = payload_dict.get("target_timezone")
-        return cast(
-            "JsonValue",
-            export_to_mt5(
-                target_db,
-                target_data_root,
-                symbol,
-                timeframe=timeframe,
-                spread_mode=spread_mode,
-                spread_points=spread_points,
-                date_from=date_from,
-                date_to=date_to,
-                output_path=output_path,
-                target_timezone=target_timezone,
-            ),
-        )
-
-    if operation == "actions.save":
-        symbols = payload_dict.get("symbols")
-        file_path = payload_dict.get("file_path")
-        return cast(
-            "JsonValue",
-            save_definitions(
-                target_db, target_data_root, symbols=symbols, file_path=file_path
-            ),
-        )
-
-    if operation == "actions.load":
-        file_path = str(payload_dict.get("file_path", ""))
-        return cast(
-            "JsonValue",
-            load_definitions(target_db, target_data_root, file_path=file_path),
-        )
-
-    if operation == "actions.review_data":
-        symbol = str(payload_dict.get("symbol", ""))
-        timeframe = str(payload_dict.get("timeframe", "M1"))
-        session = str(payload_dict.get("session", "Default"))
-        offset = int(payload_dict.get("offset", 0))
-        limit = int(payload_dict.get("limit", 100))
-        date_from = payload_dict.get("date_from")
-        date_to = payload_dict.get("date_to")
-        return cast(
-            "JsonValue",
-            review_data(
-                target_db,
-                target_data_root,
-                symbol,
-                timeframe=timeframe,
-                session=session,
-                offset=offset,
-                limit=limit,
-                date_from=date_from,
-                date_to=date_to,
-            ),
-        )
-
-    if operation == "actions.review_chart":
-        symbol = str(payload_dict.get("symbol", ""))
-        timeframe = str(payload_dict.get("timeframe", "M1"))
-        session = str(payload_dict.get("session", "Default"))
-        index_from = int(payload_dict.get("index_from", -1))
-        index_to = int(payload_dict.get("index_to", -1))
-        limit = int(payload_dict.get("limit", 500))
-        return cast(
-            "JsonValue",
-            review_chart(
-                target_db,
-                target_data_root,
-                symbol,
-                timeframe=timeframe,
-                session=session,
-                index_from=index_from,
-                index_to=index_to,
-                limit=limit,
-            ),
-        )
-
-    if operation == "actions.review_quality":
-        symbol = str(payload_dict.get("symbol", ""))
-        timeframe = str(payload_dict.get("timeframe", "M1"))
-        session = str(payload_dict.get("session", "Default"))
-        return cast(
-            "JsonValue",
-            review_quality(
-                target_db,
-                target_data_root,
-                symbol,
-                timeframe=timeframe,
-                session=session,
-            ),
-        )
-
-    if operation == "actions.save_data_changes":
-        symbol = str(payload_dict.get("symbol", ""))
-        timeframe = str(payload_dict.get("timeframe", "M1"))
-        session = str(payload_dict.get("session", "Default"))
-        changes = payload_dict.get("changes", {})
-        return cast(
-            "JsonValue",
-            save_data_changes(
-                target_db,
-                target_data_root,
-                symbol,
-                timeframe=timeframe,
-                session=session,
-                changes=changes,
-            ),
-        )
-
-    if operation == "actions.update_all":
-        provider = str(payload_dict.get("provider", "dukascopy"))
-        return cast(
-            "JsonValue",
-            update_all(target_db, target_data_root, provider=provider),
-        )
-
-    if operation == "actions.update_selected":
-        symbols = payload_dict.get("symbols", [])
-        provider = str(payload_dict.get("provider", "dukascopy"))
-        return cast(
-            "JsonValue",
-            update_selected(target_db, target_data_root, symbols, provider=provider),
-        )
-
-    if operation == "actions.list_datasets":
-        return cast(
-            "JsonValue",
-            list_datasets(target_db, target_data_root),
-        )
-
-    logger.warning("Unknown Data Manager action: %s", operation)
-    raise ValueError(f"Unknown workspace action: {operation}")
-
-
-async def prepare(  # noqa: C901
+async def prepare(  # noqa: C901, PLR0915 -- workspace lifecycle and bound operations.
     context: HostCapabilities,
 ) -> PreparedContribution:
     """Prepare a usable empty workspace with explicit host resource access."""
@@ -370,12 +106,7 @@ async def prepare(  # noqa: C901
     if resources is None:
         raise ValueError("Missing host.resources capability")
     bindings: tuple[Binding, ...] = ()
-    db_path, data_root = _resolve_paths()
-    logger.info(
-        "Preparing Data Manager workspace (db_path=%s, data_root=%s)",
-        db_path,
-        data_root,
-    )
+    logger.info("Preparing Data Manager workspace with injected custody")
 
     async def attach(children: tuple[Binding, ...]) -> None:
         """Retain immutable accepted child handles supplied only by the host."""
@@ -387,7 +118,124 @@ async def prepare(  # noqa: C901
             [binding.package_id for binding in children],
         )
 
-    async def invoke(operation: str, payload: JsonValue) -> JsonValue:
+    async def submit_updates(  # noqa: C901, PLR0912 -- report per-target admission failures.
+        operation: str, values: dict[str, JsonValue]
+    ) -> JsonValue:
+        """Submit actual attached acquisition jobs and report each rejected target."""
+        selected = values.get("dataset_ids", values.get("symbols", []))
+        if not isinstance(selected, list) or any(
+            not isinstance(item, str) for item in selected
+        ):
+            raise ValueError("Invalid update selection")
+        if operation == "actions.update_selected" and not selected:
+            raise ValueError("Choose datasets to update")
+        jobs: list[JsonValue] = []
+        errors: list[JsonValue] = []
+        requested_provider = values.get("provider")
+        admitted_providers = 0
+        matched: set[str] = set()
+        for binding in bindings:
+            provider = binding.package_id.rsplit(".", 1)[-1]
+            if binding.slot_id != "data_source.acquisition" or (
+                requested_provider and requested_provider != provider
+            ):
+                continue
+            if (
+                "catalog" not in binding.operations
+                or "download.start" not in binding.operations
+            ):
+                continue
+            admitted_providers += 1
+            try:
+                catalog = await binding.invoke("catalog", {})
+            except ValueError, TypeError, PermissionError:
+                errors.append({"reason": "Provider catalog unavailable: " + provider})
+                continue
+            rows = catalog.get("datasets") if isinstance(catalog, dict) else None
+            if not isinstance(rows, (list, tuple)):
+                errors.append({"reason": "Invalid acquisition catalog: " + provider})
+                continue
+            for row in rows:
+                if not isinstance(row, dict):
+                    raise TypeError("Invalid acquisition dataset")
+                dataset_id, symbol = row.get("id"), row.get("symbol")
+                if (
+                    operation == "actions.update_selected"
+                    and dataset_id not in selected
+                    and symbol not in selected
+                ):
+                    continue
+                matched.update(
+                    item for item in (dataset_id, symbol) if isinstance(item, str)
+                )
+                first = (
+                    values.get("date_from")
+                    or row.get("to")
+                    or row.get("date_to")
+                    or row.get("from")
+                    or row.get("date_from")
+                )
+                if not isinstance(first, str) or not first:
+                    errors.append(
+                        {
+                            "dataset_id": dataset_id,
+                            "reason": "Choose an initial download date range",
+                        }
+                    )
+                    continue
+                try:
+                    started = await binding.invoke(
+                        "download.start",
+                        {
+                            "dataset_id": dataset_id,
+                            "date_from": first[:10],
+                            "date_to": values.get("date_to")
+                            or datetime.now(UTC).date().isoformat(),
+                        },
+                    )
+                except ValueError, TypeError, PermissionError:
+                    errors.append(
+                        {
+                            "dataset_id": dataset_id,
+                            "reason": "Acquisition was not admitted",
+                        }
+                    )
+                    continue
+                if not isinstance(started, dict) or not isinstance(
+                    started.get("job_id"), str
+                ):
+                    raise TypeError("Acquisition did not return a host job")
+                jobs.append(
+                    {
+                        "dataset_id": dataset_id,
+                        "provider": provider,
+                        "job_id": started["job_id"],
+                    }
+                )
+        if not admitted_providers:
+            errors.append(
+                {"reason": "No compatible acquisition capability is available"}
+            )
+        if operation == "actions.update_selected":
+            errors.extend(
+                {
+                    "dataset_id": missing,
+                    "reason": "Dataset has no available acquisition capability",
+                }
+                for missing in sorted(set(cast("list[str]", selected)) - matched)
+            )
+        logger.info(
+            "Submitted dataset updates: jobs=%d rejected=%d", len(jobs), len(errors)
+        )
+        return {
+            "success": not errors,
+            "queued": len(jobs),
+            "queuedUpdates": len(jobs),
+            "jobs": jobs,
+            "errors": errors,
+        }
+
+    async def invoke(operation: str, payload: JsonValue) -> JsonValue:  # noqa: C901, PLR0911, PLR0912 -- one workspace operation boundary.
         """Inspect published resources or execute workspace actions."""
         logger.info("Data Manager invoking: %s", operation)
         if operation == "resources.list":
@@ -402,35 +250,101 @@ async def prepare(  # noqa: C901
         if operation == "capabilities":
             return {"providers": [binding.package_id for binding in bindings]}
 
+        if operation in ("catalogs.get", "catalogs.replace"):
+            if context.settings is None or context.market_data is None:
+                raise ValueError("Catalog custody unavailable")
+            return cast(
+                "JsonValue",
+                catalog_operation(
+                    context.settings,
+                    context.market_data,
+                    operation,
+                    payload if isinstance(payload, dict) else {},
+                ),
+            )
+
+        if operation in ("actions.broker_data", "actions.broker_data_update"):
+            if context.settings is None or context.market_data is None:
+                raise ValueError("Catalog custody unavailable")
+            return cast(
+                "JsonValue",
+                broker_operation(
+                    context.settings,
+                    context.market_data,
+                    operation,
+                    payload if isinstance(payload, dict) else {},
+                ),
+            )
+
+        if operation == "actions.list_datasets":
+            if context.market_data is None:
+                raise ValueError("Market inventory capability unavailable")
+            return cast(
+                "JsonValue",
+                [
+                    row
+                    for row in context.market_data.inventory()
+                    if row["source"] != "ExternalIndicator"
+                ],
+            )
+
+        if operation in ("actions.update_all", "actions.update_selected"):
+            if not isinstance(payload, dict):
+                raise ValueError("Invalid update request")
+            return await submit_updates(operation, payload)
+
+        if (
+            operation
+            in ("actions.review_data", "actions.review_chart", "actions.review_quality")
+            and isinstance(payload, dict)
+            and payload.get("dataset_id")
+        ):
+            if context.market_data is None:
+                raise ValueError("Market inspection capability unavailable")
+            return cast(
+                "JsonValue", inspect_source(context.market_data, operation, payload)
+            )
+
         # --- Data Manager Actions Parity ---
         if operation.startswith("actions."):
             payload_dict: dict[str, Any] = payload if isinstance(payload, dict) else {}
-            return _invoke_action(operation, payload_dict, db_path, data_root)
+            if context.market_data is None:
+                raise ValueError("Market management capability unavailable")
+            return cast(
+                "JsonValue",
+                execute(context.market_data, operation, payload_dict, context.settings),
+            )
 
-        # --- Dukascopy Acquisition Delegation ---
-        if operation.startswith("sources.dukascopy."):
+        if operation.startswith("sources."):
+            route = operation.removeprefix("sources.")
+            provider, separator, action = route.partition(".")
             acquisition = next(
                 (
                     binding
                     for binding in bindings
                     if binding.slot_id == "data_source.acquisition"
-                    and binding.package_id == "plugin.data_manager.dukascopy"
+                    and binding.package_id.rsplit(".", 1)[-1] == provider
                 ),
                 None,
             )
-            if acquisition is None:
-                logger.warning(
-                    "Dukascopy acquisition unavailable for operation: %s", operation
-                )
-                raise ValueError("Dukascopy acquisition unavailable")
-            action = operation.removeprefix("sources.dukascopy.")
+            if not separator or acquisition is None:
+                logger.warning("Acquisition unavailable: %s", operation)
+                raise ValueError("Missing acquisition capability")
             if action not in acquisition.operations:
-                logger.warning("Missing Dukascopy acquisition operation: %s", action)
                 raise ValueError("Missing acquisition operation")
             return await acquisition.invoke(action, payload)
 
         logger.warning("Missing capability for operation: %s", operation)
         raise ValueError("Missing acquisition capability")
+
+    def attached_operations() -> tuple[str, ...]:
+        """Expose only operations contributed by accepted acquisition bindings."""
+        return tuple(
+            f"sources.{binding.package_id.rsplit('.', 1)[-1]}.{operation}"
+            for binding in bindings
+            if binding.slot_id == "data_source.acquisition"
+            for operation in binding.operations
+        )
 
     async def close() -> None:
         """Release local attachment handles; host retains published resources."""
@@ -443,6 +357,8 @@ async def prepare(  # noqa: C901
             "resources.list",
             "resources.read",
             "capabilities",
+            "catalogs.get",
+            "catalogs.replace",
             "actions.broker_data",
             "actions.broker_data_update",
             "actions.clone_to_timezone",
@@ -459,17 +375,10 @@ async def prepare(  # noqa: C901
             "actions.update_all",
             "actions.update_selected",
             "actions.list_datasets",
-            "sources.dukascopy.catalog",
-            "sources.dukascopy.add",
-            "sources.dukascopy.definitions.add",
-            "sources.dukascopy.download.start",
-            "sources.dukascopy.download.status",
-            "sources.dukascopy.download.cancel",
-            "sources.dukascopy.files.list",
-            "sources.dukascopy.delete",
-            "sources.dukascopy.clear",
         ),
         invoke,
         close,
         attach,
+        attached_operations,
+        invocation_seconds=120,
     )

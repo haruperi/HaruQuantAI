@@ -5,7 +5,7 @@ import { DukascopyAddDialog } from './add';
 import { DukascopyDownloadDialog } from './import';
 import { DukascopyDisclaimerDialog } from './disclaimer';
 import { useDukascopyDownloads } from './dukascopyStore';
-import { eligibleTargets } from './dukascopyDownload';
+import { eligibleTargets, scheduleFinishedDownloadClear } from './dukascopyDownload';
 
 export interface BrokerProfile {
   id: string;
@@ -31,6 +31,11 @@ export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
     const timer = window.setInterval(() => { void useDukascopyDownloads.getState().poll(); }, 1000);
     return () => window.clearInterval(timer);
   }, [state.job?.state]);
+  useEffect(() => scheduleFinishedDownloadClear(
+    state.job,
+    () => useDukascopyDownloads.getState().job,
+    () => useDukascopyDownloads.setState({ job: null }),
+  ), [state.job]);
   useEffect(() => {
     const active = state.job?.state === 'running' || state.job?.state === 'paused';
     onSync('dukascopy', {
@@ -62,9 +67,11 @@ export function Dialogs({ dialog, contextDocument, selectedDatasetIds, toolRows,
     });
   }
   if (dialog?.id === 'dukascopy-download') {
-    const selected = (toolRows ?? []).filter((row: any) => selectedDatasetIds.includes(row.id));
-    const eligible = eligibleTargets(selected, state.job);
-    return createElement(DukascopyDownloadDialog, { targets: eligible, onClose, onStarted: () => onStarted('download', 'Dukascopy download submitted') });
+    const selected = (toolRows ?? []).filter((row: any) => selectedDatasetIds.includes(row.id) && row.source === 'Dukascopy' && !row.sourceDataId);
+    if (!selected.length) return null;
+    // Starting the open dialog's job must not invalidate its in-flight render.
+    // Selection and submission retain the duplicate-operation checks.
+    return createElement(DukascopyDownloadDialog, { targets: selected, onClose, onStarted: () => onStarted(pluginId, 'Dukascopy download submitted') });
   }
   if (dialog?.id === 'dukascopy-information' || dialog?.id === 'dukascopy-disclaimer') {
     return createElement(DukascopyDisclaimerDialog, { open: true, onClose });

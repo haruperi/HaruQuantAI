@@ -169,6 +169,19 @@ These requirements apply to every relevant workspace and plugin:
 - **Safety and Authority:** Live trading and irreversible external mutations are disabled by default and require distinct authorization and qualification. AI assistance or backtest results confer no execution or risk approval.
 - **FR-DATA-001:** Data Manager shall expose explicit Dukascopy Tick and M1 acquisition with source provenance, bounded jobs, verified UTC market-file revisions, honest coverage, and unavailable states when storage or provider authority has not been qualified. Higher timeframes derive from M1 at read time; canonical history uses the approved Parquet schemas.
 
+- **FR-DATA-002:** Data Manager shall inspect, export, edit, clone and transfer
+  actual retained source data and definitions through host custody, using exact
+  dataset identities and explicit revision checks. UI completion reflects durable
+  publication; missing or unsupported operations fail explicitly.
+- **FR-DATA-003:** Data Manager shall discover independently removable provider
+  plugins through versioned capability slots. Removing an acquisition producer
+  preserves host-owned resources and unrelated operations.
+- **FR-DATA-SCRIPT-INTEGRATION:** The approved integration shall preserve the
+  owner-written Dukascopy, Yahoo, Crypto, File Import, MT5, Tick Downloader,
+  Darwinex, SQ Equity and SQ Futures source semantics. External Indicators and
+  Data Manager catalogs shall use actual durable backend values. No mock data or
+  independent SQX parity claim substitutes for qualification.
+
 ---
 
 ## 5. System State and Persistence Ownership

@@ -9,7 +9,7 @@ export function CryptoDownloadDialog({ contextDocument, targets, onClose, onStar
   const store = useCrypto(), minimum = cryptoStart(targets[0]), last = targets[0].to || minimum;
   const [from, setFrom] = useState(last), [to, setTo] = useState(today()), [preset, setPreset] = useState<Preset>('sinceLast'), [overwrite, setOverwrite] = useState(false), [error, setError] = useState('');
   function choose(value: Preset) { const range = presetRange(value, last, minimum, from, to); setFrom(range.from); setTo(range.to); setPreset(value); setError(''); }
-  function start() { try { store.startDownload({ targets, dateFrom: from, dateTo: to, dateType: preset, overwrite }, cryptoContext(contextDocument).active); onStarted(); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to start Crypto download.'); } }
+  async function start() { try { await store.startDownload({ targets, dateFrom: from, dateTo: to, dateType: preset, overwrite }, cryptoContext(contextDocument).active); onStarted(); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to start Crypto download.'); } }
   const presetButton = (value: Preset, label: string) => <Button aria-pressed={preset === value} className={preset === value ? 'primary' : ''} onClick={() => choose(value)}>{label}</Button>;
   return <CryptoModal title={`Download crypto data for ${targets.length > 1 ? 'multiple' : `'${targets[0].symbol}'`}`} onClose={onClose} footer={<><Button onClick={onClose}>Close</Button><Button className="primary" onClick={start}>Start download</Button></>}>
     {(error || store.storageError) && <p role="alert" className="crypto-error">{error || store.storageError}</p>}

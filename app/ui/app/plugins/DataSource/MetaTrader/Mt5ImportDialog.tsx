@@ -1,8 +1,8 @@
-import { useEffect, useRef, useState, type InputHTMLAttributes } from 'react';
+import { useState } from 'react';
 import { Button, Modal, TextInput } from '../../../components/ui';
 import { useAppStore } from './localState';
-import { discoverMt5Folder, filterMt5Symbols, mt5Definitions, mt5Preset, mt5Symbols, type Mt5Folder } from './mt5Import';
-import { mt5Active, reservedMt5, useMt5Import } from './mt5ImportStore';
+import { filterMt5Symbols, mt5Definitions, mt5Preset } from './mt5Import';
+import { useMt5Import } from './mt5ImportStore';
 import { today, type Preset, type BrokerProfile } from './presentation';
 import './mt5Import.css';
 
@@ -30,10 +30,8 @@ export function Mt5ImportDialog({
 }) {
   const store = useMt5Import();
   const notify = useAppStore(state => state.notify);
-  const picker = useRef<HTMLInputElement>(null);
-  const timer = useRef<number | null>(null);
   const initialDate = initialFrom();
-  const [folder, setFolder] = useState<Mt5Folder | null>(null);
+  const [folder, setFolder] = useState(store.folder);
   const [fetched, setFetched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
@@ -45,36 +43,39 @@ export function Mt5ImportDialog({
   const [broker, setBroker] = useState('-1');
   const [postfix, setPostfix] = useState(store.postfix);
   const [error, setError] = useState('');
-  useEffect(() => () => { if (timer.current !== null) window.clearTimeout(timer.current); }, []);
 
+  const availableBrokers = (contextDocument?.brokers && contextDocument.brokers.length > 0)
+    ? contextDocument.brokers
+    : store.brokers;
   const brokers = [{ id: '-1', name: 'Default', postfix: '', timezone: 'UTC', mtUse: true, instruments: [] },
-    ...(contextDocument?.brokers?.filter(item => item.mtUse) ?? [])];
-  const visible = fetched ? filterMt5Symbols(query, category) : [];
-  const categories = [...new Set(mt5Symbols.map(row => row.path))];
+    ...availableBrokers];
+  const visible = fetched ? filterMt5Symbols(query, category, store.symbols) : [];
+  const categories = [...new Set(store.symbols.map(row => row.path))];
   const allVisible = visible.length > 0 && visible.every(row => selected.includes(row.name));
   const grouped = [...new Set(visible.map(row => row.path))].map(path => ({ path, rows: visible.filter(row => row.path === path) }));
 
   function clearResults(): void { setFetched(false); setLoading(false); setQuery(''); setCategory(''); setSelected([]); }
-  function fetchSymbols(): void {
-    if (!folder) { setError('Select an MT5 installation folder before fetching symbols.'); return; }
+  async function fetchSymbols(): Promise<void> {
     setError(''); setLoading(true); setFetched(false); setSelected([]);
-    timer.current = window.setTimeout(() => { setLoading(false); setFetched(true); timer.current = null; }, 180);
+    try { await store.connect(folder); setFetched(true); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to connect to the terminal.'); }
+    finally { setLoading(false); }
   }
   function choose(value: Preset): void {
     const range = value === 'sinceLast' ? { from: initialDate, to } : mt5Preset(value, from, to);
     setFrom(range.from); setTo(range.to); setPreset(value); setError('');
   }
-  function start(): void {
+  async function start(): Promise<void> {
     try {
-      if (!folder || !fetched) throw new Error('Select an MT5 installation folder and fetch its symbols.');
+      if (!fetched) throw new Error('Select an MT5 installation folder and fetch its symbols.');
       const profile = brokers.find(item => item.id === broker);
       if (!profile) throw new Error('Choose a valid broker profile.');
-      const request = { folder: folder.folder, symbols: selected, dateFrom: from, dateTo: to, dateType: preset,
+      const request = { folder, symbols: selected, dateFrom: from, dateTo: to, dateType: preset,
         broker: profile.id, brokerName: profile.name, timezone: profile.timezone, postfix };
       if (contextDocument?.error) throw new Error(contextDocument.error);
       const existing = contextDocument?.existing ? [...contextDocument.existing] : [];
       const active = contextDocument?.active ?? false;
-      store.start(request, mt5Definitions(request, existing), active);
+      await store.start(request, mt5Definitions(request, existing, store.symbols), active);
       onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to start MT5 import.'); }
   }
@@ -88,15 +89,7 @@ export function Mt5ImportDialog({
   }}><Modal title="Import data from MT5" width={730} onClose={onClose} footer={<><Button onClick={onClose}>Close</Button><Button className="primary" disabled={loading} onClick={start}>Start import</Button></>}>
     {(error || store.storageError) && <p className="mt5-error" role="alert">{error || store.storageError}</p>}
     <fieldset className="mt5-main">
-      <div className="mt5-folder-row"><label htmlFor="mt5-folder">MT5 install folder</label><TextInput id="mt5-folder" readOnly value={folder?.folder ?? store.folder}/><button className="mt5-link" onClick={() => picker.current?.click()}>Select</button>
-        <input ref={picker} hidden type="file" aria-label="Select MT5 installation folder" {...({ webkitdirectory: '', directory: '' } as InputHTMLAttributes<HTMLInputElement>)} onChange={event => {
-          if (!event.target.files?.length) return;
-          try { const next = discoverMt5Folder(Array.from(event.target.files, file => file.webkitRelativePath)); setFolder(next); clearResults(); setError(''); }
-          catch (cause) { setFolder(null); clearResults(); setError(cause instanceof Error ? cause.message : 'Unable to select MT5 folder.'); }
-          event.target.value = '';
-        }}/>
-      </div>
-      {!folder && store.folder && <small className="mt5-reselect">Select the folder again to fetch its available symbols.</small>}
+      <div className="mt5-folder-row"><label htmlFor="mt5-folder">MT5 terminal</label><TextInput id="mt5-folder" placeholder="Auto-detect, or enter the terminal executable path" value={folder} onChange={event => { setFolder(event.target.value); clearResults(); }}/><button className="mt5-link" onClick={() => { setFolder(''); clearResults(); }}>Auto-detect</button></div>
       <div className="mt5-filter-row"><Button className="primary" disabled={loading} onClick={fetchSymbols}>{loading ? 'Fetching…' : 'Fetch symbols'}</Button><TextInput aria-label="Filter items" placeholder="Filter items" value={query} disabled={!fetched} onChange={event => { setQuery(event.target.value); setSelected([]); }}/><label>Show types <select aria-label="Show types" disabled={!fetched} value={category} onChange={event => { setCategory(event.target.value); setSelected([]); }}><option value="">All</option>{categories.map(path => <option key={path}>{path}</option>)}</select></label></div>
 
       <label className="mt5-range-label">Download range</label>
@@ -111,7 +104,7 @@ export function Mt5ImportDialog({
       </tbody></table></div>
 
       <div className="mt5-details"><label>Broker profile * <select aria-label="Broker profile" value={broker} onChange={event => { const profile = brokers.find(item => item.id === event.target.value); setBroker(event.target.value); setPostfix(profile?.postfix ?? ''); setError(''); }}>{brokers.map(item => <option value={item.id} key={item.id}>{item.name}</option>)}</select></label><label>Data postfix <span><TextInput aria-label="Data postfix" maxLength={64} value={postfix} onChange={event => { setPostfix(event.target.value); setError(''); }}/><small>This postfix will be added to the data names</small></span></label></div>
-      <p className="mt5-mock-note">Offline mock terminal discovery. File contents are not read and MetaTrader is not started.</p>
+      <p className="mt5-mock-note">Symbols and history are read from your connected MetaTrader 5 terminal.</p>
     </fieldset>
   </Modal></div>;
 }

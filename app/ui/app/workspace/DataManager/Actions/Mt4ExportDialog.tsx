@@ -1,6 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import { Button, Field, Modal, Select, TextInput } from '../../../components/ui';
-import { actionsClient } from './actionsClient';
+import { actionsClient, downloadBinaryBlob } from './actionsClient';
 import './actions.css';
 
 export interface Mt4ExportTarget {
@@ -37,6 +37,7 @@ export function Mt4ExportDialog({
     setError('');
     try {
       const res = await actionsClient.exportToMt4({
+        dataset_id: target.id,
         symbol: target.symbol,
         mt4_symbol: mt4Symbol || undefined,
         date_from: dateFrom || undefined,
@@ -48,6 +49,7 @@ export function Mt4ExportDialog({
         digits,
         target_timezone: timezone !== 'Original' ? timezone : undefined,
       });
+      if (res.archive_base64) downloadBinaryBlob(`${res.symbol}_MT4.zip`, res.archive_base64);
       onComplete(`Successfully generated ${res.files.length} MT4 file(s) for ${res.symbol}.`);
       onClose();
     } catch (exc: any) {

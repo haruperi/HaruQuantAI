@@ -398,3 +398,51 @@ uv run python -m app.cli --url http://127.0.0.1:8000 --page=login --json
 | **Telemetry & Redaction** | Rotating JSON log, secret filtering, early buffering | `uv run pytest tests/host/test_telemetry.py` |
 | **Resource Custody** | Shared artifact storage, digest verification | `uv run pytest tests/host/test_resource_store.py` |
 | **Full Host CI Suite** | Complete host test suite with coverage | `uv run pytest tests/host/ tests/persistence/` |
+
+
+## Data Manager integration candidate (2026-09-30)
+
+The approved script integration adds candidate extensions to `FEAT-HOST-JOBS`,
+`FEAT-HOST-NETWORK`, host composition and market custody. This is not full release
+qualification. Shared operational schema activation is not performed.
+
+- `JobAccess.close()` cancels and awaits only its owner's jobs. Terminal job states
+  release capacity before another job can observe completion; cleanup is idempotent.
+- `NetworkAccess.source_session(origins)` supplies a private cookie session with
+  declared HTTPS origins, checked redirects, finite timeouts and bounded responses.
+  Provider modules own retry algorithms. Query strings are redacted from HTTP logs.
+- Prepared workspaces publish operations after child attachment; the host freezes
+  their combined operation catalog and rejects duplicate routes.
+- Source custody registers owner-scoped immutable identities and opaque options,
+  publishes versioned SHA-256 Parquet bytes, checks optimistic revisions, and reads
+  retained resources independently of their producer. Source schemas are created
+  only for explicitly isolated stores in this candidate. Publication stages and
+  flushes bytes before exposing a final content-addressed path.
+- Legacy market interval replacement accepts exact received intervals, retaining
+  rows outside them and leaving unavailable chunks eligible for acquisition.
+
+Focused evidence lives in the affected host/persistence tests and
+`.agents/logs/20260930_datamanager_script_integration/`. Candidate CI and frontend
+checks passed. Isolated cohort removal/rebuilds and fresh independent retained
+reads passed; complete browser and final source-bound release qualification remain
+outstanding. An explicit backup-first source-schema migration function is tested
+against temporary legacy databases; it has not been invoked on the shared database.
+
+### Data Manager integration additions (candidate)
+
+`host.terminal` binds a historical-only subprocess API (`connect`, `symbols`,
+`symbol`, `history`) with a 90-second call deadline. Cancellation/failure kills
+and reaps its worker; no order API is exposed. The optional `mt5` dependency extra
+pins the locally verified MetaTrader5 library version. No terminal opens at import
+or package discovery. A bounded real connection, catalog and historical-bar read
+passed; this does not establish every account, instrument or terminal configuration.
+
+Prepared contributions may request `invocation_seconds` within (0,120]; the
+existing default and activation deadline remain five seconds. Data Manager uses
+120 seconds for connection/catalog requests; bulk work stays in host jobs.
+
+Source sessions support scoped streamed ZIP archives: up to 4 GiB compressed,
+128 MiB per expanded member and 100,000 members. Temporary spooling is host-owned,
+closed on exit/cancellation, and never extracts member paths. Composition shutdown
+also closes residual network sessions. These are candidate contracts awaiting
+complete cohort qualification; focused tests cover disposal and origin bounds.

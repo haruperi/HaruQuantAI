@@ -35,10 +35,12 @@ export function formatDeleteCompletion(
 
 export function MassDeleteDialog({
   selectedSymbols,
+  selectedDatasetIds,
   onClose,
   onComplete,
 }: {
   selectedSymbols: string[];
+  selectedDatasetIds?: string[];
   onClose: () => void;
   onComplete: (message: string) => void;
 }) {
@@ -54,6 +56,7 @@ export function MassDeleteDialog({
     try {
       const res = await actionsClient.deleteDatasets({
         symbols: selectedSymbols,
+        dataset_ids: selectedDatasetIds,
         mode,
       });
       onComplete(formatDeleteCompletion(res, mode));

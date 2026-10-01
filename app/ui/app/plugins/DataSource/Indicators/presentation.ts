@@ -1,5 +1,5 @@
 /** Owner-local presentation/resource documents; no backend execution authority. */
-import { createElement, useEffect } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { ExternalIndicatorEditorDialog } from './ExternalIndicatorEditorDialog';
 import { ExternalIndicatorImportDialog } from './ExternalIndicatorImportDialog';
 import { ExternalIndicatorRecognizeDialog } from './ExternalIndicatorRecognizeDialog';
@@ -50,16 +50,21 @@ export const pluginName = 'External Indicators';
 
 export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
   const state = useExternalIndicators();
+  const [legacy, setLegacy] = useState(() => Boolean(localStorage.getItem('haru-external-indicators-v1')));
+  const [transferError, setTransferError] = useState('');
+  useEffect(() => { void useExternalIndicators.getState().refresh(); }, []);
   useEffect(() => {
     const active = externalJobActive(state.job?.state);
     onSync('indicators', {
+      backendAvailable: state.backendAvailable,
       definitions: state.definitions,
       job: state.job,
       storageError: state.storageError,
       active,
     });
   }, [state, onSync]);
-  return null;
+  if (!legacy) return null;
+  return createElement('div', { role: 'status' }, 'Saved browser indicators are preserved. ', createElement('button', { disabled: !state.backendAvailable || externalJobActive(state.job?.state), onClick: () => { void state.importLegacy().then(() => setLegacy(false)).catch(cause => setTransferError(cause instanceof Error ? cause.message : 'Indicator transfer failed.')); } }, 'Import saved indicators into backend'), transferError ? createElement('p', { role: 'alert' }, transferError) : null);
 }
 
 export function Dialogs({ externalDialog, otherProviderActive, onClose, onStarted, onNotify, onSaved }: any) {

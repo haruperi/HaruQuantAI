@@ -1,68 +1,86 @@
-import { normalizeLegacyBranding } from '../../../host/branding';
-import { validateName } from './presentation';
 import { create } from 'zustand';
-import { builtInFormats, limits, timezones, validateFormat, type ImportFormat, type ImportJob, type ImportRecord, type ImportTask } from './fileImport';
-interface Saved { formats: ImportFormat[]; records: ImportRecord[]; groups: { name: string; symbols: string[] }[]; timezone: string; job: ImportJob | null }
-interface Store extends Saved { storageError: string; saveFormat: (format: ImportFormat, replace?: boolean) => void; deleteFormat: (name: string) => void; start: (tasks: ImportTask[], timezone: string, group: string, skipped: number, externalActive: boolean) => void; advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void }
-const key = 'sqx-file-import-v1';
-export const activeImport = (state: string | undefined) => state === 'running' || state === 'paused';
-function validateSaved(value: Saved) {
-  if (!Array.isArray(value.formats) || value.formats.length > 100 || !Array.isArray(value.records) || value.records.length > 10000 || !Array.isArray(value.groups) || value.groups.length > 1000 || !timezones.some(([id]) => id === value.timezone)) throw new Error('Invalid saved imports.');
-  value.formats.forEach(format => { validateFormat(format); if (!format.name || format.name.length > 80 || format.predefined || ['Custom', ...builtInFormats.map(f => f.name)].includes(format.name)) throw new Error('Invalid saved format.'); });
-  if (new Set(value.formats.map(f => f.name)).size !== value.formats.length || new Set(value.records.map(r => r.id)).size !== value.records.length) throw new Error('Duplicate saved entries.');
-  const records = [...value.records, ...(value.job?.tasks?.map(task => task.record) ?? [])];
-  let count = 0;
-  for (const record of records) {
-    if (!record || record.source !== 'File import' || ['id', 'symbol', 'instrument', 'underlying', 'timeframe', 'broker', 'brokerName', 'timezone', 'category', 'from', 'to'].some(field => typeof (record as unknown as Record<string, unknown>)[field] !== 'string') || !['start', 'end'].includes(record.barType) || !Array.isArray(record.timestamps) || record.timestamps.length > limits.timestamps || !Number.isInteger(record.unknownBars) || record.unknownBars < 0 || record.bars !== record.timestamps.length + record.unknownBars || record.timestamps.some((stamp, i) => !Number.isFinite(stamp) || !Number.isFinite(new Date(stamp).getTime()) || (i > 0 && stamp <= record.timestamps[i - 1]))) throw new Error('Invalid saved records.');
-    validateName(record.symbol, []);
-    if (record.id !== `file:${record.symbol}` && !record.id.startsWith('dataset-')) throw new Error('Invalid imported record identity.');
-    if ((record.from || record.to) && (!/^\d{4}-\d{2}-\d{2}$/.test(record.from) || !/^\d{4}-\d{2}-\d{2}$/.test(record.to) || record.from > record.to)) throw new Error('Invalid imported range.');
-    count += record.timestamps.length;
-  }
-  if (count > limits.timestamps * 2) throw new Error('Saved timestamp limit exceeded.');
-  for (const group of value.groups) if (!group || typeof group.name !== 'string' || !group.name || group.name.length > 300 || !Array.isArray(group.symbols) || group.symbols.length > 10000 || group.symbols.some(symbol => typeof symbol !== 'string')) throw new Error('Invalid saved group.');
-  if (value.job && (!Array.isArray(value.job.tasks) || value.job.tasks.length > limits.files || !['running', 'paused', 'completed', 'failed', 'cancelled'].includes(value.job.state) || !Number.isInteger(value.job.progress) || value.job.progress < 0 || value.job.progress > 100 || !Number.isInteger(value.job.completed) || value.job.completed < 0 || value.job.completed > value.job.tasks.length || typeof value.job.group !== 'string' || value.job.group.length > 300 || !Number.isInteger(value.job.skipped) || value.job.skipped < 0 || value.job.tasks.some(task => typeof task.filename !== 'string' || task.filename.length > 300 || !Number.isInteger(task.ignored) || task.ignored < 0 || (task.error !== undefined && typeof task.error !== 'string')) || new Set(value.job.tasks.map(task => task.record.id)).size !== value.job.tasks.length)) throw new Error('Invalid saved job.');
+import { fileCatalog, fileStart, fileStatus, fileCancel, fileSaveFormat, fileDeleteFormat, filePublishGroup, formatFromBackend } from './backend';
+import type { ImportFormat, ImportJob, ImportRecord, ImportTask } from './fileImport';
+interface Store {
+  predefinedFormats: ImportFormat[]; formats: ImportFormat[]; records: ImportRecord[]; groups: { name: string; symbols: string[] }[];
+  timezone: string; job: ImportJob | null; storageError: string; backendAvailable: boolean;
+  refresh: () => Promise<void>; poll: () => Promise<void>;
+  saveFormat: (format: ImportFormat, replace?: boolean) => Promise<void>; deleteFormat: (name: string) => Promise<void>;
+  start: (tasks: ImportTask[], timezone: string, group: string, skipped: number, external: boolean) => Promise<void>;
+  advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void;
 }
+export const activeImport = (state?: string) => state === 'running';
+const message = (cause: unknown) => cause instanceof Error ? cause.message : 'File import failed.';
 export const useFileImports = create<Store>((set, get) => {
-  let initial: Saved = { formats: [], records: [], groups: [], timezone: 'EETUS', job: null }; let storageError = '';
-  try { const raw = localStorage.getItem(key); if (raw) { const value = normalizeLegacyBranding(JSON.parse(raw)); if (value.version !== 1) throw new Error('Version'); validateSaved(value); initial = value; if (initial.job?.state === 'running') initial.job.state = 'paused'; } }
-  catch { storageError = 'Saved file imports could not be read. Existing storage is preserved.'; }
-  function persist(patch: Partial<Saved>) {
-    if (get().storageError) throw new Error(get().storageError);
-    const { formats, records, groups, timezone, job } = { ...get(), ...patch };
-    const saved = { formats, records, groups, timezone, job }; validateSaved(saved);
-    try { localStorage.setItem(key, JSON.stringify({ version: 1, ...saved })); }
-    catch { throw new Error('Unable to save file import in browser storage. No changes were applied.'); }
-    set(patch);
+  let polling = false; let stopping = false;
+  async function next(job: ImportJob) {
+    const request = job.tasks[job.completed].request;
+    if (!request) throw new Error('Choose file contents for backend import.');
+    const started = await fileStart(request);
+    set({ job: { ...job, jobId: started.job_id } });
+    if (stopping) await fileCancel(started.job_id);
   }
-  function fail(cause: unknown) { const job = get().job; if (job) set({ job: { ...job, state: 'failed', error: cause instanceof Error ? cause.message : 'Unable to persist import.' } }); }
-  return { ...initial, storageError,
-    saveFormat: (format, replace = false) => {
-      validateFormat(format); const name = format.name.trim();
-      if (!name || name.length > 80 || ['Custom', ...builtInFormats.map(row => row.name)].includes(name)) throw new Error('Enter a unique custom format name (1–80 characters).');
-      if (!replace && get().formats.some(row => row.name === name)) throw new Error('A format with this name already exists.');
-      const formats = get().formats.filter(row => row.name !== name);
-      persist({ formats: [...formats, { ...format, name, predefined: false }] });
+  return {
+    predefinedFormats: [], formats: [], records: [], groups: [], timezone: 'Etc/UCT', job: null, storageError: '', backendAvailable: false,
+    refresh: async () => {
+      try {
+        const catalog = await fileCatalog();
+        if (!catalog.available) { set({ backendAvailable: false, storageError: catalog.reason }); return; }
+        set({ backendAvailable: true, storageError: '', predefinedFormats: catalog.formats.map(formatFromBackend), formats: catalog.custom_formats.map(formatFromBackend), records: catalog.datasets.map(row => ({
+          ...row, source: 'File import', connection: 'History', broker: '-1', brokerName: '—', category: '—',
+          from: row.date_from.slice(0, 10), to: row.date_to.slice(0, 10), barType: 'start', timestamps: [], unknownBars: row.bars,
+        })) });
+      } catch (cause) { set({ backendAvailable: false, storageError: message(cause) }); }
     },
-    deleteFormat: name => persist({ formats: get().formats.filter(row => row.name !== name) }),
-    start: (tasks, timezone, group, skipped, externalActive) => {
-      if (externalActive || activeImport(get().job?.state)) throw new Error('Finish or stop the active data operation first.');
-      if (!tasks.length) throw new Error(skipped ? `All ${skipped} files were skipped. No import started.` : 'Choose data to import.');
-      const planned = new Map(get().records.map(row => [row.id, row])); tasks.forEach(task => planned.set(task.record.id, task.record));
-      if ([...planned.values()].reduce((n, row) => n + row.timestamps.length, 0) > limits.timestamps) throw new Error('Browser mock limit: 200,000 tracked timestamps. Import a smaller selection.');
-      let name = group; let n = 2; while (name && get().groups.some(row => row.name === name)) name = `${group} ${n++}`;
-      persist({ timezone, job: { tasks, state: 'running', progress: 0, completed: 0, skipped, group: name } });
+    saveFormat: async (format, replace = false) => { await fileSaveFormat(format, replace); await get().refresh(); },
+    deleteFormat: async name => { await fileDeleteFormat(name); await get().refresh(); },
+    start: async (tasks, timezone, group, skipped, external) => {
+      if (!get().backendAvailable) throw new Error(get().storageError || 'File import backend is unavailable.');
+      if (external || activeImport(get().job?.state)) throw new Error('Finish or stop the active data operation first.');
+      if (!tasks.length) throw new Error('Choose data to import.');
+      if (tasks.some(task => task.record.barType === 'end')) throw new Error('The source parser preserves start-of-bar timestamps. End-of-bar conversion is unavailable.');
+      if (!['UTC', 'Etc/UCT'].includes(timezone)) throw new Error('The source parser interprets timestamps as UTC. Choose UTC for this import.');
+      stopping = false;
+      const job: ImportJob = { tasks, state: 'running', progress: 0, completed: 0, skipped, group, canPause: false };
+      set({ job, timezone });
+      try { await next(job); }
+      catch (cause) { set({ job: { ...job, state: 'failed', error: message(cause) } }); throw cause; }
     },
-    advance: () => {
-      const { job, records, groups } = get(); if (!job || job.state !== 'running') return;
-      const progress = Math.min(100, job.progress + 5);
-      const count = Math.floor(progress * job.tasks.length / 100);
-      let next = [...records]; let completed = job.completed; let error: string | undefined;
-      for (; completed < count; completed++) { const task = job.tasks[completed]; if (task.error) { error = `${task.filename}: ${task.error}`; break; } next = [...next.filter(row => row.id !== task.record.id), task.record]; }
-      const updatedGroups = [...groups];
-      if (job.group && completed > 0) { const symbols = job.tasks.slice(0, completed).map(task => task.record.symbol); const index = updatedGroups.findIndex(row => row.name === job.group); if (index < 0) updatedGroups.push({ name: job.group, symbols }); else updatedGroups[index] = { name: job.group, symbols }; }
-      try { persist({ records: next, groups: updatedGroups, job: { ...job, progress, completed, state: error ? 'failed' : progress === 100 ? 'completed' : 'running', error } }); } catch (cause) { fail(cause); }
+    poll: async () => {
+      const job = get().job;
+      if (polling || job?.state !== 'running' || !job.jobId) return;
+      polling = true;
+      try {
+        const status = await fileStatus(job.jobId);
+        if (get().job?.jobId !== job.jobId) return;
+        if (status.state === 'succeeded') {
+          const completed = job.completed + 1;
+          const updated = { ...job, completed, progress: 100 * completed / job.tasks.length };
+          await get().refresh();
+          if (stopping) set({ job: { ...updated, state: 'cancelled' } });
+          else if (completed === job.tasks.length) {
+            try {
+              if (job.group) await filePublishGroup(job.group, job.tasks.map(task => task.request!.symbol));
+              set({ job: { ...updated, state: 'completed' } });
+            } catch (cause) { set({ job: { ...updated, state: 'failed', error: message(cause) } }); }
+          }
+          else await next(updated);
+        } else if (['failed', 'cancelled', 'timed_out'].includes(status.state)) {
+          set({ job: { ...job, state: status.state === 'cancelled' ? 'cancelled' : 'failed', error: status.state === 'cancelled' ? undefined : 'Backend import failed; check the host log.' } });
+          await get().refresh();
+        } else {
+          const fraction = status.total_partitions ? status.published_partitions / status.total_partitions : 0;
+          set({ job: { ...job, progress: Math.min(99, 100 * (job.completed + fraction) / job.tasks.length) } });
+        }
+      } catch (cause) { set({ storageError: message(cause) }); }
+      finally { polling = false; }
     },
-    action: action => { const job = get().job; if (!job || !activeImport(job.state)) return; try { persist({ job: { ...job, state: action === 'pause' ? 'paused' : action === 'resume' ? 'running' : 'cancelled' } }); } catch (cause) { fail(cause); } },
+    advance: () => { void get().poll(); },
+    action: action => {
+      const job = get().job;
+      if (action !== 'stop' || job?.state !== 'running') return;
+      stopping = true;
+      if (job.jobId) void fileCancel(job.jobId).then(() => get().poll()).catch(cause => set({ storageError: message(cause) }));
+    },
   };
 });

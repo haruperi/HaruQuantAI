@@ -33,7 +33,7 @@ Key Capabilities:
     - FR-HOST-PACKAGES-INSTALLATION-LEASE: Exclusive Lifecycle Fencing
       Associated: `InstallationLease.acquire()`, `InstallationLease.release()`
       Logging: Emits info log when an installation lease is acquired and
-      released.
+      released; emits warning log when a stale fence is reclaimed.
     - FR-HOST-PACKAGES-CASCADING-REMOVAL: Atomic Journaled Removal & Recovery
       Associated: `plan_removal()`, `apply_removal()`, `restore_removal()`
       Logging: Emits info logs on removal plan generation, quarantine
@@ -83,19 +83,23 @@ CLI Usage:
 
 from __future__ import annotations
 
+import ast
 import asyncio
+import atexit
+import contextlib
 import hashlib
 import importlib.util
 import inspect
 import json
+import os
 import re
 import sys
 from collections import Counter
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path, PurePosixPath
 from types import ModuleType
-from typing import Any, Literal, Self, cast
+from typing import IO, Any, Literal, Self, cast
 from uuid import uuid4
 
 from pydantic import Field, JsonValue, model_validator
@@ -107,18 +111,19 @@ from app.host.capabilities import (
     NetworkAccess,
     ResourceAccess,
     SettingsAccess,
+    TerminalAccess,
 )
 from app.host.contracts import Document, PluginDescriptor
-from app.host.discovery import read_descriptor
 from app.host.jobs import JobManager
 from app.host.logging import get_logger
-from app.host.network import HistoricalNetwork
+from app.host.network import HistoricalNetwork, SourceCredentials
 from app.persistence.market import MarketDataStore
 from app.persistence.resources import ResourceStore
 
 logger = get_logger(__name__)
 
 MAX_MANIFEST_BYTES = 262144
+MAX_CONTRIBUTION_BYTES = 4 * 1024 * 1024
 MAX_PACKAGES = 4096
 IDENTITY = r"^[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)+$"
 VERSION = r"^\d+\.\d+\.\d+$"
@@ -141,6 +146,7 @@ OWNED_ROOTS = (
 )
 
 ACTIVATION_TIMEOUT = 5.0
+MAX_INVOCATION_SECONDS = 120.0
 HOST_SERVICES = frozenset(
     {
         "host.resources",
@@ -149,6 +155,7 @@ HOST_SERVICES = frozenset(
         "host.settings",
         "host.market_data",
         "host.network",
+        "host.terminal",
     }
 )
 
@@ -226,13 +233,21 @@ class PackageInventory(Document):
     fingerprint: str
 
 
-def confined_file(root: Path, relative: str, *, exists: bool = True) -> Path:
+def confined_file(
+    root: Path,
+    relative: str,
+    *,
+    exists: bool = True,
+    client_workspace_ids: tuple[str, ...] = (),
+) -> Path:
     """Validate one normal relative package file without following links.
 
     Args:
         root: Explicit installation boundary.
         relative: POSIX relative path under a permitted package/test root.
         exists: Require an existing regular file when true.
+        client_workspace_ids: Validated workspace identities permitting only their
+            exact named external CLI and CLI test files. Empty grants no extension.
 
     Returns:
         Absolute lexical path confined to root.
@@ -241,12 +256,24 @@ def confined_file(root: Path, relative: str, *, exists: bool = True) -> Path:
         ValueError: Invalid, protected, missing, linked, or escaped path.
     """
     parts = PurePosixPath(relative).parts
+    client_paths = {
+        name
+        for identity in client_workspace_ids
+        if re.fullmatch(IDENTITY, identity)
+        for name in (
+            f"scripts/{identity.rsplit('.', 1)[-1]}_cli.py",
+            f"tests/test_{identity.rsplit('.', 1)[-1]}_cli.py",
+        )
+    }
     if (
         not parts
         or PurePosixPath(relative).as_posix() != relative
         or any(part in {".", ".."} for part in relative.split("/"))
         or re.search(r"[\\:*?]", relative)
-        or not any(relative.startswith(prefix + "/") for prefix in OWNED_ROOTS)
+        or (
+            relative not in client_paths
+            and not any(relative.startswith(prefix + "/") for prefix in OWNED_ROOTS)
+        )
     ):
         raise ValueError("Invalid or protected package path")
     boundary = root.resolve()
@@ -275,7 +302,11 @@ def _read_package(root: Path, path: Path) -> Package:
     if relative not in package.owned_paths.metadata:
         raise ValueError("Manifest must own itself")
     for name in package.owned_paths.files():
-        confined_file(root, name)
+        confined_file(
+            root,
+            name,
+            client_workspace_ids=(package.id,) if package.kind == "workspace" else (),
+        )
     return package
 
 
@@ -368,18 +399,55 @@ class RemovalPlan(Document):
     target_ids: tuple[str, ...]
     files: tuple[str, ...]
     hashes: tuple[str, ...]
+    client_workspace_ids: tuple[str, ...] = ()
+
+
+def _lock_file(fd: int) -> None:
+    """Acquire a non-blocking exclusive OS-level lock on the file descriptor."""
+    if sys.platform == "win32":
+        import msvcrt
+
+        cur = os.lseek(fd, 0, os.SEEK_CUR)
+        os.lseek(fd, 0, os.SEEK_SET)
+        try:
+            msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+        finally:
+            os.lseek(fd, cur, os.SEEK_SET)
+    else:
+        import fcntl
+
+        fcntl.flock(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+
+def _unlock_file(fd: int) -> None:
+    """Release an OS-level lock on the file descriptor."""
+    if sys.platform == "win32":
+        import msvcrt
+
+        cur = os.lseek(fd, 0, os.SEEK_CUR)
+        os.lseek(fd, 0, os.SEEK_SET)
+        try:
+            msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+        finally:
+            os.lseek(fd, cur, os.SEEK_SET)
+    else:
+        import fcntl
+
+        fcntl.flock(fd, fcntl.LOCK_UN)
 
 
 class InstallationLease:
-    """Exclusive lifecycle/removal fence; stale files require explicit recovery."""
+    """Exclusive lifecycle/removal fence; stale files are automatically reclaimed."""
 
     def __init__(self, root: Path) -> None:
         self.root = root
         self.held = False
         self.token = uuid4().hex
+        self._file: IO[bytes] | None = None
+        self._atexit_hook: Callable[[], None] | None = None
 
     def acquire(self) -> None:
-        """Refuse linked installations, active owners or an unreconciled stale fence."""
+        """Refuse linked installations or active owners; reclaim stale fences."""
         if self.held:
             raise ValueError("Lease already held")
         if any(
@@ -387,22 +455,65 @@ class InstallationLease:
         ):
             raise ValueError("Linked installation")
         self.root.mkdir(parents=True, exist_ok=True)
-        with (self.root / ".package-operation.lock").open(
-            "x", encoding="utf-8"
-        ) as stream:
-            stream.write(self.token)
+        lock_path = self.root / ".package-operation.lock"
+        file_obj = lock_path.open("a+b")
+        try:
+            _lock_file(file_obj.fileno())
+        except OSError as error:
+            file_obj.close()
+            raise FileExistsError(
+                f"Installation lease already held by active process: root={self.root}"
+            ) from error
+
+        file_obj.seek(0)
+        existing = file_obj.read()
+        if existing:
+            logger.warning("Reclaimed stale installation fence: root=%s", self.root)
+
+        file_obj.seek(0)
+        file_obj.truncate(0)
+        file_obj.write(self.token.encode("utf-8"))
+        file_obj.flush()
+
+        self._file = file_obj
         self.held = True
+        self._atexit_hook = self._cleanup_on_exit
+        atexit.register(self._cleanup_on_exit)
         logger.info("Installation lease acquired: root=%s", self.root)
 
     def release(self) -> None:
         """Release only this lease's fence; never clear another owner's marker."""
+        if not self.held:
+            return
+        if self._atexit_hook is not None:
+            atexit.unregister(self._atexit_hook)
+            self._atexit_hook = None
+
+        path = self.root / ".package-operation.lock"
+        if self._file is not None:
+            try:
+                self._file.seek(0)
+                content = self._file.read().decode("utf-8")
+                if content != self.token:
+                    raise ValueError("Installation lease changed")
+            finally:
+                with contextlib.suppress(OSError):
+                    _unlock_file(self._file.fileno())
+                self._file.close()
+                self._file = None
+        elif path.is_file() and path.read_text(encoding="utf-8") != self.token:
+            raise ValueError("Installation lease changed")
+
+        with contextlib.suppress(OSError):
+            path.unlink(missing_ok=True)
+        self.held = False
+        logger.info("Installation lease released: root=%s", self.root)
+
+    def _cleanup_on_exit(self) -> None:
+        """Best-effort release on process exit."""
         if self.held:
-            path = self.root / ".package-operation.lock"
-            if path.read_text(encoding="utf-8") != self.token:
-                raise ValueError("Installation lease changed")
-            path.unlink()
-            self.held = False
-            logger.info("Installation lease released: root=%s", self.root)
+            with contextlib.suppress(OSError, ValueError):
+                self.release()
 
 
 def plan_removal(root: Path, inventory: PackageInventory, target: str) -> RemovalPlan:
@@ -422,8 +533,24 @@ def plan_removal(root: Path, inventory: PackageInventory, target: str) -> Remova
             p.id for p in packages.values() if p.owner_workspace_id == target
         )
     files = sorted({f for key in targets for f in packages[key].owned_paths.files()})
+    client_workspace_ids = tuple(
+        sorted(
+            key
+            for key in targets
+            if packages[key].kind == "workspace"
+            and any(
+                name.startswith(("scripts/", "tests/test_"))
+                for name in packages[key].owned_paths.files()
+            )
+        )
+    )
     hashes = tuple(
-        hashlib.sha256(confined_file(root, f).read_bytes()).hexdigest() for f in files
+        hashlib.sha256(
+            confined_file(
+                root, f, client_workspace_ids=client_workspace_ids
+            ).read_bytes()
+        ).hexdigest()
+        for f in files
     )
     logger.info("Removal plan generated for target: %s", target)
     return RemovalPlan(
@@ -431,6 +558,7 @@ def plan_removal(root: Path, inventory: PackageInventory, target: str) -> Remova
         target_ids=tuple(sorted(targets)),
         files=tuple(files),
         hashes=hashes,
+        client_workspace_ids=client_workspace_ids,
     )
 
 
@@ -485,7 +613,9 @@ def apply_removal(root: Path, plan: RemovalPlan) -> Path:
         moved: tuple[str, ...] = ()
         _write_journal(journal, plan, moved, "applying")
         for name in plan.files:
-            source = confined_file(root, name)
+            source = confined_file(
+                root, name, client_workspace_ids=plan.client_workspace_ids
+            )
             target = quarantine / name
             target.parent.mkdir(parents=True, exist_ok=True)
             source.rename(target)
@@ -534,7 +664,9 @@ def _restore_locked(root: Path, journal: Path) -> None:
         raise ValueError("Invalid recovery hashes")
     pairs: list[tuple[Path, Path]] = []
     for name, digest in zip(plan.files, plan.hashes, strict=True):
-        destination = confined_file(root, name, exists=False)
+        destination = confined_file(
+            root, name, exists=False, client_workspace_ids=plan.client_workspace_ids
+        )
         source = journal.parent / name
         if any(p.is_symlink() or p.is_junction() for p in (source, *source.parents)):
             raise ValueError("Linked recovery content")
@@ -570,6 +702,15 @@ class PreparedContribution:
     invoke: Callable[[str, JsonValue], Awaitable[JsonValue]]
     close: Callable[[], Awaitable[None]]
     attach: Callable[[tuple[Binding, ...]], Awaitable[None]] | None = None
+    attached_operations: Callable[[], tuple[str, ...]] | None = None
+    invocation_seconds: float = 5.0
+
+    def __post_init__(self) -> None:
+        """Bound owner-requested invocation budgets independently of activation."""
+        if not 0 < self.invocation_seconds <= MAX_INVOCATION_SECONDS:
+            raise ValueError(
+                "Contribution invocation budget must be within 120 seconds"
+            )
 
 
 @dataclass(frozen=True)
@@ -595,6 +736,7 @@ class Composition:
         resources: ResourceStore,
         jobs: JobManager,
         settings: Any = None,
+        source_credentials: tuple[SourceCredentials, ...] = (),
     ) -> None:
         self.root = root
         self.resources = resources
@@ -604,7 +746,7 @@ class Composition:
         self.market_data = MarketDataStore(
             data_root, data_root / "database" / "haruquantai.db"
         )
-        self.network = HistoricalNetwork()
+        self.network = HistoricalNetwork(credentials=source_credentials)
         self.active: dict[str, PreparedContribution] = {}
         self.issues: list[PackageIssue] = []
         self._modules: dict[str, ModuleType] = {}
@@ -614,7 +756,24 @@ class Composition:
         """Validate literal semantic identity and declared host authority."""
         if package.backend_entry is None:
             raise ValueError("No backend entry")
-        descriptor, _ = read_descriptor(confined_file(self.root, package.backend_entry))
+        path = confined_file(self.root, package.backend_entry)
+        with path.open("rb") as stream:
+            content = stream.read(MAX_CONTRIBUTION_BYTES + 1)
+        if len(content) > MAX_CONTRIBUTION_BYTES:
+            raise ValueError("Contribution source exceeds size limit")
+        tree = ast.parse(content.decode("utf-8"))
+        values = [
+            node.value
+            for node in tree.body
+            if isinstance(node, ast.Assign)
+            and any(
+                isinstance(target, ast.Name) and target.id == "PLUGIN"
+                for target in node.targets
+            )
+        ]
+        if len(values) != 1:
+            raise ValueError("Expected one literal PLUGIN descriptor")
+        descriptor = PluginDescriptor.model_validate(ast.literal_eval(values[0]))
         if (descriptor.id, descriptor.version, descriptor.kind) != (
             package.id,
             package.version,
@@ -678,6 +837,9 @@ class Composition:
             else None,
             network=NetworkAccess(package.id, self.network)
             if "host.network" in requirements
+            else None,
+            terminal=TerminalAccess(package.id)
+            if "host.terminal" in requirements
             else None,
         )
 
@@ -781,6 +943,7 @@ class Composition:
                 try:
                     async with asyncio.timeout(ACTIVATION_TIMEOUT):
                         await parent_runtime.attach(tuple(bindings))
+                    self._publish_attached_operations(parent.id, parent_runtime)
                 except Exception:  # noqa: BLE001 -- fail the affected owner, dispose its children.
                     self.issues.append(
                         PackageIssue(package_id=parent.id, code="attachment_failed")
@@ -789,13 +952,24 @@ class Composition:
                         await self._close_one(child.id)
                     await self._close_one(parent.id)
 
+    def _publish_attached_operations(
+        self, owner: str, runtime: PreparedContribution
+    ) -> None:
+        """Freeze an unambiguous post-attachment operation allowlist."""
+        if runtime.attached_operations is None:
+            return
+        operations = (*runtime.operations, *runtime.attached_operations())
+        if len(operations) != len(set(operations)):
+            raise ValueError("Ambiguous attached operation")
+        self.active[owner] = replace(runtime, operations=operations)
+
     async def invoke(self, owner: str, operation: str, payload: JsonValue) -> JsonValue:
         """Dispatch an authenticated command to an accepted owner operation."""
         runtime = self.active.get(owner)
         if runtime is None or operation not in runtime.operations:
             raise ValueError("Missing capability")
         logger.info("Dispatching operation '%s' to owner '%s'", operation, owner)
-        async with asyncio.timeout(ACTIVATION_TIMEOUT):
+        async with asyncio.timeout(runtime.invocation_seconds):
             return await runtime.invoke(operation, payload)
 
     async def _close_one(self, owner: str) -> None:
@@ -819,4 +993,5 @@ class Composition:
         """Dispose children before parents and retain cleanup diagnostics."""
         for owner in reversed(tuple(self.active)):
             await self._close_one(owner)
+        await self.network.aclose()
         logger.info("Composition graph closed")

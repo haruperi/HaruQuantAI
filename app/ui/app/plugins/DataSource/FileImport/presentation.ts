@@ -50,9 +50,11 @@ export const pluginName = 'File Import';
 
 export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
   const state = useFileImports();
+  useEffect(() => { void useFileImports.getState().refresh(); const timer = setInterval(() => void useFileImports.getState().poll(), 1000); return () => clearInterval(timer); }, []);
   useEffect(() => {
     const active = activeImport(state.job?.state);
     onSync('file-import', {
+      backendAvailable: state.backendAvailable,
       definitions: state.records,
       records: state.records,
       job: state.job,

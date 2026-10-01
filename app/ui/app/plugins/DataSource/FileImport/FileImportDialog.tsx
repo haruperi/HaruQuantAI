@@ -1,9 +1,10 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { Button, Field, Modal, TextInput } from '../../../components/ui';
 import { activeImport, useFileImports } from './fileImportStore';
-import { builtInFormats, columnTypes, customFormat, dateExample, datePatterns, detectFormat, importedRecord, parseImport, previewRows, readImportFile, timeframes, timezones, type ColumnType, type ImportFormat } from './fileImport';
+import { columnTypes, customFormat, dateExample, datePatterns, previewRows, readImportFile, timeframes, timezones, type ColumnType, type ImportFormat } from './fileImport';
 import type { FileDefinition } from './presentation';
 import './fileImport.css';
+import { fileDetect, wireRequest } from './backend';
 
 export interface FileImportContextDocument {
   readonly active: boolean;
@@ -30,24 +31,25 @@ export function FileImportDialog({
   const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const [page, setPage] = useState<'main' | 'save' | 'delete'>('main'); const [name, setName] = useState('');
   const picker = useRef<HTMLInputElement>(null); const generation = useRef(0);
-  const formats = [customFormat(), ...builtInFormats, ...store.formats];
+  const formats = [customFormat(), ...store.predefinedFormats, ...store.formats];
   const preview = useMemo(() => { try { const rows = text ? previewRows(text, format) : []; return { rows: rows.slice(0, 50), count: rows.length, error: '' }; } catch (cause) { return { rows: [], count: 0, error: String(cause) }; } }, [text, format]);
   const width = Math.max(format.columns.length, ...preview.rows.map(row => row.length), 0);
   const close = useCallback(() => { if (page !== 'main') { setPage('main'); setError(''); } else { generation.current++; onClose(); } }, [page, onClose]);
   function change(patch: Partial<ImportFormat>) { setFormat(current => ({ ...current, ...patch })); }
-  function start() {
+  async function start() {
     try {
       if (!filename) throw new Error('Choose a data file.');
       if (preview.error) throw new Error(preview.error);
       const mapped = { ...format, columns: Array.from({ length: width }, (_, i) => format.columns[i] ?? '') };
-      const result = parseImport(text, mapped, timeframe, ignore);
-      const record = importedRecord(target, result, timezone, store.records.find(row => row.id === target.id));
-      store.start([{ filename, record, ignored: result.ignored, error: result.error }], timezone, '', 0, contextDocument?.active ?? false);
+      setBusy(true);
+      const request = wireRequest(text, mapped, target.symbol, target.instrument, timeframe, ignore);
+      const record = { ...target, timestamps: [], unknownBars: target.bars };
+      await store.start([{ filename, record, ignored: 0, request }], timezone, '', 0, contextDocument?.active ?? false);
       onStarted(); onClose();
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to import file.'); }
+    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to import file.'); } finally { setBusy(false); }
   }
-  function saveFormat(asNew: boolean) {
-    try { if (asNew || format.name === 'Custom') { setName(''); setPage('save'); setError(''); return; } store.saveFormat(format, true); setError(''); }
+  async function saveFormat(asNew: boolean) {
+    try { if (asNew || format.name === 'Custom') { setName(''); setPage('save'); setError(''); return; } await store.saveFormat(format, true); setError(''); }
     catch (cause) { setError(String(cause)); }
   }
   return <div className="file-import-flow" onKeyDown={event => {
@@ -55,15 +57,15 @@ export function FileImportDialog({
     const controls = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled):not([type=file]),select:not(:disabled)'));
     if (event.shiftKey && document.activeElement === controls[0]) { event.preventDefault(); controls.at(-1)?.focus(); }
     else if (!event.shiftKey && document.activeElement === controls.at(-1)) { event.preventDefault(); controls[0]?.focus(); }
-  }}><Modal key={page} title={page === 'save' ? 'New data format' : page === 'delete' ? 'Delete data format' : `Data import for '${target.symbol}'`} width={page === 'main' ? 754 : 440} onClose={close} footer={<><Button onClick={close}>Close</Button><Button className="primary" disabled={busy} onClick={() => {
+  }}><Modal key={page} title={page === 'save' ? 'New data format' : page === 'delete' ? 'Delete data format' : `Data import for '${target.symbol}'`} width={page === 'main' ? 754 : 440} onClose={close} footer={<><Button onClick={close}>Close</Button><Button className="primary" disabled={busy} onClick={async () => {
     if (page === 'main') start();
-    else try { if (page === 'save') { store.saveFormat({ ...format, name }); change({ name: name.trim(), predefined: false }); } else { store.deleteFormat(format.name); change({ name: 'Custom', predefined: false }); } setPage('main'); setError(''); } catch (cause) { setError(String(cause)); }
+    else try { if (page === 'save') { await store.saveFormat({ ...format, name }); change({ name: name.trim(), predefined: false }); } else { await store.deleteFormat(format.name); change({ name: 'Custom', predefined: false }); } setPage('main'); setError(''); } catch (cause) { setError(String(cause)); }
   }}>{page === 'main' ? busy ? 'Reading…' : 'Start Import' : page === 'save' ? 'Save' : 'Delete'}</Button></>}>
     {(error || store.storageError) && <p className="file-symbol-error" role="alert">{error || store.storageError}</p>}
     {page === 'save' ? <><p>Enter name for the new data format.</p><Field label="Name"><TextInput value={name} maxLength={80} onChange={event => setName(event.target.value)}/></Field></> : page === 'delete' ? <p>Delete data format '{format.name}'?</p> : <>
       <fieldset><legend>Choose file</legend><div className="import-file-picker"><Field label="Data file"><TextInput readOnly value={filename}/></Field><Button disabled={busy} onClick={() => picker.current?.click()}>Browse</Button><input ref={picker} hidden aria-label="Choose data file" type="file" accept=".csv,.tsv,.txt" onChange={async event => {
         const file = event.target.files?.[0]; if (!file) return; const token = ++generation.current; setBusy(true); setError(''); setFilename(''); setText('');
-        try { const content = await readImportFile(file); const detected = detectFormat(content); if (token !== generation.current) return; setText(content); setFilename(file.name); setFormat(detected); }
+        try { const content = await readImportFile(file); const detected = await fileDetect(content); if (token !== generation.current) return; setText(content); setFilename(file.name); setFormat(detected); }
         catch (cause) { if (token === generation.current) setError(String(cause)); } finally { if (token === generation.current) setBusy(false); }
       }}/></div>
       <div className="import-grid"><Field label="Imported data timezone"><select aria-label="Imported data timezone" value={timezone} onChange={event => setTimezone(event.target.value)}>{timezones.map(([id, label]) => <option key={label} value={id}>{label}</option>)}</select></Field><Field label="Imported timeframe"><select aria-label="Imported timeframe" value={timeframe} onChange={event => setTimeframe(event.target.value)}><option value="auto">Recognize automatically</option><option>Intraday</option>{timeframes.map(value => <option key={value}>{value}</option>)}</select></Field></div></fieldset>

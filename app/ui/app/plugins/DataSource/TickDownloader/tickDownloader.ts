@@ -4,7 +4,7 @@ export interface TDRequest { folder: string; symbols: string[]; postfix: string 
 export interface TDJob { request: TDRequest; state: 'running' | 'paused' | 'completed' | 'cancelled' | 'failed'; progress: number; error?: string }
 export function discoverTD(paths: string[]): TDManifest {
   if (!paths.length) throw new Error('No symbols available. Select a folder containing downloaded data.');
-  if (paths.length > 20000) throw new Error('Select a folder with at most 20,000 files for this mock import.');
+  if (paths.length > 20000) throw new Error('Select a folder with at most 20,000 files in this selection.');
   const parts = paths.map(path => {
     const segments = path.split('/');
     if (path.length > 1024 || segments.some(part => !part || part === '.' || part === '..' || /[\\:\x00-\x1f]/.test(part))) throw new Error('Invalid folder structure.');

@@ -64,6 +64,7 @@ import argparse
 import json
 import os
 import sys
+from collections.abc import Iterable
 from pathlib import Path
 from typing import Any, TextIO
 from urllib.error import HTTPError
@@ -81,6 +82,58 @@ from app.host.sessions import is_loopback
 logger = get_logger(__name__)
 MAX_RESPONSE_BYTES = 1048576
 BOOT_SCHEMA_VERSION = 2
+
+
+def write_table_output(path: Path, frames: Iterable[Any]) -> int:  # noqa: C901, PLR0912 -- atomic multi-format export.
+    """Export client-owned tabular results atomically, without host store access."""
+    from tempfile import NamedTemporaryFile
+
+    import pyarrow as pa  # type: ignore[import-untyped]
+    import pyarrow.parquet as pq  # type: ignore[import-untyped]
+
+    suffix = path.suffix.lower()
+    if suffix not in (".csv", ".parquet", ".feather"):
+        raise ClientError("Choose .csv, .parquet or .feather output")
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with NamedTemporaryFile(dir=path.parent, suffix=suffix, delete=False) as stream:
+        staged = Path(stream.name)
+    writer = None
+    count = 0
+    feather: list[Any] = []
+    feather_bytes = 0
+    try:
+        for frame in frames:
+            if frame.empty:
+                continue
+            table = pa.Table.from_pandas(frame, preserve_index=False)
+            if suffix == ".csv":
+                frame.to_csv(staged, mode="a", index=False, header=count == 0)
+            elif suffix == ".parquet":
+                if writer is None:
+                    writer = pq.ParquetWriter(staged, table.schema, compression="zstd")
+                writer.write_table(table)
+            else:
+                feather_bytes += table.nbytes
+                if feather_bytes > 128 * 1024 * 1024:
+                    raise ClientError("Feather export exceeds client memory bounds")
+                feather.append(table)
+            count += len(frame)
+        if writer is not None:
+            writer.close()
+            writer = None
+        if not count:
+            raise ClientError("No rows available for output")
+        if suffix == ".feather":
+            import pyarrow.feather as feather_io  # type: ignore[import-untyped]
+
+            feather_io.write_feather(pa.concat_tables(feather), staged)
+        staged.replace(path)
+        logger.info("CLI exported rows=%d format=%s", count, suffix)
+        return count
+    finally:
+        if writer is not None:
+            writer.close()
+        staged.unlink(missing_ok=True)
 
 
 class ClientError(ValueError):

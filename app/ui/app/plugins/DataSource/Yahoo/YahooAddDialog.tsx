@@ -26,7 +26,7 @@ export function YahooModal({ title, onClose, children, footer, wide = false }: {
 
 export function YahooAddDialog({ contextDocument, onClose, onStarted }: { contextDocument: YahooContextDocument; onClose: () => void; onStarted: () => void }) {
   const store = useYahoo(); const [symbols, setSymbols] = useState(''), [postfix, setPostfix] = useState(''), [error, setError] = useState('');
-  function save() { try { const context = yahooContext(contextDocument); store.startAdd(yahooDefinitions(symbols, postfix, context.existing), context.active); onStarted(); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add Yahoo data.'); } }
+  async function save() { try { const context = yahooContext(contextDocument); await store.startAdd(yahooDefinitions(symbols, postfix, context.existing), context.active); onStarted(); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add Yahoo data.'); } }
   return <YahooModal wide title="Add Yahoo data" onClose={onClose} footer={<><Button onClick={onClose}>Close</Button><Button className="primary" onClick={save}>Save</Button></>}>
     {(error || store.storageError) && <p className="yahoo-error" role="alert">{error || store.storageError}</p>}
     <fieldset className="yahoo-add-fieldset"><legend>Add data to download</legend>
@@ -34,6 +34,6 @@ export function YahooAddDialog({ contextDocument, onClose, onStarted }: { contex
       <textarea aria-label="Yahoo symbols" value={symbols} onChange={event => { setSymbols(event.target.value); setError(''); }} />
     </fieldset>
     <label className="yahoo-postfix">Data postfix <span><TextInput aria-label="Data postfix" maxLength={64} value={postfix} onChange={event => { setPostfix(event.target.value); setError(''); }}/><small>This postfix will be optionally added to the data names created</small></span></label>
-    <p className="yahoo-mock-note">Offline mock lookup. No request is sent to Yahoo Finance.</p>
+    <p className="yahoo-mock-note">Symbols are validated against Yahoo Finance before they are added.</p>
   </YahooModal>;
 }

@@ -3,6 +3,7 @@ import { Button, TextInput } from '../../../components/ui';
 import { discoverTD, type TDManifest } from './tickDownloader';
 import { useTickDownloader } from './tickDownloaderStore';
 import './tickDownloader.css';
+import { tdInspect } from './backend';
 
 export function TickDownloaderImportDialog({ onClose, onStarted }: { onClose: () => void; onStarted: () => void }) {
   const saved = useTickDownloader();
@@ -10,6 +11,7 @@ export function TickDownloaderImportDialog({ onClose, onStarted }: { onClose: ()
   const [postfix, setPostfix] = useState(saved.postfix);
   const [selected, setSelected] = useState<string[]>([]);
   const [error, setError] = useState('');
+  const files = useRef<File[]>([]);
   const picker = useRef<HTMLInputElement>(null);
   const root = useRef<HTMLDivElement>(null);
   const allCheck = useRef<HTMLInputElement>(null);
@@ -17,10 +19,10 @@ export function TickDownloaderImportDialog({ onClose, onStarted }: { onClose: ()
   const all = symbols.length > 0 && selected.length === symbols.length;
   useEffect(() => { if (allCheck.current) allCheck.current.indeterminate = selected.length > 0 && !all; }, [all, selected]);
   useEffect(() => { const previous = document.activeElement as HTMLElement | null; root.current?.querySelector<HTMLButtonElement>('button')?.focus(); return () => previous?.focus(); }, []);
-  function start() {
+  async function start() {
     try {
       if (!manifest) throw new Error('Select a TickDownloader installation folder.');
-      saved.start({ folder: manifest.folder, symbols: selected, postfix }, symbols);
+      await saved.start({ folder: manifest.folder, symbols: selected, postfix }, symbols, [], false, files.current);
       onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to import data.'); }
   }
@@ -39,12 +41,13 @@ export function TickDownloaderImportDialog({ onClose, onStarted }: { onClose: ()
       <fieldset>
         <p className="td-import-help">If you have TickDownloader installation you can import the data directly from the TD downloaded data folders.<br/>Please select your TickDownloader installation folder below.</p>
         <div className="td-directory"><label htmlFor="td-folder">TickDownloader Installation</label><TextInput id="td-folder" readOnly value={manifest?.folder ?? saved.folder}/><button className="td-select-link" onClick={() => picker.current?.click()}>Select</button>
-          <input ref={picker} type="file" aria-label="Select TickDownloader data folder" hidden {...({ webkitdirectory: '', directory: '' } as InputHTMLAttributes<HTMLInputElement>)} onChange={event => {
+          <input ref={picker} type="file" aria-label="Select TickDownloader data folder" hidden {...({ webkitdirectory: '', directory: '' } as InputHTMLAttributes<HTMLInputElement>)} onChange={async event => {
             if (!event.target.files?.length) return;
             setError(''); setSelected([]); setManifest(null);
-            try { setManifest(discoverTD(Array.from(event.target.files, file => file.webkitRelativePath))); }
+            const input = event.currentTarget;
+            try { files.current = Array.from(event.target.files); const paths = files.current.map(file => file.webkitRelativePath); const base = discoverTD(paths); const inspected = await tdInspect(paths); setManifest({ ...base, symbols: [...new Set(inspected.files.map(file => file.symbol))] }); }
             catch (cause) { setError(cause instanceof Error ? cause.message : 'Cannot load available symbols.'); }
-            event.target.value = '';
+            input.value = '';
           }}/>
         </div>
         {!manifest && saved.folder && <small className="td-reselect">Select the folder again to access its available symbols.</small>}

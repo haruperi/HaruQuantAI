@@ -20,7 +20,7 @@ export interface ExternalImportFormat {
   dateFormat: string; columns: ExternalColumnType[]; predefined?: boolean;
 }
 export interface ExternalImportJob {
-  indicator: string; state: 'running' | 'paused' | 'cancelled' | 'failed' | 'completed';
+  canPause?: false; indicator: string; state: 'running' | 'paused' | 'cancelled' | 'failed' | 'completed';
   progress: number; records: ExternalIndicatorRecord[]; timeframe: string; ignored: number; error?: string;
 }
 export const emptyExternalLines = (): ExternalIndicatorLine[] => Array.from({ length: 3 }, () => ({ name: '', mt4: '', mt5: '', el: '' }));

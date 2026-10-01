@@ -544,7 +544,11 @@ class BootstrapCoordinator:
             max(1, int(self.resources["memory_available_bytes"]) // 2),
         )
         self.composition = Composition(
-            self.installation_root, self.resource_store, self.jobs
+            self.installation_root,
+            self.resource_store,
+            self.jobs,
+            settings=self.settings,
+            source_credentials=self.config.source_credentials,
         )
         self.pool = create_pool(self.config.workers)
         await self.startup.providers("services")
@@ -617,11 +621,16 @@ class BootstrapCoordinator:
         shutdown without waiting for running jobs, and releases owned logging handlers.
         Cancels queued pool futures; does not remove files or alter persisted sessions.
         """
+        if not self.initialized and not self.installation_lease.held:
+            return
+        self.initialized = False
         await self.startup.close()
         if self.composition is not None:
             await self.composition.close()
+            self.composition = None
         if self.jobs is not None:
             await self.jobs.close()
+            self.jobs = None
         if self.pool is not None:
             self.pool.shutdown(wait=False, cancel_futures=True)
             self.pool = None

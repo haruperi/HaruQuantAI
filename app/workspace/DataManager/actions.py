@@ -80,6 +80,7 @@ from __future__ import annotations
 
 import contextlib
 import json
+import math
 import re
 import sqlite3
 import struct
@@ -89,9 +90,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
 
+import pandas as pd  # type: ignore[import-untyped]
 import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
+from app.host.capabilities import MarketAccess
 from app.host.logging import get_logger
 from app.persistence.market import (
     M1_SCHEMA,
@@ -137,6 +140,9 @@ SATURDAY_WEEKDAY = 5
 SUNDAY_WEEKDAY = 6
 SUNDAY_OPEN_HOUR = 21
 SPIKE_THRESHOLD_PCT = 0.08
+MAX_REVIEW_ROWS = 10000
+MAX_QUALITY_PROBLEMS = 100
+ISO_DATE_LENGTH = 10
 MAX_TIMESTAMP_MS = 9999999999999
 MS_PER_DAY = 86400000
 MS_PER_HOUR = 3600000
@@ -163,6 +169,177 @@ class TickRecord:
     bid: float
     ask: float
     volume: int
+
+
+def source_view(  # noqa: C901 -- explicit view shape and interval validation.
+    market: MarketAccess, payload: dict[str, Any]
+) -> tuple[dict[str, Any], pd.DataFrame, str]:
+    """Read committed data with explicit filtering and coarser view aggregation."""
+    definition = market.retained_source(str(payload.get("dataset_id", "")))
+    stored = str(definition["timeframe"]).upper()
+    timeframe = str(payload.get("timeframe", stored)).upper()
+    if payload.get("session", "Default") != "Default":
+        raise ValueError("Session filtering requires a registered session definition")
+    frame = market.read_source(str(definition["id"])).to_pandas()
+    frame["DateTime"] = pd.to_datetime(frame["DateTime"], utc=True)
+    frame = frame.set_index("DateTime").sort_index()
+    ticks = "Bid" in frame and "Ask" in frame
+    if ticks:
+        for column in ("Bid", "Ask"):
+            if pd.api.types.is_integer_dtype(frame[column].dtype):
+                frame[column] = frame[column] / 1_000_000
+    if timeframe != stored:
+        source_minutes = TIMEFRAME_MINUTES.get(stored)
+        target_minutes = TIMEFRAME_MINUTES.get(timeframe)
+        if (
+            target_minutes is None
+            or source_minutes is None
+            or target_minutes <= source_minutes
+        ):
+            raise ValueError(
+                "Choose the stored timeframe or a supported coarser timeframe"
+            )
+        rule = (
+            "1W"
+            if timeframe == "W1"
+            else "1ME"
+            if timeframe == "MN1"
+            else f"{target_minutes}min"
+        )
+        volume = frame["Volume"].resample(rule).sum(min_count=1)
+        if ticks:
+            frame = frame["Bid"].resample(rule).ohlc().rename(columns=str.title)
+        else:
+            frame = frame.resample(rule).agg(
+                {"Open": "first", "High": "max", "Low": "min", "Close": "last"}
+            )
+        frame["Volume"] = volume
+        frame = frame.dropna(subset=["Open"])
+    if payload.get("date_from"):
+        frame = frame[frame.index >= pd.to_datetime(payload["date_from"], utc=True)]
+    if payload.get("date_to"):
+        end = pd.to_datetime(payload["date_to"], utc=True)
+        if len(str(payload["date_to"])) == ISO_DATE_LENGTH:
+            frame = frame[frame.index < end + pd.Timedelta(days=1)]
+        else:
+            frame = frame[frame.index <= end]
+    logger.info(
+        "Source view read: id=%s timeframe=%s rows=%d",
+        definition["id"],
+        timeframe,
+        len(frame),
+    )
+    return definition, frame, timeframe
+
+
+def source_quality(frame: pd.DataFrame) -> dict[str, Any]:
+    """Measure numerical validity without inventing an exchange trading calendar."""
+    problems: list[dict[str, str]] = []
+    bad_rows = 0
+    ticks = "Bid" in frame
+    columns = (
+        ("Bid", "Ask", "Volume")
+        if ticks
+        else ("Open", "High", "Low", "Close", "Volume")
+    )
+    for stamp, row in frame.iterrows():
+        reasons = []
+        if any(not math.isfinite(float(row[column])) for column in columns):
+            reasons.append("Non-finite price or volume")
+        elif ticks:
+            if row["Ask"] < row["Bid"]:
+                reasons.append("Ask below bid")
+        elif row["High"] < max(row["Open"], row["Close"], row["Low"]) or row[
+            "Low"
+        ] > min(row["Open"], row["Close"]):
+            reasons.append("Invalid OHLC bounds")
+        if row["Volume"] < 0:
+            reasons.append("Negative volume")
+        if reasons:
+            bad_rows += 1
+            if len(problems) < MAX_QUALITY_PROBLEMS:
+                problems.append(
+                    {"date": stamp.isoformat(), "problem": "; ".join(reasons)}
+                )
+    logger.info("Source numerical quality: rows=%d invalid=%d", len(frame), bad_rows)
+    return {
+        "totalBars": len(frame),
+        "totalErrors": bad_rows,
+        "qualityScore": round(100 * (1 - bad_rows / len(frame)), 2)
+        if len(frame)
+        else None,
+        "problems": problems,
+        "scope": (
+            "Numerical validity only; exchange sessions, missing history "
+            "and price jumps are not scored."
+        ),
+    }
+
+
+def inspect_source(
+    market: MarketAccess, operation: str, payload: dict[str, Any]
+) -> dict[str, Any]:
+    """Inspect stored ticks/bars independently of their acquisition plugin."""
+    definition, frame, timeframe = source_view(market, payload)
+    common = {"symbol": definition["symbol"], "timeframe": timeframe}
+    if operation == "actions.review_quality":
+        return {**common, **source_quality(frame)}
+    offset = int(payload.get("offset", 0))
+    limit = int(payload.get("limit", 500))
+    if offset < 0 or not 1 <= limit <= MAX_REVIEW_ROWS:
+        raise ValueError("Invalid inspection page")
+    selected = frame.iloc[offset : offset + limit]
+    ticks = "Bid" in frame
+    names = (
+        ("Bid", "Ask", "Volume")
+        if ticks
+        else ("Open", "High", "Low", "Close", "Volume")
+    )
+    if operation == "actions.review_data":
+        rows = [
+            [
+                stamp.isoformat(),
+                *[
+                    float(row[name]) if math.isfinite(float(row[name])) else None
+                    for name in names
+                ],
+            ]
+            for stamp, row in selected.iterrows()
+        ]
+        return {
+            **common,
+            "revisions": market.retained_revisions(str(definition["id"])),
+            "totalRows": len(frame),
+            "totalRecords": len(frame),
+            "offset": offset,
+            "limit": limit,
+            "columns": ["DateTime", *names],
+            "rows": rows,
+        }
+    if operation == "actions.review_chart":
+        chart = []
+        for stamp, row in selected.iterrows():
+            if any(not math.isfinite(float(row[name])) for name in names):
+                raise ValueError(
+                    "Chart contains invalid values; inspect numerical quality"
+                )
+            prices = (
+                {
+                    name.lower(): float(row["Bid"])
+                    for name in ("Open", "High", "Low", "Close")
+                }
+                if ticks
+                else {name.lower(): float(row[name]) for name in names}
+            )
+            chart.append(
+                {
+                    "time": int(stamp.timestamp() * 1000),
+                    **prices,
+                    "volume": float(row["Volume"]),
+                }
+            )
+        return {**common, "count": len(chart), "chart": chart}
+    raise ValueError("Unsupported source inspection operation")
 
 
 # ---------------------------------------------------------------------------
@@ -1627,24 +1804,10 @@ def save_data_changes(
     session: str,
     changes: dict[str, Any],
 ) -> dict[str, Any]:
-    """Apply bar modifications or row deletions to dataset."""
-    _ = db_path
-    _ = data_root
-    _ = timeframe
-    _ = session
-    _ = changes
-    logger.info(
-        "Saving data changes for %s (%s, session=%s, changes=%d)",
-        symbol,
-        timeframe,
-        session,
-        len(changes),
-    )
-    return {
-        "success": True,
-        "symbol": symbol,
-        "message": "Data modifications applied successfully.",
-    }
+    """Reject legacy edits without immutable revisions and host custody."""
+    _ = db_path, data_root, symbol, timeframe, session, changes
+    logger.warning("Legacy data editing refused; use revision-checked workspace action")
+    raise ValueError("Data editing requires the workspace revision-checked action")
 
 
 # ---------------------------------------------------------------------------

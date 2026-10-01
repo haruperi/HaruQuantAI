@@ -1,44 +1,76 @@
-import { describe, expect, it, vi } from 'vitest';
-import { cryptoDefinitions, cryptoDownloadRanges, cryptoExchange, cryptoExchanges, cryptoTargets } from '../../../../../app/plugins/DataSource/Crypto/crypto';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { cryptoDefinitions, cryptoDownloadRanges, cryptoTargets } from '../../../../../app/plugins/DataSource/Crypto/crypto';
+import { useCrypto } from '../../../../../app/plugins/DataSource/Crypto/cryptoStore';
+import * as backend from '../../../../../app/plugins/DataSource/Crypto/backend';
 
-describe('Crypto provider rules', () => {
-  it('defines all six source exchanges with their exact provider timeframes', () => {
-    expect(cryptoExchanges.map(item => item.id)).toEqual(['Binance','BinanceCoinM','BinanceUsdtM','Bitfinex','Poloniex','Coinbase']);
-    expect(cryptoExchange('Binance').timeframes).toEqual(['M1','M3','M5','M15','M30','H1','H2','H4','H6','H8','H12','D1']);
-    expect(cryptoExchange('Bitfinex').timeframes).toEqual(['M1','M5','M15','M30','H1','H3','H6','H12','D1']);
-    expect(cryptoExchange('Poloniex').timeframes).toEqual(['M5','M15','M30','H2','H4','D1']);
-    expect(cryptoExchange('Coinbase').timeframes).toEqual(['M1','M5','M15','H1','H6','D1']);
-    expect(() => cryptoExchange('Unknown')).toThrow('Unknown');
+vi.mock('../../../../../app/plugins/DataSource/Crypto/backend', () => ({ exchangeId: (name: string) => name === 'Coinbase Pro' ? 'Coinbase' : name, cryptoCatalog: vi.fn(), cryptoAdd: vi.fn(), cryptoDownload: vi.fn(), cryptoStatus: vi.fn(), cryptoCancel: vi.fn() }));
+const row = { id: 'a'.repeat(32), symbol: 'BTCUSD', underlying: 'BTC-USD', instrument: 'BTCUSD', timeframe: 'D1', date_from: '', date_to: '', bars: 0, options: { parameters: { exchange: 'Coinbase Pro' }, metadata: { date_from: 1577836800000 } } };
+beforeEach(() => {
+  vi.resetAllMocks();
+  useCrypto.setState({ definitions: [], job: null, ranges: {}, backendAvailable: false, storageError: '' });
+  vi.mocked(backend.cryptoCatalog).mockResolvedValue({ available: true, reason: '', datasets: [row], exchanges: [{ name: 'Coinbase Pro', timeframes: ['M1', 'D1'] }] });
+});
+describe('Crypto provider inputs', () => {
+  it('keeps native exchange symbols as inputs for backend validation', () => {
+    expect(cryptoDefinitions('Coinbase', ['BTC-USD'], 'D1', '_C', [])[0]).toMatchObject({ underlying: 'BTC-USD', exchange: 'Coinbase', bars: 0 });
+    expect(() => cryptoDefinitions('Coinbase', [], 'D1', '', [])).toThrow('No symbols');
+    expect(() => cryptoDefinitions('Coinbase', ['BTC-USD'], 'D1', '', ['BTC-USD'])).toThrow('exists');
   });
-  it('keeps native symbol syntax and validates selection, timeframes and global names', () => {
-    expect(cryptoDefinitions('Coinbase',['BTC-USD'],'M1','_CB',[])[0]).toMatchObject({ id:'crypto:Coinbase:BTC-USD_CB', symbol:'BTC-USD_CB', underlying:'BTC-USD', exchange:'Coinbase', source:'Crypto', bars:0 });
-    expect(() => cryptoDefinitions('Binance',[],'M1','',[])).toThrow('No symbols');
-    expect(() => cryptoDefinitions('Poloniex',['BTC_USDT'],'M1','',[])).toThrow('supported timeframe');
-    expect(() => cryptoDefinitions('Binance',['BTCUSDT'],'M1','',['BTCUSDT'])).toThrow('exists');
-  });
-  it('isolates Crypto targets, rejects clones and applies per-target since-last ranges', () => {
-    const targets = cryptoDefinitions('Binance',['BTCUSDT','ETHUSDT'],'M1','_C',[]); targets[0].to='2025-01-01'; targets[1].to='2025-02-01';
-    const request={targets,dateFrom:'2025-01-01',dateTo:'2025-03-01',dateType:'sinceLast' as const,overwrite:false};
+  it('calculates dates from source metadata and rejects cloned targets', () => {
+    const targets = cryptoDefinitions('Coinbase', ['BTC-USD', 'ETH-USD'], 'D1', '_C', []); targets[0].to = '2025-01-01'; targets[1].to = '2025-02-01';
+    const request = { targets, dateFrom: '2025-01-01', dateTo: '2025-03-01', dateType: 'sinceLast' as const, overwrite: false };
     expect(cryptoDownloadRanges(request)[targets[1].id].from).toBe('2025-02-01');
-    expect(() => cryptoTargets([{...targets[0],sourceDataId:'clone'}])).toThrow('cloned');
-    expect(() => cryptoDownloadRanges({...request,dateFrom:'bad'})).toThrow('valid date');
+    expect(() => cryptoTargets([{ ...targets[0], sourceDataId: 'clone' }])).toThrow('cloned');
+    expect(() => cryptoDownloadRanges({ ...request, dateFrom: 'bad' })).toThrow('valid date');
   });
 });
-
-async function isolated() {
-  vi.resetModules(); const memory=new Map<string,string>(); const storage={getItem:(key:string)=>memory.get(key)??null,setItem:(key:string,value:string)=>{memory.set(key,value);}}; vi.stubGlobal('localStorage',storage);
-  const store=(await import('../../../../../app/plugins/DataSource/Crypto/cryptoStore')).useCrypto; return {store,memory,storage};
-}
-it('persists add/download jobs, reloads paused, stops partial work and merges coverage', async () => {
-  const {store}=await isolated(); const definitions=cryptoDefinitions('Binance',['BTCUSDT','ETHUSDT'],'M1','_C',[]);
-  store.getState().startAdd(definitions,false); for(let i=0;i<10;i++)store.getState().advance(); expect(store.getState().definitions).toHaveLength(1);
-  vi.resetModules(); const restored=(await import('../../../../../app/plugins/DataSource/Crypto/cryptoStore')).useCrypto; expect(restored.getState().job?.state).toBe('paused'); restored.getState().action('stop'); expect(restored.getState().definitions).toHaveLength(1);
-  const target=restored.getState().definitions[0], request={targets:[target],dateFrom:'2025-01-01',dateTo:'2025-01-03',dateType:'custom' as const,overwrite:false};
-  restored.getState().startDownload(request,false); for(let i=0;i<20;i++)restored.getState().advance(); expect(restored.getState().ranges[target.id]).toEqual([{from:'2025-01-01',to:'2025-01-03'}]);
-  restored.getState().startDownload(request,false); for(let i=0;i<20;i++)restored.getState().advance(); expect(restored.getState().ranges[target.id]).toHaveLength(1);
+it('does not treat browser data or timers as acquisition evidence', async () => {
+  vi.stubGlobal('localStorage', { getItem: () => JSON.stringify({ definitions: [row], job: { state: 'completed' } }), setItem: vi.fn() });
+  expect(useCrypto.getState().definitions).toEqual([]);
+  await useCrypto.getState().refresh();
+  vi.mocked(backend.cryptoDownload).mockResolvedValue({ job_id: 'host-job' });
+  const target = useCrypto.getState().definitions[0];
+  await useCrypto.getState().startDownload({ targets: [target], dateFrom: '2025-01-01', dateTo: '2025-01-03', dateType: 'custom', overwrite: false }, false);
+  for (let i = 0; i < 100; i++) useCrypto.getState().advance();
+  expect(useCrypto.getState().job?.state).toBe('running');
+  expect(useCrypto.getState().definitions[0].bars).toBe(0);
+  vi.mocked(backend.cryptoStatus).mockResolvedValue({ job_id: 'host-job', state: 'succeeded', progress: 1, published_partitions: 1, rows: 2 });
+  vi.mocked(backend.cryptoCatalog).mockResolvedValue({ available: true, reason: '', datasets: [{ ...row, bars: 2, date_from: '2025-01-01', date_to: '2025-01-03' }], exchanges: [{ name: 'Coinbase Pro', timeframes: ['M1', 'D1'] }] });
+  await useCrypto.getState().poll();
+  expect(useCrypto.getState().job?.state).toBe('completed');
+  expect(useCrypto.getState().definitions[0].bars).toBe(2);
+  expect(localStorage.setItem).not.toHaveBeenCalled();
 });
-it('fails closed for active work, quota errors and corrupt saved state', async () => {
-  const {store,memory,storage}=await isolated(); const definition=cryptoDefinitions('Coinbase',['BTC-USD'],'M1','_C',[]);
-  expect(()=>store.getState().startAdd(definition,true)).toThrow('active'); store.getState().startAdd(definition,false); const prior=memory.get('sqx-crypto-data-v1'); storage.setItem=()=>{throw new Error('quota');}; store.getState().advance(); expect(store.getState().job?.state).toBe('failed'); expect(memory.get('sqx-crypto-data-v1')).toBe(prior);
-  memory.set('sqx-crypto-data-v1','bad'); vi.resetModules(); const corrupt=(await import('../../../../../app/plugins/DataSource/Crypto/cryptoStore')).useCrypto; expect(corrupt.getState().storageError).toContain('preserved'); expect(memory.get('sqx-crypto-data-v1')).toBe('bad');
+it('blocks acquisition on missing or stale backend state and preserves the last snapshot', async () => {
+  await expect(useCrypto.getState().startAdd(cryptoDefinitions('Coinbase', ['AAPL'], 'D1', '', []), false)).rejects.toThrow('unavailable');
+  await useCrypto.getState().refresh();
+  await expect(useCrypto.getState().startAdd(cryptoDefinitions('Coinbase', ['MSFT'], 'D1', '', []), true)).rejects.toThrow('active');
+  vi.mocked(backend.cryptoCatalog).mockRejectedValue(new Error('Connection lost'));
+  await useCrypto.getState().refresh();
+  expect(useCrypto.getState().definitions[0].id).toBe(row.id);
+  expect(useCrypto.getState().backendAvailable).toBe(false);
+  expect(useCrypto.getState().storageError).toBe('Connection lost');
+});
+it('propagates add errors and does not publish invented definitions', async () => {
+  await useCrypto.getState().refresh();
+  vi.mocked(backend.cryptoAdd).mockRejectedValue(new Error('Symbol unavailable'));
+  await expect(useCrypto.getState().startAdd(cryptoDefinitions('Coinbase', ['UNKNOWN'], 'D1', '', []), false)).rejects.toThrow('Symbol unavailable');
+  expect(useCrypto.getState().definitions).toHaveLength(1);
+  expect(useCrypto.getState().job?.state).toBe('failed');
+});
+
+it('does not submit the next target when cancellation races with completion', async () => {
+  await useCrypto.getState().refresh();
+  vi.mocked(backend.cryptoDownload).mockResolvedValue({ job_id: 'first-job' });
+  vi.mocked(backend.cryptoCancel).mockResolvedValue({ job_id: 'first-job', state: 'cancelled', progress: 0, published_partitions: 0, rows: 0 });
+  const target = useCrypto.getState().definitions[0];
+  await useCrypto.getState().startDownload({ targets: [target, { ...target, id: 'b'.repeat(32) }], dateFrom: '2025-01-01', dateTo: '2025-01-03', dateType: 'custom', overwrite: false }, false);
+  let finish!: (value: Awaited<ReturnType<typeof backend.cryptoStatus>>) => void;
+  vi.mocked(backend.cryptoStatus).mockReturnValue(new Promise(resolve => { finish = resolve; }));
+  const poll = useCrypto.getState().poll();
+  useCrypto.getState().action('stop');
+  finish({ job_id: 'first-job', state: 'succeeded', progress: 1, published_partitions: 1, rows: 2 });
+  await poll;
+  expect(backend.cryptoDownload).toHaveBeenCalledTimes(1);
+  expect(useCrypto.getState().job?.state).toBe('cancelled');
 });

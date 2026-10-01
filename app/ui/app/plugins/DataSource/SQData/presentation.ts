@@ -10,9 +10,11 @@ export const pluginName = 'SQ Data';
 
 export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
   const state = useSQData();
+  useEffect(() => { void useSQData.getState().refresh(); }, []);
   useEffect(() => {
     const active = sqActive(state.job?.state);
     onSync('sq', {
+      backendAvailable: state.backendAvailable,
       definitions: state.definitions,
       job: state.job,
       storageError: state.storageError,

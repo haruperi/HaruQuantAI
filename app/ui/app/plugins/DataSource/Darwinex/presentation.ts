@@ -21,21 +21,6 @@ export interface Interval { from: string; to: string }
 
 export type Preset = 'sinceLast' | 'sixMonths' | 'year' | 'fiveYears' | 'tenYears' | 'allTime' | 'custom';
 
-export function mergeRanges(existing: Interval[], incoming: Interval, overwrite: boolean): Interval[] {
-  const day = (iso: string, offset: number) => new Date(Date.parse(iso) + offset * 86400000).toISOString().slice(0, 10);
-  const retained = overwrite ? existing.flatMap(row => row.to < incoming.from || row.from > incoming.to ? [row] : [
-    ...(row.from < incoming.from ? [{ from: row.from, to: day(incoming.from, -1) }] : []),
-    ...(row.to > incoming.to ? [{ from: day(incoming.to, 1), to: row.to }] : []),
-  ]) : existing;
-  const result: Interval[] = [];
-  for (const range of [...retained, incoming].sort((a, b) => a.from.localeCompare(b.from))) {
-    const previous = result.at(-1);
-    if (previous && Date.parse(range.from) <= Date.parse(previous.to) + 86400000) previous.to = previous.to > range.to ? previous.to : range.to;
-    else result.push({ ...range });
-  }
-  return result;
-}
-
 export function presetRange(preset: Preset, last: string, minimum: string, from: string, to: string, now = today()): Interval {
   if (preset === 'custom') return { from, to };
   if (preset === 'allTime') return { from: minimum, to: now };
@@ -46,28 +31,18 @@ export function presetRange(preset: Preset, last: string, minimum: string, from:
   return { from: [minimum, date.toISOString().slice(0, 10)].sort().at(-1)!, to };
 }
 
-export function simulationSummary(target: { from?: string; to?: string; bars?: number }, ranges: Interval[]) {
-  const from = target.from ?? '';
-  const to = target.to ?? '';
-  const bars = target.bars ?? 0;
-  if (!ranges.length) return { from, to, bars };
-  const samples = ranges.reduce((sum, row) => sum + (Date.parse(row.to) - Date.parse(row.from)) / 86400000 + 1, 0);
-  return { from: [from, ...ranges.map(row => row.from)].filter(Boolean).sort()[0], to: [to, ...ranges.map(row => row.to)].filter(Boolean).sort().at(-1)!, bars: bars + samples };
-}
-
 export const pluginId = 'darwinex';
 export const pluginName = 'Darwinex';
 
 export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
   const state = useDarwinex();
+  useEffect(() => { void useDarwinex.getState().refresh(); const timer = window.setInterval(() => { void useDarwinex.getState().poll(); }, 1000); return () => window.clearInterval(timer); }, []);
   useEffect(() => {
     const active = darwinexActive(state.job?.state);
-    const definitions = [...state.definitions, ...(active && state.job?.kind !== 'download' ? state.job!.definitions.filter(item => !state.definitions.some(row => row.id === item.id)) : [])].map(row => ({
-      ...row,
-      ...simulationSummary(row, state.ranges[row.id] ?? []),
-    }));
+    const definitions = state.definitions;
     onSync('darwinex', {
       definitions,
+      backendAvailable: state.backendAvailable,
       job: state.job,
       ranges: state.ranges,
       storageError: state.storageError,
@@ -86,7 +61,7 @@ export function Dialogs({ dialog, contextDocument, selectedDatasetIds, onClose, 
   }
   if (dialog?.id === 'darwinex-download') {
     const darwinexState = useDarwinex.getState();
-    const targets = darwinexTargets(darwinexState.definitions.filter(row => selectedDatasetIds.includes(row.id))).map(row => ({ ...row, ...simulationSummary(row, darwinexState.ranges[row.id] ?? []) }));
+    const targets = darwinexTargets(darwinexState.definitions.filter(row => selectedDatasetIds.includes(row.id)));
     return createElement(DarwinexDownloadDialog, { targets, onClose, onStarted: () => onStarted('darwinex') });
   }
   return null;

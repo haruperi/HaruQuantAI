@@ -94,6 +94,7 @@ from pydantic import Field, SecretStr, model_validator
 from app.host.contracts import Document
 from app.host.events import SETTINGS_CHANNEL, EventBus
 from app.host.logging import get_logger
+from app.host.network import SourceCredentials
 from app.persistence.host import (
     HostPersistenceConflictError,
     HostPersistenceValueError,
@@ -360,6 +361,9 @@ class HostSettings(Document):
     port: int = Field(default=8000, ge=1, le=65535)
     data_dir: Path = Path("data")
     password: SecretStr | None = Field(default=None, exclude=True, repr=False)
+    source_credentials: tuple[SourceCredentials, ...] = Field(
+        default=(), exclude=True, repr=False
+    )
     workers: int = Field(default=0, ge=0, le=61)
     ui_dist: Path = Path("app/ui/dist")
     installation_root: Path | None = None
@@ -453,14 +457,22 @@ def load_settings(
                     raise ValueError("Unsupported runtime settings version")
                 raw = json.loads(record.value_json)
                 if not isinstance(raw, dict) or any(
-                    k in raw for k in ("password", "private_key", "data_dir")
+                    k in raw
+                    for k in (
+                        "password",
+                        "private_key",
+                        "data_dir",
+                        "source_credentials",
+                    )
                 ):
                     raise ValueError("Invalid persisted runtime configuration")
                 values.update(raw)
     for name in HostSettings.model_fields:
         key = "HARU_" + name.upper()
         if key in env and name not in ("roots", "origins"):
-            values[name] = env[key]
+            values[name] = (
+                json.loads(env[key]) if name == "source_credentials" else env[key]
+            )
     values.update(explicit)
     values["data_dir"] = root
     result = HostSettings.model_validate(values)

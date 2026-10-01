@@ -1,3 +1,4 @@
+import { catalogPort } from './catalogClient';
 import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
 import { normalizeBrokerName, validateBroker, type BrokerProfile } from '../Catalogs/BrokerProfiles/brokerProfiles';
@@ -6,11 +7,11 @@ const storageKey = 'sqx-data-manager-v1';
 
 interface DataState {
   brokers: BrokerProfile[];
-  storageError: string;
-  saveBroker: (profile: BrokerProfile) => void;
-  saveBrokerStocks: (id: string, stocks: string[]) => void;
-  removeBrokers: (ids: string[]) => void;
-  importBrokers: (profiles: Omit<BrokerProfile, 'id'>[], overwrite: string[]) => number;
+  storageError: string; refresh:()=>Promise<void>; importLegacy:()=>Promise<void>;
+  saveBroker: (profile: BrokerProfile) => Promise<void>;
+  saveBrokerStocks: (id: string, stocks: string[]) => Promise<void>;
+  removeBrokers: (ids: string[]) => Promise<void>;
+  importBrokers: (profiles: Omit<BrokerProfile, 'id'>[], overwrite: string[]) => Promise<number>;
 }
 
 function completeBroker(value: Partial<BrokerProfile> & Pick<BrokerProfile, 'id' | 'name' | 'postfix' | 'timezone' | 'mtUse'>): BrokerProfile {
@@ -35,9 +36,12 @@ function readState(): Pick<DataState, 'brokers' | 'storageError'> {
   }
 }
 
+const brokerPort = catalogPort<{ brokers: BrokerProfile[] }>('brokers');
 export const useDataManagerStore = create<DataState>((set, get) => ({
-  ...readState(),
-  saveBroker: profile => {
+  brokers: [], storageError: '',
+  refresh: async () => { try { set({ ...await brokerPort.read(), storageError: '' }); } catch (cause) { set({ storageError: cause instanceof Error ? cause.message : 'Broker catalog unavailable.' }); } },
+  importLegacy: async () => { const value = readState(); if (value.storageError) throw new Error(value.storageError); const saved = await brokerPort.write({ brokers: value.brokers }); set(saved); },
+  saveBroker: async profile => {
     const state = get();
     if (state.storageError) throw new Error(state.storageError);
     const clean = validateBroker(profile, state.brokers, profile.id || undefined);
@@ -45,27 +49,27 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
     const brokers = [...state.brokers];
     if (found >= 0) brokers[found] = structuredClone(clean);
     else brokers.push({ ...structuredClone(clean), id: `broker-${crypto.randomUUID()}` });
-    persistData(state, brokers);
+    await persistData(state, brokers);
     set({ brokers });
   },
-  saveBrokerStocks: (id, stocks) => {
+  saveBrokerStocks: async (id, stocks) => {
     const state = get();
     const index = state.brokers.findIndex(row => row.id === id);
     if (index < 0) throw new Error("Broker doesn't exist.");
     if (state.brokers[index].system) throw new Error("This broker can't be edited.");
     const brokers = [...state.brokers];
     brokers[index] = { ...brokers[index], stocks: [...stocks] };
-    persistData(state, brokers);
+    await persistData(state, brokers);
     set({ brokers });
   },
-  removeBrokers: ids => {
+  removeBrokers: async ids => {
     const state = get();
     const selected = new Set(ids);
     const brokers = state.brokers.filter(row => !selected.has(row.id));
-    persistData(state, brokers);
+    await persistData(state, brokers);
     set({ brokers });
   },
-  importBrokers: (profiles, overwrite) => {
+  importBrokers: async (profiles, overwrite) => {
     const state = get();
     const replace = new Set(overwrite.map(name => normalizeBrokerName(name).toLowerCase()));
     const brokers = [...state.brokers];
@@ -82,16 +86,13 @@ export const useDataManagerStore = create<DataState>((set, get) => ({
         count++;
       }
     }
-    persistData(state, brokers);
+    await persistData(state, brokers);
     set({ brokers });
     return count;
   },
 }));
 
-function persistData(state: Pick<DataState, 'storageError'>, brokers: BrokerProfile[]): void {
+async function persistData(state: Pick<DataState, 'storageError'>, brokers: BrokerProfile[]): Promise<void> {
   if (state.storageError) throw new Error(state.storageError);
-  // Preserve legacy data bytes as fields when editing unrelated local configuration.
-  const raw = localStorage.getItem(storageKey);
-  const saved = raw ? JSON.parse(raw) : {};
-  localStorage.setItem(storageKey, JSON.stringify({ ...saved, version: 2, brokers }));
+  await brokerPort.write({ brokers });
 }

@@ -71,13 +71,15 @@ from __future__ import annotations
 import hashlib
 import heapq
 import json
+import os
 import re
 import shutil
 import sqlite3
 from collections.abc import Iterator
-from contextlib import closing, suppress
+from contextlib import ExitStack, closing, suppress
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from itertools import pairwise
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import Any
@@ -100,6 +102,7 @@ from app.persistence.market_files import (
 )
 
 logger = get_logger(__name__)
+MARKET_PAGE_ROWS = 2000
 
 __all__ = [
     "BATCH_ROWS",
@@ -129,6 +132,7 @@ __all__ = [
     "open_definition_catalog",
     "open_market_catalog",
     "preseed_native_sqx_datasets",
+    "read_all_broker_profiles",
     "read_broker_profiles",
     "read_datamgr_log",
     "resolve_market_path",
@@ -144,6 +148,7 @@ class BrokerSchemaUnavailableError(ValueError):
     """The existing read-only broker catalog is absent or incompatible."""
 
 
+MAX_SOURCE_LABEL = 160
 MAX_BROKER_TEXT = 80
 MAX_BROKER_POSTFIX = 64
 
@@ -191,6 +196,52 @@ def read_broker_profiles(path: Path) -> tuple[tuple[int, str, str, str], ...]:
             raise BrokerSchemaUnavailableError("Broker catalog row is invalid")
         result.append((broker_id, name, clean_postfix, clean_timezone))
     logger.info("Read %d eligible broker profiles from %s", len(result), path)
+    return tuple(result)
+
+
+def read_all_broker_profiles(path: Path) -> tuple[dict[str, Any], ...]:
+    """Read enabled datamgr_broker records without modifying the database."""
+    if not path.is_file():
+        return ()
+    try:
+        with closing(
+            sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+        ) as connection:
+            connection.row_factory = sqlite3.Row
+            columns = {
+                row["name"]
+                for row in connection.execute(
+                    "PRAGMA table_info(datamgr_broker)"
+                ).fetchall()
+            }
+            if not {"id", "name", "postfix"}.issubset(columns):
+                return ()
+            rows = connection.execute(
+                "SELECT * FROM datamgr_broker WHERE enabled=1 ORDER BY id"
+            ).fetchall()
+    except sqlite3.DatabaseError:
+        return ()
+    result: list[dict[str, Any]] = []
+    for row in rows:
+        r = dict(row)
+        clean_name = str(r.get("name") or "")
+        if not clean_name:
+            continue
+        result.append(
+            {
+                "id": str(r.get("id", "")),
+                "name": clean_name,
+                "desc": str(r.get("description", "") or ""),
+                "postfix": str(r.get("postfix", "") or ""),
+                "timezone": str(r.get("server_timezone", "") or "UTC"),
+                "mtUse": bool(r.get("mt_use", 0)),
+                "stockPickerUse": bool(r.get("stockpicker_use", 0)),
+                "system": bool(r.get("is_system", 0)),
+                "stocks": (),
+                "instruments": (),
+            }
+        )
+    logger.info("Read %d full broker profiles from %s", len(result), path)
     return tuple(result)
 
 
@@ -243,6 +294,31 @@ CREATE TABLE market_ingestions (
 );
 """
 
+# Immutable script-backed partitions are indexed independently of the legacy
+# tick/M1 tables. Provisioning remains explicit, never part of host startup.
+SOURCE_SCHEMA = """
+CREATE TABLE source_datasets (
+  id TEXT PRIMARY KEY REFERENCES datamgr_datasets(id),
+  owner TEXT NOT NULL,
+  identity_json TEXT NOT NULL,
+  options_json TEXT NOT NULL,
+  UNIQUE(owner, identity_json)
+);
+CREATE TABLE source_partitions (
+  dataset_id TEXT NOT NULL REFERENCES source_datasets(id),
+  period TEXT NOT NULL,
+  revision INTEGER NOT NULL CHECK(revision > 0),
+  relative_path TEXT NOT NULL UNIQUE,
+  sha256 TEXT NOT NULL,
+  row_count INTEGER NOT NULL CHECK(row_count > 0),
+  first_ms INTEGER NOT NULL,
+  last_ms INTEGER NOT NULL,
+  schema_json TEXT NOT NULL,
+  committed_at TEXT NOT NULL,
+  PRIMARY KEY(dataset_id, period, revision)
+);
+"""
+
 
 def create_isolated_schema(path: Path) -> None:
     """Create a fresh test/research store; refuse to alter an existing database."""
@@ -251,6 +327,7 @@ def create_isolated_schema(path: Path) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with closing(sqlite3.connect(path)) as connection:
         connection.executescript(SCHEMA)
+        connection.executescript(SOURCE_SCHEMA)
     logger.info("Created isolated market schema at %s", path)
 
 
@@ -344,6 +421,39 @@ def migrate_market_schema(path: Path) -> Path | None:
 
     logger.info("Migrated market catalog schema for %s (backup=%s)", path, backup_path)
     return backup_path
+
+
+def migrate_source_schema(path: Path) -> Path | None:
+    """Provision explicitly authorized source tables after a verified backup.
+
+    The caller must stop every writer sharing this database and obtain separate
+    authorization for operational storage. Startup never invokes this function.
+    Existing incompatible or partially provisioned source tables are rejected.
+    """
+    with closing(open_market_catalog(path)) as connection:
+        names = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+        if {"source_datasets", "source_partitions"}.intersection(names):
+            if MarketDataStore(path.parent, path).source_available():
+                return None
+            raise MarketSchemaUnavailableError(
+                "Existing source catalog is incompatible"
+            )
+        backup = path.with_name(f"{path.stem}_source_backup_{uuid4().hex}.db")
+        with closing(sqlite3.connect(backup)) as target:
+            connection.backup(target)
+            if target.execute("PRAGMA quick_check").fetchone()[0] != "ok":
+                raise MarketSchemaUnavailableError(
+                    "Source migration backup failed validation"
+                )
+        with connection:
+            connection.executescript("BEGIN IMMEDIATE;\n" + SOURCE_SCHEMA + "\nCOMMIT;")
+    logger.info("Provisioned source catalog after verified backup")
+    return backup
 
 
 def open_market_catalog(path: Path) -> sqlite3.Connection:
@@ -714,6 +824,544 @@ class MarketDataStore:
         connection.close()
         return True
 
+    def source_available(self) -> bool:
+        """Check script-backed storage without creating or migrating tables."""
+        try:
+            with closing(open_definition_catalog(self.database_path)) as connection:
+                connection.execute(
+                    "SELECT id,owner,identity_json,options_json FROM "
+                    "source_datasets LIMIT 0"
+                )
+                connection.execute(
+                    "SELECT dataset_id,period,revision,relative_path,sha256,row_count,"
+                    "first_ms,last_ms,schema_json,committed_at FROM "
+                    "source_partitions LIMIT 0"
+                )
+        except ValueError, sqlite3.Error:
+            return False
+        return True
+
+    def inventory(self) -> tuple[dict[str, Any], ...]:
+        """Read durable definitions without assigning invented quality or readiness."""
+        with closing(open_definition_catalog(self.database_path)) as connection:
+            rows = connection.execute(
+                "SELECT * FROM datamgr_datasets ORDER BY symbol,id"
+            ).fetchall()
+        legacy = {row["id"]: row for row in self.list_datasets("dukascopy")}
+        inventory: list[dict[str, Any]] = []
+        for item in rows:
+            row = dict(item)
+            if row["id"] in legacy:
+                actual = legacy[row["id"]]
+                row.update(
+                    bars=actual["bars"], date_from=actual["from"], date_to=actual["to"]
+                )
+            row["from"] = row["date_from"][:10]
+            row["to"] = row["date_to"][:10]
+            row["brokerName"] = row["broker_name"]
+            row["quality"] = None
+            row["status"] = "Stored" if row["bars"] else "Empty"
+            inventory.append(row)
+        logger.info("Read market inventory: count=%d", len(inventory))
+        return tuple(inventory)
+
+    def register_source(
+        self,
+        owner: str,
+        *,
+        source: str,
+        symbol: str,
+        underlying: str,
+        instrument: str,
+        timeframe: str,
+        timezone: str,
+        broker: str,
+        options: dict[str, Any],
+    ) -> str:
+        """Register source identity and opaque provider options atomically."""
+        labels = (
+            owner,
+            source,
+            symbol,
+            underlying,
+            instrument,
+            timeframe,
+            timezone,
+            broker,
+        )
+        if any(not value or len(value) > MAX_SOURCE_LABEL for value in labels):
+            raise ValueError("Invalid source dataset identity")
+        if not self.source_available():
+            raise MarketSchemaUnavailableError(
+                "Script-backed catalog migration is required"
+            )
+        identity = json.dumps(
+            [source, symbol, underlying, instrument, timeframe, timezone, broker],
+            separators=(",", ":"),
+        )
+        encoded_options = json.dumps(options, allow_nan=False, sort_keys=True)
+        dataset_id = uuid4().hex
+        now = datetime.now(UTC).isoformat()
+        with (
+            closing(open_definition_catalog(self.database_path)) as connection,
+            connection,
+        ):
+            connection.execute("BEGIN IMMEDIATE")
+            existing = connection.execute(
+                "SELECT id, options_json FROM source_datasets WHERE owner=? "
+                "AND identity_json=?",
+                (owner, identity),
+            ).fetchone()
+            if existing is not None:
+                if existing["options_json"] != encoded_options:
+                    raise ValueError(
+                        "Dataset already exists with different provider options"
+                    )
+                logger.info(
+                    "Reused source definition: owner=%s id=%s", owner, existing["id"]
+                )
+                return str(existing["id"])
+            connection.execute(
+                "INSERT INTO datamgr_datasets "
+                "(id,source,symbol,underlying,instrument,timeframe,broker,broker_name,"
+                "timezone,category,date_from,date_to,bars,created_at,updated_at) "
+                "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                (
+                    dataset_id,
+                    source,
+                    symbol,
+                    underlying,
+                    instrument,
+                    timeframe,
+                    broker,
+                    broker,
+                    timezone,
+                    "",
+                    "",
+                    "",
+                    0,
+                    now,
+                    now,
+                ),
+            )
+            connection.execute(
+                "INSERT INTO source_datasets VALUES (?,?,?,?)",
+                (dataset_id, owner, identity, encoded_options),
+            )
+        logger.info("Registered source definition: owner=%s id=%s", owner, dataset_id)
+        return dataset_id
+
+    def source_definition(self, owner: str, dataset_id: str) -> dict[str, Any]:
+        """Read an owned definition, rejecting access to another provider's options."""
+        with closing(open_definition_catalog(self.database_path)) as connection:
+            row = connection.execute(
+                "SELECT d.*,s.options_json FROM datamgr_datasets d "
+                "JOIN source_datasets s "
+                "ON s.id=d.id WHERE d.id=? AND s.owner=?",
+                (dataset_id, owner),
+            ).fetchone()
+        if row is None:
+            raise ValueError("Source dataset unavailable")
+        result = dict(row)
+        result["options"] = json.loads(result.pop("options_json"))
+        logger.info("Read source definition: owner=%s id=%s", owner, dataset_id)
+        return result
+
+    def source_definitions(self, owner: str) -> tuple[dict[str, Any], ...]:
+        """List only this source owner's definitions."""
+        with closing(open_definition_catalog(self.database_path)) as connection:
+            ids = connection.execute(
+                "SELECT id FROM source_datasets WHERE owner=? ORDER BY id", (owner,)
+            ).fetchall()
+        return tuple(self.source_definition(owner, row["id"]) for row in ids)
+
+    def source_partitions(self, dataset_id: str) -> tuple[dict[str, Any], ...]:
+        """Read latest committed partition metadata without a producer import."""
+        with closing(open_definition_catalog(self.database_path)) as connection:
+            rows = connection.execute(
+                "SELECT p.* FROM source_partitions p WHERE p.dataset_id=? AND "
+                "p.revision=(SELECT MAX(q.revision) FROM source_partitions q "
+                "WHERE q.dataset_id=p.dataset_id AND q.period=p.period) "
+                "ORDER BY p.period",
+                (dataset_id,),
+            ).fetchall()
+        return tuple(dict(row) for row in rows)
+
+    def retained_source(self, dataset_id: str) -> dict[str, Any]:
+        """Resolve retained definition metadata without loading its producer."""
+        with closing(open_definition_catalog(self.database_path)) as connection:
+            row = connection.execute(
+                "SELECT * FROM datamgr_datasets WHERE id=?",
+                (dataset_id,),
+            ).fetchone()
+            custody = (
+                connection.execute(
+                    "SELECT owner FROM source_datasets WHERE id=?",
+                    (dataset_id,),
+                ).fetchone()
+                if self.source_available()
+                else None
+            )
+        if row is None:
+            raise ValueError("Source dataset unavailable")
+        if custody is not None:
+            return {
+                **dict(row),
+                "owner": custody["owner"],
+                "storage_backend": "source_partitions",
+            }
+        # Retain the existing public format without importing its producer.
+        self.get_dataset(dataset_id)
+        return {
+            **dict(row),
+            "owner": "plugin.data_manager.dukascopy",
+            "storage_backend": "market_files",
+        }
+
+    def read_source(self, dataset_id: str) -> pa.Table:
+        """Decode current retained partitions in timestamp order."""
+        definition = self.retained_source(dataset_id)
+        if definition["storage_backend"] == "market_files":
+            dataset = self.get_dataset(dataset_id)
+            tables = [
+                pq.read_table(self._verified_path(record))
+                for record in self.list_files(
+                    dataset.source,
+                    dataset.kind,
+                    dataset.symbol,
+                )
+            ]
+        else:
+            tables = [
+                self.read_source_partition(row)
+                for row in self.source_partitions(dataset_id)
+            ]
+        if not tables:
+            raise ValueError("Dataset has no committed market rows")
+        return pa.concat_tables(tables).sort_by("DateTime")
+
+    def update_source_broker(
+        self, dataset_id: str, broker: str, broker_name: str
+    ) -> None:
+        """Update broker metadata and its identity atomically without changing rows."""
+        definition = self.retained_source(dataset_id)
+        with (
+            closing(open_definition_catalog(self.database_path)) as connection,
+            connection,
+        ):
+            connection.execute("BEGIN IMMEDIATE")
+            if definition["storage_backend"] == "source_partitions":
+                identity = json.dumps(
+                    [
+                        definition[key]
+                        for key in (
+                            "source",
+                            "symbol",
+                            "underlying",
+                            "instrument",
+                            "timeframe",
+                            "timezone",
+                        )
+                    ]
+                    + [broker],
+                    separators=(",", ":"),
+                )
+                connection.execute(
+                    "UPDATE source_datasets SET identity_json=? WHERE id=?",
+                    (identity, dataset_id),
+                )
+            connection.execute(
+                "UPDATE datamgr_datasets SET broker=?,broker_name=?,updated_at=? "
+                "WHERE id=?",
+                (broker, broker_name, datetime.now(UTC).isoformat(), dataset_id),
+            )
+        logger.info("Updated dataset broker: id=%s broker=%s", dataset_id, broker)
+
+    def export_source_definition(self, dataset_id: str) -> dict[str, Any]:
+        """Return retained metadata and opaque source options for explicit transfer."""
+        record = self.retained_source(dataset_id)
+        if record["storage_backend"] == "source_partitions":
+            record.update(self.source_definition(record["owner"], dataset_id))
+        else:
+            record["options"] = {}
+        logger.info("Exported retained definition: id=%s", dataset_id)
+        return record
+
+    def remove_source(self, dataset_id: str, *, clear_only: bool) -> None:
+        """Remove current catalog references; preserve immutable published bytes."""
+        definition = self.retained_source(dataset_id)
+        if definition["storage_backend"] != "source_partitions":
+            if clear_only:
+                clear_market_symbol(
+                    self.database_path, self.data_root, definition["symbol"]
+                )
+            else:
+                delete_market_symbol(
+                    self.database_path, self.data_root, definition["symbol"]
+                )
+            return
+        with (
+            closing(open_definition_catalog(self.database_path)) as connection,
+            connection,
+        ):
+            connection.execute("BEGIN IMMEDIATE")
+            connection.execute(
+                "DELETE FROM source_partitions WHERE dataset_id=?", (dataset_id,)
+            )
+            if clear_only:
+                connection.execute(
+                    "UPDATE datamgr_datasets SET bars=0,date_from='',date_to='' "
+                    "WHERE id=?",
+                    (dataset_id,),
+                )
+            else:
+                connection.execute(
+                    "DELETE FROM source_datasets WHERE id=?", (dataset_id,)
+                )
+                connection.execute(
+                    "DELETE FROM datamgr_datasets WHERE id=?", (dataset_id,)
+                )
+        logger.info(
+            "Removed dataset references: id=%s clear=%s", dataset_id, clear_only
+        )
+
+    def read_source_partition(self, record: dict[str, Any]) -> pa.Table:
+        """Verify retained bytes and decode standard Parquet independently."""
+        relative = Path(str(record["relative_path"]))
+        root = self.data_root.resolve()
+        path = root / relative
+        if relative.is_absolute() or not path.resolve().is_relative_to(root):
+            raise ValueError("Source partition path escapes storage")
+        if any(p.is_symlink() or p.is_junction() for p in (path, *path.parents)):
+            raise ValueError("Linked source partition path")
+        data = path.read_bytes()
+        if hashlib.sha256(data).hexdigest() != record["sha256"]:
+            raise ValueError("Source partition digest mismatch")
+        logger.info(
+            "Read verified source partition: id=%s period=%s",
+            record["dataset_id"],
+            record["period"],
+        )
+        return pq.read_table(pa.BufferReader(data))
+
+    def publish_source(
+        self,
+        owner: str,
+        dataset_id: str,
+        period: str,
+        table: pa.Table,
+        *,
+        expected_revision: int = 0,
+    ) -> dict[str, Any]:
+        """Publish one complete partition under checked host custody."""
+        return self._publish_source(
+            owner, dataset_id, period, table, expected_revision=expected_revision
+        )
+
+    def replace_source(
+        self,
+        owner: str,
+        dataset_id: str,
+        tables: dict[str, pa.Table],
+        *,
+        expected_revisions: dict[str, int],
+    ) -> None:
+        """Atomically replace a complete dataset snapshot, preserving prior bytes.
+
+        A checked complete revision map prevents concurrent acquisition from being
+        overwritten. New immutable files from a failed transaction stay unreferenced.
+        """
+        self.source_definition(owner, dataset_id)
+        with (
+            closing(open_definition_catalog(self.database_path)) as connection,
+            connection,
+        ):
+            connection.execute("BEGIN IMMEDIATE")
+            current = {
+                row["period"]: row["revision"]
+                for row in connection.execute(
+                    "SELECT period,MAX(revision) AS revision FROM source_partitions "
+                    "WHERE dataset_id=? GROUP BY period",
+                    (dataset_id,),
+                )
+            }
+            if current != expected_revisions:
+                raise ValueError("Dataset changed; reload before replacing rows")
+            for period, table in tables.items():
+                self._publish_source(
+                    owner,
+                    dataset_id,
+                    period,
+                    table,
+                    expected_revision=current.get(period, 0),
+                    connection=connection,
+                )
+            for period in current.keys() - tables.keys():
+                connection.execute(
+                    "DELETE FROM source_partitions WHERE dataset_id=? AND period=?",
+                    (dataset_id, period),
+                )
+            totals = connection.execute(
+                "SELECT MIN(p.first_ms),MAX(p.last_ms),SUM(p.row_count) "
+                "FROM source_partitions p WHERE p.dataset_id=? AND p.revision="
+                "(SELECT MAX(q.revision) FROM source_partitions q "
+                "WHERE q.dataset_id=p.dataset_id AND q.period=p.period)",
+                (dataset_id,),
+            ).fetchone()
+            connection.execute(
+                "UPDATE datamgr_datasets SET date_from=?,date_to=?,bars=?,updated_at=? "
+                "WHERE id=?",
+                (
+                    datetime.fromtimestamp(totals[0] / 1000, tz=UTC).isoformat()
+                    if totals[0] is not None
+                    else "",
+                    datetime.fromtimestamp(totals[1] / 1000, tz=UTC).isoformat()
+                    if totals[1] is not None
+                    else "",
+                    totals[2] or 0,
+                    datetime.now(UTC).isoformat(),
+                    dataset_id,
+                ),
+            )
+        logger.info(
+            "Replaced source snapshot: id=%s partitions=%d", dataset_id, len(tables)
+        )
+
+    def _publish_source(  # noqa: C901, PLR0915 -- atomic immutable bytes and catalog commit.
+        self,
+        owner: str,
+        dataset_id: str,
+        period: str,
+        table: pa.Table,
+        *,
+        expected_revision: int = 0,
+        connection: sqlite3.Connection | None = None,
+    ) -> dict[str, Any]:
+        """Commit immutable source bytes under a checked optimistic revision.
+
+        The plugin supplies the complete partition after its own merge policy.
+        Failed catalog commits leave only unreferenced immutable bytes; readers
+        never see them and previous revisions remain valid.
+        """
+        self.source_definition(owner, dataset_id)
+        if not re.fullmatch(r"[0-9a-f]{32}", dataset_id) or not re.fullmatch(
+            r"[A-Za-z0-9_-]{1,40}", period
+        ):
+            raise ValueError("Invalid source partition identity")
+        if table.num_rows == 0 or "DateTime" not in table.column_names:
+            raise ValueError("Source partition requires timestamped rows")
+        column = table.column("DateTime")
+        if (
+            not pa.types.is_timestamp(column.type)
+            or column.type.tz != "UTC"
+            or column.null_count
+        ):
+            raise ValueError("Source timestamps must be non-null UTC timestamps")
+        stamps = column.cast(pa.timestamp("ms", tz="UTC")).cast(pa.int64()).to_pylist()
+        if stamps != sorted(stamps):
+            raise ValueError("Source timestamps are not ordered")
+        sink = pa.BufferOutputStream()
+        pq.write_table(table, sink, compression="zstd", compression_level=6)
+        content = sink.getvalue().to_pybytes()
+        digest = hashlib.sha256(content).hexdigest()
+        relative = Path("market", "datasets", dataset_id, period, f"{digest}.parquet")
+        path = self.data_root / relative
+        if any(p.is_symlink() or p.is_junction() for p in (path, *path.parents)):
+            raise ValueError("Linked source partition path")
+        path.parent.mkdir(parents=True, exist_ok=True)
+        schema_json = json.dumps({"arrow_schema": str(table.schema), "owner": owner})
+        with ExitStack() as stack:
+            if connection is None:
+                connection = stack.enter_context(
+                    closing(open_definition_catalog(self.database_path))
+                )
+                stack.enter_context(connection)
+                connection.execute("BEGIN IMMEDIATE")
+            actual = connection.execute(
+                "SELECT COALESCE(MAX(revision),0) FROM source_partitions "
+                "WHERE dataset_id=? AND period=?",
+                (dataset_id, period),
+            ).fetchone()[0]
+            if actual != expected_revision:
+                raise ValueError(
+                    "Source partition changed; retry from the current revision"
+                )
+            if not path.exists():
+                with NamedTemporaryFile(
+                    dir=path.parent, suffix=".tmp", delete=False
+                ) as target:
+                    staged = Path(target.name)
+                try:
+                    with staged.open("wb") as target:
+                        target.write(content)
+                        target.flush()
+                        os.fsync(target.fileno())
+                    staged.replace(path)
+                finally:
+                    staged.unlink(missing_ok=True)
+            elif hashlib.sha256(path.read_bytes()).hexdigest() != digest:
+                raise ValueError("Existing source bytes failed integrity verification")
+            revision = actual + 1
+            # Equal bytes are an idempotent publication, not a duplicate revision.
+            prior = connection.execute(
+                "SELECT * FROM source_partitions WHERE dataset_id=? AND "
+                "period=? AND revision=?",
+                (dataset_id, period, actual),
+            ).fetchone()
+            if prior is not None and prior["sha256"] == digest:
+                logger.info(
+                    "Source partition unchanged: id=%s period=%s", dataset_id, period
+                )
+                return dict(prior)
+            now = datetime.now(UTC).isoformat()
+            connection.execute(
+                "INSERT INTO source_partitions VALUES (?,?,?,?,?,?,?,?,?,?)",
+                (
+                    dataset_id,
+                    period,
+                    revision,
+                    relative.as_posix(),
+                    digest,
+                    table.num_rows,
+                    stamps[0],
+                    stamps[-1],
+                    schema_json,
+                    now,
+                ),
+            )
+            totals = connection.execute(
+                "SELECT "
+                "MIN(p.first_ms),MAX(p.last_ms),SUM(p.row_count) FROM "
+                "source_partitions p "
+                "WHERE p.dataset_id=? AND p.revision=(SELECT "
+                "MAX(q.revision) FROM source_partitions q "
+                "WHERE q.dataset_id=p.dataset_id AND q.period=p.period)",
+                (dataset_id,),
+            ).fetchone()
+            connection.execute(
+                "UPDATE datamgr_datasets SET "
+                "date_from=?,date_to=?,bars=?,updated_at=? WHERE id=?",
+                (
+                    datetime.fromtimestamp(totals[0] / 1000, tz=UTC).isoformat(),
+                    datetime.fromtimestamp(totals[1] / 1000, tz=UTC).isoformat(),
+                    totals[2],
+                    now,
+                    dataset_id,
+                ),
+            )
+            committed = connection.execute(
+                "SELECT * FROM source_partitions WHERE dataset_id=? AND "
+                "period=? AND revision=?",
+                (dataset_id, period, revision),
+            ).fetchone()
+        logger.info(
+            "Published source partition: id=%s period=%s revision=%d",
+            dataset_id,
+            period,
+            revision,
+        )
+        return dict(committed)
+
     def list_brokers(self) -> tuple[MarketBroker, ...]:
         """List eligible profiles independently of market-file migration."""
         return tuple(
@@ -722,6 +1370,10 @@ class MarketDataStore:
                 self.database_path
             )
         )
+
+    def list_all_brokers(self) -> tuple[dict[str, Any], ...]:
+        """List full broker records independently of market-file migration."""
+        return read_all_broker_profiles(self.database_path)
 
     def definitions_available(self) -> bool:
         """Check definition storage independently of acquisition storage."""
@@ -732,7 +1384,7 @@ class MarketDataStore:
             return False
 
     def register_definitions(
-        self, requests: tuple[DefinitionRequest, ...]
+        self, requests: tuple[DefinitionRequest, ...], *, idempotent: bool = False
     ) -> tuple[MarketDataset, ...]:
         """Insert a bounded batch atomically, retaining provider identity."""
         if not 1 <= len(requests) <= MAX_DEFINITION_BATCH:
@@ -762,12 +1414,27 @@ class MarketDataStore:
                     )
                 name = request.symbol + request.postfix
                 timeframe = "M1" if request.kind == "m1" else "TICK"
-                if connection.execute(
-                    "SELECT 1 FROM datamgr_datasets WHERE source=? AND symbol=? "
+                existing = connection.execute(
+                    "SELECT id FROM datamgr_datasets WHERE source=? AND symbol=? "
                     "AND timeframe=? AND broker=?",
                     ("Dukascopy", name, timeframe, request.broker),
-                ).fetchone():
-                    raise ValueError("Dukascopy dataset definition already exists")
+                ).fetchone()
+                if existing:
+                    if not idempotent:
+                        raise ValueError("Dukascopy dataset definition already exists")
+                    datasets.append(
+                        MarketDataset(
+                            existing["id"],
+                            "dukascopy",
+                            request.symbol.lower(),
+                            request.kind,
+                            request.symbol,
+                            request.broker,
+                            "UTC",
+                        )
+                    )
+                    logger.info("Reused Dukascopy definition: id=%s", existing["id"])
+                    continue
                 dataset = MarketDataset(
                     uuid4().hex,
                     "dukascopy",
@@ -956,6 +1623,48 @@ class MarketDataStore:
                 }
             )
         return tuple(result)
+
+    def read_market_rows(
+        self,
+        dataset_id: str,
+        *,
+        start_ms: int,
+        end_ms: int,
+        offset: int = 0,
+        limit: int = 2000,
+    ) -> pa.Table:
+        """Read a bounded verified page from a definition's canonical partitions."""
+        if start_ms > end_ms or offset < 0 or not 1 <= limit <= MARKET_PAGE_ROWS:
+            raise ValueError("Invalid market read bounds")
+        dataset = self.get_dataset(dataset_id)
+        schema = TICK_SCHEMA if dataset.kind == "ticks" else M1_SCHEMA
+        selected: list[dict[str, Any]] = []
+        skipped = 0
+        for record in sorted(
+            self.list_files("dukascopy", dataset.kind, dataset.symbol),
+            key=lambda item: item.period,
+        ):
+            if record.last_ms < start_ms or record.first_ms > end_ms:
+                continue
+            parquet = pq.ParquetFile(self._verified_path(record))
+            if not parquet.schema_arrow.equals(schema):
+                raise ValueError("Market read schema mismatch")
+            for batch in parquet.iter_batches(batch_size=BATCH_ROWS):
+                for row in batch.to_pylist():
+                    stamp = int(row["DateTime"].timestamp() * 1000)
+                    if not start_ms <= stamp <= end_ms:
+                        continue
+                    if skipped < offset:
+                        skipped += 1
+                        continue
+                    selected.append(row)
+                    if len(selected) == limit:
+                        logger.info(
+                            "Read market page: rows=%d offset=%d", limit, offset
+                        )
+                        return pa.Table.from_pylist(selected, schema=schema)
+        logger.info("Read market page: rows=%d offset=%d", len(selected), offset)
+        return pa.Table.from_pylist(selected, schema=schema)
 
     def delete_dataset(self, symbol: str) -> bool:
         """Purge market files and delete dataset definition."""
@@ -1151,12 +1860,25 @@ class MarketDataStore:
         start_ms: int,
         end_ms: int,
         provider_mode: str,
+        received_intervals: tuple[tuple[int, int], ...] | None = None,
+        merge_timestamps: bool = False,
     ) -> MarketFile:
         """Replace one interval by streaming an immutable period rewrite."""
         path = self.path(source, kind, symbol, period)
         schema = TICK_SCHEMA if kind == "ticks" else M1_SCHEMA
         if not incoming.schema.equals(schema) or start_ms > end_ms:
             raise ValueError("Invalid market interval")
+        intervals = (
+            received_intervals
+            if received_intervals is not None
+            else ((start_ms, end_ms),)
+        )
+        if not intervals or any(
+            not start_ms <= first <= last <= end_ms for first, last in intervals
+        ):
+            raise ValueError("Invalid received intervals")
+        if any(right[0] <= left[1] for left, right in pairwise(intervals)):
+            raise ValueError("Overlapping or unordered received intervals")
         logger.info(
             "MarketDataStore replacing interval %s/%s/%s period=%s "
             "[%d - %d ms] with %d rows",
@@ -1173,7 +1895,11 @@ class MarketDataStore:
             return int(row["DateTime"].timestamp() * 1000)
 
         fresh: list[dict[str, Any]] = incoming.to_pylist()
-        if any(not start_ms <= stamp(row) <= end_ms for row in fresh):
+        fresh_stamps = {stamp(row) for row in fresh}
+        if any(
+            not any(first <= stamp(row) <= last for first, last in intervals)
+            for row in fresh
+        ):
             raise ValueError("Incoming market row outside requested interval")
         if fresh != sorted(fresh, key=stamp):
             raise ValueError("Incoming market rows are unordered")
@@ -1196,7 +1922,13 @@ class MarketDataStore:
                 raise ValueError("Prior market schema mismatch")
             for batch in parquet.iter_batches(batch_size=BATCH_ROWS):
                 for row in batch.to_pylist():
-                    if not start_ms <= stamp(row) <= end_ms:
+                    if (
+                        stamp(row) not in fresh_stamps
+                        if merge_timestamps
+                        else not any(
+                            first <= stamp(row) <= last for first, last in intervals
+                        )
+                    ):
                         yield row
 
         staging = self.data_root / "market-staging"
@@ -1234,12 +1966,20 @@ class MarketDataStore:
                 pending: dict[str, Any] | None = None
                 for row in merged:
                     if kind == "ticks":
+                        if (
+                            merge_timestamps
+                            and previous
+                            and pending is not None
+                            and stamp(row) == stamp(pending)
+                        ):
+                            continue
                         append_row(row, writer)
+                        pending = row if merge_timestamps and previous else None
                         continue
                     if pending is not None and stamp(row) != stamp(pending):
                         append_row(pending, writer)
                     pending = row
-                if pending is not None:
+                if pending is not None and kind == "m1":
                     append_row(pending, writer)
                 if buffered:
                     writer.write_table(pa.Table.from_pylist(buffered, schema=schema))
@@ -1265,9 +2005,9 @@ class MarketDataStore:
             path.parent.mkdir(parents=True, exist_ok=True)
             staged.replace(path)
             coverage = (
-                tuple(sorted((*previous.coverage, (start_ms, end_ms))))
+                tuple(sorted({*previous.coverage, *intervals}))
                 if previous
-                else ((start_ms, end_ms),)
+                else intervals
             )
             relative = path.relative_to(self.data_root).as_posix()
             size = path.stat().st_size

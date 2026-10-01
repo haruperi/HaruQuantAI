@@ -255,6 +255,8 @@ async def run_host(
         watcher.cancel()
         await asyncio.gather(watcher, return_exceptions=True)
         bound.close()
+        if host.initialized or host.installation_lease.held:
+            await host.close()
 
 
 def arguments(argv: list[str] | None = None) -> dict[str, Any]:
@@ -322,6 +324,9 @@ def main(argv: list[str] | None = None) -> int:
             "%s Host startup failed; inspect configuration, schema and boot log", stage
         )
         return 1
+    except KeyboardInterrupt:
+        logger.info("HaruQuantAI entrypoint interrupted by user; shutdown complete")
+        return 0
     finally:
         close_host_logging()
     return 0

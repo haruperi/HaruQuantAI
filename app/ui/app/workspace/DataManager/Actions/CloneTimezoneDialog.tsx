@@ -42,6 +42,7 @@ export function CloneTimezoneDialog({
       for (const t of targets) {
         const computedShift = mode === 'shift' ? shiftHours : parseInt(timezone.replace('UTC', '').replace('+', '')) || 0;
         const res = await actionsClient.cloneToTimezone({
+          dataset_id: t.id,
           symbol: t.symbol,
           shift_hours: computedShift,
           timezone: mode === 'shift' ? `UTC${shiftHours >= 0 ? '+' : ''}${shiftHours}` : timezone,

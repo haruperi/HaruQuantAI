@@ -8,7 +8,7 @@ from tempfile import TemporaryDirectory
 
 import pyarrow as pa  # type: ignore[import-untyped]
 from app.persistence.market import TICK_SCHEMA, MarketDataStore, create_isolated_schema
-from app.plugin.DataSource.dukascopy import decode_ticks
+from app.plugin.DataSource.dukascopy import _decode_ticks
 
 
 def main() -> None:
@@ -18,7 +18,7 @@ def main() -> None:
         struct.pack(">IIIff", 10, 123456, 123450, 0.01, 0.02),
         format=lzma.FORMAT_ALONE,
     )
-    rows = decode_ticks(payload, hour, "CHFJPY")
+    rows = _decode_ticks(payload, hour, "CHFJPY")
     with TemporaryDirectory() as directory:
         root = Path(directory)
         database = root / "database" / "haruquantai.db"

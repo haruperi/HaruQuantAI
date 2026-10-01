@@ -1,103 +1,73 @@
-import { normalizeLegacyBranding } from '../../../host/branding';
-import { validateTD, type TDJob, type TDRequest } from './tickDownloader';
 import { create } from 'zustand';
-
-export function tdActive(state?: string): boolean {
-  return ['running', 'paused'].includes(state ?? '');
+import { validateTD, type TDRequest } from './tickDownloader';
+import { tdCatalog, tdInspect, tdImport, tdStatus, tdCancel, encodeBI5, type TDFileInfo } from './backend';
+export const tdActive = (state?: string) => state === 'running';
+export interface TDDefinition { id: string; source: string; symbol: string; underlying: string; instrument: string; timeframe: string; broker: string; brokerName: string; timezone: string; category: string; from: string; to: string; bars: number }
+interface ImportJob { request: TDRequest; state: 'running' | 'completed' | 'failed' | 'cancelled'; progress: number; completed: number; total: number; canPause: false; jobId?: string; error?: string }
+interface Store {
+ definitions: TDDefinition[]; job: ImportJob | null; folder: string; postfix: string; backendAvailable: boolean; storageError: string;
+ refresh: () => Promise<void>; poll: () => Promise<void>;
+ start: (request: TDRequest, available: string[], existing?: string[], otherActive?: boolean, files?: File[]) => Promise<void>;
+ advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void;
 }
-
-export interface TDDefinition {
-  id: string;
-  source: string;
-  symbol: string;
-  underlying: string;
-  instrument: string;
-  timeframe: string;
-  broker: string;
-  brokerName: string;
-  timezone: string;
-  category: string;
-  from: string;
-  to: string;
-  bars: number;
-}
-
-export interface TDState {
-  definitions: TDDefinition[];
-  job: TDJob | null;
-  folder: string;
-  postfix: string;
-  storageError: string;
-  start: (request: TDRequest, available: string[], existing?: string[], otherActive?: boolean) => void;
-  advance: () => void;
-  action: (action: 'pause' | 'resume' | 'stop') => void;
-}
-
-const tdKey = 'sqx-tickdownloader-v1';
-
-export const useTickDownloader = create<TDState>((set, get) => {
-  let initial: Pick<TDState, 'definitions' | 'job' | 'folder' | 'postfix' | 'storageError'> = {
-    definitions: [],
-    job: null,
-    folder: '',
-    postfix: '',
-    storageError: '',
-  };
-  try {
-    const raw = localStorage.getItem(tdKey);
-    if (raw) {
-      const saved = normalizeLegacyBranding(JSON.parse(raw));
-      if (saved.version !== 1 || !Array.isArray(saved.definitions) || saved.definitions.length > 10000 || typeof saved.folder !== 'string' || typeof saved.postfix !== 'string'
-        || saved.definitions.some((row: TDDefinition) => !row || ['id','source','symbol','underlying','instrument','timeframe','broker','brokerName','timezone','category','from','to'].some(key => typeof (row as unknown as Record<string, unknown>)[key] !== 'string') || row.bars !== 0)) throw new Error('Invalid saved import');
-      if (saved.job) {
-        if (!['running','paused','completed','cancelled','failed'].includes(saved.job.state) || !Number.isFinite(saved.job.progress) || saved.job.progress < 0 || saved.job.progress > 100) throw new Error('Invalid import job');
-        validateTD(saved.job.request, saved.job.request.symbols, []);
-        if (saved.job.state === 'running') saved.job.state = 'paused';
-      }
-      initial = { definitions: saved.definitions, folder: saved.folder, postfix: saved.postfix, job: saved.job ?? null, storageError: '' };
+const message = (cause: unknown) => cause instanceof Error ? cause.message : 'Tick Downloader import failed.';
+export const useTickDownloader = create<Store>((set, get) => {
+ let stopping = false, polling = false;
+ let pending: { file: File; info: TDFileInfo }[] = [];
+ async function next(job: ImportJob) {
+   const selected = pending[job.completed];
+   const content_base64 = await encodeBI5(selected.file);
+   if (stopping) { set({ job: { ...job, state: 'cancelled' } }); pending = []; return; }
+   const result = await tdImport(selected.info.symbol, job.request.postfix, selected.info.decimals, [{ hour: selected.info.hour, content_base64 }]);
+   set({ job: { ...job, jobId: result.job_id } });
+   if (stopping) await tdCancel(result.job_id);
+ }
+ return {
+  definitions: [], job: null, folder: '', postfix: '', backendAvailable: false, storageError: '',
+  refresh: async () => {
+   try {
+    const catalog = await tdCatalog();
+    if (!catalog.available) { set({ backendAvailable: false, storageError: catalog.reason }); return; }
+    set({ backendAvailable: true, storageError: '', definitions: catalog.datasets.map(row => ({ id: row.id, symbol: row.symbol, underlying: row.underlying, instrument: row.instrument, source: 'TickDownloader', timeframe: row.timeframe, broker: '-1', brokerName: 'Default', timezone: 'UTC', category: 'Tick data', from: row.date_from.slice(0, 10), to: row.date_to.slice(0, 10), bars: row.bars })) });
+   } catch (cause) { set({ backendAvailable: false, storageError: message(cause) }); }
+  },
+  start: async (request, available, existing = [], otherActive = false, files = []) => {
+   if (!get().backendAvailable) throw new Error(get().storageError || 'Tick Downloader backend unavailable.');
+   if (otherActive || tdActive(get().job?.state)) throw new Error('Finish or stop the active data operation first.');
+   validateTD(request, available, existing);
+   if (!files.length) throw new Error('Select the actual BI5 files.');
+   const inspected = await tdInspect(files.map(file => file.webkitRelativePath));
+   const byPath = new Map(files.map(file => [file.webkitRelativePath, file]));
+   pending = inspected.files.filter(info => request.symbols.includes(info.symbol)).sort((a, b) => a.symbol.localeCompare(b.symbol) || a.hour.localeCompare(b.hour)).map(info => ({ info, file: byPath.get(info.path)! }));
+   if (!pending.length) throw new Error('No BI5 hours found for selected symbols.');
+   stopping = false;
+   const job: ImportJob = { request, state: 'running', progress: 0, completed: 0, total: pending.length, canPause: false };
+   set({ job, folder: request.folder, postfix: request.postfix });
+   try { await next(job); } catch (cause) { pending = []; set({ job: { ...job, state: 'failed', error: message(cause) } }); throw cause; }
+  },
+  poll: async () => {
+   const job = get().job;
+   if (polling || job?.state !== 'running' || !job.jobId) return;
+   polling = true;
+   try {
+    const status = await tdStatus(job.jobId);
+    if (get().job?.jobId !== job.jobId) return;
+    if (status.state === 'succeeded') {
+      const nextJob = { ...job, completed: job.completed + 1, progress: 100 * (job.completed + 1) / job.total };
+      await get().refresh();
+      if (stopping || nextJob.completed === job.total) { pending = []; set({ job: { ...nextJob, state: stopping ? 'cancelled' : 'completed' } }); }
+      else { try { await next(nextJob); } catch (cause) { pending = []; set({ job: { ...nextJob, state: 'failed', error: message(cause) } }); } }
+    } else if (['failed', 'timed_out', 'cancelled'].includes(status.state)) {
+      pending = []; set({ job: { ...job, state: status.state === 'cancelled' ? 'cancelled' : 'failed', error: status.state === 'cancelled' ? undefined : 'BI5 import failed. Check the host log.' } }); await get().refresh();
     }
-  } catch { initial.storageError = 'Saved TickDownloader mock state could not be read. Existing storage is preserved.'; }
-  function persist(patch: Partial<TDState>) {
-    const next = { ...get(), ...patch };
-    if (next.storageError) throw new Error(next.storageError);
-    localStorage.setItem(tdKey, JSON.stringify({ version: 1, definitions: next.definitions, job: next.job, folder: next.folder, postfix: next.postfix }));
-    set(patch);
-  }
-  return {
-    ...initial,
-    start: (request, available, existing = [], otherActive = false) => {
-      if (otherActive) throw new Error('Finish or stop the active data operation first.');
-      if (get().job && ['running', 'paused'].includes(get().job!.state)) throw new Error('Finish or stop the active import first.');
-      validateTD(request, available, [...existing, ...get().definitions.map(row => row.symbol)]);
-      if (get().definitions.length + request.symbols.length > 10000) throw new Error('Mock dataset limit reached.');
-      const additions: TDDefinition[] = request.symbols.map(symbol => ({
-        id: `td:${symbol + request.postfix}`,
-        symbol: symbol + request.postfix,
-        underlying: symbol,
-        instrument: symbol,
-        source: 'TickDownloader',
-        timeframe: 'TICK',
-        broker: '-1',
-        brokerName: 'Default',
-        timezone: 'UTC',
-        category: 'Tick data',
-        from: '',
-        to: '',
-        bars: 0,
-      }));
-      try { persist({ folder: request.folder, postfix: request.postfix, definitions: [...get().definitions, ...additions], job: { request: structuredClone(request), state: 'running', progress: 0 } }); }
-      catch { throw new Error(get().storageError || 'Unable to save mock import. No import was started.'); }
-    },
-    advance: () => {
-      const job = get().job; if (!job || job.state !== 'running') return;
-      const progress = Math.min(100, job.progress + 5);
-      try { persist({ job: { ...job, progress, state: progress === 100 ? 'completed' : 'running' } }); }
-      catch { set({ job: { ...job, state: 'failed', error: 'Unable to persist mock import progress.' } }); }
-    },
-    action: action => {
-      const job = get().job; if (!job || !['running','paused'].includes(job.state)) return;
-      try { persist({ job: { ...job, state: action === 'pause' ? 'paused' : action === 'resume' ? 'running' : 'cancelled' } }); }
-      catch { set({ job: { ...job, state: 'failed', error: 'Unable to persist mock import action.' } }); }
-    },
-  };
+   } catch (cause) { set({ storageError: message(cause) }); } finally { polling = false; }
+  },
+  advance: () => {},
+  action: action => {
+   const job = get().job;
+   if (action !== 'stop' || job?.state !== 'running') return;
+   stopping = true;
+   if (job.jobId) void tdCancel(job.jobId).then(() => get().poll()).catch(cause => set({ storageError: message(cause) }));
+  },
+ };
 });

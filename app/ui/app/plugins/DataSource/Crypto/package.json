@@ -4,13 +4,13 @@
   "kind": "plugin",
   "version": "1.0.0",
   "host_contract": "1.0.0",
-  "mode": "ui_only",
+  "mode": "paired",
   "owner_workspace_id": "workspace.data_manager",
   "attachment": {
-    "slot_id": "data_source.presentation",
+    "slot_id": "data_source.acquisition",
     "contract_version": "1.0.0"
   },
-  "backend_entry": null,
+  "backend_entry": "app/plugin/DataSource/crypto.py",
   "ui_entry": "app/ui/app/plugins/DataSource/Crypto/contribution.tsx",
   "owned_paths": {
     "source": [
@@ -20,18 +20,24 @@
       "app/ui/app/plugins/DataSource/Crypto/crypto.ts",
       "app/ui/app/plugins/DataSource/Crypto/cryptoStore.ts",
       "app/ui/app/plugins/DataSource/Crypto/localState.ts",
-      "app/ui/app/plugins/DataSource/Crypto/presentation.ts"
+      "app/ui/app/plugins/DataSource/Crypto/presentation.ts",
+      "app/plugin/DataSource/crypto.py",
+      "app/ui/app/plugins/DataSource/Crypto/backend.ts"
     ],
     "tests": [
       "app/ui/tests/e2e/data-manager-crypto.spec.ts",
-      "app/ui/tests/unit/plugins/DataSource/Crypto/crypto.test.ts"
+      "app/ui/tests/unit/plugins/DataSource/Crypto/crypto.test.ts",
+      "tests/plugin/DataSource/test_crypto.py"
     ],
     "assets": [
       "app/ui/app/plugins/DataSource/Crypto/crypto.css"
     ],
-    "examples": [],
+    "examples": [
+      "tests/examples/data_manager/crypto_offline.py"
+    ],
     "metadata": [
-      "app/ui/app/plugins/DataSource/Crypto/package.json"
+      "app/ui/app/plugins/DataSource/Crypto/package.json",
+      "app/plugin/DataSource/manifests/crypto/README.md"
     ]
   }
 }

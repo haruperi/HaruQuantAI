@@ -2,6 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { effectiveInstruments, newInstrument } from '../../../../../app/workspace/DataManager/Catalogs/Instruments/fileSymbols';
 import { effectiveSessions, type SessionDefinition } from '../../../../../app/workspace/DataManager/Catalogs/Sessions/sessions';
 
+const persisted = vi.hoisted(() => ({ states: new Map<string, any>(), fail: false, writes: vi.fn() }));
+vi.mock('../../../../../app/workspace/DataManager/Common/catalogClient', () => ({
+  catalogPort: (kind: string) => ({
+    read: async () => structuredClone(persisted.states.get(kind) ?? (kind === 'instruments' ? { instruments: [], overrides: {}, removed: [] } : kind === 'sessions' ? { sessions: [], overrides: {}, removed: [] } : { [kind]: [] })),
+    write: async (state: object) => { if (persisted.fail) throw new Error('Backend unavailable'); persisted.writes(kind, state); persisted.states.set(kind, structuredClone(state)); return structuredClone(state); },
+  }),
+}));
 const instrument = { ...newInstrument(), symbol: 'CUSTOM', name: 'My instrument' };
 const session: SessionDefinition = {
   name: 'MySession', broker: '-1', brokerName: 'Default',
@@ -12,7 +19,7 @@ describe('local configuration without runtime seed data', () => {
   let saved: Map<string, string>;
   beforeEach(() => {
     vi.resetModules();
-    saved = new Map();
+    saved = new Map(); persisted.states.clear(); persisted.fail = false; persisted.writes.mockClear();
     vi.stubGlobal('localStorage', {
       getItem: (key: string) => saved.get(key) ?? null,
       setItem: (key: string, value: string) => saved.set(key, value),
@@ -35,11 +42,14 @@ describe('local configuration without runtime seed data', () => {
     const legacy = JSON.stringify({ version: 2, brokers: [broker], definitions: [{ symbol: 'AUDCAD' }], brokerJob: { state: 'running' } });
     saved.set(key, legacy);
     const { useDataManagerStore } = await import('../../../../../app/workspace/DataManager/Common/dataManagerStore');
+    expect(useDataManagerStore.getState().brokers).toEqual([]);
+    await useDataManagerStore.getState().importLegacy();
     expect(useDataManagerStore.getState().brokers[0].id).toBe('b1');
     expect(useDataManagerStore.getState()).not.toHaveProperty('definitions');
     expect(useDataManagerStore.getState()).not.toHaveProperty('brokerJob');
     expect(saved.get(key)).toBe(legacy);
-    useDataManagerStore.getState().saveBrokerStocks('b1', ['REAL']);
+    await useDataManagerStore.getState().saveBrokerStocks('b1', ['REAL']);
+    expect(persisted.states.get('brokers').brokers[0].stocks).toEqual(['REAL']);
     expect(JSON.parse(saved.get(key)!).definitions).toEqual([{ symbol: 'AUDCAD' }]);
   });
 
@@ -51,11 +61,12 @@ describe('local configuration without runtime seed data', () => {
     expect(useFileSymbols.getState().storageError).toBe('');
     expect(useFileSymbols.getState()).not.toHaveProperty('definitions');
     expect(saved.get(key)).toBe(legacy);
-    useFileSymbols.getState().editInstrument('CUSTOM', { ...instrument, name: 'Edited' }, ['-1']);
+    await useFileSymbols.getState().importLegacy();
+    await useFileSymbols.getState().editInstrument('CUSTOM', { ...instrument, name: 'Edited' }, ['-1']);
     expect(JSON.parse(saved.get(key)!).definitions).toEqual([{ symbol: 'OLD_FILE' }]);
-    expect(() => useFileSymbols.getState().addSymbol('NEW', instrument, 'start', [])).toThrow('unavailable');
     vi.resetModules();
     const reloaded = await import('../../../../../app/workspace/DataManager/Catalogs/Instruments/fileSymbolsStore');
+    await reloaded.useFileSymbols.getState().refresh();
     expect(reloaded.useFileSymbols.getState().overrides.CUSTOM.name).toBe('Edited');
   });
 
@@ -66,7 +77,8 @@ describe('local configuration without runtime seed data', () => {
     const { useSessions } = await import('../../../../../app/workspace/DataManager/Catalogs/Sessions/sessionStore');
     expect(useSessions.getState().storageError).toBe('');
     expect(saved.get(key)).toBe(legacy);
-    useSessions.getState().edit('MySession', session, ['-1']);
+    await useSessions.getState().importLegacy();
+    await useSessions.getState().edit('MySession', session, ['-1']);
     expect(effectiveSessions(useSessions.getState().sessions, useSessions.getState().overrides, [])).toEqual([session]);
   });
 
@@ -76,11 +88,20 @@ describe('local configuration without runtime seed data', () => {
     const legacy = JSON.stringify({ version: 1, groups: [group], generated: [{ symbol: 'AAPL', bars: 999 }], job: { state: 'running' } });
     saved.set(key, legacy);
     const { useStockGroups } = await import('../../../../../app/workspace/DataManager/Catalogs/StockGroups/stockGroupsStore');
+    expect(useStockGroups.getState().groups).toEqual([]);
+    await useStockGroups.getState().importLegacy();
     expect(useStockGroups.getState().groups).toEqual([group]);
     expect(useStockGroups.getState()).not.toHaveProperty('generated');
     expect(useStockGroups.getState()).not.toHaveProperty('job');
     expect(saved.get(key)).toBe(legacy);
-    useStockGroups.getState().replaceMembers('g1', [{ ticker: 'MSFT' }]);
+    await useStockGroups.getState().replaceMembers('g1', [{ ticker: 'MSFT' }]);
     expect(JSON.parse(saved.get(key)!).generated).toEqual([{ symbol: 'AAPL', bars: 999 }]);
   });
+});
+
+it('does not report an instrument mutation as saved when backend persistence fails', async () => {
+  vi.resetModules(); vi.stubGlobal('localStorage', { getItem: () => null }); persisted.states.clear(); persisted.fail = true;
+  const { useFileSymbols } = await import('../../../../../app/workspace/DataManager/Catalogs/Instruments/fileSymbolsStore');
+  await expect(useFileSymbols.getState().addInstrument(instrument, ['-1'])).rejects.toThrow('Backend unavailable');
+  expect(useFileSymbols.getState().instruments).toEqual([]); persisted.fail = false; vi.unstubAllGlobals();
 });

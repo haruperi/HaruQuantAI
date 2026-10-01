@@ -1,5 +1,5 @@
 /* Data Manager workspace styles */
-.data-manager { height:100%; display:grid; grid-template-rows:34px 29px 96px 37px 1fr; background:var(--bg); }
+.data-manager { height:100%; display:grid; grid-template-rows:34px auto 29px 96px 37px minmax(0,1fr); background:var(--bg); }
 .dm-title { display:flex; align-items:center; padding:0 11px; background:var(--panel); font-weight:600; font-size:14px; }
 .ribbon-tabs { background:#191e24; display:flex; padding-left:8px; }
 .ribbon-tabs button { border:0; background:transparent; color:var(--muted); padding:0 13px; font-size:10px; cursor:pointer; }
@@ -50,7 +50,7 @@
 .external-indicators-grid table { min-width:1120px; table-layout:fixed; }
 .stock-groups-grid table { min-width:1250px; table-layout:fixed; }
 .broker-profiles-grid table { min-width:1250px; table-layout:fixed; }
-.data-manager.show-log { grid-template-rows:34px 29px minmax(0,1fr); }
+.data-manager.show-log { grid-template-rows:34px auto 29px minmax(0,1fr); }
 .show-log > .ribbon, .show-log > .dm-progress { display:none; }
 .dm-body > .dm-log { display:flex; flex-direction:column; min-width:0; padding:8px; overflow:hidden; }
 .dm-log header { display:flex; align-items:center; justify-content:space-between; min-height:25px; padding-bottom:5px; }

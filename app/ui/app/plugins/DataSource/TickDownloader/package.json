@@ -4,13 +4,13 @@
   "kind": "plugin",
   "version": "1.0.0",
   "host_contract": "1.0.0",
-  "mode": "ui_only",
+  "mode": "paired",
   "owner_workspace_id": "workspace.data_manager",
   "attachment": {
-    "slot_id": "data_source.presentation",
+    "slot_id": "data_source.acquisition",
     "contract_version": "1.0.0"
   },
-  "backend_entry": null,
+  "backend_entry": "app/plugin/DataSource/tick_downloader_import.py",
   "ui_entry": "app/ui/app/plugins/DataSource/TickDownloader/contribution.tsx",
   "owned_paths": {
     "source": [
@@ -19,18 +19,24 @@
       "app/ui/app/plugins/DataSource/TickDownloader/localState.ts",
       "app/ui/app/plugins/DataSource/TickDownloader/presentation.ts",
       "app/ui/app/plugins/DataSource/TickDownloader/tickDownloader.ts",
-      "app/ui/app/plugins/DataSource/TickDownloader/tickDownloaderStore.ts"
+      "app/ui/app/plugins/DataSource/TickDownloader/tickDownloaderStore.ts",
+      "app/plugin/DataSource/tick_downloader_import.py",
+      "app/ui/app/plugins/DataSource/TickDownloader/backend.ts"
     ],
     "tests": [
       "app/ui/tests/e2e/data-manager-tickdownloader.spec.ts",
-      "app/ui/tests/unit/plugins/DataSource/TickDownloader/tickDownloader.test.ts"
+      "app/ui/tests/unit/plugins/DataSource/TickDownloader/tickDownloader.test.ts",
+      "tests/plugin/DataSource/test_tick_downloader.py"
     ],
     "assets": [
       "app/ui/app/plugins/DataSource/TickDownloader/tickDownloader.css"
     ],
-    "examples": [],
+    "examples": [
+      "tests/examples/data_manager/tick_downloader_offline.py"
+    ],
     "metadata": [
-      "app/ui/app/plugins/DataSource/TickDownloader/package.json"
+      "app/ui/app/plugins/DataSource/TickDownloader/package.json",
+      "app/plugin/DataSource/manifests/tick_downloader/README.md"
     ]
   }
 }

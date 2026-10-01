@@ -27,7 +27,13 @@ export function ViewAnalyzeDialog({
   const [error, setError] = useState<string>('');
 
   // Tab 1: Data Table state
-  const [rows, setRows] = useState<Array<[string, number, number, number, number, number]>>([]);
+  const [rows, setRows] = useState<Array<Array<string | number | null>>>([]);
+  const [columns, setColumns] = useState(['DateTime', 'Open', 'High', 'Low', 'Close', 'Volume']);
+  const [revisions, setRevisions] = useState<Record<string, number>>({});
+  const [edits, setEdits] = useState<Record<string, { values?: Record<string, number>; delete?: boolean }>>({});
+  const [reload, setReload] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [qualityScope, setQualityScope] = useState('');
   const [totalRows, setTotalRows] = useState<number>(0);
   const [page, setPage] = useState<number>(0);
   const pageSize = 100;
@@ -36,7 +42,7 @@ export function ViewAnalyzeDialog({
   const [candles, setCandles] = useState<ReviewCandle[]>([]);
 
   // Tab 3: Quality state
-  const [qualityScore, setQualityScore] = useState<number>(100);
+  const [qualityScore, setQualityScore] = useState<number | null>(null);
   const [totalBars, setTotalBars] = useState<number>(0);
   const [totalErrors, setTotalErrors] = useState<number>(0);
   const [problems, setProblems] = useState<ReviewProblem[]>([]);
@@ -49,17 +55,20 @@ export function ViewAnalyzeDialog({
       try {
         if (activeTab === 'data') {
           const res = await actionsClient.reviewData({
+            dataset_id: target.id,
             symbol: target.symbol,
             timeframe,
             offset: page * pageSize,
             limit: pageSize,
           });
           if (!cancelled) {
-            setRows(res.rows);
+            setRows(res.rows); setRevisions(res.revisions || {}); setEdits({});
+            setColumns(res.columns || ['DateTime', 'Open', 'High', 'Low', 'Close', 'Volume']);
             setTotalRows(res.totalRows);
           }
         } else if (activeTab === 'chart') {
           const res = await actionsClient.reviewChart({
+            dataset_id: target.id,
             symbol: target.symbol,
             timeframe,
             limit: 500,
@@ -69,11 +78,13 @@ export function ViewAnalyzeDialog({
           }
         } else if (activeTab === 'quality') {
           const res = await actionsClient.reviewQuality({
+            dataset_id: target.id,
             symbol: target.symbol,
             timeframe,
           });
           if (!cancelled) {
             setQualityScore(res.qualityScore);
+            setQualityScope(res.scope || '');
             setTotalBars(res.totalBars);
             setTotalErrors(res.totalErrors);
             setProblems(res.problems);
@@ -91,8 +102,15 @@ export function ViewAnalyzeDialog({
     return () => {
       cancelled = true;
     };
-  }, [target.symbol, timeframe, activeTab, page]);
+  }, [target.id, target.symbol, timeframe, activeTab, page, reload]);
 
+  async function saveEdits() {
+    setSaving(true); setError('');
+    try { await actionsClient.saveDataChanges({ dataset_id: target.id, timeframe, expected_revisions: revisions, changes: Object.entries(edits).filter(([, change]) => change.delete || Object.keys(change.values || {}).length).map(([timestamp, change]) => ({ timestamp, ...change })) }); setEdits({}); setReload(value => value + 1); }
+    catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save changes.'); }
+    finally { setSaving(false); }
+  }
+  const editable = timeframe === (target.timeframe || 'M1');
   const totalPages = Math.ceil(totalRows / pageSize) || 1;
   const isTick = timeframe.toUpperCase().includes('TICK');
 
@@ -113,6 +131,7 @@ export function ViewAnalyzeDialog({
             <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
               <label style={{ fontSize: 12, fontWeight: 600 }}>Timeframe:</label>
               <Select value={timeframe} onChange={setTimeframe}>
+                <option value={target.timeframe || 'M1'}>{target.timeframe || 'M1'} (Stored)</option>
                 <option value="M1">M1 (1 Minute)</option>
                 <option value="M5">M5 (5 Minutes)</option>
                 <option value="M15">M15 (15 Minutes)</option>
@@ -152,7 +171,7 @@ export function ViewAnalyzeDialog({
             aria-selected={activeTab === 'quality'}
             onClick={() => setActiveTab('quality')}
           >
-            Data Quality ({qualityScore}%)
+            Data Quality ({qualityScore === null ? '—' : `${qualityScore}%`})
           </button>
         </div>
 
@@ -166,6 +185,7 @@ export function ViewAnalyzeDialog({
           {!loading && activeTab === 'data' && (
             <>
               <div className="review-data-toolbar">
+                {editable && <Button disabled={saving || !Object.keys(edits).length} onClick={() => void saveEdits()}>{saving ? 'Saving…' : 'Save changes'}</Button>}
                 <span style={{ fontSize: 12 }}>
                   Showing {page * pageSize + 1}–{Math.min((page + 1) * pageSize, totalRows)} of {totalRows} bars
                 </span>
@@ -188,28 +208,19 @@ export function ViewAnalyzeDialog({
                 <table>
                   <thead>
                     <tr>
-                      <th>DateTime</th>
-                      <th>Open</th>
-                      <th>High</th>
-                      <th>Low</th>
-                      <th>Close</th>
-                      <th>Volume</th>
+                      {columns.map(column => <th key={column}>{column}</th>)}{editable && <th>Delete</th>}
                     </tr>
                   </thead>
                   <tbody>
                     {rows.map((row, idx) => (
                       <tr key={idx}>
-                        <td>{row[0]}</td>
-                        <td>{typeof row[1] === 'number' ? row[1].toFixed(5) : row[1]}</td>
-                        <td>{typeof row[2] === 'number' ? row[2].toFixed(5) : row[2]}</td>
-                        <td>{typeof row[3] === 'number' ? row[3].toFixed(5) : row[3]}</td>
-                        <td>{typeof row[4] === 'number' ? row[4].toFixed(5) : row[4]}</td>
-                        <td>{row[5]}</td>
+                        {row.map((value, column) => <td key={column}>{editable && column > 0 ? <input aria-label={`${columns[column]} ${row[0]}`} type="number" step="any" disabled={saving || edits[String(row[0])]?.delete} value={edits[String(row[0])]?.values?.[columns[column]] ?? value ?? ''} onChange={event => { const timestamp = String(row[0]); const number = Number(event.target.value); setEdits(current => ({ ...current, [timestamp]: { ...current[timestamp], values: { ...current[timestamp]?.values, [columns[column]]: number } } })); }} /> : value === null ? 'Invalid' : value}</td>)}
+                        {editable && <td><input type="checkbox" aria-label={`Delete ${row[0]}`} disabled={saving} checked={edits[String(row[0])]?.delete || false} onChange={event => { const timestamp = String(row[0]); setEdits(current => ({ ...current, [timestamp]: { ...current[timestamp], delete: event.target.checked } })); }} /></td>}
                       </tr>
                     ))}
                     {!rows.length && (
                       <tr>
-                        <td colSpan={6} style={{ textAlign: 'center', padding: 20 }}>
+                        <td colSpan={columns.length} style={{ textAlign: 'center', padding: 20 }}>
                           No bars available.
                         </td>
                       </tr>
@@ -226,6 +237,7 @@ export function ViewAnalyzeDialog({
 
           {!loading && activeTab === 'quality' && (
             <div className="quality-view">
+              <p>{qualityScope}</p>
               <div className="quality-summary">
                 <table>
                   <thead>
@@ -237,8 +249,8 @@ export function ViewAnalyzeDialog({
                   </thead>
                   <tbody>
                     <tr>
-                      <td style={{ fontSize: 16, fontWeight: 700, color: qualityScore >= 90 ? 'var(--good, #68d391)' : 'var(--warn, #e7c88e)' }}>
-                        {qualityScore}%
+                      <td style={{ fontSize: 16, fontWeight: 700, color: (qualityScore ?? 0) >= 90 ? 'var(--good, #68d391)' : 'var(--warn, #e7c88e)' }}>
+                        {qualityScore === null ? '—' : `${qualityScore}%`}
                       </td>
                       <td>{totalBars.toLocaleString()}</td>
                       <td style={{ color: totalErrors > 0 ? 'var(--bad)' : 'inherit' }}>
@@ -266,7 +278,7 @@ export function ViewAnalyzeDialog({
                     {!problems.length && (
                       <tr>
                         <td colSpan={2} style={{ color: 'var(--good, #68d391)', padding: 12 }}>
-                          No quality defects detected. Data is continuous and within bounds.
+                          No issues found by the checks performed.
                         </td>
                       </tr>
                     )}

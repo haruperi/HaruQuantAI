@@ -1,37 +1,109 @@
-import { normalizeLegacyBranding } from '../../../host/branding';
 import { create } from 'zustand';
-import { cryptoDownloadRanges, validateCryptoName, type CryptoDefinition, type CryptoDownload } from './crypto';
-import { mergeRanges, validDate, type Interval } from './presentation';
+import { cryptoCatalog, cryptoAdd, cryptoDownload, cryptoStatus, cryptoCancel, type CryptoRecord, exchangeId } from './backend';
+import { cryptoDownloadRanges, type CryptoDefinition, type CryptoDownload } from './crypto';
 
-export const cryptoActive = (state?: string) => state === 'running' || state === 'paused';
+export const cryptoActive = (state?: string) => state === 'running';
 export const cryptoKey = 'sqx-crypto-data-v1';
-export interface CryptoJob { kind: 'add' | 'download'; definitions: CryptoDefinition[]; request?: CryptoDownload; state: 'running' | 'paused' | 'completed' | 'cancelled' | 'failed'; progress: number; completed: number; error?: string }
-interface Saved { definitions: CryptoDefinition[]; ranges: Record<string, Interval[]>; job: CryptoJob | null }
-interface Store extends Saved { storageError: string; startAdd: (definitions: CryptoDefinition[], externalActive: boolean) => void; startDownload: (request: CryptoDownload, externalActive: boolean) => void; advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void }
-
-function validateDefinition(row: CryptoDefinition) {
-  if (!row || row.id !== `crypto:${row.exchange}:${row.symbol}` || row.source !== 'Crypto' || row.category !== 'Crypto' || row.barType !== 'start' || row.broker !== '-1' || row.brokerName !== '—' || row.timezone !== 'UTC' || row.bars !== 0 || row.from !== '' || row.to !== '' || ['symbol','underlying','instrument','timeframe'].some(key => typeof row[key as keyof CryptoDefinition] !== 'string')) throw new Error('Invalid saved Crypto definition.');
+export interface CryptoJob {
+  kind: 'add' | 'download'; definitions: CryptoDefinition[]; request?: CryptoDownload;
+  state: 'running' | 'completed' | 'cancelled' | 'failed'; progress: number;
+  completed: number; error?: string; jobId?: string; canPause: false;
 }
-function validateSaved(value: Saved) {
-  if (!Array.isArray(value.definitions) || value.definitions.length > 10000 || !value.ranges || typeof value.ranges !== 'object' || Array.isArray(value.ranges)) throw new Error('Invalid saved Crypto state.');
-  const names: string[] = []; for (const row of value.definitions) { validateDefinition(row); validateCryptoName(row.symbol, names); names.push(row.symbol); }
-  if (Object.keys(value.ranges).length > 10000) throw new Error('Too many saved Crypto ranges.');
-  for (const [id, ranges] of Object.entries(value.ranges)) if (!value.definitions.some(row => row.id === id) || !Array.isArray(ranges) || ranges.length > 1000 || ranges.some(range => !validDate(range.from) || !validDate(range.to) || range.from > range.to)) throw new Error('Invalid saved Crypto coverage.');
-  const job = value.job; if (!job) return;
-  if (!['add','download'].includes(job.kind) || !Array.isArray(job.definitions) || !job.definitions.length || job.definitions.length > 1000 || job.definitions.some(row => { try { validateDefinition(row); return false; } catch { return true; } }) || !['running','paused','completed','cancelled','failed'].includes(job.state) || !Number.isInteger(job.progress) || job.progress < 0 || job.progress > 100 || !Number.isInteger(job.completed) || job.completed < 0 || job.completed > job.definitions.length) throw new Error('Invalid saved Crypto job.');
-  if (job.kind === 'download') { if (!job.request) throw new Error('Missing Crypto request.'); cryptoDownloadRanges(job.request); if (job.request.targets.some(row => !value.definitions.some(item => item.id === row.id))) throw new Error('Missing Crypto target.'); }
+interface Store {
+  exchanges: { name: string; timeframes: string[] }[]; definitions: CryptoDefinition[]; ranges: Record<string, never[]>;
+  job: CryptoJob | null; storageError: string; backendAvailable: boolean;
+  refresh: () => Promise<void>; poll: () => Promise<void>;
+  startAdd: (definitions: CryptoDefinition[], external: boolean) => Promise<void>;
+  startDownload: (request: CryptoDownload, external: boolean) => Promise<void>;
+  advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void;
 }
-
+function fromBackend(row: CryptoRecord): CryptoDefinition {
+  const inception = row.options.metadata.date_from;
+  return { id: row.id, symbol: row.symbol, underlying: row.underlying, instrument: row.instrument,
+    exchange: exchangeId(row.options.parameters.exchange), source: 'Crypto', timeframe: row.timeframe,
+    broker: '-1', brokerName: '—', timezone: 'UTC', category: 'Crypto', barType: 'start',
+    from: row.date_from.slice(0, 10), to: row.date_to.slice(0, 10), bars: row.bars,
+    availableFrom: inception ? new Date(inception).toISOString().slice(0, 10) : undefined };
+}
+function message(cause: unknown): string { return cause instanceof Error ? cause.message : 'Crypto operation failed.'; }
 export const useCrypto = create<Store>((set, get) => {
-  let initial: Saved = { definitions: [], ranges: {}, job: null }; let storageError = '';
-  try { const raw = localStorage.getItem(cryptoKey); if (raw) { const saved = normalizeLegacyBranding(JSON.parse(raw)); if (saved.version !== 1) throw new Error('Version'); validateSaved(saved); initial = saved; if (initial.job?.state === 'running') initial.job.state = 'paused'; } } catch { storageError = 'Saved Crypto data could not be read. Existing storage is preserved.'; }
-  function persist(patch: Partial<Saved>) { if (get().storageError) throw new Error(get().storageError); const { definitions, ranges, job } = { ...get(), ...patch }; const saved = { definitions, ranges, job }; validateSaved(saved); try { localStorage.setItem(cryptoKey, JSON.stringify({ version: 1, ...saved })); } catch { throw new Error('Unable to save Crypto data in browser storage. No changes were applied.'); } set(patch); }
-  function guard(external: boolean) { if (external || cryptoActive(get().job?.state)) throw new Error('Finish or stop the active data operation first.'); }
-  return { ...initial, storageError,
-    startAdd: (definitions, external) => { guard(external); const names = get().definitions.map(row => row.symbol); for (const row of definitions) { validateDefinition(row); validateCryptoName(row.symbol, names); names.push(row.symbol); } if (names.length > 10000) throw new Error('Mock dataset limit reached.'); persist({ job: { kind: 'add', definitions, state: 'running', progress: 0, completed: 0 } }); },
-    startDownload: (request, external) => { guard(external); cryptoDownloadRanges(request); const definitions = request.targets.map(row => { const saved = get().definitions.find(item => item.id === row.id); if (!saved) throw new Error('Unknown Crypto record.'); return saved; }); persist({ job: { kind: 'download', request, definitions, state: 'running', progress: 0, completed: 0 } }); },
-    advance: () => { const { job, definitions } = get(); if (job?.state !== 'running') return; const progress = Math.min(100, job.progress + 5), completed = Math.floor(progress * job.definitions.length / 100), ready = job.definitions.slice(job.completed, completed), ranges = { ...get().ranges }; try { if (job.kind === 'download') { const incoming = cryptoDownloadRanges(job.request!); for (const row of ready) ranges[row.id] = mergeRanges(ranges[row.id] ?? [], incoming[row.id], job.request!.overwrite); } persist({ definitions: job.kind === 'download' ? definitions : [...definitions, ...ready], ranges, job: { ...job, progress, completed, state: progress === 100 ? 'completed' : 'running' } }); } catch (cause) { set({ job: { ...job, state: 'failed', error: cause instanceof Error ? cause.message : 'Unable to save Crypto data.' } }); } },
-    action: action => { const job = get().job; if (!job || !cryptoActive(job.state)) return; try { persist({ job: { ...job, state: action === 'stop' ? 'cancelled' : action === 'pause' ? 'paused' : 'running' } }); } catch (cause) { set({ job: { ...job, state: 'failed', error: cause instanceof Error ? cause.message : 'Unable to save Crypto action.' } }); } },
+  let polling = false;
+  let stopRequested = false;
+  async function startNext(job: CryptoJob): Promise<void> {
+    const request = job.request!;
+    const target = job.definitions[job.completed];
+    const range = cryptoDownloadRanges({ ...request, targets: [target] })[target.id];
+    const started = await cryptoDownload(target.id, range.from, range.to, request.overwrite);
+    set({ job: { ...job, jobId: started.job_id } });
+    if (stopRequested) await cryptoCancel(started.job_id);
+  }
+  function guard(external: boolean) {
+    if (!get().backendAvailable) throw new Error(get().storageError || 'Crypto backend is unavailable.');
+    if (external || cryptoActive(get().job?.state)) throw new Error('Finish or stop the active data operation first.');
+  }
+  return {
+    exchanges: [], definitions: [], ranges: {}, job: null, storageError: '', backendAvailable: false,
+    refresh: async () => {
+      try {
+        const catalog = await cryptoCatalog();
+        if (!catalog.available) { set({ backendAvailable: false, storageError: catalog.reason }); return; }
+        set({ exchanges: catalog.exchanges, definitions: catalog.datasets.map(fromBackend), backendAvailable: true, storageError: '' });
+      } catch (cause) { set({ backendAvailable: false, storageError: message(cause) }); }
+    },
+    startAdd: async (definitions, external) => {
+      guard(external);
+      const job: CryptoJob = { kind: 'add', definitions, state: 'running', completed: 0, progress: 0, canPause: false };
+      set({ job });
+      try {
+        for (const row of definitions) {
+          const created = await cryptoAdd(row.underlying, row.symbol.slice(row.underlying.length), row.exchange, row.timeframe);
+          job.completed += 1; job.jobId = created.id;
+          set({ job: { ...job, progress: 100 * job.completed / definitions.length } });
+        }
+        await get().refresh();
+        set({ job: { ...job, state: 'completed', progress: 100 } });
+      } catch (cause) { set({ job: { ...job, state: 'failed', error: message(cause) } }); await get().refresh(); throw cause; }
+    },
+    startDownload: async (request, external) => {
+      guard(external); cryptoDownloadRanges(request);
+      stopRequested = false;
+      const job: CryptoJob = { kind: 'download', request, definitions: request.targets, state: 'running', completed: 0, progress: 0, canPause: false };
+      set({ job });
+      try { await startNext(job); }
+      catch (cause) { set({ job: { ...job, state: 'failed', error: message(cause) } }); throw cause; }
+    },
+    poll: async () => {
+      const job = get().job;
+      if (polling || job?.kind !== 'download' || job.state !== 'running' || !job.jobId) return;
+      polling = true;
+      try {
+        const status = await cryptoStatus(job.jobId);
+        if (get().job?.jobId !== job.jobId) return;
+        if (status.state === 'succeeded') {
+          const completed = job.completed + 1;
+          const next = { ...job, completed, progress: 100 * completed / job.definitions.length };
+          await get().refresh();
+          if (stopRequested) set({ job: { ...next, state: 'cancelled' } });
+          else if (completed === job.definitions.length) set({ job: { ...next, state: 'completed' } });
+          else { try { await startNext(next); } catch (cause) { set({ job: { ...next, state: 'failed', error: message(cause) } }); } }
+        } else if (['failed', 'timed_out', 'cancelled'].includes(status.state)) {
+          set({ job: { ...job, state: status.state === 'cancelled' ? 'cancelled' : 'failed', error: status.state === 'cancelled' ? undefined : 'The backend acquisition failed. Check the host log.' } });
+          await get().refresh();
+        } else {
+          const fraction = status.progress || 0;
+          set({ job: { ...job, progress: Math.min(99, 100 * (job.completed + fraction) / job.definitions.length) } });
+        }
+      } catch (cause) { set({ storageError: message(cause) }); }
+      finally { polling = false; }
+    },
+    advance: () => {},
+    action: action => {
+      const job = get().job;
+      if (action !== 'stop' || job?.kind !== 'download' || job.state !== 'running') return;
+      stopRequested = true;
+      if (!job.jobId) return;
+      void cryptoCancel(job.jobId).then(() => get().poll()).catch(cause => set({ storageError: message(cause) }));
+    },
   };
 });
-export function reservedCrypto() { const state = useCrypto.getState(); if (state.storageError) throw new Error(state.storageError); return [...state.definitions, ...(cryptoActive(state.job?.state) && state.job?.kind === 'add' ? state.job.definitions : [])]; }
+export function reservedCrypto() { return useCrypto.getState().definitions; }

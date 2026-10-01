@@ -4,7 +4,7 @@ export const contribution: UIContribution = {
   kind: 'plugin',
   version: '1.0.0',
   owner: 'workspace.data_manager',
-  slot: 'data_source.presentation',
+  slot: 'data_source.acquisition',
   contractVersion: '1.0.0',
   loadPorts: () => import('./presentation'),
 };

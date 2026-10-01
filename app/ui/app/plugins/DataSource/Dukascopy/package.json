@@ -28,6 +28,8 @@
     ],
     "tests": [
       "tests/plugin/DataSource/test_dukascopy.py",
+      "tests/plugin/DataSource/test_dukascopy_parity.py",
+      "tests/plugin/DataSource/test_dukascopy_cli.py",
       "app/ui/tests/e2e/data-manager-dukascopy-download.spec.ts",
       "app/ui/tests/e2e/data-manager-dukascopy.spec.ts",
       "app/ui/tests/unit/plugins/DataSource/Dukascopy/dukascopy.test.ts",
@@ -42,7 +44,8 @@
     ],
     "metadata": [
       "app/plugin/DataSource/README.md",
-      "app/ui/app/plugins/DataSource/Dukascopy/package.json"
+      "app/ui/app/plugins/DataSource/Dukascopy/package.json",
+      "app/plugin/DataSource/manifests/dukascopy/README.md"
     ]
   }
 }

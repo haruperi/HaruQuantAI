@@ -4,11 +4,13 @@ import asyncio
 import base64
 import json
 from pathlib import Path
+from typing import Any, cast
 
 import pytest
 from app.host.bootstrap import BootstrapCoordinator
 from app.host.capabilities import HostCapabilities, ResourceAccess
 from app.host.packages import (
+    Binding,
     apply_removal,
     plan_removal,
     restore_removal,
@@ -21,7 +23,59 @@ from starlette.testclient import TestClient
 from tests.host.conftest import make_config
 
 
-def test_empty_workspace_resource_read_and_unavailable_acquisition(tmp_path):
+def test_acquisition_routes_follow_attached_operations(tmp_path: Path) -> None:
+    """A new provider needs no workspace registry edit and removal revokes routes."""
+    calls = []
+
+    async def invoke(operation: Any, payload: Any) -> Any:
+        calls.append((operation, payload))
+        return {"job_id": "real-job"}
+
+    async def scenario() -> None:
+        owner = await prepare(
+            HostCapabilities(
+                ResourceAccess(
+                    "workspace.data_manager", "1.0.0", ResourceStore(tmp_path)
+                ),
+                None,
+                None,
+            )
+        )
+        assert owner.attach is not None
+        assert owner.attached_operations is not None
+        binding = Binding(
+            "plugin.data_manager.new_provider",
+            "data_source.acquisition",
+            "1.0.0",
+            ("download.start", "disclaimer"),
+            invoke,
+        )
+        await owner.attach((binding,))
+        assert owner.attached_operations() == (
+            "sources.new_provider.download.start",
+            "sources.new_provider.disclaimer",
+        )
+        assert cast(
+            "Any",
+            await owner.invoke(
+                "sources.new_provider.download.start", {"dataset_id": "sample"}
+            ),
+        ) == {"job_id": "real-job"}
+        with pytest.raises(ValueError, match="Missing acquisition operation"):
+            cast("Any", await owner.invoke("sources.new_provider.not_declared", {}))
+        await owner.attach(())
+        assert owner.attached_operations() == ()
+        with pytest.raises(ValueError, match="Missing acquisition capability"):
+            cast("Any", await owner.invoke("sources.new_provider.download.start", {}))
+        assert calls == [("download.start", {"dataset_id": "sample"})]
+        await owner.close()
+
+    asyncio.run(scenario())
+
+
+def test_empty_workspace_resource_read_and_unavailable_acquisition(
+    tmp_path: Path,
+) -> None:
     store = ResourceStore(tmp_path)
     reference = store.publish(
         "removed.producer",
@@ -39,27 +93,32 @@ def test_empty_workspace_resource_read_and_unavailable_acquisition(tmp_path):
             ResourceAccess("workspace.data_manager", "1.0.0", store), None, None
         )
         owner = await prepare(context)
-        assert await owner.invoke("capabilities", None) == {"providers": []}
-        assert await owner.invoke("resources.list", None) == [
+        assert cast("Any", await owner.invoke("capabilities", None)) == {
+            "providers": []
+        }
+        assert cast("Any", await owner.invoke("resources.list", None)) == [
             reference.model_dump(mode="json")
         ]
-        result = await owner.invoke("resources.read", reference.model_dump(mode="json"))
+        result = cast(
+            "Any",
+            await owner.invoke("resources.read", reference.model_dump(mode="json")),
+        )
         assert isinstance(result, dict)
         assert result["content_base64"] == "cHJlc2VydmVk"
         with pytest.raises(ValueError, match="Missing acquisition"):
-            await owner.invoke("download", None)
+            cast("Any", await owner.invoke("download", None))
         await owner.close()
         assert store.read("consumer", reference)[0] == b"preserved"
 
     asyncio.run(run())
 
 
-def test_missing_declared_service_fails_closed():
+def test_missing_declared_service_fails_closed() -> None:
     with pytest.raises(ValueError, match=r"Missing host\.resources"):
         asyncio.run(prepare(HostCapabilities(None, None, None)))
 
 
-def test_real_workspace_restart_removal_retains_resources(tmp_path):
+def test_real_workspace_restart_removal_retains_resources(tmp_path: Path) -> None:
     host_config = make_config(tmp_path)
     root = host_config.data_dir / "installation"
     directory = root / "app/workspace/DataManager"
@@ -165,7 +224,7 @@ def test_workspace_logging(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> 
         )
         with caplog.at_level("INFO", logger="app.workspace.DataManager.workspace"):
             owner = await prepare(context)
-            await owner.invoke("capabilities", None)
+            cast("Any", await owner.invoke("capabilities", None))
             await owner.close()
 
         assert "Preparing Data Manager workspace" in caplog.text
@@ -173,3 +232,64 @@ def test_workspace_logging(tmp_path: Path, caplog: pytest.LogCaptureFixture) -> 
         assert "Data Manager workspace closed" in caplog.text
 
     asyncio.run(run())
+
+
+def test_updates_submit_jobs_and_report_unmatched_targets(tmp_path: Path) -> None:
+    """Actual provider admission, missing dates, and removed owners stay distinct."""
+    calls = []
+
+    async def invoke(operation: Any, payload: Any) -> Any:
+        if operation == "catalog":
+            return {
+                "datasets": [
+                    {"id": "stored", "symbol": "A", "date_to": "2024-01-02"},
+                    {"id": "empty", "symbol": "B", "date_to": ""},
+                ]
+            }
+        calls.append(payload)
+        return {"job_id": "admitted"}
+
+    async def scenario() -> None:
+        owner = await prepare(
+            HostCapabilities(
+                ResourceAccess(
+                    "workspace.data_manager", "1.0.0", ResourceStore(tmp_path)
+                ),
+                None,
+                None,
+            )
+        )
+        assert owner.attach is not None
+        await owner.attach(
+            (
+                Binding(
+                    "plugin.data_manager.sample",
+                    "data_source.acquisition",
+                    "1.0.0",
+                    ("catalog", "download.start"),
+                    invoke,
+                ),
+            )
+        )
+        result = cast(
+            "Any",
+            await owner.invoke(
+                "actions.update_selected",
+                {
+                    "dataset_ids": ["stored", "empty", "removed"],
+                },
+            ),
+        )
+        assert result["success"] is False
+        assert result["queued"] == 1
+        assert result["jobs"][0]["job_id"] == "admitted"
+        assert {item["dataset_id"] for item in result["errors"]} == {"empty", "removed"}
+        assert calls[0]["dataset_id"] == "stored"
+        assert calls[0]["date_from"] == "2024-01-02"
+        await owner.attach(())
+        unavailable = cast("Any", await owner.invoke("actions.update_all", {}))
+        assert unavailable["success"] is False
+        assert unavailable["queued"] == 0
+        await owner.close()
+
+    asyncio.run(scenario())

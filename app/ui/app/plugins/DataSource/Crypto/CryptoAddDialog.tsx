@@ -3,6 +3,7 @@ import { Button, Modal, TextInput } from '../../../components/ui';
 import { cryptoDefinitions, cryptoExchange, type CryptoExchangeId } from './crypto';
 import { useCrypto } from './cryptoStore';
 import './crypto.css';
+import { cryptoSymbols, exchangeNames } from './backend';
 
 /** Inert owner-supplied names and operation status; no peer store handles. */
 export interface CryptoContextDocument {
@@ -26,17 +27,21 @@ export function CryptoModal({ title, onClose, children, footer, wide = false }: 
 
 export function CryptoAddDialog({ contextDocument, exchangeId, onClose, onStarted }: { contextDocument: CryptoContextDocument; exchangeId: CryptoExchangeId; onClose: () => void; onStarted: () => void }) {
   const exchange = cryptoExchange(exchangeId), store = useCrypto();
-  const [query, setQuery] = useState(''), [selected, setSelected] = useState<string[]>([]), [timeframe, setTimeframe] = useState(exchange.timeframes[0]), [postfix, setPostfix] = useState(''), [agreed, setAgreed] = useState(false), [error, setError] = useState('');
+  const [query, setQuery] = useState(''), [selected, setSelected] = useState<string[]>([]), [timeframe, setTimeframe] = useState('M1'), [postfix, setPostfix] = useState(''), [agreed, setAgreed] = useState(false), [error, setError] = useState('');
   const allCheck = useRef<HTMLInputElement>(null);
-  const rows = exchange.symbols.filter(row => row.symbol.toLowerCase().includes(query.trim().toLowerCase()));
+  const [symbols, setSymbols] = useState<{ symbol: string }[]>([]);
+  const timeframes = store.exchanges.find(row => row.name === exchangeNames[exchangeId])?.timeframes ?? [];
+  useEffect(() => { if (timeframes.length && !timeframes.includes(timeframe)) setTimeframe(timeframes[0]); }, [timeframes, timeframe]);
+  useEffect(() => { let active = true; cryptoSymbols(exchangeId).then(result => { if (active) setSymbols(result.symbols.map(symbol => ({ symbol }))); }).catch(cause => { if (active) setError(String(cause)); }); return () => { active = false; }; }, [exchangeId]);
+  const rows = symbols.filter(row => row.symbol.toLowerCase().includes(query.trim().toLowerCase()));
   const all = rows.length > 0 && rows.every(row => selected.includes(row.symbol));
   useEffect(() => { if (allCheck.current) allCheck.current.indeterminate = selected.length > 0 && !all; }, [all, selected]);
-  function save() {
+  async function save() {
     try {
       if (!selected.length) throw new Error('No symbols selected');
       if (!agreed) throw new Error('Please read and confirm Data Disclaimer for Free Data.');
       const context = cryptoContext(contextDocument), definitions = cryptoDefinitions(exchangeId, selected, timeframe, postfix, context.existing);
-      store.startAdd(definitions, context.active); onStarted(); onClose();
+      await store.startAdd(definitions, context.active); onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add Crypto data.'); }
   }
   return <CryptoModal wide title={exchange.title} onClose={onClose} footer={<>
@@ -45,10 +50,10 @@ export function CryptoAddDialog({ contextDocument, exchangeId, onClose, onStarte
   </>}>
     {(error || store.storageError) && <p className="crypto-error" role="alert">{error || store.storageError}</p>}
     <fieldset className="crypto-catalogue"><legend>Choose from available data</legend>
-      <div className="crypto-filter"><TextInput aria-label="Filter items" placeholder="Filter items" value={query} onChange={event => { setQuery(event.target.value); setSelected([]); setError(''); }}/><span>{rows.length} mock symbols</span></div>
+      <div className="crypto-filter"><TextInput aria-label="Filter items" placeholder="Filter items" value={query} onChange={event => { setQuery(event.target.value); setSelected([]); setError(''); }}/><span>{rows.length} symbols</span></div>
       <div className="crypto-grid"><table className="plain-table" aria-label={`${exchange.menuLabel} symbols`}><thead><tr><th><input ref={allCheck} type="checkbox" aria-label={`Select all ${exchange.menuLabel} symbols`} checked={all} disabled={!rows.length} onChange={() => setSelected(all ? [] : rows.map(row => row.symbol))}/></th><th>Symbol</th></tr></thead><tbody>{rows.map(row => <tr key={row.symbol} className={selected.includes(row.symbol) ? 'selected' : ''}><td><input type="checkbox" aria-label={`Select symbol ${row.symbol}`} checked={selected.includes(row.symbol)} onChange={() => setSelected(current => current.includes(row.symbol) ? current.filter(item => item !== row.symbol) : [...current, row.symbol])}/></td><td>{row.symbol}</td></tr>)}{!rows.length && <tr><td colSpan={2}>No symbols available.</td></tr>}</tbody></table></div>
-      <div className="crypto-details"><label>Timeframe <select aria-label="Timeframe" value={timeframe} onChange={event => { setTimeframe(event.target.value); setError(''); }}>{exchange.timeframes.map(value => <option key={value}>{value}</option>)}</select></label><label>Data postfix <span><TextInput aria-label="Data postfix" maxLength={64} value={postfix} onChange={event => { setPostfix(event.target.value); setError(''); }}/><small>This postfix will be optionally added to the data names created</small></span></label></div>
-      <p className="crypto-mock-note">Offline mock catalog. No exchange connection is made.</p>
+      <div className="crypto-details"><label>Timeframe <select aria-label="Timeframe" value={timeframe} onChange={event => { setTimeframe(event.target.value); setError(''); }}>{timeframes.map(value => <option key={value}>{value}</option>)}</select></label><label>Data postfix <span><TextInput aria-label="Data postfix" maxLength={64} value={postfix} onChange={event => { setPostfix(event.target.value); setError(''); }}/><small>This postfix will be optionally added to the data names created</small></span></label></div>
+      <p className="crypto-mock-note">Symbols are retrieved from the selected exchange.</p>
     </fieldset>
   </CryptoModal>;
 }

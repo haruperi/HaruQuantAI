@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import { Button, Field, Modal, TextInput } from '../../../components/ui';
 import { activeImport, useFileImports } from './fileImportStore';
-import { datePatterns, emptyFileRecord, importedRecord, limits, massSymbol, parseImport, readImportFile, timeframes, timezones, type ImportTask } from './fileImport';
+import { datePatterns, emptyFileRecord, limits, massSymbol, readImportFile, timeframes, timezones, type ImportTask } from './fileImport';
 import { newInstrument, type FileDefinition, type FileInstrument } from './presentation';
 import './fileImport.css';
+import { wireRequest } from './backend';
 
 export interface FileMassImportContextDocument {
   readonly existing: readonly string[];
@@ -29,7 +30,7 @@ export function FileMassImportDialog({
   const [busy, setBusy] = useState(false);
   const cancelled = useRef(false);
   const close = useCallback(() => { cancelled.current = true; onClose(); }, [onClose]);
-  const [timezone, setTimezone] = useState('EETUS');
+  const [timezone, setTimezone] = useState('Etc/UCT');
   const [timeframe, setTimeframe] = useState('D1');
   const [dateFormat, setDateFormat] = useState('ddMMyyyy');
   const [group, setGroup] = useState(false);
@@ -67,14 +68,14 @@ export function FileMassImportDialog({
         const symbol = massSymbol(stem, postfix, existing.map(s => ({ symbol: s, source: 'File import' })), policy);
         if (!symbol) { skipped++; continue; }
         const text = await readImportFile(file);
-        const parsed = parseImport(text, { name: 'Folder CSV', separator: ',', skipRows: 0, skipColumns: 0, dateFormat, columns: timeframe === 'TICK' ? ['Date & Time', 'Ask', 'Bid', 'Volume'] : ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'] }, timeframe, false);
+        const request = wireRequest(text, { name: 'Folder CSV', separator: ',', skipRows: 0, skipColumns: 0, dateFormat, columns: timeframe === 'TICK' ? ['Date & Time', 'Ask', 'Bid', 'Volume'] : ['Date', 'Open', 'High', 'Low', 'Close', 'Volume'] }, symbol, instrument.symbol, timeframe, false);
         const previousId = `file:${symbol}`;
         const base: FileDefinition = { ...emptyFileRecord(symbol, instrument, selectedBarType), id: previousId };
-        tasks.push({ filename: file.name, record: importedRecord(base, parsed, timezone, undefined, true), ignored: parsed.ignored, error: parsed.error });
+        tasks.push({ filename: file.name, record: { ...base, timestamps: [], unknownBars: 0 }, ignored: 0, request });
         existing.push(symbol);
       }
       if (cancelled.current) return;
-      useFileImports.getState().start(
+      await useFileImports.getState().start(
         tasks,
         timezone,
         group ? folder || 'Imported symbols' : '',

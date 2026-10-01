@@ -19,7 +19,8 @@
       "app/ui/app/plugins/DataSource/SQData/localState.ts",
       "app/ui/app/plugins/DataSource/SQData/presentation.ts",
       "app/ui/app/plugins/DataSource/SQData/sqData.ts",
-      "app/ui/app/plugins/DataSource/SQData/sqDataStore.ts"
+      "app/ui/app/plugins/DataSource/SQData/sqDataStore.ts",
+      "app/ui/app/plugins/DataSource/SQData/backend.ts"
     ],
     "tests": [
       "app/ui/tests/e2e/data-manager-sq-data.spec.ts",

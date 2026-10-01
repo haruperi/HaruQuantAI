@@ -88,9 +88,9 @@ import math
 import os
 import platform
 from collections.abc import Awaitable, Callable
-from concurrent.futures import ProcessPoolExecutor
+from concurrent.futures import ProcessPoolExecutor, ThreadPoolExecutor
 from dataclasses import dataclass, replace
-from typing import Any, Literal
+from typing import Any, Literal, TypeVar
 from uuid import uuid4
 
 import psutil
@@ -98,6 +98,8 @@ import psutil
 from app.host.logging import get_logger
 
 logger = get_logger(__name__)
+
+Result = TypeVar("Result")
 
 MAX_JOBS = 4096
 SHUTDOWN_SECONDS = 5.0
@@ -187,6 +189,34 @@ class JobManager:
         self.records: dict[str, Job] = {}
         self.tasks: dict[str, asyncio.Task[None]] = {}
         self.closed = False
+        self._compute_pool = ThreadPoolExecutor(
+            max_workers=workers, thread_name_prefix="haru-compute"
+        )
+
+    async def offload(
+        self, owner: str, operation: Callable[..., Result], *arguments: Any
+    ) -> Result:
+        """Offload bounded pure work while retaining admission through cancellation.
+
+        Work is permitted only inside an admitted owner job. Cancellation waits for
+        the pure worker to leave before its reservation or dependencies are released.
+        Threads provide responsiveness, not OS memory or execution-time containment.
+        """
+        current = asyncio.current_task()
+        if not any(
+            task is current and self.records[key].owner == owner
+            for key, task in self.tasks.items()
+        ):
+            raise PermissionError("Compute requires an admitted owner job")
+        logger.info("Host compute started: owner=%s", owner)
+        future = asyncio.wrap_future(self._compute_pool.submit(operation, *arguments))
+        try:
+            return await asyncio.shield(future)
+        except asyncio.CancelledError:
+            await asyncio.shield(future)
+            raise
+        finally:
+            logger.info("Host compute finished: owner=%s", owner)
 
     def submit(
         self, owner: str, budget: Budget, operation: Callable[[], Awaitable[None]]
@@ -222,7 +252,8 @@ class JobManager:
 
     def _finished(self, job: Job) -> None:
         """Release reservations even for cancellation before a queued task starts."""
-        self.tasks.pop(job.id, None)
+        if self.tasks.pop(job.id, None) is None:
+            return
         self.reserved = (
             self.reserved[0] - job.budget.workers,
             self.reserved[1] - job.budget.memory_bytes,
@@ -249,12 +280,19 @@ class JobManager:
             self.records[job.id] = replace(job, state="cancelled")
             logger.info("Host job cancelled: id=%s, owner=%s", job.id, job.owner)
             raise
-        except Exception:
+        except Exception as error:  # noqa: BLE001 -- supervised extension failure boundary.
             self.records[job.id] = replace(job, state="failed")
-            logger.exception("Host job failed: id=%s, owner=%s", job.id, job.owner)
+            logger.error(  # noqa: TRY400 -- omit secret-bearing exception details.
+                "Host job failed: id=%s owner=%s error_type=%s",
+                job.id,
+                job.owner,
+                type(error).__name__,
+            )
         else:
             self.records[job.id] = replace(job, state="succeeded")
             logger.info("Host job succeeded: id=%s, owner=%s", job.id, job.owner)
+        finally:
+            self._finished(job)
 
     def status(self, owner: str, job_id: str) -> Job:
         """Read only the caller's job, without granting peer execution authority."""
@@ -290,4 +328,6 @@ class JobManager:
             _, unfinished = await asyncio.wait(pending, timeout=SHUTDOWN_SECONDS)
             if unfinished:
                 raise TimeoutError("Owner jobs did not stop")
+        if owner is None:
+            self._compute_pool.shutdown(wait=False, cancel_futures=True)
         logger.info("JobManager closed: owner=%s", owner)

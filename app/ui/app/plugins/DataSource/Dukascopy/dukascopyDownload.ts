@@ -4,7 +4,7 @@ export type Preset = 'sinceLast' | 'sixMonths' | 'year' | 'fiveYears' | 'tenYear
 export interface DownloadTarget { id: string; symbol: string; source: string; underlying?: string; instrument?: string; timeframe: string; from: string; to: string; bars: number; sourceDataId?: string; fastDownloadAvailable?: boolean }
 export interface DownloadRequest { targets: DownloadTarget[]; dateFrom: string; dateTo: string; dateType: Preset; overwrite: boolean; downloadType: DownloadMode }
 export interface Interval { from: string; to: string }
-export interface DownloadJob { request: DownloadRequest; state: 'running' | 'paused' | 'cancelled' | 'completed' | 'failed'; progress: number; error?: string; resolvedModes?: Record<string, DownloadMode>; jobId?: string; canPause?: boolean }
+export interface DownloadJob { request: DownloadRequest; state: 'running' | 'paused' | 'cancelled' | 'completed' | 'failed'; progress: number; error?: string; resolvedModes?: Record<string, DownloadMode>; jobId?: string; canPause?: boolean; outcome?: 'complete' | 'partial' | 'empty' }
 export interface DownloadState { job: DownloadJob | null; ranges: Record<string, Interval[]>; preferred: DownloadMode | null }
 export const emptyDownload: DownloadState = { job: null, ranges: {}, preferred: null };
 export function today(): string { const now = new Date(); return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`; }
@@ -67,4 +67,13 @@ export function resolveDownloadModes(request: DownloadRequest): Record<string, D
 export function downloadStep(job: DownloadJob): number {
   const modes = job.resolvedModes ?? resolveDownloadModes(job.request);
   return Math.min(...job.request.targets.map(target => ({ standard: 5, cdn: 10, 'cdn-cn': 8 }[modes[target.id] ?? 'standard'])));
+}
+
+/** Expire only this terminal display; a replacement job keeps its own lifecycle. */
+export function scheduleFinishedDownloadClear(job: DownloadJob | null, current: () => DownloadJob | null, clear: () => void): () => void {
+  if (!job || !['completed', 'failed', 'cancelled'].includes(job.state)) return () => {};
+  const timer = setTimeout(() => {
+    if (current() === job) clear();
+  }, 10_000);
+  return () => clearTimeout(timer);
 }

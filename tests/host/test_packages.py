@@ -105,3 +105,92 @@ def test_invalid_modes_and_entry_ownership(tmp_path):
     doc["ui_entry"] = "app/ui/app/workspace/one/other.ts"
     with pytest.raises(ValueError, match="owned source"):
         Package.model_validate(doc)
+
+
+def test_workspace_cli_paths_removal_restore_and_retained_data(tmp_path: Path) -> None:
+    """Exact named clients belong to one workspace closure; data stays independent."""
+    from app.host.packages import apply_removal, plan_removal, restore_removal
+    from app.persistence.resources import ResourceStore
+
+    doc = make_package(tmp_path, "workspace")
+    make_package(tmp_path, "child", "test.workspace")
+    clients = ("scripts/workspace_cli.py", "tests/test_workspace_cli.py")
+    for name in clients:
+        path = tmp_path / name
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("# Workspace-owned client fixture\n")
+        with pytest.raises(ValueError, match="protected"):
+            confined_file(tmp_path, name)
+        assert (
+            confined_file(tmp_path, name, client_workspace_ids=("test.workspace",))
+            == path
+        )
+    doc["owned_paths"]["source"].append(clients[0])
+    doc["owned_paths"]["tests"] = [clients[1]]
+    (tmp_path / doc["owned_paths"]["metadata"][0]).write_text(json.dumps(doc))
+    store = ResourceStore(tmp_path / "retained/resources")
+    ref = store.publish(
+        "test.child",
+        "1.0.0",
+        b"retained",
+        schema_id="test.retained",
+        schema_version="1.0.0",
+        schema_json='{"type":"string"}',
+        media_type="text/plain",
+        readers=("*",),
+    )
+    inventory = scan_packages(tmp_path)
+    assert not inventory.issues
+    child_plan = plan_removal(tmp_path, inventory, "test.child")
+    assert not set(clients).intersection(child_plan.files)
+    assert child_plan.client_workspace_ids == ()
+    plan = plan_removal(tmp_path, inventory, "test.workspace")
+    assert set(clients).issubset(plan.files)
+    assert plan.client_workspace_ids == ("test.workspace",)
+    journal = apply_removal(tmp_path, plan)
+    assert all(not (tmp_path / name).exists() for name in clients)
+    assert store.read("independent", ref)[0] == b"retained"
+    restore_removal(tmp_path, journal)
+    assert scan_packages(tmp_path).fingerprint == inventory.fingerprint
+    assert all((tmp_path / name).is_file() for name in clients)
+
+
+@pytest.mark.parametrize(
+    "name",
+    [
+        "scripts/other_cli.py",
+        "scripts/ci_check.py",
+        "scripts/main.py",
+        "scripts/workspace_cli.py/escape",
+        "tests/test_cli.py",
+        "tests/test_other_cli.py",
+        "tests/host/test_packages.py",
+    ],
+)
+def test_workspace_cli_allowance_does_not_open_generic_roots(
+    tmp_path: Path, name: str
+) -> None:
+    """A workspace cannot claim arbitrary CLI files, host tests or workflow scripts."""
+    doc = make_package(tmp_path, "workspace")
+    path = tmp_path / name
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("# Protected fixture\n")
+    doc["owned_paths"]["source"].append(name)
+    (tmp_path / doc["owned_paths"]["metadata"][0]).write_text(json.dumps(doc))
+    assert scan_packages(tmp_path).issues[0].code == "invalid_package"
+    with pytest.raises(ValueError, match="protected"):
+        confined_file(tmp_path, name, client_workspace_ids=("test.workspace",))
+
+
+def test_plugin_cannot_claim_named_workspace_cli(tmp_path: Path) -> None:
+    """External client path authority belongs exclusively to workspace declarations."""
+    make_package(tmp_path, "workspace")
+    doc = make_package(tmp_path, "child", "test.workspace")
+    path = tmp_path / "scripts/child_cli.py"
+    path.parent.mkdir()
+    path.write_text("# Not a workspace client\n")
+    doc["owned_paths"]["source"].append("scripts/child_cli.py")
+    (tmp_path / doc["owned_paths"]["metadata"][0]).write_text(json.dumps(doc))
+    assert any(
+        issue.code == "invalid_package" for issue in scan_packages(tmp_path).issues
+    )

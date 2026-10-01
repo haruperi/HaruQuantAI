@@ -1,80 +1,62 @@
-import { describe, expect, it, vi } from 'vitest';
-import { defaultSQConfig, lookupSQ, planSQAdd } from '../../../../../app/plugins/DataSource/SQData/sqData';
-describe('SQ catalogue rules', () => {
-  it('combines ticker/name tokens, exchange and exact filters', () => {
-    const config = { ...defaultSQConfig(), symbols: 'aapl;Microsoft\nAmazon' };
-    expect(lookupSQ('equity', config).map(row => row.ticker)).toEqual(['AAPL', 'MSFT', 'AMZN']);
-    expect(lookupSQ('equity', { ...config, exchange: 'NYSE' })).toEqual([]);
-    expect(lookupSQ('equity', { ...config, symbols: 'AA', exact: true })).toEqual([]);
-    expect(() => lookupSQ('equity', { ...config, searchInName: false, searchInTicker: false })).toThrow('Enable');
-  });
-  it('filters dated futures and validates entitlement and duplicate names', () => {
-    const config = { ...defaultSQConfig(), symbols: 'ES', searchInName: false };
-    expect(lookupSQ('futures', config).map(row => row.ticker)).toEqual(['ES']);
-    expect(lookupSQ('futures', { ...config, onlyContFutures: false }).map(row => row.ticker)).toEqual(['ES', 'ESZ26']);
-    expect(() => planSQAdd('futures', config, ['ES'], true, 'Full', ['ES'])).toThrow('exists');
-    expect(() => planSQAdd('equity', defaultSQConfig(), ['AMZN'], true, 'Starter', [])).toThrow('subscription');
-    expect(() => planSQAdd('equity', defaultSQConfig(), ['AAPL'], false, 'Full', [])).toThrow('agree');
-  });
-  it('adds empty definitions with configured bar and timezone metadata', () => {
-    const row = planSQAdd('equity', { ...defaultSQConfig(), postfix: '_test', timezoneType: 0, timezoneShift: -2 }, ['AAPL'], true, 'Full', [])[0];
-    expect(row).toMatchObject({ symbol: 'AAPL_test', bars: 0, from: '', to: '', timezone: 'Exchange -2h', barType: 'end', availableTimeframes: ['M1', 'D1'] });
-    expect(() => planSQAdd('equity', { ...defaultSQConfig(), timezoneShift: 24 }, ['AAPL'], true, 'Full', [])).toThrow('integer');
-  });
-});
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { defaultSQConfig } from '../../../../../app/plugins/DataSource/SQData/sqData';
+const api = vi.hoisted(() => ({ sqCatalog: vi.fn(), sqLookup: vi.fn(), sqAdd: vi.fn() }));
+vi.mock('../../../../../app/plugins/DataSource/SQData/backend', () => api);
+const symbol = { ticker: 'AAPL', name: 'Apple', exchange: 'NASDAQ', timeframe: 'D', date_from: '1980-12-12', date_to: '', commodity_code: null };
 async function isolated() {
-  vi.resetModules(); const memory = new Map<string, string>();
-  const storage = { getItem: (key: string) => memory.get(key) ?? null, setItem: (key: string, value: string) => { memory.set(key, value); } };
-  vi.stubGlobal('localStorage', storage);
-  const store = (await import('../../../../../app/plugins/DataSource/SQData/sqDataStore')).useSQData;
-  return { store, memory, storage };
+  vi.resetModules();
+  return (await import('../../../../../app/plugins/DataSource/SQData/sqDataStore')).useSQData;
 }
-describe('SQ add persistence', () => {
-  it('commits atomically, pauses, resumes after reload, and completes without duplicate rows', async () => {
-    const { store } = await isolated();
-    store.getState().start('equity', defaultSQConfig(), ['AAPL', 'MSFT'], true, 'Full', [], false);
-    expect(() => store.getState().start('futures', defaultSQConfig(), ['ES'], true, 'Full', [], false)).toThrow('active');
-    for (let i = 0; i < 10; i++) store.getState().advance();
-    expect(store.getState().definitions.map(row => row.symbol)).toEqual(['AAPL']);
-    vi.resetModules(); const restored = (await import('../../../../../app/plugins/DataSource/SQData/sqDataStore')).useSQData;
-    expect(restored.getState().job?.state).toBe('paused'); restored.getState().advance(); expect(restored.getState().job?.progress).toBe(50);
-    restored.getState().action('resume'); for (let i = 0; i < 10; i++) restored.getState().advance();
-    expect(restored.getState().definitions.map(row => row.symbol)).toEqual(['AAPL', 'MSFT']); expect(restored.getState().job?.state).toBe('completed');
-  });
-  it('stops unfinished additions and preserves storage on write failure or corruption', async () => {
-    const { store, memory, storage } = await isolated();
-    store.getState().start('futures', defaultSQConfig(), ['ES', '6E'], true, 'Full', [], false);
-    for (let i = 0; i < 10; i++) store.getState().advance(); store.getState().action('stop'); store.getState().advance();
-    expect(store.getState().definitions.map(row => row.symbol)).toEqual(['ES']);
-    storage.setItem = () => { throw new Error('Quota'); };
-    expect(() => store.getState().start('equity', defaultSQConfig(), ['AAPL'], true, 'Full', [], false)).toThrow('Unable to save');
-    memory.set('sqx-sq-data-v1', '{bad'); vi.resetModules(); const restored = (await import('../../../../../app/plugins/DataSource/SQData/sqDataStore')).useSQData;
-    expect(restored.getState().storageError).toContain('preserved'); expect(memory.get('sqx-sq-data-v1')).toBe('{bad');
-  });
-  it('normalizes legacy product labels before validating persisted data', async () => {
-    const { store, memory } = await isolated();
-    store.getState().start('futures', defaultSQConfig(), ['ES'], true, 'Full', [], false);
-    for (let index = 0; index < 20; index++) store.getState().advance();
-    const current = memory.get('sqx-sq-data-v1');
-    expect(current).toBeDefined();
-    const legacy = JSON.parse(current!);
-    legacy.definitions[0].source = 'SQ Futures';
-    legacy.job.definitions[0].source = 'SQ Futures';
-    memory.set('sqx-sq-data-v1', JSON.stringify(legacy));
-    vi.resetModules();
-    const restored = (await import('../../../../../app/plugins/DataSource/SQData/sqDataStore')).useSQData;
-    expect(restored.getState().storageError).toBe('');
-    expect(restored.getState().definitions[0]?.source).toBe('Futures');
-  });
+beforeEach(() => {
+  vi.clearAllMocks();
+  vi.stubGlobal('localStorage', { getItem: vi.fn(() => null), setItem: vi.fn() });
+  api.sqCatalog.mockResolvedValue({ available: true, reason: '', datasets: [], exchanges: ['NASDAQ'], credentials_configured: true });
+  api.sqLookup.mockImplementation(async (_provider, config) => ({ symbols: [{ ...symbol, ticker: config.symbols }] }));
+  api.sqAdd.mockResolvedValue({ id: 'actual-id' });
 });
-it('reserves SQ names across providers and reports mid-job persistence failure', async () => {
-  const { store, storage, memory } = await isolated();
-  store.getState().start('equity', defaultSQConfig(), ['AAPL'], true, 'Full', [], false);
-  const { reservedSQDefinitions } = await import('../../../../../app/plugins/DataSource/SQData/sqDataStore');
-  expect(reservedSQDefinitions().map(row => row.symbol)).toEqual(['AAPL']);
-  const previous = memory.get('sqx-sq-data-v1'); storage.setItem = () => { throw new Error('Quota'); };
-  store.getState().advance();
-  expect(store.getState().job).toMatchObject({ state: 'failed', completed: 0 });
-  expect(store.getState().definitions).toEqual([]); expect(memory.get('sqx-sq-data-v1')).toBe(previous);
-  expect(() => store.getState().start('equity', defaultSQConfig(), ['MSFT'], true, 'Full', [], true)).toThrow('active');
+afterEach(() => vi.unstubAllGlobals());
+describe('SQ backend additions', () => {
+  it('uses actual catalogs and script authentication availability', async () => {
+    const store = await isolated(); await store.getState().refresh();
+    expect(store.getState()).toMatchObject({ backendAvailable: true, credentials: { equity: true, futures: true }, definitions: [] });
+    expect(api.sqCatalog).toHaveBeenCalledWith('equity');
+    expect(api.sqCatalog).toHaveBeenCalledWith('futures');
+  });
+  it('reports completion only after both backend definitions commit', async () => {
+    const store = await isolated();
+    store.getState().start('equity', defaultSQConfig(), ['AAPL', 'MSFT'], true, 'Starter', [], false);
+    expect(store.getState().job).toMatchObject({ state: 'running', completed: 0, canPause: false });
+    for (let i=0;i<20;i++) store.getState().advance();
+    expect(store.getState().job?.completed).toBe(0);
+    expect(() => store.getState().start('futures', defaultSQConfig(), ['ES'], true, 'Full', [], false)).toThrow('active');
+    await vi.waitFor(() => expect(store.getState().job).toMatchObject({ state: 'completed', completed: 2, progress: 100 }));
+    expect(api.sqAdd.mock.calls.map(call => call[1].ticker)).toEqual(['AAPL', 'MSFT']);
+    expect(localStorage.setItem).not.toHaveBeenCalled();
+  });
+  it('cancels before starting another definition while accounting for an in-flight commit', async () => {
+    const store = await isolated();
+    let complete!: () => void;
+    api.sqAdd.mockImplementationOnce(() => new Promise(resolve => { complete=()=>resolve({ id: 'committed' }); }));
+    store.getState().start('equity', defaultSQConfig(), ['AAPL', 'MSFT'], true, 'Full', [], false);
+    await vi.waitFor(() => expect(api.sqAdd).toHaveBeenCalledTimes(1));
+    store.getState().action('stop'); complete();
+    await vi.waitFor(() => expect(store.getState().job).toMatchObject({ state: 'cancelled', completed: 1 }));
+    expect(api.sqAdd).toHaveBeenCalledTimes(1);
+  });
+  it('retains committed progress when a subsequent backend operation fails', async () => {
+    const store = await isolated(); api.sqAdd.mockResolvedValueOnce({ id: 'committed' }).mockRejectedValueOnce(new Error('Storage unavailable'));
+    store.getState().start('equity', defaultSQConfig(), ['AAPL', 'MSFT'], true, 'Full', [], false);
+    await vi.waitFor(() => expect(store.getState().job).toMatchObject({ state: 'failed', completed: 1, error: 'Storage unavailable' }));
+  });
+  it('requires consent, unique names and supported timestamps before invoking a source', async () => {
+    const store = await isolated();
+    expect(() => store.getState().start('equity', defaultSQConfig(), ['AAPL'], false, 'Full', [], false)).toThrow('accept');
+    expect(() => store.getState().start('equity', defaultSQConfig(), ['AAPL'], true, 'Full', ['AAPL'], false)).toThrow('exists');
+    expect(() => store.getState().start('equity', { ...defaultSQConfig(), timezoneType: 0 }, ['AAPL'], true, 'Full', [], false)).toThrow('UTC');
+    expect(api.sqAdd).not.toHaveBeenCalled();
+  });
+  it('reports unavailable providers without fabricating definitions', async () => {
+    const store = await isolated(); api.sqCatalog.mockRejectedValue(new Error('Host offline')); await store.getState().refresh();
+    expect(store.getState()).toMatchObject({ backendAvailable: false, definitions: [], storageError: 'Host offline Host offline' });
+  });
 });

@@ -73,7 +73,10 @@ export const useDukascopyDownloads = create<DownloadStore>((set, get) => ({
       const state = status.state === 'succeeded' ? 'completed'
         : status.state === 'cancelled' ? 'cancelled'
         : status.state === 'failed' || status.state === 'timed_out' ? 'failed' : 'running';
-      set({ job: { ...job, state, progress: Math.round(status.progress * 100), error: status.error } });
+      const warning = status.outcome === 'partial' || status.outcome === 'empty'
+        ? `${status.outcome === 'empty' ? 'No data downloaded' : 'Partial download; available rows retained'}; ${status.failed_chunks ?? 0} failed and ${status.missing_chunks ?? 0} missing chunks. Retry Add only missing data.`
+        : undefined;
+      set({ job: { ...job, state, outcome: status.outcome === 'pending' ? undefined : status.outcome, progress: Math.round(status.progress * 100), error: status.error ?? warning } });
       if (state === 'completed') await get().refresh();
     } catch {
       set({ job: { ...job, state: 'failed', error: 'Unable to read the host job status.' } });

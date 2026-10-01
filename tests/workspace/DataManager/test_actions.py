@@ -8,10 +8,16 @@ import struct
 from contextlib import closing
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any, cast
 
 import pyarrow as pa  # type: ignore[import-untyped]
 import pytest
-from app.host.capabilities import HostCapabilities, ResourceAccess
+from app.host.capabilities import (
+    HostCapabilities,
+    MarketAccess,
+    ResourceAccess,
+    SettingsAccess,
+)
 from app.persistence.market import (
     M1_SCHEMA,
     TICK_SCHEMA,
@@ -49,8 +55,12 @@ def test_env(tmp_path: Path) -> tuple[Path, Path]:
     data_root.mkdir(parents=True, exist_ok=True)
 
     create_isolated_schema(db_path)
-    csv_path = Path("data/market/dukascopy/dukascopy.csv")
-    preseed_native_sqx_datasets(db_path, csv_path if csv_path.is_file() else None)
+    csv_path = tmp_path / "authored_catalog.csv"
+    csv_path.write_text(
+        "EURUSD;EURUSD;Forex;Majors;05.05.2003;05.05.2003;5;100000;3;0.0001;0.00001;3\n"
+        "GBPUSD;GBPUSD;Forex;Majors;05.05.2003;05.05.2003;5;100000;3;0.0001;0.00001;3\n"
+    )
+    preseed_native_sqx_datasets(db_path, csv_path)
 
     with closing(sqlite3.connect(db_path)) as conn, conn:
         conn.execute(
@@ -360,15 +370,15 @@ def test_review_actions(test_env: tuple[Path, Path]) -> None:
     assert r_qual["qualityScore"] >= 90.0
 
     # 4. save_data_changes
-    r_save = save_data_changes(
-        db_path,
-        data_root,
-        "EURUSD_dukascopy",
-        timeframe="M1",
-        session="Default",
-        changes={},
-    )
-    assert r_save["success"] is True
+    with pytest.raises(ValueError, match="revision-checked"):
+        save_data_changes(
+            db_path,
+            data_root,
+            "EURUSD_dukascopy",
+            timeframe="M1",
+            session="Default",
+            changes={},
+        )
 
 
 def test_update_all_and_selected(test_env: tuple[Path, Path]) -> None:
@@ -393,42 +403,68 @@ def test_workspace_actions_dispatch(
 
     async def run() -> None:
         context = HostCapabilities(
-            ResourceAccess("workspace.data_manager", "1.0.0", store), None, None
+            ResourceAccess("workspace.data_manager", "1.0.0", store),
+            None,
+            None,
+            settings=SettingsAccess("workspace.data_manager", {}),
+            market_data=MarketAccess(
+                "workspace.data_manager", MarketDataStore(data_root, db_path)
+            ),
         )
+        assert context.market_data is not None
         owner = await prepare(context)
 
         # Broker data operation
-        b_data = await owner.invoke(
-            "actions.broker_data",
-            {"query": "EUR", "db_path": str(db_path), "data_root": str(data_root)},
+        b_data = cast(
+            "Any",
+            await owner.invoke(
+                "actions.broker_data",
+                {"query": "EUR"},
+            ),
         )
-        assert isinstance(b_data, list)
+        assert isinstance(b_data, dict)
+        assert b_data["instruments"] == []
 
         # Review quality operation
-        qual = await owner.invoke(
-            "actions.review_quality",
-            {
-                "symbol": "EURUSD_dukascopy",
-                "timeframe": "M1",
-                "db_path": str(db_path),
-                "data_root": str(data_root),
-            },
+        qual = cast(
+            "Any",
+            await owner.invoke(
+                "actions.review_quality",
+                {
+                    "symbol": "EURUSD_dukascopy",
+                    "timeframe": "M1",
+                    "dataset_id": next(
+                        row["id"]
+                        for row in context.market_data.inventory()
+                        if row["symbol"] == "EURUSD_dukascopy"
+                        and row["timeframe"] == "M1"
+                    ),
+                },
+            ),
         )
         assert isinstance(qual, dict)
         assert "qualityScore" in qual
 
         # Update all operation
-        up_all = await owner.invoke(
-            "actions.update_all",
-            {"db_path": str(db_path), "data_root": str(data_root)},
+        up_all = cast(
+            "Any",
+            await owner.invoke(
+                "actions.update_all",
+                {},
+            ),
         )
         assert isinstance(up_all, dict)
-        assert up_all["success"] is True
+        assert up_all["success"] is False
+        assert up_all["queued"] == 0
+        assert up_all["errors"]
 
         # List datasets operation
-        all_ds = await owner.invoke(
-            "actions.list_datasets",
-            {"db_path": str(db_path), "data_root": str(data_root)},
+        all_ds = cast(
+            "Any",
+            await owner.invoke(
+                "actions.list_datasets",
+                {},
+            ),
         )
         assert isinstance(all_ds, list)
         assert len(all_ds) > 0
@@ -461,3 +497,72 @@ def test_list_datasets(test_env: tuple[Path, Path]) -> None:
     assert "quality" in first
     assert "status" in first
     assert first["status"] == "Ready"
+
+
+def test_retained_ticks_coarser_views_and_source_specific_quality(
+    tmp_path: Path,
+) -> None:
+    import pyarrow as pa
+    from app.host.capabilities import MarketAccess
+    from app.persistence.market import MarketDataStore, create_isolated_schema
+    from app.workspace.DataManager.actions import inspect_source
+
+    database = tmp_path / "catalog.db"
+    create_isolated_schema(database)
+    store = MarketDataStore(tmp_path, database)
+    owner = "plugin.test.ticks"
+    source = MarketAccess(owner, store)
+    dataset = source.register_source(
+        source="Test",
+        symbol="TEST",
+        underlying="TEST",
+        instrument="TEST",
+        timeframe="TICK",
+        options={},
+    )
+    source.publish_source(
+        dataset,
+        "2024-01",
+        pa.table(
+            {
+                "DateTime": pa.array(
+                    [1704067200123, 1704067200223, 1704153600000],
+                    type=pa.timestamp("ms", tz="UTC"),
+                ),
+                "Bid": [1000000, 1200000, 1300000],
+                "Ask": [1100000, 1300000, 1400000],
+                "Volume": [1, 2, 3],
+            }
+        ),
+        expected_revision=0,
+    )
+    workspace = MarketAccess("workspace.data_manager", store)
+    result = inspect_source(
+        workspace,
+        "actions.review_data",
+        {"dataset_id": dataset, "date_to": "2024-01-01"},
+    )
+    assert result["columns"] == ["DateTime", "Bid", "Ask", "Volume"]
+    assert result["totalRows"] == 2
+    assert result["rows"][0][1:] == [1.0, 1.1, 1.0]
+    result = inspect_source(
+        workspace,
+        "actions.review_chart",
+        {"dataset_id": dataset, "timeframe": "M1", "date_to": "2024-01-01"},
+    )
+    assert result["chart"] == [
+        {
+            "time": 1704067200000,
+            "open": 1.0,
+            "high": 1.2,
+            "low": 1.0,
+            "close": 1.2,
+            "volume": 3.0,
+        }
+    ]
+    quality = inspect_source(
+        workspace, "actions.review_quality", {"dataset_id": dataset}
+    )
+    assert quality["totalBars"] == 3
+    assert quality["qualityScore"] == 100
+    assert "missing history" in quality["scope"]

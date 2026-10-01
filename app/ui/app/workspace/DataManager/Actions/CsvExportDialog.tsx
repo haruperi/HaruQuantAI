@@ -21,12 +21,12 @@ export function CsvExportDialog({
   onComplete: (message: string) => void;
 }) {
   const target = targets[0];
-  const [timeframe, setTimeframe] = useState<string>('M1');
+  const [timeframe, setTimeframe] = useState<string>(target?.timeframe || 'M1');
   const [dateFrom, setDateFrom] = useState<string>(target?.from || '');
   const [dateTo, setDateTo] = useState<string>(target?.to || '');
   const [timezone, setTimezone] = useState<string>('Original');
   const [includeHeader, setIncludeHeader] = useState<boolean>(true);
-  const [header, setHeader] = useState<string>('<DATE>,<TIME>,<OPEN>,<HIGH>,<LOW>,<CLOSE>,<VOL>');
+  const [header, setHeader] = useState<string>(target?.timeframe === 'TICK' ? '<DATE>,<TIME>,<BID>,<ASK>,<VOL>' : '<DATE>,<TIME>,<OPEN>,<HIGH>,<LOW>,<CLOSE>,<VOL>');
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
 
@@ -38,6 +38,7 @@ export function CsvExportDialog({
       let totalRecords = 0;
       for (const t of targets) {
         const res = await actionsClient.exportToCsv({
+          dataset_id: t.id,
           symbol: t.symbol,
           timeframe,
           date_from: dateFrom || undefined,
@@ -89,6 +90,7 @@ export function CsvExportDialog({
           <div className="export-grid">
             <Field label="Target Timeframe">
               <Select value={timeframe} onChange={setTimeframe}>
+                {target?.timeframe === 'TICK' && <option value="TICK">TICK (Stored)</option>}
                 <option value="M1">M1 (1 Minute)</option>
                 <option value="M5">M5 (5 Minutes)</option>
                 <option value="M15">M15 (15 Minutes)</option>

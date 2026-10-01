@@ -1,111 +1,71 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import {
-  discoverMt5Folder,
-  filterMt5Symbols,
-  mt5Definitions,
-  mt5ImportRanges,
-  mt5Preset,
-  mt5Symbols,
-  type Mt5ImportRequest,
-} from '../../../../../app/plugins/DataSource/MetaTrader/mt5Import';
-
-const request: Mt5ImportRequest = {
-  folder: 'MockMT5',
-  symbols: ['EURUSD', 'AAPL'],
-  dateFrom: '2025-01-01',
-  dateTo: '2025-02-01',
-  dateType: 'custom',
-  broker: '-1',
-  brokerName: 'Default',
-  timezone: 'UTC',
-  postfix: '_MT5',
-};
-
-describe('MT5 import rules', () => {
-  it('recognizes bounded MT5 folder metadata without reading file contents', () => {
-    expect(discoverMt5Folder(['MockMT5/terminal64.exe', 'MockMT5/MQL5/Profiles/a.ini']))
-      .toEqual({ folder: 'MockMT5', fileCount: 2 });
-    expect(() => discoverMt5Folder([])).toThrow('Select an MT5');
-    expect(() => discoverMt5Folder(['Files/readme.txt'])).toThrow('does not look');
-    expect(() => discoverMt5Folder(['MT5/../terminal64.exe'])).toThrow('Invalid');
-    expect(() => discoverMt5Folder(['MT5/terminal64.exe', 'Other/MQL5/a.ini'])).toThrow('one MT5');
-  });
-
-  it('sorts, filters, groups and creates M1 definitions with HaruQuantAI duplicate numbering', () => {
-    expect(mt5Symbols).toEqual([...mt5Symbols].sort((a, b) => a.path.localeCompare(b.path) || a.name.localeCompare(b.name)));
-    expect(filterMt5Symbols('apple', '')).toMatchObject([{ name: 'AAPL', path: 'Stocks\\US' }]);
-    expect(filterMt5Symbols('', 'Forex\\Majors').map(row => row.name)).toEqual(['EURUSD', 'GBPUSD', 'USDJPY']);
-    expect(mt5Definitions(request, ['EURUSD_MT5', 'EURUSD_MT5_1'])).toMatchObject([
-      { id: 'mt5:EURUSD_MT5_2', symbol: 'EURUSD_MT5_2', timeframe: 'M1', source: 'MT5' },
-      { id: 'mt5:AAPL_MT5', symbol: 'AAPL_MT5', timeframe: 'M1', source: 'MT5' },
-    ]);
-  });
-
-  it('validates ranges and resolves presets against fixture availability', () => {
-    expect(mt5ImportRanges(request).EURUSD).toEqual({ from: '2025-01-01', to: '2025-02-01' });
-    expect(mt5ImportRanges({ ...request, symbols: ['AAPL'], dateFrom: '2010-01-01', dateType: 'allTime' }).AAPL.from).toBe('2015-01-02');
-    expect(mt5Preset('allTime', request.dateFrom, request.dateTo).from).toBe('2010-01-04');
-    expect(() => mt5ImportRanges({ ...request, dateFrom: '2025-03-01' })).toThrow('valid date');
-    expect(() => mt5Definitions({ ...request, symbols: ['UNKNOWN'] }, [])).toThrow('fetched');
-  });
+import { beforeEach, expect, it, vi } from 'vitest';
+import { filterMt5Symbols, mt5Definitions, mt5ImportRanges, type Mt5ImportRequest } from '../../../../../app/plugins/DataSource/MetaTrader/mt5Import';
+import { useMt5Import } from '../../../../../app/plugins/DataSource/MetaTrader/mt5ImportStore';
+import * as backend from '../../../../../app/plugins/DataSource/MetaTrader/backend';
+vi.mock('../../../../../app/plugins/DataSource/MetaTrader/backend', () => ({ mt5Catalog: vi.fn(), mt5Connect: vi.fn(), mt5Symbols: vi.fn(), mt5Add: vi.fn(), mt5Download: vi.fn(), mt5Status: vi.fn(), mt5Cancel: vi.fn() }));
+const symbols = [{ name: 'EURUSD', description: 'Euro', path: 'Forex-Majors', category: 'Forex' }];
+const request: Mt5ImportRequest = { folder: '', symbols: ['EURUSD'], dateFrom: '2024-01-01', dateTo: '2024-01-02', dateType: 'custom', broker: '-1', brokerName: 'Default', timezone: 'UTC', postfix: '_MT' };
+beforeEach(() => {
+  vi.resetAllMocks();
+  useMt5Import.setState({ definitions: [], symbols: [], ranges: {}, job: null, backendAvailable: false, storageError: '' });
+  vi.mocked(backend.mt5Catalog).mockResolvedValue({ available: true, connected: true, reason: '', datasets: [] });
+  vi.mocked(backend.mt5Symbols).mockResolvedValue({ symbols });
+});
+it('uses only terminal-returned symbols and preserves selected date ranges', () => {
+  expect(filterMt5Symbols('eur', '', symbols)).toEqual(symbols);
+  expect(filterMt5Symbols('', '', [])).toEqual([]);
+  expect(mt5Definitions(request, [], symbols)[0].symbol).toBe('EURUSD_MT');
+  expect(mt5Definitions(request, ['EURUSD_MT'], symbols)[0].symbol).toBe('EURUSD_MT_1');
+  expect(() => mt5Definitions({ ...request, symbols: ['UNKNOWN'] }, [], symbols)).toThrow('Select symbols');
+  expect(mt5ImportRanges(request, symbols).EURUSD).toEqual({ from: '2024-01-01', to: '2024-01-02' });
+});
+it('does not advance imports with timers or create browser datasets', async () => {
+  await useMt5Import.getState().connect('');
+  expect(backend.mt5Connect).toHaveBeenCalledWith('');
+  vi.mocked(backend.mt5Add).mockResolvedValue({ id: 'a'.repeat(32) });
+  vi.mocked(backend.mt5Download).mockResolvedValue({ job_id: 'actual-job' });
+  await useMt5Import.getState().start(request, mt5Definitions(request, [], symbols), false);
+  for (let i = 0; i < 100; i++) useMt5Import.getState().advance();
+  expect(useMt5Import.getState().job?.state).toBe('running');
+  expect(useMt5Import.getState().definitions).toEqual([]);
+  vi.mocked(backend.mt5Status).mockResolvedValue({ state: 'succeeded', rows: 2, progress: 1 });
+  vi.mocked(backend.mt5Catalog).mockResolvedValue({ available: true, connected: true, reason: '', datasets: [{ id: 'a'.repeat(32), symbol: 'EURUSD_MT', underlying: 'EURUSD', instrument: 'EURUSD', timeframe: 'M1', broker: '-1', date_from: '2024-01-01', date_to: '2024-01-02', bars: 2, options: { metadata: {} } }] });
+  await useMt5Import.getState().poll();
+  expect(useMt5Import.getState().job?.state).toBe('completed');
+  expect(useMt5Import.getState().definitions[0].bars).toBe(2);
+});
+it('propagates terminal failures with no catalog fallback', async () => {
+  vi.mocked(backend.mt5Connect).mockRejectedValue(new Error('Terminal unavailable'));
+  await expect(useMt5Import.getState().connect('')).rejects.toThrow('Terminal unavailable');
+  expect(backend.mt5Symbols).not.toHaveBeenCalled();
+  expect(useMt5Import.getState().symbols).toEqual([]);
+  await expect(useMt5Import.getState().start(request, mt5Definitions(request, [], symbols), false)).rejects.toThrow('unavailable');
 });
 
-async function isolated() {
-  vi.resetModules();
-  const memory = new Map<string, string>();
-  const storage = {
-    getItem: (key: string) => memory.get(key) ?? null,
-    setItem: (key: string, value: string) => { memory.set(key, value); },
+it('loads broker profiles from catalog and populates postfix on request', async () => {
+  const brokers = [
+    { id: '2', name: 'RoboForex', postfix: '_roboforex', timezone: 'EET', mtUse: true, instruments: [] },
+    { id: '4', name: 'Darwinex', postfix: '_darwinex', timezone: 'EETUS', mtUse: true, instruments: [] },
+  ];
+  vi.mocked(backend.mt5Catalog).mockResolvedValue({ available: true, connected: true, reason: '', datasets: [], brokers });
+  await useMt5Import.getState().refresh();
+  expect(useMt5Import.getState().brokers).toEqual(brokers);
+
+  const roboReq: Mt5ImportRequest = {
+    ...request,
+    broker: brokers[0].id,
+    brokerName: brokers[0].name,
+    timezone: brokers[0].timezone,
+    postfix: brokers[0].postfix,
   };
-  vi.stubGlobal('localStorage', storage);
-  const store = (await import('../../../../../app/plugins/DataSource/MetaTrader/mt5ImportStore')).useMt5Import;
-  return { store, memory, storage };
-}
-
-beforeEach(() => vi.unstubAllGlobals());
-
-it('persists partial imports, restores active work paused and completes coherently', async () => {
-  const { store } = await isolated();
-  const definitions = mt5Definitions(request, []);
-  store.getState().start(request, definitions, false);
-  for (let index = 0; index < 10; index += 1) store.getState().advance();
-  expect(store.getState().definitions).toHaveLength(1);
-  vi.resetModules();
-  const restored = (await import('../../../../../app/plugins/DataSource/MetaTrader/mt5ImportStore')).useMt5Import;
-  expect(restored.getState().job?.state).toBe('paused');
-  restored.getState().action('resume');
-  for (let index = 0; index < 20; index += 1) restored.getState().advance();
-  expect(restored.getState().job?.state).toBe('completed');
-  expect(restored.getState().definitions.map(row => row.symbol)).toEqual(['EURUSD_MT5', 'AAPL_MT5']);
-  expect(restored.getState().ranges['mt5:AAPL_MT5']).toEqual([{ from: '2025-01-01', to: '2025-02-01' }]);
-});
-
-it('fails closed for active work, quota errors and corrupt storage', async () => {
-  const { store, memory, storage } = await isolated();
-  const definitions = mt5Definitions(request, []);
-  expect(() => store.getState().start(request, definitions, true)).toThrow('active');
-  store.getState().start(request, definitions, false);
-  const prior = memory.get('sqx-mt5-import-v1');
-  storage.setItem = () => { throw new Error('quota'); };
-  store.getState().advance();
-  expect(store.getState().job?.state).toBe('failed');
-  expect(memory.get('sqx-mt5-import-v1')).toBe(prior);
-  memory.set('sqx-mt5-import-v1', 'bad');
-  vi.resetModules();
-  const corrupt = (await import('../../../../../app/plugins/DataSource/MetaTrader/mt5ImportStore')).useMt5Import;
-  expect(corrupt.getState().storageError).toContain('preserved');
-  expect(memory.get('sqx-mt5-import-v1')).toBe('bad');
-});
-
-it('pauses, resumes and stops without committing unfinished rows', async () => {
-  const { store } = await isolated();
-  const definitions = mt5Definitions(request, []);
-  store.getState().start(request, definitions, false);
-  store.getState().action('pause');
-  expect(store.getState().job?.state).toBe('paused');
-  store.getState().action('resume');
-  expect(store.getState().job?.state).toBe('running');
-  store.getState().action('stop');
-  expect(store.getState().job?.state).toBe('cancelled');
-  expect(store.getState().definitions).toEqual([]);
+  const defs = mt5Definitions(roboReq, [], symbols);
+  expect(defs[0].symbol).toBe('EURUSD_roboforex');
+  expect(defs[0].broker).toBe('2');
+  // Verify start succeeds with non-UTC timezone (e.g. EET / EETUS) without throwing
+  await useMt5Import.getState().connect('');
+  vi.mocked(backend.mt5Add).mockResolvedValue({ id: 'b'.repeat(32) });
+  vi.mocked(backend.mt5Download).mockResolvedValue({ job_id: 'job-robo' });
+  await useMt5Import.getState().start(roboReq, defs, false);
+  expect(useMt5Import.getState().job?.state).toBe('running');
+  expect(useMt5Import.getState().postfix).toBe('_roboforex');
 });

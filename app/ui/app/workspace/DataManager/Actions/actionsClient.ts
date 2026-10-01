@@ -6,6 +6,7 @@ import { createDomainClient } from '../../../host/transport';
 const client = createDomainClient('/contributions/workspace.data_manager');
 
 export interface ExportCsvParams {
+  dataset_id?: string;
   symbol: string;
   timeframe?: string;
   date_from?: string;
@@ -27,6 +28,7 @@ export interface ExportCsvResult {
 }
 
 export interface ExportMt4Params {
+  dataset_id?: string;
   symbol: string;
   mt4_symbol?: string;
   date_from?: string;
@@ -44,9 +46,11 @@ export interface ExportMt4Result {
   success: boolean;
   symbol: string;
   files: string[];
+  archive_base64?: string;
 }
 
 export interface ExportMt5Params {
+  dataset_id?: string;
   symbol: string;
   timeframe?: string;
   spread_mode?: 'real' | 'fixed';
@@ -69,6 +73,7 @@ export interface ExportMt5Result {
 }
 
 export interface CloneTimezoneParams {
+  dataset_id?: string;
   symbol: string;
   shift_hours?: number;
   timezone?: string;
@@ -87,6 +92,7 @@ export interface CloneTimezoneResult {
 }
 
 export interface DeleteParams {
+  dataset_ids?: string[];
   symbols: string[];
   mode?: 'remove' | 'clear';
 }
@@ -100,6 +106,7 @@ export interface DeleteResult {
 }
 
 export interface SaveDefinitionsParams {
+  dataset_ids?: string[];
   symbols?: string[];
   file_path?: string;
 }
@@ -125,6 +132,7 @@ export interface LoadDefinitionsResult {
 }
 
 export interface ReviewDataParams {
+  dataset_id?: string;
   symbol: string;
   timeframe?: string;
   session?: string;
@@ -135,15 +143,18 @@ export interface ReviewDataParams {
 }
 
 export interface ReviewDataResult {
+  revisions?: Record<string, number>;
   symbol: string;
   timeframe: string;
   totalRows: number;
   offset: number;
   limit: number;
-  rows: Array<[string, number, number, number, number, number]>;
+  columns?: string[];
+  rows: Array<Array<string | number | null>>;
 }
 
 export interface ReviewChartParams {
+  dataset_id?: string;
   symbol: string;
   timeframe?: string;
   session?: string;
@@ -172,6 +183,7 @@ export interface ReviewProblem {
 }
 
 export interface ReviewQualityParams {
+  dataset_id?: string;
   symbol: string;
   timeframe?: string;
   session?: string;
@@ -182,15 +194,19 @@ export interface ReviewQualityResult {
   timeframe: string;
   totalBars: number;
   totalErrors: number;
-  qualityScore: number;
+  qualityScore: number | null;
+  scope?: string;
   problems: ReviewProblem[];
 }
 
 export interface UpdateAllParams {
+  date_from?: string; date_to?: string;
   provider?: string;
 }
 
 export interface UpdateAllResult {
+  jobs?: Array<{ provider: string; job_id: string; dataset_id: string }>;
+  errors?: Array<{ dataset_id?: string; reason: string }>;
   success: boolean;
   datasets: Array<{
     id: string;
@@ -203,10 +219,13 @@ export interface UpdateAllResult {
 }
 
 export interface UpdateSelectedParams {
+  date_from?: string; date_to?: string;
   symbols: string[];
 }
 
 export interface UpdateSelectedResult {
+  jobs?: Array<{ provider: string; job_id: string; dataset_id: string }>;
+  errors?: Array<{ dataset_id?: string; reason: string }>;
   success: boolean;
   datasets: Array<{
     id: string;
@@ -258,7 +277,7 @@ export interface DatasetRow {
   date_from?: string;
   date_to?: string;
   bars: number;
-  quality?: number;
+  quality?: number | null;
   status?: string;
   barType?: string;
 }
@@ -278,6 +297,11 @@ export function downloadBlob(filename: string, content: string, mimeType = 'text
 }
 
 export const actionsClient = {
+  updateJob: (provider: string, job_id: string): Promise<{ state: string; rows?: number }> =>
+    client.post(`/sources.${provider}.download.status`, { job_id }),
+  cancelUpdateJob: (provider: string, job_id: string): Promise<unknown> =>
+    client.post(`/sources.${provider}.download.cancel`, { job_id }),
+
   listDatasets: (): Promise<DatasetRow[]> =>
     client.post('/actions.list_datasets', {}),
 
@@ -302,6 +326,9 @@ export const actionsClient = {
   loadDefinitions: (params: LoadDefinitionsParams): Promise<LoadDefinitionsResult> =>
     client.post('/actions.load', params),
 
+  saveDataChanges: (params: { dataset_id: string; timeframe: string; expected_revisions: Record<string, number>; changes: Array<{ timestamp: string; values?: Record<string, number>; delete?: boolean }> }): Promise<{ success: boolean; changedRows: number }> =>
+    client.post('/actions.save_data_changes', params),
+
   reviewData: (params: ReviewDataParams): Promise<ReviewDataResult> =>
     client.post('/actions.review_data', params),
 
@@ -323,3 +350,10 @@ export const actionsClient = {
   brokerDataUpdate: (params: { profile_ids?: string[] } = {}): Promise<BrokerDataUpdateResult> =>
     client.post('/actions.broker_data_update', params),
 };
+
+export function downloadBinaryBlob(filename: string, base64: string): void {
+  const data = Uint8Array.from(atob(base64), character => character.charCodeAt(0));
+  const url = URL.createObjectURL(new Blob([data], { type: 'application/zip' }));
+  const link = document.createElement('a'); link.href = url; link.download = filename; link.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}

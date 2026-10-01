@@ -49,6 +49,9 @@ export interface BackendJob {
   skipped_days: number;
   progress: number;
   error?: string;
+  outcome?: 'pending' | 'complete' | 'partial' | 'empty';
+  failed_chunks?: number;
+  missing_chunks?: number;
 }
 
 export function getCapability(): Promise<DukascopyCapability> {

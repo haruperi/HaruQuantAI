@@ -259,3 +259,25 @@ An architectural contribution is accepted only when all verification criteria ar
 | **Offline Examples** | Deterministic, offline usage example executes and passes | `uv run python tests/examples/dukascopy_offline_example.py` |
 | **Module Standards & Telemetry** | Top-of-file docstring (5 sections), descriptive FR labels, zero silent FR executions (`docs/templates/PYTHON_MODULE.md`) | `uv run ruff check`<br>`uv run pytest tests/` |
 | **Package Removal** | Full removal cascade passes in isolation; surviving tests pass 100% | `uv run python scripts/release_check.py` |
+
+
+## Approved Data Manager integration candidate contracts
+
+Source providers use owner-scoped host network, jobs, terminal and market custody
+capabilities. One concrete provider remains one cohesive Python file; embedded
+public catalogs are decoded during preparation. The universal package loader
+validates literal descriptors from bounded Python sources up to 4 MiB; package
+JSON retains its 256 KiB bound. Discovery performs no provider execution.
+
+Market custody represents source-specific Arrow schemas, immutable dataset
+identity and SHA-256 Parquet revisions. Consumers read retained resources without
+importing producers. Whole-source snapshot replacement checks all current
+partition revisions inside one SQLite transaction and preserves historical bytes.
+Plugins never receive raw database connections or choose operational store roots.
+
+The host owns compute workers and admission. A cancelled offloaded task retains
+its budget until its pure worker completes, preventing detached work from escaping
+accounting. This is admission accounting, not operating-system memory containment.
+Credentials enter host settings or an ephemeral owner session and are excluded
+from persisted/public configuration and diagnostics. Shared live schema activation
+requires its own approved migration and recovery procedure.

@@ -52,14 +52,17 @@ export const pluginName = 'Yahoo';
 
 export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
   const state = useYahoo();
+  useEffect(() => { void useYahoo.getState().refresh(); }, []);
+  useEffect(() => {
+    if (!yahooActive(state.job?.state)) return;
+    const timer = setInterval(() => { void useYahoo.getState().poll(); }, 1000);
+    return () => clearInterval(timer);
+  }, [state.job?.state]);
   useEffect(() => {
     const active = yahooActive(state.job?.state);
-    const definitions = [...state.definitions, ...(active && state.job?.kind === 'add' ? state.job.definitions.filter(item => !state.definitions.some(row => row.id === item.id)) : [])].map(row => ({
-      ...row,
-      ...simulationSummary(row, state.ranges[row.id] ?? []),
-    }));
     onSync('yahoo', {
-      definitions,
+      definitions: state.definitions,
+      backendAvailable: state.backendAvailable,
       job: state.job,
       ranges: state.ranges,
       storageError: state.storageError,
@@ -71,12 +74,12 @@ export function Sync({ onSync }: { onSync: (id: string, state: any) => void }) {
 
 export function Dialogs({ dialog, contextDocument, selectedDatasetIds, onClose, onStarted }: any) {
   if (dialog?.id === 'yahoo-add') {
-    return createElement(YahooAddDialog, { contextDocument, onClose, onStarted: () => onStarted('yahoo', 'Yahoo symbols are being added (simulation)') });
+    return createElement(YahooAddDialog, { contextDocument, onClose, onStarted: () => onStarted('yahoo', 'Yahoo symbols added') });
   }
   if (dialog?.id === 'yahoo-download') {
     const yahooState = useYahoo.getState();
-    const targets = yahooTargets(yahooState.definitions.filter(row => selectedDatasetIds.includes(row.id))).map(row => ({ ...row, ...simulationSummary(row, yahooState.ranges[row.id] ?? []) }));
-    return createElement(YahooDownloadDialog, { contextDocument, targets, onClose, onStarted: () => onStarted('yahoo', 'Yahoo download started (simulation)') });
+    const targets = yahooTargets(yahooState.definitions.filter(row => selectedDatasetIds.includes(row.id)));
+    return createElement(YahooDownloadDialog, { contextDocument, targets, onClose, onStarted: () => onStarted('yahoo', 'Yahoo download submitted') });
   }
   return null;
 }

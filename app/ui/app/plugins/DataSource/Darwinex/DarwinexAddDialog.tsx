@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState, type ReactNode } from 'react';
 import { Button, Modal, TextInput } from '../../../components/ui';
 import { useDarwinex } from './darwinexStore';
-import { darwinexCatalogue, darwinexDefinitions } from './darwinex';
+import { darwinexDefinitions } from './darwinex';
 import type { BrokerProfile } from './presentation';
 import './darwinex.css';
 
@@ -34,9 +34,9 @@ export function DarwinexAddDialog({ contextDocument, onClose, onStarted }: { con
   const [mapping, setMapping] = useState(false), [mappings, setMappings] = useState<Record<string,string>>({});
   const [sort, setSort] = useState<'symbol' | 'dateFrom' | null>(null), [descending, setDescending] = useState(false); const warned = useRef(false);
   const broker = brokers.find(row => row.id === brokerId && row.mtUse);
-  const rows = darwinexCatalogue.filter(row => row.symbol.toLowerCase().includes(query.toLowerCase())).sort((a,b) => sort ? a[sort].localeCompare(b[sort]) * (descending ? -1 : 1) : 0);
+  const rows = store.catalog.map(row => ({ symbol: row.symbol, dateFrom: row.date_from })).filter(row => row.symbol.toLowerCase().includes(query.toLowerCase())).sort((a,b) => sort ? a[sort].localeCompare(b[sort]) * (descending ? -1 : 1) : 0);
   const close = useCallback(() => { if (mapping) { setMapping(false); setError(''); } else onClose(); }, [mapping, onClose]);
-  function save() {
+  async function save() {
     try {
       if (!selected.length) throw new Error('No symbols selected');
       if (!agreed) throw new Error('Please confirm that you understand the free data disclaimer.');
@@ -44,7 +44,7 @@ export function DarwinexAddDialog({ contextDocument, onClose, onStarted }: { con
       if (broker && !mapping) { setMappings(Object.fromEntries(selected.map(symbol => [symbol, broker.instruments.find(item => !item.startsWith('[') && item.startsWith(symbol)) ?? '-1001']))); setMapping(true); setError(''); return; }
       const context = darwinexContext(contextDocument); const definitions = darwinexDefinitions(selected, postfix, context.existing, broker, mappings);
       if (!definitions.length) throw new Error('No symbols selected');
-      store.start('add', definitions, context.active, undefined, postfix); onStarted(); onClose();
+      await store.start('add', definitions, context.active, undefined, postfix); onStarted(); onClose();
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add data.'); }
   }
   function mass(value: string) { setMappings(current => Object.fromEntries(Object.entries(current).map(([symbol, mapping]) => [symbol, mapping === '-1001' ? value : mapping]))); }
