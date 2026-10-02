@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 from app.host.jobs import Budget, JobManager
+from app.host.logging import DiagnosticCaptureHandler, get_logger
 
 
 def test_capacity_cancellation_and_peer_denial() -> None:
@@ -27,6 +28,33 @@ def test_capacity_cancellation_and_peer_denial() -> None:
             jobs.submit("one", Budget(1, 1, 1), wait)
 
     asyncio.run(run())
+
+
+def test_failed_job_logs_safe_code_location_and_identity() -> None:
+    sink = DiagnosticCaptureHandler(100)
+    log = get_logger()
+    log.addHandler(sink)
+
+    async def run() -> None:
+        manager = JobManager(1, 1024)
+
+        async def secret_failure() -> None:
+            raise RuntimeError("never-log-this-private-value")
+
+        job = manager.submit("workspace.test", Budget(1, 512, 1), secret_failure)
+        await asyncio.sleep(0.02)
+        assert manager.status("workspace.test", job.id).state == "failed"
+        records = "\n".join(sink.snapshot())
+        assert job.id in records
+        assert "secret_failure" in records and "RuntimeError" in records
+        assert "never-log-this-private-value" not in records
+        await manager.close()
+
+    try:
+        asyncio.run(run())
+    finally:
+        log.removeHandler(sink)
+        sink.close()
 
 
 def test_success_failure_timeout_release() -> None:

@@ -95,6 +95,78 @@ def test_healthy_and_failed_children_are_isolated(tmp_path: Path) -> None:
     asyncio.run(run())
 
 
+def test_composition_injects_current_global_terminal_settings(
+    tmp_path: Path, monkeypatch: Any
+) -> None:
+    from app.host.settings import SettingsStore
+    from app.persistence.host import (
+        HostSettingRecord,
+        HostStore,
+        prepare_boot_database,
+        utc_now_iso,
+    )
+
+    folder = package(tmp_path, "terminal")
+    entry = folder / "entry.py"
+    source = entry.read_text().replace("host.resources", "host.terminal")
+    source = source.replace("context.resources.owner", "context.terminal.owner")
+    source = source.replace(
+        "return payload", "return await context.terminal.call(operation, payload)"
+    )
+    entry.write_text(source)
+    database = tmp_path / "settings.db"
+    prepare_boot_database(database)
+    executable = tmp_path / "terminal64.exe"
+    executable.touch()
+    persistence = HostStore(database)
+    persistence.upsert_setting(
+        HostSettingRecord(
+            "application",
+            "config.metatrader5",
+            json.dumps({"enabled": True, "terminal_path": str(executable)}),
+            1,
+            utc_now_iso(),
+        )
+    )
+    worker = (
+        "import sys,json\nfor line in sys.stdin:\n"
+        " request=json.loads(line)\n"
+        " sys.stdout.write(json.dumps({'value':request['arguments']})+'\\n')\n"
+        " sys.stdout.flush()\n"
+    )
+    monkeypatch.setattr("app.host.capabilities._TERMINAL_WORKER", worker)
+
+    async def run() -> None:
+        jobs = JobManager(1, 1024**3)
+        composition = Composition(
+            tmp_path,
+            ResourceStore(tmp_path / "resources"),
+            jobs,
+            settings=SettingsStore(database),
+        )
+        await composition.start(scan_packages(tmp_path))
+        assert not composition.issues
+        assert await composition.active["test.terminal"].invoke("connect", {}) == {
+            "path": str(executable),
+            "portable": False,
+        }
+        persistence.upsert_setting(
+            HostSettingRecord(
+                "application",
+                "config.metatrader5",
+                json.dumps({"enabled": False, "terminal_path": str(executable)}),
+                1,
+                utc_now_iso(),
+            )
+        )
+        with pytest.raises(ValueError, match="disabled"):
+            await composition.active["test.terminal"].invoke("connect", {})
+        await composition.close()
+        await jobs.close()
+
+    asyncio.run(run())
+
+
 def test_missing_owner_does_not_import_orphan(tmp_path: Path) -> None:
     orphan = package(tmp_path, "orphan", "test.missing")
     (orphan / "entry.py").write_text("raise RuntimeError('must not import')")

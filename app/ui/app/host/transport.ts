@@ -29,6 +29,7 @@ export class ApiClientError extends Error {
     message: string,
     public readonly issues: ValidationIssue[] = [],
     public readonly status?: number,
+    public readonly requestId?: string,
   ) {
     super(message);
     this.name = 'ApiClientError';
@@ -151,7 +152,7 @@ export function createDomainClient(routeBase: string, config: TransportConfig = 
         code: `HTTP_${response.status}`,
         message: response.statusText || 'Request failed',
       };
-      throw new ApiClientError(err.code, err.message, err.issues ?? [], response.status);
+      throw new ApiClientError(err.code, err.message, err.issues ?? [], response.status, json.request_id);
     }
 
     return json.data as T;

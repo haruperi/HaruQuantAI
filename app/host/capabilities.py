@@ -22,6 +22,8 @@ Purpose:
     and plugins, preventing ambient authority and isolating resource custody.
 
 Key Capabilities:
+    - FR-HOST-BROKER-TIME-PUBLICATION:
+      Explicit original-time publication; host logs publication and reads.
     - FR-HOST-CAPABILITIES-RESOURCE-CUSTODY: Scoped Shared Resource Custody
       Associated: `ResourceAccess.read()`, `ResourceAccess.publish()`,
       `ResourceAccess.list()`
@@ -44,6 +46,11 @@ Key Capabilities:
     - FR-HOST-CAPABILITIES-NETWORK-RETRIEVAL: Allowlisted Network Access
       Associated: `NetworkAccess.get()`
       Logging: Emits debug log with target URL upon historical data retrieval.
+    - FR-HOST-CAPABILITIES-TERMINAL-SELECTION: Deterministic Historical Terminal
+      Associated: `TerminalAccess.call()`
+      Logging: Emits info with owner and selection source before connection;
+      verification checks that failed selection cannot start a worker and
+      credentials and paths are absent from diagnostics.
 
 Python API Usage:
     ```python
@@ -80,11 +87,14 @@ import re
 import sys
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Literal, TypeVar, cast
 
+from app.host.contracts import BrokerTimeProvenance, ClockPolicy, ClockProvenance
 from app.host.jobs import Budget, Job, JobManager
 from app.host.logging import get_logger
 from app.host.network import HistoricalNetwork, NetworkResult, SourceNetwork
+from app.host.settings import MT5TerminalConfiguration
 from app.persistence.market import (
     DefinitionRequest,
     Kind,
@@ -226,12 +236,24 @@ class HostCapabilities:
     terminal: TerminalAccess | None = field(default=None, kw_only=True)
 
 
+AUTHORIZED_MARKET_SOURCES: dict[str, str] = {
+    "plugin.data_manager.dukascopy": "dukascopy",
+    "plugin.data_manager.meta_trader": "mt5",
+}
+
+
 @dataclass(frozen=True)
 class MarketAccess:
     """Owner-scoped market custody with no raw SQL or filesystem authority."""
 
     owner: str
     _store: MarketDataStore
+
+    def _authorized_source(self) -> str:
+        source = AUTHORIZED_MARKET_SOURCES.get(self.owner)
+        if source is None:
+            raise PermissionError("Market source ownership denied")
+        return source
 
     def available(self) -> bool:
         """Check whether market storage has an approved schema."""
@@ -246,6 +268,38 @@ class MarketAccess:
         if self.owner != "workspace.data_manager":
             raise PermissionError("Workspace inventory access denied")
         return self._store.inventory()
+
+    def broker_clock_policy(
+        self, broker_id: str, *, dataset_id: str | None = None
+    ) -> dict[str, Any]:
+        """Read a workspace profile or the broker of an owned source definition."""
+        if self.owner != "workspace.data_manager" and (
+            dataset_id is None
+            or self.source_definition(dataset_id)["broker"] != broker_id
+        ):
+            raise PermissionError("Broker clock access denied")
+        return self._store.broker_clock_policy(broker_id)
+
+    def replace_broker_clock_policy(
+        self, broker_id: str, expected_revision: int, policy: ClockPolicy
+    ) -> dict[str, Any]:
+        """Grant policy mutation only to the owning workspace."""
+        if self.owner != "workspace.data_manager":
+            raise PermissionError("Broker clock update denied")
+        return self._store.replace_broker_clock_policy(
+            broker_id, expected_revision, policy
+        )
+
+    def source_clock_provenance(
+        self, dataset_id: str, period: str
+    ) -> ClockProvenance | BrokerTimeProvenance | None:
+        """Read retained raw timestamp evidence through explicit resource authority."""
+        self.retained_source(dataset_id)
+        records = self._store.source_partitions(dataset_id)
+        record = next((item for item in records if item["period"] == period), None)
+        if record is None:
+            raise ValueError("Source partition unavailable")
+        return self._store.source_clock_provenance(record)
 
     def retained_source(self, dataset_id: str) -> dict[str, Any]:
         """Read retained metadata through the workspace or source owner boundary."""
@@ -316,7 +370,11 @@ class MarketAccess:
         ):
             raise ValueError("Invalid definition owner")
         if (
-            owner == "plugin.data_manager.dukascopy"
+            owner
+            in (
+                "plugin.data_manager.dukascopy",
+                "plugin.data_manager.meta_trader",
+            )
             and record.get("storage_backend") == "market_files"
         ):
             for existing in self._store.inventory():
@@ -421,6 +479,7 @@ class MarketAccess:
         table: Any,
         *,
         expected_revision: int = 0,
+        clock_provenance: ClockProvenance | None = None,
     ) -> dict[str, Any]:
         """Publish lossless source data under host revision and catalog custody."""
         return self._store.publish_source(
@@ -428,6 +487,26 @@ class MarketAccess:
             dataset_id,
             period,
             table,
+            expected_revision=expected_revision,
+            clock_provenance=clock_provenance,
+        )
+
+    def publish_broker_time_source(
+        self,
+        dataset_id: str,
+        period: str,
+        table: Any,
+        *,
+        provenance: BrokerTimeProvenance,
+        expected_revision: int = 0,
+    ) -> dict[str, Any]:
+        """Publish explicitly un-normalized rows without clock policy admission."""
+        return self._store.publish_broker_time_source(
+            self.owner,
+            dataset_id,
+            period,
+            table,
+            provenance=provenance,
             expected_revision=expected_revision,
         )
 
@@ -453,22 +532,22 @@ class MarketAccess:
 
     def definitions_available(self) -> bool:
         """Check the owner's definition catalog."""
-        if self.owner != "plugin.data_manager.dukascopy":
-            raise PermissionError("Market source ownership denied")
+        self._authorized_source()
         return self._store.definitions_available()
 
     def register_definitions(
         self, requests: tuple[DefinitionRequest, ...], *, idempotent: bool = False
     ) -> tuple[MarketDataset, ...]:
         """Register an owned batch through host custody."""
-        if self.owner != "plugin.data_manager.dukascopy":
-            raise PermissionError("Market source ownership denied")
+        source = self._authorized_source()
         logger.info(
             "Market definitions registered: owner=%s count=%d",
             self.owner,
             len(requests),
         )
-        return self._store.register_definitions(requests, idempotent=idempotent)
+        return self._store.register_definitions(
+            requests, source=source, idempotent=idempotent
+        )
 
     def read_market_rows(
         self,
@@ -480,7 +559,9 @@ class MarketAccess:
         limit: int = 2000,
     ) -> Any:
         """Read a bounded owned page without exposing mutable stores or paths."""
-        if self.owner != "plugin.data_manager.dukascopy":
+        source = self._authorized_source()
+        dataset = self._store.get_dataset(dataset_id)
+        if dataset.source != source:
             raise PermissionError("Market source ownership denied")
         return self._store.read_market_rows(
             dataset_id,
@@ -492,21 +573,29 @@ class MarketAccess:
 
     def market_root(self) -> str:
         """Describe this provider's configured custody root to a local client."""
-        if self.owner != "plugin.data_manager.dukascopy":
-            raise PermissionError("Market source ownership denied")
+        source = self._authorized_source()
         logger.info("Described market custody root: owner=%s", self.owner)
-        return str((self._store.data_root / "market").resolve())
+        return str((self._store.data_root / "market" / source).resolve())
 
     def market_path(self, kind: str, symbol: str, period: str) -> str:
         """Describe an owned canonical path without delegating filesystem access."""
-        if self.owner != "plugin.data_manager.dukascopy" or kind not in ("m1", "ticks"):
+        source = self._authorized_source()
+        if kind not in ("m1", "ticks"):
             raise PermissionError("Market source ownership denied")
         logger.info("Described canonical market path: owner=%s", self.owner)
-        return str(self._store.path("dukascopy", cast("Kind", kind), symbol, period))
+        return str(self._store.path(source, cast("Kind", kind), symbol, period))
 
-    def register_dataset(self, symbol: str, kind: str, instrument: str) -> Any:
-        """Create only an owned Dukascopy definition, without SQL authority."""
-        if self.owner != "plugin.data_manager.dukascopy" or kind not in ("ticks", "m1"):
+    def register_dataset(
+        self,
+        symbol: str,
+        kind: str,
+        instrument: str,
+        broker: str = "-1",
+        timezone: str = "UTC",
+    ) -> Any:
+        """Create only an owned definition, without SQL authority."""
+        source = self._authorized_source()
+        if kind not in ("ticks", "m1"):
             raise PermissionError("Market source ownership denied")
         logger.info(
             "Market dataset registered: owner=%s symbol=%s",
@@ -514,41 +603,43 @@ class MarketAccess:
             symbol,
         )
         return self._store.register_dataset(
-            source="dukascopy",
+            source=source,
             symbol=symbol,
             kind=cast("Kind", kind),
             instrument=instrument,
+            broker=broker,
+            timezone=timezone,
         )
 
     def get_dataset(self, dataset_id: str) -> Any:
-        """Resolve only an owned Dukascopy dataset ID."""
-        if self.owner != "plugin.data_manager.dukascopy":
+        """Resolve only an owned dataset ID."""
+        source = self._authorized_source()
+        dataset = self._store.get_dataset(dataset_id)
+        if dataset.source != source:
             raise PermissionError("Market source ownership denied")
-        return self._store.get_dataset(dataset_id)
+        return dataset
 
     def list_datasets(self) -> tuple[dict[str, Any], ...]:
-        """Read committed Dukascopy definitions and file-backed summaries."""
-        if self.owner != "plugin.data_manager.dukascopy":
-            raise PermissionError("Market source ownership denied")
-        return self._store.list_datasets("dukascopy")
+        """Read committed definitions and file-backed summaries."""
+        source = self._authorized_source()
+        return self._store.list_datasets(source)
 
     def delete_dataset(self, symbol: str) -> bool:
         """Purge files and delete dataset definition for an owned symbol."""
-        if self.owner != "plugin.data_manager.dukascopy":
-            raise PermissionError("Market source ownership denied")
+        self._authorized_source()
         logger.info("Market dataset deleted: owner=%s symbol=%s", self.owner, symbol)
         return self._store.delete_dataset(symbol)
 
     def clear_dataset(self, symbol: str) -> bool:
         """Purge files and reset dataset coverage for an owned symbol."""
-        if self.owner != "plugin.data_manager.dukascopy":
-            raise PermissionError("Market source ownership denied")
+        self._authorized_source()
         logger.info("Market dataset cleared: owner=%s symbol=%s", self.owner, symbol)
         return self._store.clear_dataset(symbol)
 
     def list_files(self, source: str, kind: str, symbol: str) -> tuple[Any, ...]:
         """List committed revisions for a validated identity."""
-        if source != "dukascopy" or self.owner != "plugin.data_manager.dukascopy":
+        expected = self._authorized_source()
+        if source != expected:
             raise PermissionError("Market source ownership denied")
         if kind not in ("ticks", "m1"):
             raise ValueError("Invalid market kind")
@@ -565,11 +656,12 @@ class MarketAccess:
         mode: str,
     ) -> Any:
         """Publish only this plugin's source under host custody."""
-        if self.owner != "plugin.data_manager.dukascopy" or kind not in ("ticks", "m1"):
+        source = self._authorized_source()
+        if kind not in ("ticks", "m1"):
             raise PermissionError("Market source ownership denied")
         clean_kind = cast("Kind", kind)
         return self._store.publish(
-            source="dukascopy",
+            source=source,
             kind=clean_kind,
             symbol=symbol,
             period=period,
@@ -592,11 +684,12 @@ class MarketAccess:
         merge_timestamps: bool = False,
     ) -> Any:
         """Replace one owned interval without exposing a writable path or SQL."""
-        if self.owner != "plugin.data_manager.dukascopy" or kind not in ("ticks", "m1"):
+        source = self._authorized_source()
+        if kind not in ("ticks", "m1"):
             raise PermissionError("Market source ownership denied")
         clean_kind = cast("Kind", kind)
         return self._store.replace_interval(
-            source="dukascopy",
+            source=source,
             kind=clean_kind,
             symbol=symbol,
             period=period,
@@ -639,19 +732,8 @@ class NetworkAccess:
 # The worker has no trading operations. A process boundary makes blocked native
 # terminal calls cancellable without abandoning a thread or unloading a live DLL.
 _TERMINAL_WORKER = """
-import datetime, json, os, sys
+import datetime, json, os, sys, time
 import MetaTrader5 as terminal
-
-CANDIDATES = [
-    r"C:\\Program Files\\MetaTrader 5\\terminal64.exe",
-    r"C:\\Program Files\\Darwinex MetaTrader 5\\terminal64.exe",
-    r"C:\\Program Files\\Pepperstone MetaTrader 5\\terminal64.exe",
-    r"C:\\Program Files\\IC Markets Global MetaTrader 5\\terminal64.exe",
-    r"C:\\Program Files\\RoboForex MetaTrader 5\\terminal64.exe",
-    r"C:\\Program Files\\FTMO MetaTrader 5\\terminal64.exe",
-    r"C:\\Program Files\\MetaQuotes\\MetaTrader 5\\terminal64.exe",
-    r"C:\\Program Files (x86)\\MetaTrader 5\\terminal64.exe",
-]
 
 for line in sys.stdin:
     try:
@@ -661,13 +743,9 @@ for line in sys.stdin:
         if operation == 'connect':
             options = {'timeout': 30000}
             path = args.get('path')
-            if not path or not os.path.exists(path):
-                for candidate in CANDIDATES:
-                    if os.path.exists(candidate):
-                        path = candidate
-                        break
-            if path:
-                options['path'] = path
+            if not path or not os.path.isfile(path):
+                raise ValueError('Terminal executable unavailable')
+            options['path'] = path
             if args.get('portable'):
                 options['portable'] = True
             value = bool(terminal.initialize(**options))
@@ -685,6 +763,15 @@ for line in sys.stdin:
             if rows is None:
                 raise ValueError('Terminal symbols unavailable')
             value = [r._asdict() for r in rows]
+        elif operation == 'tick':
+            before = time.time()
+            monotonic_before = time.monotonic()
+            tick = terminal.symbol_info_tick(args['symbol'])
+            after = time.time()
+            value = {'time_msc': (tick.time_msc or tick.time * 1000) if tick else None,
+                     'utc_before': before, 'utc_after': after,
+                     'monotonic_before': monotonic_before,
+                     'monotonic_after': time.monotonic()}
         elif operation == 'symbol':
             symbol = args['symbol']
             terminal.symbol_select(symbol, True)
@@ -732,15 +819,50 @@ class TerminalAccess:
     """Historical-only terminal worker with bounded requests and owned cleanup."""
 
     owner: str
+    configuration_reader: Callable[[], MT5TerminalConfiguration] | None = None
     _process: asyncio.subprocess.Process | None = field(default=None, init=False)
     _lock: asyncio.Lock = field(default_factory=asyncio.Lock, init=False)
 
+    def _connection_arguments(self, arguments: dict[str, Any]) -> dict[str, Any]:
+        """Resolve one explicit or enabled saved executable without fallback."""
+        path = arguments.get("path", "")
+        if not isinstance(path, str):
+            raise TypeError("MT5 terminal path must be text")
+        path = path.strip()
+        portable = arguments.get("portable", False)
+        selection = "manual"
+        if not path:
+            if self.configuration_reader is None:
+                raise ValueError("MT5 global settings are unavailable")
+            config = self.configuration_reader()
+            if not config.enabled:
+                raise ValueError("MT5 is disabled in global settings")
+            path = config.terminal_path.strip()
+            portable = config.portable
+            selection = "global"
+        if type(portable) is not bool:
+            raise ValueError("MT5 portable mode must be a boolean")
+        if not path or Path(path).name.lower() != "terminal64.exe":
+            raise ValueError(
+                "Set an MT5 terminal64.exe path in global settings or enter it"
+            )
+        if not Path(path).is_file():
+            raise ValueError(
+                "MT5 terminal executable does not exist; check its settings"
+            )
+        logger.info(
+            "Historical terminal selection: owner=%s source=%s", self.owner, selection
+        )
+        return {"path": path, "portable": portable}
+
     async def call(self, operation: str, arguments: dict[str, Any]) -> Any:
         """Invoke an allowed read in an isolated, killable native worker."""
-        if operation not in ("connect", "symbols", "symbol", "history"):
+        if operation not in ("connect", "symbols", "symbol", "history", "tick"):
             raise ValueError("Unsupported historical terminal operation")
         async with self._lock:
             try:
+                if operation == "connect":
+                    arguments = self._connection_arguments(arguments)
                 async with asyncio.timeout(90):
                     if self._process is None:
                         self._process = await asyncio.create_subprocess_exec(

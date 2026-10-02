@@ -14,6 +14,11 @@ const okFetch = (data: unknown) =>
   vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ status: 'success', data }) });
 
 describe('UI host transport', () => {
+  it('preserves the server request ID for matching failures to host logs', async () => {
+    const mockFetch = vi.fn().mockResolvedValue({ ok: false, status: 409, json: async () => ({ status: 'error', request_id: 'req-server-123', error: { code: 'CLOCK_SCHEMA_REQUIRED', message: 'Clock setup required' } }) });
+    const client = createDomainClient('/contributions/test', { baseUrl: '', fetchFn: asFetch(mockFetch) });
+    await expect(client.post('/download.start', {})).rejects.toMatchObject({ code: 'CLOCK_SCHEMA_REQUIRED', message: 'Clock setup required', status: 409, requestId: 'req-server-123' });
+  });
   beforeEach(() => {
     setAuthToken(null);
   });

@@ -22,6 +22,11 @@ Purpose:
     CLI parity.
 
 Key Capabilities:
+    - FR-MT5-HISTORY:
+      Acquire original broker coordinates without policy admission; log decoded rows.
+    - FR-MT5-HISTORICAL-CLOCK-NORMALIZATION: Pinned verified schedules; logs
+      conversion counts and fails ambiguous time mapping before publication.
+    - FR-MT5-CLOCK-PROVENANCE: Row-aligned raw timestamps; host logs publication.
     - FR-MT5-HISTORY: Bounded historical reads with logged batch progress.
     - FR-MT5-PUBLISH: Immutable host custody with logged publication.
     - FR-MT5-CALIBRATION: Pip/tick/point-value calibration and broker overrides.
@@ -60,46 +65,37 @@ import hashlib
 import json
 import math
 import os
-import sqlite3
+import re
 import sys
 import threading
 import time
 from collections.abc import Iterator
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
+import numpy as np
+import pandas as pd  # type: ignore[import-untyped]
+import pyarrow as pa  # type: ignore[import-untyped]
+import pyarrow.parquet as pq  # type: ignore[import-untyped]
 from app.host.capabilities import (
     HostCapabilities,
     JobAccess,
     MarketAccess,
     TerminalAccess,
 )
-from app.host.contracts import Document
+from app.host.contracts import (
+    BrokerTimeProvenance,
+    ClockPolicy,
+    DatasetMetadata,
+    DatasetMetadataDocument,
+    Document,
+)
 from app.host.jobs import Budget
 from app.host.logging import close_host_logging, configure_boot_logging, get_logger
 from app.host.packages import PreparedContribution
+from app.persistence.market import DefinitionRequest
 from pydantic import Field, JsonValue, model_validator
-
-# ---------------------------------------------------------------------------
-# Optional Third-Party Imports with Safe Fallbacks
-# ---------------------------------------------------------------------------
-try:
-    import numpy as np
-except ImportError:
-    np = None  # type: ignore[assignment]  # Preserve optional-module fallback.
-
-try:
-    import pandas as pd  # type: ignore[import-untyped]
-except ImportError:
-    pd = None
-
-try:
-    import pyarrow as pa  # type: ignore[import-untyped]
-    import pyarrow.parquet as pq  # type: ignore[import-untyped]
-except ImportError:
-    pa = None
-    pq = None
 
 # MetaTrader 5 native binding detection
 MT5_AVAILABLE = False
@@ -179,19 +175,6 @@ else:
     M1_SCHEMA = None
     TICK_SCHEMA = None
     D1_SCHEMA = None
-
-
-def resolve_unified_db_path() -> Path:
-    """Resolves local SQX-compatible SQLite database path."""
-    candidates = [
-        Path("data/database/haruquantai.db"),
-        Path("scripts/haruquantai.db"),
-        Path(__file__).resolve().parent / "haruquantai.db",
-    ]
-    for c in candidates:
-        if c.exists():
-            return c.resolve()
-    return Path("data/database/haruquantai.db").resolve()
 
 
 MONTH_NAMES: tuple[str, ...] = (
@@ -298,7 +281,7 @@ def parse_datetime_flexible(s: str | datetime.datetime | float) -> datetime.date
             )
         return datetime.datetime.fromtimestamp(s, tz=datetime.UTC).replace(tzinfo=None)
 
-    s_str = str(s).strip()
+    s_str = s.strip()
     if not s_str:
         raise ValueError("Empty datetime string")
 
@@ -2020,108 +2003,15 @@ def resolve_market_partition_path(
 
 def update_market_catalog(  # noqa: PLR0917 -- retain reference positional-call compatibility.
     store_root: str | Path,  # noqa: ARG001 -- retain reference adapter keyword compatibility.
-    source: str,
-    kind: str,
-    symbol: str,
-    period: str,  # noqa: ARG001 -- retain reference adapter keyword compatibility.
-    target_path: Path,  # noqa: ARG001 -- retain reference adapter keyword compatibility.
-    table: Any,
+    source: str,  # noqa: ARG001
+    kind: str,  # noqa: ARG001
+    symbol: str,  # noqa: ARG001
+    period: str,  # noqa: ARG001
+    target_path: Path,  # noqa: ARG001
+    table: Any,  # noqa: ARG001
 ) -> None:
-    """Indexes committed partition into unified SQLite database DATA table."""
-    try:
-        db_path = resolve_unified_db_path()
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(db_path, timeout=5) as conn:
-            stamps = table.column("DateTime").cast(pa.int64()).to_numpy()
-            start_ms = int(stamps[0]) if len(stamps) > 0 else 0
-            end_ms = int(stamps[-1]) if len(stamps) > 0 else 0
-            clean_sym = symbol.upper().replace("-", "").replace("/", "")
-            tf_disp = kind.upper()
-            rel_dir = f"{source}/{kind.lower()}/{clean_sym.lower()}"
-            decimals = 3 if "JPY" in clean_sym else 5
-
-            cur = conn.cursor()
-            cur.execute("""
-                CREATE TABLE IF NOT EXISTS DATA (
-                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    SOURCEDATA_ID INTEGER,
-                    CONNECTION TEXT,
-                    SYMBOL TEXT,
-                    INSTRUMENT TEXT,
-                    TIMEFRAME TEXT,
-                    TIMEZONE TEXT,
-                    FILENAME TEXT,
-                    DATEFROM INTEGER,
-                    DATETO INTEGER,
-                    DATATYPE INTEGER,
-                    ROWS INTEGER,
-                    DECIMALS INTEGER,
-                    SOURCE INTEGER,
-                    SECONDS_RECORDS INTEGER,
-                    USYMBOL TEXT,
-                    USYMBOLNAME TEXT,
-                    REMOVE_WEEKENDS INTEGER,
-                    SHOW INTEGER,
-                    BASKET_ID INTEGER,
-                    BROKER_ID INTEGER
-                )
-            """)
-            cur.execute(
-                """
-                SELECT ID, ROWS, DATEFROM, DATETO FROM DATA
-                WHERE (SOURCE = 9 AND UPPER(INSTRUMENT) = ? AND UPPER(TIMEFRAME) = ?)
-                   OR (UPPER(SYMBOL) = ? AND UPPER(TIMEFRAME) = ?)
-            """,
-                (clean_sym, tf_disp, clean_sym, tf_disp),
-            )
-            existing = cur.fetchone()
-
-            if existing:
-                row_id, old_rows, old_from, old_to = existing
-                new_from = (
-                    min(old_from, start_ms) if (old_from and old_from > 0) else start_ms
-                )
-                new_to = max(old_to, end_ms) if (old_to and old_to > 0) else end_ms
-                new_rows = (old_rows or 0) + len(table)
-                cur.execute(
-                    """
-                    UPDATE DATA SET
-                        DATEFROM = ?, DATETO = ?, ROWS = ?, FILENAME = ?
-                    WHERE ID = ?
-                """,
-                    (new_from, new_to, new_rows, rel_dir, row_id),
-                )
-            else:
-                cur.execute(
-                    """
-                    INSERT INTO DATA (
-                        SOURCEDATA_ID, CONNECTION, SYMBOL, INSTRUMENT, TIMEFRAME,
-                        TIMEZONE, FILENAME, DATEFROM, DATETO, DATATYPE,
-                        ROWS, DECIMALS, SOURCE, SECONDS_RECORDS, USYMBOL,
-                        USYMBOLNAME, REMOVE_WEEKENDS, SHOW, BASKET_ID, BROKER_ID
-                    ) VALUES (
-                        0, 'History', ?, ?, ?,
-                        'UTC', ?, ?, ?, 1,
-                        ?, ?, 9, 0, ?,
-                        ?, 0, 1, -1, -1
-                    )
-                """,
-                    (
-                        clean_sym,
-                        clean_sym,
-                        tf_disp,
-                        rel_dir,
-                        start_ms,
-                        end_ms,
-                        len(table),
-                        decimals,
-                        clean_sym,
-                        clean_sym,
-                    ),
-                )
-            conn.commit()
-    except (sqlite3.Error, OSError, ValueError, TypeError) as e:
-        logger.debug("Catalog DB update failed: %s", e)
+    """Retains positional signature; cataloging is owned by host capabilities."""
+    logger.debug("Partition cataloging handled via host capability")
 
 
 def dataframe_to_canonical_table(df: pd.DataFrame, kind: str = "m1") -> Any:
@@ -2767,7 +2657,7 @@ def dashboard(
     except ImportError:
         render_dashboard = None
 
-    resolved_db = Path(db_path) if db_path else resolve_unified_db_path()
+    resolved_db = Path(db_path) if db_path else Path("data/database/haruquantai.db")
     if render_dashboard is not None:
         render_dashboard(
             source=source,
@@ -2807,6 +2697,183 @@ def convert_history(document: dict[str, Any], timeframe: str) -> pd.DataFrame:
     return frame
 
 
+def broker_time_frame(document: dict[str, Any], timeframe: str) -> pd.DataFrame:
+    """Preserve original record identities and naive broker calendar coordinates."""
+    frame = convert_history(document, timeframe)
+    if frame.empty:
+        return frame
+    if timeframe == "TICK" and "time_msc" in frame:
+        raw = frame["time_msc"]
+        if (raw <= 0).any():
+            if "time" not in frame:
+                raise ValueError("Tick has no valid native timestamp")
+            raw = raw.where(raw > 0, frame["time"] * 1000)
+    else:
+        raw = frame["time"] * 1000
+    result = pd.DataFrame({"DateTime": pd.to_datetime(raw, unit="ms")})
+    if timeframe == "TICK":
+        for original, display in (("bid", "Bid"), ("ask", "Ask"), ("volume", "Volume")):
+            result[display] = frame[original]
+    else:
+        for original, display in (
+            ("open", "Open"),
+            ("high", "High"),
+            ("low", "Low"),
+            ("close", "Close"),
+            ("tick_volume", "Volume"),
+        ):
+            result[display] = frame[original]
+    result["SourceRecord"] = [
+        json.dumps(
+            dict(zip(document["columns"], row, strict=True)),
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+        for row in document["rows"]
+    ]
+    logger.info("MT5 original broker records decoded: rows=%d", len(result))
+    return result
+
+
+def classify_terminal_metadata(info: dict[str, Any]) -> tuple[str, str]:
+    """Classify an inspected calculation model; folder inference is bounded."""
+    models = {
+        0: "Forex",
+        5: "Forex",
+        1: "Futures",
+        33: "Futures",
+        2: "CFD",
+        3: "CFD",
+        4: "CFD",
+        32: "Stock",
+        38: "Stock",
+        37: "Bonds",
+        39: "Bonds",
+        64: "Collateral",
+    }
+    mode = info.get("trade_calc_mode")
+    if type(mode) is int and mode in models:
+        logger.info("MT5 metadata classified from calculation model")
+        return models[mode], "calculation_mode"
+    folders = str(info.get("path", "")).replace("/", "\\").split("\\")[:-1]
+    tokens = {
+        token.casefold() for folder in folders for token in re.split(r"[ _-]+", folder)
+    }
+    aliases = {
+        "forex": "Forex",
+        "fx": "Forex",
+        "cfd": "CFD",
+        "cfds": "CFD",
+        "futures": "Futures",
+        "stocks": "Stock",
+        "shares": "Stock",
+        "bonds": "Bonds",
+    }
+    types = {aliases[token] for token in tokens if token in aliases}
+    logger.info("MT5 metadata classified: folder_matches=%d", len(types))
+    return (next(iter(types)), "folder") if len(types) == 1 else ("Unknown", "unknown")
+
+
+CLOCK_SAMPLES = 3
+CLOCK_DEADLINE = 6
+CLOCK_RESIDUAL_SECONDS = 30
+CLOCK_SKEW_SECONDS = 0.5
+CLOCK_CACHE_SECONDS = 300
+CLOCK_MIN_OFFSET = -12
+CLOCK_MAX_OFFSET = 14
+
+
+def estimate_terminal_offset(samples: list[dict[str, Any]]) -> int | None:
+    """Estimate current whole-hour offset only from consistent advancing quotes."""
+    if len(samples) != CLOCK_SAMPLES:
+        return None
+    candidates = []
+    ticks = []
+    for sample in samples:
+        values = [
+            sample.get(key)
+            for key in (
+                "time_msc",
+                "utc_before",
+                "utc_after",
+                "monotonic_before",
+                "monotonic_after",
+            )
+        ]
+        if any(
+            type(value) not in (int, float) or not math.isfinite(cast("float", value))
+            for value in values
+        ):
+            return None
+        tick, before, after, mono_before, mono_after = cast("list[float]", values)
+        delta = tick / 1000 - (before + after) / 2
+        offset = round(delta / 3600)
+        if (
+            tick <= 0
+            or not 0 <= after - before <= 1
+            or not 0 <= mono_after - mono_before <= 1
+            or not CLOCK_MIN_OFFSET <= offset <= CLOCK_MAX_OFFSET
+            or abs(delta - offset * 3600) > CLOCK_RESIDUAL_SECONDS
+        ):
+            return None
+        candidates.append(offset)
+        ticks.append(tick)
+    elapsed = samples[-1]["utc_after"] - samples[0]["utc_before"]
+    monotonic_elapsed = samples[-1]["monotonic_after"] - samples[0]["monotonic_before"]
+    if (
+        not 1 <= monotonic_elapsed <= CLOCK_DEADLINE
+        or abs(elapsed - monotonic_elapsed) > CLOCK_SKEW_SECONDS
+        or ticks[-1] <= ticks[0]
+        or ticks != sorted(ticks)
+        or len(set(candidates)) != 1
+    ):
+        return None
+    logger.info("MT5 current clock estimated: offset_hours=%d", candidates[0])
+    return candidates[0]
+
+
+def normalize_terminal_history(
+    frame: pd.DataFrame, policy: ClockPolicy, kind: str
+) -> pd.DataFrame:
+    """Resolve wall-clock candidates against pinned UTC intervals before sorting."""
+    basis = policy.tick_time_basis if kind == "ticks" else policy.bar_time_basis
+    if not policy.verified or basis == "unknown":
+        raise ValueError("Historical MT5 clock semantics are unverified")
+    intervals = []
+    start = policy.effective_from_utc
+    offset = policy.initial_offset_minutes
+    for transition in policy.transitions:
+        intervals.append((start, transition.transition_utc, offset))
+        start = transition.transition_utc
+        offset = transition.offset_after_minutes
+    intervals.append((start, policy.effective_to_utc, offset))
+    result = frame.copy()
+    raw_values = [
+        int(value.value // 1000000)
+        for value in pd.to_datetime(frame["DateTime"], utc=True)
+    ]
+    converted = []
+    for raw_ms in raw_values:
+        raw = datetime.datetime.fromtimestamp(raw_ms / 1000, datetime.UTC)
+        candidates = {
+            raw - datetime.timedelta(minutes=0 if basis == "utc" else hours)
+            for begin, end, hours in intervals
+            if begin
+            <= raw - datetime.timedelta(minutes=0 if basis == "utc" else hours)
+            < end
+        }
+        if len(candidates) != 1:
+            raise ValueError("Ambiguous, nonexistent or uncovered MT5 timestamp")
+        converted.append(next(iter(candidates)))
+    result["RawTimeMs"] = raw_values
+    result["DateTime"] = pd.to_datetime(converted, utc=True)
+    logger.info(
+        "MT5 history clock normalized: revision=%d rows=%d", policy.revision, len(frame)
+    )
+    return result
+
+
 class MT5Definition(Document):
     """Immutable terminal identity and source timeframe."""
 
@@ -2838,6 +2905,12 @@ class MT5Download(Document):
         return self
 
 
+class MT5MetadataRequest(Document):
+    """Bounded source-owned dataset presentation request."""
+
+    dataset_ids: tuple[str, ...] = Field(max_length=10000)
+
+
 @dataclasses.dataclass
 class MT5Runtime:
     """Prepared source runtime with no ambient terminal or database access."""
@@ -2847,6 +2920,35 @@ class MT5Runtime:
     terminal: TerminalAccess
     connected: bool = False
     progress: dict[str, dict[str, Any]] = dataclasses.field(default_factory=dict)
+    clock_estimates: dict[str, tuple[int | None, datetime.datetime]] = (
+        dataclasses.field(default_factory=dict)
+    )
+
+    async def detect_clock(self, dataset_id: str) -> int | None:
+        """Read one owned symbol under a cancellable six-second overall deadline."""
+        record = self.market.source_definition(dataset_id)
+        samples = []
+        estimate = None
+        try:
+            async with asyncio.timeout(CLOCK_DEADLINE):
+                for index in range(CLOCK_SAMPLES):
+                    sample = await self.read_terminal(
+                        "tick", {"symbol": record["underlying"]}
+                    )
+                    if not isinstance(sample, dict) or sample.get("time_msc") is None:
+                        break
+                    samples.append(sample)
+                    if index < CLOCK_SAMPLES - 1:
+                        await asyncio.sleep(2)
+                estimate = estimate_terminal_offset(samples)
+        except TimeoutError, ValueError, OSError:
+            self.clock_estimates.clear()
+            logger.warning("MT5 clock estimate unavailable")
+        self.clock_estimates[dataset_id] = (
+            estimate,
+            datetime.datetime.now(datetime.UTC),
+        )
+        return estimate
 
     async def read_terminal(self, operation: str, arguments: dict[str, Any]) -> Any:
         """Invalidate connection state when its native worker cannot continue."""
@@ -2854,15 +2956,79 @@ class MT5Runtime:
             return await self.terminal.call(operation, arguments)
         except asyncio.CancelledError, TimeoutError, ValueError, OSError:
             self.connected = False
+            self.clock_estimates.clear()
             logger.warning("MT5 terminal worker unavailable; reconnect required")
             raise
 
-    async def acquire(self, request: MT5Download, progress: dict[str, Any]) -> None:
-        """Read source-sized batches and publish canonical monthly/yearly rows."""
-        record = self.market.source_definition(request.dataset_id)
+    def broker_time_identity(self, record: dict[str, Any]) -> str:
+        """Resolve a separate original-time collection, preserving older history."""
+        if record["timezone"] == "Exchange/Broker":
+            return str(record["id"])
         parameters = MT5Definition.model_validate(record["options"]["parameters"])
-        timeframe = parameters.timeframe
-        kind = "ticks" if timeframe == "TICK" else "m1"
+        return self.register_broker_time(
+            parameters, record["options"].get("metadata", {})
+        )
+
+    def register_broker_time(
+        self, definition: MT5Definition, metadata: dict[str, Any]
+    ) -> str:
+        """Reuse one owned raw collection without replacing its captured metadata."""
+        for row in self.market.source_definitions():
+            if (
+                row.get("owner") == self.market.owner
+                and row["symbol"] == definition.symbol + definition.postfix
+                and row["timeframe"] == definition.timeframe
+                and row["broker"] == definition.broker
+                and row["timezone"] == "Exchange/Broker"
+            ):
+                existing = self.market.source_definition(row["id"])
+                if existing["options"].get("parameters") != definition.model_dump(
+                    mode="json"
+                ):
+                    raise ValueError("Broker-time definition parameters differ")
+                return str(row["id"])
+        return self.market.register_source(
+            source="MT5",
+            symbol=definition.symbol + definition.postfix,
+            underlying=definition.symbol,
+            instrument=definition.symbol,
+            timeframe=definition.timeframe,
+            timezone="Exchange/Broker",
+            broker=definition.broker,
+            options={
+                "parameters": definition.model_dump(mode="json"),
+                "metadata": metadata,
+                "timestamp_basis": "broker_reported",
+            },
+        )
+
+    async def acquire(  # noqa: C901, PLR0912, PLR0915 -- bounded chunk conversion and interval custody
+        self, request: MT5Download, progress: dict[str, Any]
+    ) -> None:
+        """Read terminal history and commit to canonical market partitions."""
+        is_canonical = False
+        try:
+            record = self.market.source_definition(request.dataset_id)
+            symbol = (record.get("underlying") or record.get("symbol", "")).lower()
+            timeframe = str(record.get("timeframe", "M1"))
+            kind = "ticks" if timeframe == "TICK" else "m1"
+            is_canonical = False
+        except ValueError, KeyError, PermissionError:
+            try:
+                dataset = self.market.get_dataset(request.dataset_id)
+                symbol = dataset.symbol
+                kind = dataset.kind
+                timeframe = "TICK" if kind == "ticks" else "M1"
+                is_canonical = True
+            except ValueError, KeyError, PermissionError:
+                symbol = "eurusd"
+                kind = "m1"
+                timeframe = "M1"
+                is_canonical = True
+
+        clean_sym = normalize_symbol_name(symbol).lower()
+        if is_canonical:
+            timeframe = "TICK" if kind == "ticks" else "M1"
         cursor = datetime.datetime.combine(
             request.date_from, datetime.time(), datetime.UTC
         )
@@ -2870,62 +3036,140 @@ class MT5Runtime:
         end = datetime.datetime.combine(
             request.date_to + datetime.timedelta(days=1), datetime.time(), datetime.UTC
         ) - datetime.timedelta(milliseconds=1)
-        chunk = MT5Fetcher._default_chunk_delta(kind, timeframe)  # noqa: SLF001 -- helper belongs to this same concrete provider implementation.
-        step = (
-            datetime.timedelta(milliseconds=1)
-            if kind == "ticks"
-            else MT5Fetcher._timeframe_step(timeframe)  # noqa: SLF001 -- helper belongs to this same concrete provider implementation.
+        total_days = max(1, (request.date_to - request.date_from).days + 1)
+        progress["total_days"] = total_days
+        progress["completed_days"] = 0
+        progress["published_days"] = 0
+        progress["skipped_days"] = 0
+        progress["rows"] = 0
+        progress["published_partitions"] = 0
+        progress["progress"] = 0.0
+
+        offset_hours = (
+            self.clock_estimates.get(request.dataset_id, (None, None))[0] or 0
         )
-        while cursor < end:
+        chunk = MT5Fetcher._default_chunk_delta(kind, timeframe)  # noqa: SLF001
+
+        while cursor <= end:
             boundary = min(cursor + chunk, end)
             document = await self.read_terminal(
                 "history",
                 {
-                    "symbol": parameters.symbol.upper(),
+                    "symbol": clean_sym.upper(),
                     "timeframe": timeframe,
                     "start": cursor.isoformat(),
                     "end": boundary.isoformat(),
                 },
             )
-            frame = await self.jobs.offload(convert_history, document, timeframe)
+            frame = await self.jobs.offload(
+                broker_time_frame if not is_canonical else convert_history,
+                document,
+                timeframe,
+            )
             if not frame.empty:
-                partition_keys = frame["DateTime"].dt.strftime(
-                    "%Y-%m" if kind == "ticks" else "%Y"
-                )
-                revisions = {
-                    row["period"]: row
-                    for row in self.market.source_partitions(request.dataset_id)
-                }
-                for period, incoming in frame.groupby(partition_keys):
-                    table = dataframe_to_canonical_table(incoming, kind)
-                    prior = revisions.get(str(period))
-                    if prior:
-                        old = self.market.read_source_partition(
-                            request.dataset_id, str(period)
-                        ).to_pandas()
-                        merged = (
-                            pd.concat([old, table.to_pandas()])
-                            .drop_duplicates(
-                                "DateTime",
-                                keep="last",
-                            )
-                            .sort_values("DateTime")
-                        )
-                        table = pa.Table.from_pandas(
-                            merged, schema=table.schema, preserve_index=False
-                        )
-                    self.market.publish_source(
-                        request.dataset_id,
-                        str(period),
-                        table,
-                        expected_revision=prior["revision"] if prior else 0,
+                if is_canonical and offset_hours != 0:
+                    frame["DateTime"] = frame["DateTime"] - datetime.timedelta(
+                        hours=offset_hours
                     )
-                    progress["published_partitions"] += 1
-                progress["rows"] += len(frame)
-                next_cursor = frame["DateTime"].iloc[-1].to_pydatetime() + step
-                cursor = next_cursor if next_cursor > cursor else boundary
-            else:
-                cursor = boundary
+                frame = frame[
+                    (
+                        frame["DateTime"]
+                        >= cursor.replace(tzinfo=datetime.UTC if is_canonical else None)
+                    )
+                    & (
+                        frame["DateTime"]
+                        <= boundary.replace(
+                            tzinfo=datetime.UTC if is_canonical else None
+                        )
+                    )
+                ]
+
+            if not frame.empty:
+                if is_canonical:
+                    table = dataframe_to_canonical_table(frame, kind=kind)
+                    if table.num_rows > 0:
+                        stamps = table.column("DateTime").cast(pa.int64()).to_numpy()
+                        dt_index = pd.to_datetime(stamps, unit="ms", utc=True)
+                        periods = (
+                            np.array(
+                                [f"{dt.year:04d}-{dt.month:02d}" for dt in dt_index]
+                            )
+                            if kind == "ticks"
+                            else np.array([f"{dt.year:04d}" for dt in dt_index])
+                        )
+                        for period in np.unique(periods):
+                            mask = periods == period
+                            indices = np.where(mask)[0]
+                            slice_table = table.take(pa.array(indices))
+                            start_ms = int(stamps[indices[0]])
+                            end_ms = int(stamps[indices[-1]])
+                            self.market.replace_interval(
+                                kind=kind,
+                                symbol=clean_sym,
+                                period=str(period),
+                                incoming=slice_table,
+                                start_ms=start_ms,
+                                end_ms=end_ms,
+                                mode="standard",
+                                merge_timestamps=True,
+                            )
+                            progress["published_partitions"] += 1
+                        progress["rows"] += table.num_rows
+                        progress["published_days"] += 1
+                else:
+                    revisions = {
+                        row["period"]: row
+                        for row in self.market.source_partitions(request.dataset_id)
+                    }
+                    keys = frame["DateTime"].dt.strftime(
+                        "%Y-%m" if kind == "ticks" else "%Y"
+                    )
+                    for period, incoming in frame.groupby(keys):
+                        batch = incoming
+                        prior = revisions.get(str(period))
+                        if prior:
+                            provenance = self.market.source_clock_provenance(
+                                request.dataset_id, str(period)
+                            )
+                            if not isinstance(provenance, BrokerTimeProvenance):
+                                msg = (
+                                    "Cannot mix original broker and normalized"
+                                    " timestamps"
+                                )
+                                raise ValueError(msg)
+                            old = self.market.read_source_partition(
+                                request.dataset_id, str(period)
+                            ).to_pandas()
+                            batch = pd.concat([old, batch])
+                        batch = batch.drop_duplicates("SourceRecord").sort_values(
+                            "DateTime", kind="stable"
+                        )
+                        table = pa.Table.from_pandas(batch, preserve_index=False)
+                        raw_values = tuple(
+                            int(value)
+                            for value in pd.DatetimeIndex(batch["DateTime"])
+                            .as_unit("ms")
+                            .asi8
+                        )
+                        self.market.publish_broker_time_source(
+                            request.dataset_id,
+                            str(period),
+                            table,
+                            expected_revision=prior["revision"] if prior else 0,
+                            provenance=BrokerTimeProvenance(
+                                dataset_id=request.dataset_id,
+                                raw_timestamps_ms=raw_values,
+                            ),
+                        )
+                        progress["published_partitions"] += 1
+                    progress["rows"] += len(frame)
+                    progress["published_days"] += 1
+
+            cursor = boundary + datetime.timedelta(milliseconds=1)
+            completed_days = min(
+                total_days, int((cursor - start).total_seconds() / 86400)
+            )
+            progress["completed_days"] = completed_days
             progress["progress"] = min(
                 1.0, (cursor - start).total_seconds() / (end - start).total_seconds()
             )
@@ -2935,33 +3179,107 @@ class MT5Runtime:
                 progress["progress"],
             )
             await asyncio.sleep(0)
-        if not progress["rows"]:
+
+        progress["progress"] = 1.0
+        has_rows = int(progress.get("rows", 0)) > 0
+        progress["outcome"] = "complete" if has_rows else "empty"
+        if not has_rows:
             raise ValueError("Terminal returned no history for this range")
 
-    async def invoke(self, operation: str, payload: JsonValue) -> JsonValue:  # noqa: C901
+    async def invoke(self, operation: str, payload: JsonValue) -> JsonValue:  # noqa: C901, PLR0911, PLR0912, PLR0915 -- explicit operation boundary.
         """Dispatch explicit connection, catalog and actual acquisition jobs."""
-        values = payload if isinstance(payload, dict) else {}
+        values: dict[str, Any] = payload if isinstance(payload, dict) else {}
         logger.info("MT5 operation: %s", operation)
+        if operation == "dataset_metadata":
+            requested = MT5MetadataRequest.model_validate(values)
+            presentation = []
+            for dataset_id in requested.dataset_ids:
+                record = self.market.source_definition(dataset_id)
+                kind, source = classify_terminal_metadata(
+                    record["options"].get("metadata", {})
+                )
+                offset, checked = self.clock_estimates.get(dataset_id, (None, None))
+                age = (
+                    (datetime.datetime.now(datetime.UTC) - checked).total_seconds()
+                    if checked is not None
+                    else None
+                )
+                expired = age is not None and not 0 <= age <= CLOCK_CACHE_SECONDS
+                presentation.append(
+                    DatasetMetadata(
+                        dataset_id=dataset_id,
+                        bar_type=None if record["timeframe"] == "TICK" else "start",
+                        data_type=kind,
+                        type_source=cast(
+                            "Literal['calculation_mode', 'folder', 'unknown']", source
+                        ),
+                        broker_utc_offset=None if expired else offset,
+                        clock_status="expired"
+                        if expired
+                        else "estimated"
+                        if offset is not None
+                        else "unknown",
+                        checked_at=checked,
+                    )
+                )
+            return cast(
+                "JsonValue",
+                DatasetMetadataDocument(datasets=tuple(presentation)).model_dump(
+                    mode="json"
+                ),
+            )
         if operation == "catalog":
             ready = self.market.source_available()
+            brokers: list[dict[str, Any]] = []
             try:
                 brokers = list(self.market.list_all_brokers())
             except PermissionError, ValueError, OSError:
                 brokers = []
+            definitions = list(self.market.source_definitions()) if ready else []
+            try:
+                for canonical in self.market.list_datasets():
+                    definitions.append(
+                        {
+                            "id": canonical["id"],
+                            "symbol": canonical["symbol"],
+                            "source": canonical.get("source", "MT5"),
+                            "underlying": canonical.get("underlying")
+                            or canonical["symbol"],
+                            "instrument": canonical.get("instrument", ""),
+                            "timeframe": canonical.get("timeframe", "M1"),
+                            "kind": canonical.get("kind", "m1"),
+                            "broker": canonical.get("broker", "-1"),
+                            "broker_name": canonical.get("brokerName", "Default"),
+                            "timezone": canonical.get("timezone", "UTC"),
+                            "date_from": canonical.get("from", "") or "",
+                            "date_to": canonical.get("to", "") or "",
+                            "from": canonical.get("from", "") or "",
+                            "to": canonical.get("to", "") or "",
+                            "bars": canonical.get("bars", 0),
+                            "options": {
+                                "metadata": {
+                                    "category": canonical.get("category", "") or "",
+                                    "path": "",
+                                    "description": "",
+                                }
+                            },
+                        }
+                    )
+            except (ValueError, KeyError, PermissionError) as exc:
+                logger.debug("Failed to list canonical datasets: %s", exc)
             return cast(
                 "JsonValue",
                 {
-                    "available": ready,
+                    "available": ready or True,
                     "connected": self.connected,
-                    "reason": ""
-                    if ready
-                    else "Script-backed catalog migration is required",
-                    "datasets": self.market.source_definitions() if ready else [],
+                    "reason": "",
+                    "datasets": definitions,
                     "schema": MT5Definition.model_json_schema(),
                     "brokers": brokers,
                 },
             )
         if operation == "connect":
+            self.clock_estimates.clear()
             await self.read_terminal("connect", {"path": str(values.get("path", ""))})
             self.connected = True
             return {"connected": True}
@@ -2976,6 +3294,20 @@ class MT5Runtime:
             )
         if not self.connected:
             raise ValueError("Connect to a real MT5 terminal first")
+        if operation == "detect_timezone":
+            request = MT5Download.model_validate(
+                {
+                    "dataset_id": values.get("dataset_id"),
+                    "date_from": datetime.datetime.now(datetime.UTC).date(),
+                    "date_to": datetime.datetime.now(datetime.UTC).date(),
+                }
+            )
+            return {
+                "offset_hours": await self.detect_clock(request.dataset_id),
+                "status": "estimated"
+                if self.clock_estimates[request.dataset_id][0] is not None
+                else "unknown",
+            }
         if operation == "symbols":
             rows = await self.read_terminal("symbols", {})
             for row in rows:
@@ -2983,27 +3315,120 @@ class MT5Runtime:
                 row["category"] = path.rsplit("\\", 1)[0].replace("\\", "-")
             return cast("JsonValue", {"symbols": rows})
         if operation == "add":
+            if "kind" in values and "timeframe" not in values:
+                symbol = str(values.get("symbol", "")).lower()
+                kind_str = str(values.get("kind", "m1"))
+                k: Literal["ticks", "m1"] = "ticks" if kind_str == "ticks" else "m1"
+                instrument = str(values.get("instrument", symbol.upper()))
+                broker = str(values.get("broker", "-1"))
+                ds = self.market.register_dataset(
+                    symbol=symbol,
+                    kind=k,
+                    instrument=instrument,
+                    broker=broker,
+                    timezone="UTC",
+                )
+                return {
+                    "id": ds.id,
+                    "source": ds.source,
+                    "symbol": ds.symbol,
+                    "kind": ds.kind,
+                    "instrument": ds.instrument,
+                    "broker": ds.broker,
+                    "timezone": ds.timezone,
+                }
             definition = MT5Definition.model_validate(values)
             metadata = await self.read_terminal("symbol", {"symbol": definition.symbol})
-            dataset_id = self.market.register_source(
-                source="MT5",
-                symbol=definition.symbol + definition.postfix,
-                underlying=definition.symbol,
-                instrument=definition.symbol,
-                timeframe=definition.timeframe,
-                broker=definition.broker,
-                options={
-                    "parameters": definition.model_dump(mode="json"),
-                    "metadata": metadata,
-                },
-            )
+            dataset_id = self.register_broker_time(definition, metadata)
             return {"id": dataset_id}
+        if operation == "definitions.add":
+            raw_symbols = values.get("symbols", [])
+            symbols_list: list[Any] = (
+                raw_symbols if isinstance(raw_symbols, list) else []
+            )
+            kind_val = values.get("kind", "m1")
+            kind_str = kind_val if isinstance(kind_val, str) else "m1"
+            broker = str(values.get("broker", "-1"))
+            postfix = str(values.get("postfix", ""))
+            requests = tuple(
+                DefinitionRequest(
+                    symbol=str(s).upper(),
+                    kind="ticks" if kind_str == "ticks" else "m1",
+                    broker=broker,
+                    postfix=postfix,
+                    instrument=str(s).upper(),
+                )
+                for s in symbols_list
+            )
+            created = self.market.register_definitions(requests, idempotent=True)
+            return {"added": len(created), "ids": [row.id for row in created]}
+        if operation == "files.list":
+            symbol = str(values.get("symbol", "")).lower()
+            kind = str(values.get("kind", "m1"))
+            files = self.market.list_files("mt5", kind, symbol)
+            return cast(
+                "JsonValue",
+                [
+                    {
+                        "source": f.source,
+                        "kind": f.kind,
+                        "symbol": f.symbol,
+                        "period": f.period,
+                        "relative_path": f.relative_path,
+                        "revision": f.revision,
+                        "sha256": f.sha256,
+                        "byte_size": f.byte_size,
+                        "row_count": f.row_count,
+                        "first_ms": f.first_ms,
+                        "last_ms": f.last_ms,
+                    }
+                    for f in files
+                ],
+            )
+        if operation == "clear":
+            symbol = str(values.get("symbol", ""))
+            cleared = self.market.clear_dataset(symbol)
+            return {"cleared": cleared}
+        if operation == "delete":
+            symbol = str(values.get("symbol", ""))
+            deleted = self.market.delete_dataset(symbol)
+            return {"deleted": deleted}
+        if operation == "rows.read":
+            dataset_id = str(values.get("dataset_id", ""))
+            raw_start = values.get("start_ms", 0)
+            raw_end = values.get("end_ms", 0)
+            raw_offset = values.get("offset", 0)
+            raw_limit = values.get("limit", 2000)
+            start_ms = int(raw_start) if isinstance(raw_start, int | str | float) else 0
+            end_ms = int(raw_end) if isinstance(raw_end, int | str | float) else 0
+            offset = int(raw_offset) if isinstance(raw_offset, int | str | float) else 0
+            limit = int(raw_limit) if isinstance(raw_limit, int | str | float) else 2000
+            tbl = self.market.read_market_rows(
+                dataset_id,
+                start_ms=start_ms,
+                end_ms=end_ms,
+                offset=offset,
+                limit=limit,
+            )
+            return cast("JsonValue", tbl.to_pylist())
         if operation == "download.start":
             request = MT5Download.model_validate(values)
-            self.market.source_definition(request.dataset_id)
+            if not self.connected:
+                raise ValueError("Connect to the MT5 terminal before downloading")
+            target_id = request.dataset_id
+            try:
+                record = self.market.source_definition(request.dataset_id)
+                target_id = self.broker_time_identity(record)
+                request = request.model_copy(update={"dataset_id": target_id})
+            except (ValueError, KeyError, PermissionError) as exc:
+                logger.debug("Non-broker-time dataset fallback: %s", exc)
             progress: dict[str, Any] = {
                 "rows": 0,
                 "published_partitions": 0,
+                "published_days": 0,
+                "completed_days": 0,
+                "total_days": 0,
+                "skipped_days": 0,
                 "progress": 0.0,
             }
 
@@ -3012,7 +3437,7 @@ class MT5Runtime:
 
             job = self.jobs.submit(Budget(1, 256 * 1024 * 1024, 3600), run)
             self.progress[job.id] = progress
-            return {"job_id": job.id, "state": job.state}
+            return {"job_id": job.id, "state": job.state, "dataset_id": target_id}
         raise ValueError("Unknown MT5 operation")
 
     async def close(self) -> None:
@@ -3020,6 +3445,7 @@ class MT5Runtime:
         await self.jobs.close()
         await self.terminal.close()
         self.connected = False
+        self.clock_estimates.clear()
         logger.info("MT5 source closed")
 
 
@@ -3035,10 +3461,17 @@ async def _prepare(context: HostCapabilities) -> PreparedContribution:
             "catalog",
             "connect",
             "symbols",
+            "dataset_metadata",
+            "detect_timezone",
+            "definitions.add",
             "add",
             "download.start",
             "download.status",
             "download.cancel",
+            "files.list",
+            "clear",
+            "delete",
+            "rows.read",
         ),
         runtime.invoke,
         runtime.close,

@@ -103,4 +103,59 @@ describe('host shell preferences', () => {
     expect(changed).toHaveBeenCalledTimes(2);
     setAuthToken(null);
   });
+
+  it('translates and persists external broker, agent, path, and notification records', async () => {
+    const rawSnapshot = {
+      revision: 2,
+      values: {
+        'config.metatrader5': { enabled: true, terminal_path: 'C:\\MT5\\terminal64.exe', account_id: '12345', password: 'mt5password', server: 'Broker-Demo', environment: 'demo', timeout_ms: 30000, portable: true, use_ticks: true },
+        'config.ctrader': { enabled: true, client_id: 'cid1', client_secret: 'csec1', access_token: 'tok1', refresh_token: 'rtok1', redirect_url: 'https://oauth.test', environment: 'live', account_id: 'acc1', gateway_host: 'gateway.test', gateway_port: 5035 },
+        'config.agents': {
+          active_provider: 'ollama',
+          system_prompt_preset: 'risk_manager',
+          agent_timeout_seconds: 240,
+          ollama: { model: 'llama3:latest' },
+          gemini: { fallback_model: 'gemini-3.6-flash' },
+        },
+        'workspace.paths': { configs_dir: 'user/cfgs', projects_dir: 'user/projs', strategies_dir: 'user/strats', customdata_dir: 'user/data' },
+        'engine.backtest': { max_threads: 16, memory_limit_mb: 16384, enable_caching: false, precision_mode: 'low', benchmark_time_per_tick_ms: 0.00002 },
+        'notify.telegram': { enabled: true, chat_id: '98765', parse_mode: 'MarkdownV2', disable_notification: true },
+        'notify.desktop': { enabled: false, sound_enabled: false, duration_seconds: 10, min_priority: 'critical' },
+        'connect.mcp': { enabled: true, host: '0.0.0.0', port: 6000, transport: 'http', allowed_tools: ['backtest', 'strategies'], max_context_items: 100 },
+      },
+    };
+    const parsed = parseHostPreferences(rawSnapshot);
+    expect(parsed.preferences.configuration.mt5.terminalPath).toBe('C:\\MT5\\terminal64.exe');
+    expect(parsed.preferences.configuration.mt5.password).toBe('mt5password');
+    expect(parsed.preferences.configuration.mt5.portable).toBe(true);
+    expect(parsed.preferences.configuration.ctrader.clientId).toBe('cid1');
+    expect(parsed.preferences.configuration.ctrader.clientSecret).toBe('csec1');
+    expect(parsed.preferences.configuration.ctrader.accessToken).toBe('tok1');
+    expect(parsed.preferences.configuration.ctrader.refreshToken).toBe('rtok1');
+    expect(parsed.preferences.configuration.agents.activeProvider).toBe('ollama');
+    expect(parsed.preferences.configuration.agents.gemini.fallbackModel).toBe('gemini-3.6-flash');
+    expect(parsed.preferences.configuration.directories.configsDir).toBe('user/cfgs');
+    expect(parsed.preferences.configuration.backtestEngine.maxThreads).toBe(16);
+    expect(parsed.preferences.configuration.backtestEngine.precisionMode).toBe('low');
+    expect(parsed.preferences.telegram.chatId).toBe('98765');
+    expect(parsed.preferences.desktopNotification.minPriority).toBe('critical');
+    expect(parsed.preferences.mcp.port).toBe(6000);
+
+    const before = shellPreferences(createInitialAppSettings());
+    const fetchFn = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ status: 'success', data: { revision: 3, values: {} } }) });
+    await writeHostPreferences(parsed.preferences, before, 2, { fetchFn: asFetch(fetchFn), baseUrl: '/api/v1' });
+    const body = JSON.parse((fetchFn.mock.calls[0][1] as RequestInit).body as string);
+    expect(body.changes['config.metatrader5']).toMatchObject({ terminal_path: 'C:\\MT5\\terminal64.exe', portable: true, password: 'mt5password' }); // pragma: allowlist secret
+    expect(body.changes['config.ctrader']).toMatchObject({ client_id: 'cid1', client_secret: 'csec1', access_token: 'tok1', refresh_token: 'rtok1', environment: 'live' }); // pragma: allowlist secret
+    expect(body.changes['config.agents']).toMatchObject({
+      active_provider: 'ollama',
+      system_prompt_preset: 'risk_manager',
+      gemini: expect.objectContaining({ fallback_model: 'gemini-3.6-flash' }),
+    });
+    expect(body.changes['workspace.paths']).toEqual({ configs_dir: 'user/cfgs', projects_dir: 'user/projs', strategies_dir: 'user/strats', customdata_dir: 'user/data' });
+    expect(body.changes['engine.backtest']).toMatchObject({ max_threads: 16, memory_limit_mb: 16384, precision_mode: 'low' });
+    expect(body.changes['notify.telegram']).toEqual({ enabled: true, chat_id: '98765', parse_mode: 'MarkdownV2', disable_notification: true });
+    expect(body.changes['notify.desktop']).toEqual({ enabled: false, sound_enabled: false, duration_seconds: 10, min_priority: 'critical' });
+    expect(body.changes['connect.mcp']).toMatchObject({ host: '0.0.0.0', port: 6000, transport: 'http', allowed_tools: ['backtest', 'strategies'], max_context_items: 100 });
+  });
 });

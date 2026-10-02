@@ -23,6 +23,12 @@ Purpose:
     descriptor metadata structures, and lifecycle hook callback protocols.
 
 Key Capabilities:
+    - FR-HOST-BROKER-TIME-PROVENANCE:
+      Immutable raw broker documents; custody logs validate row correspondence.
+    - FR-HOST-TRANSPORT-UNIFORM-ENVELOPE: Safe typed operation rejections;
+      the transport boundary logs the validated code and request correlation.
+    - FR-HOST-CLOCK-CONTRACT: Immutable clock schedules/provenance; operation
+      boundaries log validation/admission and publication outcomes.
     - FR-HOST-CONTRACTS-IMMUTABLE-DOCUMENT: Schema-Enforced Frozen Document Base
       Associated: `Document`
       Logging: Enforces strict immutable attribute assignment and forbids
@@ -81,9 +87,40 @@ CLI Usage:
 
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, JsonValue
+from pydantic import BaseModel, ConfigDict, Field, JsonValue, model_validator
+
+CLOCK_MAX_MINUTES = 840
+MAX_REJECTION_CODE = 64
+MAX_REJECTION_MESSAGE = 500
+REJECTION_CODE_CHARACTERS = (
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZ_0123456789"  # pragma: allowlist secret
+)
+
+
+class OperationRejectedError(ValueError):
+    """Expected rejection with an explicitly safe, developer-authored message.
+
+    Never construct this contract from an unrestricted exception string or input.
+    Transport owns serialization; the rejecting component owns its reason code.
+    """
+
+    def __init__(self, code: str, public_message: str, *, status: int = 422) -> None:
+        """Validate bounded public diagnostics without emitting log records."""
+        if (
+            not 1 <= len(code) <= MAX_REJECTION_CODE
+            or not all(character in REJECTION_CODE_CHARACTERS for character in code)
+            or not 1 <= len(public_message) <= MAX_REJECTION_MESSAGE
+            or status not in {409, 422, 503}
+        ):
+            raise ValueError("Invalid operation rejection contract")
+        self.code = code
+        self.public_message = public_message
+        self.status = status
+        super().__init__(public_message)
+
 
 Outcome = Literal[
     "pending", "running", "succeeded", "unavailable", "failed", "cancelled"
@@ -106,6 +143,127 @@ class Document(BaseModel):
     """
 
     model_config = ConfigDict(frozen=True, extra="forbid")
+
+
+class ClockTransition(Document):
+    """Immutable UTC boundary supplied by an assessed source clock policy."""
+
+    transition_utc: datetime
+    offset_before_minutes: int = Field(strict=True, ge=-720, le=840)
+    offset_after_minutes: int = Field(strict=True, ge=-720, le=840)
+
+    @model_validator(mode="after")
+    def utc_boundary(self) -> ClockTransition:
+        """Reject local or naive boundaries; log validated policy boundaries."""
+        if self.transition_utc.utcoffset() != UTC.utcoffset(None):
+            raise ValueError("Clock transition must be explicit UTC")
+        return self
+
+
+class ClockPolicy(Document):
+    """Immutable assessed clock schedule; host custody does not evaluate DST."""
+
+    schema_version: Literal[1] = 1
+    revision: int = Field(strict=True, gt=0)
+    effective_from_utc: datetime
+    effective_to_utc: datetime
+    tick_time_basis: Literal["utc", "server_wall_clock", "unknown"] = "unknown"
+    bar_time_basis: Literal["utc", "server_wall_clock", "unknown"] = "unknown"
+    request_time_basis: Literal["utc", "server_wall_clock", "unknown"] = "unknown"
+    standard_offset_minutes: int = Field(strict=True, ge=-720, le=840)
+    dst_increment_minutes: int = Field(default=0, strict=True, ge=0, le=120)
+    dst_rule: Literal["none", "us", "eu", "iana", "explicit_transitions"] = "none"
+    iana_timezone: str = Field(default="", max_length=100)
+    timezone_data_identity: str = Field(default="", max_length=100)
+    initial_offset_minutes: int = Field(strict=True, ge=-720, le=840)
+    transitions: tuple[ClockTransition, ...] = Field(default=(), max_length=1000)
+    verified: bool = Field(default=False, strict=True)
+    evidence_references: tuple[str, ...] = Field(default=(), max_length=50)
+    assessed_at: datetime
+    limitations: str = Field(min_length=1, max_length=2000)
+
+    @model_validator(mode="after")
+    def coherent_schedule(self) -> ClockPolicy:  # noqa: C901 -- schedule invariants are validated together.
+        """Reject inconsistent schedules before persistence or publication."""
+        dates = (self.effective_from_utc, self.effective_to_utc, self.assessed_at)
+        if any(date.utcoffset() != UTC.utcoffset(None) for date in dates):
+            raise ValueError("Policy dates must be explicit UTC")
+        if self.effective_from_utc >= self.effective_to_utc:
+            raise ValueError("Clock policy coverage is empty")
+        if self.verified and not self.evidence_references:
+            raise ValueError("Verified clock policy needs evidence")
+        if any(not reference.strip() for reference in self.evidence_references):
+            raise ValueError("Clock evidence references must be nonempty")
+        if self.dst_rule == "iana" and not (
+            self.iana_timezone and self.timezone_data_identity
+        ):
+            raise ValueError("IANA policy needs pinned timezone data identity")
+        offsets = {
+            self.standard_offset_minutes,
+            self.standard_offset_minutes + self.dst_increment_minutes,
+        }
+        if (
+            max(offsets) > CLOCK_MAX_MINUTES
+            or self.initial_offset_minutes not in offsets
+        ):
+            raise ValueError("Initial clock offset conflicts with policy")
+        previous = self.effective_from_utc
+        offset = self.initial_offset_minutes
+        for transition in self.transitions:
+            if not previous < transition.transition_utc < self.effective_to_utc:
+                raise ValueError("Clock transitions must be ordered within coverage")
+            if transition.offset_before_minutes != offset:
+                raise ValueError("Clock transition offsets are not contiguous")
+            if transition.offset_after_minutes not in offsets:
+                raise ValueError("Clock transition conflicts with policy offsets")
+            previous = transition.transition_utc
+            offset = transition.offset_after_minutes
+        if self.dst_rule == "none" and (self.transitions or self.dst_increment_minutes):
+            raise ValueError("Fixed clock policy cannot contain DST transitions")
+        if self.dst_rule != "none" and not self.transitions:
+            raise ValueError(
+                "Seasonal clock policy needs a resolved transition schedule"
+            )
+        return self
+
+
+class ClockProvenance(Document):
+    """Pinned policy and row-aligned raw milliseconds for one partition revision."""
+
+    schema_version: Literal[1] = 1
+    policy: ClockPolicy
+    input_basis: Literal["utc", "server_wall_clock"]
+    converter_version: Literal["mt5.clock.v1"] = "mt5.clock.v1"
+    raw_timestamps_ms: tuple[int, ...] = Field(max_length=500000)
+
+
+class BrokerTimeProvenance(Document):
+    """Uninterpreted original broker coordinates; no UTC policy is asserted."""
+
+    schema_version: Literal[1] = 1
+    timestamp_basis: Literal["broker_reported"] = "broker_reported"
+    acquisition_convention: Literal["mt5.broker_time.v1"] = "mt5.broker_time.v1"
+    dataset_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+    raw_timestamps_ms: tuple[int, ...] = Field(max_length=500000)
+
+
+class DatasetMetadata(Document):
+    """Optional producer presentation; no concrete provider schema is imported."""
+
+    dataset_id: str = Field(pattern=r"^[0-9a-f]{32}$")
+    bar_type: Literal["start", "end"] | None = None
+    data_type: str = Field(max_length=80)
+    type_source: Literal["calculation_mode", "folder", "unknown"]
+    broker_utc_offset: int | None = Field(default=None, ge=-12, le=14)
+    clock_status: Literal["estimated", "unknown", "expired"] = "unknown"
+    checked_at: datetime | None = None
+
+
+class DatasetMetadataDocument(Document):
+    """Versioned optional acquisition response consumed by workspace projection."""
+
+    schema_version: Literal[1] = 1
+    datasets: tuple[DatasetMetadata, ...] = Field(max_length=10000)
 
 
 class StageResult(Document):

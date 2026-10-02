@@ -29,6 +29,10 @@ Purpose:
     parquet partition ingestion, and dataset operational lifecycle.
 
 Key Capabilities:
+    - FR-HOST-BROKER-TIME-CUSTODY:
+      Preserve hashed original timestamps; log publication, integrity and basis.
+    - FR-DM-BROKER-CLOCK-POLICY: Revision-checked custody; logs reads/appends.
+    - FR-MT5-CLOCK-PROVENANCE: Hashed raw/policy custody; logs publication/reads.
     - FR-PERSIST-MARKET-SCHEMA: Initializes isolated SQLite schema or safely
       migrates existing database tables for dataset registries and audit logs
       via create_isolated_schema() and migrate_market_schema().
@@ -88,6 +92,12 @@ from uuid import uuid4
 import pyarrow as pa  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 
+from app.host.contracts import (
+    BrokerTimeProvenance,
+    ClockPolicy,
+    ClockProvenance,
+    OperationRejectedError,
+)
 from app.host.logging import get_logger
 from app.persistence.market_files import (
     BATCH_ROWS,
@@ -151,6 +161,8 @@ class BrokerSchemaUnavailableError(ValueError):
 MAX_SOURCE_LABEL = 160
 MAX_BROKER_TEXT = 80
 MAX_BROKER_POSTFIX = 64
+MAX_CLOCK_POLICY_REVISIONS = 1000
+CLOCK_MIGRATION_LOCK_SECONDS = 5.0
 
 
 def read_broker_profiles(path: Path) -> tuple[tuple[int, str, str, str], ...]:
@@ -315,6 +327,7 @@ CREATE TABLE source_partitions (
   last_ms INTEGER NOT NULL,
   schema_json TEXT NOT NULL,
   committed_at TEXT NOT NULL,
+  clock_provenance_json TEXT NOT NULL DEFAULT '{}',
   PRIMARY KEY(dataset_id, period, revision)
 );
 """
@@ -329,6 +342,186 @@ def create_isolated_schema(path: Path) -> None:
         connection.executescript(SCHEMA)
         connection.executescript(SOURCE_SCHEMA)
     logger.info("Created isolated market schema at %s", path)
+
+
+def _clock_schema(
+    connection: sqlite3.Connection,
+) -> dict[str, dict[str, tuple[Any, ...]]]:
+    """Inspect fixed migration targets without interpreting broker contents."""
+    return {
+        table: {
+            row[1]: tuple(row)
+            for row in connection.execute(f"PRAGMA table_info({table})")
+        }
+        for table in ("datamgr_broker", "source_partitions")
+    }
+
+
+def _clock_validate_schema(schema: dict[str, dict[str, tuple[Any, ...]]]) -> None:
+    """Reject incompatible types, keys or partial broker policy provisioning."""
+    required = {
+        "datamgr_broker": {
+            "id": ("INTEGER", 1),
+            "name": ("TEXT", 0),
+            "enabled": ("INTEGER", 0),
+            "mt_use": ("INTEGER", 0),
+            "server_timezone": ("TEXT", 0),
+        },
+        "source_partitions": {
+            "dataset_id": ("TEXT", 1),
+            "period": ("TEXT", 2),
+            "revision": ("INTEGER", 3),
+            "relative_path": ("TEXT", 0),
+            "sha256": ("TEXT", 0),
+            "row_count": ("INTEGER", 0),
+            "first_ms": ("INTEGER", 0),
+            "last_ms": ("INTEGER", 0),
+            "schema_json": ("TEXT", 0),
+            "committed_at": ("TEXT", 0),
+        },
+    }
+    for table, columns in required.items():
+        for name, (kind, primary_key) in columns.items():
+            row = schema[table].get(name)
+            if row is None or row[2].upper() != kind or row[5] != primary_key:
+                raise BrokerSchemaUnavailableError("Unsupported broker clock schema")
+    broker_fields = {"clock_policy_json", "clock_policy_revision"}
+    present = broker_fields.intersection(schema["datamgr_broker"])
+    if present and present != broker_fields:
+        raise BrokerSchemaUnavailableError("Partially provisioned broker clock schema")
+    for table, column, kind, default in (
+        ("datamgr_broker", "clock_policy_json", "TEXT", "'{}'"),
+        ("datamgr_broker", "clock_policy_revision", "INTEGER", "0"),
+        ("source_partitions", "clock_provenance_json", "TEXT", "'{}'"),
+    ):
+        row = schema[table].get(column)
+        if row is not None and (
+            row[2].upper() != kind or row[3] != 1 or row[4] != default or row[5] != 0
+        ):
+            raise BrokerSchemaUnavailableError("Conflicting broker clock column")
+
+
+def _clock_original_columns(
+    connection: sqlite3.Connection,
+) -> dict[str, tuple[str, ...]]:
+    """Capture every existing ordinary table column for preservation checks."""
+    tables = connection.execute(
+        "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name"
+    ).fetchall()
+    return {
+        name: tuple(
+            row[1]
+            for row in connection.execute(
+                'PRAGMA table_info("' + name.replace('"', '""') + '")'
+            )
+        )
+        for (name,) in tables
+    }
+
+
+def _clock_contents(
+    connection: sqlite3.Connection, columns: dict[str, tuple[str, ...]]
+) -> dict[str, tuple[int, str]]:
+    """Hash ordered rows without exposing values, including WAL-only records."""
+    snapshots = {}
+    for table, names in columns.items():
+        quoted = ",".join('"' + name.replace('"', '""') + '"' for name in names)
+        quoted_table = '"' + table.replace('"', '""') + '"'
+        digest = hashlib.sha256()
+        count = 0
+        query = f"SELECT {quoted} FROM {quoted_table} ORDER BY {quoted}"  # noqa: S608 -- escaped inspected schema identifiers only.
+        for row in connection.execute(query):
+            values = [
+                {"bytes": value.hex()} if isinstance(value, bytes) else value
+                for value in row
+            ]
+            digest.update(
+                json.dumps(values, ensure_ascii=True, separators=(",", ":")).encode()
+            )
+            digest.update(b"\n")
+            count += 1
+        snapshots[table] = (count, digest.hexdigest())
+    return snapshots
+
+
+def migrate_broker_clock_schema(
+    path: Path, *, lock_timeout_seconds: float = CLOCK_MIGRATION_LOCK_SECONDS
+) -> Path | None:
+    """Back up a write-reserved approved store and preserve every existing row.
+
+    Never called at startup. The caller must coordinate every application writer
+    before invoking this explicitly authorized operational migration.
+    """
+    if not path.is_file():
+        raise BrokerSchemaUnavailableError("Broker clock database unavailable")
+    if not 0 < lock_timeout_seconds <= CLOCK_MIGRATION_LOCK_SECONDS:
+        raise ValueError("Clock migration lock timeout is invalid")
+    with (
+        closing(sqlite3.connect(path, timeout=lock_timeout_seconds)) as connection,
+        connection,
+    ):
+        connection.execute("BEGIN IMMEDIATE")
+        schema = _clock_schema(connection)
+        _clock_validate_schema(schema)
+        broker = schema["datamgr_broker"]
+        partitions = schema["source_partitions"]
+        additions = [
+            (
+                "datamgr_broker",
+                "clock_policy_json",
+                "TEXT NOT NULL DEFAULT '{}'",
+                broker,
+            ),
+            (
+                "datamgr_broker",
+                "clock_policy_revision",
+                "INTEGER NOT NULL DEFAULT 0",
+                broker,
+            ),
+            (
+                "source_partitions",
+                "clock_provenance_json",
+                "TEXT NOT NULL DEFAULT '{}'",
+                partitions,
+            ),
+        ]
+        missing = [
+            (table, column, ddl)
+            for table, column, ddl, columns in additions
+            if column not in columns
+        ]
+        if not missing:
+            return None
+        backup = path.with_name(f"{path.name}.clock-{uuid4().hex}.backup")
+        columns = _clock_original_columns(connection)
+        before = _clock_contents(connection, columns)
+        with backup.open("xb"):
+            pass
+        with (
+            closing(
+                sqlite3.connect(path.resolve().as_uri() + "?mode=ro", uri=True)
+            ) as source,
+            closing(sqlite3.connect(backup)) as target,
+        ):
+            source.backup(target, pages=256)
+            if target.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+                raise ValueError("Broker clock backup failed integrity verification")
+            if _clock_contents(target, columns) != before:
+                raise ValueError("Broker clock backup changed original contents")
+        for table, column, ddl in missing:
+            connection.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
+        _clock_validate_schema(_clock_schema(connection))
+        if connection.execute("PRAGMA integrity_check").fetchone()[0] != "ok":
+            raise ValueError("Broker clock migration failed integrity verification")
+        if _clock_contents(connection, columns) != before:
+            raise ValueError("Broker clock migration changed original contents")
+    logger.info(
+        "Broker clock schema migrated: added_columns=%d preserved_tables=%d "
+        "verified_backup=true",
+        len(missing),
+        len(before),
+    )
+    return backup
 
 
 DATASET_TABLE_SCHEMA = """
@@ -604,7 +797,7 @@ def preseed_native_sqx_datasets(
 def delete_market_symbol(database_path: Path, data_root: Path, symbol: str) -> bool:
     """Purge physical parquet files and delete dataset definition."""
     clean_sym = symbol.strip()
-    underlying = clean_sym.removesuffix("_dukascopy").lower()
+    underlying = clean_sym.removesuffix("_dukascopy").removesuffix("_mt5").lower()
     sym_lower = clean_sym.lower()
 
     with closing(sqlite3.connect(database_path)) as connection, connection:
@@ -653,7 +846,7 @@ def delete_market_symbol(database_path: Path, data_root: Path, symbol: str) -> b
 def clear_market_symbol(database_path: Path, data_root: Path, symbol: str) -> bool:
     """Purge physical market files and reset dataset coverage, retaining definition."""
     clean_sym = symbol.strip()
-    underlying = clean_sym.removesuffix("_dukascopy").lower()
+    underlying = clean_sym.removesuffix("_dukascopy").removesuffix("_mt5").lower()
     sym_lower = clean_sym.lower()
     now_iso = datetime.now(UTC).isoformat()
 
@@ -841,6 +1034,130 @@ class MarketDataStore:
             return False
         return True
 
+    def broker_clock_policy(self, broker_id: str) -> dict[str, Any]:
+        """Read assessed policy history without changing a broker or its schema."""
+        with closing(
+            sqlite3.connect(
+                self.database_path.resolve().as_uri() + "?mode=ro", uri=True
+            )
+        ) as connection:
+            columns = {
+                row[1]
+                for row in connection.execute("PRAGMA table_info(datamgr_broker)")
+            }
+            if not {"clock_policy_json", "clock_policy_revision"} <= columns:
+                raise OperationRejectedError(
+                    "CLOCK_SCHEMA_REQUIRED",
+                    "Broker clock database setup is required before MT5 history "
+                    "import. An approved clock-schema migration and verified "
+                    "broker policy are required.",
+                    status=409,
+                )
+            row = connection.execute(
+                "SELECT clock_policy_json,clock_policy_revision "
+                "FROM datamgr_broker WHERE id=?",
+                (broker_id,),
+            ).fetchone()
+        if row is None:
+            raise OperationRejectedError(
+                "CLOCK_PROFILE_UNAVAILABLE",
+                "The selected database broker has no clock profile. "
+                "Check its broker association.",
+                status=409,
+            )
+        history = json.loads(row[0])
+        policies = tuple(
+            ClockPolicy.model_validate(value) for value in history.get("revisions", [])
+        )
+        if (
+            len(policies) > MAX_CLOCK_POLICY_REVISIONS
+            or (policies[-1].revision if policies else 0) != row[1]
+        ):
+            raise ValueError("Broker clock history is inconsistent")
+        logger.info("Read broker clock policy: revision=%d", row[1])
+        return {
+            "revision": row[1],
+            "revisions": [policy.model_dump(mode="json") for policy in policies],
+        }
+
+    def replace_broker_clock_policy(
+        self, broker_id: str, expected_revision: int, policy: ClockPolicy
+    ) -> dict[str, Any]:
+        """Append one immutable policy using an atomic optimistic revision check."""
+        policy = ClockPolicy.model_validate(policy.model_dump())
+        current = self.broker_clock_policy(broker_id)
+        if (
+            current["revision"] != expected_revision
+            or policy.revision != expected_revision + 1
+        ):
+            raise ValueError("Broker clock changed; reload before saving")
+        for value in current["revisions"]:
+            old = ClockPolicy.model_validate(value)
+            if (
+                policy.effective_from_utc < old.effective_to_utc
+                and old.effective_from_utc < policy.effective_to_utc
+            ):
+                raise ValueError("Broker clock effective intervals overlap")
+        history = {
+            "schema_version": 1,
+            "revisions": [*current["revisions"], policy.model_dump(mode="json")],
+        }
+        with closing(sqlite3.connect(self.database_path)) as connection, connection:
+            changed = connection.execute(
+                "UPDATE datamgr_broker SET clock_policy_json=?,"
+                "clock_policy_revision=? WHERE id=? AND clock_policy_revision=?",
+                (
+                    json.dumps(history, sort_keys=True),
+                    policy.revision,
+                    broker_id,
+                    expected_revision,
+                ),
+            )
+            if changed.rowcount != 1:
+                raise ValueError("Broker clock changed; reload before saving")
+        logger.info("Appended broker clock policy: revision=%d", policy.revision)
+        return self.broker_clock_policy(broker_id)
+
+    def source_clock_provenance(
+        self, record: dict[str, Any]
+    ) -> ClockProvenance | BrokerTimeProvenance | None:
+        """Verify and read immutable raw timestamps independently of a producer."""
+        value = json.loads(record.get("clock_provenance_json") or "{}")
+        if not value:
+            return None
+        raw = value.pop("raw_resource")
+        path = self.data_root / raw["relative_path"]
+        if not path.resolve().is_relative_to(self.data_root.resolve()) or any(
+            p.is_symlink() or p.is_junction() for p in (path, *path.parents)
+        ):
+            raise ValueError("Invalid raw clock resource path")
+        content = path.read_bytes()
+        if hashlib.sha256(content).hexdigest() != raw["sha256"]:
+            raise ValueError("Raw clock resource integrity failure")
+        if value.get("timestamp_basis") != "broker_reported":
+            policy_bytes = json.dumps(
+                value["policy"], sort_keys=True, separators=(",", ":")
+            ).encode()
+            if value.pop("policy_sha256") != hashlib.sha256(policy_bytes).hexdigest():
+                raise ValueError("Clock policy snapshot integrity failure")
+        value["raw_timestamps_ms"] = json.loads(content)
+        result: ClockProvenance | BrokerTimeProvenance = (
+            BrokerTimeProvenance.model_validate(value)
+            if value.get("timestamp_basis") == "broker_reported"
+            else ClockProvenance.model_validate(value)
+        )
+        if (
+            isinstance(result, BrokerTimeProvenance)
+            and result.dataset_id != record["dataset_id"]
+        ):
+            raise ValueError("Broker time provenance identity mismatch")
+        if len(result.raw_timestamps_ms) != record["row_count"]:
+            raise ValueError("Raw clock resource row correspondence failure")
+        logger.info(
+            "Read immutable source clock provenance: rows=%d", record["row_count"]
+        )
+        return result
+
     def inventory(self) -> tuple[dict[str, Any], ...]:
         """Read durable definitions without assigning invented quality or readiness."""
         with closing(open_definition_catalog(self.database_path)) as connection:
@@ -861,6 +1178,19 @@ class MarketDataStore:
             row["brokerName"] = row["broker_name"]
             row["quality"] = None
             row["status"] = "Stored" if row["bars"] else "Empty"
+            if row["source"] == "MT5":
+                partitions = self.source_partitions(row["id"])
+                row["clockNormalization"] = (
+                    "normalized"
+                    if partitions
+                    and all(
+                        isinstance(self.source_clock_provenance(part), ClockProvenance)
+                        for part in partitions
+                    )
+                    else "broker_time"
+                    if row["timezone"] == "Exchange/Broker"
+                    else "legacy_unverified"
+                )
             inventory.append(row)
         logger.info("Read market inventory: count=%d", len(inventory))
         return tuple(inventory)
@@ -1083,7 +1413,8 @@ class MarketDataStore:
         if record["storage_backend"] == "source_partitions":
             record.update(self.source_definition(record["owner"], dataset_id))
         else:
-            record["options"] = {}
+            options: dict[str, Any] = {}
+            record["options"] = options
         logger.info("Exported retained definition: id=%s", dataset_id)
         return record
 
@@ -1152,10 +1483,36 @@ class MarketDataStore:
         table: pa.Table,
         *,
         expected_revision: int = 0,
+        clock_provenance: ClockProvenance | None = None,
     ) -> dict[str, Any]:
         """Publish one complete partition under checked host custody."""
         return self._publish_source(
-            owner, dataset_id, period, table, expected_revision=expected_revision
+            owner,
+            dataset_id,
+            period,
+            table,
+            expected_revision=expected_revision,
+            clock_provenance=clock_provenance,
+        )
+
+    def publish_broker_time_source(
+        self,
+        owner: str,
+        dataset_id: str,
+        period: str,
+        table: pa.Table,
+        *,
+        provenance: BrokerTimeProvenance,
+        expected_revision: int = 0,
+    ) -> dict[str, Any]:
+        """Keep original broker coordinates in a distinct immutable namespace."""
+        return self._publish_source(
+            owner,
+            dataset_id,
+            period,
+            table,
+            expected_revision=expected_revision,
+            broker_time_provenance=provenance,
         )
 
     def replace_source(
@@ -1227,7 +1584,7 @@ class MarketDataStore:
             "Replaced source snapshot: id=%s partitions=%d", dataset_id, len(tables)
         )
 
-    def _publish_source(  # noqa: C901, PLR0915 -- atomic immutable bytes and catalog commit.
+    def _publish_source(  # noqa: C901, PLR0912, PLR0915 -- atomic immutable bytes and catalog commit.
         self,
         owner: str,
         dataset_id: str,
@@ -1236,6 +1593,8 @@ class MarketDataStore:
         *,
         expected_revision: int = 0,
         connection: sqlite3.Connection | None = None,
+        clock_provenance: ClockProvenance | None = None,
+        broker_time_provenance: BrokerTimeProvenance | None = None,
     ) -> dict[str, Any]:
         """Commit immutable source bytes under a checked optimistic revision.
 
@@ -1243,7 +1602,24 @@ class MarketDataStore:
         Failed catalog commits leave only unreferenced immutable bytes; readers
         never see them and previous revisions remain valid.
         """
-        self.source_definition(owner, dataset_id)
+        definition = self.source_definition(owner, dataset_id)
+        broker_time = broker_time_provenance is not None
+        if broker_time_provenance is not None:
+            if clock_provenance is not None:
+                raise ValueError("Raw and normalized clock provenance cannot mix")
+            broker_time_provenance = BrokerTimeProvenance.model_validate(
+                broker_time_provenance.model_dump()
+            )
+            if (
+                owner != "plugin.data_manager.meta_trader"
+                or definition["source"] != "MT5"
+                or definition["timezone"] != "Exchange/Broker"
+                or definition["options"].get("timestamp_basis") != "broker_reported"
+                or broker_time_provenance.dataset_id != dataset_id
+            ):
+                raise ValueError("Broker time publication identity mismatch")
+        elif definition["timezone"] == "Exchange/Broker":
+            raise ValueError("Broker time source requires explicit raw publication")
         if not re.fullmatch(r"[0-9a-f]{32}", dataset_id) or not re.fullmatch(
             r"[A-Za-z0-9_-]{1,40}", period
         ):
@@ -1253,23 +1629,119 @@ class MarketDataStore:
         column = table.column("DateTime")
         if (
             not pa.types.is_timestamp(column.type)
-            or column.type.tz != "UTC"
+            or column.type.tz != (None if broker_time else "UTC")
             or column.null_count
         ):
-            raise ValueError("Source timestamps must be non-null UTC timestamps")
-        stamps = column.cast(pa.timestamp("ms", tz="UTC")).cast(pa.int64()).to_pylist()
+            raise ValueError("Source timestamps must match the declared time basis")
+        stamps = column.cast(pa.timestamp("ms")).cast(pa.int64()).to_pylist()
+        if broker_time_provenance is not None and tuple(stamps) != (
+            broker_time_provenance.raw_timestamps_ms
+        ):
+            raise ValueError("Original broker timestamps do not correspond to rows")
         if stamps != sorted(stamps):
             raise ValueError("Source timestamps are not ordered")
         sink = pa.BufferOutputStream()
         pq.write_table(table, sink, compression="zstd", compression_level=6)
         content = sink.getvalue().to_pybytes()
         digest = hashlib.sha256(content).hexdigest()
-        relative = Path("market", "datasets", dataset_id, period, f"{digest}.parquet")
+        relative = Path(
+            "market",
+            "broker_time" if broker_time else "datasets",
+            dataset_id,
+            period,
+            f"{digest}.parquet",
+        )
         path = self.data_root / relative
         if any(p.is_symlink() or p.is_junction() for p in (path, *path.parents)):
             raise ValueError("Linked source partition path")
         path.parent.mkdir(parents=True, exist_ok=True)
-        schema_json = json.dumps({"arrow_schema": str(table.schema), "owner": owner})
+        schema_json = json.dumps(
+            {
+                "arrow_schema": str(table.schema),
+                "owner": owner,
+                "timestamp_basis": "broker_reported" if broker_time else "utc",
+            }
+        )
+        provenance_json = "{}"
+        if clock_provenance is not None:
+            clock_provenance = ClockProvenance.model_validate(
+                clock_provenance.model_dump()
+            )
+            definition = self.source_definition(owner, dataset_id)
+            history = self.broker_clock_policy(definition["broker"])
+            if (
+                clock_provenance.policy.model_dump(mode="json")
+                not in history["revisions"]
+            ):
+                raise ValueError(
+                    "Clock provenance policy is not registered to this broker"
+                )
+            expected_basis = (
+                clock_provenance.policy.tick_time_basis
+                if definition["timeframe"] == "TICK"
+                else clock_provenance.policy.bar_time_basis
+            )
+            if clock_provenance.input_basis != expected_basis:
+                raise ValueError(
+                    "Clock provenance input basis conflicts with broker policy"
+                )
+            if (
+                len(clock_provenance.raw_timestamps_ms) != table.num_rows
+                or not clock_provenance.policy.verified
+            ):
+                raise ValueError("Clock provenance needs verified row-aligned policy")
+            policy = clock_provenance.policy
+            for raw_ms, utc_ms in zip(
+                clock_provenance.raw_timestamps_ms, stamps, strict=True
+            ):
+                utc = datetime.fromtimestamp(utc_ms / 1000, tz=UTC)
+                if not policy.effective_from_utc <= utc < policy.effective_to_utc:
+                    raise ValueError("Clock provenance outside policy coverage")
+                offset = policy.initial_offset_minutes
+                for transition in policy.transitions:
+                    if utc >= transition.transition_utc:
+                        offset = transition.offset_after_minutes
+                expected = (
+                    0 if clock_provenance.input_basis == "utc" else offset * 60000
+                )
+                if raw_ms - utc_ms != expected:
+                    raise ValueError("Raw and normalized timestamps do not correspond")
+        provenance = broker_time_provenance or clock_provenance
+        if provenance is not None:
+            raw_content = json.dumps(
+                provenance.raw_timestamps_ms, separators=(",", ":")
+            ).encode()
+            raw_hash = hashlib.sha256(raw_content).hexdigest()
+            raw_relative = relative.parent / f"{raw_hash}.clock.json"
+            raw_path = self.data_root / raw_relative
+            if raw_path.is_symlink() or raw_path.is_junction():
+                raise ValueError("Linked raw clock resource path")
+            if not raw_path.exists():
+                with NamedTemporaryFile(
+                    dir=path.parent, suffix=".tmp", delete=False
+                ) as target:
+                    raw_staged = Path(target.name)
+                    target.write(raw_content)
+                    target.flush()
+                    os.fsync(target.fileno())
+                try:
+                    raw_staged.replace(raw_path)
+                finally:
+                    raw_staged.unlink(missing_ok=True)
+            elif hashlib.sha256(raw_path.read_bytes()).hexdigest() != raw_hash:
+                raise ValueError("Raw clock resource integrity failure")
+            value = provenance.model_dump(mode="json", exclude={"raw_timestamps_ms"})
+            value["raw_resource"] = {
+                "relative_path": raw_relative.as_posix(),
+                "sha256": raw_hash,
+            }
+            if isinstance(provenance, ClockProvenance):
+                value["policy_sha256"] = hashlib.sha256(
+                    json.dumps(
+                        value["policy"], sort_keys=True, separators=(",", ":")
+                    ).encode()
+                ).hexdigest()
+            provenance_json = json.dumps(value, sort_keys=True)
         with ExitStack() as stack:
             if connection is None:
                 connection = stack.enter_context(
@@ -1308,26 +1780,51 @@ class MarketDataStore:
                 "period=? AND revision=?",
                 (dataset_id, period, actual),
             ).fetchone()
-            if prior is not None and prior["sha256"] == digest:
+            if (
+                prior is not None
+                and prior["sha256"] == digest
+                and (
+                    prior["clock_provenance_json"]
+                    if "clock_provenance_json" in set(prior.keys())
+                    else "{}"
+                )
+                == provenance_json
+            ):
                 logger.info(
                     "Source partition unchanged: id=%s period=%s", dataset_id, period
                 )
                 return dict(prior)
             now = datetime.now(UTC).isoformat()
+            columns = (
+                "dataset_id,period,revision,relative_path,sha256,row_count,"
+                "first_ms,last_ms,schema_json,committed_at"
+            )
+            items: tuple[Any, ...] = (
+                dataset_id,
+                period,
+                revision,
+                relative.as_posix(),
+                digest,
+                table.num_rows,
+                stamps[0],
+                stamps[-1],
+                schema_json,
+                now,
+            )
+            clock_columns = {
+                r[1] for r in connection.execute("PRAGMA table_info(source_partitions)")
+            }
+            if "clock_provenance_json" in clock_columns:
+                columns += ",clock_provenance_json"
+                items += (provenance_json,)
+            elif provenance is not None:
+                raise BrokerSchemaUnavailableError(
+                    "Clock provenance migration required"
+                )
             connection.execute(
-                "INSERT INTO source_partitions VALUES (?,?,?,?,?,?,?,?,?,?)",
-                (
-                    dataset_id,
-                    period,
-                    revision,
-                    relative.as_posix(),
-                    digest,
-                    table.num_rows,
-                    stamps[0],
-                    stamps[-1],
-                    schema_json,
-                    now,
-                ),
+                f"INSERT INTO source_partitions ({columns}) "  # noqa: S608 -- closed internal columns.
+                f"VALUES ({','.join('?' for _ in items)})",
+                items,
             )
             totals = connection.execute(
                 "SELECT "
@@ -1342,8 +1839,12 @@ class MarketDataStore:
                 "UPDATE datamgr_datasets SET "
                 "date_from=?,date_to=?,bars=?,updated_at=? WHERE id=?",
                 (
-                    datetime.fromtimestamp(totals[0] / 1000, tz=UTC).isoformat(),
-                    datetime.fromtimestamp(totals[1] / 1000, tz=UTC).isoformat(),
+                    datetime.fromtimestamp(totals[0] / 1000, tz=UTC)
+                    .replace(tzinfo=None if broker_time else UTC)
+                    .isoformat(),
+                    datetime.fromtimestamp(totals[1] / 1000, tz=UTC)
+                    .replace(tzinfo=None if broker_time else UTC)
+                    .isoformat(),
                     totals[2],
                     now,
                     dataset_id,
@@ -1384,7 +1885,11 @@ class MarketDataStore:
             return False
 
     def register_definitions(
-        self, requests: tuple[DefinitionRequest, ...], *, idempotent: bool = False
+        self,
+        requests: tuple[DefinitionRequest, ...],
+        *,
+        source: str = "dukascopy",
+        idempotent: bool = False,
     ) -> tuple[MarketDataset, ...]:
         """Insert a bounded batch atomically, retaining provider identity."""
         if not 1 <= len(requests) <= MAX_DEFINITION_BATCH:
@@ -1394,6 +1899,8 @@ class MarketDataStore:
             if any(row.broker != "-1" for row in requests)
             else {}
         )
+        canonical_src = source.lower()
+        db_source = "MT5" if canonical_src == "mt5" else source.capitalize()
         datasets: list[MarketDataset] = []
         now = datetime.now(UTC).isoformat()
         with (
@@ -1417,15 +1924,16 @@ class MarketDataStore:
                 existing = connection.execute(
                     "SELECT id FROM datamgr_datasets WHERE source=? AND symbol=? "
                     "AND timeframe=? AND broker=?",
-                    ("Dukascopy", name, timeframe, request.broker),
+                    (db_source, name, timeframe, request.broker),
                 ).fetchone()
                 if existing:
                     if not idempotent:
-                        raise ValueError("Dukascopy dataset definition already exists")
+                        msg = f"{db_source} dataset definition already exists"
+                        raise ValueError(msg)
                     datasets.append(
                         MarketDataset(
                             existing["id"],
-                            "dukascopy",
+                            canonical_src,
                             request.symbol.lower(),
                             request.kind,
                             request.symbol,
@@ -1433,11 +1941,13 @@ class MarketDataStore:
                             "UTC",
                         )
                     )
-                    logger.info("Reused Dukascopy definition: id=%s", existing["id"])
+                    logger.info(
+                        "Reused %s definition: id=%s", db_source, existing["id"]
+                    )
                     continue
                 dataset = MarketDataset(
                     uuid4().hex,
-                    "dukascopy",
+                    canonical_src,
                     request.symbol.lower(),
                     request.kind,
                     request.symbol,
@@ -1451,7 +1961,7 @@ class MarketDataStore:
                     "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                     (
                         dataset.id,
-                        "Dukascopy",
+                        db_source,
                         name,
                         request.symbol,
                         request.symbol,
@@ -1461,7 +1971,7 @@ class MarketDataStore:
                         if request.broker == "-1"
                         else brokers[request.broker].name,
                         "UTC",
-                        "",
+                        "Forex",
                         "",
                         "",
                         0,
@@ -1492,10 +2002,12 @@ class MarketDataStore:
             or len(broker) > MAX_DATASET_LABEL
         ):
             raise ValueError("Invalid dataset instrument or broker")
+        canonical_src = source.lower()
+        db_source = "MT5" if canonical_src == "mt5" else source.capitalize()
         if timezone != "UTC":
-            raise ValueError("Canonical Dukascopy datasets must use UTC")
+            raise ValueError(f"Canonical {db_source} datasets must use UTC")
         dataset = MarketDataset(
-            uuid4().hex, source, symbol, kind, instrument, broker, timezone
+            uuid4().hex, canonical_src, symbol, kind, instrument, broker, timezone
         )
         now = datetime.now(UTC).isoformat()
         timeframe = "M1" if kind == "m1" else "TICK"
@@ -1503,10 +2015,10 @@ class MarketDataStore:
             existing = connection.execute(
                 "SELECT id FROM datamgr_datasets WHERE source=? AND symbol=? "
                 "AND timeframe=? AND broker=? AND instrument=?",
-                ("Dukascopy", symbol.upper(), timeframe, broker, instrument),
+                (db_source, symbol.upper(), timeframe, broker, instrument),
             ).fetchone()
             if existing is not None:
-                raise ValueError("Dukascopy dataset definition already exists")
+                raise ValueError(f"{db_source} dataset definition already exists")
             connection.execute(
                 "INSERT INTO datamgr_datasets "
                 "(id,source,symbol,underlying,instrument,timeframe,broker,broker_name,"
@@ -1514,7 +2026,7 @@ class MarketDataStore:
                 "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
                 (
                     dataset.id,
-                    "Dukascopy",
+                    db_source,
                     symbol.upper(),
                     symbol.upper(),
                     instrument,
@@ -1540,7 +2052,7 @@ class MarketDataStore:
         return dataset
 
     def get_dataset(self, dataset_id: str) -> MarketDataset:
-        """Resolve a Data Manager ID to a checked Dukascopy source definition."""
+        """Resolve a Data Manager ID to a checked source definition."""
         if not re.fullmatch(r"[0-9a-f]{32}", dataset_id):
             raise ValueError("Invalid dataset ID")
         with closing(open_definition_catalog(self.database_path)) as connection:
@@ -1550,16 +2062,22 @@ class MarketDataStore:
                 "FROM datamgr_datasets WHERE id=?",
                 (dataset_id,),
             ).fetchone()
-        if row is None or row["source"] != "Dukascopy":
-            raise ValueError("Dukascopy dataset unavailable")
+        if row is None:
+            raise ValueError("Market dataset unavailable")
+        canonical_src = row["source"].lower()
+        if canonical_src not in ("dukascopy", "mt5"):
+            raise ValueError(f"{row['source']} dataset unavailable")
+        if row["timezone"] != "UTC":
+            msg = f"{row['source']} non-UTC dataset is not a canonical market dataset"
+            raise ValueError(msg)
         kind: Kind = "m1" if row["timeframe"] == "M1" else "ticks"
         if row["timeframe"] not in ("M1", "TICK"):
-            raise ValueError("Unsupported Dukascopy dataset kind")
+            raise ValueError(f"Unsupported {row['source']} dataset kind")
         symbol = (row["underlying"] or row["symbol"]).lower()
-        self.path("dukascopy", kind, symbol, "2000" if kind == "m1" else "2000-01")
+        self.path(canonical_src, kind, symbol, "2000" if kind == "m1" else "2000-01")
         return MarketDataset(
             row["id"],
-            "dukascopy",
+            canonical_src,
             symbol,
             kind,
             row["instrument"],
@@ -1569,14 +2087,16 @@ class MarketDataStore:
 
     def list_datasets(self, source: str) -> tuple[dict[str, Any], ...]:
         """List definitions with coverage from committed files only."""
-        if source != "dukascopy":
+        canonical_src = source.lower()
+        if canonical_src not in ("dukascopy", "mt5"):
             raise ValueError("Unsupported market source")
+        db_source = "MT5" if canonical_src == "mt5" else source.capitalize()
         with closing(open_definition_catalog(self.database_path)) as connection:
             rows = connection.execute(
                 "SELECT id,symbol,underlying,instrument,timeframe,broker,broker_name,"
                 "timezone,category "
                 "FROM datamgr_datasets WHERE source=? ORDER BY symbol,id",
-                ("Dukascopy",),
+                (db_source,),
             ).fetchall()
         file_stats: dict[tuple[str, str], tuple[int | None, int | None, int]] = {}
         if self.available():
@@ -1585,7 +2105,7 @@ class MarketDataStore:
                     "SELECT kind, lower(symbol), min(first_ms), max(last_ms), "
                     "sum(row_count) FROM market_files WHERE source=? "
                     "GROUP BY kind, lower(symbol)",
-                    (source,),
+                    (canonical_src,),
                 ).fetchall()
                 for f_kind, f_sym, f_first, f_last, f_bars in f_rows:
                     file_stats[(f_kind, f_sym)] = (f_first, f_last, f_bars or 0)
@@ -1603,10 +2123,11 @@ class MarketDataStore:
                 {
                     "id": row["id"],
                     "symbol": row["symbol"],
-                    "source": "Dukascopy",
+                    "source": db_source,
                     "underlying": row["underlying"] or row["symbol"],
                     "instrument": row["instrument"],
                     "timeframe": row["timeframe"],
+                    "kind": kind,
                     "broker": row["broker"],
                     "brokerName": row["broker_name"],
                     "timezone": row["timezone"],
@@ -1641,7 +2162,7 @@ class MarketDataStore:
         selected: list[dict[str, Any]] = []
         skipped = 0
         for record in sorted(
-            self.list_files("dukascopy", dataset.kind, dataset.symbol),
+            self.list_files(dataset.source, dataset.kind, dataset.symbol),
             key=lambda item: item.period,
         ):
             if record.last_ms < start_ms or record.first_ms > end_ms:

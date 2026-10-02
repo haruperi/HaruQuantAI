@@ -9,6 +9,87 @@ export type CoreUsage = 'single' | 'reserve-one' | 'custom' | 'maximum';
 export type GarbageCollector = 'parallel' | 'g1' | 'automatic';
 export type ResultPreference = 'portfolio' | 'main';
 
+export interface Mt5Settings {
+  enabled: boolean;
+  terminalPath: string;
+  accountId: string;
+  password: string;
+  server: string;
+  environment: 'demo' | 'live' | 'real';
+  timeoutMs: number;
+  portable: boolean;
+  useTicks: boolean;
+}
+
+export interface CtraderSettings {
+  enabled: boolean;
+  clientId: string;
+  clientSecret: string;
+  accessToken: string;
+  refreshToken: string;
+  redirectUrl: string;
+  environment: 'demo' | 'live' | 'real';
+  accountId: string;
+  gatewayHost: string;
+  gatewayPort: number;
+}
+
+export interface GeminiAgentConfig {
+  apiKey: string;
+  model: string;
+  fastModel: string;
+  premiumModel: string;
+  fallbackModel: string;
+  temperature: number;
+  maxTokens: number;
+  useVertexAi: boolean;
+}
+
+export interface OpenAiAgentConfig {
+  apiKey: string;
+  baseUrl: string;
+  model: string;
+  temperature: number;
+  maxTokens: number;
+}
+
+export interface OllamaAgentConfig {
+  baseUrl: string;
+  model: string;
+  temperature: number;
+  timeoutSeconds: number;
+}
+
+export interface AgentSettings {
+  activeProvider: 'gemini' | 'openai' | 'ollama';
+  gemini: GeminiAgentConfig;
+  openai: OpenAiAgentConfig;
+  ollama: OllamaAgentConfig;
+  systemPromptPreset: string;
+  agentTimeoutSeconds: number;
+}
+
+export interface DirectoriesSettings {
+  configsDir: string;
+  projectsDir: string;
+  strategiesDir: string;
+  customdataDir: string;
+}
+
+export interface BacktestEngineSettings {
+  maxThreads: number;
+  memoryLimitMb: number;
+  enableCaching: boolean;
+  precisionMode: 'high' | 'standard' | 'low';
+  benchmarkTimePerTickMs: number;
+  dontStorePendingOrders: boolean;
+  dontStoreOp3dCharts: boolean;
+  computeSeparateMetrics: boolean;
+  computePctsMetrics: boolean;
+  computePipsMetrics: boolean;
+  sourceCodeConstantsParams: boolean;
+}
+
 export interface ConfigurationSettings {
   soundsOff: boolean;
   rememberFileChooser: boolean;
@@ -37,6 +118,11 @@ export interface ConfigurationSettings {
   gpuAccelerated: boolean;
   memoryProtection: boolean;
   debugLevel: boolean;
+  mt5: Mt5Settings;
+  ctrader: CtraderSettings;
+  agents: AgentSettings;
+  directories: DirectoriesSettings;
+  backtestEngine: BacktestEngineSettings;
 }
 
 export interface RemoteAccessSettings {
@@ -45,11 +131,35 @@ export interface RemoteAccessSettings {
 }
 
 export interface SmtpSettings {
+  enabled: boolean;
   server: string;
   port: string;
   ssl: boolean;
   username: string;
   emailFrom: string;
+}
+
+export interface TelegramSettings {
+  enabled: boolean;
+  chatId: string;
+  parseMode: 'HTML' | 'Markdown' | 'MarkdownV2';
+  disableNotification: boolean;
+}
+
+export interface DesktopNotificationSettings {
+  enabled: boolean;
+  soundEnabled: boolean;
+  durationSeconds: number;
+  minPriority: 'low' | 'normal' | 'high' | 'critical';
+}
+
+export interface McpSettings {
+  enabled: boolean;
+  host: string;
+  port: number;
+  transport: 'sse' | 'stdio' | 'websocket' | 'http';
+  allowedTools: string[];
+  maxContextItems: number;
 }
 
 export interface AppSettings {
@@ -63,4 +173,7 @@ export interface AppSettings {
   configuration: ConfigurationSettings;
   remoteAccess: RemoteAccessSettings;
   smtp: SmtpSettings;
+  telegram: TelegramSettings;
+  desktopNotification: DesktopNotificationSettings;
+  mcp: McpSettings;
 }

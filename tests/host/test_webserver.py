@@ -1,6 +1,9 @@
 """Real HTTP/ASGI authentication, static delivery and WebSocket lifecycle."""
 
 import pytest
+from app.host.contracts import OperationRejectedError
+from app.host.logging import DiagnosticCaptureHandler, get_logger
+from pydantic import BaseModel
 from starlette.websockets import WebSocketDisconnect
 
 
@@ -95,3 +98,77 @@ def test_static_bundle_is_confined(client, services):
     assert "shell" in client.get("/builder").text
     assert client.get("/asset.js").text == "export {}"
     assert client.get("/api/v1/missing").status_code == 401
+
+
+def test_request_rejections_are_correlated_and_secret_free(client, auth_headers):
+    sink = DiagnosticCaptureHandler(100)
+    log = get_logger()
+    log.addHandler(sink)
+
+    async def prerequisite() -> None:
+        get_logger(__name__).warning("Inside clock admission")
+        raise OperationRejectedError(
+            "CLOCK_SCHEMA_REQUIRED", "Clock setup required", status=409
+        )
+
+    async def unexpected() -> None:
+        raise RuntimeError("password=never-log-this-private-value")
+
+    async def invalid_fields() -> None:
+        class Input(BaseModel):
+            count: int
+
+        Input.model_validate({"count": "never-log-this-private-value"})
+
+    for name, endpoint in [
+        ("prerequisite", prerequisite),
+        ("unexpected", unexpected),
+        ("invalid_fields", invalid_fields),
+    ]:
+        client.app.add_api_route(
+            "/api/v1/diagnostic/" + name, endpoint, methods=["POST"]
+        )
+    try:
+        prerequisite_response = client.post(
+            "/api/v1/diagnostic/prerequisite", json={}, headers=auth_headers
+        )
+        assert prerequisite_response.status_code == 409
+        envelope = prerequisite_response.json()
+        assert envelope["error"]["code"] == "CLOCK_SCHEMA_REQUIRED"
+        request_id = envelope["request_id"]
+        assert prerequisite_response.headers["X-Request-Id"] == request_id
+        first_records = sink.snapshot()
+        assert any(
+            "Inside clock admission" in record and request_id in record
+            for record in first_records
+        )
+        assert any(
+            "CLOCK_SCHEMA_REQUIRED" in record and request_id in record
+            for record in first_records
+        )
+        failure = client.post(
+            "/api/v1/diagnostic/unexpected", json={}, headers=auth_headers
+        )
+        assert failure.status_code == 500
+        assert failure.json()["request_id"] != request_id
+        invalid = client.post(
+            "/api/v1/diagnostic/invalid_fields", json={}, headers=auth_headers
+        )
+        assert invalid.status_code == 422
+        assert invalid.json()["error"]["code"] == "VALIDATION_FAILED"
+        malformed = client.post("/api/v1/auth/login", content="broken")
+        assert malformed.status_code == 400
+        missing = client.post("/api/v1/commands/builder", json={}, headers=auth_headers)
+        assert missing.status_code == 503
+        get_logger(__name__).warning("After request context")
+        records = "\n".join(sink.snapshot())
+        assert "RuntimeError" in records and "unexpected" in records
+        assert "int_parsing" in records
+        assert "MALFORMED_REQUEST" in records
+        assert "MISSING_DEPENDENCY" in records
+        assert "never-log-this-private-value" not in records
+        assert "C:\\" not in records
+        assert "correlation_id=" not in sink.snapshot()[-1]
+    finally:
+        log.removeHandler(sink)
+        sink.close()

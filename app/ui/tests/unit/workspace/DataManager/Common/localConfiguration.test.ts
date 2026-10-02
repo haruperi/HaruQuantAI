@@ -2,8 +2,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { effectiveInstruments, newInstrument } from '../../../../../app/workspace/DataManager/Catalogs/Instruments/fileSymbols';
 import { effectiveSessions, type SessionDefinition } from '../../../../../app/workspace/DataManager/Catalogs/Sessions/sessions';
 
+import { brokerClockPort } from '../../../../../app/workspace/DataManager/Common/catalogClient';
+const clockPost = vi.hoisted(() => vi.fn());
+vi.mock('../../../../../app/host/transport', () => ({ createDomainClient: () => ({ post: clockPost }) }));
+
 const persisted = vi.hoisted(() => ({ states: new Map<string, any>(), fail: false, writes: vi.fn() }));
-vi.mock('../../../../../app/workspace/DataManager/Common/catalogClient', () => ({
+vi.mock('../../../../../app/workspace/DataManager/Common/catalogClient', async importOriginal => ({
+  ...await importOriginal<typeof import('../../../../../app/workspace/DataManager/Common/catalogClient')>(),
   catalogPort: (kind: string) => ({
     read: async () => structuredClone(persisted.states.get(kind) ?? (kind === 'instruments' ? { instruments: [], overrides: {}, removed: [] } : kind === 'sessions' ? { sessions: [], overrides: {}, removed: [] } : { [kind]: [] })),
     write: async (state: object) => { if (persisted.fail) throw new Error('Backend unavailable'); persisted.writes(kind, state); persisted.states.set(kind, structuredClone(state)); return structuredClone(state); },
@@ -104,4 +109,20 @@ it('does not report an instrument mutation as saved when backend persistence fai
   const { useFileSymbols } = await import('../../../../../app/workspace/DataManager/Catalogs/Instruments/fileSymbolsStore');
   await expect(useFileSymbols.getState().addInstrument(instrument, ['-1'])).rejects.toThrow('Backend unavailable');
   expect(useFileSymbols.getState().instruments).toEqual([]); persisted.fail = false; vi.unstubAllGlobals();
+});
+
+describe('broker clock metadata port', () => {
+  beforeEach(() => clockPost.mockReset());
+  it('reads authoritative database policy rather than browser clock configuration', async () => {
+    const response = { revision: 0, revisions: [], database_broker_id: '6', schema: { properties: {} } };
+    clockPost.mockResolvedValueOnce(response);
+    expect(await brokerClockPort.read('profile')).toEqual(response);
+    expect(clockPost).toHaveBeenCalledWith('/broker_clock.get', { broker_id: 'profile' });
+  });
+  it('sends an explicit optimistic revision and leaves policy validation to the host', async () => {
+    const policy = { revision: 4, standard_offset_minutes: 120, dst_rule: 'us' };
+    clockPost.mockResolvedValueOnce({ revision: 4, revisions: [policy] });
+    await brokerClockPort.write('profile', 3, policy);
+    expect(clockPost).toHaveBeenCalledWith('/broker_clock.replace', { broker_id: 'profile', expected_revision: 3, policy });
+  });
 });

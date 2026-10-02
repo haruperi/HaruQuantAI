@@ -6,23 +6,31 @@ import {
   clampZoom,
   configurationTabs,
   createDefaultConfiguration,
+  credentialsTabs,
   globalMenuGroups,
   globalMenuLabels,
   isEmail,
   mergeAppSettings,
+  safeMcpSettings,
   safeRemoteSettings,
   safeSmtpSettings,
+  safeTelegramSettings,
   validateConfiguration,
 } from '../../../app/host/globalSettings';
 
 describe('global settings contracts', () => {
   it('matches the audited HaruQuantAI menu groups and configuration tabs', () => {
     expect(globalMenuGroups.flat().map(id => globalMenuLabels[id])).toEqual([
-      'Configuration...', 'Benchmark...', 'Remote access...', 'MCP Server...', 'SMTP server...',
-      'Language', 'Skin', 'Zoom', 'HaruQuantAI Website', 'Help center', 'Support',
-      'Update license', 'About', 'Reload UI', 'Exit',
+      'Configuration...', 'Credentials...', 'Benchmark...', 'Remote access...', 'MCP Server...', 'Notifications...',
+      'Skin', 'Zoom', 'Reload UI', 'Exit',
     ]);
-    expect(configurationTabs).toEqual(['Global', 'CPU', 'Performance', 'Memory', 'Databanks', 'Optimizations', 'Troubleshooting']);
+    expect(configurationTabs).toEqual([
+      'Global', 'CPU', 'Performance', 'Memory', 'Databanks', 'Optimizations', 'Troubleshooting',
+      'Directories', 'Backtest Engine',
+    ]);
+    expect(credentialsTabs).toEqual([
+      'MetaTrader 5', 'cTrader', 'AI Agents',
+    ]);
   });
 
   it('keeps the active languages and skins explicit', () => {
@@ -58,7 +66,9 @@ describe('global settings contracts', () => {
     expect(clampZoom(1.26)).toBe(1.3);
     expect(clampZoom(2.4)).toBe(1.8);
     expect(safeRemoteSettings({ allow: true, requirePassword: true, password: 'secret' })).toEqual({ allow: true, requirePassword: true }); // pragma: allowlist secret
-    expect(safeSmtpSettings({ server: ' smtp.test ', port: ' 587 ', ssl: true, username: ' me ', emailFrom: ' from@test.dev ', password: 'secret' })).toEqual({ server: 'smtp.test', port: '587', ssl: true, username: 'me', emailFrom: 'from@test.dev' }); // pragma: allowlist secret
+    expect(safeSmtpSettings({ enabled: true, server: ' smtp.test ', port: ' 587 ', ssl: true, username: ' me ', emailFrom: ' from@test.dev ', password: 'secret' })).toEqual({ enabled: true, server: 'smtp.test', port: '587', ssl: true, username: 'me', emailFrom: 'from@test.dev' }); // pragma: allowlist secret
+    expect(safeTelegramSettings({ enabled: true, chatId: ' 12345 ', parseMode: 'HTML', disableNotification: false, botToken: 'secret' })).toEqual({ enabled: true, chatId: '12345', parseMode: 'HTML', disableNotification: false }); // pragma: allowlist secret
+    expect(safeMcpSettings({ enabled: true, host: ' 127.0.0.1 ', port: 5055, transport: 'sse', allowedTools: ['backtest'], maxContextItems: 50, authToken: 'secret' })).toEqual({ enabled: true, host: '127.0.0.1', port: 5055, transport: 'sse', allowedTools: ['backtest'], maxContextItems: 50 }); // pragma: allowlist secret
   });
 
   it('uses a bounded practical email check for the mock SMTP test', () => {

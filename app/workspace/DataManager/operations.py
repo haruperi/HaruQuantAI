@@ -7,6 +7,8 @@ Description:
 Purpose:
     FEAT-DM-ACTIONS: Producer-independent Data Manager workflows.
 Key Capabilities:
+    - FR-DM-BROKER-TIME-EXPORT:
+      Preserve original export times; export logs identify dataset and row count.
     - FR-DM-EXPORT: Actual source rows and standard export bytes; logs row counts.
     - FR-DM-CLONE: Explicit timestamp transformation; logs publication.
     - FR-DM-DEFINITIONS: Durable definition transfer; logs accepted records.
@@ -38,6 +40,41 @@ from app.workspace.DataManager.actions import TIMEFRAME_MINUTES, source_view
 from app.workspace.DataManager.catalogs import Instrument, catalog_operation
 
 logger = get_logger(__name__)
+
+
+def inventory_presentation(
+    market: MarketAccess, settings: SettingsAccess | None
+) -> list[dict[str, Any]]:
+    """Project authoritative broker names without changing durable definitions."""
+    rows = [
+        dict(row) for row in market.inventory() if row["source"] != "ExternalIndicator"
+    ]
+    brokers = (
+        catalog_operation(settings, market, "catalogs.get", {"kind": "brokers"})[
+            "state"
+        ]["brokers"]
+        if settings
+        else list(market.list_all_brokers())
+    )
+    names = {row["id"]: row["name"] for row in brokers}
+    names.update(
+        {
+            row["databaseBrokerId"]: row["name"]
+            for row in brokers
+            if row.get("databaseBrokerId")
+        }
+    )
+    names["-1"] = "Default"
+    for row in rows:
+        stored = str(row.get("brokerName") or "")
+        row["brokerName"] = names.get(
+            row["broker"],
+            stored
+            if stored and stored != row["broker"] and not stored.lstrip("-").isdigit()
+            else "Unknown broker",
+        )
+    logger.info("Projected dataset inventory names: rows=%d", len(rows))
+    return rows
 
 
 def resolve(market: MarketAccess, values: dict[str, Any]) -> dict[str, Any]:
@@ -80,14 +117,26 @@ def shifted(index: pd.DatetimeIndex, timezone: str) -> pd.DatetimeIndex:
     return index.tz_convert(ZoneInfo(timezone)).tz_localize(None).tz_localize("UTC")
 
 
+def export_timezone(record: dict[str, Any], values: dict[str, Any]) -> str:
+    """Require qualified conversion for original broker coordinates."""
+    target = str(values.get("target_timezone") or "Original")
+    if record["timezone"] == "Exchange/Broker" and target not in (
+        "Original",
+        "Exchange/Broker",
+    ):
+        raise ValueError("Broker-time conversion requires a verified historical policy")
+    return "Original" if target == "Exchange/Broker" else target
+
+
 def text_export(
     market: MarketAccess, operation: str, values: dict[str, Any]
 ) -> dict[str, Any]:
     """Export lossless prices and source volumes, with truthful column headers."""
     record = resolve(market, values)
     request = {**values, "dataset_id": record["id"]}
+    target = export_timezone(record, values)
     _, frame, timeframe = source_view(market, request)
-    frame.index = shifted(frame.index, str(values.get("target_timezone") or "Original"))
+    frame.index = shifted(frame.index, target)
     mt5 = operation == "actions.export_to_mt5"
     if frame.empty:
         raise ValueError("No rows in the selected export range")
@@ -280,6 +329,10 @@ def edit_rows(  # noqa: C901, PLR0912 -- bounded source-type edit validation.
 ) -> dict[str, Any]:
     """Apply timestamp-addressed edits to stored rows with optimistic revisions."""
     record = resolve(market, values)
+    if record["timezone"] == "Exchange/Broker":
+        raise ValueError(
+            "Broker-time edits require source-specific record identification"
+        )
     if values.get("timeframe", record["timeframe"]) != record["timeframe"]:
         raise ValueError("Edit the stored timeframe; aggregated views cannot be edited")
     revisions = values.get("expected_revisions")
@@ -377,7 +430,15 @@ def validate_definition_batch(rows: list[dict[str, Any]]) -> None:
             row["owner"],
         ):
             raise ValueError("Invalid definition owner")
-        ZoneInfo(row["timezone"])
+        if row["timezone"] == "Exchange/Broker":
+            if (
+                row["source"] != "MT5"
+                or row["owner"] != "plugin.data_manager.meta_trader"
+                or row.get("options", {}).get("timestamp_basis") != "broker_reported"
+            ):
+                raise ValueError("Invalid broker-time source definition")
+        else:
+            ZoneInfo(row["timezone"])
         if not isinstance(row.get("options", {}), dict):
             raise TypeError("Invalid provider options")
         encoded = json.dumps(row.get("options", {}), allow_nan=False, sort_keys=True)
@@ -514,6 +575,10 @@ def execute(  # noqa: C901, PLR0912 -- workspace operation boundary.
         }
     if operation == "actions.clone_to_timezone":
         record = resolve(market, values)
+        if record["timezone"] == "Exchange/Broker":
+            raise ValueError(
+                "Broker-time conversion requires a verified historical policy"
+            )
         if record["source"] == "Clone":
             raise ValueError("Cloned data cannot be cloned again")
         table = market.read_source(str(record["id"]))

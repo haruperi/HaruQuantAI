@@ -117,6 +117,7 @@ from app.host.contracts import Document, PluginDescriptor
 from app.host.jobs import JobManager
 from app.host.logging import get_logger
 from app.host.network import HistoricalNetwork, SourceCredentials
+from app.host.settings import SettingsStore
 from app.persistence.market import MarketDataStore
 from app.persistence.resources import ResourceStore
 
@@ -838,7 +839,12 @@ class Composition:
             network=NetworkAccess(package.id, self.network)
             if "host.network" in requirements
             else None,
-            terminal=TerminalAccess(package.id)
+            terminal=TerminalAccess(
+                package.id,
+                self.settings.mt5_terminal_configuration
+                if isinstance(self.settings, SettingsStore)
+                else None,
+            )
             if "host.terminal" in requirements
             else None,
         )

@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { actionsClient, downloadBlob } from '../../../../../app/workspace/DataManager/Actions/actionsClient';
+import { actionsClient, downloadBlob, datasetBarLabel, datasetTypeLabel, datasetTimezoneLabel, type DatasetRow } from '../../../../../app/workspace/DataManager/Actions/actionsClient';
 import { formatDeleteCompletion, getDeleteConfirmMessage } from '../../../../../app/workspace/DataManager/Actions/MassDeleteDialog';
 
 const mockPost = vi.fn();
@@ -10,6 +10,11 @@ vi.mock('../../../../../app/host/transport', () => ({
 }));
 
 describe('actionsClient', () => {
+  it('requests an explicit clock observation for one dataset without changing its definition', async () => {
+    mockPost.mockResolvedValueOnce({ offset_hours: 3, status: 'estimated' });
+    expect(await actionsClient.detectMt5Timezone('dataset-id')).toEqual({ offset_hours: 3, status: 'estimated' });
+    expect(mockPost).toHaveBeenCalledWith('/sources.meta_trader.detect_timezone', { dataset_id: 'dataset-id' });
+  });
   beforeEach(() => {
     mockPost.mockReset();
   });
@@ -291,5 +296,27 @@ describe('actionsClient', () => {
     expect(mockPost).toHaveBeenCalledWith('/actions.list_datasets', {});
     expect(res).toHaveLength(1);
     expect(res[0].symbol).toBe('EURUSD_dukascopy');
+  });
+});
+
+const row: DatasetRow = { id: 'fixture', source: 'MT5', symbol: 'XAUUSD', underlying: 'XAUUSD', instrument: 'XAUUSD', timeframe: 'M1', broker: '6', brokerName: 'Pepperstone', timezone: 'UTC', category: 'Markets-Commodities-Gold', from: '', to: '', bars: 0 };
+
+describe('authoritative dataset presentation', () => {
+  it('distinguishes unknown bar convention from end of bar', () => {
+    expect(datasetBarLabel(row)).toBe('—');
+    expect(datasetBarLabel({ ...row, barType: 'start' })).toBe('Start of Bar');
+    expect(datasetBarLabel({ ...row, barType: 'end' })).toBe('End of Bar');
+  });
+  it('uses instrument type separately from folder category', () => {
+    expect(datasetTypeLabel({ ...row, dataType: 'CFD' })).toBe('CFD');
+    expect(datasetTypeLabel({ ...row, source: 'Dukascopy' })).toBe(row.category);
+  });
+  it('never presents a current broker estimate as normalized historical data', () => {
+    const estimated = { ...row, clockStatus: 'estimated' as const, brokerUtcOffset: 3 };
+    expect(datasetTimezoneLabel(estimated)).toBe('Exchange/Broker');
+    expect(datasetTimezoneLabel({ ...estimated, clockStatus: 'expired' })).toBe('Exchange/Broker');
+    expect(datasetTimezoneLabel({ ...estimated, clockNormalization: 'broker_time' })).toBe('Exchange/Broker');
+    expect(datasetTimezoneLabel({ ...estimated, clockNormalization: 'normalized' })).toBe('UTC');
+    expect(datasetTimezoneLabel({ ...row, source: 'Yahoo' })).toBe('UTC');
   });
 });

@@ -196,6 +196,7 @@ log_*.txt
 /data/cache/
 /data/saved/
 /data/states/
+/data/market/broker_time/
 datasets/
 /results/
 exports/

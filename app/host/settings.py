@@ -41,6 +41,10 @@ Key Capabilities:
       Associated: `SettingsStore.get_private()`, `SettingsStore.set_private()`
       Logging: Emits info log when an owner-scoped private configuration record is
       upserted into storage.
+    - FR-HOST-SETTINGS-TERMINAL-SELECTION: Credential-Free Global Terminal Read
+      Associated: `SettingsStore.mt5_terminal_configuration()`
+      Logging: Emits info on successful global terminal configuration reads;
+      verification checks that credentials and paths are absent from logs.
 
 Python API Usage:
     ```python
@@ -85,7 +89,8 @@ import ipaddress
 import json
 import math
 import os
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Self
 
@@ -117,6 +122,15 @@ class SettingsConflictError(SettingsError):
     """A concurrent writer changed the expected revision."""
 
 
+@dataclass(frozen=True)
+class MT5TerminalConfiguration:
+    """Credential-free terminal selection owned by global host settings."""
+
+    enabled: bool
+    terminal_path: str
+    portable: bool = False
+
+
 PUBLIC_FIELDS: dict[str, dict[str, str]] = {
     "app.general": {
         "theme": "str",
@@ -144,6 +158,7 @@ PUBLIC_FIELDS: dict[str, dict[str, str]] = {
         "compute_pips_metrics": "bool",
         "compute_pcts_metrics": "bool",
         "compute_separate_metrics": "bool",
+        "benchmark_time_per_tick_ms": "number",
     },
     "config.memory": {
         "gc_type": "str",
@@ -164,7 +179,58 @@ PUBLIC_FIELDS: dict[str, dict[str, str]] = {
         "memory_protection": "bool",
         "debug_level_active": "bool",
     },
+    "config.metatrader5": {
+        "enabled": "bool",
+        "terminal_path": "str",
+        "account_id": "str_or_int",
+        "password": "str",  # pragma: allowlist secret
+        "server": "str",
+        "environment": "str",
+        "timeout_ms": "int",
+        "portable": "bool",
+        "use_ticks": "bool",
+    },
+    "config.ctrader": {
+        "enabled": "bool",
+        "client_id": "str",
+        "client_secret": "str",  # pragma: allowlist secret
+        "access_token": "str",
+        "refresh_token": "str",
+        "redirect_url": "str",
+        "environment": "str",
+        "account_id": "str_or_int",
+        "gateway_host": "str",
+        "gateway_port": "int",
+    },
+    "config.agents": {
+        "active_provider": "str",
+        "gemini": "dict",
+        "openai": "dict",
+        "ollama": "dict",
+        "system_prompt_preset": "str",
+        "agent_timeout_seconds": "int",
+    },
+    "workspace.paths": {
+        "configs_dir": "str",
+        "projects_dir": "str",
+        "strategies_dir": "str",
+        "customdata_dir": "str",
+    },
+    "engine.backtest": {
+        "max_threads": "int",
+        "memory_limit_mb": "int",
+        "enable_caching": "bool",
+        "precision_mode": "str",
+        "benchmark_time_per_tick_ms": "number",
+        "dont_store_pending_orders": "bool",
+        "dont_store_op3d_charts": "bool",
+        "compute_separate_metrics": "bool",
+        "compute_pcts_metrics": "bool",
+        "compute_pips_metrics": "bool",
+        "source_code_constants_params": "bool",
+    },
     "notify.email": {
+        "enabled": "bool",
         "smtp_server": "str",
         "smtp_port": "int",
         "use_ssl": "bool",
@@ -172,9 +238,29 @@ PUBLIC_FIELDS: dict[str, dict[str, str]] = {
         "username": "str",
         "from_address": "str",
     },
+    "notify.telegram": {
+        "enabled": "bool",
+        "chat_id": "str",
+        "parse_mode": "str",
+        "disable_notification": "bool",
+    },
+    "notify.desktop": {
+        "enabled": "bool",
+        "sound_enabled": "bool",
+        "duration_seconds": "int",
+        "min_priority": "str",
+    },
     "connect.remote": {
         "allow": "bool",
         "require_password": "bool",  # pragma: allowlist secret
+    },
+    "connect.mcp": {
+        "enabled": "bool",
+        "host": "str",
+        "port": "int",
+        "transport": "str",
+        "allowed_tools": "list",
+        "max_context_items": "int",
     },
 }
 
@@ -199,12 +285,26 @@ ALLOWED_VALUES: dict[str, tuple[Any, ...]] = {
     "gc_type": ("ParallelGC", "G1GC", "Automatic"),
     "cleanup_interval_mins": (5, 15, 30, 60),
     "databank_sync_interval_mins": (None, 0, 5, 10, 15, 60),
+    "active_provider": ("gemini", "openai", "ollama"),
+    "environment": ("demo", "live", "real"),
+    "precision_mode": ("high", "standard", "low"),
+    "transport": ("sse", "stdio", "websocket", "http"),
+    "min_priority": ("low", "normal", "high", "critical"),
+    "parse_mode": ("HTML", "Markdown", "MarkdownV2"),
 }
 FIELD_RANGES: dict[str, tuple[float, float]] = {
     "zoom": (0.7, 1.8),
     "custom_cores": (1, 1024),
     "memory_limit_gb": (2, 1024),
     "smtp_port": (1, 65535),
+    "gateway_port": (1, 65535),
+    "port": (1, 65535),
+    "timeout_ms": (1000, 300000),
+    "agent_timeout_seconds": (10, 3600),
+    "max_threads": (1, 256),
+    "memory_limit_mb": (256, 1048576),
+    "duration_seconds": (1, 60),
+    "max_context_items": (1, 1000),
 }
 TITLE_FIELDS = frozenset(("header_custom_text", "footer_custom_text"))
 MAX_TITLE_LENGTH = 30
@@ -218,22 +318,25 @@ def _valid_field(value: Any, kind: str) -> bool:
 
     Args:
         value: Candidate decoded JSON value.
-        kind: Schema kind: str, bool, int, number, or interval.
+        kind: Schema kind: str, bool, int, number, interval, list, dict, or str_or_int.
 
     Returns:
         True for matching values; unknown kinds return False.
     """
-    if kind == "str":
-        return isinstance(value, str)
-    if kind == "bool":
-        return type(value) is bool
-    if kind == "int":
-        return type(value) is int
-    if kind == "number":
-        return type(value) in (int, float) and math.isfinite(value)
-    if kind == "interval":
-        return value is None or (type(value) is int and value >= 0)
-    return False
+    validators: dict[str, Callable[[Any], bool]] = {
+        "str": lambda v: isinstance(v, str),
+        "bool": lambda v: type(v) is bool,
+        "int": lambda v: type(v) is int,
+        "number": lambda v: type(v) in (int, float) and math.isfinite(v),
+        "interval": lambda v: v is None or (type(v) is int and v >= 0),
+        "list": lambda v: isinstance(v, list),
+        "dict": lambda v: isinstance(v, dict),
+        "str_or_int": lambda v: (
+            (isinstance(v, str) or type(v) is int) and type(v) is not bool
+        ),
+    }
+    check = validators.get(kind)
+    return check(value) if check is not None else False
 
 
 def _valid_setting(key: str, field: str, value: Any) -> bool:
@@ -517,6 +620,30 @@ class SettingsStore:
             return snap
         except (ValueError, HostPersistenceValueError) as error:
             raise SettingsError("Malformed host settings") from error
+
+    def mt5_terminal_configuration(self) -> MT5TerminalConfiguration:
+        """Read current global terminal selection without exposing credentials.
+
+        Raises:
+            SettingsError: The saved record is absent or malformed.
+        """
+        record = HostStore(self.path).get_setting("application", "config.metatrader5")
+        if record is None:
+            raise SettingsError("MT5 global settings are missing")
+        if record.schema_version != 1:
+            raise SettingsError("Unsupported MT5 global settings version")
+        value = _decode_record(record.value_json)
+        enabled = value.get("enabled")
+        terminal_path = value.get("terminal_path")
+        portable = value.get("portable", False)
+        if (
+            type(enabled) is not bool
+            or not isinstance(terminal_path, str)
+            or type(portable) is not bool
+        ):
+            raise SettingsError("Invalid MT5 global terminal settings")
+        logger.info("MT5 global terminal configuration read")
+        return MT5TerminalConfiguration(enabled, terminal_path, portable)
 
     def patch(
         self,

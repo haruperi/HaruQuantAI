@@ -1,5 +1,16 @@
 import { createDomainClient } from '../../../host/transport';
 const client = createDomainClient('/contributions/workspace.data_manager');
+export interface ClockPolicyResponse {
+  revision: number;
+  revisions: Record<string, unknown>[];
+  database_broker_id: string;
+  schema: { properties: Record<string, { type?: string; enum?: unknown[]; format?: string; default?: unknown; minimum?: number; maximum?: number; title?: string }> };
+}
+export const brokerClockPort = {
+  read: (broker_id: string): Promise<ClockPolicyResponse> => client.post('/broker_clock.get', { broker_id }),
+  write: (broker_id: string, expected_revision: number, policy: Record<string, unknown>): Promise<ClockPolicyResponse> =>
+    client.post('/broker_clock.replace', { broker_id, expected_revision, policy }),
+};
 export type CatalogKind = 'instruments' | 'sessions' | 'groups' | 'brokers';
 export function catalogPort<T extends object>(kind: CatalogKind) {
   let revision = 0; let loaded = false; let busy = false;

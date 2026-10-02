@@ -1,5 +1,19 @@
 # HaruQuantAI Host System
 
+## Error diagnostics candidate (2026-10-02)
+
+The existing host logging/correlation and transport features now record API error
+envelopes at warning/error level with server request ID, route template, HTTP
+status and error code. Downstream request execution binds the same correlation
+ID. Expected operation rejections use the shared bounded safe-message contract;
+validation failures are distinct from malformed JSON. Unexpected request/job
+failures include bounded module/function/line locations, omitting exception
+messages, input values, source text, locals, raw URLs and absolute paths.
+Frontend ApiClientError preserves the server requestId for operator lookup in
+the existing host log. This candidate does not change log custody or restart the
+running host. Verification and remaining release blockers belong to
+`.agents/logs/20261002_082829_mt5_error_diagnostics/walkthrough.md`.
+
 > **Authority:** This document owns the backend host runtime contracts, boot lifecycle, and host features.
 > [ARCHITECTURE.md](../../docs/ARCHITECTURE.md) owns spatial and structural composability rules;
 > [PROJECT.md](../../docs/PROJECT.md) owns system scope and traced requirements;
@@ -437,6 +451,19 @@ pins the locally verified MetaTrader5 library version. No terminal opens at impo
 or package discovery. A bounded real connection, catalog and historical-bar read
 passed; this does not establish every account, instrument or terminal configuration.
 
+Data Manager's empty connection path resolves through a typed configuration reader
+injected by host composition. SettingsStore reads the current `application` record
+`config.metatrader5` through persistence custody, projecting only `enabled`,
+`terminal_path` and `portable` (absent portable defaults to false). The saved
+terminal is used only when enabled is exactly true. Disabled, missing, malformed
+or invalid configuration errors without searching other installations. Explicit
+manual paths override this default and must also identify an existing
+`terminal64.exe` file. The native worker receives one path and uses a 30-second
+initialization timeout; it never falls back to library discovery or other paths.
+Connection selection does not read account credentials or change persisted settings.
+This target contract is covered by isolated settings, worker and composition tests;
+it does not establish live connection or full release qualification for this change.
+
 Prepared contributions may request `invocation_seconds` within (0,120]; the
 existing default and activation deadline remain five seconds. Data Manager uses
 120 seconds for connection/catalog requests; bulk work stays in host jobs.
@@ -446,3 +473,37 @@ Source sessions support scoped streamed ZIP archives: up to 4 GiB compressed,
 closed on exit/cancellation, and never extracts member paths. Composition shutdown
 also closes residual network sessions. These are candidate contracts awaiting
 complete cohort qualification; focused tests cover disposal and origin bounds.
+
+## Broker clock custody candidate
+
+`MarketAccess` exposes revision-checked broker clock policy reads/writes and
+producer-independent raw timestamp/provenance reads. The workspace alone may
+append policies; a provider reads only the broker of its owned dataset. Policy
+history is authoritative in `datamgr_broker.clock_policy_json` and
+`clock_policy_revision`, not duplicated in host settings. Partition provenance
+pins policy snapshots and immutable, hashed raw timestamp sidecars.
+
+`migrate_broker_clock_schema` is an explicit persistence operation with a consistent,
+verified SQLite backup and transactional column additions. It never runs on host
+startup. Operational activation on 2026-10-02 added the three approved columns
+after graceful writer shutdown, a verified SQLite backup and complete original-row
+preservation checks. All nine retained partition files survived unchanged. See
+`.agents/logs/20261002_090258_clock_activation/observations.json` and its walkthrough.
+Broker 6 policy reads now return revision zero; no historical policy was written.
+Missing columns in other stores still fail policy operations explicitly.
+
+The historical terminal worker additionally permits timestamp-only `tick` reads.
+No prices, account data or order APIs are returned by this operation. MT5 owns
+clock estimation and normalization; the host validates custody, policy authority,
+row correspondence and publication integrity.
+
+## Original broker-time custody candidate
+
+`BrokerTimeProvenance` is distinct from policy-backed `ClockProvenance`.
+`MarketAccess.publish_broker_time_source` admits only owned MT5 Exchange/Broker
+identities with broker_reported options and matching naive timestamps. Immutable
+Parquet and hashed raw timestamp sidecars live under market/broker_time;
+publication uses existing provenance columns, without an implicit migration.
+Canonical publish_source and UTC readers retain their stricter contracts.
+Retained readers expose original broker coordinates and provenance independently
+of producer availability. No policy read/write occurs during raw publication.

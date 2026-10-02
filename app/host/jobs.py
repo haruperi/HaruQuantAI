@@ -38,8 +38,8 @@ Key Capabilities:
       reservation, and timeout on task submission.
     - FR-HOST-JOBS-EXECUTION-LIFECYCLE: Execution & State Transitions
       Associated: `JobManager._run()`, `JobManager._finished()`
-      Logging: Emits debug log on job start and info/warning/exception logs on
-      success, timeout, failure, or cancellation.
+      Logging: Emits info/warning/error logs on lifecycle transitions; failures
+      include job identity and safe code locations, omitting exception values.
     - FR-HOST-JOBS-COOPERATIVE-CANCELLATION: Owner-Scoped Task Cancellation
       Associated: `JobManager.cancel()`, `JobManager.close()`
       Logging: Emits info log when job cancellation is requested and when
@@ -95,7 +95,7 @@ from uuid import uuid4
 
 import psutil
 
-from app.host.logging import get_logger
+from app.host.logging import failure_diagnostics, get_logger
 
 logger = get_logger(__name__)
 
@@ -287,6 +287,13 @@ class JobManager:
                 job.id,
                 job.owner,
                 type(error).__name__,
+                extra={
+                    "fields": {
+                        "job_id": job.id,
+                        "owner": job.owner,
+                        **failure_diagnostics(error),
+                    }
+                },
             )
         else:
             self.records[job.id] = replace(job, state="succeeded")

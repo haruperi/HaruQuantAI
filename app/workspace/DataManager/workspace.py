@@ -69,14 +69,19 @@ from typing import Any, cast
 from pydantic import JsonValue
 
 from app.host.capabilities import HostCapabilities
+from app.host.contracts import DatasetMetadataDocument
 from app.host.logging import get_logger
 from app.host.packages import Binding, PreparedContribution
 from app.persistence.resources import ResourceRef
 from app.workspace.DataManager.actions import (
     inspect_source,
 )
-from app.workspace.DataManager.catalogs import broker_operation, catalog_operation
-from app.workspace.DataManager.operations import execute
+from app.workspace.DataManager.catalogs import (
+    broker_clock_operation,
+    broker_operation,
+    catalog_operation,
+)
+from app.workspace.DataManager.operations import execute, inventory_presentation
 
 logger = get_logger(__name__)
 
@@ -235,7 +240,7 @@ async def prepare(  # noqa: C901, PLR0915 -- workspace lifecycle and bound opera
             "errors": errors,
         }
 
-    async def invoke(operation: str, payload: JsonValue) -> JsonValue:  # noqa: C901, PLR0911, PLR0912 -- one workspace operation boundary.
+    async def invoke(operation: str, payload: JsonValue) -> JsonValue:  # noqa: C901, PLR0911, PLR0912, PLR0915 -- one workspace operation boundary.
         """Inspect published resources or execute workspace actions."""
         logger.info("Data Manager invoking: %s", operation)
         if operation == "resources.list":
@@ -263,6 +268,32 @@ async def prepare(  # noqa: C901, PLR0915 -- workspace lifecycle and bound opera
                 ),
             )
 
+        if operation in ("broker_clock.get", "broker_clock.replace"):
+            if context.settings is None or context.market_data is None:
+                raise ValueError("Broker clock custody unavailable")
+            return cast(
+                "JsonValue",
+                broker_clock_operation(
+                    context.settings,
+                    context.market_data,
+                    operation,
+                    payload if isinstance(payload, dict) else {},
+                ),
+            )
+
+        if operation == "actions.clock_provenance":
+            if context.market_data is None or not isinstance(payload, dict):
+                raise ValueError("Clock provenance custody unavailable")
+            provenance = context.market_data.source_clock_provenance(
+                str(payload.get("dataset_id", "")), str(payload.get("period", ""))
+            )
+            return cast(
+                "JsonValue",
+                provenance.model_dump(mode="json")
+                if provenance
+                else {"status": "legacy_unverified"},
+            )
+
         if operation in ("actions.broker_data", "actions.broker_data_update"):
             if context.settings is None or context.market_data is None:
                 raise ValueError("Catalog custody unavailable")
@@ -279,14 +310,55 @@ async def prepare(  # noqa: C901, PLR0915 -- workspace lifecycle and bound opera
         if operation == "actions.list_datasets":
             if context.market_data is None:
                 raise ValueError("Market inventory capability unavailable")
-            return cast(
-                "JsonValue",
-                [
-                    row
-                    for row in context.market_data.inventory()
-                    if row["source"] != "ExternalIndicator"
-                ],
-            )
+            rows = inventory_presentation(context.market_data, context.settings)
+            by_id = {row["id"]: row for row in rows}
+            for binding in bindings:
+                if (
+                    binding.slot_id != "data_source.acquisition"
+                    or "dataset_metadata" not in binding.operations
+                ):
+                    continue
+                selected_ids = [
+                    row["id"] for row in rows if row.get("owner") == binding.package_id
+                ]
+                if not selected_ids:
+                    # Inventory intentionally contains no provider implementation data.
+                    selected_ids = [
+                        row["id"]
+                        for row in rows
+                        if context.market_data.retained_source(row["id"])["owner"]
+                        == binding.package_id
+                    ]
+                try:
+                    metadata = DatasetMetadataDocument.model_validate(
+                        await binding.invoke(
+                            "dataset_metadata", {"dataset_ids": selected_ids}
+                        )
+                    )
+                    if len({item.dataset_id for item in metadata.datasets}) != len(
+                        metadata.datasets
+                    ) or any(
+                        item.dataset_id not in selected_ids
+                        for item in metadata.datasets
+                    ):
+                        raise ValueError("Provider metadata ownership mismatch")  # noqa: TRY301 -- handled optional response validation failure.
+                    for item in metadata.datasets:
+                        by_id[item.dataset_id].update(
+                            barType=item.bar_type,
+                            dataType=item.data_type,
+                            typeSource=item.type_source,
+                            brokerUtcOffset=item.broker_utc_offset,
+                            clockStatus=item.clock_status,
+                            checkedAt=item.checked_at.isoformat()
+                            if item.checked_at
+                            else None,
+                        )
+                except ValueError, TypeError, PermissionError, OSError, TimeoutError:
+                    logger.warning(
+                        "Optional dataset metadata unavailable: provider=%s",
+                        binding.package_id,
+                    )
+            return cast("JsonValue", rows)
 
         if operation in ("actions.update_all", "actions.update_selected"):
             if not isinstance(payload, dict):
@@ -359,6 +431,9 @@ async def prepare(  # noqa: C901, PLR0915 -- workspace lifecycle and bound opera
             "capabilities",
             "catalogs.get",
             "catalogs.replace",
+            "broker_clock.get",
+            "broker_clock.replace",
+            "actions.clock_provenance",
             "actions.broker_data",
             "actions.broker_data_update",
             "actions.clone_to_timezone",

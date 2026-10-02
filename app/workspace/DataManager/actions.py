@@ -28,6 +28,8 @@ Purpose:
     handlers for catalog management, timezone cloning, exports, and data review.
 
 Key Capabilities:
+    - FR-DM-BROKER-TIME-READ:
+      Keep original coordinates in review; source-view logs report timestamp basis.
     - FR-WORKSPACE-DATAMANAGER-BROKER: Queries and updates broker profile
       configurations and symbol mappings via broker_data() and
       broker_data_update().
@@ -171,6 +173,14 @@ class TickRecord:
     volume: int
 
 
+def view_date(value: Any, broker_time: bool) -> pd.Timestamp:
+    """Parse a filter in the declared basis without assigning UTC to broker time."""
+    stamp = pd.to_datetime(value, utc=not broker_time)
+    if broker_time and stamp.tzinfo is not None:
+        raise ValueError("Broker-time filters require unzoned calendar timestamps")
+    return stamp
+
+
 def source_view(  # noqa: C901 -- explicit view shape and interval validation.
     market: MarketAccess, payload: dict[str, Any]
 ) -> tuple[dict[str, Any], pd.DataFrame, str]:
@@ -181,12 +191,14 @@ def source_view(  # noqa: C901 -- explicit view shape and interval validation.
     if payload.get("session", "Default") != "Default":
         raise ValueError("Session filtering requires a registered session definition")
     frame = market.read_source(str(definition["id"])).to_pandas()
-    frame["DateTime"] = pd.to_datetime(frame["DateTime"], utc=True)
+    broker_time = definition["timezone"] == "Exchange/Broker"
+    frame = frame.drop(columns=["SourceRecord"], errors="ignore")
+    frame["DateTime"] = pd.to_datetime(frame["DateTime"], utc=not broker_time)
     frame = frame.set_index("DateTime").sort_index()
     ticks = "Bid" in frame and "Ask" in frame
     if ticks:
         for column in ("Bid", "Ask"):
-            if pd.api.types.is_integer_dtype(frame[column].dtype):
+            if not broker_time and pd.api.types.is_integer_dtype(frame[column].dtype):
                 frame[column] = frame[column] / 1_000_000
     if timeframe != stored:
         source_minutes = TIMEFRAME_MINUTES.get(stored)
@@ -216,18 +228,20 @@ def source_view(  # noqa: C901 -- explicit view shape and interval validation.
         frame["Volume"] = volume
         frame = frame.dropna(subset=["Open"])
     if payload.get("date_from"):
-        frame = frame[frame.index >= pd.to_datetime(payload["date_from"], utc=True)]
+        begin = view_date(payload["date_from"], broker_time)
+        frame = frame[frame.index >= begin]
     if payload.get("date_to"):
-        end = pd.to_datetime(payload["date_to"], utc=True)
+        end = view_date(payload["date_to"], broker_time)
         if len(str(payload["date_to"])) == ISO_DATE_LENGTH:
             frame = frame[frame.index < end + pd.Timedelta(days=1)]
         else:
             frame = frame[frame.index <= end]
     logger.info(
-        "Source view read: id=%s timeframe=%s rows=%d",
+        "Source view read: id=%s timeframe=%s rows=%d basis=%s",
         definition["id"],
         timeframe,
         len(frame),
+        "broker_reported" if broker_time else "utc",
     )
     return definition, frame, timeframe
 

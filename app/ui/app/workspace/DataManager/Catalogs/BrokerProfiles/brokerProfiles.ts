@@ -2,6 +2,7 @@ import type { FileInstrument } from '../Instruments/fileSymbols';
 import type { SessionDefinition } from '../Sessions/sessions';
 
 export interface BrokerProfile {
+  databaseBrokerId?: string;
   id:string; name:string; desc:string; postfix:string; timezone:string; mtUse:boolean;
   stockPickerUse:boolean; system:boolean; stocks:string[]; instruments:string[];
 }

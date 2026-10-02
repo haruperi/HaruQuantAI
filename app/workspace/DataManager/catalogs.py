@@ -7,6 +7,8 @@ Description:
 Purpose:
     FEAT-DM-CATALOGS: Persisted Data Manager configuration workflows.
 Key Capabilities:
+    - FR-DM-BROKER-CLOCK-POLICY: Explicit database association and policy edits;
+      logs operation and accepted revisions.
     - FR-DM-CATALOG-SCHEMA: Typed immutable metadata; logs validation failures.
     - FR-DM-CATALOG-PERSIST: Explicit revision checks; logs committed revisions.
 Python API Usage:
@@ -23,7 +25,7 @@ from typing import Any, Literal
 from pydantic import Field, model_validator
 
 from app.host.capabilities import MarketAccess, SettingsAccess
-from app.host.contracts import Document
+from app.host.contracts import ClockPolicy, Document
 from app.host.logging import get_logger
 
 logger = get_logger(__name__)
@@ -125,6 +127,7 @@ class Broker(Document):
     """One explicit broker configuration."""
 
     id: str
+    databaseBrokerId: str | None = Field(default=None, pattern=r"^[1-9][0-9]*$")
     name: str = Field(min_length=1, max_length=50)
     desc: str = Field(max_length=250)
     postfix: str = Field(max_length=100)
@@ -172,7 +175,7 @@ class Request(Document):
     state: dict[str, Any] | None = None
 
 
-def catalog_operation(  # noqa: PLR0912, C901 -- cohesive source conversion or bounded operation dispatch.
+def catalog_operation(  # noqa: PLR0912, PLR0915, C901 -- cohesive source conversion or bounded operation dispatch.
     settings: SettingsAccess,
     market: MarketAccess,
     operation: str,
@@ -221,6 +224,22 @@ def catalog_operation(  # noqa: PLR0912, C901 -- cohesive source conversion or b
         mode="json", by_alias=True, exclude_none=True
     )
     rows = state.get(request.kind, [])
+    if request.kind == "brokers":
+        database_ids = {row["id"] for row in market.list_all_brokers()}
+        previous_by_id = {row["id"]: row for row in current["state"]["brokers"]}
+        associations = []
+        for row in rows:
+            associated = row.get("databaseBrokerId")
+            previous = previous_by_id.get(row["id"], {}).get("databaseBrokerId")
+            if previous and associated != previous:
+                raise ValueError("Database broker association is immutable")
+            if associated and associated not in database_ids:
+                raise ValueError("Database broker association is unavailable")
+            resolved = associated or (row["id"] if row["id"] in database_ids else None)
+            if resolved:
+                associations.append(resolved)
+        if len(associations) != len(set(associations)):
+            raise ValueError("Duplicate database broker association")
     names = [str(row.get("symbol", row.get("name", ""))).casefold() for row in rows]
     if len(names) != len(set(names)):
         raise ValueError("Duplicate catalog identities")
@@ -245,6 +264,48 @@ def catalog_operation(  # noqa: PLR0912, C901 -- cohesive source conversion or b
         result["revision"],
     )
     return result
+
+
+def broker_clock_operation(
+    settings: SettingsAccess,
+    market: MarketAccess,
+    operation: str,
+    values: dict[str, Any],
+) -> dict[str, Any]:
+    """Resolve explicit catalog/database association and serve host policy custody."""
+    broker_id = values.get("broker_id")
+    if not isinstance(broker_id, str):
+        raise TypeError("Select a broker profile")
+    brokers = catalog_operation(settings, market, "catalogs.get", {"kind": "brokers"})[
+        "state"
+    ]["brokers"]
+    selected = next((row for row in brokers if row["id"] == broker_id), None)
+    if selected is None:
+        raise ValueError("Broker profile unavailable")
+    database_ids = {row["id"] for row in market.list_all_brokers()}
+    database_id = selected.get("databaseBrokerId") or broker_id
+    if database_id not in database_ids:
+        raise ValueError(
+            "Associate this profile with a database broker "
+            "before editing its clock policy"
+        )
+    if operation == "broker_clock.replace":
+        revision = values.get("expected_revision")
+        if type(revision) is not int or revision < 0:
+            raise ValueError("Invalid broker clock revision")
+        result = market.replace_broker_clock_policy(
+            database_id, revision, ClockPolicy.model_validate(values.get("policy"))
+        )
+    elif operation == "broker_clock.get":
+        result = market.broker_clock_policy(database_id)
+    else:
+        raise ValueError("Unknown broker clock operation")
+    logger.info("Broker clock operation: %s", operation)
+    return {
+        **result,
+        "database_broker_id": database_id,
+        "schema": ClockPolicy.model_json_schema(),
+    }
 
 
 def broker_operation(

@@ -1,21 +1,26 @@
-import type { AppSettings, ConfigurationSettings, RemoteAccessSettings, SmtpSettings } from './types';
+import type { AppSettings, ConfigurationSettings, McpSettings, RemoteAccessSettings, SmtpSettings, TelegramSettings } from './types';
 
-export const configurationTabs = ['Global', 'CPU', 'Performance', 'Memory', 'Databanks', 'Optimizations', 'Troubleshooting'] as const;
+export const configurationTabs = [
+  'Global', 'CPU', 'Performance', 'Memory', 'Databanks', 'Optimizations', 'Troubleshooting',
+  'Directories', 'Backtest Engine',
+] as const;
+
+export const credentialsTabs = [
+  'MetaTrader 5', 'cTrader', 'AI Agents',
+] as const;
 
 export const globalMenuGroups = [
-  ['configuration', 'benchmark', 'remote-access', 'mcp-server', 'smtp-server'],
-  ['language'],
+  ['configuration', 'credentials', 'benchmark', 'remote-access', 'mcp-server', 'notifications'],
   ['skin'],
   ['zoom'],
-  ['website', 'help-center', 'support', 'update-license', 'about'],
   ['reload-ui', 'exit'],
 ] as const;
 
 export const globalMenuLabels: Record<string, string> = {
-  configuration: 'Configuration...', benchmark: 'Benchmark...', 'remote-access': 'Remote access...',
-  'mcp-server': 'MCP Server...', 'smtp-server': 'SMTP server...', language: 'Language', skin: 'Skin', zoom: 'Zoom',
-  website: 'HaruQuantAI Website', 'help-center': 'Help center', support: 'Support', 'update-license': 'Update license',
-  about: 'About', 'reload-ui': 'Reload UI', exit: 'Exit',
+  configuration: 'Configuration...', credentials: 'Credentials...', benchmark: 'Benchmark...', 'remote-access': 'Remote access...',
+  'mcp-server': 'MCP Server...', notifications: 'Notifications...', 'smtp-server': 'Notifications...',
+  skin: 'Skin', zoom: 'Zoom',
+  'reload-ui': 'Reload UI', exit: 'Exit',
 };
 
 export const applicationLanguages = [
@@ -36,6 +41,42 @@ export function createDefaultConfiguration(): ConfigurationSettings {
     databankSyncInterval: 'Every 15 minutes', syncDatabanksAfterTask: true,
     storeChartData: false, dontStoreOptimization3d: true, gpuAccelerated: true,
     memoryProtection: true, debugLevel: false,
+    mt5: {
+      enabled: false, terminalPath: '',
+      accountId: '', password: '', server: '', environment: 'demo',
+      timeoutMs: 60000, portable: false, useTicks: true,
+    },
+    ctrader: {
+      enabled: false, clientId: '', clientSecret: '',
+      accessToken: '', refreshToken: '', redirectUrl: '',
+      environment: 'demo', accountId: '', gatewayHost: '', gatewayPort: 5035,
+    },
+    agents: {
+      activeProvider: 'gemini',
+      gemini: {
+        apiKey: '', model: '', fastModel: '',
+        premiumModel: '', fallbackModel: '', temperature: 0.2, maxTokens: 8192, useVertexAi: false,
+      },
+      openai: {
+        apiKey: '', baseUrl: '', model: '',
+        temperature: 0.2, maxTokens: 4096,
+      },
+      ollama: {
+        baseUrl: '', model: '', temperature: 0.2, timeoutSeconds: 120,
+      },
+      systemPromptPreset: 'quant_researcher',
+      agentTimeoutSeconds: 180,
+    },
+    directories: {
+      configsDir: '', projectsDir: '',
+      strategiesDir: '', customdataDir: '',
+    },
+    backtestEngine: {
+      maxThreads: 4, memoryLimitMb: 8192, enableCaching: true, precisionMode: 'high',
+      benchmarkTimePerTickMs: 0.000017, dontStorePendingOrders: true, dontStoreOp3dCharts: true,
+      computeSeparateMetrics: true, computePctsMetrics: false, computePipsMetrics: false,
+      sourceCodeConstantsParams: true,
+    },
   };
 }
 
@@ -44,7 +85,14 @@ export function createInitialAppSettings(): AppSettings {
     theme: 'dark', language: 'English', autosave: true, workers: 8, memoryGb: 10,
     profile: 'Full', zoom: 1, configuration: createDefaultConfiguration(),
     remoteAccess: { allow: false, requirePassword: false },
-    smtp: { server: '', port: '587', ssl: true, username: '', emailFrom: '' },
+    smtp: { enabled: true, server: '', port: '587', ssl: true, username: '', emailFrom: '' },
+    telegram: { enabled: false, chatId: '', parseMode: 'HTML', disableNotification: false },
+    desktopNotification: { enabled: true, soundEnabled: true, durationSeconds: 5, minPriority: 'normal' },
+    mcp: {
+      enabled: false, host: '127.0.0.1', port: 5055, transport: 'sse',
+      allowedTools: [],
+      maxContextItems: 50,
+    },
   };
 }
 
@@ -54,9 +102,26 @@ export function mergeAppSettings(saved?: Partial<AppSettings> & { navigationColl
   return {
     ...defaults,
     ...rest,
-    configuration: { ...defaults.configuration, ...saved?.configuration },
+    configuration: {
+      ...defaults.configuration,
+      ...saved?.configuration,
+      mt5: { ...defaults.configuration.mt5, ...saved?.configuration?.mt5 },
+      ctrader: { ...defaults.configuration.ctrader, ...saved?.configuration?.ctrader },
+      agents: {
+        ...defaults.configuration.agents,
+        ...saved?.configuration?.agents,
+        gemini: { ...defaults.configuration.agents.gemini, ...saved?.configuration?.agents?.gemini },
+        openai: { ...defaults.configuration.agents.openai, ...saved?.configuration?.agents?.openai },
+        ollama: { ...defaults.configuration.agents.ollama, ...saved?.configuration?.agents?.ollama },
+      },
+      directories: { ...defaults.configuration.directories, ...saved?.configuration?.directories },
+      backtestEngine: { ...defaults.configuration.backtestEngine, ...saved?.configuration?.backtestEngine },
+    },
     remoteAccess: { ...defaults.remoteAccess, ...saved?.remoteAccess },
     smtp: { ...defaults.smtp, ...saved?.smtp },
+    telegram: { ...defaults.telegram, ...saved?.telegram },
+    desktopNotification: { ...defaults.desktopNotification, ...saved?.desktopNotification },
+    mcp: { ...defaults.mcp, ...saved?.mcp },
   };
 }
 
@@ -75,8 +140,28 @@ export function safeRemoteSettings(value: RemoteAccessSettings & { password?: st
   return { allow: value.allow, requirePassword: value.allow && value.requirePassword };
 }
 
-export function safeSmtpSettings(value: SmtpSettings & { password?: string }): SmtpSettings {
-  return { server: value.server.trim(), port: value.port.trim(), ssl: value.ssl, username: value.username.trim(), emailFrom: value.emailFrom.trim() };
+export function safeSmtpSettings(value: Omit<SmtpSettings, 'enabled'> & { enabled?: boolean; password?: string }): SmtpSettings {
+  return { enabled: value.enabled ?? true, server: value.server.trim(), port: value.port.trim(), ssl: value.ssl, username: value.username.trim(), emailFrom: value.emailFrom.trim() };
+}
+
+export function safeTelegramSettings(value: Omit<TelegramSettings, 'enabled'> & { enabled?: boolean; botToken?: string }): TelegramSettings {
+  return {
+    enabled: value.enabled ?? false,
+    chatId: value.chatId.trim(),
+    parseMode: value.parseMode,
+    disableNotification: value.disableNotification,
+  };
+}
+
+export function safeMcpSettings(value: Omit<McpSettings, 'enabled'> & { enabled?: boolean; authToken?: string }): McpSettings {
+  return {
+    enabled: value.enabled ?? true,
+    host: value.host.trim() || '127.0.0.1',
+    port: Number(value.port) || 5055,
+    transport: value.transport,
+    allowedTools: [...value.allowedTools],
+    maxContextItems: Number(value.maxContextItems) || 50,
+  };
 }
 
 export function isEmail(value: string): boolean {

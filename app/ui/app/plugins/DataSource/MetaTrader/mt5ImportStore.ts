@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { mt5Catalog, mt5Add, mt5Download, mt5Status, mt5Cancel, mt5Connect, mt5Symbols, type MT5Record } from './backend';
 import { mt5ImportRanges, type Mt5Definition, type Mt5ImportRequest, type Mt5Symbol } from './mt5Import';
 import type { BrokerProfile } from './presentation';
+import { ApiClientError } from '../../../host/transport';
 
 export const mt5Active = (state?: string) => state === 'running';
 export const mt5ImportKey = 'sqx-mt5-import-v1';
@@ -20,13 +21,33 @@ interface Store {
   advance: () => void; action: (action: 'pause' | 'resume' | 'stop') => void;
 }
 function fromBackend(row: MT5Record): Mt5Definition {
-  return { id: row.id, symbol: row.symbol, underlying: row.underlying, instrument: row.instrument,
-    source: 'MT5', timeframe: row.timeframe, broker: row.broker, brokerName: row.broker === '-1' ? 'Default' : row.broker,
-    timezone: 'UTC', category: row.options.metadata.category || '', barType: 'start',
-    from: row.date_from.slice(0, 10), to: row.date_to.slice(0, 10), bars: row.bars,
-    path: row.options.metadata.path || '', description: row.options.metadata.description || '' };
+  const options = row.options ?? { metadata: {} };
+  const metadata = options.metadata ?? {};
+  const dateFrom = row.date_from ?? row.from ?? '';
+  const dateTo = row.date_to ?? row.to ?? '';
+  return {
+    id: row.id,
+    symbol: row.symbol,
+    underlying: row.underlying,
+    instrument: row.instrument,
+    source: 'MT5',
+    timeframe: (row.timeframe === 'TICK' ? 'TICK' : 'M1') as 'M1',
+    broker: row.broker,
+    brokerName: row.broker === '-1' ? 'Default' : (row.brokerName || row.broker),
+    timezone: 'UTC',
+    category: metadata.category || '',
+    barType: 'start',
+    from: typeof dateFrom === 'string' ? dateFrom.slice(0, 10) : '',
+    to: typeof dateTo === 'string' ? dateTo.slice(0, 10) : '',
+    bars: row.bars || 0,
+    path: metadata.path || '',
+    description: metadata.description || '',
+  };
 }
-function message(cause: unknown): string { return cause instanceof Error ? cause.message : 'MT5 operation failed.'; }
+function message(cause: unknown): string {
+  if (cause instanceof ApiClientError) return `${cause.message} [${cause.code}${cause.requestId ? `; request_id=${cause.requestId}` : ''}]`;
+  return cause instanceof Error ? cause.message : 'MT5 operation failed.';
+}
 export const useMt5Import = create<Store>((set, get) => {
   let polling = false;
   let stopRequested = false;
@@ -55,10 +76,12 @@ export const useMt5Import = create<Store>((set, get) => {
     },
     connect: async path => {
       if (mt5Active(get().job?.state)) throw new Error('Finish or stop the active import first.');
-      await mt5Connect(path);
-      const result = await mt5Symbols();
-      set({ symbols: result.symbols, folder: path });
-      await get().refresh();
+      try {
+        await mt5Connect(path);
+        const result = await mt5Symbols();
+        set({ symbols: result.symbols, folder: path });
+        await get().refresh();
+      } catch (cause) { throw new Error(message(cause)); }
     },
     start: async (request, definitions, external) => {
       guard(external);
@@ -68,7 +91,7 @@ export const useMt5Import = create<Store>((set, get) => {
       const job: Mt5Job = { kind: 'download', request, definitions, state: 'running', completed: 0, progress: 0, canPause: false };
       set({ job, postfix: request.postfix });
       try { await startNext(job); }
-      catch (cause) { set({ job: { ...job, state: 'failed', error: message(cause) } }); throw cause; }
+      catch (cause) { const detail = message(cause); set({ job: { ...job, state: 'failed', error: detail } }); throw new Error(detail); }
     },
     poll: async () => {
       const job = get().job;

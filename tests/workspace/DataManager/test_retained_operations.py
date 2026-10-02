@@ -291,3 +291,66 @@ def test_mt4_binary_headers_and_tick_exports_preserve_actual_rows(
             execute(
                 workspace, "actions.export_to_mt4", {"dataset_id": identity, **values}
             )
+
+
+def test_original_broker_export_preserves_wall_time_and_rejects_conversion(
+    tmp_path: Path,
+) -> None:
+    from app.host.contracts import BrokerTimeProvenance
+    from app.workspace.DataManager.actions import source_view
+
+    database = tmp_path / "raw.db"
+    create_isolated_schema(database)
+    store = MarketDataStore(tmp_path, database)
+    provider = MarketAccess("plugin.data_manager.meta_trader", store)
+    workspace = MarketAccess("workspace.data_manager", store)
+    dataset_id = provider.register_source(
+        source="MT5",
+        symbol="RAW",
+        underlying="RAW",
+        instrument="RAW",
+        timeframe="M1",
+        timezone="Exchange/Broker",
+        options={"timestamp_basis": "broker_reported"},
+    )
+    table = pa.Table.from_pandas(
+        pd.DataFrame(
+            {
+                "DateTime": pd.to_datetime(["2024-01-01 03:00"]),
+                "Open": [1.0],
+                "High": [2.0],
+                "Low": [1.0],
+                "Close": [1.5],
+                "Volume": [10],
+                "SourceRecord": ["native-record"],
+            }
+        ),
+        preserve_index=False,
+    )
+    provider.publish_broker_time_source(
+        dataset_id,
+        "2024",
+        table,
+        provenance=BrokerTimeProvenance(
+            dataset_id=dataset_id, raw_timestamps_ms=(1704078000000,)
+        ),
+    )
+    request = {
+        "dataset_id": dataset_id,
+        "date_from": "2024-01-01",
+        "date_to": "2024-01-01",
+    }
+    _, frame, _ = source_view(workspace, request)
+    assert frame.index.tz is None
+    assert "SourceRecord" not in frame
+    result = execute(workspace, "actions.export_to_csv", request)
+    assert "2024.01.01,03:00:00.000" in result["content"]
+    assert "SOURCERECORD" not in result["content"]
+    with pytest.raises(ValueError, match="verified historical policy"):
+        execute(
+            workspace, "actions.export_to_csv", {**request, "target_timezone": "UTC"}
+        )
+    with pytest.raises(ValueError, match="verified historical policy"):
+        execute(workspace, "actions.clone_to_timezone", request)
+    with pytest.raises(ValueError, match="unzoned"):
+        source_view(workspace, {**request, "date_from": "2024-01-01T00:00:00Z"})

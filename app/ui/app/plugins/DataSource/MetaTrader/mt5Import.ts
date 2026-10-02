@@ -29,8 +29,33 @@ export function discoverMt5Folder(paths: string[]): Mt5Folder {
 
 export function filterMt5Symbols(query: string, category: string, symbols: readonly Mt5Symbol[]): Mt5Symbol[] {
   const needle = query.trim().toLowerCase();
-  return symbols.filter(row => (!category || row.path === category)
+  return symbols.filter(row => (!category || mt5CategoryKey(row) === category)
     && (!needle || row.name.toLowerCase().includes(needle) || row.description.toLowerCase().includes(needle)));
+}
+
+export function mt5CategoryKey(symbol: Mt5Symbol): string {
+  // Prefix populated categories so the empty-category bucket cannot collide.
+  return symbol.category ? `category:${symbol.category}` : 'uncategorized';
+}
+
+export interface Mt5SymbolGroup {
+  key: string;
+  label: string;
+  rows: Mt5Symbol[];
+}
+
+export function groupMt5Symbols(symbols: readonly Mt5Symbol[]): Mt5SymbolGroup[] {
+  const groups = new Map<string, Mt5SymbolGroup>();
+  for (const symbol of symbols) {
+    const key = mt5CategoryKey(symbol);
+    let group = groups.get(key);
+    if (!group) {
+      group = { key, label: symbol.category || 'Uncategorized', rows: [] };
+      groups.set(key, group);
+    }
+    group.rows.push(symbol);
+  }
+  return [...groups.values()];
 }
 
 export interface Mt5Definition {

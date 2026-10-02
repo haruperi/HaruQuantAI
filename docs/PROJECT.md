@@ -32,6 +32,10 @@ a similar screen or workflow exists.
 
 - Local-first quantitative research workflows and experiment repeatability.
 - Canonical UTC market data acquisition, validation, and Parquet storage.
+  MT5 also supports explicitly separate original broker-time acquisition labelled
+  Exchange/Broker. It preserves raw coordinates without asserting UTC; missing
+  broker clock policy does not block downloading. Historical normalization and
+  UTC-dependent use require separate qualification.
 - Strategy rule authoring, search-space generation, and algebraic node composition.
 - Historical simulation, out-of-sample retesting, parameter optimization, and robustness challenges.
 - Immutable result persistence, trade analysis, equity calculation, and databank management.

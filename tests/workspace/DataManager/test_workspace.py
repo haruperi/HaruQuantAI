@@ -8,7 +8,12 @@ from typing import Any, cast
 
 import pytest
 from app.host.bootstrap import BootstrapCoordinator
-from app.host.capabilities import HostCapabilities, ResourceAccess
+from app.host.capabilities import (
+    HostCapabilities,
+    MarketAccess,
+    ResourceAccess,
+    SettingsAccess,
+)
 from app.host.packages import (
     Binding,
     apply_removal,
@@ -17,6 +22,7 @@ from app.host.packages import (
     scan_packages,
 )
 from app.host.transport import create_app
+from app.persistence.market import MarketDataStore, create_isolated_schema
 from app.persistence.resources import ResourceStore
 from app.workspace.DataManager.workspace import prepare
 from starlette.testclient import TestClient
@@ -291,5 +297,93 @@ def test_updates_submit_jobs_and_report_unmatched_targets(tmp_path: Path) -> Non
         assert unavailable["success"] is False
         assert unavailable["queued"] == 0
         await owner.close()
+
+    asyncio.run(scenario())
+
+
+def test_inventory_metadata_names_and_provider_removal(tmp_path: Path) -> None:
+    database = tmp_path / "metadata.db"
+    create_isolated_schema(database)
+    store = MarketDataStore(tmp_path, database)
+    source = MarketAccess("plugin.data_manager.meta_trader", store)
+    dataset_id = source.register_source(
+        source="MT5",
+        symbol="GOLD",
+        underlying="GOLD",
+        instrument="GOLD",
+        timeframe="M1",
+        broker="6",
+        options={"metadata": {"trade_calc_mode": 2}},
+    )
+    broker = {
+        "id": "6",
+        "name": "Current name",
+        "desc": "",
+        "postfix": "",
+        "timezone": "UTC",
+        "mtUse": True,
+        "stockPickerUse": False,
+        "system": False,
+        "stocks": [],
+        "instruments": [],
+    }
+    settings = SettingsAccess(
+        "workspace.data_manager",
+        {
+            "workspace.data_manager:catalog.brokers": {
+                "revision": 1,
+                "state": {"brokers": [broker]},
+            }
+        },
+    )
+    calls = []
+
+    async def metadata(operation: Any, payload: Any) -> Any:
+        calls.append(operation)
+        return {
+            "schema_version": 1,
+            "datasets": [
+                {
+                    "dataset_id": dataset_id,
+                    "bar_type": "start",
+                    "data_type": "CFD",
+                    "type_source": "calculation_mode",
+                }
+            ],
+        }
+
+    async def scenario() -> None:
+        prepared = await prepare(
+            HostCapabilities(
+                ResourceAccess(
+                    "workspace.data_manager", "1.0.0", ResourceStore(tmp_path)
+                ),
+                None,
+                None,
+                settings,
+                market_data=MarketAccess("workspace.data_manager", store),
+            )
+        )
+        assert prepared.attach is not None
+        binding = Binding(
+            "plugin.data_manager.meta_trader",
+            "data_source.acquisition",
+            "1.0.0",
+            ("dataset_metadata",),
+            metadata,
+        )
+        await prepared.attach((binding,))
+        rows = cast("Any", await prepared.invoke("actions.list_datasets", {}))
+        assert rows[0]["brokerName"] == "Current name"
+        assert rows[0]["barType"] == "start"
+        assert rows[0]["dataType"] == "CFD"
+        assert rows[0]["clockNormalization"] == "legacy_unverified"
+        await prepared.attach(())
+        retained = cast("Any", await prepared.invoke("actions.list_datasets", {}))
+        assert retained[0]["id"] == dataset_id
+        assert "dataType" not in retained[0]
+        assert retained[0]["brokerName"] == "Current name"
+        assert calls == ["dataset_metadata"]
+        await prepared.close()
 
     asyncio.run(scenario())

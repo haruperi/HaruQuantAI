@@ -22,11 +22,45 @@ from app.host.logging import (
     TextFormatter,
     bind_correlation,
     configure_host_logging,
+    failure_diagnostics,
     get_logger,
     host_log_path,
     redact_sensitive,
     secret_fingerprint,
 )
+
+
+def test_failure_diagnostics_omit_values_paths_and_source_text() -> None:
+    private_value = "never-log-this-private-value"
+    try:
+        raise RuntimeError(private_value)
+    except RuntimeError as error:
+        fields = failure_diagnostics(error)
+    serialized = json.dumps(fields)
+    assert fields["error_type"] == "RuntimeError"
+    assert "test_failure_diagnostics_omit_values_paths_and_source_text" in serialized
+    assert private_value not in serialized
+    assert "private_value" not in serialized
+    assert ".py" not in serialized
+    assert "/" not in serialized and "\\" not in serialized
+
+
+def test_failure_diagnostics_keep_origin_when_trace_is_deep() -> None:
+    def nested(depth: int) -> None:
+        if depth:
+            nested(depth - 1)
+        else:
+            raise RuntimeError("private-origin-value")
+
+    try:
+        nested(20)
+    except RuntimeError as error:
+        fields = failure_diagnostics(error)
+    locations = fields["locations"]
+    assert isinstance(locations, list)
+    assert len(locations) == 12
+    assert locations[-1]["function"] == "nested"
+    assert "private-origin-value" not in json.dumps(fields)
 
 
 @pytest.fixture(autouse=True)

@@ -280,6 +280,24 @@ export interface DatasetRow {
   quality?: number | null;
   status?: string;
   barType?: string;
+  dataType?: string;
+  brokerUtcOffset?: number | null;
+  clockStatus?: 'estimated' | 'unknown' | 'expired';
+  checkedAt?: string | null;
+  clockNormalization?: 'normalized' | 'broker_time' | 'legacy_unverified';
+}
+
+export function datasetBarLabel(row: DatasetRow): string {
+  return row.barType === 'start' ? 'Start of Bar' : row.barType === 'end' ? 'End of Bar' : '—';
+}
+
+export function datasetTypeLabel(row: DatasetRow): string {
+  return row.dataType ?? (row.source === 'MT5' ? 'Unknown' : row.category);
+}
+
+export function datasetTimezoneLabel(row: DatasetRow): string {
+  if (row.source !== 'MT5') return row.timezone;
+  return row.clockNormalization === 'normalized' ? 'UTC' : 'Exchange/Broker';
 }
 
 export function downloadBlob(filename: string, content: string, mimeType = 'text/plain;charset=utf-8'): void {
@@ -297,6 +315,8 @@ export function downloadBlob(filename: string, content: string, mimeType = 'text
 }
 
 export const actionsClient = {
+  detectMt5Timezone: (dataset_id: string): Promise<{ offset_hours: number | null; status: string }> =>
+    client.post('/sources.meta_trader.detect_timezone', { dataset_id }),
   updateJob: (provider: string, job_id: string): Promise<{ state: string; rows?: number }> =>
     client.post(`/sources.${provider}.download.status`, { job_id }),
   cancelUpdateJob: (provider: string, job_id: string): Promise<unknown> =>

@@ -22,13 +22,13 @@ import { StockGroupStocksDialog } from './Catalogs/StockGroups/StockGroupStocksD
 import { StockGroupTransferDialog } from './Catalogs/StockGroups/StockGroupTransferDialog';
 import { serializeStockGroupsJson, summarizeGroup, type StockGroupDefinition } from './Catalogs/StockGroups/stockGroups';
 import { useStockGroups } from './Catalogs/StockGroups/stockGroupsStore';
-import { BrokerProfileEditorDialog } from './Catalogs/BrokerProfiles/BrokerProfileEditorDialog';
+import { BrokerClockPolicyDialog, BrokerProfileEditorDialog } from './Catalogs/BrokerProfiles/BrokerProfileEditorDialog';
 import { BrokerStocksDialog } from './Catalogs/BrokerProfiles/BrokerStocksDialog';
 import { BrokerRecordImportDialog } from './Catalogs/BrokerProfiles/BrokerRecordImportDialog';
 import { BrokerTransferDialog } from './Catalogs/BrokerProfiles/BrokerTransferDialog';
 import { brokerCounts, serializeBrokersJson, type BrokerProfile } from './Catalogs/BrokerProfiles/brokerProfiles';
 import { useDataManagerStore } from './Common/dataManagerStore';
-import { actionsClient, type DatasetRow } from './Actions/actionsClient';
+import { actionsClient, datasetBarLabel, datasetTypeLabel, datasetTimezoneLabel, type DatasetRow } from './Actions/actionsClient';
 import { CsvExportDialog } from './Actions/CsvExportDialog';
 import { Mt4ExportDialog } from './Actions/Mt4ExportDialog';
 import { Mt5ExportDialog } from './Actions/Mt5ExportDialog';
@@ -219,6 +219,9 @@ type StockGroupDialogState = {
     kind: 'load';
 };
 type BrokerDialogState = {
+    kind: 'clock';
+    source: BrokerProfile;
+} | {
     kind: 'editor';
     mode: 'add' | 'edit';
     source?: BrokerProfile;
@@ -476,13 +479,14 @@ function BrokerProfilesTable({ profiles: allProfiles, selected, instruments, ses
     </table></div>
   </main>;
 }
-function DatasetTable({ selectedIds, onToggle, onSelect, pluginStates, dbDatasets, dbDatasetsLoaded }: {
+function DatasetTable({ selectedIds, onToggle, onSelect, pluginStates, dbDatasets, dbDatasetsLoaded, onRefresh }: {
     selectedIds: string[];
     onToggle: (id: string) => void;
     onSelect: (ids: string[]) => void;
     pluginStates: Record<string, any>;
     dbDatasets: DatasetRow[];
     dbDatasetsLoaded: boolean;
+    onRefresh: () => void;
 }) {
     const stockGroups = useStockGroups();
     const [stockGroup, setStockGroup] = useState('');
@@ -493,9 +497,20 @@ function DatasetTable({ selectedIds, onToggle, onSelect, pluginStates, dbDataset
     const [brokerFilter, setBrokerFilter] = useState('');
     const [hiddenIds, setHiddenIds] = useState<string[]>([]);
     const [descending, setDescending] = useState(false);
+    const [clockBusy, setClockBusy] = useState(false);
+    const [clockError, setClockError] = useState('');
+    async function refreshClock(): Promise<void> {
+      setClockBusy(true); setClockError('');
+      try {
+        for (const row of dbDatasets.filter(item => selectedIds.includes(item.id) && item.source === 'MT5'))
+          await actionsClient.detectMt5Timezone(row.id);
+        onRefresh();
+      } catch (cause) { setClockError(cause instanceof Error ? cause.message : 'Connect to MT5 before estimating its clock.'); }
+      finally { setClockBusy(false); }
+    }
     const rows = allDatasets.filter(row => (!source || row.source === source)
         && (!stockGroup || stockGroups.groups.find(group => group.id === stockGroup)?.members.some(member => member.ticker === row.symbol))
-        && (!dataType || row.category === dataType)
+        && (!dataType || datasetTypeLabel(row) === dataType)
         && (!brokerFilter || row.brokerName === brokerFilter)
         && (row.symbol + ' ' + row.source).toLowerCase().includes(query.toLowerCase()))
         .sort((a, b) => a.symbol.localeCompare(b.symbol) * (descending ? -1 : 1));
@@ -509,12 +524,14 @@ function DatasetTable({ selectedIds, onToggle, onSelect, pluginStates, dbDataset
         <option value="">All data sources</option>{[...new Set(allDatasets.map(row => row.source))].map(value => <option key={value}>{value}</option>)}
       </select>
       <select className="text-input" aria-label="Data type" value={dataType} onChange={event => setDataType(event.target.value)}>
-        <option value="">All data types</option>{[...new Set(allDatasets.map(item => item.category))].map(value => <option key={value}>{value}</option>)}
+        <option value="">All data types</option>{[...new Set(allDatasets.map(datasetTypeLabel))].map(value => <option key={value}>{value}</option>)}
       </select>
       <select className="text-input" aria-label="Stock group" value={stockGroup} onChange={event => setStockGroup(event.target.value)}><option value="">By stock group - none</option>{stockGroups.groups.map(group => <option value={group.id} key={group.id}>{group.name}</option>)}</select>
       <select className="text-input" aria-label="Broker profile" value={brokerFilter} onChange={event => setBrokerFilter(event.target.value)}><option value="">All broker profiles</option>{[...new Set(allDatasets.map(row => row.brokerName).filter(name => name && name !== '—'))].map(name => <option key={name}>{name}</option>)}</select>
       <span role="status">Records: {rows.length}</span>
+      <Button disabled={clockBusy || !dbDatasets.some(row => row.source === 'MT5' && selectedIds.includes(row.id))} onClick={() => void refreshClock()}>{clockBusy ? 'Checking clock…' : 'Check MT5 clock'}</Button>
     </div>
+    {clockError && <p role="alert">{clockError}</p>}
     <div className="dataset-grid"><table className="plain-table" aria-label="Historical data">
       <thead><tr>
         <th><input type="checkbox" aria-label="Select all visible datasets" checked={allSelected} disabled={!rows.length} onChange={() => onSelect(allSelected ? selectedIds.filter(id => !rows.some(row => row.id === id)) : [...new Set([...selectedIds, ...rows.map(row => row.id)])])}/></th>
@@ -527,8 +544,8 @@ function DatasetTable({ selectedIds, onToggle, onSelect, pluginStates, dbDataset
             return <tr key={row.id} className={selectedIds.includes(row.id) ? 'selected' : ''}>
           <td><input type="checkbox" aria-label={`Select ${row.symbol}`} checked={selectedIds.includes(row.id)} onChange={() => onToggle(row.id)}/></td>
           <td><strong>{row.symbol}</strong></td><td>{row.instrument}</td><td>{row.brokerName}</td><td>{row.underlying}</td>
-          <td>{row.timeframe}</td><td>{row.timezone}</td><td>{row.from || '—'}</td><td>{row.to || '—'}</td><td>{days.toLocaleString()}</td>
-          <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row ? row.barType === "start" ? "Start of bar" : "End of bar" : "—"}</td><td>{row.category}</td>
+          <td>{row.timeframe}</td><td title={row.source === 'MT5' ? `Original broker timestamps are preserved unless independently normalized. Historical normalization: ${row.clockNormalization ?? 'unverified'}.` : undefined}>{datasetTimezoneLabel(row)}</td><td>{row.from || '—'}</td><td>{row.to || '—'}</td><td>{days.toLocaleString()}</td>
+          <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{datasetBarLabel(row)}</td><td>{datasetTypeLabel(row)}</td>
           <td><input type="checkbox" aria-label={`Hide ${row.symbol}`} checked={hiddenIds.includes(row.id)} onChange={() => setHiddenIds(current => current.includes(row.id) ? current.filter(id => id !== row.id) : [...current, row.id])}/></td>
           <td aria-label={`Status for ${row.symbol}`}>{rowStatus}</td>
         </tr>;
@@ -655,6 +672,21 @@ export function DataManager() {
             setSelectionMessage('');
     }, [selectedDatasetIds]);
     const [logEntries, setLogEntries] = useState<string[]>([]);
+    const loggedProviderFailures = useRef(new Map<string, string>());
+    useEffect(() => {
+      for (const [owner, state] of Object.entries(reportedPluginStates)) {
+        const job = state?.job;
+        if (!job || !['failed', 'timed_out'].includes(job.state)) {
+          loggedProviderFailures.current.delete(owner);
+          continue;
+        }
+        const detail = typeof job.error === 'string' && job.error ? job.error : 'Acquisition failed. Check the host log.';
+        const identity = `${job.jobId ?? ''}:${job.state}:${detail}`;
+        if (loggedProviderFailures.current.get(owner) === identity) continue;
+        loggedProviderFailures.current.set(owner, identity);
+        setLogEntries(entries => [...entries.slice(-499), `${new Date().toLocaleString()} ${owner}: ${detail}${job.jobId ? ` [job_id=${job.jobId}]` : ''}`]);
+      }
+    }, [reportedPluginStates]);
     useEffect(() => {
         if (!updateJobs.length) return;
         let stopped = false; let timer: ReturnType<typeof setTimeout>;
@@ -813,7 +845,8 @@ export function DataManager() {
     const openBrokerEdit = (profile: BrokerProfile) => {
         setSelectedBrokerIds([profile.id]);
         if (profile.system) {
-            setSelectionMessage("This broker can't be edited.");
+            setSelectionMessage('');
+            setBrokerDialog({ kind: 'clock', source: profile });
             return;
         }
         setBrokerDialog({ kind: 'editor', mode: 'edit', source: profile });
@@ -1164,11 +1197,11 @@ export function DataManager() {
   </div><div className="dm-progress" role="status" aria-label="Data Manager progress"><strong>Progress</strong><ProgressBar value={updateJobs.length ? 0 : providerJob?.progress ?? 0} label={progressText}/><Button disabled={updateJobs.length > 0 || providerJob?.canPause === false || !isOperationActive(providerJob?.state)} onClick={() => providerAction(providerJob.state === 'paused' ? 'resume' : 'pause')}>{providerJob?.state === 'paused' ? 'Resume all' : 'Pause all'}</Button><Button disabled={!updateJobs.length && !isOperationActive(providerJob?.state)} onClick={() => { stopUpdates(); if (isOperationActive(providerJob?.state)) providerAction('stop'); }}>Stop all</Button></div>
   {['Instruments', 'Sessions', 'Stock groups', 'Broker profiles'].includes(tab) && <p className="selection-message">Configuration is stored by the backend.</p>}
   {dbDatasetsError && <div role="alert" className="selection-message">{dbDatasetsError} <Button disabled={dbDatasetsLoading} onClick={loadDatabaseDatasets}>{dbDatasetsLoading ? 'Refreshing datasets...' : 'Retry dataset refresh'}</Button></div>}
-  <div className="dm-body">{tab === 'Log' ? <main className="dm-log"><header><strong>Log</strong><button className="clear-log" onClick={() => setLogEntries([])}>Clear log</button></header><div className="dm-log-output" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} pluginStates={pluginStates} dbDatasets={dbDatasets} dbDatasetsLoaded={dbDatasetsLoaded}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group => updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={indicatorDefinitions} selected={selectedExternalNames} job={pluginStates['indicators']?.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item => openSessionDelete([item])} brokers={sessionBrokers}/> : <p>This view is unavailable.</p>}</div>
+  <div className="dm-body">{tab === 'Log' ? <main className="dm-log"><header><strong>Log</strong><button className="clear-log" onClick={() => setLogEntries([])}>Clear log</button></header><div className="dm-log-output" role="log" aria-label="Data Manager log">{logEntries.map((entry, index) => <div key={index}>{entry}</div>)}</div></main> : ['Data sources', 'Export', 'Tools'].includes(tab) ? <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} pluginStates={pluginStates} dbDatasets={dbDatasets} dbDatasetsLoaded={dbDatasetsLoaded} onRefresh={loadDatabaseDatasets}/> : tab === 'Broker profiles' ? <BrokerProfilesTable profiles={brokerProfiles} selected={selectedBrokerIds} instruments={instrumentRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/> : tab === 'Stock groups' ? <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group => updateStockGroups([group])}/> : tab === 'External indicators' ? <ExternalIndicatorsTable rows={indicatorDefinitions} selected={selectedExternalNames} job={pluginStates['indicators']?.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/> : tab === 'Instruments' ? <InstrumentTable selected={selectedInstrumentIds} onSelect={setSelectedInstrumentIds} onEdit={openInstrumentEdit} onDelete={item => openInstrumentDelete([item])}/> : tab === 'Sessions' ? <SessionTable rows={sessionRows} selected={selectedSessionIds} onSelect={setSelectedSessionIds} onEdit={openSessionEdit} onDelete={item => openSessionDelete([item])} brokers={sessionBrokers}/> : <p>This view is unavailable.</p>}</div>
 
   {plugins.map(p => (<p.Sync key={p.pluginId} onSync={handlePluginSync}/>))}
 
-  {plugins.filter(p => pluginStates[p.pluginId] || dialog?.id === 'dukascopy-information').map(p => (<p.Dialogs key={p.pluginId} dialog={dialog} exportDialog={exportDialog} cloneTargets={cloneTargets} reviewTarget={reviewTarget} externalDialog={externalDialog} contextDocument={contextDocument} selectedDatasetIds={selectedDatasetIds} toolRows={toolRows} externalActive={externalActive} otherDataActive={otherDataActive} otherProviderActive={otherProviderActive} onClose={closeDialog} onCloneClose={() => setCloneTargets(null)} onReviewClose={() => setReviewTarget(null)} onStarted={(owner: string, msg?: string) => {
+  {plugins.filter(p => pluginStates[p.pluginId] || dialog?.id === 'dukascopy-information').map(p => (<p.Dialogs key={p.pluginId} dialog={dialog} exportDialog={exportDialog} cloneTargets={cloneTargets} reviewTarget={reviewTarget} externalDialog={externalDialog} contextDocument={p.pluginId === 'mt5' ? { ...contextDocument, brokers: brokerProfiles.map(profile => ({ ...profile, id: profile.databaseBrokerId ?? profile.id })) } : contextDocument} selectedDatasetIds={selectedDatasetIds} toolRows={toolRows} externalActive={externalActive} otherDataActive={otherDataActive} otherProviderActive={otherProviderActive} onClose={closeDialog} onCloneClose={() => setCloneTargets(null)} onReviewClose={() => setReviewTarget(null)} onStarted={(owner: string, msg?: string) => {
                 setProgressOwner(owner);
                 setSelectionMessage('');
                 if (msg)
@@ -1210,6 +1243,7 @@ export function DataManager() {
                     }
                 }}>Yes</Button></>}>{stockGroupError && <p role="alert" className="stock-group-error">{stockGroupError}</p>}<p>Are you sure you want to remove selected groups ({stockGroupDialog.selected.length})?</p></Modal></div>}
   {brokerDialog?.kind === 'editor' && <BrokerProfileEditorDialog mode={brokerDialog.mode} source={brokerDialog.source} canSetStockPicker={!brokerDialog.source?.stocks.length} canSetMt={!brokerDialog.source || (!instrumentRows.some(row => row.broker === brokerDialog.source!.id) && !sessionRows.some(row => row.broker === brokerDialog.source!.id))} canSetTimezone={!brokerDialog.source || !dbDatasets.some(row => row.broker === brokerDialog.source!.id)} onClose={() => setBrokerDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>}
+  {brokerDialog?.kind === 'clock' && <BrokerClockPolicyDialog source={brokerDialog.source} onClose={() => setBrokerDialog(null)}/>}
   {brokerDialog?.kind === 'stocks' && <BrokerStocksDialog profile={brokerDialog.source} onClose={() => setBrokerDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>}
   {brokerDialog?.kind === 'import' && <BrokerRecordImportDialog kind={brokerDialog.recordType} brokers={brokerProfiles} onClose={() => setBrokerDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>}
   {brokerDialog?.kind === 'load' && <BrokerTransferDialog onClose={() => setBrokerDialog(null)} onSaved={message => { notify(message); loadDatabaseDatasets(); }}/>}

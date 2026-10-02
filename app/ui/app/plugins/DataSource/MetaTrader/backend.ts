@@ -2,7 +2,21 @@ import { createDomainClient } from '../../../host/transport';
 import type { Mt5Definition, Mt5Symbol } from './mt5Import';
 import type { BrokerProfile } from './presentation';
 const client = createDomainClient('/contributions/workspace.data_manager');
-export interface MT5Record { id: string; symbol: string; underlying: string; instrument: string; timeframe: 'M1'; broker: string; date_from: string; date_to: string; bars: number; options: { metadata: { path?: string; description?: string; category?: string } } }
+export interface MT5Record {
+  id: string;
+  symbol: string;
+  underlying: string;
+  instrument: string;
+  timeframe: string;
+  broker: string;
+  brokerName?: string;
+  date_from?: string;
+  date_to?: string;
+  from?: string;
+  to?: string;
+  bars: number;
+  options?: { metadata?: { path?: string; description?: string; category?: string } };
+}
 export const mt5Catalog = () => client.post<{ available: boolean; connected: boolean; reason: string; datasets: MT5Record[]; brokers?: BrokerProfile[] }>('/sources.meta_trader.catalog', {});
 export const mt5Connect = (path: string) => client.post('/sources.meta_trader.connect', { path });
 export const mt5Symbols = () => client.post<{ symbols: Mt5Symbol[] }>('/sources.meta_trader.symbols', {});

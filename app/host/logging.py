@@ -37,9 +37,10 @@ Key Capabilities:
       Logging: Binds rotating JSON log file, enforces size limits, and
       replays early buffered boot records to disk.
     - FR-HOST-LOGGING-CORRELATION-TRACING: Request Context Correlation
-      Associated: `bind_correlation()`
+      Associated: `bind_correlation()`, `failure_diagnostics()`
       Logging: Injects contextual correlation IDs into structured record
-      metadata for end-to-end request tracing.
+      metadata for end-to-end request tracing. Error boundaries log bounded code
+      locations without exception messages, source text, locals or local paths.
 
 Python API Usage:
     ```python
@@ -93,6 +94,7 @@ from typing import TextIO, override
 
 LOGGER_NAME = "app"
 LOG_FILENAME = "haruquantai.log"
+MAX_DIAGNOSTIC_LOCATIONS = 12
 DEFAULT_LOG_DIR = Path("data/logs")
 DEFAULT_MAX_BYTES = 10 * 1024 * 1024
 DEFAULT_BACKUP_COUNT = 5
@@ -333,6 +335,33 @@ class DiagnosticCaptureHandler(logging.Handler):
 def host_log_path(log_dir: Path) -> Path:
     """Return the fixed rotating host log path without filesystem access."""
     return log_dir / LOG_FILENAME
+
+
+def failure_diagnostics(error: BaseException) -> dict[str, object]:
+    """Return bounded code locations without messages, values or local paths.
+
+    HTTP and job boundaries log these fields through the existing host sink.
+    Source text, exception arguments, frame locals and request bodies are omitted.
+    """
+    locations: deque[dict[str, str | int]] = deque(maxlen=MAX_DIAGNOSTIC_LOCATIONS)
+    trace = error.__traceback__
+    while trace is not None:
+        module = trace.tb_frame.f_globals.get("__name__", "unknown")
+        function = trace.tb_frame.f_code.co_name
+        locations.append(
+            {
+                "module": module
+                if isinstance(module, str)
+                and re.fullmatch(r"[A-Za-z_][A-Za-z_0-9.]{0,119}", module)
+                else "unknown",
+                "function": function
+                if re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]{0,79}", function)
+                else "anonymous",
+                "line": trace.tb_lineno,
+            }
+        )
+        trace = trace.tb_next
+    return {"error_type": type(error).__name__, "locations": list(locations)}
 
 
 def get_logger(name: str | None = None) -> logging.Logger:

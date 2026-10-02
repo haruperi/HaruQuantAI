@@ -24,12 +24,12 @@ Purpose:
 Key Capabilities:
     - FR-HOST-TRANSPORT-UNIFORM-ENVELOPE: Standardized JSON Wire Envelopes
       Associated: `success()`, `failure()`, `render_error()`, `response()`
-      Logging: Emits debug log on response rendering and warning log on
-      validation or error response packaging.
+      Logging: Emits warning/error records for error envelopes with request ID,
+      route template, status and stable code; successful polling emits no noise.
     - FR-HOST-TRANSPORT-REQUEST-TRACING: Correlation Tracing and Request Guard
       Associated: `request_guard()`, `new_request_id()`
-      Logging: Emits debug log with correlation ID on request arrival and
-      warning log on unauthorized access or authentication rejection.
+      Logging: Binds request correlation through downstream execution and emits
+      warning/error rejection diagnostics without payloads or exception values.
     - FR-HOST-TRANSPORT-COMMAND-MEDIATION: Sandboxed Command Dispatch
       Associated: `handle_command()`, `COMMAND_HANDLERS`
       Logging: Emits info log on command dispatch completion and warning
@@ -79,26 +79,29 @@ from __future__ import annotations
 import asyncio
 import base64
 import json
+import logging
 import secrets
 import time
 from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from http import HTTPStatus
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import TYPE_CHECKING, Any
 from urllib.parse import urlsplit
 
 from fastapi import FastAPI, Request, WebSocket
-from pydantic import JsonValue, TypeAdapter
+from pydantic import JsonValue, TypeAdapter, ValidationError
 from starlette.middleware.cors import CORSMiddleware
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import FileResponse, JSONResponse, Response, StreamingResponse
 from starlette.websockets import WebSocketDisconnect
 
+from app.host.contracts import OperationRejectedError
 from app.host.events import ChannelError
-from app.host.logging import get_logger
+from app.host.logging import bind_correlation, failure_diagnostics, get_logger
 from app.host.sessions import SessionError
 from app.host.settings import SettingsConflictError, SettingsError
 from app.persistence.resources import ResourceRef
@@ -464,10 +467,16 @@ MAX_USERNAME = 100
 MAX_CREDENTIAL = 1024
 MAX_AUTH_FRAME = 2048
 MAX_BODY = 11 * 1024 * 1024
+MAX_VALIDATION_CODES = 12
 
 
 def response(
-    request: Request, data: Any, *, code: str | None = None, status: int = 200
+    request: Request,
+    data: Any,
+    *,
+    code: str | None = None,
+    status: int = 200,
+    diagnostics: dict[str, object] | None = None,
 ) -> JSONResponse:
     """Construct an API envelope and matching request-ID header.
 
@@ -476,6 +485,7 @@ def response(
         data: Success payload or safe error message when code is set.
         code: Error code, or None for success.
         status: HTTP status code independently selected by the handler.
+        diagnostics: Safe location-only fields for the host log, never the client.
 
     Returns:
         JSONResponse with the shared envelope and X-Request-Id.
@@ -486,6 +496,28 @@ def response(
         if code is None
         else error_payload(request_id, code, str(data))
     )
+    if code is not None:
+        route = getattr(request.scope.get("route"), "path", "/api/*")
+        logger.log(
+            logging.ERROR
+            if status >= HTTPStatus.INTERNAL_SERVER_ERROR
+            else logging.WARNING,
+            "HTTP operation rejected: code=%s status=%d request_id=%s",
+            code,
+            status,
+            request_id,
+            extra={
+                "correlation_id": request_id,
+                "fields": {
+                    "request_id": request_id,
+                    "method": request.method,
+                    "route": route,
+                    "code": code,
+                    "status": status,
+                    **(diagnostics or {}),
+                },
+            },
+        )
     return JSONResponse(
         payload, status_code=status, headers={"X-Request-Id": request_id}
     )
@@ -1161,14 +1193,14 @@ def request_guard(
         Async middleware callable accepting a request and downstream handler.
     """
 
-    async def guard(
+    async def guard(  # noqa: PLR0911 -- each failure class has a distinct safe public envelope.
         request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         """Assign request identity and enforce protected API session authority.
 
         Health, status, and login are public. Other /api/ routes require a valid session
         which is attached to request.state. Known downstream errors map to safe codes;
-        unexpected downstream exceptions log only the request ID. Non-API requests
+        unexpected downstream exceptions log safe code locations. Non-API requests
         pass through, and CORS/trusted-host checks belong to separate middleware.
 
         Args:
@@ -1195,23 +1227,59 @@ def request_guard(
                         status=401,
                     )
                 request.state.session = session
-            try:
-                return await call_next(request)
-            except CommandError:
-                return response(
-                    request, "Command rejected", code="COMMAND_REJECTED", status=422
-                )
-            except ValueError, TypeError, UnicodeError:
-                return response(
-                    request, "Malformed request", code="MALFORMED_REQUEST", status=400
-                )
-            except Exception:  # noqa: BLE001 -- public error boundary must not leak request/secret details.
-                logger.error(  # noqa: TRY400 -- redact by omission at the public boundary.
-                    "HTTP request failed; request_id=%s", request.state.request_id
-                )
-                return response(
-                    request, "Host operation failed", code="INTERNAL_ERROR", status=500
-                )
+            with bind_correlation(request.state.request_id):
+                try:
+                    return await call_next(request)
+                except OperationRejectedError as error:
+                    return response(
+                        request,
+                        error.public_message,
+                        code=error.code,
+                        status=error.status,
+                        diagnostics=failure_diagnostics(error),
+                    )
+                except ValidationError as error:
+                    return response(
+                        request,
+                        "Request fields failed validation",
+                        code="VALIDATION_FAILED",
+                        status=422,
+                        diagnostics={
+                            **failure_diagnostics(error),
+                            "validation_codes": [
+                                issue["type"]
+                                for issue in error.errors(
+                                    include_input=False,
+                                    include_context=False,
+                                    include_url=False,
+                                )[:MAX_VALIDATION_CODES]
+                            ],
+                        },
+                    )
+                except CommandError as error:
+                    return response(
+                        request,
+                        "Command rejected",
+                        code="COMMAND_REJECTED",
+                        status=422,
+                        diagnostics=failure_diagnostics(error),
+                    )
+                except (ValueError, TypeError, UnicodeError) as error:
+                    return response(
+                        request,
+                        "Malformed request",
+                        code="MALFORMED_REQUEST",
+                        status=400,
+                        diagnostics=failure_diagnostics(error),
+                    )
+                except Exception as error:  # noqa: BLE001 -- public error boundary must not leak request/secret details.
+                    return response(
+                        request,
+                        "Host operation failed",
+                        code="INTERNAL_ERROR",
+                        status=500,
+                        diagnostics=failure_diagnostics(error),
+                    )
         return await call_next(request)
 
     return guard
