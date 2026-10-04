@@ -13,6 +13,9 @@ Key Capabilities:
     - FR-APP-CLI-BOOTSTRAP: Coordinate host telemetry and start application runtime.
       Associated: `main()`
       Logging: Emits INFO event upon process initialization.
+    - FR-APP-CLI-SESSION: Initialize host session authority and record operator session.
+      Associated: `main()`
+      Logging: Emits INFO event upon session initialization and operator recording.
     - FR-APP-CLI-LIFECYCLE: Coordinate graceful process shutdown and telemetry sync.
       Associated: `main()`
       Logging: Emits INFO event before exit and drains queued telemetry via shutdown.
@@ -29,7 +32,11 @@ CLI Usage:
 
 from __future__ import annotations
 
+import os
+from pathlib import Path
 from typing import TYPE_CHECKING
+
+import psutil
 
 from app.host.logging import (
     TelemetryEngine,
@@ -37,6 +44,7 @@ from app.host.logging import (
     get_logger,
     shutdown,
 )
+from app.host.session import SessionAuthority
 from app.host.settings import settings
 
 if TYPE_CHECKING:
@@ -52,6 +60,17 @@ def main(config: LoggingConfig | None = None) -> None:
         config: Optional telemetry configuration override. If None, default host
             logging configuration is utilized.
     """
+    logger.info("HaruQuantAI Application is booting up using CLI...")
+
+    logger.info("Configuring Runtime Environment...")
+    logger.info("Resolving Settings...")
+    if settings:
+        logger.info("Settings loaded...")
+    else:
+        logger.error("Failed to load settings...")
+        return
+
+    logger.info("Configuring Logging...")
     is_root_caller = not TelemetryEngine.is_configured()
 
     if config is not None:
@@ -69,13 +88,48 @@ def main(config: LoggingConfig | None = None) -> None:
         )
         configure_host_logging(level=target_level)
 
+    logger.info("Validating paths...")
+    paths_to_validate = {
+        "Configs": Path(settings.workspace_paths.configs_dir),
+        "Data": Path(settings.workspace_paths.data_dir),
+        "Projects": Path(settings.workspace_paths.projects_dir),
+        "Strategies": Path(settings.workspace_paths.strategies_dir),
+    }
+
+    for name, path in paths_to_validate.items():
+        if path.exists():
+            logger.info("%s directory exists...", name)
+        else:
+            logger.error("%s directory does not exist...", name)
+            return
+
+    logger.info("Security checks...")
+    if bool(settings.user_access.get("locked", False)):
+        logger.error("Application is locked. Please contact support.")
+        return
+
+    logger.info("Initializing Sessions...")
+    logger.info("Logging in user: %s ...", settings.user_access.username)
+    session_authority = SessionAuthority(db_path=settings.db_path)
+    session_authority.initialize()
+    timeout_mins = int(settings.user_access.get("session_timeout_mins", 1440))
+    username = str(settings.user_access.get("username", "haruquantai"))
+    session_authority.create_session(
+        username=username,
+        peer_id="cli-local",
+        ttl_seconds=timeout_mins * 60,
+    )
+
+    logger.info("Gathering system resources...")
+    logger.info("Number of Cores: %s", os.cpu_count())
+    logger.info("Memory: %s GB", psutil.virtual_memory().total / (1024**3))
+    logger.info(
+        "Number of Cores to be used: %s Active",
+        settings.config_cpu.custom_cores,
+    )
+    logger.info("Memory: %s GB", settings.config_memory.memory_limit_gb)
+
     try:
-        logger.info("Logging in user: %s ...", settings.user_access.username)
-        logger.info(
-            "Number of Cores to be used: %s Active",
-            settings.config_cpu.custom_cores,
-        )
-        logger.info("Memory: %s GB", settings.config_memory.memory_limit_gb)
         logger.info("Application started successfully")
 
     finally:
