@@ -1,1 +1,0 @@
-"""Host feature verification."""
