@@ -13,7 +13,6 @@ Description:
 Purpose:
     FEAT-HOST-SETTINGS: Host configuration settings management and dot-accessible
     access.
-
 Key Capabilities:
     - FR-HOST-SETTINGS-LOAD: Query and parse scoped configuration records into memory.
       Associated: `HostSettings.reload()`, `HostSettings.__init__()`
@@ -21,6 +20,9 @@ Key Capabilities:
     - FR-HOST-SETTINGS-DOT-ACCESS: Provide recursive dot and dict attribute navigation.
       Associated: `_SettingsNode.__getattr__()`, `HostSettings.__getattr__()`
       Logging: Emits DEBUG when accessing setting attributes or namespaces.
+    - FR-HOST-SETTINGS-PATH-VALIDATION: Validate configured workspace paths on disk.
+      Associated: `HostSettings.validate_workspace_paths()`
+      Logging: Emits INFO when directory exists, ERROR when directory does not exist.
 
 Python API Usage:
     ```python
@@ -383,6 +385,33 @@ class HostSettings(_SettingsNode):
         """
         self._store.update_settings(scope, values)
         self.reload()
+
+    def validate_workspace_paths(self) -> bool:
+        """Validate that configured workspace directories exist on disk.
+
+        Returns:
+            True if all workspace paths exist, False otherwise.
+        """
+        logger.info("Validating paths...")
+        workspace_paths = self.get("workspace_paths")
+        if workspace_paths is None:
+            logger.error("Workspace paths configuration missing")
+            return False
+
+        paths_to_validate = {
+            "Configs": Path(workspace_paths.get("configs_dir", "")),
+            "Data": Path(workspace_paths.get("data_dir", "")),
+            "Projects": Path(workspace_paths.get("projects_dir", "")),
+            "Strategies": Path(workspace_paths.get("strategies_dir", "")),
+        }
+
+        for name, path in paths_to_validate.items():
+            if path.exists():
+                logger.info("%s directory exists...", name)
+            else:
+                logger.error("%s directory does not exist...", name)
+                return False
+        return True
 
     @override
     def __repr__(self) -> str:

@@ -16,6 +16,9 @@ Key Capabilities:
     - FR-APP-CLI-SESSION: Initialize host session authority and record operator session.
       Associated: `main()`
       Logging: Emits INFO event upon session initialization and operator recording.
+    - FR-APP-CLI-JOBS: Initialize hardware diagnostics and job admission manager.
+      Associated: `main()`
+      Logging: Emits INFO event upon jobs system initialization.
     - FR-APP-CLI-LIFECYCLE: Coordinate graceful process shutdown and telemetry sync.
       Associated: `main()`
       Logging: Emits INFO event before exit and drains queued telemetry via shutdown.
@@ -32,12 +35,9 @@ CLI Usage:
 
 from __future__ import annotations
 
-import os
-from pathlib import Path
 from typing import TYPE_CHECKING
 
-import psutil
-
+from app.host.jobs import JobManager, create_pool, diagnostics
 from app.host.logging import (
     TelemetryEngine,
     configure_host_logging,
@@ -88,20 +88,8 @@ def main(config: LoggingConfig | None = None) -> None:
         )
         configure_host_logging(level=target_level)
 
-    logger.info("Validating paths...")
-    paths_to_validate = {
-        "Configs": Path(settings.workspace_paths.configs_dir),
-        "Data": Path(settings.workspace_paths.data_dir),
-        "Projects": Path(settings.workspace_paths.projects_dir),
-        "Strategies": Path(settings.workspace_paths.strategies_dir),
-    }
-
-    for name, path in paths_to_validate.items():
-        if path.exists():
-            logger.info("%s directory exists...", name)
-        else:
-            logger.error("%s directory does not exist...", name)
-            return
+    if not settings.validate_workspace_paths():
+        return
 
     logger.info("Security checks...")
     if bool(settings.user_access.get("locked", False)):
@@ -120,19 +108,33 @@ def main(config: LoggingConfig | None = None) -> None:
         ttl_seconds=timeout_mins * 60,
     )
 
+    logger.info("Jobs System setting up...")
+    diag = diagnostics()
+
     logger.info("Gathering system resources...")
-    logger.info("Number of Cores: %s", os.cpu_count())
-    logger.info("Memory: %s GB", psutil.virtual_memory().total / (1024**3))
+    logger.info("Number of Cores: %s", diag.cpu_count_logical)
+    logger.info("Memory: %s GB", diag.total_ram_gb)
     logger.info(
         "Number of Cores to be used: %s Active",
         settings.config_cpu.custom_cores,
     )
     logger.info("Memory: %s GB", settings.config_memory.memory_limit_gb)
 
+    max_cores = int(settings.config_cpu.get("custom_cores", diag.cpu_count_logical))
+    max_ram_gb = float(settings.config_memory.get("memory_limit_gb", 8.0))
+    max_ram_bytes = int(max_ram_gb * (1024**3))
+    job_pool = create_pool(max_workers=max_cores)
+    job_manager = JobManager(
+        pool=job_pool,
+        max_workers=max_cores,
+        max_memory_bytes=max_ram_bytes,
+    )
+
     try:
         logger.info("Application started successfully")
 
     finally:
+        job_manager.close(timeout=5.0)
         logger.info("Application shutdown... Routine finished")
         if is_root_caller or config is not None:
             shutdown(timeout=5.0)

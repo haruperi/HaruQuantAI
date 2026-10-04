@@ -200,7 +200,7 @@ def test_cli_main_aborts_when_workspace_path_missing(
     def mock_error(msg: str, *args: Any, **kwargs: Any) -> None:
         captured_logs.append(msg % args if args else msg)
 
-    monkeypatch.setattr("app.cli.logger.error", mock_error)
+    monkeypatch.setattr("app.host.settings.logger.error", mock_error)
 
     cli_main()
     assert any("Configs directory does not exist" in msg for msg in captured_logs)
@@ -256,3 +256,30 @@ def test_cli_main_records_session_in_database(
     assert rows[0][1] == "test_user"
     assert rows[0][2] == "cli-local"
     assert rows[0][3] == "ACTIVE"
+
+
+def test_cli_main_initializes_jobs_system(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Verify that cli main() initializes hardware diagnostics and JobManager."""
+    db_file = tmp_path / "jobs_cli.db"
+    store = SettingsStore(db_file)
+    store.initialize()
+    _seed_basic_cli_settings(store, root_dir=tmp_path)
+    host_settings = HostSettings(db_path=db_file)
+    monkeypatch.setattr("app.cli.settings", host_settings)
+
+    closed: list[bool] = []
+    from app.host import jobs as host_jobs
+
+    original_close = host_jobs.JobManager.close
+
+    def spy_close(self: Any, *args: Any, **kwargs: Any) -> None:
+        closed.append(True)
+        original_close(self, *args, **kwargs)
+
+    monkeypatch.setattr("app.host.jobs.JobManager.close", spy_close)
+
+    cli_main()
+    assert len(closed) >= 1

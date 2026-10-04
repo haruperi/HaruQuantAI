@@ -172,3 +172,42 @@ def test_global_settings_singleton() -> None:
     """Verify default global settings singleton is instantiated."""
     assert settings.db_path.name == "haruquantai.db"
     assert isinstance(settings, HostSettings)
+
+
+def test_host_settings_validate_workspace_paths(tmp_path: Path) -> None:
+    """Verify FR-HOST-SETTINGS-PATH-VALIDATION checks directory existence."""
+    db_file = tmp_path / "paths.db"
+    store = SettingsStore(db_file)
+    store.initialize()
+
+    # Case 1: Missing workspace_paths configuration
+    s_empty = HostSettings(db_path=db_file)
+    assert not s_empty.validate_workspace_paths()
+
+    # Case 2: One directory absent
+    configs = tmp_path / "presets"
+    configs.mkdir()
+    data = tmp_path / "market"
+    data.mkdir()
+    projects = tmp_path / "projects"
+    projects.mkdir()
+    missing_strat = tmp_path / "strategies_missing"
+
+    store.update_settings(
+        scope="application",
+        values={
+            "workspace_paths": {
+                "configs_dir": str(configs),
+                "data_dir": str(data),
+                "projects_dir": str(projects),
+                "strategies_dir": str(missing_strat),
+            }
+        },
+    )
+    s_invalid = HostSettings(db_path=db_file)
+    assert not s_invalid.validate_workspace_paths()
+
+    # Case 3: All directories exist
+    missing_strat.mkdir()
+    s_valid = HostSettings(db_path=db_file)
+    assert s_valid.validate_workspace_paths()
