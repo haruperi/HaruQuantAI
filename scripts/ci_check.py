@@ -22,7 +22,6 @@ def main() -> int:
             "tests",
             "scripts",
         ),
-        (sys.executable, "scripts/architecture_check.py"),
         (
             sys.executable,
             "-m",

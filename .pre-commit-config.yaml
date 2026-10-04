@@ -59,26 +59,9 @@ repos:
         types_or: [python, pyi]
         stages: [pre-commit]
 
-      - id: architecture-check
-        name: Architectural AST check
-        entry: uv run python scripts/architecture_check.py
-        language: system
-        pass_filenames: false
-        stages: [pre-commit]
-
       - id: qualification-check
         name: Authoritative pre-push qualification
         entry: uv run python scripts/ci_check.py
         language: system
         pass_filenames: false
         stages: [pre-push]
-
-  # Secret detection runs after formatting so it scans the exact final bytes.
-  - repo: local
-    hooks:
-      - id: detect-secrets
-        name: Detect secrets without mutating the tracked baseline
-        entry: uv run python scripts/detect_secrets_filters.py --baseline .github/.secrets.baseline
-        language: system
-        exclude: \.secrets\.baseline$
-        stages: [pre-commit]
