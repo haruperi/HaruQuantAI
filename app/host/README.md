@@ -59,7 +59,7 @@ from app.host.logging import (
     reset_logging,
 )
 
-# Optional explicit configuration (e.g. In entrypoints or test fixtures)
+# Optional explicit configuration (e.g. in entrypoints or test fixtures)
 configure_host_logging(Path("data/logs"))
 
 # Obtain logger and bind context
@@ -70,4 +70,102 @@ with request_context(order_id="ord-555"):
 
 # Clean shutdown
 reset_logging()
+```
+
+---
+
+# Host SQLite Persistence (`app/host/persistance.py`)
+
+## Overview
+
+The host persistence layer provides authoritative SQLite database management and transactional storage for HaruQuantAI host services within `data/database/haruquantai.db`.
+
+It enforces connection-per-operation isolation, foreign key constraints, busy wait timeouts, and serialized `BEGIN IMMEDIATE` write transactions to eliminate concurrency deadlocks.
+
+> [!NOTE]
+> `app/host/persistance.py` is an internal host data access engine. External consumer modules, CLI commands, and user entrypoints must never import `app/host/persistance.py` directly; all configuration settings operations must flow through `app/host/settings.py`.
+
+## Core Capabilities
+
+1. **Scoped Settings Keyset Pagination (`FR-HOST-SETTINGS-READ`)**:
+   - `read_settings(scope, key=None, after_key=None, limit=100)` queries settings with deterministic lexicographical ordering.
+   - Decodes stored JSON values into immutable `SettingRecord` instances.
+   - Emits structured DEBUG telemetry (`FR-HOST-SETTINGS-READ`) without leaking values.
+
+2. **Atomic Batch Settings Upserts (`FR-HOST-SETTINGS-UPDATE`)**:
+   - `update_settings(scope, values)` applies batch upserts in a single transaction.
+   - Unchanged canonical JSON preserves original `updated_at_utc` timestamps.
+   - Emits structured INFO telemetry (`FR-HOST-SETTINGS-UPDATE`) upon commit.
+
+## Internal Host API Usage
+
+```python
+from pathlib import Path
+from app.host.persistance import SettingsStore
+
+# Internal store usage within host subsystem
+store = SettingsStore(Path("data/database/haruquantai.db"))
+store.initialize()
+
+# Atomically update scoped settings
+changed = store.update_settings("system", {"theme": "dark", "refresh_rate": 60})
+
+# Read scoped settings page
+page = store.read_settings("system", limit=50)
+for record in page.items:
+    _ = (record.key, record.value)
+```
+
+---
+
+# Host Settings Container & Dot-Access Interface (`app/host/settings.py`)
+
+## Overview
+
+The host settings subsystem provides the central configuration settings container and dot-accessible interface for HaruQuantAI operations. It encapsulates the authoritative SQLite persistence store (`SettingsStore`) to query, parse, and structure scoped application and host configuration records into memory.
+
+It exposes a module-level `settings` singleton, enabling application services, quantitative engines, and operator diagnostic utilities to navigate configuration values cleanly via dot-notation (e.g. `settings.app_general.theme` or `settings.config_agents.gemini.model`) or dictionary indexing, without direct coupling to low-level persistence tables.
+
+## Core Capabilities
+
+1. **Scoped Record Loading & Key Normalization (`FR-HOST-SETTINGS-LOAD`)**:
+   - `HostSettings.reload()` queries scoped records from the SQLite database.
+   - Automatically normalizes dot-separated keys to valid Python attribute identifiers (`app.general` -> `app_general`), while preserving original key lookups.
+   - Organizes scoped containers (`settings.application`, `settings.host`).
+   - Emits structured INFO telemetry upon loading with count of items loaded.
+
+2. **Recursive Dot & Dictionary Navigation (`FR-HOST-SETTINGS-DOT-ACCESS`)**:
+   - Internal `_SettingsNode` instances recursively wrap nested dictionaries and lists.
+   - Provides intuitive dot-notation (`settings.app_general.theme`), dictionary indexing (`settings["app_general"]`), `.get(key, default)`, and `in` membership testing.
+   - Emits DEBUG telemetry when accessing setting attributes or scoped namespaces.
+
+3. **Dynamic Reload & Persistence Updates**:
+   - `settings.reload()` refreshes memory state from disk.
+   - `settings.update(scope, values)` executes atomic transactional upserts in the SQLite store and refreshes in-memory structures.
+
+## Python API Usage
+
+```python
+from app.host.settings import HostSettings, settings
+
+# Use the global singleton directly
+theme = settings.app_general.theme
+gemini_model = settings.config_agents.gemini.model
+
+# Scoped namespace access
+port = settings.host.bound_port
+
+# Dictionary-style lookup and defaults
+timeout = settings.get("request_timeout", 30)
+
+# Isolated instance for testing or alternative databases
+custom_settings = HostSettings(db_path="path/to/isolated.db")
+```
+
+## CLI Diagnostics
+
+Inspect loaded host settings via the diagnostic CLI:
+
+```bash
+uv run python -m app.cli
 ```
