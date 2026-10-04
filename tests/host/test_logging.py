@@ -17,6 +17,7 @@ Key Capabilities:
 
 from __future__ import annotations
 
+import io
 import json
 import logging
 import queue
@@ -437,3 +438,27 @@ def test_bridge_idempotency_and_uninitialized_lifecycle() -> None:
         h for h in lib_logger.handlers if h.__class__.__name__ == "HostBridgeHandler"
     ]
     assert len(handlers) == 1
+
+
+def test_console_filtering_by_level(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """Verify that console emission filters out events below configured level."""
+    log_dir = tmp_path / "console_filter_logs"
+    stream = io.StringIO()
+
+    engine = configure_host_logging(
+        log_dir=log_dir,
+        level="INFO",
+        include_console=True,
+    )
+    monkeypatch.setattr(engine, "_console_stream", stream)
+
+    log = get_logger("app.console_test")
+    log.debug("Hidden debug message")
+    log.info("Visible info message")
+
+    assert flush(timeout=5.0)
+    console_output = stream.getvalue()
+    assert "Hidden debug message" not in console_output
+    assert "Visible info message" in console_output

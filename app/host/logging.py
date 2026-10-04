@@ -163,6 +163,22 @@ LEVEL_COLORS: Final[dict[str, str]] = {
     "CRITICAL": ANSI_BOLD_RED,
 }
 
+LEVEL_NUMBERS: Final[dict[str, int]] = {
+    "DEBUG": logging.DEBUG,
+    "INFO": logging.INFO,
+    "WARNING": logging.WARNING,
+    "ERROR": logging.ERROR,
+    "CRITICAL": logging.CRITICAL,
+}
+
+
+def parse_log_level(level: int | str) -> int:
+    """Normalize integer or string log level representation to standard integer."""
+    if isinstance(level, str):
+        return LEVEL_NUMBERS.get(level.strip().upper(), logging.INFO)
+    return int(level)
+
+
 # ============================================================================
 # Secret Redaction Patterns
 # ============================================================================
@@ -548,6 +564,7 @@ class TelemetryEngine:
     """Telemetry coordinator, multi-sink router, and async queue manager."""
 
     _instance: TelemetryEngine | None = None
+    _configured: bool = False
     _init_lock: Final[threading.RLock] = threading.RLock()
 
     def __init__(self, config: LoggingConfig) -> None:
@@ -612,9 +629,32 @@ class TelemetryEngine:
             return cls._instance
 
     @classmethod
+    def is_active(cls) -> bool:
+        """Return True if an active singleton engine is running."""
+        with cls._init_lock:
+            return cls._instance is not None and cls._instance.is_running
+
+    @classmethod
+    def is_configured(cls) -> bool:
+        """Return True if an engine was explicitly configured."""
+        with cls._init_lock:
+            return (
+                cls._configured
+                and cls._instance is not None
+                and cls._instance.is_running
+            )
+
+    @classmethod
+    def mark_configured(cls) -> None:
+        """Mark the engine as explicitly configured under lock."""
+        with cls._init_lock:
+            cls._configured = True
+
+    @classmethod
     def reset(cls) -> None:
         """Shut down and reset the active singleton engine."""
         with cls._init_lock:
+            cls._configured = False
             if cls._instance is not None:
                 cls._instance.shutdown()
                 cls._instance = None
@@ -685,7 +725,8 @@ class TelemetryEngine:
             event: The event to dispatch.
         """
         # 1. Console emission
-        if self.config.include_console:
+        event_level_no = LEVEL_NUMBERS.get(event.level, logging.INFO)
+        if self.config.include_console and event_level_no >= self.config.level:
             human_line = format_human_record(event, use_color=self._use_color)
             try:
                 self._console_stream.write(human_line + "\n")
@@ -1029,7 +1070,7 @@ logger: BoundLogger = get_logger("app")
 def configure_host_logging(
     log_dir: Path | None = None,
     *,
-    level: int = logging.INFO,
+    level: int | str = "INFO",
     max_bytes: int = DEFAULT_MAX_BYTES,
     retention_days: int = DEFAULT_RETENTION_DAYS,
     include_console: bool = True,
@@ -1042,7 +1083,7 @@ def configure_host_logging(
 
     Args:
         log_dir: Target directory for log files and archives (default: 'data/logs').
-        level: Minimum threshold log level.
+        level: Minimum threshold log level (integer or string representation).
         max_bytes: Byte limit per file before ZIP rotation (default: 10 MB).
         retention_days: Days of rotated archives to retain (default: 10).
         include_console: Whether to emit human-readable lines to stderr.
@@ -1051,15 +1092,17 @@ def configure_host_logging(
     Returns:
         The newly configured TelemetryEngine instance.
     """
+    log_level = parse_log_level(level)
     reset_logging()
     cfg = LoggingConfig(
         log_dir=log_dir or DEFAULT_LOG_DIR,
-        level=level,
+        level=log_level,
         max_bytes=max_bytes,
         retention_days=retention_days,
         include_console=include_console,
         use_color=use_color,
     )
+    TelemetryEngine.mark_configured()
     return TelemetryEngine.get_or_create(cfg)
 
 

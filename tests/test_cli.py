@@ -1,174 +1,138 @@
 """Unit tests for the CLI entry point module.
 
 Description:
-    Verifies that app/cli.py resolves its logger safely at import, emits all five
-    severities when main() is executed, queries host settings via show_settings(),
-    and flushes output cleanly to disk.
+    Verifies that app/cli.py coordinates process bootstrap, executes initial
+    runtime sanity checks, dynamically resolves debug telemetry log level based on
+    troubleshooting configuration, and guarantees graceful shutdown in a finally boundary.
 
 Purpose:
-    FEAT-APP-CLI: Command-line interface and diagnostic test dispatch.
+    FEAT-APP-CLI: CLI application lifecycle entry point and process coordinator.
 
 Key Capabilities:
-    - FR-APP-CLI-DISPATCH: Emit multi-severity diagnostic records and flush telemetry.
-      Associated: `test_cli_main_emits_expected_severities()`,
-      `test_cli_main_default_settings_fallback()`
+    - FR-APP-CLI-BOOTSTRAP: Coordinate host telemetry and start application runtime.
+      Associated: `test_cli_main_execution_lifecycle()`
       Logging: Implicit pytest test reporting.
-    - FR-APP-CLI-SETTINGS: Query and display host database settings via telemetry.
-      Associated: `test_show_settings_seeded()`,
-      `test_show_settings_missing_database()`, `test_show_settings_empty_database()`
+    - FR-APP-CLI-LIFECYCLE: Coordinate graceful process shutdown and telemetry sync.
+      Associated: `test_cli_main_execution_lifecycle()`
       Logging: Implicit pytest test reporting.
 """
 
 from __future__ import annotations
 
-import logging
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import pytest
 from app.cli import main as cli_main
-from app.cli import show_settings
-from app.host.logging import configure_host_logging, flush, reset_logging
+from app.host.logging import reset_logging
 from app.host.persistance import SettingsStore
 from app.host.settings import HostSettings
 
+if TYPE_CHECKING:
+    from collections.abc import Generator
 
-def test_cli_main_emits_expected_severities(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
+
+@pytest.fixture(autouse=True)
+def _isolate_test_logging() -> Generator[None]:
+    """Ensure clean telemetry isolation before and after each test."""
+    reset_logging()
+    yield
+    reset_logging()
+
+
+def _seed_basic_cli_settings(store: SettingsStore) -> None:
+    """Seed baseline user and hardware settings required for CLI banner printing."""
+    store.update_settings("user_access", {"username": "test_user"})
+    store.update_settings("config_cpu", {"custom_cores": 4})
+    store.update_settings("config_memory", {"memory_limit_gb": 8})
+
+
+def test_cli_main_execution_lifecycle(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """Verify that cli main() emits events across all log levels and flushes to disk."""
-    log_dir = tmp_path / "cli_logs"
-    db_file = tmp_path / "isolated.db"
-    store = SettingsStore(db_file)
-    store.initialize()
-    host_settings = HostSettings(db_path=db_file)
-    monkeypatch.setattr("app.cli.settings", host_settings)
+    """Verify that cli main() boots telemetry, logs startup, and shuts down cleanly."""
+    log_dir = tmp_path / "cli_lifecycle"
+    from app.host import logging as host_logging
 
-    configure_host_logging(log_dir=log_dir, level=logging.DEBUG, include_console=False)
+    def isolated_configure(*args: Any, **kwargs: Any) -> Any:
+        kwargs["log_dir"] = log_dir
+        kwargs["include_console"] = False
+        return host_logging.configure_host_logging(**kwargs)
+
+    monkeypatch.setattr("app.cli.configure_host_logging", isolated_configure)
 
     try:
         cli_main()
 
         app_log = log_dir / "app.log"
-        debug_log = log_dir / "debug.log"
-        errors_log = log_dir / "errors.log"
-
         assert app_log.exists()
-        assert debug_log.exists()
-        assert errors_log.exists()
+        content = app_log.read_text(encoding="utf-8")
 
-        app_text = app_log.read_text(encoding="utf-8")
-        assert "This is a debug" in app_text
-        assert "This is a info" in app_text
-        assert "This is a warning" in app_text
-        assert "This is a error" in app_text
-        assert "This is a critical" in app_text
-
-        debug_text = debug_log.read_text(encoding="utf-8")
-        assert "This is a debug" in debug_text
-
-        errors_text = errors_log.read_text(encoding="utf-8")
-        assert "This is a error" in errors_text
-        assert "This is a critical" in errors_text
+        assert "Application started successfully" in content
+        assert "Application shutdown... Routine finished" in content
     finally:
         reset_logging()
 
 
-def test_show_settings_seeded(
+def test_cli_main_debug_level_override_when_active(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Verify show_settings reads seeded records and logs each entry."""
-    log_dir = tmp_path / "seeded_logs"
-    db_file = tmp_path / "seeded.db"
+    """Verify that debug_level_active=True overrides log level to DEBUG."""
+    db_file = tmp_path / "active_debug.db"
     store = SettingsStore(db_file)
     store.initialize()
+    _seed_basic_cli_settings(store)
     store.update_settings(
-        scope="application",
-        values={"theme": "dark", "timeout": 30},
+        scope="config_troubleshooting",
+        values={"debug_level_active": True},
     )
     host_settings = HostSettings(db_path=db_file)
     monkeypatch.setattr("app.cli.settings", host_settings)
 
-    configure_host_logging(log_dir=log_dir, level=logging.DEBUG, include_console=False)
-    try:
-        displayed = show_settings(limit=10)
-        assert len(displayed) == 2
-        assert displayed["theme"] == "dark"
-        assert displayed["timeout"] == 30
+    captured_kwargs: dict[str, Any] = {}
+    from app.host import logging as host_logging
 
-        flush(timeout=5.0)
+    def spy_configure(**kwargs: Any) -> Any:
+        captured_kwargs.update(kwargs)
+        return host_logging.TelemetryEngine.get_or_create()
 
-        app_log = log_dir / "app.log"
-        assert app_log.exists()
-        app_text = app_log.read_text(encoding="utf-8")
-        assert "Loaded setting theme = dark" in app_text
-        assert "Loaded setting timeout = 30" in app_text
-    finally:
-        reset_logging()
+    monkeypatch.setattr("app.cli.configure_host_logging", spy_configure)
 
-
-def test_show_settings_missing_database(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Verify show_settings handles non-existent database file gracefully."""
-    log_dir = tmp_path / "missing_db_logs"
-    db_file = tmp_path / "does_not_exist.db"
-    host_settings = HostSettings(db_path=db_file)
-    monkeypatch.setattr("app.cli.settings", host_settings)
-
-    configure_host_logging(log_dir=log_dir, level=logging.DEBUG, include_console=False)
-    try:
-        displayed = show_settings()
-        assert displayed == {}
-
-        flush(timeout=5.0)
-
-        app_log = log_dir / "app.log"
-        assert app_log.exists()
-        app_text = app_log.read_text(encoding="utf-8")
-        assert "No settings loaded from host database" in app_text
-    finally:
-        reset_logging()
-
-
-def test_show_settings_empty_database(
-    tmp_path: Path,
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    """Verify show_settings handles empty database gracefully."""
-    log_dir = tmp_path / "empty_logs"
-    db_file = tmp_path / "empty.db"
-    store = SettingsStore(db_file)
-    store.initialize()
-    host_settings = HostSettings(db_path=db_file)
-    monkeypatch.setattr("app.cli.settings", host_settings)
-
-    configure_host_logging(log_dir=log_dir, level=logging.DEBUG, include_console=False)
-    try:
-        displayed = show_settings()
-        assert displayed == {}
-
-        flush(timeout=5.0)
-
-        app_log = log_dir / "app.log"
-        assert app_log.exists()
-        app_text = app_log.read_text(encoding="utf-8")
-        assert "No settings loaded from host database" in app_text
-    finally:
-        reset_logging()
-
-
-def test_cli_main_default_settings_fallback(tmp_path: Path) -> None:
-    """Verify cli main() works with default settings parameter without error."""
-    log_dir = tmp_path / "default_logs"
-    configure_host_logging(log_dir=log_dir, level=logging.DEBUG, include_console=False)
     try:
         cli_main()
-        app_log = log_dir / "app.log"
-        assert app_log.exists()
-        app_text = app_log.read_text(encoding="utf-8")
-        assert "This is a info" in app_text
+        assert captured_kwargs.get("level") == "DEBUG"
+    finally:
+        reset_logging()
+
+
+def test_cli_main_uses_info_level_when_inactive(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Verify that debug_level_active=False configures INFO level."""
+    db_file = tmp_path / "inactive_debug.db"
+    store = SettingsStore(db_file)
+    store.initialize()
+    _seed_basic_cli_settings(store)
+    store.update_settings(
+        scope="config_troubleshooting",
+        values={"debug_level_active": False},
+    )
+    host_settings = HostSettings(db_path=db_file)
+    monkeypatch.setattr("app.cli.settings", host_settings)
+
+    captured_kwargs: dict[str, Any] = {}
+    from app.host import logging as host_logging
+
+    def spy_configure(**kwargs: Any) -> Any:
+        captured_kwargs.update(kwargs)
+        return host_logging.TelemetryEngine.get_or_create()
+
+    monkeypatch.setattr("app.cli.configure_host_logging", spy_configure)
+
+    try:
+        cli_main()
+        assert captured_kwargs.get("level") == "INFO"
     finally:
         reset_logging()

@@ -39,7 +39,7 @@ def test_main_execution_lifecycle(tmp_path: Path) -> None:
         content = app_log.read_text(encoding="utf-8")
 
         assert "Starting HaruQuantAI application..." in content
-        assert "This is a info" in content
+        assert "Application started successfully" in content
         assert "HaruQuantAI application shutdown routine finished" in content
     finally:
         reset_logging()

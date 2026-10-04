@@ -18,11 +18,7 @@ Key Capabilities:
       Logging: Emits INFO event before exit and drains queued telemetry via shutdown.
 
 Python API Usage:
-    ```python
-    from app.main import main
-
-    main()
-    ```
+    Not applicable
 
 CLI Usage:
     Launch the main application entry point:
@@ -40,8 +36,6 @@ from app.host.logging import configure_host_logging, get_logger, shutdown
 
 if TYPE_CHECKING:
     from app.host.logging import LoggingConfig
-
-__all__ = ["main"]
 
 logger = get_logger(__name__)
 
