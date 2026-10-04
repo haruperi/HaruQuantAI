@@ -6,12 +6,6 @@ and React UI shell can run together now. Most quantitative workspace screens
 still use fixtures or local simulation; they are not evidence of completed
 backend algorithms or trading integration.
 
-[PROJECT.md](docs/PROJECT.md) defines product scope,
-[ARCHITECTURE.md](docs/ARCHITECTURE.md) defines the Five Laws of Spatial
-Composability and pair boundaries, and [AGENTS.md](AGENTS.md) defines the
-contributor workflow. See the [backend host](app/host/README.md) and
-[UI host](app/ui/app/host/README.md) READMEs for current feature status.
-
 ## Prerequisites
 
 Run these commands from the repository root. Install Python 3.14,
