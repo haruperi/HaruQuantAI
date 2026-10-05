@@ -261,6 +261,26 @@ def test_standard_response_error_serialization() -> None:
     assert json.dumps(serialized)
 
 
+def test_standard_response_ergonomics_and_unwrap() -> None:
+    """Verify __bool__, is_success, and unwrap behavior on StandardResponse."""
+    # Successful response
+    payload = {"account": 12345}
+    success_resp = StandardResponse.success(data=payload, message="OK")
+    assert success_resp.is_success is True
+    assert bool(success_resp) is True
+    assert success_resp.unwrap() == payload
+
+    # Error response
+    err = StandardError(code="ERR_AUTH", message="Authentication failed.")
+    error_resp = StandardResponse.failure(message="Auth failed", error=err)
+    assert error_resp.is_success is False
+    assert bool(error_resp) is False
+    with pytest.raises(
+        RuntimeError, match=r"^Operation failed \[ERR_AUTH\]: Authentication failed\.$"
+    ):
+        error_resp.unwrap()
+
+
 def test_response_telemetry_logging_requirements(tmp_path: Path) -> None:
     """Verify non-silent logging for FR-HOST-RESPONSE capabilities."""
     log_dir = tmp_path / "telemetry_logs"

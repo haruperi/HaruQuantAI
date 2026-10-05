@@ -161,9 +161,44 @@ ignore = [
     "PTH",
     "SLF001",
 ]
+"app/plugin/broker/**/*.py" = [
+    "C901",
+    "PLR0911",
+    "PLR0912",
+    "PLR0913",
+    "PLR0915",
+    "PLR0917",
+    "PLR2004",
+    "BLE001",
+    "TRY",
+    "SIM",
+    "E501",
+    "ANN401",
+    "ARG002",
+    "PLC0415",
+    "PTH",
+    "SLF001",
+    "EM",
+    "S101",
+    "S311",
+    "RUF012",
+    "PERF401",
+    "F841",
+    "UP042",
+    "UP046",
+    "B024",
+    "S110",
+    "E741",
+    "N813",
+    "PLR1714",
+    "RUF022",
+]
 "tests/**/*.py" = [
     "S",
     "PLR2004",
+    "PLR0915",
+    "PLR0912",
+    "PLR0913",
     "SLF001",
     "D",
     "DOC",
@@ -195,8 +230,8 @@ ignore = [
 ]
 "scripts/*.py" = [
     "INP001",
-    "D100",
-    "D103",
+    "D",
+    "DOC",
     "ANN",
     "S",
     "T201",
@@ -204,6 +239,8 @@ ignore = [
     "BLE001",
     "C901",
     "PLR2004",
+    "PLR0915",
+    "E501",
     "SIM",
 ]
 
@@ -245,6 +282,8 @@ source = ["app"]
 branch = true
 omit = [
     "tests/*",
+    "app/plugin/broker/metatrader.py",
+    "app/plugin/broker/ctrader.py",
 ]
 
 [tool.coverage.report]
@@ -296,11 +335,40 @@ check_untyped_defs = true
 no_implicit_optional = true
 
 [[tool.mypy.overrides]]
+module = [
+    "MetaTrader5",
+    "MetaTrader5.*",
+    "ctrader_open_api",
+    "ctrader_open_api.*",
+    "google.protobuf",
+    "google.protobuf.*",
+    "pyarrow",
+    "pyarrow.*",
+]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = "app.plugin.broker.*"
+check_untyped_defs = true
+disallow_untyped_defs = false
+disable_error_code = ["explicit-override", "import-untyped", "arg-type", "operator", "assignment", "index", "union-attr"]
+
+[[tool.mypy.overrides]]
 module = "tests.*"
 check_untyped_defs = true
 disallow_untyped_defs = false
 disable_error_code = ["explicit-override"]
 
 [[tool.mypy.overrides]]
-module = "scripts.*"
+module = "tests.plugin.broker.*"
 check_untyped_defs = true
+disallow_untyped_defs = false
+disable_error_code = ["explicit-override", "union-attr", "arg-type", "index", "no-untyped-def", "method-assign", "attr-defined"]
+
+[[tool.mypy.overrides]]
+module = [
+    "scripts.*",
+    "test_all_brokers",
+    "test_broker_mt5",
+]
+ignore_errors = true

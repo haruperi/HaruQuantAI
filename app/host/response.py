@@ -206,6 +206,23 @@ class StandardResponse[T]:
         """Return True if the operation failed with an error."""
         return self.status == "error"
 
+    def __bool__(self) -> bool:
+        """Allow direct boolean evaluation: `if response: ...`"""
+        return self.is_success
+
+    def unwrap(self) -> T:
+        """Return data if successful, otherwise raise RuntimeError."""
+        if not self.is_success:
+            err_msg = self.error.message if self.error else self.message
+            err_code = self.error.code if self.error else "UNKNOWN_ERROR"
+            raise RuntimeError(f"Operation failed [{err_code}]: {err_msg}")
+        return self.data  # type: ignore[return-value]
+
+    @property
+    def error_code(self) -> str | None:
+        """Return the error code if an error is attached, else None."""
+        return self.error.code if self.error is not None else None
+
     @classmethod
     def success[V](
         cls,
