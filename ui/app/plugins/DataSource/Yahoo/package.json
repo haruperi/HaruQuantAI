@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.yahoo",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "paired",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.acquisition",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": "app/plugin/DataSource/yahoo.py",
+  "ui_entry": "app/ui/app/plugins/DataSource/Yahoo/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/DataSource/Yahoo/YahooAddDialog.tsx",
+      "app/ui/app/plugins/DataSource/Yahoo/YahooDownloadDialog.tsx",
+      "app/ui/app/plugins/DataSource/Yahoo/contribution.tsx",
+      "app/ui/app/plugins/DataSource/Yahoo/localState.ts",
+      "app/ui/app/plugins/DataSource/Yahoo/presentation.ts",
+      "app/ui/app/plugins/DataSource/Yahoo/yahoo.ts",
+      "app/ui/app/plugins/DataSource/Yahoo/yahooStore.ts",
+      "app/plugin/DataSource/yahoo.py",
+      "app/ui/app/plugins/DataSource/Yahoo/backend.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-yahoo.spec.ts",
+      "app/ui/tests/unit/plugins/DataSource/Yahoo/yahoo.test.ts",
+      "tests/plugin/DataSource/test_yahoo.py"
+    ],
+    "assets": [
+      "app/ui/app/plugins/DataSource/Yahoo/assets/dm-yahoo.png",
+      "app/ui/app/plugins/DataSource/Yahoo/yahoo.css"
+    ],
+    "examples": [
+      "tests/examples/data_manager/yahoo_offline.py"
+    ],
+    "metadata": [
+      "app/ui/app/plugins/DataSource/Yahoo/package.json",
+      "app/plugin/DataSource/manifests/yahoo/README.md"
+    ]
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema_version": 1,
+  "id": "plugin.portfolio_composer.project_workbench",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.portfolio_composer",
+  "attachment": {
+    "slot_id": "project.workbench",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/project/PortfolioComposer/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/project/PortfolioComposer/ProjectFrame.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/ProjectModal.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/ProjectProgress.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/ProjectResults.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/ProjectSettings.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/contracts.ts",
+      "app/ui/app/plugins/project/PortfolioComposer/contribution.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/index.ts",
+      "app/ui/app/plugins/project/PortfolioComposer/localState.ts",
+      "app/ui/app/plugins/project/PortfolioComposer/presentation.ts",
+      "app/ui/app/plugins/project/PortfolioComposer/projectFixtures.ts",
+      "app/ui/app/plugins/project/PortfolioComposer/results/ResultsCharts.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/ResultsChrome.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/ResultsModals.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/resultsFixtures.ts",
+      "app/ui/app/plugins/project/PortfolioComposer/results/resultsModel.ts",
+      "app/ui/app/plugins/project/PortfolioComposer/results/tabs/ConditionalTabs.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/tabs/EquityChartTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/tabs/OverviewTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/tabs/SmallTabs.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/tabs/SourceCodeTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/results/tabs/TradeListTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/AtmTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/CrossChecksTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/DataTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/MoneyManagementTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/NotesTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/RankingTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/SettingsControls.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/TradingOptionsTab.tsx",
+      "app/ui/app/plugins/project/PortfolioComposer/settings/sharedSettingsFixtures.ts"
+    ],
+    "tests": [
+      "app/ui/tests/unit/plugins/project/PortfolioComposer/projectWorkbench.test.ts"
+    ],
+    "assets": [],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/project/PortfolioComposer/README.md",
+      "app/ui/app/plugins/project/PortfolioComposer/package.json"
+    ]
+  }
+}

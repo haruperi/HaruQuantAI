@@ -1,0 +1,42 @@
+{
+  "name": "sqx-frontend-recreation",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b --pretty false",
+    "test": "vitest run",
+    "test:ui": "playwright test",
+    "lint:chart": "eslint --config eslint.chart.config.mjs app/workspace/Chart tests/unit/workspace/Chart tests/e2e/chart-*.spec.ts",
+    "format:chart:check": "prettier --config .prettier.chart.json --check \"app/workspace/Chart/**/*.{ts,tsx,css}\" \"tests/unit/workspace/Chart/**/*.ts\" \"tests/e2e/chart-*.spec.ts\""
+  },
+  "dependencies": {
+    "@tanstack/react-table": "^8.21.3",
+    "@tanstack/react-virtual": "^3.13.12",
+    "dockview": "^4.10.0",
+    "lightweight-charts": "^5.0.8",
+    "lucide-react": "^0.544.0",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1",
+    "react-router-dom": "^7.18.4",
+    "zustand": "^5.0.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.55.0",
+    "@tailwindcss/vite": "^4.1.13",
+    "@types/react": "^19.1.13",
+    "@types/react-dom": "^19.1.9",
+    "@vitejs/plugin-react": "^5.0.3",
+    "eslint": "^10.11.0",
+    "globals": "^17.12.0",
+    "prettier": "^3.9.9",
+    "tailwindcss": "^4.1.13",
+    "typescript": "^5.9.2",
+    "typescript-eslint": "^8.70.1",
+    "vite": "^7.1.5",
+    "vitest": "^3.2.4"
+  }
+}

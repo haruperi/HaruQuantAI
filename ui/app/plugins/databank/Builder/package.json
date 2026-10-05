@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "plugin.builder.databank",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.builder",
+  "attachment": {
+    "slot_id": "databank.panel",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/databank/Builder/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/CompareStrategiesModal.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/DatabankDialogs.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/DatabankPanel.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/DatabankSplitter.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/DatabankToolbar.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/FilterByCorrelationModal.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/ManageViewsDialog.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/StrategyTable.tsx",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/databankColumns.ts",
+      "app/ui/app/plugins/databank/Builder/ProjectDatabanks/databankStore.ts",
+      "app/ui/app/plugins/databank/Builder/contribution.tsx",
+      "app/ui/app/plugins/databank/Builder/fixtures.ts",
+      "app/ui/app/plugins/databank/Builder/localState.ts",
+      "app/ui/app/plugins/databank/Builder/presentation.ts"
+    ],
+    "tests": [
+      "app/ui/tests/unit/plugins/databank/Builder/databankCorrelation.test.ts",
+      "app/ui/tests/unit/plugins/databank/Builder/databankSplitter.test.ts",
+      "app/ui/tests/unit/plugins/databank/Builder/databankToolbar.test.ts",
+      "app/ui/tests/unit/plugins/databank/Builder/databankViews.test.ts",
+      "app/ui/tests/unit/plugins/databank/Builder/fixtures.test.ts",
+      "app/ui/tests/unit/plugins/databank/Builder/strategyCompare.test.ts"
+    ],
+    "assets": [],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/databank/Builder/README.md",
+      "app/ui/app/plugins/databank/Builder/package.json"
+    ]
+  }
+}

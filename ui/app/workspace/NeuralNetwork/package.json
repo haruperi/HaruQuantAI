@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "id": "workspace.neural_network",
+  "kind": "workspace",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": null,
+  "attachment": null,
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/workspace/NeuralNetwork/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx",
+      "app/ui/app/workspace/NeuralNetwork/contribution.tsx",
+      "app/ui/app/workspace/NeuralNetwork/documents.ts",
+      "app/ui/app/workspace/NeuralNetwork/localState.ts",
+      "app/ui/app/workspace/NeuralNetwork/neuralNetStore.ts"
+    ],
+    "tests": [
+      "app/ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts"
+    ],
+    "assets": [],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/workspace/NeuralNetwork/package.json"
+    ]
+  }
+}

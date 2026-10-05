@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "id": "workspace.optimizer",
+  "kind": "workspace",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": null,
+  "attachment": null,
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/workspace/Optimizer/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/workspace/Optimizer/OptimizationDialogs.tsx",
+      "app/ui/app/workspace/Optimizer/OptimizationParameters.tsx",
+      "app/ui/app/workspace/Optimizer/OptimizerProgress.tsx",
+      "app/ui/app/workspace/Optimizer/OptimizerResults.tsx",
+      "app/ui/app/workspace/Optimizer/OptimizerSettings.tsx",
+      "app/ui/app/workspace/Optimizer/OptimizerWorkspace.tsx",
+      "app/ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx",
+      "app/ui/app/workspace/Optimizer/contribution.tsx",
+      "app/ui/app/workspace/Optimizer/documents.ts",
+      "app/ui/app/workspace/Optimizer/localState.ts",
+      "app/ui/app/workspace/Optimizer/optimizerClient.ts",
+      "app/ui/app/workspace/Optimizer/optimizerFixtures.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/optimizer-parity.spec.ts",
+      "app/ui/tests/unit/workspace/Optimizer/optimizerModes.test.ts"
+    ],
+    "assets": [],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/workspace/Optimizer/README.md",
+      "app/ui/app/workspace/Optimizer/package.json"
+    ]
+  }
+}

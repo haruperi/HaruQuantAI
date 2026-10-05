@@ -1,0 +1,46 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.indicators",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "paired",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.acquisition",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": "app/plugin/DataSource/external_indicators.py",
+  "ui_entry": "app/ui/app/plugins/DataSource/Indicators/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/DataSource/Indicators/ExternalIndicatorDeleteDialog.tsx",
+      "app/ui/app/plugins/DataSource/Indicators/ExternalIndicatorEditorDialog.tsx",
+      "app/ui/app/plugins/DataSource/Indicators/ExternalIndicatorImportDialog.tsx",
+      "app/ui/app/plugins/DataSource/Indicators/ExternalIndicatorRecognizeDialog.tsx",
+      "app/ui/app/plugins/DataSource/Indicators/ExternalIndicatorTransferDialog.tsx",
+      "app/ui/app/plugins/DataSource/Indicators/ExternalIndicatorViewDialog.tsx",
+      "app/ui/app/plugins/DataSource/Indicators/contribution.tsx",
+      "app/ui/app/plugins/DataSource/Indicators/externalIndicators.ts",
+      "app/ui/app/plugins/DataSource/Indicators/externalIndicatorsStore.ts",
+      "app/ui/app/plugins/DataSource/Indicators/localState.ts",
+      "app/ui/app/plugins/DataSource/Indicators/presentation.ts",
+      "app/plugin/DataSource/external_indicators.py",
+      "app/ui/app/plugins/DataSource/Indicators/backend.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-external-indicators.spec.ts",
+      "app/ui/tests/unit/plugins/DataSource/Indicators/externalIndicators.test.ts",
+      "tests/plugin/DataSource/test_external_indicators.py"
+    ],
+    "assets": [
+      "app/ui/app/plugins/DataSource/Indicators/externalIndicators.css"
+    ],
+    "examples": [
+      "tests/examples/data_manager/external_indicators_offline.py"
+    ],
+    "metadata": [
+      "app/ui/app/plugins/DataSource/Indicators/package.json"
+    ]
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "id": "plugin.retester.databank",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "ui_only",
+  "owner_workspace_id": "workspace.retester",
+  "attachment": {
+    "slot_id": "databank.panel",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": null,
+  "ui_entry": "app/ui/app/plugins/databank/Retester/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/CompareStrategiesModal.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/DatabankDialogs.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/DatabankPanel.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/DatabankSplitter.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/DatabankToolbar.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/FilterByCorrelationModal.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/ManageViewsDialog.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/StrategyTable.tsx",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/databankColumns.ts",
+      "app/ui/app/plugins/databank/Retester/ProjectDatabanks/databankStore.ts",
+      "app/ui/app/plugins/databank/Retester/contribution.tsx",
+      "app/ui/app/plugins/databank/Retester/fixtures.ts",
+      "app/ui/app/plugins/databank/Retester/localState.ts",
+      "app/ui/app/plugins/databank/Retester/presentation.ts"
+    ],
+    "tests": [
+      "app/ui/tests/unit/plugins/databank/Retester/databankCorrelation.test.ts",
+      "app/ui/tests/unit/plugins/databank/Retester/databankSplitter.test.ts",
+      "app/ui/tests/unit/plugins/databank/Retester/databankToolbar.test.ts",
+      "app/ui/tests/unit/plugins/databank/Retester/databankViews.test.ts",
+      "app/ui/tests/unit/plugins/databank/Retester/fixtures.test.ts",
+      "app/ui/tests/unit/plugins/databank/Retester/strategyCompare.test.ts"
+    ],
+    "assets": [],
+    "examples": [],
+    "metadata": [
+      "app/ui/app/plugins/databank/Retester/README.md",
+      "app/ui/app/plugins/databank/Retester/package.json"
+    ]
+  }
+}

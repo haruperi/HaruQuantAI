@@ -1,0 +1,2 @@
+import type { UIContribution } from '../../../host/contributions';
+export const contribution: UIContribution = { id:'plugin.custom_projects.databank', kind:'plugin', version:'1.0.0', owner:'workspace.custom_projects', slot:'databank.panel', contractVersion:'1.0.0', wrapsWorkspace:true, load:async()=> { const { DatabankSplitter } = await import('./ProjectDatabanks/DatabankSplitter'); return { View: ({children}) => <DatabankSplitter showBank>{children}</DatabankSplitter> }; } };

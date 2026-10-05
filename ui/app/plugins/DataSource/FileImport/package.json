@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "id": "plugin.data_manager.file_import",
+  "kind": "plugin",
+  "version": "1.0.0",
+  "host_contract": "1.0.0",
+  "mode": "paired",
+  "owner_workspace_id": "workspace.data_manager",
+  "attachment": {
+    "slot_id": "data_source.acquisition",
+    "contract_version": "1.0.0"
+  },
+  "backend_entry": "app/plugin/DataSource/file_import.py",
+  "ui_entry": "app/ui/app/plugins/DataSource/FileImport/contribution.tsx",
+  "owned_paths": {
+    "source": [
+      "app/ui/app/plugins/DataSource/FileImport/FileImportDialog.tsx",
+      "app/ui/app/plugins/DataSource/FileImport/FileMassImportDialog.tsx",
+      "app/ui/app/plugins/DataSource/FileImport/contribution.tsx",
+      "app/ui/app/plugins/DataSource/FileImport/fileImport.ts",
+      "app/ui/app/plugins/DataSource/FileImport/fileImportStore.ts",
+      "app/ui/app/plugins/DataSource/FileImport/localState.ts",
+      "app/ui/app/plugins/DataSource/FileImport/presentation.ts",
+      "app/plugin/DataSource/file_import.py",
+      "app/ui/app/plugins/DataSource/FileImport/backend.ts"
+    ],
+    "tests": [
+      "app/ui/tests/e2e/data-manager-file-import.spec.ts",
+      "app/ui/tests/unit/plugins/DataSource/FileImport/fileImport.test.ts",
+      "tests/plugin/DataSource/test_file_import.py"
+    ],
+    "assets": [
+      "app/ui/app/plugins/DataSource/FileImport/fileImport.css"
+    ],
+    "examples": [
+      "tests/examples/data_manager/file_import_offline.py"
+    ],
+    "metadata": [
+      "app/ui/app/plugins/DataSource/FileImport/package.json",
+      "app/plugin/DataSource/manifests/file_import/README.md"
+    ]
+  }
+}

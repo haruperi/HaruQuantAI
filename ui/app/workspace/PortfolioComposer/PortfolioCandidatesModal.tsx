@@ -1,0 +1,13 @@
+import { useProjectWorkbench } from './documents';
+import {useState,type ChangeEvent} from 'react';
+
+import type {ComposerDraft,ComposerMember} from './composerModel';
+import {parseComposition} from './composerModel';
+export function PortfolioCandidatesModal({candidates,existingIds,onAdd,onImport,onClose}:{candidates:ComposerMember[];existingIds:string[];onAdd:(ids:string[])=>void;onImport:(draft:ComposerDraft)=>void;onClose:()=>void}){
+const { SqdModal } = useProjectWorkbench();
+
+ const [query,setQuery]=useState(''),[selected,setSelected]=useState<string[]>([]),[error,setError]=useState('');
+ const visible=candidates.filter(m=>!existingIds.includes(m.id)&&(m.name+' '+m.symbol).toLowerCase().includes(query.toLowerCase()));
+ const load=async(e:ChangeEvent<HTMLInputElement>)=>{const f=e.target.files?.[0];if(!f)return;try{if(f.size>2_000_000)throw new Error('Preview file must be below 2 MB.');onImport(parseComposition(await f.text()));}catch(error){setError(error instanceof Error?error.message:'Unable to read preview file.');}e.target.value='';};
+ return <SqdModal title="Load strategies" width={650} onClose={onClose} footer={<><button className="sqd-btn" onClick={onClose}>Cancel</button><button className="sqd-btn sqd-btn-primary" disabled={!selected.length} onClick={()=>onAdd(selected)}>Load selected</button></>}><label className="pf-row"><span>Import preview composition</span><input aria-label="Import preview composition" type="file" accept=".json" onChange={load}/></label><p className="pf-hint">Preview JSON replaces this local composition. Native SQX files are not parsed.</p>{error&&<p role="alert">{error}</p>}<label className="pf-row"><span>Search examples</span><input aria-label="Search examples" value={query} onChange={e=>setQuery(e.target.value)}/></label><div className="pf-candidate-list">{visible.map(m=><label className="pf-check" key={m.id}><input type="checkbox" checked={selected.includes(m.id)} onChange={e=>setSelected(e.target.checked?[...selected,m.id]:selected.filter(id=>id!==m.id))}/>{m.name} · {m.symbol}</label>)}{!visible.length&&<p>No matching strategies.</p>}</div></SqdModal>;
+}
