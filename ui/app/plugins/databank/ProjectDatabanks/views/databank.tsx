@@ -1,3 +1,4 @@
+import { SaveRecordsDialog, completeSimulatedSave } from '../../ResultsDatabankActions/save/module';
 import { SetNoteDialog, applySetNote } from '../../ResultsDatabankActions/tools/module';
 import { confirmClearAll } from '../../ResultsDatabankActions/module';
 import { confirmDelete } from '../../ResultsDatabankActions/delete/module';
@@ -7,7 +8,6 @@ import { LoadRecordsDialog } from '../../ResultsDatabankActions/load/module';
 import { DatabankToolbar } from '../DatabankToolbar';
 import {
   RemovingReportsConfirm,
-  SaveRecordsDialog,
 } from '../DatabankDialogs';
 import { StrategyTable } from '../StrategyTable';
 import { ManageViewsDialog } from '../../ResultsDatabankViews/module';
@@ -115,7 +115,7 @@ export function DatabankPanel() {
       {dialog.kind === 'save' && (
         <SaveRecordsDialog
           format={dialog.format}
-          onSave={() => deferred(`Save: ${dialog.format}`)}
+          onSave={() => completeSimulatedSave(dialog.format, deferred)}
           onClose={() => setDialog({ kind: 'none' })}
         />
       )}

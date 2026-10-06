@@ -1,0 +1,157 @@
+{
+    "schema_version":  1,
+    "scope":  "Frontend-only ResultsStockpicker bounded structural traceability",
+    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker",
+    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsStockpicker",
+    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
+    "review":  {
+                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+                   "state":  "owner-approved-plan",
+                   "version":  1
+               },
+    "owner":  {
+                  "domain":  "plugins/project",
+                  "feature":  "FEAT-UI-PROJECT_WORKBENCH",
+                  "decision":  "DEC-UI-CONDITIONAL-RESULTS-STRUCTURAL-OWNERSHIP",
+                  "requirements":  [
+                                       "FR-UI-PROJECT-source-mapping",
+                                       "FR-UI-PROJECT-workflow-preservation",
+                                       "FR-UI-PROJECT-clean-room"
+                                   ]
+              },
+    "clean_room":  {
+                       "contains_proprietary_source":  false,
+                       "contains_sensitive_data":  false,
+                       "contains_personal_data":  false,
+                       "paraphrased_behavior_only":  true
+                   },
+    "source_catalog":  [
+                           {
+                               "id":  "sqx-resultsstockpicker-ui",
+                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker",
+                               "family":  "bounded installed frontend plugin artifacts"
+                           }
+                       ],
+    "sources":  [
+                    {
+                        "catalog_id":  "sqx-resultsstockpicker-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/module.js",
+                        "relative_path":  "module.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "independently authored structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "97bc27d1e8076f4b73d24012e3735b1eead2e766b6862ac92030e11dfd334668",
+                        "target":  "module.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsstockpicker-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/ResultsStockpicker.jar",
+                        "relative_path":  "ResultsStockpicker.jar",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "5b616da0ab1bb4e0ef5d2fd77c59ac5a40e0e409460f35e25527d258e4a9f8a8",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Backend binary excluded from frontend-only scope."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsstockpicker-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/stockpicker.html",
+                        "relative_path":  "stockpicker.html",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "independently authored structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "be5344a922d90ce798a0db443f9ec15edfd9b7247ac3d0492297a32808dc7ad4",
+                        "target":  "stockpicker.tsx",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsstockpicker-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerCtrl.js",
+                        "relative_path":  "StockpickerCtrl.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "55481e83fa34ba390913ae71df4f334a75e4db847ee4596511f2ac8dcd9ae7c8",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsstockpicker-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js",
+                        "relative_path":  "StockpickerService.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "b06a9a7d9bbe501ae3494240209701f2b6ec81b00fcbe7b5b2c07d04ef08fae9",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Backend/chart/report/view persistence operations absent; no services implemented."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsstockpicker-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/styles.css",
+                        "relative_path":  "styles.css",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "00c7ddec7efc8657140854f8b068dfc257639d91535ef8bdda4311599ea254c1",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Current conditional presentation uses shared selectors/plot styles; no exclusive counterpart extracted."
+                    }
+                ],
+    "target_only":  [
+                        {
+                            "path":  "source-map.json",
+                            "reason":  "Structural manifest, not behavioral ledger"
+                        },
+                        {
+                            "path":  "README.md",
+                            "reason":  "Coordinator-owned documentation/ownership"
+                        }
+                    ],
+    "retained_support":  [
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/ConditionalTabs.tsx",
+                                 "reason":  "Coordinator-owned dispatcher invokes both period/method hooks unconditionally, preserving state lifetime and unknown-ID fallback"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
+                                 "reason":  "Retained target-only CustomAnalysisTab; exact donor owner outside authorized families unverified"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+                                 "reason":  "Shared independent synthetic plots and TradesChart controls retained"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
+                                 "reason":  "Shared result capability flags and mock contracts"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
+                                 "reason":  "Shared conditional visibility/order/defaults"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx",
+                                 "reason":  "Shared session analysis rename/delete/export modal behavior retained"
+                             }
+                         ],
+    "limitations":  [
+                        "No backend/chart feeds/simulation/correlation computation/transfers or persistence changes.",
+                        "Custom analysis owner unverified; retained explicitly without donor-family expansion.",
+                        "Canonical behavioral ledger/schema absent; no replacement ledger or new EV IDs.",
+                        "Structure and mock responsibilities do not establish SQX runtime parity."
+                    ]
+}

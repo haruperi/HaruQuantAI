@@ -1,3 +1,4 @@
+import { openSimulatedSave } from '../ResultsDatabankActions/save/module';
 import { requestCompareStrategies } from '../ResultsDatabankActions/tools/compareStrategies/module';
 import { handleEditItem } from '../ResultsDatabankActions/tools/edit/module';
 import { requestRunCa } from '../ResultsDatabankActions/tools/runCa/module';
@@ -54,7 +55,7 @@ export function useDatabankPanel() {
         openMockLoad(() => setDialog({ kind: 'load' }));
         break;
       case 'save':
-        setDialog({ kind: 'save', format: menuItem || '' });
+        openSimulatedSave(menuItem || '', format => setDialog({ kind: 'save', format }));
         break;
       case 'delete':
         requestDeleteConfirmation(store.selectedRows, store.notify, () => setDialog({ kind: 'delete' }));

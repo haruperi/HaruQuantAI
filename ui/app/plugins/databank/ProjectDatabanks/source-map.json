@@ -191,6 +191,10 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/compareStrategies/module.ts",
       "relation": "Existing latent comparison presentation and independent local calculations relocated; inactive toolbar leaf retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/module.ts",
+      "relation": "Existing generic Save popup/draft and deferred format completion delegate to bounded Save modules; no real export."
     }
   ],
   "inventory_review": {

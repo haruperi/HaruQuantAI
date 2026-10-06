@@ -1,0 +1,235 @@
+{
+    "schema_version":  1,
+    "scope":  "Frontend-only ResultsPortfolioCorrelation bounded structural traceability",
+    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation",
+    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsPortfolioCorrelation",
+    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
+    "review":  {
+                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+                   "state":  "owner-approved-plan",
+                   "version":  1
+               },
+    "owner":  {
+                  "domain":  "plugins/project",
+                  "feature":  "FEAT-UI-PROJECT_WORKBENCH",
+                  "decision":  "DEC-UI-CONDITIONAL-RESULTS-STRUCTURAL-OWNERSHIP",
+                  "requirements":  [
+                                       "FR-UI-PROJECT-source-mapping",
+                                       "FR-UI-PROJECT-workflow-preservation",
+                                       "FR-UI-PROJECT-clean-room"
+                                   ]
+              },
+    "clean_room":  {
+                       "contains_proprietary_source":  false,
+                       "contains_sensitive_data":  false,
+                       "contains_personal_data":  false,
+                       "paraphrased_behavior_only":  true
+                   },
+    "source_catalog":  [
+                           {
+                               "id":  "sqx-resultsportfoliocorrelation-ui",
+                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation",
+                               "family":  "bounded installed frontend plugin artifacts"
+                           }
+                       ],
+    "sources":  [
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/module.js",
+                        "relative_path":  "module.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "independently authored structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "19793040364dfca5b63519642ac1962db97c7b75a0513ae34ad316b782a72940",
+                        "target":  "module.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/portfolioCorrelation.html",
+                        "relative_path":  "portfolioCorrelation.html",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "independently authored structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "4847402bd54237329a18bc6de0be903b2fd23d0c59cc5698fcad9076a97ab8cb",
+                        "target":  "portfolioCorrelation.tsx",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationCtrl.js",
+                        "relative_path":  "PortfolioCorrelationCtrl.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "independently authored structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "6149f757ae1dd055764de1e67bd8dfbd126f9b04211ae80cccd252fd25e6117a",
+                        "target":  "PortfolioCorrelationCtrl.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js",
+                        "relative_path":  "PortfolioCorrelationService.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "ee865da326078b465a48705d197bddc04431ffa4f0def1afba19093958f975be",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Backend/chart/report/view persistence operations absent; no services implemented."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
+                        "relative_path":  "ResultsPortfolioCorrelation.jar",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "8cc910853b04b570650a4805917d30b8319c87c7b44cb9f23988e04564e1116b",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Backend binary excluded from frontend-only scope."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/styles.css",
+                        "relative_path":  "styles.css",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "102eef53c9d460fcfa40a82aad3375579aa7f0091e11b1f6b10ac43ae1a86119",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Current conditional presentation uses shared selectors/plot styles; no exclusive counterpart extracted."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/tabs/correlationMatrix/correlationMatrix.html",
+                        "relative_path":  "tabs/correlationMatrix/correlationMatrix.html",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "independently authored structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "34392d400bf85f6b84f4d9aaabcd3f2de8b141d6a7acd596091a20d6be9ecb40",
+                        "target":  "tabs/correlationMatrix/correlationMatrix.tsx",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent precomputed mock presentation only; donor runtime parity not established."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/tabs/correlationMatrix/CorrelationMatrixCtrl.js",
+                        "relative_path":  "tabs/correlationMatrix/CorrelationMatrixCtrl.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "18de4827679191ad7712cdd3bec2d8fd50c605d9d20d58cfa9b501260e576aa7",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "No distinct existing controller/directive/view-manager responsibility; no placeholder or new functionality introduced."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/tabs/correlationMatrix/correlationMatrixDetailPopup.html",
+                        "relative_path":  "tabs/correlationMatrix/correlationMatrixDetailPopup.html",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "7b8dfe527f5f3c21a6e25fc9c645a53090296732b3729bd3d0df45f87d496186",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "No assigned conditional overlap/detail presentation; distinct Results workspace mock remains out of scope."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/tabs/overlappingTrades/overlappingTrades.html",
+                        "relative_path":  "tabs/overlappingTrades/overlappingTrades.html",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "d51f89accc3cabba2e904692dc6a21f3abc9b90d486d2c3b63b0468285a6a430",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "No assigned conditional overlap/detail presentation; distinct Results workspace mock remains out of scope."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/tabs/overlappingTrades/OverlappingTradesCtrl.js",
+                        "relative_path":  "tabs/overlappingTrades/OverlappingTradesCtrl.js",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "952737cdecd9bfc450ff3aba19a9bdb28f6a130c86b04e38af08e599efbfb288",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "No assigned conditional overlap/detail presentation; distinct Results workspace mock remains out of scope."
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsportfoliocorrelation-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/tabs/overlappingTrades/overlappingTradesDetailPopup.html",
+                        "relative_path":  "tabs/overlappingTrades/overlappingTradesDetailPopup.html",
+                        "location":  "whole-file structural identity",
+                        "inspection_method":  "recursive inventory, SHA-256 and scoped responsibility inspection",
+                        "relation":  "explicit artifact exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "d2b336ad8e6ee83a405f3846842dd0aef91ed4590ad6c1d21e295e33ed65b143",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "No assigned conditional overlap/detail presentation; distinct Results workspace mock remains out of scope."
+                    }
+                ],
+    "target_only":  [
+                        {
+                            "path":  "source-map.json",
+                            "reason":  "Structural manifest, not behavioral ledger"
+                        },
+                        {
+                            "path":  "README.md",
+                            "reason":  "Coordinator-owned documentation/ownership"
+                        }
+                    ],
+    "retained_support":  [
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/ConditionalTabs.tsx",
+                                 "reason":  "Coordinator-owned dispatcher invokes both period/method hooks unconditionally, preserving state lifetime and unknown-ID fallback"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/tabs/SmallTabs.tsx",
+                                 "reason":  "Retained target-only CustomAnalysisTab; exact donor owner outside authorized families unverified"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+                                 "reason":  "Shared independent synthetic plots and TradesChart controls retained"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts",
+                                 "reason":  "Shared result capability flags and mock contracts"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts",
+                                 "reason":  "Shared conditional visibility/order/defaults"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx",
+                                 "reason":  "Shared session analysis rename/delete/export modal behavior retained"
+                             }
+                         ],
+    "limitations":  [
+                        "No backend/chart feeds/simulation/correlation computation/transfers or persistence changes.",
+                        "Custom analysis owner unverified; retained explicitly without donor-family expansion.",
+                        "Canonical behavioral ledger/schema absent; no replacement ledger or new EV IDs.",
+                        "Structure and mock responsibilities do not establish SQX runtime parity."
+                    ]
+}

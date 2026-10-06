@@ -1,0 +1,116 @@
+{
+    "schema_version":  1,
+    "scope":  "Frontend-only SettingsNotes recursive bounded structural traceability",
+    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes",
+    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsNotes",
+    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
+    "review":  {
+                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+                   "state":  "owner-approved-plan",
+                   "version":  1
+               },
+    "owner":  {
+                  "domain":  "plugins/project",
+                  "feature":  "FEAT-UI-PROJECT_WORKBENCH",
+                  "decision":  "DEC-UI-PROJECT-NOTES-STRUCTURAL-OWNERSHIP",
+                  "requirements":  [
+                                       "FR-UI-PROJECT-source-mapping",
+                                       "FR-UI-PROJECT-workflow-preservation",
+                                       "FR-UI-PROJECT-clean-room"
+                                   ]
+              },
+    "clean_room":  {
+                       "paraphrased_behavior_only":  true,
+                       "contains_personal_data":  false,
+                       "contains_sensitive_data":  false,
+                       "contains_proprietary_source":  false
+                   },
+    "source_catalog":  [
+                           {
+                               "id":  "sqx-settingsnotes-ui",
+                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes",
+                               "family":  "bounded installed project-settings frontend artifacts"
+                           }
+                       ],
+    "sources":  [
+                    {
+                        "catalog_id":  "sqx-settingsnotes-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/module.js",
+                        "relative_path":  "module.js",
+                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
+                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
+                        "relation":  "independently authored target structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "62f84a7fe46a7f4dad1c028cbf62fd3c1264cd63ebab052e5f0739e666fad0bc",
+                        "target":  "module.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
+                    },
+                    {
+                        "catalog_id":  "sqx-settingsnotes-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/notes.html",
+                        "relative_path":  "notes.html",
+                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
+                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
+                        "relation":  "independently authored target structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "f605eddabe28adad31c79e57b8dc5609457ad3d1253737736052acf5813dd056",
+                        "target":  "notes.tsx",
+                        "classification":  "counterpart",
+                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
+                    },
+                    {
+                        "catalog_id":  "sqx-settingsnotes-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/NotesCtrl.js",
+                        "relative_path":  "NotesCtrl.js",
+                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
+                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
+                        "relation":  "independently authored target structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "aacc2619e1fa2780d8f19272f2d0966ab83ed35c22bb673bd500b8aa80a9795b",
+                        "target":  "NotesCtrl.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Independently authored retained prototype responsibility only; no native runtime or quantitative parity."
+                    },
+                    {
+                        "catalog_id":  "sqx-settingsnotes-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/SettingsNotes.jar",
+                        "relative_path":  "SettingsNotes.jar",
+                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
+                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
+                        "relation":  "justified exclusion from existing responsibilities",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "bd9fb36e69240c03bbfae7499aa2b102d957505616d0f4b77d861506965c0272",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Backend binary outside approved frontend scope."
+                    },
+                    {
+                        "catalog_id":  "sqx-settingsnotes-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/styles.css",
+                        "relative_path":  "styles.css",
+                        "location":  "whole-file structural identity and scoped frontend responsibility boundary",
+                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
+                        "relation":  "independently authored target structural counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "e7d1c5a6161ac19382bd9298ee369b33f1e5bc495fb4baeb7154682cc655cf28",
+                        "target":  "styles.css",
+                        "classification":  "counterpart",
+                        "limitation":  "Coordinator-owned independent retained unique style subset; creation and cascade verification pending integration."
+                    }
+                ],
+    "target_only":  [
+                        {
+                            "path":  "source-map.json",
+                            "reason":  "Bounded structural manifest, not behavioral ledger."
+                        }
+                    ],
+    "external_dependencies":  [
+
+                              ],
+    "limitations":  [
+                        "Canonical behavioral ledger/schema absent; no new evidence IDs or parity claims.",
+                        "Existing mounted drafts, task filtering, session snapshots and formatting/Save feedback remain local prototype behavior.",
+                        "Coordinator CSS, registry and facade integration pending."
+                    ]
+}

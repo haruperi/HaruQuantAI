@@ -1,0 +1,3 @@
+.sqd-fitness-head,.sqd-fitness-row{display:grid;grid-template-columns:240px 220px 28px;gap:6px;align-items:center}
+.sqd-fitness-head{border-bottom:2px solid var(--sqx-menu-border,#888888);font-weight:600;padding:4px 0}
+.sqd-fitness-row{border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);padding:5px 0}

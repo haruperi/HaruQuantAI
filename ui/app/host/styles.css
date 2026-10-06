@@ -1,3 +1,6 @@
+@import '../plugins/project/SettingsCrossChecks/styles.css';
+@import '../plugins/project/SettingsNotes/styles.css';
+@import '../plugins/project/SettingsRankings/styles.css';
 @import '../plugins/project/SettingsOptions/styles.css';
 @import '../plugins/project/SettingsAdvancedTM/styles.css';
 @import '../plugins/project/SettingsMoneyManagement/styles.css';
@@ -507,25 +510,11 @@
 /* atm + money management */
 
 /* cross checks */
-.sqd-cc-actions{position:absolute;top:8px;right:12px;display:flex;gap:6px}
-.sqd-cc-titles{display:grid;grid-template-columns:340px 1fr 1fr;border-bottom:2px solid var(--sqx-menu-border,#888888);padding-bottom:2px;margin-top:12px}
-.sqd-cc-titles legend{font-weight:600;font-size:12px;padding:0}
-.sqd-cc-desc{color:var(--sqx-text-muted,#ababab);font-size:11.5px;margin:4px 0}
-.sqd-cc-row{display:grid;grid-template-columns:340px 1fr 1fr;border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);align-items:center;min-height:30px}
-.sqd-cc-row.disabled{opacity:.5}
 .sqd-cc-link{border:0;background:transparent;color:var(--sqx-link,#4290d8);cursor:pointer;font-size:11.5px;text-align:left;padding:2px 4px;text-decoration:underline}
 .sqd-cc-link:hover{text-decoration:none}
 /* ranking */
 .sqd-fitness-table{max-width:640px}
-.sqd-fitness-head,.sqd-fitness-row{display:grid;grid-template-columns:240px 220px 28px;gap:6px;align-items:center}
-.sqd-fitness-head{border-bottom:2px solid var(--sqx-menu-border,#888888);font-weight:600;padding:4px 0}
-.sqd-fitness-row{border-bottom:1px solid var(--sqx-grid-row-border,#4a4a4a);padding:5px 0}
 /* notes */
-.sqd-notes-toolbar{display:flex;align-items:center;gap:4px;padding:6px 0;border-bottom:1px solid var(--sqx-menu-border,#888888);flex-wrap:wrap}
-.sqd-notes-tool{width:26px;height:24px;border:1px solid var(--sqx-btn-border,#696969);background:var(--sqx-btn-bg,#303030);color:var(--sqx-btn-text,#e0e0e0);cursor:pointer;font-size:12px}
-.sqd-notes-tool:hover{background:var(--sqx-btn-hover,#3a3a3a)}
-.sqd-notes-saved{color:var(--sqx-text-muted,#ababab);font-size:11px;margin:0 8px}
-.sqd-notes-container{min-height:280px;border:1px solid var(--sqx-menu-border,#888888);background:var(--sqd-log-bg,#292929);padding:10px;color:var(--sqx-text,#cccccc);outline:none;overflow:auto}
 /* custom analysis */
 .sqd-ca-row{display:flex;align-items:center;gap:10px;padding:5px 0;flex-wrap:wrap}
 .sqd-ca-row>.sqd-label{min-width:160px}

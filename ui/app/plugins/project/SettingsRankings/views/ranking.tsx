@@ -1,13 +1,10 @@
-import { useState } from 'react';
-import { SqdFieldset, SqdHelpLink, SqdRadio, SqdSelect, SqdSpinner } from './SettingsControls';
-import { fitnessMethods, rankingDefaults, type RankingState } from './sharedSettingsFixtures';
+import { useRankingController } from '../RankingCtrl';
+import { FitnessFunction } from '../FitnessFunction/fitnessFunction';
+import { SqdFieldset, SqdHelpLink, SqdRadio, SqdSpinner } from '../../ProjectWorkbench/settings/SettingsControls';
 
 /** "Ranking" tab (donor evidence SQX144-EV-000043). */
 export function RankingTab({task='Build'}:{task?:'Build'|'Retest'|'Optimize'}={}) {
-  const [method, setMethod] = useState("ComputeFromStrategyResult");
-  const [state, setState] = useState<RankingState>(rankingDefaults);
-  const patch = (part: Partial<RankingState>) => setState(current => ({ ...current, ...part }));
-  const stop = state.stopConditionType;
+  const { state, patch, stop, fitness } = useRankingController();
 
   return (
     <div id="ranking-settings" className="sqd-tab-content">
@@ -47,48 +44,7 @@ export function RankingTab({task='Build'}:{task?:'Build'|'Retest'|'Optimize'}={}
         </div>
       </SqdFieldset>}
 
-      <SqdFieldset legend="Fitness function">
-        <div className="sqd-fitness-table" role="table" aria-label="Fitness criteria">
-          <div className="sqd-fitness-head" role="row">
-            <span role="columnheader">Method</span>
-            <span role="columnheader">Criteria</span>
-            <span role="columnheader" />
-          </div>
-          {state.fitnessCriteria.map((criterion, index) => (
-            <div className="sqd-fitness-row" role="row" key={index}>
-              <SqdSelect
-                ariaLabel="Fitness method"
-                value={method}
-                onChange={setMethod}
-                options={fitnessMethods.filter(m => m.value !== 'ReturnDDRatio').map(m => ({ value: m.value, label: m.label }))}
-                width={230}
-              />
-              <SqdSelect
-                ariaLabel="Fitness criterion"
-                value={criterion.key}
-                onChange={key => patch({fitnessCriteria:state.fitnessCriteria.map((c,i)=> i===index ? {key,label:fitnessMethods.find(m=>m.value===key)?.label ?? key} : c)})}
-                options={fitnessMethods.slice(1).map(m => ({ value: m.value, label: m.label }))}
-                width={200}
-              />
-              <button
-                type="button"
-                className="sqd-cc-link"
-                aria-label="Remove criterion"
-                onClick={() => patch({ fitnessCriteria: state.fitnessCriteria.filter((_, i) => i !== index) })}
-              >
-                &times;
-              </button>
-            </div>
-          ))}
-          <button
-            type="button"
-            className="sqd-link-button"
-            onClick={() => patch({ fitnessCriteria: [...state.fitnessCriteria, { key: 'NetProfit', label: 'Net profit' }] })}
-          >
-            + Add criterion
-          </button>
-        </div>
-      </SqdFieldset>
+      <FitnessFunction state={state} patch={patch} fitness={fitness} />
 
       <SqdFieldset legend={<span>Custom analysis <SqdHelpLink url="https://strategyquant.com/doc/strategyquant/custom-analysis" /></span>}>
         <p className="sqd-gen-help">Custom analysis on ranking results (demo — donor surface).</p>

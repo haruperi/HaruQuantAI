@@ -1,3 +1,4 @@
+import { SAVE_MENU } from '../ResultsDatabankActions/save/module';
 import { TOOLS_MENU } from '../ResultsDatabankActions/tools/module';
 export { TOOLS_MENU } from '../ResultsDatabankActions/tools/module';
 import { useEffect, useRef, useState } from 'react';
@@ -36,15 +37,7 @@ export const TOOLBAR_BUTTON_ORDER: { id: ToolbarAction; label: string; destructi
   { id: 'tools', label: 'Tools' },
 ];
 
-export const SAVE_MENU: string[] = [
-  'Save to SQ X format',
-  'HTML report',
-  'PDF report',
-  'Source code',
-  'Export databank contents',
-  'Save stats in SQ3 format',
-  'Export strategy trades to CSV/XLSX',
-];
+export { SAVE_MENU } from '../ResultsDatabankActions/save/module';
 
 export const PORTFOLIO_MENU: string[] = [
   'Merge strategies',

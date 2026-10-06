@@ -1,0 +1,108 @@
+{
+    "schema_version":  1,
+    "scope":  "Frontend-only Save bounded structural traceability",
+    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save",
+    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save",
+    "source_head":  "619531cf2bdedfdbe009833c5883282d554dfca8",
+    "review":  {
+                   "version":  1,
+                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+                   "state":  "owner-approved-plan"
+               },
+    "owner":  {
+                  "requirements":  [
+                                       "FR-UI-DATABANK-source-mapping",
+                                       "FR-UI-DATABANK-workflow-preservation",
+                                       "FR-UI-DATABANK-clean-room"
+                                   ],
+                  "domain":  "plugins/databank",
+                  "decision":  "DEC-UI-DATABANK-SAVE-EXPORTS-STRUCTURAL-OWNERSHIP",
+                  "feature":  "FEAT-UI-DATABANK_BUILDER"
+              },
+    "clean_room":  {
+                       "paraphrased_behavior_only":  true,
+                       "contains_personal_data":  false,
+                       "contains_proprietary_source":  false,
+                       "contains_sensitive_data":  false
+                   },
+    "source_catalog":  [
+                           {
+                               "id":  "sqx-resultsdatabankactions-save-direct-ui",
+                               "family":  "bounded installed Save artifacts",
+                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save"
+                           }
+                       ],
+    "sources":  [
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-save-direct-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/module.js",
+                        "relative_path":  "module.js",
+                        "location":  "whole-file structural inventory and scoped responsibility inspection",
+                        "inspection_method":  "local SHA-256 inventory and independent target audit",
+                        "relation":  "Existing independent simulated frontend responsibility or justified exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "0b264a7efcc6238ac8e592e90d2f997095374c3fb61a214ce404920be6f8a3f6",
+                        "target":  "module.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent Save menu/dialog/draft/deferred action responsibility"
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-save-direct-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/saveBtnPopupCtrl.js",
+                        "relative_path":  "saveBtnPopupCtrl.js",
+                        "location":  "whole-file structural inventory and scoped responsibility inspection",
+                        "inspection_method":  "local SHA-256 inventory and independent target audit",
+                        "relation":  "Existing independent simulated frontend responsibility or justified exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "21c4982d831a9193d481451fff37a9c73278d6eeca754068186978ef3f4020e7",
+                        "target":  "saveBtnPopupCtrl.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent Save menu/dialog/draft/deferred action responsibility"
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-save-direct-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/SaveButtonService.js",
+                        "relative_path":  "SaveButtonService.js",
+                        "location":  "whole-file structural inventory and scoped responsibility inspection",
+                        "inspection_method":  "local SHA-256 inventory and independent target audit",
+                        "relation":  "Existing independent simulated frontend responsibility or justified exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "620b38c84ee9844a7154ce9f828c537fec6ea301922b8fd34fcd3294f29083f3",
+                        "target":  "SaveButtonService.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent Save menu/dialog/draft/deferred action responsibility"
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-save-direct-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/savePopup.html",
+                        "relative_path":  "savePopup.html",
+                        "location":  "whole-file structural inventory and scoped responsibility inspection",
+                        "inspection_method":  "local SHA-256 inventory and independent target audit",
+                        "relation":  "Existing independent simulated frontend responsibility or justified exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "6753ad9ba4ac18c3642550bc5440372ca8993cb8e7e8e06ede377b592eecc788",
+                        "target":  "savePopup.tsx",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing independent Save menu/dialog/draft/deferred action responsibility"
+                    },
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-save-direct-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/styles.css",
+                        "relative_path":  "styles.css",
+                        "location":  "whole-file structural inventory and scoped responsibility inspection",
+                        "inspection_method":  "local SHA-256 inventory and independent target audit",
+                        "relation":  "Existing independent simulated frontend responsibility or justified exclusion",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "0e99eb0118031c2f64ca3d81b95e16818fa4049db215b33395f66cac00b8439e",
+                        "target":  null,
+                        "classification":  "excluded",
+                        "limitation":  "Generic target modal/input styles remain shared; no existing Save-specific CSS"
+                    }
+                ],
+    "target_only":  [
+                        {
+                            "path":  "source-map.json",
+                            "reason":  "Structural manifest; not behavioral ledger"
+                        }
+                    ]
+}

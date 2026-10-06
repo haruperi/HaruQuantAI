@@ -1,0 +1,1 @@
+export { ResultsChartTab } from './chart';

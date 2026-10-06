@@ -217,3 +217,11 @@ Bounded inventories preserve existing mock and deferred behavior. No new backend
 - `FR-UI-DATABANK-clean-room`
 - `FR-UI-DATABANK-source-mapping`
 - `FR-UI-DATABANK-workflow-preservation`
+
+## Wave4 structural ownership
+
+- `DEC-UI-DATABANK-SAVE-EXPORTS-STRUCTURAL-OWNERSHIP`
+- `FEAT-UI-DATABANK_BUILDER`
+- `FR-UI-DATABANK-clean-room`
+- `FR-UI-DATABANK-source-mapping`
+- `FR-UI-DATABANK-workflow-preservation`
