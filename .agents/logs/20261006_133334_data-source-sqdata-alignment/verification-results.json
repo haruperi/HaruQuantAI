@@ -1,0 +1,39 @@
+{
+  "recorded_at": "2026-10-06T10:44:43.348182+00:00",
+  "source_head": "7866f254378fac3b478537d3e59ba01c9976821b",
+  "typecheck": {
+    "exit": 0,
+    "final_repeat": true
+  },
+  "focused_unit": {
+    "exit": 0,
+    "files": 2,
+    "tests": 13
+  },
+  "full_unit": {
+    "exit": 0,
+    "files": 75,
+    "tests": 335
+  },
+  "build": {
+    "exit": 0,
+    "modules": 2071,
+    "warning": "existing large bundle"
+  },
+  "browser": {
+    "exit": 0,
+    "tests": 6,
+    "seconds": 42.1
+  },
+  "initial_new_browser_test": {
+    "exit": 1,
+    "reason": "incorrect generic-update guard expectation; corrected without behavior change"
+  },
+  "visual_review": {
+    "normal_and_narrow": "reviewed; dialog/footer bounded",
+    "light_skin": "not visually established; screenshots dark"
+  },
+  "diff_check": {
+    "exit": 0
+  }
+}

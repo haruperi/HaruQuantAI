@@ -1,0 +1,100 @@
+import hashlib
+import json
+from pathlib import Path
+import sys
+
+root = Path.cwd()
+logs = root / '.agents/logs/20261006_133334_data-source-sqdata-alignment'
+base = root / 'ui/app/plugins/data_source/SQData'
+donor = Path(sys.argv[1])
+def write(path, content):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding='utf-8')
+def inventory(folder):
+    return {p.relative_to(folder).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(folder.rglob('*')) if p.is_file()}
+baseline = inventory(root / 'ui/app')
+write(logs / 'baseline.json', json.dumps(baseline, indent=2))
+plan = logs / 'implementation-plan.md'
+write(plan, plan.read_text(encoding='utf-8').replace('Status: PROPOSED.', 'Status: APPROVED.').replace('Owner approval reference: pending for this version.', 'Owner approval reference: explicit APPROVED: EXECUTE user reply on 2026-10-06 for version 1.'))
+original = (base / 'SQDataAddDialog.tsx').read_text(encoding='utf-8')
+imports, body = original.split('export function SQDataAddDialog', 1)
+state = body[body.index('\n  const store'):body.index('\n  return <div')]
+service_start = state.index('      const data = useDataManagerStore')
+service_end = state.index('\n      onStarted();')
+start_body = state[service_start:service_end]
+state = state[:service_start] + '      service.start(config, selected, agreed);' + state[service_end:]
+state = state.replace('lookupSQ(provider, config)', 'service.lookup(config)')
+state += '\n  return { provider, store, profile, notify, config, results, lookedUp, selected, agreed, conditions, busy, error, sort, container, subscription, cancelLookup, close, patch, lookup, add, eligible, allSelected, rows, columns, setConditions, setAgreed, setSelected, setSort, setResults, setLookedUp, setError };\n}\n'
+hook_imports = "import { useCallback, useEffect, useRef, useState } from 'react';\nimport { useAppStore } from '../../../../../host/store';\nimport { sqAllowed, sqSubscription, type SQConfig, type SQProvider, type SQTicker } from '../../sqData';\nimport { useSQData } from '../../sqDataStore';\nimport { equityService } from '../SQEquityDataService';\n"
+write(base / 'Equity/add/SQEquityDataAddCtrl.ts', hook_imports + "export interface SQAddCallbacks { onClose: () => void; onStarted: () => void }\nexport function useSQDataAdd(provider: SQProvider, { onClose, onStarted }: SQAddCallbacks, service: typeof equityService) {" + state + "export function useSQEquityDataAdd(callbacks: SQAddCallbacks) { return useSQDataAdd('equity', callbacks, equityService); }\n")
+view = body[body.index('\n  return <div'):]
+conditions = '<section className="sq-data-conditions"><h1>HaruQuantAI Data Usage Conditions</h1>{sqUsageConditions.map((text, index) => <p key={index}>{text}</p>)}</section>'
+view = view.replace(conditions, '<Conditions/>')
+names = 'provider, store, profile, notify, config, results, lookedUp, selected, agreed, conditions, busy, error, sort, container, subscription, cancelLookup, close, patch, lookup, add, eligible, allSelected, rows, columns, setConditions, setAgreed, setSelected, setSort, setResults, setLookedUp, setError'
+write(base / 'Equity/add/addPopup.tsx', "import type { ComponentType } from 'react';\nimport { Button, Field, Modal, TextInput } from '../../../../../components/ui';\nimport { timezones } from '../../../FileImport/fileImport';\nimport { providerLabel, sqAllowed, sqExchanges } from '../../sqData';\nimport { useSQEquityDataAdd, type SQAddCallbacks } from './SQEquityDataAddCtrl';\nimport { EquityDataUsageConditions } from './dataUsageConditionsPopup';\nimport '../styles.css';\nexport function SQEquityAddPopup(props: SQAddCallbacks) { return <SQDataAddView controller={useSQEquityDataAdd(props)} Conditions={EquityDataUsageConditions}/>; }\nexport function SQDataAddView({ controller, Conditions }: { controller: ReturnType<typeof useSQEquityDataAdd>; Conditions: ComponentType }) {\n  const { " + names + ' } = controller;' + view)
+write(base / 'Equity/add/dataUsageConditionsPopup.tsx', "import { sqUsageConditions } from '../../sqData';\nexport function EquityDataUsageConditions() { return " + conditions + '; }\n')
+write(base / 'Futures/add/dataUsageConditionsPopup.tsx', "import { EquityDataUsageConditions } from '../../Equity/add/dataUsageConditionsPopup';\n/** Futures uses the same independently authored workspace conditions. */\nexport function FuturesDataUsageConditions() { return <EquityDataUsageConditions/>; }\n")
+write(base / 'Futures/add/SQFuturesDataAddCtrl.ts', "import { useSQDataAdd, type SQAddCallbacks } from '../../Equity/add/SQEquityDataAddCtrl';\nimport { futuresService } from '../SQFuturesDataService';\nexport function useSQFuturesDataAdd(callbacks: SQAddCallbacks) { return useSQDataAdd('futures', callbacks, futuresService); }\n")
+write(base / 'Futures/add/addPopup.tsx', "import { SQDataAddView } from '../../Equity/add/addPopup';\nimport type { SQAddCallbacks } from '../../Equity/add/SQEquityDataAddCtrl';\nimport { useSQFuturesDataAdd } from './SQFuturesDataAddCtrl';\nimport { FuturesDataUsageConditions } from './dataUsageConditionsPopup';\nimport '../styles.css';\nexport function SQFuturesAddPopup(props: SQAddCallbacks) { return <SQDataAddView controller={useSQFuturesDataAdd(props)} Conditions={FuturesDataUsageConditions}/>; }\n")
+service_imports = imports[:imports.index("import { useCallback")]+imports[imports.index("import { datasets"):imports.index("import { timezones")]
+service_imports = service_imports.replace("from '../", "from '../../")
+for folder, provider in [('Equity','equity'), ('Futures','futures')]:
+    service = folder.lower() + 'Service'
+    content = service_imports + "import { lookupSQ, type SQConfig } from '../sqData';\nimport { useSQData } from '../sqDataStore';\nimport { useAppStore } from '../../../../host/store';\n"
+    start = start_body.replace('store.start(provider,', f"useSQData.getState().start('{provider}',")
+    content += f"export const {service} = {{\n  lookup: (config: SQConfig) => lookupSQ('{provider}', config),\n  start(config: SQConfig, selected: string[], agreed: boolean): void {{\n{start}\n  }},\n  update(dispatch: (label: string) => void): void {{ dispatch('{folder} dataset update'); }},\n}};\n"
+    write(base / folder / f'SQ{folder}DataService.ts', content)
+    write(base / folder / 'add/module.ts', f"export {{ SQ{folder}AddPopup }} from './addPopup';\nexport const {provider}AddCommand = {{ id: 'sq-{provider}-find', label: 'Find and add {provider} data', icon: 'search', dialog: 'sq-{provider}-find' }} as const;\n")
+    write(base / folder / f'update/SQ{folder}DataUpdateCtrl.ts', f"import {{ {service} }} from '../SQ{folder}DataService';\n/** Attach to the existing host's guarded, generic progress simulation. */\nexport function run{folder}Update(dispatch: (label: string) => void): void {{ {service}.update(dispatch); }}\n")
+    write(base / folder / 'update/module.ts', f"export {{ run{folder}Update }} from './SQ{folder}DataUpdateCtrl';\nexport const {provider}UpdateCommand = {{ id: 'sq-{provider}-update', label: 'Update {folder} datasets', icon: 'refresh', action: 'sq-{provider}-update' }} as const;\n")
+    write(base / folder / 'module.ts', f"import type {{ DataSourceProvider }} from '../../Common/dataSourceRibbon';\nimport {{ {provider}AddCommand }} from './add/module';\nimport {{ {provider}UpdateCommand }} from './update/module';\nexport {{ SQ{folder}AddPopup }} from './add/module';\nexport {{ run{folder}Update }} from './update/module';\nexport const {provider}Provider: DataSourceProvider = {{ id: 'sq-{provider}', label: '{folder} data', commands: [{provider}AddCommand, {provider}UpdateCommand] }};\n")
+write(base / 'Equity/styles.css', (base / 'sqData.css').read_text(encoding='utf-8'))
+write(base / 'Futures/styles.css', "/* Futures shares the existing SQData presentation capability. */\n@import '../Equity/styles.css';\n")
+(base / 'sqData.css').unlink()
+(base / 'SQDataAddDialog.tsx').unlink()
+dm = root / 'ui/app/workspace/DataManager/DataManager.tsx'
+text = dm.read_text(encoding='utf-8').replace("import { SQDataAddDialog } from '../../plugins/data_source/SQData/SQDataAddDialog';", "import { SQEquityAddPopup, runEquityUpdate } from '../../plugins/data_source/SQData/Equity/module';\nimport { SQFuturesAddPopup, runFuturesUpdate } from '../../plugins/data_source/SQData/Futures/module';")
+text = text.replace('  const runDirectAction = (action: DirectDataSourceAction) => {', "  const runDirectAction = (action: DirectDataSourceAction) => {\n    if (action === 'sq-equity-update') { runEquityUpdate(startOperation); return; }\n    if (action === 'sq-futures-update') { runFuturesUpdate(startOperation); return; }")
+old = text[text.index("  {(dialog?.id === 'sq-equity-find'"):text.index("\n", text.index("  {(dialog?.id === 'sq-equity-find'"))]
+callbacks = "onClose={closeDialog} onStarted={() => { setProgressOwner('sq'); setOperationState('idle'); setSelectionMessage(''); }}"
+text = text.replace(old, f"  {{dialog?.id === 'sq-equity-find' && <SQEquityAddPopup {callbacks}/>}}\n  {{dialog?.id === 'sq-futures-find' && <SQFuturesAddPopup {callbacks}/>}}")
+write(dm, text)
+ribbon = root / 'ui/app/plugins/data_source/Common/dataSourceRibbon.ts'
+text = ribbon.read_text(encoding='utf-8')
+text = "import { equityProvider } from '../SQData/Equity/module';\nimport { futuresProvider } from '../SQData/Futures/module';\n" + text
+begin = text.index("  {\n    id: 'sq-equity'")
+end = text.index('  darwinexProvider,', begin)
+write(ribbon, text[:begin] + '  equityProvider,\n  futuresProvider,\n' + text[end:])
+registry = '# SQData frontend ownership\n\nStatus: structurally aligned; qualification recorded in the cohort walkthrough. No SQX behavioral parity claim.\n\n'
+for folder in ['Equity', 'Futures']:
+    key = 'SQ' + folder.upper()
+    registry += f'## {folder}\n\nFEAT-UI-{key}-TRACEABILITY owns the {folder} mapped UI and existing mock capabilities.\n\n- FR-UI-{key}-source-mapping: exact scoped filenames, casing and provenance.\n- FR-UI-{key}-workflow-preservation: existing frontend workflows and host simulation callbacks.\n- FR-UI-{key}-clean-room: independent target code, no donor implementation copying.\n\nDEC-UI-{key}-TRACEABILITY: map DataSourceSQ{folder}Data to SQData/{folder}; retain shared rules/store at the parent. Shared view/hook/conditions/styles are owned by mapped Equity files and composed by distinct Futures counterparts. Empty update template and backend binary are excluded.\n\n'
+registry += 'Shared exceptions: sqData.ts and sqDataStore.ts retain existing sibling contracts; README.md owns registry/status; source-map.json delegates provider manifests. Provider manifests are declared target-only files. No backend/subscription/network capability added. Donor runtime defaults, remote services and algorithmic parity remain unverified. Canonical behavioral ledger/schema are absent; structural manifests do not replace them.\n'
+write(base / 'README.md', registry)
+template = json.loads((root / 'ui/app/plugins/data_source/MetaTrader/source-map.json').read_text())
+for folder in ['Equity', 'Futures']:
+    key = 'SQ' + folder.upper()
+    source_root = donor / f'DataSourceSQ{folder}Data'
+    mapping = dict(template)
+    mapping.update(scope=f'Frontend structural {folder} mapping', donor_root=f'SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQ{folder}Data', target_root=f'HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData/{folder}', source_head='7866f254378fac3b478537d3e59ba01c9976821b')
+    mapping['review'] = dict(reference='HARUQUANTAI_ROOT/.agents/logs/20261006_133334_data-source-sqdata-alignment/implementation-plan.md',state='owner-approved-plan',version=1)
+    mapping['owner'] = dict(domain='plugins/data_source/SQData',feature=f'FEAT-UI-{key}-TRACEABILITY',decision=f'DEC-UI-{key}-TRACEABILITY',requirements=[f'FR-UI-{key}-{s}' for s in ['source-mapping','workflow-preservation','clean-room']])
+    catalog = f'sqx-sq{folder.lower()}-ui'
+    mapping['source_catalog'] = [dict(id=catalog,locator=mapping['donor_root'],family='installed plugin UI artifacts')]
+    mapping['sources'] = []
+    for p in sorted(source_root.rglob('*')):
+        if not p.is_file(): continue
+        relative = p.relative_to(source_root).as_posix()
+        excluded = p.suffix == '.jar' or relative == 'update/updatePopup.html'
+        target = None if excluded else str(Path(relative).with_suffix({'.html':'.tsx','.js':'.ts','.css':'.css'}[p.suffix])).replace('\\','/')
+        mapping['sources'].append(dict(catalog_id=catalog,artifact_locator=mapping['donor_root']+'/'+relative,relative_path=relative,location='whole-file structural identity' if p.suffix=='.jar' else ('zero-byte template' if p.stat().st_size==0 else 'UI responsibility and filename mapping'),inspection_method='local inventory and SHA-256; scoped UI inspection; binaries hash only',relation=('backend binary excluded' if p.suffix=='.jar' else 'zero-byte update template excluded') if excluded else 'independently authored counterpart using existing target capabilities',access_date='2026-10-06',sha256=hashlib.sha256(p.read_bytes()).hexdigest(),byte_size=p.stat().st_size,target=target,classification='excluded' if excluded else 'counterpart',limitation='Structural identity only; remote/backend behavior and SQX runtime parity unverified.'))
+    mapping['target_only'] = [dict(path='source-map.json',reason='Structural provenance manifest; ownership/status lives in parent README.')]
+    write(base / folder / 'source-map.json', json.dumps(mapping,indent=2)+'\n')
+write(base / 'source-map.json', json.dumps(dict(schema_version=1,target_root='HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData',source_head='7866f254378fac3b478537d3e59ba01c9976821b',children=['Equity/source-map.json','Futures/source-map.json'],target_only=[dict(path=p,reason=r) for p,r in [('sqData.ts','Preserved shared mock rules/catalogues'),('sqDataStore.ts','Preserved shared persistence/simulation'),('README.md','Ownership registry/status'),('source-map.json','Parent structural delegation')]],counts=dict(donor_artifacts=22,counterparts=18,excluded=4,target_files=24,target_only=6)),indent=2)+'\n')
+e2e = root / 'ui/tests/e2e/data-manager-sq-data.spec.ts'
+text = e2e.read_text(encoding='utf-8').replace('selectLightSkin, setFeatureProfileFixture','selectLightSkin').replace("{ name: 'Data Manager', exact: true }).click()", "{ name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click()")
+fixture = (root / 'ui/tests/e2e/data-manager-darwinex.spec.ts').read_text(encoding='utf-8')
+fixture = fixture[fixture.index('/** Settings'):fixture.index('async function open')]
+text = text.replace('async function open',fixture+'async function open',1)
+write(e2e,text)
+write(logs / 'after-inventory.json',json.dumps(inventory(base),indent=2))

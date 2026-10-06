@@ -1,0 +1,13 @@
+{
+  "timestamp": "2026-10-06T10:43:07.855501+00:00",
+  "result": "passed",
+  "donor_artifacts": 22,
+  "mapped": 18,
+  "excluded": 4,
+  "target_files": 24,
+  "target_only": 6,
+  "donor_hashes": "all match inspected files",
+  "protected_ui": "all baseline application files outside approved scope unchanged",
+  "protected_shared_rules_store": "unchanged",
+  "relocated_stylesheet": "byte-identical"
+}

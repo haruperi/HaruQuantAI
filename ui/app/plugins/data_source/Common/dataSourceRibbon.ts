@@ -1,3 +1,5 @@
+import { equityProvider } from '../SQData/Equity/module';
+import { futuresProvider } from '../SQData/Futures/module';
 import { mt5Provider } from '../MetaTrader/module';
 import { filesProvider } from '../FileImport/module';
 import { darwinexProvider } from '../Darwinex/module';
@@ -88,22 +90,8 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
     commands: [{ id: 'tickdownloader-import', label: 'Import TickDownloader data', icon: 'folder-import', dialog: 'tickdownloader-import' }],
   },
   filesProvider,
-  {
-    id: 'sq-equity',
-    label: 'Equity data',
-    commands: [
-      { id: 'sq-equity-find', label: 'Find and add equity data', icon: 'search', dialog: 'sq-equity-find' },
-      { id: 'sq-equity-update', label: 'Update Equity datasets', icon: 'refresh', action: 'sq-equity-update' },
-    ],
-  },
-  {
-    id: 'sq-futures',
-    label: 'Futures data',
-    commands: [
-      { id: 'sq-futures-find', label: 'Find and add futures data', icon: 'search', dialog: 'sq-futures-find' },
-      { id: 'sq-futures-update', label: 'Update Futures datasets', icon: 'refresh', action: 'sq-futures-update' },
-    ],
-  },
+  equityProvider,
+  futuresProvider,
   darwinexProvider,
   cryptoProvider,
   {

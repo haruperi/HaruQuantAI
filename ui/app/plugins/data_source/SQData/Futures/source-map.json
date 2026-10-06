@@ -1,0 +1,197 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend structural Futures mapping",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData/Futures",
+  "source_head": "7866f254378fac3b478537d3e59ba01c9976821b",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_133334_data-source-sqdata-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/data_source/SQData",
+    "feature": "FEAT-UI-SQFUTURES-TRACEABILITY",
+    "decision": "DEC-UI-SQFUTURES-TRACEABILITY",
+    "requirements": [
+      "FR-UI-SQFUTURES-source-mapping",
+      "FR-UI-SQFUTURES-workflow-preservation",
+      "FR-UI-SQFUTURES-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-sqfutures-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData",
+      "family": "installed plugin UI artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/add/addPopup.html",
+      "relative_path": "add/addPopup.html",
+      "location": "lines 1-253; provider form/conditions markup",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "b2df71bac2664854aafd92451aaf7d6d01da3fc1411a36edc0908270f8e0955b",
+      "byte_size": 15676,
+      "target": "add/addPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/add/dataUsageConditionsPopup.html",
+      "relative_path": "add/dataUsageConditionsPopup.html",
+      "location": "lines 1-40; provider form/conditions markup",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "e3622f6146e034a051e4534ba0ab483bb8b6f47d5b3b1beb1319bb2e26a7786f",
+      "byte_size": 3022,
+      "target": "add/dataUsageConditionsPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/add/module.js",
+      "relative_path": "add/module.js",
+      "location": "lines 1-10; Angular module/contribution registration",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "6aed1672de94aab9855f847ac4311a459b9d94875672d962da93f12e631a1ba2",
+      "byte_size": 456,
+      "target": "add/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/add/SQFuturesDataAddCtrl.js",
+      "relative_path": "add/SQFuturesDataAddCtrl.js",
+      "location": "lines 1-192; named Angular controller registration and UI state/actions",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "7b10c8ac18afcdd37be27f3cbc8699300a185e9bf5a48436fc603520a6f7fd60",
+      "byte_size": 5805,
+      "target": "add/SQFuturesDataAddCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
+      "relative_path": "DataSourceSQFuturesData.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "backend binary excluded",
+      "access_date": "2026-10-06",
+      "sha256": "8c56d64a1dab0739f077faa1fc960c9c7bbacb514a9229afdcba698549704809",
+      "byte_size": 13174,
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-13; Angular module/contribution registration",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "0a5f940e89b5d686420551450e3ebef8cfd17823506549afe8e574088820f288",
+      "byte_size": 412,
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/SQFuturesDataService.js",
+      "relative_path": "SQFuturesDataService.js",
+      "location": "lines 1-56; Angular service registration and lookup/add/update methods",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "5cf38b898d0ef763a3c55775b27d98deda246e5ee68e4a24e755922d30d6a2a9",
+      "byte_size": 1846,
+      "target": "SQFuturesDataService.ts",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/styles.css",
+      "relative_path": "styles.css",
+      "location": "lines 1-3; plugin stylesheet rules",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "729cd894c5bda4ea51f557792cea1d5cc954bc4260485350b455ea74d5e35954",
+      "byte_size": 84,
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/update/module.js",
+      "relative_path": "update/module.js",
+      "location": "lines 1-10; Angular module/contribution registration",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "e105420332330e22e50c080c65a86335452e35dfa72689f478fa1c5726e070cc",
+      "byte_size": 465,
+      "target": "update/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/update/SQFuturesDataUpdateCtrl.js",
+      "relative_path": "update/SQFuturesDataUpdateCtrl.js",
+      "location": "lines 1-8; named Angular controller registration and UI state/actions",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "independently authored counterpart using existing target capabilities",
+      "access_date": "2026-10-06",
+      "sha256": "b03bd3860ac74bf722199fe3ab7f67214466e90a8015a6a2cfa748eb5bfd6c38",
+      "byte_size": 296,
+      "target": "update/SQFuturesDataUpdateCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-sqfutures-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/update/updatePopup.html",
+      "relative_path": "update/updatePopup.html",
+      "location": "zero-byte template",
+      "inspection_method": "local inventory and SHA-256; scoped UI inspection; binaries hash only",
+      "relation": "zero-byte update template excluded",
+      "access_date": "2026-10-06",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "byte_size": 0,
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Structural identity only; remote/backend behavior and SQX runtime parity unverified."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural provenance manifest; ownership/status lives in parent README."
+    }
+  ]
+}

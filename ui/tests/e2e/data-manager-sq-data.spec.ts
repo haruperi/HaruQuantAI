@@ -1,11 +1,21 @@
 import { expect, test, type Page } from '@playwright/test';
-import { selectLightSkin, setFeatureProfileFixture } from './shellTestUtils';
+import { selectLightSkin } from './shellTestUtils';
+/** Settings are intentionally not persisted by the current host. */
+async function setFeatureProfileFixture(page: Page, profile: 'Full' | 'Starter'): Promise<void> {
+  await page.evaluate(async nextProfile => {
+    const modulePath = '/app/host/store.ts';
+    const { useAppStore } = await import(/* @vite-ignore */ modulePath);
+    const state = useAppStore.getState();
+    useAppStore.setState({ settings: { ...state.settings, profile: nextProfile } });
+  }, profile);
+  await page.waitForFunction(expected => document.documentElement.dataset.profile === expected, profile);
+}
 async function open(page: Page, provider: 'Equity' | 'Futures') {
   await page.getByRole('button', { name: `${provider} data`, exact: true }).click();
   await page.getByRole('menuitem', { name: `Find and add ${provider.toLowerCase()} data`, exact: true }).click();
   return page.getByRole('dialog', { name: `Add ${provider} Data`, exact: true });
 }
-test.beforeEach(async ({ page }) => { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).click(); });
+test.beforeEach(async ({ page }) => { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click(); });
 test('equity search, conditions, validation, add, pause/reload/resume and row status', async ({ page }) => {
   const dialog = await open(page, 'Equity');
   await expect(dialog.getByRole('button', { name: 'Add', exact: true })).toHaveCount(0);
@@ -101,4 +111,26 @@ test('futures adds timezone metadata, guards other jobs and stays offline', asyn
   const row = page.getByRole('row').filter({ has: page.getByRole('checkbox', { name: 'Select ES', exact: true }) });
   await expect(row).toContainText('UTC'); await expect(row).toContainText('Start of bar');
   expect(requests).toEqual([]);
+});
+
+test('provider update callbacks preserve host progress and provider-job guard', async ({ page }) => {
+  await page.getByRole('button', { name: 'Equity data', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Update Equity datasets', exact: true }).click();
+  await expect(page.getByRole('status', { name: 'Data Manager progress' })).toContainText('Equity dataset update');
+  await page.getByRole('button', { name: 'Pause all', exact: true }).click();
+  await page.getByRole('button', { name: 'Futures data', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Update Futures datasets', exact: true }).click();
+  await expect(page.getByRole('status', { name: 'Data Manager progress' })).toContainText('Futures dataset update');
+  await expect(page.getByRole('status', { name: 'Data Manager progress' })).toContainText('complete');
+  const dialog = await open(page, 'Equity');
+  await dialog.getByRole('textbox', { name: 'Search text' }).fill('AAPL');
+  await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
+  await dialog.getByRole('checkbox', { name: 'Select ticker AAPL', exact: true }).check();
+  await dialog.getByRole('checkbox', { name: 'I confirm' }).check();
+  await dialog.getByRole('textbox', { name: 'Name postfix' }).fill('_guard');
+  await dialog.getByRole('button', { name: 'Add', exact: true }).click();
+  await page.getByRole('button', { name: 'Pause all', exact: true }).click();
+  await page.getByRole('button', { name: 'Futures data', exact: true }).click();
+  await page.getByRole('menuitem', { name: 'Update Futures datasets', exact: true }).click();
+  await expect(page.getByRole('status', { name: 'Data Manager progress' })).toContainText('Finish or stop');
 });

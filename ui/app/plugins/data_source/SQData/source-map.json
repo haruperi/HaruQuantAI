@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData",
+  "source_head": "7866f254378fac3b478537d3e59ba01c9976821b",
+  "children": [
+    "Equity/source-map.json",
+    "Futures/source-map.json"
+  ],
+  "target_only": [
+    {
+      "path": "sqData.ts",
+      "reason": "Preserved shared mock rules/catalogues"
+    },
+    {
+      "path": "sqDataStore.ts",
+      "reason": "Preserved shared persistence/simulation"
+    },
+    {
+      "path": "README.md",
+      "reason": "Ownership registry/status"
+    },
+    {
+      "path": "source-map.json",
+      "reason": "Parent structural delegation"
+    }
+  ],
+  "counts": {
+    "donor_artifacts": 22,
+    "counterparts": 18,
+    "excluded": 4,
+    "target_files": 24,
+    "target_only": 6
+  }
+}

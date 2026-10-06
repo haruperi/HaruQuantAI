@@ -1,52 +1,13 @@
-import { reservedDarwinex, useDarwinex } from '../Darwinex/darwinexStore';
-import { reservedCrypto, useCrypto } from '../Crypto/cryptoStore';
-import { reservedYahoo, useYahoo } from '../Yahoo/yahooStore';
-import { reservedMt5, useMt5Import } from '../MetaTrader/mt5ImportStore';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useAppStore } from '../../../host/store';
-import { Button, Field, Modal, TextInput } from '../../../components/ui';
-import { datasets } from '../Common/fixtures';
-import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
-import { useFileSymbols } from '../FileImport/fileSymbolsStore';
-import { activeImport, useFileImports } from '../FileImport/fileImportStore';
-import { timezones } from '../FileImport/fileImport';
-import { lookupSQ, providerLabel, sqAllowed, sqExchanges, sqSubscription, sqUsageConditions, type SQConfig, type SQProvider, type SQTicker } from './sqData';
-import { useSQData } from './sqDataStore';
-import './sqData.css';
-export function SQDataAddDialog({ provider, onClose, onStarted }: { provider: SQProvider; onClose: () => void; onStarted: () => void }) {
-  const store = useSQData(); const profile = useAppStore(state => state.settings.profile); const notify = useAppStore(state => state.notify);
-  const [config, setConfig] = useState<SQConfig>(() => ({ ...store.preferred[provider], symbols: '' }));
-  const [results, setResults] = useState<SQTicker[]>([]); const [lookedUp, setLookedUp] = useState(false);
-  const [selected, setSelected] = useState<string[]>([]); const [agreed, setAgreed] = useState(false);
-  const [conditions, setConditions] = useState(false); const [busy, setBusy] = useState(false); const [error, setError] = useState('');
-  const [sort, setSort] = useState<{ key: keyof SQTicker; descending: boolean }>({ key: 'ticker', descending: false });
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null); const sequence = useRef(0); const container = useRef<HTMLDivElement>(null); const returnFocus = useRef(false);
-  const subscription = sqSubscription(provider, profile);
-  const cancelLookup = useCallback(() => { sequence.current++; if (timer.current) clearTimeout(timer.current); timer.current = null; }, []);
-  useEffect(() => () => cancelLookup(), [cancelLookup]);
-  useEffect(() => { cancelLookup(); setBusy(false); setSelected(current => current.filter(ticker => results.some(row => row.ticker === ticker && sqAllowed(row, profile)))); }, [profile, cancelLookup, results]);
-  const close = useCallback(() => { if (conditions) { returnFocus.current = true; setConditions(false); } else { cancelLookup(); onClose(); } }, [conditions, cancelLookup, onClose]);
-  useEffect(() => { if (!conditions && returnFocus.current) { returnFocus.current = false; const id = window.setTimeout(() => container.current?.querySelector<HTMLButtonElement>('[data-sq-conditions]')?.focus(), 0); return () => clearTimeout(id); } }, [conditions]);
-  const patch = (values: Partial<SQConfig>) => setConfig(current => ({ ...current, ...values }));
-  function lookup() {
-    setError(''); cancelLookup();
-    try {
-      const found = lookupSQ(provider, config); const token = sequence.current; setBusy(true);
-      timer.current = setTimeout(() => { if (sequence.current !== token) return; setResults(found); setSelected([]); setLookedUp(true); setBusy(false); }, 180);
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Lookup failed.'); }
-  }
-  function add() {
-    try {
-      const data = useDataManagerStore.getState(), td = useTickDownloader.getState(), files = useFileSymbols.getState(), imports = useFileImports.getState();
-      if (data.storageError || td.storageError || files.storageError || imports.storageError) throw new Error(data.storageError || td.storageError || files.storageError || imports.storageError);
-      const existing = [...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedMt5(), ...datasets, ...data.definitions, ...td.definitions, ...files.definitions, ...imports.records, ...(activeImport(imports.job?.state) ? imports.job!.tasks.map(task => task.record) : [])];
-      store.start(provider, config, selected, agreed, useAppStore.getState().settings.profile, existing.map(row => row.symbol), [useYahoo.getState().job?.state, useCrypto.getState().job?.state, useDarwinex.getState().job?.state, useMt5Import.getState().job?.state, td.job?.state, useDukascopyDownloads.getState().job?.state, imports.job?.state].some(activeImport));
-      onStarted(); onClose();
-    } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to add symbols.'); }
-  }
-  const eligible = results.filter(row => sqAllowed(row, profile)); const allSelected = eligible.length > 0 && eligible.every(row => selected.includes(row.ticker));
-  const rows = [...results].sort((a, b) => String(a[sort.key]).localeCompare(String(b[sort.key])) * (sort.descending ? -1 : 1));
-  const columns: { key: keyof SQTicker; label: string }[] = [{ key: 'ticker', label: 'Ticker' }, { key: 'name', label: 'Name' }, { key: 'exchange', label: 'Exchange' }, ...(provider === 'equity' ? [{ key: 'type' as const, label: 'Type' }] : []), { key: 'dataFrom', label: 'Data from' }];
+import type { ComponentType } from 'react';
+import { Button, Field, Modal, TextInput } from '../../../../../components/ui';
+import { timezones } from '../../../FileImport/fileImport';
+import { providerLabel, sqAllowed, sqExchanges } from '../../sqData';
+import { useSQEquityDataAdd, type SQAddCallbacks } from './SQEquityDataAddCtrl';
+import { EquityDataUsageConditions } from './dataUsageConditionsPopup';
+import '../styles.css';
+export function SQEquityAddPopup(props: SQAddCallbacks) { return <SQDataAddView controller={useSQEquityDataAdd(props)} Conditions={EquityDataUsageConditions}/>; }
+export function SQDataAddView({ controller, Conditions }: { controller: ReturnType<typeof useSQEquityDataAdd>; Conditions: ComponentType }) {
+  const { provider, store, profile, notify, config, results, lookedUp, selected, agreed, conditions, busy, error, sort, container, subscription, cancelLookup, close, patch, lookup, add, eligible, allSelected, rows, columns, setConditions, setAgreed, setSelected, setSort, setResults, setLookedUp, setError } = controller;
   return <div className="sq-data-flow" ref={container} onKeyDown={event => {
     if (event.key !== 'Tab') return;
     const elements = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('button:not(:disabled),input:not(:disabled),select:not(:disabled),textarea:not(:disabled),a[href]'));
@@ -56,7 +17,7 @@ export function SQDataAddDialog({ provider, onClose, onStarted }: { provider: SQ
     <div className="sq-data-consent"><label><input type="checkbox" checked={agreed} onChange={event => setAgreed(event.target.checked)}/> I confirm that I agree to</label> <button className="sq-data-link" data-sq-conditions onClick={() => setConditions(true)}>HaruQuantAI Data Usage Conditions</button></div>
     <Button onClick={close}>Close</Button>{results.length > 0 && <Button className="primary" disabled={busy} onClick={add}>Add</Button>}
   </>}>
-    {conditions ? <section className="sq-data-conditions"><h1>HaruQuantAI Data Usage Conditions</h1>{sqUsageConditions.map((text, index) => <p key={index}>{text}</p>)}</section> : <>
+    {conditions ? <Conditions/> : <>
       {(error || store.storageError) && <p className="sq-data-error" role="alert">{error || store.storageError}</p>}
       <fieldset className="sq-data-main">
         {!lookedUp ? <>

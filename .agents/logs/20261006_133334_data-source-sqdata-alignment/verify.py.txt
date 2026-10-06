@@ -1,0 +1,35 @@
+import hashlib
+import json
+from pathlib import Path
+import sys
+from datetime import datetime, timezone
+
+root = Path.cwd()
+log = root / '.agents/logs/20261006_133334_data-source-sqdata-alignment'
+base = root / 'ui/app/plugins/data_source/SQData'
+donor = Path(sys.argv[1])
+baseline = json.loads((log / 'baseline.json').read_text())
+allowed = {'plugins/data_source/Common/dataSourceRibbon.ts', 'workspace/DataManager/DataManager.tsx'}
+for path, fingerprint in baseline.items():
+    if path.startswith('plugins/data_source/SQData/') or path in allowed:
+        continue
+    assert hashlib.sha256((root / 'ui/app' / path).read_bytes()).hexdigest() == fingerprint, path
+for name in ['sqData.ts', 'sqDataStore.ts']:
+    assert hashlib.sha256((base / name).read_bytes()).hexdigest() == baseline['plugins/data_source/SQData/' + name]
+for folder in ['Equity', 'Futures']:
+    manifest = json.loads((base / folder / 'source-map.json').read_text())
+    actual = {p.relative_to(donor / f'DataSourceSQ{folder}Data').as_posix() for p in (donor / f'DataSourceSQ{folder}Data').rglob('*') if p.is_file()}
+    assert actual == {s['relative_path'] for s in manifest['sources']}
+    for source in manifest['sources']:
+        p = donor / f'DataSourceSQ{folder}Data' / source['relative_path']
+        assert hashlib.sha256(p.read_bytes()).hexdigest() == source['sha256']
+        assert p.stat().st_size == source['byte_size']
+    assert len(actual) == 11
+    assert sum(s['target'] is not None for s in manifest['sources']) == 9
+files = {p.relative_to(base).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in base.rglob('*') if p.is_file()}
+assert len(files) == 24
+css = (base / 'Equity/styles.css').read_bytes()
+assert hashlib.sha256(css).hexdigest() == baseline['plugins/data_source/SQData/sqData.css']
+(log / 'after-inventory.json').write_text(json.dumps(files, indent=2) + '\n', encoding='utf-8')
+(log / 'mapping-verification.json').write_text(json.dumps(dict(timestamp=datetime.now(timezone.utc).isoformat(), result='passed', donor_artifacts=22, mapped=18, excluded=4, target_files=24, target_only=6, donor_hashes='all match inspected files', protected_ui='all baseline application files outside approved scope unchanged', protected_shared_rules_store='unchanged', relocated_stylesheet='byte-identical'), indent=2)+'\n', encoding='utf-8')
+print('Mapping inventory/hashes and protected UI verification passed.')

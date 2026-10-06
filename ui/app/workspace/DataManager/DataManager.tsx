@@ -14,7 +14,8 @@ import { yahooTargets, type YahooDefinition } from '../../plugins/data_source/Ya
 import { ImportPopup as Mt5ImportDialog } from '../../plugins/data_source/MetaTrader/import/module';
 import { mt5Active, useMt5Import } from '../../plugins/data_source/MetaTrader/mt5ImportStore';
 import { mt5Summary } from '../../plugins/data_source/MetaTrader/mt5Import';
-import { SQDataAddDialog } from '../../plugins/data_source/SQData/SQDataAddDialog';
+import { SQEquityAddPopup, runEquityUpdate } from '../../plugins/data_source/SQData/Equity/module';
+import { SQFuturesAddPopup, runFuturesUpdate } from '../../plugins/data_source/SQData/Futures/module';
 import { sqActive, useSQData } from '../../plugins/data_source/SQData/sqDataStore';
 import { providerLabel } from '../../plugins/data_source/SQData/sqData';
 import { ImportPopup as FileImportDialog } from '../../plugins/data_source/FileImport/import/module';
@@ -584,8 +585,9 @@ export function DataManager() {
 
   const startOperation = (label: string) => { if ([td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(state => state === 'running' || state === 'paused')) { setSelectionMessage('Finish or stop the active data operation first.'); return; } setSelectionMessage(''); setOpenMenu(null); setNestedOpen(false); setOperationLabel(label); setProgress(4); setOperationState('running'); notify(`${label} queued as a simulation`); };
   const runDirectAction = (action: DirectDataSourceAction) => {
-    const labels: Record<DirectDataSourceAction, string> = {
-      'sq-equity-update': 'Equity dataset update', 'sq-futures-update': 'Futures dataset update',
+    if (action === 'sq-equity-update') { runEquityUpdate(startOperation); return; }
+    if (action === 'sq-futures-update') { runFuturesUpdate(startOperation); return; }
+    const labels: Record<Exclude<DirectDataSourceAction, 'sq-equity-update' | 'sq-futures-update'>, string> = {
       'update-all': 'All eligible dataset updates', 'update-selected': `${selectedDatasetIds.length} selected dataset update${selectedDatasetIds.length === 1 ? '' : 's'}`,
     };
     startOperation(labels[action]);
@@ -766,7 +768,8 @@ export function DataManager() {
   {dialog?.id === 'mt5-import' && (
     <Mt5ImportDialog onClose={closeDialog} onStarted={() => { setProgressOwner('mt5'); setOperationState('idle'); setSelectionMessage(''); notify('MT5 import started (simulation)'); }}/>
   )}
-  {(dialog?.id === 'sq-equity-find' || dialog?.id === 'sq-futures-find') && <SQDataAddDialog key={dialog.id} provider={dialog.id === 'sq-equity-find' ? 'equity' : 'futures'} onClose={closeDialog} onStarted={() => { setProgressOwner('sq'); setOperationState('idle'); setSelectionMessage(''); }}/> }
+  {dialog?.id === 'sq-equity-find' && <SQEquityAddPopup onClose={closeDialog} onStarted={() => { setProgressOwner('sq'); setOperationState('idle'); setSelectionMessage(''); }}/>}
+  {dialog?.id === 'sq-futures-find' && <SQFuturesAddPopup onClose={closeDialog} onStarted={() => { setProgressOwner('sq'); setOperationState('idle'); setSelectionMessage(''); }}/>}
   {dialog?.id === 'tickdownloader-import' && <TickDownloaderImportDialog onClose={closeDialog} onStarted={() => { setProgressOwner('td'); setOperationState('idle'); notify('TickDownloader import started (simulation)'); }}/>}
   {dialog?.id === 'file-add' && <FileSymbolDialog onClose={closeDialog} onSaved={() => notify('File symbol added')}/>}
   {dialog?.id === 'file-import' && fileTarget && <FileImportDialog target={fileTarget} onClose={closeDialog} onStarted={() => { setProgressOwner('file'); setOperationState('idle'); }}/>}
