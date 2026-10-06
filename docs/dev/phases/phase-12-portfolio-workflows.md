@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# AppPortfolioComposer.jar — FEAT-PORTFOLIO-APP-PORTFOLIO-COMPOSER
+# 12.1 FEAT-PORTFOLIO-APP-PORTFOLIO-COMPOSER - AppPortfolioComposer.jar
 
 ## 1. Objective
 
@@ -57,7 +57,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_app_portfolio_composer.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# AppPortfolioMaster.jar — FEAT-PORTFOLIO-APP-PORTFOLIO-MASTER
+# 12.2 FEAT-PORTFOLIO-APP-PORTFOLIO-MASTER - AppPortfolioMaster.jar
 
 ## 1. Objective
 
@@ -105,7 +105,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_app_portfolio_master.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# FitnessMethodExistingPortfolio.jar — FEAT-PORTFOLIO-FITNESS-METHOD-EXISTING-PORTFOLIO
+# 12.3 FEAT-PORTFOLIO-FITNESS-METHOD-EXISTING-PORTFOLIO - FitnessMethodExistingPortfolio.jar
 
 ## 1. Objective
 
@@ -150,7 +150,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_fitness_method_existing_portfolio.py --no-cov`; expect objective direction, ties, missing metrics and nonfinite scores; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture objective direction, ties, missing metrics and nonfinite scores and visible failures.
 
-# PortfolioComposer.jar — FEAT-PORTFOLIO-PORTFOLIO-COMPOSER
+# 12.4 FEAT-PORTFOLIO-PORTFOLIO-COMPOSER - PortfolioComposer.jar
 
 ## 1. Objective
 
@@ -195,7 +195,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_portfolio_composer.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# ResultsPortfolioComposerChart.jar — FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-CHART
+# 12.5 FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-CHART - ResultsPortfolioComposerChart.jar
 
 ## 1. Objective
 
@@ -240,7 +240,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_results_portfolio_composer_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# ResultsPortfolioComposerLog.jar — FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-LOG
+# 12.6 FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-LOG - ResultsPortfolioComposerLog.jar
 
 ## 1. Objective
 
@@ -285,7 +285,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_results_portfolio_composer_log.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# ResultsPortfolioCorrelation.jar — FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION
+# 12.7 FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION - ResultsPortfolioCorrelation.jar
 
 ## 1. Objective
 
@@ -330,7 +330,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_results_portfolio_correlation.py --no-cov`; expect alignment, sample basis, undefined correlation and threshold equality; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture alignment, sample basis, undefined correlation and threshold equality and visible failures.
 
-# SettingsAutomaticPortfolioBuilder.jar — FEAT-PORTFOLIO-SETTINGS-AUTOMATIC-PORTFOLIO-BUILDER
+# 12.8 FEAT-PORTFOLIO-SETTINGS-AUTOMATIC-PORTFOLIO-BUILDER - SettingsAutomaticPortfolioBuilder.jar
 
 ## 1. Objective
 
@@ -376,7 +376,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_settings_automatic_portfolio_builder.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# SettingsCreatePortfolio.jar — FEAT-PORTFOLIO-SETTINGS-CREATE-PORTFOLIO
+# 12.9 FEAT-PORTFOLIO-SETTINGS-CREATE-PORTFOLIO - SettingsCreatePortfolio.jar
 
 ## 1. Objective
 
@@ -422,7 +422,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_settings_create_portfolio.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# TaskAutomaticPortfolioBuilder.jar — FEAT-PORTFOLIO-TASK-AUTOMATIC-PORTFOLIO-BUILDER
+# 12.10 FEAT-PORTFOLIO-TASK-AUTOMATIC-PORTFOLIO-BUILDER - TaskAutomaticPortfolioBuilder.jar
 
 ## 1. Objective
 
@@ -467,7 +467,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_task_automatic_portfolio_builder.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# TaskCreatePortfolio.jar — FEAT-PORTFOLIO-TASK-CREATE-PORTFOLIO
+# 12.11 FEAT-PORTFOLIO-TASK-CREATE-PORTFOLIO - TaskCreatePortfolio.jar
 
 ## 1. Objective
 
@@ -513,7 +513,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_task_create_portfolio.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
 
-# P12 integration — Compose and search portfolios with reconciled aggregate metrics
+# 12.12 P12 integration — Compose and search portfolios with reconciled aggregate metrics
 
 ## 1. Objective
 

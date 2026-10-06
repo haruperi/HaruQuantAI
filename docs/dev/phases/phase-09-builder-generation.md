@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# commons-math3-3.6.1.jar — FEAT-BUILDER-COMMONS-MATH3-3-6-1
+# 9.1 FEAT-BUILDER-COMMONS-MATH3-3-6-1 - commons-math3-3.6.1.jar
 
 ## 1. Objective
 
@@ -57,7 +57,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_commons_math3_3_6_1.py --no-cov`; expect seed behavior, distributions, selection operators and tolerance bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seed behavior, distributions, selection operators and tolerance bounds and visible failures.
 
-# uncommons-maths.jar — FEAT-BUILDER-UNCOMMONS-MATHS
+# 9.2 FEAT-BUILDER-UNCOMMONS-MATHS - uncommons-maths.jar
 
 ## 1. Objective
 
@@ -105,7 +105,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_uncommons_maths.py --no-cov`; expect seed behavior, distributions, selection operators and tolerance bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seed behavior, distributions, selection operators and tolerance bounds and visible failures.
 
-# watchmaker-framework.jar — FEAT-BUILDER-WATCHMAKER-FRAMEWORK
+# 9.3 FEAT-BUILDER-WATCHMAKER-FRAMEWORK - watchmaker-framework.jar
 
 ## 1. Objective
 
@@ -152,7 +152,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_watchmaker_framework.py --no-cov`; expect seed behavior, distributions, selection operators and tolerance bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seed behavior, distributions, selection operators and tolerance bounds and visible failures.
 
-# AppBuilder.jar — FEAT-BUILDER-APP-BUILDER
+# 9.4 FEAT-BUILDER-APP-BUILDER - AppBuilder.jar
 
 ## 1. Objective
 
@@ -200,7 +200,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_app_builder.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# DashboardResults.jar — FEAT-BUILDER-DASHBOARD-RESULTS
+# 9.5 FEAT-BUILDER-DASHBOARD-RESULTS - DashboardResults.jar
 
 ## 1. Objective
 
@@ -245,7 +245,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_dashboard_results.py --no-cov`; expect fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries and visible failures.
 
-# EnginePanel.jar — FEAT-BUILDER-ENGINE-PANEL
+# 9.6 FEAT-BUILDER-ENGINE-PANEL - EnginePanel.jar
 
 ## 1. Objective
 
@@ -290,7 +290,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_engine_panel.py --no-cov`; expect fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture fixed-seed build, allowed blocks, fitness ordering and stop-rule boundaries and visible failures.
 
-# FitnessMethodStrategyResult.jar — FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT
+# 9.7 FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT - FitnessMethodStrategyResult.jar
 
 ## 1. Objective
 
@@ -335,7 +335,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_fitness_method_strategy_result.py --no-cov`; expect objective direction, ties, missing metrics and nonfinite scores; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture objective direction, ties, missing metrics and nonfinite scores and visible failures.
 
-# ServletBuilder.jar — FEAT-BUILDER-SERVLET-BUILDER
+# 9.8 FEAT-BUILDER-SERVLET-BUILDER - ServletBuilder.jar
 
 ## 1. Objective
 
@@ -380,7 +380,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_servlet_builder.py --no-cov`; expect block constraints, preserved strategy parts, stop rules and repeatability; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 
-# SettingsPartsToImprove.jar — FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE
+# 9.9 FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE - SettingsPartsToImprove.jar
 
 ## 1. Objective
 
@@ -428,7 +428,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_settings_parts_to_improve.py --no-cov`; expect block constraints, preserved strategy parts, stop rules and repeatability; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 
-# SettingsRankings.jar — FEAT-BUILDER-SETTINGS-RANKINGS
+# 9.10 FEAT-BUILDER-SETTINGS-RANKINGS - SettingsRankings.jar
 
 ## 1. Objective
 
@@ -476,7 +476,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_settings_rankings.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsWhatToBuild.jar — FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD
+# 9.11 FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD - SettingsWhatToBuild.jar
 
 ## 1. Objective
 
@@ -523,7 +523,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_settings_what_to_build.py --no-cov`; expect block constraints, preserved strategy parts, stop rules and repeatability; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 
-# TaskBuild.jar — FEAT-BUILDER-TASK-BUILD
+# 9.12 FEAT-BUILDER-TASK-BUILD - TaskBuild.jar
 
 ## 1. Objective
 
@@ -571,7 +571,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_builder_task_build.py --no-cov`; expect block constraints, preserved strategy parts, stop rules and repeatability; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture block constraints, preserved strategy parts, stop rules and repeatability and visible failures.
 
-# DashboardPanel resource contribution — FEAT-UI-DASHBOARD-PANEL
+# 9.13 FEAT-UI-DASHBOARD-PANEL - DashboardPanel resource contribution
 
 ## 1. Objective
 
@@ -608,7 +608,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_dashboard_panel.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Start a bounded fixed-seed build; pause/resume/stop; inspect real rankings; rerun and compare the qualified result sequence. Inspect the DashboardPanel contribution; an empty or unavailable contribution must remain explicit.
 
-# SettingsGeneticOptions resource contribution — FEAT-UI-SETTINGS-GENETIC-OPTIONS
+# 9.14 FEAT-UI-SETTINGS-GENETIC-OPTIONS - SettingsGeneticOptions resource contribution
 
 ## 1. Objective
 
@@ -645,7 +645,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_settings_genetic_options.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Start a bounded fixed-seed build; pause/resume/stop; inspect real rankings; rerun and compare the qualified result sequence. Inspect the SettingsGeneticOptions contribution; an empty or unavailable contribution must remain explicit.
 
-# P09 integration — Generate and improve executable strategies with real build progress and ranking
+# 9.15 P09 integration — Generate and improve executable strategies with real build progress and ranking
 
 ## 1. Objective
 

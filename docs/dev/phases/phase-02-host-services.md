@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# caffeine-2.8.5.jar — FEAT-HOST-CAFFEINE-2-8-5
+# 2.1 FEAT-HOST-CAFFEINE-2-8-5 - caffeine-2.8.5.jar
 
 ## 1. Objective
 
@@ -53,7 +53,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_caffeine_2_8_5.py --no-cov`; expect expiry, eviction, invalidation and concurrent lookup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture expiry, eviction, invalidation and concurrent lookup and visible failures.
 
-# conscrypt-openjdk-uber.jar — FEAT-HOST-CONSCRYPT-OPENJDK-UBER
+# 2.2 FEAT-HOST-CONSCRYPT-OPENJDK-UBER - conscrypt-openjdk-uber.jar
 
 ## 1. Objective
 
@@ -103,7 +103,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_conscrypt_openjdk_uber.py --no-cov`; expect startup failure, protocol compatibility, connection cleanup and TLS configuration; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup failure, protocol compatibility, connection cleanup and TLS configuration and visible failures.
 
-# fastutil.jar — FEAT-HOST-FASTUTIL
+# 2.3 FEAT-HOST-FASTUTIL - fastutil.jar
 
 ## 1. Objective
 
@@ -147,7 +147,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_fastutil.py --no-cov`; expect ordering, duplicate/null handling and bounded collection behavior; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture ordering, duplicate/null handling and bounded collection behavior and visible failures.
 
-# fst.jar — FEAT-HOST-FST
+# 2.4 FEAT-HOST-FST - fst.jar
 
 ## 1. Objective
 
@@ -195,7 +195,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_fst.py --no-cov`; expect version compatibility, invalid object shape and round-trip identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture version compatibility, invalid object shape and round-trip identity and visible failures.
 
-# geronimo-json.jar — FEAT-HOST-GERONIMO-JSON
+# 2.5 FEAT-HOST-GERONIMO-JSON - geronimo-json.jar
 
 ## 1. Objective
 
@@ -243,7 +243,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_geronimo_json.py --no-cov`; expect null/number handling, unknown fields and malformed payload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture null/number handling, unknown fields and malformed payload and visible failures.
 
-# h2.jar — FEAT-HOST-H2
+# 2.6 FEAT-HOST-H2 - h2.jar
 
 ## 1. Objective
 
@@ -293,7 +293,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_h2.py --no-cov`; expect transaction rollback, restart durability and retention in temporary stores; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture transaction rollback, restart durability and retention in temporary stores and visible failures.
 
-# jackson-annotations.jar — FEAT-HOST-JACKSON-ANNOTATIONS
+# 2.7 FEAT-HOST-JACKSON-ANNOTATIONS - jackson-annotations.jar
 
 ## 1. Objective
 
@@ -339,7 +339,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jackson_annotations.py --no-cov`; expect null/number handling, unknown fields and malformed payload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture null/number handling, unknown fields and malformed payload and visible failures.
 
-# jackson-core.jar — FEAT-HOST-JACKSON-CORE
+# 2.8 FEAT-HOST-JACKSON-CORE - jackson-core.jar
 
 ## 1. Objective
 
@@ -387,7 +387,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jackson_core.py --no-cov`; expect null/number handling, unknown fields and malformed payload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture null/number handling, unknown fields and malformed payload and visible failures.
 
-# jackson-databind.jar — FEAT-HOST-JACKSON-DATABIND
+# 2.9 FEAT-HOST-JACKSON-DATABIND - jackson-databind.jar
 
 ## 1. Objective
 
@@ -435,7 +435,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jackson_databind.py --no-cov`; expect null/number handling, unknown fields and malformed payload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture null/number handling, unknown fields and malformed payload and visible failures.
 
-# jdom.jar — FEAT-HOST-JDOM
+# 2.10 FEAT-HOST-JDOM - jdom.jar
 
 ## 1. Objective
 
@@ -483,7 +483,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jdom.py --no-cov`; expect namespaces, encoding, rejected unsafe constructs and lossless unknown fields; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture namespaces, encoding, rejected unsafe constructs and lossless unknown fields and visible failures.
 
-# jetty-all-uber.jar — FEAT-HOST-JETTY-ALL-UBER
+# 2.11 FEAT-HOST-JETTY-ALL-UBER - jetty-all-uber.jar
 
 ## 1. Objective
 
@@ -533,7 +533,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jetty_all_uber.py --no-cov`; expect startup failure, protocol compatibility, connection cleanup and TLS configuration; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup failure, protocol compatibility, connection cleanup and TLS configuration and visible failures.
 
-# jetty-alpn-conscrypt-server.jar — FEAT-HOST-JETTY-ALPN-CONSCRYPT-SERVER
+# 2.12 FEAT-HOST-JETTY-ALPN-CONSCRYPT-SERVER - jetty-alpn-conscrypt-server.jar
 
 ## 1. Objective
 
@@ -583,7 +583,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jetty_alpn_conscrypt_server.py --no-cov`; expect startup failure, protocol compatibility, connection cleanup and TLS configuration; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup failure, protocol compatibility, connection cleanup and TLS configuration and visible failures.
 
-# jetty-alpn-java-server.jar — FEAT-HOST-JETTY-ALPN-JAVA-SERVER
+# 2.13 FEAT-HOST-JETTY-ALPN-JAVA-SERVER - jetty-alpn-java-server.jar
 
 ## 1. Objective
 
@@ -633,7 +633,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jetty_alpn_java_server.py --no-cov`; expect startup failure, protocol compatibility, connection cleanup and TLS configuration; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup failure, protocol compatibility, connection cleanup and TLS configuration and visible failures.
 
-# jetty-alpn-server.jar — FEAT-HOST-JETTY-ALPN-SERVER
+# 2.14 FEAT-HOST-JETTY-ALPN-SERVER - jetty-alpn-server.jar
 
 ## 1. Objective
 
@@ -683,7 +683,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jetty_alpn_server.py --no-cov`; expect startup failure, protocol compatibility, connection cleanup and TLS configuration; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup failure, protocol compatibility, connection cleanup and TLS configuration and visible failures.
 
-# json-schema-validator.jar — FEAT-HOST-JSON-SCHEMA-VALIDATOR
+# 2.15 FEAT-HOST-JSON-SCHEMA-VALIDATOR - json-schema-validator.jar
 
 ## 1. Objective
 
@@ -731,7 +731,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_json_schema_validator.py --no-cov`; expect required fields, schema versions and actionable validation errors; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture required fields, schema versions and actionable validation errors and visible failures.
 
-# json.jar — FEAT-HOST-JSON
+# 2.16 FEAT-HOST-JSON - json.jar
 
 ## 1. Objective
 
@@ -779,7 +779,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_json.py --no-cov`; expect login/readiness/preferences, event correlation, restart durability and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture login/readiness/preferences, event correlation, restart durability and cancellation and visible failures.
 
-# jspf.core.jar — FEAT-HOST-JSPF-CORE
+# 2.17 FEAT-HOST-JSPF-CORE - jspf.core.jar
 
 ## 1. Objective
 
@@ -827,7 +827,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jspf_core.py --no-cov`; expect duplicate registration, compatibility failure and mount/unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture duplicate registration, compatibility failure and mount/unmount cleanup and visible failures.
 
-# lzma.jar — FEAT-HOST-LZMA
+# 2.18 FEAT-HOST-LZMA - lzma.jar
 
 ## 1. Objective
 
@@ -877,7 +877,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_lzma.py --no-cov`; expect compression round trip, expansion limits, corrupt entry and traversal rejection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture compression round trip, expansion limits, corrupt entry and traversal rejection and visible failures.
 
-# objenesis.jar — FEAT-HOST-OBJENESIS
+# 2.19 FEAT-HOST-OBJENESIS - objenesis.jar
 
 ## 1. Objective
 
@@ -927,7 +927,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_objenesis.py --no-cov`; expect version compatibility, invalid object shape and round-trip identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture version compatibility, invalid object shape and round-trip identity and visible failures.
 
-# reactive-streams.jar — FEAT-HOST-REACTIVE-STREAMS
+# 2.20 FEAT-HOST-REACTIVE-STREAMS - reactive-streams.jar
 
 ## 1. Objective
 
@@ -975,7 +975,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_reactive_streams.py --no-cov`; expect ordering, backpressure, subscriber loss and resource release; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture ordering, backpressure, subscriber loss and resource release and visible failures.
 
-# reactor-core.jar — FEAT-HOST-REACTOR-CORE
+# 2.21 FEAT-HOST-REACTOR-CORE - reactor-core.jar
 
 ## 1. Objective
 
@@ -1023,7 +1023,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_reactor_core.py --no-cov`; expect ordering, backpressure, subscriber loss and resource release; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture ordering, backpressure, subscriber loss and resource release and visible failures.
 
-# SQJobsLib.jar — FEAT-HOST-SQ-JOBS-LIB
+# 2.22 FEAT-HOST-SQ-JOBS-LIB - SQJobsLib.jar
 
 ## 1. Objective
 
@@ -1071,7 +1071,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_sq_jobs_lib.py --no-cov`; expect state transitions, concurrency limits, duplicate submit and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture state transitions, concurrency limits, duplicate submit and cancellation and visible failures.
 
-# sqlite-jdbc.jar — FEAT-HOST-SQLITE-JDBC
+# 2.23 FEAT-HOST-SQLITE-JDBC - sqlite-jdbc.jar
 
 ## 1. Objective
 
@@ -1121,7 +1121,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_sqlite_jdbc.py --no-cov`; expect transaction rollback, restart durability and retention in temporary stores; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture transaction rollback, restart durability and retention in temporary stores and visible failures.
 
-# SQPluginLib.jar — FEAT-HOST-SQ-PLUGIN-LIB
+# 2.24 FEAT-HOST-SQ-PLUGIN-LIB - SQPluginLib.jar
 
 ## 1. Objective
 
@@ -1169,7 +1169,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_sq_plugin_lib.py --no-cov`; expect duplicate registration, compatibility failure and mount/unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture duplicate registration, compatibility failure and mount/unmount cleanup and visible failures.
 
-# SQWebGUILib.jar — FEAT-HOST-SQ-WEB-GUI-LIB
+# 2.25 FEAT-HOST-SQ-WEB-GUI-LIB - SQWebGUILib.jar
 
 ## 1. Objective
 
@@ -1219,7 +1219,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_sq_web_gui_lib.py --no-cov`; expect request correlation, unauthorized access, reconnect and domain mounting; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture request correlation, unauthorized access, reconnect and domain mounting and visible failures.
 
-# zip4j.jar — FEAT-HOST-ZIP4J
+# 2.26 FEAT-HOST-ZIP4J - zip4j.jar
 
 ## 1. Objective
 
@@ -1269,7 +1269,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_zip4j.py --no-cov`; expect compression round trip, expansion limits, corrupt entry and traversal rejection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture compression round trip, expansion limits, corrupt entry and traversal rejection and visible failures.
 
-# P02 integration — Connect the frontend to typed host discovery, sessions, jobs and resources
+# 2.27 P02 integration — Connect the frontend to typed host discovery, sessions, jobs and resources
 
 ## 1. Objective
 

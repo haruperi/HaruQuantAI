@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# freemarker.jar — FEAT-AUTHORING-FREEMARKER
+# 7.1 FEAT-AUTHORING-FREEMARKER - freemarker.jar
 
 ## 1. Objective
 
@@ -58,7 +58,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_freemarker.py --no-cov`; expect escaping, missing variables, deterministic output and target syntax; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture escaping, missing variables, deterministic output and target syntax and visible failures.
 
-# javassist.jar — FEAT-AUTHORING-JAVASSIST
+# 7.2 FEAT-AUTHORING-JAVASSIST - javassist.jar
 
 ## 1. Objective
 
@@ -108,7 +108,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_javassist.py --no-cov`; expect trust boundary, version rejection and qualified extension lifecycle; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture trust boundary, version rejection and qualified extension lifecycle and visible failures.
 
-# SQWizardBusiness.jar — FEAT-AUTHORING-SQ-WIZARD-BUSINESS
+# 7.3 FEAT-AUTHORING-SQ-WIZARD-BUSINESS - SQWizardBusiness.jar
 
 ## 1. Objective
 
@@ -158,7 +158,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_sq_wizard_business.py --no-cov`; expect node types, parameter mapping and save/reload semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture node types, parameter mapping and save/reload semantics and visible failures.
 
-# AppCodeEditor.jar — FEAT-AUTHORING-APP-CODE-EDITOR
+# 7.4 FEAT-AUTHORING-APP-CODE-EDITOR - AppCodeEditor.jar
 
 ## 1. Objective
 
@@ -206,7 +206,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_app_code_editor.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
 
-# AppWizard.jar — FEAT-AUTHORING-APP-WIZARD
+# 7.5 FEAT-AUTHORING-APP-WIZARD - AppWizard.jar
 
 ## 1. Objective
 
@@ -254,7 +254,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_app_wizard.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# CodeEditorImportExport.jar — FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT
+# 7.6 FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT - CodeEditorImportExport.jar
 
 ## 1. Objective
 
@@ -301,7 +301,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_code_editor_import_export.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
 
-# CodeEditorIndicatorTester.jar — FEAT-AUTHORING-CODE-EDITOR-INDICATOR-TESTER
+# 7.7 FEAT-AUTHORING-CODE-EDITOR-INDICATOR-TESTER - CodeEditorIndicatorTester.jar
 
 ## 1. Objective
 
@@ -349,7 +349,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_code_editor_indicator_tester.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
 
-# LoaderSQ3.jar — FEAT-AUTHORING-LOADER-SQ3
+# 7.8 FEAT-AUTHORING-LOADER-SQ3 - LoaderSQ3.jar
 
 ## 1. Objective
 
@@ -396,7 +396,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_loader_sq3.py --no-cov`; expect format version, unknown fields, checksum/entry validation and preserved semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, unknown fields, checksum/entry validation and preserved semantics and visible failures.
 
-# LoaderSQ4.jar — FEAT-AUTHORING-LOADER-SQ4
+# 7.9 FEAT-AUTHORING-LOADER-SQ4 - LoaderSQ4.jar
 
 ## 1. Objective
 
@@ -444,7 +444,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_loader_sq4.py --no-cov`; expect format version, unknown fields, checksum/entry validation and preserved semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, unknown fields, checksum/entry validation and preserved semantics and visible failures.
 
-# ResultsSourceCode.jar — FEAT-AUTHORING-RESULTS-SOURCE-CODE
+# 7.10 FEAT-AUTHORING-RESULTS-SOURCE-CODE - ResultsSourceCode.jar
 
 ## 1. Objective
 
@@ -490,7 +490,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_results_source_code.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# SaverSQ3.jar — FEAT-AUTHORING-SAVER-SQ3
+# 7.11 FEAT-AUTHORING-SAVER-SQ3 - SaverSQ3.jar
 
 ## 1. Objective
 
@@ -538,7 +538,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_saver_sq3.py --no-cov`; expect format version, unknown fields, checksum/entry validation and preserved semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, unknown fields, checksum/entry validation and preserved semantics and visible failures.
 
-# ServletAlgoWizard.jar — FEAT-AUTHORING-SERVLET-ALGO-WIZARD
+# 7.12 FEAT-AUTHORING-SERVLET-ALGO-WIZARD - ServletAlgoWizard.jar
 
 ## 1. Objective
 
@@ -586,7 +586,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_algo_wizard.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# ServletCodeEditor.jar — FEAT-AUTHORING-SERVLET-CODE-EDITOR
+# 7.13 FEAT-AUTHORING-SERVLET-CODE-EDITOR - ServletCodeEditor.jar
 
 ## 1. Objective
 
@@ -634,7 +634,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_code_editor.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
 
-# ServletIndicatorTester.jar — FEAT-AUTHORING-SERVLET-INDICATOR-TESTER
+# 7.14 FEAT-AUTHORING-SERVLET-INDICATOR-TESTER - ServletIndicatorTester.jar
 
 ## 1. Objective
 
@@ -680,7 +680,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_indicator_tester.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
 
-# ServletStrategy.jar — FEAT-AUTHORING-SERVLET-STRATEGY
+# 7.15 FEAT-AUTHORING-SERVLET-STRATEGY - ServletStrategy.jar
 
 ## 1. Objective
 
@@ -728,7 +728,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_strategy.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# ServletWizard.jar — FEAT-AUTHORING-SERVLET-WIZARD
+# 7.16 FEAT-AUTHORING-SERVLET-WIZARD - ServletWizard.jar
 
 ## 1. Objective
 
@@ -775,7 +775,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_wizard.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# ProjectResources resource contribution — FEAT-UI-PROJECT-RESOURCES
+# 7.17 FEAT-UI-PROJECT-RESOURCES - ProjectResources resource contribution
 
 ## 1. Objective
 
@@ -812,7 +812,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_resources.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Author a fixture strategy; save/reload/run it; test an indicator in CodeEditor; export each promised target and qualify its syntax. Inspect the ProjectResources contribution; an empty or unavailable contribution must remain explicit.
 
-# P07 integration — Save, validate and execute authored strategies and generated platform code
+# 7.18 P07 integration — Save, validate and execute authored strategies and generated platform code
 
 ## 1. Objective
 

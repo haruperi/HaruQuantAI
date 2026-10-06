@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# AppRetester.jar — FEAT-ROBUSTNESS-APP-RETESTER
+# 11.1 FEAT-ROBUSTNESS-APP-RETESTER - AppRetester.jar
 
 ## 1. Objective
 
@@ -57,7 +57,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_app_retester.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# CrossCheckMonteCarloManipulation.jar — FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-MANIPULATION
+# 11.2 FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-MANIPULATION - CrossCheckMonteCarloManipulation.jar
 
 ## 1. Objective
 
@@ -102,7 +102,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_monte_carlo_manipulation.py --no-cov`; expect seeded sampling, replacement rules, thresholds and rejected scenarios; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seeded sampling, replacement rules, thresholds and rejected scenarios and visible failures.
 
-# CrossCheckMonteCarloRetest.jar — FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-RETEST
+# 11.3 FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-RETEST - CrossCheckMonteCarloRetest.jar
 
 ## 1. Objective
 
@@ -147,7 +147,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_monte_carlo_retest.py --no-cov`; expect seeded sampling, replacement rules, thresholds and rejected scenarios; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seeded sampling, replacement rules, thresholds and rejected scenarios and visible failures.
 
-# CrossCheckOptProfileSysParamPermutation.jar — FEAT-ROBUSTNESS-CROSS-CHECK-OPT-PROFILE-SYS-PARAM-PERMUTATION
+# 11.4 FEAT-ROBUSTNESS-CROSS-CHECK-OPT-PROFILE-SYS-PARAM-PERMUTATION - CrossCheckOptProfileSysParamPermutation.jar
 
 ## 1. Objective
 
@@ -192,7 +192,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_opt_profile_sys_param_permutation.py --no-cov`; expect range endpoints, enumeration order and matrix/result reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture range endpoints, enumeration order and matrix/result reconciliation and visible failures.
 
-# CrossCheckRetestOnAdditionalMarkets.jar — FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-ON-ADDITIONAL-MARKETS
+# 11.5 FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-ON-ADDITIONAL-MARKETS - CrossCheckRetestOnAdditionalMarkets.jar
 
 ## 1. Objective
 
@@ -237,7 +237,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_retest_on_additional_markets.py --no-cov`; expect symbol/data selection, missing market and aggregate check decisions; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol/data selection, missing market and aggregate check decisions and visible failures.
 
-# CrossCheckRetestWithHigherPrecision.jar — FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-WITH-HIGHER-PRECISION
+# 11.6 FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-WITH-HIGHER-PRECISION - CrossCheckRetestWithHigherPrecision.jar
 
 ## 1. Objective
 
@@ -282,7 +282,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_retest_with_higher_precision.py --no-cov`; expect precision availability, event alignment and result comparison; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture precision availability, event alignment and result comparison and visible failures.
 
-# CrossCheckSequentialOptimization.jar — FEAT-ROBUSTNESS-CROSS-CHECK-SEQUENTIAL-OPTIMIZATION
+# 11.7 FEAT-ROBUSTNESS-CROSS-CHECK-SEQUENTIAL-OPTIMIZATION - CrossCheckSequentialOptimization.jar
 
 ## 1. Objective
 
@@ -328,7 +328,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_sequential_optimization.py --no-cov`; expect candidate dependencies, repeated passes, stopping and score ordering; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture candidate dependencies, repeated passes, stopping and score ordering and visible failures.
 
-# CrossCheckWalkForwardMatrix.jar — FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-MATRIX
+# 11.8 FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-MATRIX - CrossCheckWalkForwardMatrix.jar
 
 ## 1. Objective
 
@@ -374,7 +374,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_walk_forward_matrix.py --no-cov`; expect in/out-of-sample boundaries, leakage rejection, aggregation and tie rules; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture in/out-of-sample boundaries, leakage rejection, aggregation and tie rules and visible failures.
 
-# CrossCheckWalkForwardOptimization.jar — FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-OPTIMIZATION
+# 11.9 FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-OPTIMIZATION - CrossCheckWalkForwardOptimization.jar
 
 ## 1. Objective
 
@@ -420,7 +420,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_walk_forward_optimization.py --no-cov`; expect in/out-of-sample boundaries, leakage rejection, aggregation and tie rules; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture in/out-of-sample boundaries, leakage rejection, aggregation and tie rules and visible failures.
 
-# CrossCheckWhatIf.jar — FEAT-ROBUSTNESS-CROSS-CHECK-WHAT-IF
+# 11.10 FEAT-ROBUSTNESS-CROSS-CHECK-WHAT-IF - CrossCheckWhatIf.jar
 
 ## 1. Objective
 
@@ -465,7 +465,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_what_if.py --no-cov`; expect scenario composition, excluded trades and denominator/totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture scenario composition, excluded trades and denominator/totals reconciliation and visible failures.
 
-# ProjectRetester.jar — FEAT-ROBUSTNESS-PROJECT-RETESTER
+# 11.11 FEAT-ROBUSTNESS-PROJECT-RETESTER - ProjectRetester.jar
 
 ## 1. Objective
 
@@ -511,7 +511,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_project_retester.py --no-cov`; expect project revisions, input/output contracts, failed transitions and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture project revisions, input/output contracts, failed transitions and cancellation and visible failures.
 
-# ResultsRobustnessTests.jar — FEAT-ROBUSTNESS-RESULTS-ROBUSTNESS-TESTS
+# 11.12 FEAT-ROBUSTNESS-RESULTS-ROBUSTNESS-TESTS - ResultsRobustnessTests.jar
 
 ## 1. Objective
 
@@ -556,7 +556,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_results_robustness_tests.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# SettingsAutoRetestData.jar — FEAT-ROBUSTNESS-SETTINGS-AUTO-RETEST-DATA
+# 11.13 FEAT-ROBUSTNESS-SETTINGS-AUTO-RETEST-DATA - SettingsAutoRetestData.jar
 
 ## 1. Objective
 
@@ -604,7 +604,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_settings_auto_retest_data.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsCrossChecks.jar — FEAT-ROBUSTNESS-SETTINGS-CROSS-CHECKS
+# 11.14 FEAT-ROBUSTNESS-SETTINGS-CROSS-CHECKS - SettingsCrossChecks.jar
 
 ## 1. Objective
 
@@ -650,7 +650,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_settings_cross_checks.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsWhatToRetest.jar — FEAT-ROBUSTNESS-SETTINGS-WHAT-TO-RETEST
+# 11.15 FEAT-ROBUSTNESS-SETTINGS-WHAT-TO-RETEST - SettingsWhatToRetest.jar
 
 ## 1. Objective
 
@@ -698,7 +698,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_settings_what_to_retest.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# TaskAutomaticRetest.jar — FEAT-ROBUSTNESS-TASK-AUTOMATIC-RETEST
+# 11.16 FEAT-ROBUSTNESS-TASK-AUTOMATIC-RETEST - TaskAutomaticRetest.jar
 
 ## 1. Objective
 
@@ -746,7 +746,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_task_automatic_retest.py --no-cov`; expect child-job ownership, threshold evaluation, cancellation and result retention; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture child-job ownership, threshold evaluation, cancellation and result retention and visible failures.
 
-# TaskRetest.jar — FEAT-ROBUSTNESS-TASK-RETEST
+# 11.17 FEAT-ROBUSTNESS-TASK-RETEST - TaskRetest.jar
 
 ## 1. Objective
 
@@ -794,7 +794,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_task_retest.py --no-cov`; expect child-job ownership, threshold evaluation, cancellation and result retention; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture child-job ownership, threshold evaluation, cancellation and result retention and visible failures.
 
-# SettingsAutomaticRetest resource contribution — FEAT-UI-SETTINGS-AUTOMATIC-RETEST
+# 11.18 FEAT-UI-SETTINGS-AUTOMATIC-RETEST - SettingsAutomaticRetest resource contribution
 
 ## 1. Objective
 
@@ -831,7 +831,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_settings_automatic_retest.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Retest one saved strategy with a fixed seed; inspect scenario inputs and thresholds; cancel a check and verify consistent status. Inspect the SettingsAutomaticRetest contribution; an empty or unavailable contribution must remain explicit.
 
-# P11 integration — Run reproducible robustness checks and publish actual retest outcomes
+# 11.19 P11 integration — Run reproducible robustness checks and publish actual retest outcomes
 
 ## 1. Objective
 

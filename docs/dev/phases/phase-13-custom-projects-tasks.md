@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# activation.jar — FEAT-PROJECT-ACTIVATION
+# 13.1 FEAT-PROJECT-ACTIVATION - activation.jar
 
 ## 1. Objective
 
@@ -55,7 +55,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_activation.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture recipient/input validation, redaction, timeout and failed delivery and visible failures.
 
-# commons-email.jar — FEAT-PROJECT-COMMONS-EMAIL
+# 13.2 FEAT-PROJECT-COMMONS-EMAIL - commons-email.jar
 
 ## 1. Objective
 
@@ -101,7 +101,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_commons_email.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture recipient/input validation, redaction, timeout and failed delivery and visible failures.
 
-# commons-exec.jar — FEAT-PROJECT-COMMONS-EXEC
+# 13.3 FEAT-PROJECT-COMMONS-EXEC - commons-exec.jar
 
 ## 1. Objective
 
@@ -147,7 +147,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_commons_exec.py --no-cov`; expect allowlisted invocation, timeout, exit failure, cancellation and redacted output; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture allowlisted invocation, timeout, exit failure, cancellation and redacted output and visible failures.
 
-# javax-mail.jar — FEAT-PROJECT-JAVAX-MAIL
+# 13.4 FEAT-PROJECT-JAVAX-MAIL - javax-mail.jar
 
 ## 1. Objective
 
@@ -192,7 +192,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_javax_mail.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture recipient/input validation, redaction, timeout and failed delivery and visible failures.
 
-# AppTaskManager.jar — FEAT-PROJECT-APP-TASK-MANAGER
+# 13.5 FEAT-PROJECT-APP-TASK-MANAGER - AppTaskManager.jar
 
 ## 1. Objective
 
@@ -240,7 +240,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_app_task_manager.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# ProjectConditionCyclesCount.jar — FEAT-PROJECT-PROJECT-CONDITION-CYCLES-COUNT
+# 13.6 FEAT-PROJECT-PROJECT-CONDITION-CYCLES-COUNT - ProjectConditionCyclesCount.jar
 
 ## 1. Objective
 
@@ -288,7 +288,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_cycles_count.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
 
-# ProjectConditionDuration.jar — FEAT-PROJECT-PROJECT-CONDITION-DURATION
+# 13.7 FEAT-PROJECT-PROJECT-CONDITION-DURATION - ProjectConditionDuration.jar
 
 ## 1. Objective
 
@@ -334,7 +334,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_duration.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
 
-# ProjectConditionGoToActivated.jar — FEAT-PROJECT-PROJECT-CONDITION-GO-TO-ACTIVATED
+# 13.8 FEAT-PROJECT-PROJECT-CONDITION-GO-TO-ACTIVATED - ProjectConditionGoToActivated.jar
 
 ## 1. Objective
 
@@ -382,7 +382,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_go_to_activated.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
 
-# ProjectConditionGoToEvaluated.jar — FEAT-PROJECT-PROJECT-CONDITION-GO-TO-EVALUATED
+# 13.9 FEAT-PROJECT-PROJECT-CONDITION-GO-TO-EVALUATED - ProjectConditionGoToEvaluated.jar
 
 ## 1. Objective
 
@@ -430,7 +430,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_go_to_evaluated.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
 
-# ProjectConditionResultsCount.jar — FEAT-PROJECT-PROJECT-CONDITION-RESULTS-COUNT
+# 13.10 FEAT-PROJECT-PROJECT-CONDITION-RESULTS-COUNT - ProjectConditionResultsCount.jar
 
 ## 1. Objective
 
@@ -478,7 +478,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_results_count.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
 
-# ProjectConditionRunTime.jar — FEAT-PROJECT-PROJECT-CONDITION-RUN-TIME
+# 13.11 FEAT-PROJECT-PROJECT-CONDITION-RUN-TIME - ProjectConditionRunTime.jar
 
 ## 1. Objective
 
@@ -526,7 +526,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_run_time.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
 
-# ServletProject.jar — FEAT-PROJECT-SERVLET-PROJECT
+# 13.12 FEAT-PROJECT-SERVLET-PROJECT - ServletProject.jar
 
 ## 1. Objective
 
@@ -573,7 +573,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_servlet_project.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# ServletProjectOld.jar — FEAT-PROJECT-SERVLET-PROJECT-OLD
+# 13.13 FEAT-PROJECT-SERVLET-PROJECT-OLD - ServletProjectOld.jar
 
 ## 1. Objective
 
@@ -619,7 +619,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_servlet_project_old.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# SettingsApplyMassConfig.jar — FEAT-PROJECT-SETTINGS-APPLY-MASS-CONFIG
+# 13.14 FEAT-PROJECT-SETTINGS-APPLY-MASS-CONFIG - SettingsApplyMassConfig.jar
 
 ## 1. Objective
 
@@ -665,7 +665,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_apply_mass_config.py --no-cov`; expect target selection, compatibility, rollback and unaffected settings; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target selection, compatibility, rollback and unaffected settings and visible failures.
 
-# SettingsCallExternalScript.jar — FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT
+# 13.15 FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT - SettingsCallExternalScript.jar
 
 ## 1. Objective
 
@@ -711,7 +711,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_call_external_script.py --no-cov`; expect allowlisted invocation, timeout, exit failure, cancellation and redacted output; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture allowlisted invocation, timeout, exit failure, cancellation and redacted output and visible failures.
 
-# SettingsClearDatabanks.jar — FEAT-PROJECT-SETTINGS-CLEAR-DATABANKS
+# 13.16 FEAT-PROJECT-SETTINGS-CLEAR-DATABANKS - SettingsClearDatabanks.jar
 
 ## 1. Objective
 
@@ -757,7 +757,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_clear_databanks.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
 
-# SettingsCustomAnalysis.jar — FEAT-PROJECT-SETTINGS-CUSTOM-ANALYSIS
+# 13.17 FEAT-PROJECT-SETTINGS-CUSTOM-ANALYSIS - SettingsCustomAnalysis.jar
 
 ## 1. Objective
 
@@ -803,7 +803,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_custom_analysis.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsDatabanks.jar — FEAT-PROJECT-SETTINGS-DATABANKS
+# 13.18 FEAT-PROJECT-SETTINGS-DATABANKS - SettingsDatabanks.jar
 
 ## 1. Objective
 
@@ -847,7 +847,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_databanks.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsDeleteFile.jar — FEAT-PROJECT-SETTINGS-DELETE-FILE
+# 13.19 FEAT-PROJECT-SETTINGS-DELETE-FILE - SettingsDeleteFile.jar
 
 ## 1. Objective
 
@@ -893,7 +893,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_delete_file.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
 
-# SettingsFiltering.jar — FEAT-PROJECT-SETTINGS-FILTERING
+# 13.20 FEAT-PROJECT-SETTINGS-FILTERING - SettingsFiltering.jar
 
 ## 1. Objective
 
@@ -939,7 +939,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_filtering.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsGoToTask.jar — FEAT-PROJECT-SETTINGS-GO-TO-TASK
+# 13.21 FEAT-PROJECT-SETTINGS-GO-TO-TASK - SettingsGoToTask.jar
 
 ## 1. Objective
 
@@ -985,7 +985,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_go_to_task.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
 
-# SettingsLoadFromFiles.jar — FEAT-PROJECT-SETTINGS-LOAD-FROM-FILES
+# 13.22 FEAT-PROJECT-SETTINGS-LOAD-FROM-FILES - SettingsLoadFromFiles.jar
 
 ## 1. Objective
 
@@ -1031,7 +1031,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_load_from_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
 
-# SettingsLogDatabankStats.jar — FEAT-PROJECT-SETTINGS-LOG-DATABANK-STATS
+# 13.23 FEAT-PROJECT-SETTINGS-LOG-DATABANK-STATS - SettingsLogDatabankStats.jar
 
 ## 1. Objective
 
@@ -1077,7 +1077,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_log_databank_stats.py --no-cov`; expect sample basis, empty bank, metric provenance and redacted diagnostics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sample basis, empty bank, metric provenance and redacted diagnostics and visible failures.
 
-# SettingsNotes.jar — FEAT-PROJECT-SETTINGS-NOTES
+# 13.24 FEAT-PROJECT-SETTINGS-NOTES - SettingsNotes.jar
 
 ## 1. Objective
 
@@ -1123,7 +1123,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_notes.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsNotification.jar — FEAT-PROJECT-SETTINGS-NOTIFICATION
+# 13.25 FEAT-PROJECT-SETTINGS-NOTIFICATION - SettingsNotification.jar
 
 ## 1. Objective
 
@@ -1169,7 +1169,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_notification.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture recipient/input validation, redaction, timeout and failed delivery and visible failures.
 
-# SettingsSaveToFiles.jar — FEAT-PROJECT-SETTINGS-SAVE-TO-FILES
+# 13.26 FEAT-PROJECT-SETTINGS-SAVE-TO-FILES - SettingsSaveToFiles.jar
 
 ## 1. Objective
 
@@ -1215,7 +1215,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_save_to_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
 
-# SettingsStopAndStart.jar — FEAT-PROJECT-SETTINGS-STOP-AND-START
+# 13.27 FEAT-PROJECT-SETTINGS-STOP-AND-START - SettingsStopAndStart.jar
 
 ## 1. Objective
 
@@ -1261,7 +1261,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_stop_and_start.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
 
-# SettingsUpdateData.jar — FEAT-PROJECT-SETTINGS-UPDATE-DATA
+# 13.28 FEAT-PROJECT-SETTINGS-UPDATE-DATA - SettingsUpdateData.jar
 
 ## 1. Objective
 
@@ -1307,7 +1307,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_update_data.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsWaitFor.jar — FEAT-PROJECT-SETTINGS-WAIT-FOR
+# 13.29 FEAT-PROJECT-SETTINGS-WAIT-FOR - SettingsWaitFor.jar
 
 ## 1. Objective
 
@@ -1353,7 +1353,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_wait_for.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
 
-# TaskApplyMassConfig.jar — FEAT-PROJECT-TASK-APPLY-MASS-CONFIG
+# 13.30 FEAT-PROJECT-TASK-APPLY-MASS-CONFIG - TaskApplyMassConfig.jar
 
 ## 1. Objective
 
@@ -1399,7 +1399,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_apply_mass_config.py --no-cov`; expect target selection, compatibility, rollback and unaffected settings; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target selection, compatibility, rollback and unaffected settings and visible failures.
 
-# TaskCallExternalScript.jar — FEAT-PROJECT-TASK-CALL-EXTERNAL-SCRIPT
+# 13.31 FEAT-PROJECT-TASK-CALL-EXTERNAL-SCRIPT - TaskCallExternalScript.jar
 
 ## 1. Objective
 
@@ -1445,7 +1445,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_call_external_script.py --no-cov`; expect allowlisted invocation, timeout, exit failure, cancellation and redacted output; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture allowlisted invocation, timeout, exit failure, cancellation and redacted output and visible failures.
 
-# TaskClearDatabanks.jar — FEAT-PROJECT-TASK-CLEAR-DATABANKS
+# 13.32 FEAT-PROJECT-TASK-CLEAR-DATABANKS - TaskClearDatabanks.jar
 
 ## 1. Objective
 
@@ -1491,7 +1491,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_clear_databanks.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
 
-# TaskCustomAnalysis.jar — FEAT-PROJECT-TASK-CUSTOM-ANALYSIS
+# 13.33 FEAT-PROJECT-TASK-CUSTOM-ANALYSIS - TaskCustomAnalysis.jar
 
 ## 1. Objective
 
@@ -1537,7 +1537,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_custom_analysis.py --no-cov`; expect resource trust/version, input identity and execution failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource trust/version, input identity and execution failure and visible failures.
 
-# TaskDeleteFile.jar — FEAT-PROJECT-TASK-DELETE-FILE
+# 13.34 FEAT-PROJECT-TASK-DELETE-FILE - TaskDeleteFile.jar
 
 ## 1. Objective
 
@@ -1583,7 +1583,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_delete_file.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
 
-# TaskFiltering.jar — FEAT-PROJECT-TASK-FILTERING
+# 13.35 FEAT-PROJECT-TASK-FILTERING - TaskFiltering.jar
 
 ## 1. Objective
 
@@ -1629,7 +1629,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_filtering.py --no-cov`; expect input handles, start/stop/clone transitions, failure status and retained outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture input handles, start/stop/clone transitions, failure status and retained outputs and visible failures.
 
-# TaskGoToTask.jar — FEAT-PROJECT-TASK-GO-TO-TASK
+# 13.36 FEAT-PROJECT-TASK-GO-TO-TASK - TaskGoToTask.jar
 
 ## 1. Objective
 
@@ -1675,7 +1675,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_go_to_task.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
 
-# TaskLoadFromFiles.jar — FEAT-PROJECT-TASK-LOAD-FROM-FILES
+# 13.37 FEAT-PROJECT-TASK-LOAD-FROM-FILES - TaskLoadFromFiles.jar
 
 ## 1. Objective
 
@@ -1721,7 +1721,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_load_from_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
 
-# TaskLogDatabankStats.jar — FEAT-PROJECT-TASK-LOG-DATABANK-STATS
+# 13.38 FEAT-PROJECT-TASK-LOG-DATABANK-STATS - TaskLogDatabankStats.jar
 
 ## 1. Objective
 
@@ -1767,7 +1767,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_log_databank_stats.py --no-cov`; expect sample basis, empty bank, metric provenance and redacted diagnostics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sample basis, empty bank, metric provenance and redacted diagnostics and visible failures.
 
-# TaskManagerProjects.jar — FEAT-PROJECT-TASK-MANAGER-PROJECTS
+# 13.39 FEAT-PROJECT-TASK-MANAGER-PROJECTS - TaskManagerProjects.jar
 
 ## 1. Objective
 
@@ -1814,7 +1814,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_manager_projects.py --no-cov`; expect input handles, start/stop/clone transitions, failure status and retained outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture input handles, start/stop/clone transitions, failure status and retained outputs and visible failures.
 
-# TaskNotification.jar — FEAT-PROJECT-TASK-NOTIFICATION
+# 13.40 FEAT-PROJECT-TASK-NOTIFICATION - TaskNotification.jar
 
 ## 1. Objective
 
@@ -1860,7 +1860,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_notification.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture recipient/input validation, redaction, timeout and failed delivery and visible failures.
 
-# TaskSaveToFiles.jar — FEAT-PROJECT-TASK-SAVE-TO-FILES
+# 13.41 FEAT-PROJECT-TASK-SAVE-TO-FILES - TaskSaveToFiles.jar
 
 ## 1. Objective
 
@@ -1906,7 +1906,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_save_to_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
 
-# TaskStopAndStart.jar — FEAT-PROJECT-TASK-STOP-AND-START
+# 13.42 FEAT-PROJECT-TASK-STOP-AND-START - TaskStopAndStart.jar
 
 ## 1. Objective
 
@@ -1952,7 +1952,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_stop_and_start.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
 
-# TaskUpdateData.jar — FEAT-PROJECT-TASK-UPDATE-DATA
+# 13.43 FEAT-PROJECT-TASK-UPDATE-DATA - TaskUpdateData.jar
 
 ## 1. Objective
 
@@ -1998,7 +1998,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_update_data.py --no-cov`; expect selected dataset, partial failure, cancellation and updated provenance; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture selected dataset, partial failure, cancellation and updated provenance and visible failures.
 
-# TaskWaitFor.jar — FEAT-PROJECT-TASK-WAIT-FOR
+# 13.44 FEAT-PROJECT-TASK-WAIT-FOR - TaskWaitFor.jar
 
 ## 1. Objective
 
@@ -2044,7 +2044,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_wait_for.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
 
-# ProjectSettings resource contribution — FEAT-UI-PROJECT-SETTINGS
+# 13.45 FEAT-UI-PROJECT-SETTINGS - ProjectSettings resource contribution
 
 ## 1. Objective
 
@@ -2081,7 +2081,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_settings.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Run a small build→retest→save graph on fixtures; inspect condition transitions; reject a destructive task without authority. Inspect the ProjectSettings contribution; an empty or unavailable contribution must remain explicit.
 
-# SettingsPanel resource contribution — FEAT-UI-SETTINGS-PANEL
+# 13.46 FEAT-UI-SETTINGS-PANEL - SettingsPanel resource contribution
 
 ## 1. Objective
 
@@ -2118,7 +2118,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_settings_panel.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Run a small build→retest→save graph on fixtures; inspect condition transitions; reject a destructive task without authority. Inspect the SettingsPanel contribution; an empty or unavailable contribution must remain explicit.
 
-# TaskManagerTasks resource contribution — FEAT-UI-TASK-MANAGER-TASKS
+# 13.47 FEAT-UI-TASK-MANAGER-TASKS - TaskManagerTasks resource contribution
 
 ## 1. Objective
 
@@ -2155,7 +2155,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_task_manager_tasks.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Run a small build→retest→save graph on fixtures; inspect condition transitions; reject a destructive task without authority. Inspect the TaskManagerTasks contribution; an empty or unavailable contribution must remain explicit.
 
-# P13 integration — Execute custom-project task graphs with owned conditions and bounded side effects
+# 13.48 P13 integration — Execute custom-project task graphs with owned conditions and bounded side effects
 
 ## 1. Objective
 

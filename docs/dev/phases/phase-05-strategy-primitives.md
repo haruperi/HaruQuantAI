@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# Snippets.jar — FEAT-SHARED-SNIPPETS
+# 5.1 FEAT-SHARED-SNIPPETS - Snippets.jar
 
 ## 1. Objective
 
@@ -58,7 +58,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_shared_snippets.py --no-cov`; expect all 948 class dispositions, defaults, warm-up, formulas and boundary vectors; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture all 948 class dispositions, defaults, warm-up, formulas and boundary vectors and visible failures.
 
-# ta-lib.jar — FEAT-STRATEGY-TA-LIB
+# 5.2 FEAT-STRATEGY-TA-LIB - ta-lib.jar
 
 ## 1. Objective
 
@@ -107,7 +107,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_strategy_ta_lib.py --no-cov`; expect lookback, output alignment, missing values and numerical tolerances; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture lookback, output alignment, missing values and numerical tolerances and visible failures.
 
-# ServletConstants.jar — FEAT-STRATEGY-SERVLET-CONSTANTS
+# 5.3 FEAT-STRATEGY-SERVLET-CONSTANTS - ServletConstants.jar
 
 ## 1. Objective
 
@@ -155,7 +155,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_strategy_servlet_constants.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# SettingsBlocks.jar — FEAT-STRATEGY-SETTINGS-BLOCKS
+# 5.4 FEAT-STRATEGY-SETTINGS-BLOCKS - SettingsBlocks.jar
 
 ## 1. Objective
 
@@ -203,7 +203,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_strategy_settings_blocks.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# P05 integration — Expose executable strategy blocks and qualified indicator primitives
+# 5.5 P05 integration — Expose executable strategy blocks and qualified indicator primitives
 
 ## 1. Objective
 

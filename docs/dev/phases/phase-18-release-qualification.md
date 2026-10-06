@@ -7,7 +7,7 @@
 - **File labels:** Create means proposed new output; Modify means verified existing file.
 - **Execution:** task plan/approval first; isolated stores; no Git or live external mutations without separate authority.
 
-# Complete archive/class/FR traceability
+# 18.1 Complete archive/class/FR traceability
 
 ## 1. Objective
 
@@ -42,7 +42,7 @@
 - **Automated Tests:** `uv run python tests/reference/qualification/traceability.py`; zero unresolved IDs/unclassified accepted items; missing references fail.
 - **Manual / Browser Verification:** Review the per-feature disposition matrix and unverified/excluded capability list with the owner.
 
-# Independent numerical and format qualification
+# 18.2 Independent numerical and format qualification
 
 ## 1. Objective
 
@@ -78,7 +78,7 @@
 - **Automated Tests:** `uv run pytest tests/reference/qualification/test_differential.py tests/reference/qualification/test_format_roundtrips.py --no-cov`; accepted traces/formats match under explicit tolerances; injected mismatches fail.
 - **Manual / Browser Verification:** Inspect representative same-bar fills, WF boundaries, MC seeds and saved/exported strategies against source observations.
 
-# Whole application frontend/backend journeys
+# 18.3 Whole application frontend/backend journeys
 
 ## 1. Objective
 
@@ -112,7 +112,7 @@
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_application_journeys.py --no-cov`; all accepted journeys use real domain outputs and reload/restart correctly.
 - **Manual / Browser Verification:** Run `npm --prefix ui run test:ui -- tests/e2e/sqx-application-journeys.spec.ts`; review loading/empty/error/cancelled/ready states.
 
-# Failure, recovery and authority qualification
+# 18.4 Failure, recovery and authority qualification
 
 ## 1. Objective
 
@@ -146,7 +146,7 @@
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_failure_recovery.py tests/integration/qualification/test_authority.py --no-cov`; bounded failures; no unauthorized mutation; redacted correlated diagnostics.
 - **Manual / Browser Verification:** Disconnect a worker/provider and expire the session; inspect UI recovery and verify every blocked side effect remains unapplied.
 
-# Capability removal, restart and retained data
+# 18.5 Capability removal, restart and retained data
 
 ## 1. Objective
 
@@ -180,7 +180,7 @@
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_removal_matrix.py tests/integration/qualification/test_retention.py --no-cov`; no leaked ownership; unaffected data preserved; isolated recovery is repeatable.
 - **Manual / Browser Verification:** Remove a test capability while a fixture job runs; restart; inspect disabled dependents and preserved unrelated resources.
 
-# Resource limits, concurrency and repeatability
+# 18.6 Resource limits, concurrency and repeatability
 
 ## 1. Objective
 
@@ -214,7 +214,7 @@
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_resource_limits.py --no-cov`; ratified limits hold; injected overflow fails visibly; completed-job counts reconcile.
 - **Manual / Browser Verification:** Run the bounded reference workloads; inspect progress, cancellation, resource recovery and chart/table responsiveness.
 
-# Application tooling and clean distribution
+# 18.7 Application tooling and clean distribution
 
 ## 1. Objective
 
@@ -253,7 +253,7 @@
 - **Automated Tests:** `uv run pytest tests/integration/qualification/test_distribution.py --no-cov`; fresh distribution boots/runs approved journeys; retained code and UI checks pass.
 - **Manual / Browser Verification:** Install/launch the candidate in an isolated environment; check startup, resource paths, preferences and shutdown.
 
-# Evidence review and owner release gate
+# 18.8 Evidence review and owner release gate
 
 ## 1. Objective
 

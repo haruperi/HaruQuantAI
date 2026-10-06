@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# AppNeuralNetwork.jar — FEAT-NEURAL-APP-NEURAL-NETWORK
+# 15.1 FEAT-NEURAL-APP-NEURAL-NETWORK - AppNeuralNetwork.jar
 
 ## 1. Objective
 
@@ -57,7 +57,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_neural_app_neural_network.py --no-cov`; expect feature scaling, seed/split policy, model version and finite inference; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture feature scaling, seed/split policy, model version and finite inference and visible failures.
 
-# TaskNeuralNetworkTrainer.jar — FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER
+# 15.2 FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER - TaskNeuralNetworkTrainer.jar
 
 ## 1. Objective
 
@@ -103,7 +103,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_neural_task_neural_network_trainer.py --no-cov`; expect feature scaling, seed/split policy, model version and finite inference; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture feature scaling, seed/split policy, model version and finite inference and visible failures.
 
-# P15 integration — Train, persist and consume qualified neural model resources
+# 15.3 P15 integration — Train, persist and consume qualified neural model resources
 
 ## 1. Objective
 

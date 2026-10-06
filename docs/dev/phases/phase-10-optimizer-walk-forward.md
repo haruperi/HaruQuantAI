@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# AppOptimizer.jar — FEAT-OPTIMIZER-APP-OPTIMIZER
+# 10.1 FEAT-OPTIMIZER-APP-OPTIMIZER - AppOptimizer.jar
 
 ## 1. Objective
 
@@ -57,7 +57,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_app_optimizer.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# FitnessMethodWFResult.jar — FEAT-OPTIMIZER-FITNESS-METHOD-WF-RESULT
+# 10.2 FEAT-OPTIMIZER-FITNESS-METHOD-WF-RESULT - FitnessMethodWFResult.jar
 
 ## 1. Objective
 
@@ -105,7 +105,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_fitness_method_wf_result.py --no-cov`; expect objective direction, ties, missing metrics and nonfinite scores; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture objective direction, ties, missing metrics and nonfinite scores and visible failures.
 
-# ProjectOptimizer.jar — FEAT-OPTIMIZER-PROJECT-OPTIMIZER
+# 10.3 FEAT-OPTIMIZER-PROJECT-OPTIMIZER - ProjectOptimizer.jar
 
 ## 1. Objective
 
@@ -151,7 +151,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_project_optimizer.py --no-cov`; expect project revisions, input/output contracts, failed transitions and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture project revisions, input/output contracts, failed transitions and cancellation and visible failures.
 
-# ResultsOptimizationProfile.jar — FEAT-OPTIMIZER-RESULTS-OPTIMIZATION-PROFILE
+# 10.4 FEAT-OPTIMIZER-RESULTS-OPTIMIZATION-PROFILE - ResultsOptimizationProfile.jar
 
 ## 1. Objective
 
@@ -198,7 +198,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_optimization_profile.py --no-cov`; expect range endpoints, enumeration order and matrix/result reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture range endpoints, enumeration order and matrix/result reconciliation and visible failures.
 
-# ResultsProfileChart.jar — FEAT-OPTIMIZER-RESULTS-PROFILE-CHART
+# 10.5 FEAT-OPTIMIZER-RESULTS-PROFILE-CHART - ResultsProfileChart.jar
 
 ## 1. Objective
 
@@ -246,7 +246,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_profile_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# ResultsSequentialOptimization.jar — FEAT-OPTIMIZER-RESULTS-SEQUENTIAL-OPTIMIZATION
+# 10.6 FEAT-OPTIMIZER-RESULTS-SEQUENTIAL-OPTIMIZATION - ResultsSequentialOptimization.jar
 
 ## 1. Objective
 
@@ -293,7 +293,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_sequential_optimization.py --no-cov`; expect candidate dependencies, repeated passes, stopping and score ordering; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture candidate dependencies, repeated passes, stopping and score ordering and visible failures.
 
-# ResultsSysParamPermutation.jar — FEAT-OPTIMIZER-RESULTS-SYS-PARAM-PERMUTATION
+# 10.7 FEAT-OPTIMIZER-RESULTS-SYS-PARAM-PERMUTATION - ResultsSysParamPermutation.jar
 
 ## 1. Objective
 
@@ -341,7 +341,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_sys_param_permutation.py --no-cov`; expect range endpoints, enumeration order and matrix/result reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture range endpoints, enumeration order and matrix/result reconciliation and visible failures.
 
-# ResultsWalkForward.jar — FEAT-OPTIMIZER-RESULTS-WALK-FORWARD
+# 10.8 FEAT-OPTIMIZER-RESULTS-WALK-FORWARD - ResultsWalkForward.jar
 
 ## 1. Objective
 
@@ -389,7 +389,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_walk_forward.py --no-cov`; expect in/out-of-sample boundaries, leakage rejection, aggregation and tie rules; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture in/out-of-sample boundaries, leakage rejection, aggregation and tie rules and visible failures.
 
-# SettingsOptimization.jar — FEAT-OPTIMIZER-SETTINGS-OPTIMIZATION
+# 10.9 FEAT-OPTIMIZER-SETTINGS-OPTIMIZATION - SettingsOptimization.jar
 
 ## 1. Objective
 
@@ -437,7 +437,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_settings_optimization.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# TaskOptimize.jar — FEAT-OPTIMIZER-TASK-OPTIMIZE
+# 10.10 FEAT-OPTIMIZER-TASK-OPTIMIZE - TaskOptimize.jar
 
 ## 1. Objective
 
@@ -485,7 +485,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_task_optimize.py --no-cov`; expect input handles, start/stop/clone transitions, failure status and retained outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture input handles, start/stop/clone transitions, failure status and retained outputs and visible failures.
 
-# P10 integration — Optimize strategy parameters and calculate walk-forward/profile results
+# 10.11 P10 integration — Optimize strategy parameters and calculate walk-forward/profile results
 
 ## 1. Objective
 

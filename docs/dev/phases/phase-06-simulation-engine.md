@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# SQTradingLib.jar — FEAT-SHARED-SQ-TRADING-LIB
+# 6.1 FEAT-SHARED-SQ-TRADING-LIB - SQTradingLib.jar
 
 ## 1. Objective
 
@@ -59,7 +59,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_shared_sq_trading_lib.py --no-cov`; expect event order, same-bar precedence, costs, rounding and reconciled equity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture event order, same-bar precedence, costs, rounding and reconciled equity and visible failures.
 
-# SettingsAdvancedTM.jar — FEAT-SIMULATOR-SETTINGS-ADVANCED-TM
+# 6.2 FEAT-SIMULATOR-SETTINGS-ADVANCED-TM - SettingsAdvancedTM.jar
 
 ## 1. Objective
 
@@ -106,7 +106,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_simulator_settings_advanced_tm.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsMoneyManagement.jar — FEAT-SIMULATOR-SETTINGS-MONEY-MANAGEMENT
+# 6.3 FEAT-SIMULATOR-SETTINGS-MONEY-MANAGEMENT - SettingsMoneyManagement.jar
 
 ## 1. Objective
 
@@ -154,7 +154,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_simulator_settings_money_management.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# SettingsOptions.jar — FEAT-SIMULATOR-SETTINGS-OPTIONS
+# 6.4 FEAT-SIMULATOR-SETTINGS-OPTIONS - SettingsOptions.jar
 
 ## 1. Objective
 
@@ -201,7 +201,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_simulator_settings_options.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# P06 integration — Execute deterministic strategies and produce reconciled trade/account ledgers
+# 6.5 P06 integration — Execute deterministic strategies and produce reconciled trade/account ledgers
 
 ## 1. Objective
 

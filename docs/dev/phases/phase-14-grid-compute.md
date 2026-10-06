@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# affinity.jar — FEAT-COMPUTE-AFFINITY
+# 14.1 FEAT-COMPUTE-AFFINITY - affinity.jar
 
 ## 1. Objective
 
@@ -59,7 +59,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_affinity.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture unsupported probe, process lifetime and bounded sampling and visible failures.
 
-# artemis-commons.jar — FEAT-COMPUTE-ARTEMIS-COMMONS
+# 14.2 FEAT-COMPUTE-ARTEMIS-COMMONS - artemis-commons.jar
 
 ## 1. Objective
 
@@ -107,7 +107,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_commons.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
 
-# artemis-core-client.jar — FEAT-COMPUTE-ARTEMIS-CORE-CLIENT
+# 14.3 FEAT-COMPUTE-ARTEMIS-CORE-CLIENT - artemis-core-client.jar
 
 ## 1. Objective
 
@@ -157,7 +157,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_core_client.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
 
-# artemis-jms-client.jar — FEAT-COMPUTE-ARTEMIS-JMS-CLIENT
+# 14.4 FEAT-COMPUTE-ARTEMIS-JMS-CLIENT - artemis-jms-client.jar
 
 ## 1. Objective
 
@@ -207,7 +207,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_jms_client.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
 
-# artemis-selector.jar — FEAT-COMPUTE-ARTEMIS-SELECTOR
+# 14.5 FEAT-COMPUTE-ARTEMIS-SELECTOR - artemis-selector.jar
 
 ## 1. Objective
 
@@ -257,7 +257,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_selector.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
 
-# geronimo-jms.jar — FEAT-COMPUTE-GERONIMO-JMS
+# 14.6 FEAT-COMPUTE-GERONIMO-JMS - geronimo-jms.jar
 
 ## 1. Objective
 
@@ -307,7 +307,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_geronimo_jms.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
 
-# jspf.remote.jar — FEAT-COMPUTE-JSPF-REMOTE
+# 14.7 FEAT-COMPUTE-JSPF-REMOTE - jspf.remote.jar
 
 ## 1. Objective
 
@@ -356,7 +356,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_jspf_remote.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
 
-# SQGridLib2.jar — FEAT-COMPUTE-SQ-GRID-LIB2
+# 14.8 FEAT-COMPUTE-SQ-GRID-LIB2 - SQGridLib2.jar
 
 ## 1. Objective
 
@@ -406,7 +406,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_sq_grid_lib2.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
 
-# AppGridControl.jar — FEAT-COMPUTE-APP-GRID-CONTROL
+# 14.9 FEAT-COMPUTE-APP-GRID-CONTROL - AppGridControl.jar
 
 ## 1. Objective
 
@@ -454,7 +454,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_app_grid_control.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# AppGridTest.jar — FEAT-COMPUTE-APP-GRID-TEST
+# 14.10 FEAT-COMPUTE-APP-GRID-TEST - AppGridTest.jar
 
 ## 1. Objective
 
@@ -502,7 +502,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_app_grid_test.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# ServletGridControl.jar — FEAT-COMPUTE-SERVLET-GRID-CONTROL
+# 14.11 FEAT-COMPUTE-SERVLET-GRID-CONTROL - ServletGridControl.jar
 
 ## 1. Objective
 
@@ -547,7 +547,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_servlet_grid_control.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# P14 integration — Run owned distributed jobs with compatible workers and bounded messaging
+# 14.12 P14 integration — Run owned distributed jobs with compatible workers and bounded messaging
 
 ## 1. Objective
 

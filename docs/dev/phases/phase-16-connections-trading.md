@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# ConnectionLiveTest.jar — FEAT-CONNECTION-CONNECTION-LIVE-TEST
+# 16.1 FEAT-CONNECTION-CONNECTION-LIVE-TEST - ConnectionLiveTest.jar
 
 ## 1. Objective
 
@@ -57,7 +57,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_connection_connection_live_test.py --no-cov`; expect handshake, symbol/account mapping, disconnect, timeout and denied live action; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture handshake, symbol/account mapping, disconnect, timeout and denied live action and visible failures.
 
-# ConnectionMT4.jar — FEAT-CONNECTION-CONNECTION-MT4
+# 16.2 FEAT-CONNECTION-CONNECTION-MT4 - ConnectionMT4.jar
 
 ## 1. Objective
 
@@ -105,7 +105,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_connection_connection_mt4.py --no-cov`; expect handshake, symbol/account mapping, disconnect, timeout and denied live action; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture handshake, symbol/account mapping, disconnect, timeout and denied live action and visible failures.
 
-# ConnectionTest.jar — FEAT-CONNECTION-CONNECTION-TEST
+# 16.3 FEAT-CONNECTION-CONNECTION-TEST - ConnectionTest.jar
 
 ## 1. Objective
 
@@ -153,7 +153,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_connection_connection_test.py --no-cov`; expect handshake, symbol/account mapping, disconnect, timeout and denied live action; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture handshake, symbol/account mapping, disconnect, timeout and denied live action and visible failures.
 
-# DataManagerConnections.jar — FEAT-CONNECTION-DATA-MANAGER-CONNECTIONS
+# 16.4 FEAT-CONNECTION-DATA-MANAGER-CONNECTIONS - DataManagerConnections.jar
 
 ## 1. Objective
 
@@ -201,7 +201,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_connection_data_manager_connections.py --no-cov`; expect handshake, symbol/account mapping, disconnect, timeout and denied live action; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture handshake, symbol/account mapping, disconnect, timeout and denied live action and visible failures.
 
-# ServletConnection.jar — FEAT-CONNECTION-SERVLET-CONNECTION
+# 16.5 FEAT-CONNECTION-SERVLET-CONNECTION - ServletConnection.jar
 
 ## 1. Objective
 
@@ -249,7 +249,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_connection_servlet_connection.py --no-cov`; expect handshake, symbol/account mapping, disconnect, timeout and denied live action; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture handshake, symbol/account mapping, disconnect, timeout and denied live action and visible failures.
 
-# P16 integration — Qualify terminal connections and segregate simulation from authorized trading
+# 16.6 P16 integration — Qualify terminal connections and segregate simulation from authorized trading
 
 ## 1. Objective
 

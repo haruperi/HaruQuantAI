@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# commons-imaging.jar — FEAT-RESULTS-COMMONS-IMAGING
+# 8.1 FEAT-RESULTS-COMMONS-IMAGING - commons-imaging.jar
 
 ## 1. Objective
 
@@ -59,7 +59,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_commons_imaging.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture dimensions, scaling, supported encodings and malformed image handling and visible failures.
 
-# image4j.jar — FEAT-RESULTS-IMAGE4J
+# 8.2 FEAT-RESULTS-IMAGE4J - image4j.jar
 
 ## 1. Objective
 
@@ -107,7 +107,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_image4j.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture dimensions, scaling, supported encodings and malformed image handling and visible failures.
 
-# java-image-scaling-0.8.6.jar — FEAT-RESULTS-JAVA-IMAGE-SCALING-0-8-6
+# 8.3 FEAT-RESULTS-JAVA-IMAGE-SCALING-0-8-6 - java-image-scaling-0.8.6.jar
 
 ## 1. Objective
 
@@ -157,7 +157,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_java_image_scaling_0_8_6.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture dimensions, scaling, supported encodings and malformed image handling and visible failures.
 
-# pd4ml.jar — FEAT-RESULTS-PD4ML
+# 8.4 FEAT-RESULTS-PD4ML - pd4ml.jar
 
 ## 1. Objective
 
@@ -205,7 +205,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_pd4ml.py --no-cov`; expect page layout, fonts, metadata and totals matching result artifacts; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture page layout, fonts, metadata and totals matching result artifacts and visible failures.
 
-# pngj.jar — FEAT-RESULTS-PNGJ
+# 8.5 FEAT-RESULTS-PNGJ - pngj.jar
 
 ## 1. Objective
 
@@ -255,7 +255,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_pngj.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture dimensions, scaling, supported encodings and malformed image handling and visible failures.
 
-# poi-ooxml-schemas.jar — FEAT-RESULTS-POI-OOXML-SCHEMAS
+# 8.6 FEAT-RESULTS-POI-OOXML-SCHEMAS - poi-ooxml-schemas.jar
 
 ## 1. Objective
 
@@ -305,7 +305,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_poi_ooxml_schemas.py --no-cov`; expect sheet types, formula/value policy, units and totals matching artifacts; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sheet types, formula/value policy, units and totals matching artifacts and visible failures.
 
-# poi-ooxml.jar — FEAT-RESULTS-POI-OOXML
+# 8.7 FEAT-RESULTS-POI-OOXML - poi-ooxml.jar
 
 ## 1. Objective
 
@@ -355,7 +355,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_poi_ooxml.py --no-cov`; expect sheet types, formula/value policy, units and totals matching artifacts; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sheet types, formula/value policy, units and totals matching artifacts and visible failures.
 
-# poi.jar — FEAT-RESULTS-POI
+# 8.8 FEAT-RESULTS-POI - poi.jar
 
 ## 1. Objective
 
@@ -403,7 +403,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_poi.py --no-cov`; expect sheet types, formula/value policy, units and totals matching artifacts; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sheet types, formula/value policy, units and totals matching artifacts and visible failures.
 
-# xmlbeans.jar — FEAT-RESULTS-XMLBEANS
+# 8.9 FEAT-RESULTS-XMLBEANS - xmlbeans.jar
 
 ## 1. Objective
 
@@ -453,7 +453,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_xmlbeans.py --no-cov`; expect namespaces, encoding, rejected unsafe constructs and lossless unknown fields; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture namespaces, encoding, rejected unsafe constructs and lossless unknown fields and visible failures.
 
-# AppResults.jar — FEAT-RESULTS-APP-RESULTS
+# 8.10 FEAT-RESULTS-APP-RESULTS - AppResults.jar
 
 ## 1. Objective
 
@@ -501,7 +501,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_app_results.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# DatabankFilterByCorrelation.jar — FEAT-RESULTS-DATABANK-FILTER-BY-CORRELATION
+# 8.11 FEAT-RESULTS-DATABANK-FILTER-BY-CORRELATION - DatabankFilterByCorrelation.jar
 
 ## 1. Objective
 
@@ -548,7 +548,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_databank_filter_by_correlation.py --no-cov`; expect alignment, sample basis, undefined correlation and threshold equality; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture alignment, sample basis, undefined correlation and threshold equality and visible failures.
 
-# DatabankRename.jar — FEAT-RESULTS-DATABANK-RENAME
+# 8.12 FEAT-RESULTS-DATABANK-RENAME - DatabankRename.jar
 
 ## 1. Objective
 
@@ -595,7 +595,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_databank_rename.py --no-cov`; expect collision, stable IDs, history and permission rejection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture collision, stable IDs, history and permission rejection and visible failures.
 
-# EquityChartBenchmark.jar — FEAT-RESULTS-EQUITY-CHART-BENCHMARK
+# 8.13 FEAT-RESULTS-EQUITY-CHART-BENCHMARK - EquityChartBenchmark.jar
 
 ## 1. Objective
 
@@ -641,7 +641,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_benchmark.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# EquityChartDailyChart.jar — FEAT-RESULTS-EQUITY-CHART-DAILY-CHART
+# 8.14 FEAT-RESULTS-EQUITY-CHART-DAILY-CHART - EquityChartDailyChart.jar
 
 ## 1. Objective
 
@@ -687,7 +687,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_daily_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# EquityChartDrawdown.jar — FEAT-RESULTS-EQUITY-CHART-DRAWDOWN
+# 8.15 FEAT-RESULTS-EQUITY-CHART-DRAWDOWN - EquityChartDrawdown.jar
 
 ## 1. Objective
 
@@ -733,7 +733,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_drawdown.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# EquityChartVolatility.jar — FEAT-RESULTS-EQUITY-CHART-VOLATILITY
+# 8.16 FEAT-RESULTS-EQUITY-CHART-VOLATILITY - EquityChartVolatility.jar
 
 ## 1. Objective
 
@@ -779,7 +779,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_volatility.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# EquityChartVolume.jar — FEAT-RESULTS-EQUITY-CHART-VOLUME
+# 8.17 FEAT-RESULTS-EQUITY-CHART-VOLUME - EquityChartVolume.jar
 
 ## 1. Objective
 
@@ -825,7 +825,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_volume.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# ResultsChart.jar — FEAT-RESULTS-RESULTS-CHART
+# 8.18 FEAT-RESULTS-RESULTS-CHART - ResultsChart.jar
 
 ## 1. Objective
 
@@ -872,7 +872,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# ResultsDatabankActions.jar — FEAT-RESULTS-RESULTS-DATABANK-ACTIONS
+# 8.19 FEAT-RESULTS-RESULTS-DATABANK-ACTIONS - ResultsDatabankActions.jar
 
 ## 1. Objective
 
@@ -919,7 +919,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_databank_actions.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsDatabankViews.jar — FEAT-RESULTS-RESULTS-DATABANK-VIEWS
+# 8.20 FEAT-RESULTS-RESULTS-DATABANK-VIEWS - ResultsDatabankViews.jar
 
 ## 1. Objective
 
@@ -966,7 +966,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_databank_views.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsEquityChart.jar — FEAT-RESULTS-RESULTS-EQUITY-CHART
+# 8.21 FEAT-RESULTS-RESULTS-EQUITY-CHART - ResultsEquityChart.jar
 
 ## 1. Objective
 
@@ -1014,7 +1014,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_equity_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
 
-# ResultsExplore.jar — FEAT-RESULTS-RESULTS-EXPLORE
+# 8.22 FEAT-RESULTS-RESULTS-EXPLORE - ResultsExplore.jar
 
 ## 1. Objective
 
@@ -1061,7 +1061,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_explore.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsOverview.jar — FEAT-RESULTS-RESULTS-OVERVIEW
+# 8.23 FEAT-RESULTS-RESULTS-OVERVIEW - ResultsOverview.jar
 
 ## 1. Objective
 
@@ -1109,7 +1109,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_overview.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsPlugins.jar — FEAT-RESULTS-RESULTS-PLUGINS
+# 8.24 FEAT-RESULTS-RESULTS-PLUGINS - ResultsPlugins.jar
 
 ## 1. Objective
 
@@ -1156,7 +1156,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_plugins.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsSPOverview.jar — FEAT-RESULTS-RESULTS-SP-OVERVIEW
+# 8.25 FEAT-RESULTS-RESULTS-SP-OVERVIEW - ResultsSPOverview.jar
 
 ## 1. Objective
 
@@ -1203,7 +1203,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_sp_overview.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsStockpicker.jar — FEAT-RESULTS-RESULTS-STOCKPICKER
+# 8.26 FEAT-RESULTS-RESULTS-STOCKPICKER - ResultsStockpicker.jar
 
 ## 1. Objective
 
@@ -1250,7 +1250,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_stockpicker.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsStrategyConfig.jar — FEAT-RESULTS-RESULTS-STRATEGY-CONFIG
+# 8.27 FEAT-RESULTS-RESULTS-STRATEGY-CONFIG - ResultsStrategyConfig.jar
 
 ## 1. Objective
 
@@ -1297,7 +1297,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_strategy_config.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
 
-# ResultsTradeAnalysis.jar — FEAT-RESULTS-RESULTS-TRADE-ANALYSIS
+# 8.28 FEAT-RESULTS-RESULTS-TRADE-ANALYSIS - ResultsTradeAnalysis.jar
 
 ## 1. Objective
 
@@ -1345,7 +1345,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_trade_analysis.py --no-cov`; expect trade identity, filters, aggregation boundaries and empty results; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture trade identity, filters, aggregation boundaries and empty results and visible failures.
 
-# ResultsTradeList.jar — FEAT-RESULTS-RESULTS-TRADE-LIST
+# 8.29 FEAT-RESULTS-RESULTS-TRADE-LIST - ResultsTradeList.jar
 
 ## 1. Objective
 
@@ -1392,7 +1392,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_trade_list.py --no-cov`; expect trade identity, filters, aggregation boundaries and empty results; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture trade identity, filters, aggregation boundaries and empty results and visible failures.
 
-# ResultsTradelistViews.jar — FEAT-RESULTS-RESULTS-TRADELIST-VIEWS
+# 8.30 FEAT-RESULTS-RESULTS-TRADELIST-VIEWS - ResultsTradelistViews.jar
 
 ## 1. Objective
 
@@ -1439,7 +1439,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_tradelist_views.py --no-cov`; expect trade identity, filters, aggregation boundaries and empty results; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture trade identity, filters, aggregation boundaries and empty results and visible failures.
 
-# SaverHTML.jar — FEAT-RESULTS-SAVER-HTML
+# 8.31 FEAT-RESULTS-SAVER-HTML - SaverHTML.jar
 
 ## 1. Objective
 
@@ -1485,7 +1485,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_saver_html.py --no-cov`; expect escaping/format, missing output destination and totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture escaping/format, missing output destination and totals reconciliation and visible failures.
 
-# SaverPDF.jar — FEAT-RESULTS-SAVER-PDF
+# 8.32 FEAT-RESULTS-SAVER-PDF - SaverPDF.jar
 
 ## 1. Objective
 
@@ -1531,7 +1531,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_saver_pdf.py --no-cov`; expect escaping/format, missing output destination and totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture escaping/format, missing output destination and totals reconciliation and visible failures.
 
-# SaverStrategyTrades.jar — FEAT-RESULTS-SAVER-STRATEGY-TRADES
+# 8.33 FEAT-RESULTS-SAVER-STRATEGY-TRADES - SaverStrategyTrades.jar
 
 ## 1. Objective
 
@@ -1577,7 +1577,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_saver_strategy_trades.py --no-cov`; expect escaping/format, missing output destination and totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture escaping/format, missing output destination and totals reconciliation and visible failures.
 
-# ServletDatabankViews.jar — FEAT-RESULTS-SERVLET-DATABANK-VIEWS
+# 8.34 FEAT-RESULTS-SERVLET-DATABANK-VIEWS - ServletDatabankViews.jar
 
 ## 1. Objective
 
@@ -1623,7 +1623,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_servlet_databank_views.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
 
-# ServletRenameTool.jar — FEAT-RESULTS-SERVLET-RENAME-TOOL
+# 8.35 FEAT-RESULTS-SERVLET-RENAME-TOOL - ServletRenameTool.jar
 
 ## 1. Objective
 
@@ -1670,7 +1670,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_servlet_rename_tool.py --no-cov`; expect collision, stable IDs, history and permission rejection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture collision, stable IDs, history and permission rejection and visible failures.
 
-# CustomDatabankActions resource contribution — FEAT-UI-CUSTOM-DATABANK-ACTIONS
+# 8.36 FEAT-UI-CUSTOM-DATABANK-ACTIONS - CustomDatabankActions resource contribution
 
 ## 1. Objective
 
@@ -1707,7 +1707,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_custom_databank_actions.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the CustomDatabankActions contribution; an empty or unavailable contribution must remain explicit.
 
-# CustomResultsPluginActions resource contribution — FEAT-UI-CUSTOM-RESULTS-PLUGIN-ACTIONS
+# 8.37 FEAT-UI-CUSTOM-RESULTS-PLUGIN-ACTIONS - CustomResultsPluginActions resource contribution
 
 ## 1. Objective
 
@@ -1744,7 +1744,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_custom_results_plugin_actions.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the CustomResultsPluginActions contribution; an empty or unavailable contribution must remain explicit.
 
-# ProjectDatabanks resource contribution — FEAT-UI-PROJECT-DATABANKS
+# 8.38 FEAT-UI-PROJECT-DATABANKS - ProjectDatabanks resource contribution
 
 ## 1. Objective
 
@@ -1781,7 +1781,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_databanks.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the ProjectDatabanks contribution; an empty or unavailable contribution must remain explicit.
 
-# ProjectResults resource contribution — FEAT-UI-PROJECT-RESULTS
+# 8.39 FEAT-UI-PROJECT-RESULTS - ProjectResults resource contribution
 
 ## 1. Objective
 
@@ -1818,7 +1818,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_results.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the ProjectResults contribution; an empty or unavailable contribution must remain explicit.
 
-# ResultsReport resource contribution — FEAT-UI-RESULTS-REPORT
+# 8.40 FEAT-UI-RESULTS-REPORT - ResultsReport resource contribution
 
 ## 1. Objective
 
@@ -1855,7 +1855,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_results_report.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the ResultsReport contribution; an empty or unavailable contribution must remain explicit.
 
-# P08 integration — Render authoritative databanks, result analysis, charts and exports
+# 8.41 P08 integration — Render authoritative databanks, result analysis, charts and exports
 
 ## 1. Objective
 

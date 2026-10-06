@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# P00 prerequisites — evidence, ownership and missing common core
+# 1.1 P00 prerequisites — evidence, ownership and missing common core
 
 ## 1. Objective
 
@@ -52,7 +52,7 @@
 - **Automated Tests:** Inventory reconciliation and registry/schema checks after restoration; no runtime or ledger pass is claimed before actual recorded observations.
 - **Manual / Browser Verification:** Owner reviews restored authority, common-core gaps and the selected fixture/release matrix before backend execution.
 
-# commons-beanutils.jar — FEAT-HOST-COMMONS-BEANUTILS
+# 1.2 FEAT-HOST-COMMONS-BEANUTILS - commons-beanutils.jar
 
 ## 1. Objective
 
@@ -98,7 +98,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_beanutils.py --no-cov`; expect coercion, missing properties and rejected unknown fields; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture coercion, missing properties and rejected unknown fields and visible failures.
 
-# commons-codec.jar — FEAT-HOST-COMMONS-CODEC
+# 1.3 FEAT-HOST-COMMONS-CODEC - commons-codec.jar
 
 ## 1. Objective
 
@@ -143,7 +143,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_codec.py --no-cov`; expect encoding vectors, malformed input and byte/text boundary; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture encoding vectors, malformed input and byte/text boundary and visible failures.
 
-# commons-collections.jar — FEAT-HOST-COMMONS-COLLECTIONS
+# 1.4 FEAT-HOST-COMMONS-COLLECTIONS - commons-collections.jar
 
 ## 1. Objective
 
@@ -189,7 +189,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_collections.py --no-cov`; expect ordering, duplicate/null handling and bounded collection behavior; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture ordering, duplicate/null handling and bounded collection behavior and visible failures.
 
-# commons-io-icm.jar — FEAT-HOST-COMMONS-IO-ICM
+# 1.5 FEAT-HOST-COMMONS-IO-ICM - commons-io-icm.jar
 
 ## 1. Objective
 
@@ -235,7 +235,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_io_icm.py --no-cov`; expect encoding, path containment, interrupted write and closed handle; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture encoding, path containment, interrupted write and closed handle and visible failures.
 
-# commons-io.jar — FEAT-HOST-COMMONS-IO
+# 1.6 FEAT-HOST-COMMONS-IO - commons-io.jar
 
 ## 1. Objective
 
@@ -281,7 +281,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_io.py --no-cov`; expect encoding, path containment, interrupted write and closed handle; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture encoding, path containment, interrupted write and closed handle and visible failures.
 
-# commons-lang3.jar — FEAT-HOST-COMMONS-LANG3
+# 1.7 FEAT-HOST-COMMONS-LANG3 - commons-lang3.jar
 
 ## 1. Objective
 
@@ -326,7 +326,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_lang3.py --no-cov`; expect ordering, duplicate/null handling and bounded collection behavior; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture ordering, duplicate/null handling and bounded collection behavior and visible failures.
 
-# commons-logging.jar — FEAT-HOST-COMMONS-LOGGING
+# 1.8 FEAT-HOST-COMMONS-LOGGING - commons-logging.jar
 
 ## 1. Objective
 
@@ -374,7 +374,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_logging.py --no-cov`; expect logger identity, level filtering and exception/redaction projection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture logger identity, level filtering and exception/redaction projection and visible failures.
 
-# guava.jar — FEAT-HOST-GUAVA
+# 1.9 FEAT-HOST-GUAVA - guava.jar
 
 ## 1. Objective
 
@@ -418,7 +418,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_guava.py --no-cov`; expect ordering, duplicate/null handling and bounded collection behavior; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture ordering, duplicate/null handling and bounded collection behavior and visible failures.
 
-# jna-platform.jar — FEAT-HOST-JNA-PLATFORM
+# 1.10 FEAT-HOST-JNA-PLATFORM - jna-platform.jar
 
 ## 1. Objective
 
@@ -464,7 +464,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jna_platform.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture unsupported probe, process lifetime and bounded sampling and visible failures.
 
-# jna.jar — FEAT-HOST-JNA
+# 1.11 FEAT-HOST-JNA - jna.jar
 
 ## 1. Objective
 
@@ -508,7 +508,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jna.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture unsupported probe, process lifetime and bounded sampling and visible failures.
 
-# jProcesses.jar — FEAT-HOST-J-PROCESSES
+# 1.12 FEAT-HOST-J-PROCESSES - jProcesses.jar
 
 ## 1. Objective
 
@@ -554,7 +554,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_j_processes.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture unsupported probe, process lifetime and bounded sampling and visible failures.
 
-# logback-classic.jar — FEAT-HOST-LOGBACK-CLASSIC
+# 1.13 FEAT-HOST-LOGBACK-CLASSIC - logback-classic.jar
 
 ## 1. Objective
 
@@ -602,7 +602,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_logback_classic.py --no-cov`; expect inheritance, context isolation and sanitized exception records; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture inheritance, context isolation and sanitized exception records and visible failures.
 
-# logback-core.jar — FEAT-HOST-LOGBACK-CORE
+# 1.14 FEAT-HOST-LOGBACK-CORE - logback-core.jar
 
 ## 1. Objective
 
@@ -650,7 +650,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_logback_core.py --no-cov`; expect sink failure, rotation limits, flush ordering and shutdown; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sink failure, rotation limits, flush ordering and shutdown and visible failures.
 
-# oshi-core.jar — FEAT-HOST-OSHI-CORE
+# 1.15 FEAT-HOST-OSHI-CORE - oshi-core.jar
 
 ## 1. Objective
 
@@ -696,7 +696,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_oshi_core.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture unsupported probe, process lifetime and bounded sampling and visible failures.
 
-# PSUtils.jar — FEAT-HOST-PS-UTILS
+# 1.16 FEAT-HOST-PS-UTILS - PSUtils.jar
 
 ## 1. Objective
 
@@ -742,7 +742,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_ps_utils.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture unsupported probe, process lifetime and bounded sampling and visible failures.
 
-# slf4j-api.jar — FEAT-HOST-SLF4J-API
+# 1.17 FEAT-HOST-SLF4J-API - slf4j-api.jar
 
 ## 1. Objective
 
@@ -790,7 +790,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_slf4j_api.py --no-cov`; expect logger identity, level filtering and exception/redaction projection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture logger identity, level filtering and exception/redaction projection and visible failures.
 
-# AppDebugConsole.jar — FEAT-HOST-APP-DEBUG-CONSOLE
+# 1.18 FEAT-HOST-APP-DEBUG-CONSOLE - AppDebugConsole.jar
 
 ## 1. Objective
 
@@ -838,7 +838,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_app_debug_console.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# jrt-fs.jar — FEAT-HOST-JRT-FS
+# 1.19 FEAT-HOST-JRT-FS - jrt-fs.jar
 
 ## 1. Objective
 
@@ -880,7 +880,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jrt_fs.py --no-cov`; expect fresh-process boot/shutdown, deterministic settings and sanitized logs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture fresh-process boot/shutdown, deterministic settings and sanitized logs and visible failures.
 
-# P01 integration — Boot the host with validated settings, structured logging and diagnostics
+# 1.20 P01 integration — Boot the host with validated settings, structured logging and diagnostics
 
 ## 1. Objective
 

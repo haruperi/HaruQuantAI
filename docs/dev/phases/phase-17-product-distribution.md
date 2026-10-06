@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# jfx_2.4.9_sq.jar — FEAT-PRODUCT-JFX-2-4-9-SQ
+# 17.1 FEAT-PRODUCT-JFX-2-4-9-SQ - jfx_2.4.9_sq.jar
 
 ## 1. Objective
 
@@ -55,7 +55,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_jfx_2_4_9_sq.py --no-cov`; expect startup/exit, window lifecycle, skin persistence and unsupported native behavior; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup/exit, window lifecycle, skin persistence and unsupported native behavior and visible failures.
 
-# mcp-core.jar — FEAT-PRODUCT-MCP-CORE
+# 17.2 FEAT-PRODUCT-MCP-CORE - mcp-core.jar
 
 ## 1. Objective
 
@@ -103,7 +103,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_mcp_core.py --no-cov`; expect tool schema, authority, timeout, cancellation and unavailable capability; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture tool schema, authority, timeout, cancellation and unavailable capability and visible failures.
 
-# mcp-json-jackson2.jar — FEAT-PRODUCT-MCP-JSON-JACKSON2
+# 17.3 FEAT-PRODUCT-MCP-JSON-JACKSON2 - mcp-json-jackson2.jar
 
 ## 1. Objective
 
@@ -151,7 +151,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_mcp_json_jackson2.py --no-cov`; expect null/number handling, unknown fields and malformed payload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture null/number handling, unknown fields and malformed payload and visible failures.
 
-# swingx.jar — FEAT-PRODUCT-SWINGX
+# 17.4 FEAT-PRODUCT-SWINGX - swingx.jar
 
 ## 1. Objective
 
@@ -197,7 +197,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_swingx.py --no-cov`; expect startup/exit, window lifecycle, skin persistence and unsupported native behavior; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup/exit, window lifecycle, skin persistence and unsupported native behavior and visible failures.
 
-# weblaf.jar — FEAT-PRODUCT-WEBLAF
+# 17.5 FEAT-PRODUCT-WEBLAF - weblaf.jar
 
 ## 1. Objective
 
@@ -243,7 +243,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_weblaf.py --no-cov`; expect startup/exit, window lifecycle, skin persistence and unsupported native behavior; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture startup/exit, window lifecycle, skin persistence and unsupported native behavior and visible failures.
 
-# AppHelp.jar — FEAT-PRODUCT-APP-HELP
+# 17.6 FEAT-PRODUCT-APP-HELP - AppHelp.jar
 
 ## 1. Objective
 
@@ -289,7 +289,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_app_help.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# AppHome.jar — FEAT-PRODUCT-APP-HOME
+# 17.7 FEAT-PRODUCT-APP-HOME - AppHome.jar
 
 ## 1. Objective
 
@@ -335,7 +335,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_app_home.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# AppPaymentDialog.jar — FEAT-PRODUCT-APP-PAYMENT-DIALOG
+# 17.8 FEAT-PRODUCT-APP-PAYMENT-DIALOG - AppPaymentDialog.jar
 
 ## 1. Objective
 
@@ -381,7 +381,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_app_payment_dialog.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# AppQuantDataManager.jar — FEAT-PRODUCT-APP-QUANT-DATA-MANAGER
+# 17.9 FEAT-PRODUCT-APP-QUANT-DATA-MANAGER - AppQuantDataManager.jar
 
 ## 1. Objective
 
@@ -428,7 +428,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_app_quant_data_manager.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# AppSQXBusiness.jar — FEAT-PRODUCT-APP-SQX-BUSINESS
+# 17.10 FEAT-PRODUCT-APP-SQX-BUSINESS - AppSQXBusiness.jar
 
 ## 1. Objective
 
@@ -476,7 +476,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_app_sqx_business.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# AppSQXHome.jar — FEAT-PRODUCT-APP-SQX-HOME
+# 17.11 FEAT-PRODUCT-APP-SQX-HOME - AppSQXHome.jar
 
 ## 1. Objective
 
@@ -523,7 +523,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_app_sqx_home.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# AppStrategyQuant.jar — FEAT-PRODUCT-APP-STRATEGY-QUANT
+# 17.12 FEAT-PRODUCT-APP-STRATEGY-QUANT - AppStrategyQuant.jar
 
 ## 1. Objective
 
@@ -571,7 +571,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_app_strategy_quant.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# HomeAbout.jar — FEAT-PRODUCT-HOME-ABOUT
+# 17.13 FEAT-PRODUCT-HOME-ABOUT - HomeAbout.jar
 
 ## 1. Objective
 
@@ -614,7 +614,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_home_about.py --no-cov`; expect product navigation, theme/language reload, tool capability discovery and distribution launch; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture product navigation, theme/language reload, tool capability discovery and distribution launch and visible failures.
 
-# ServletMCP.jar — FEAT-PRODUCT-SERVLET-MCP
+# 17.14 FEAT-PRODUCT-SERVLET-MCP - ServletMCP.jar
 
 ## 1. Objective
 
@@ -660,7 +660,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_product_servlet_mcp.py --no-cov`; expect tool schema, authority, timeout, cancellation and unavailable capability; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture tool schema, authority, timeout, cancellation and unavailable capability and visible failures.
 
-# SkinDark resource contribution — FEAT-UI-SKIN-DARK
+# 17.15 FEAT-UI-SKIN-DARK - SkinDark resource contribution
 
 ## 1. Objective
 
@@ -697,7 +697,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_skin_dark.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Launch a clean distribution; switch product/theme/language; inspect help/about; test MCP in an isolated authorized session. Inspect the SkinDark contribution; an empty or unavailable contribution must remain explicit.
 
-# SkinLight resource contribution — FEAT-UI-SKIN-LIGHT
+# 17.16 FEAT-UI-SKIN-LIGHT - SkinLight resource contribution
 
 ## 1. Objective
 
@@ -734,7 +734,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_skin_light.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Launch a clean distribution; switch product/theme/language; inspect help/about; test MCP in an isolated authorized session. Inspect the SkinLight contribution; an empty or unavailable contribution must remain explicit.
 
-# P17 integration — Complete product shells, help, business/MCP capabilities and distributable startup
+# 17.17 P17 integration — Complete product shells, help, business/MCP capabilities and distributable startup
 
 ## 1. Objective
 

@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# httpasyncclient.jar — FEAT-DATA-SOURCE-HTTPASYNCCLIENT
+# 4.1 FEAT-DATA-SOURCE-HTTPASYNCCLIENT - httpasyncclient.jar
 
 ## 1. Objective
 
@@ -57,7 +57,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpasyncclient.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture timeout, status mapping, cache revalidation and connection release and visible failures.
 
-# httpclient-cache.jar — FEAT-DATA-SOURCE-HTTPCLIENT-CACHE
+# 4.2 FEAT-DATA-SOURCE-HTTPCLIENT-CACHE - httpclient-cache.jar
 
 ## 1. Objective
 
@@ -105,7 +105,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpclient_cache.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture timeout, status mapping, cache revalidation and connection release and visible failures.
 
-# httpclient.jar — FEAT-DATA-SOURCE-HTTPCLIENT
+# 4.3 FEAT-DATA-SOURCE-HTTPCLIENT - httpclient.jar
 
 ## 1. Objective
 
@@ -151,7 +151,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpclient.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture timeout, status mapping, cache revalidation and connection release and visible failures.
 
-# httpcore-nio.jar — FEAT-DATA-SOURCE-HTTPCORE-NIO
+# 4.4 FEAT-DATA-SOURCE-HTTPCORE-NIO - httpcore-nio.jar
 
 ## 1. Objective
 
@@ -199,7 +199,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpcore_nio.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture timeout, status mapping, cache revalidation and connection release and visible failures.
 
-# httpcore.jar — FEAT-DATA-SOURCE-HTTPCORE
+# 4.5 FEAT-DATA-SOURCE-HTTPCORE - httpcore.jar
 
 ## 1. Objective
 
@@ -245,7 +245,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpcore.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture timeout, status mapping, cache revalidation and connection release and visible failures.
 
-# CryptoExchangeBinance.jar — FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE
+# 4.6 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE - CryptoExchangeBinance.jar
 
 ## 1. Objective
 
@@ -291,7 +291,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_binance.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# CryptoExchangeBinanceCoinM.jar — FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-COIN-M
+# 4.7 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-COIN-M - CryptoExchangeBinanceCoinM.jar
 
 ## 1. Objective
 
@@ -337,7 +337,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_binance_coin_m.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# CryptoExchangeBinanceUsdtM.jar — FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-USDT-M
+# 4.8 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-USDT-M - CryptoExchangeBinanceUsdtM.jar
 
 ## 1. Objective
 
@@ -383,7 +383,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_binance_usdt_m.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# CryptoExchangeBitfinex.jar — FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BITFINEX
+# 4.9 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BITFINEX - CryptoExchangeBitfinex.jar
 
 ## 1. Objective
 
@@ -429,7 +429,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_bitfinex.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# CryptoExchangeCoinbasePro.jar — FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-COINBASE-PRO
+# 4.10 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-COINBASE-PRO - CryptoExchangeCoinbasePro.jar
 
 ## 1. Objective
 
@@ -475,7 +475,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_coinbase_pro.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# CryptoExchangePoloniex.jar — FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-POLONIEX
+# 4.11 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-POLONIEX - CryptoExchangePoloniex.jar
 
 ## 1. Objective
 
@@ -521,7 +521,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_poloniex.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceCrypto.jar — FEAT-DATA-SOURCE-DATA-SOURCE-CRYPTO
+# 4.12 FEAT-DATA-SOURCE-DATA-SOURCE-CRYPTO - DataSourceCrypto.jar
 
 ## 1. Objective
 
@@ -568,7 +568,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_crypto.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceDarwinex.jar — FEAT-DATA-SOURCE-DATA-SOURCE-DARWINEX
+# 4.13 FEAT-DATA-SOURCE-DATA-SOURCE-DARWINEX - DataSourceDarwinex.jar
 
 ## 1. Objective
 
@@ -615,7 +615,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_darwinex.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceDukascopy.jar — FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY
+# 4.14 FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY - DataSourceDukascopy.jar
 
 ## 1. Objective
 
@@ -662,7 +662,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_dukascopy.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceFiles.jar — FEAT-DATA-SOURCE-DATA-SOURCE-FILES
+# 4.15 FEAT-DATA-SOURCE-DATA-SOURCE-FILES - DataSourceFiles.jar
 
 ## 1. Objective
 
@@ -709,7 +709,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_files.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceMt5Api.jar — FEAT-DATA-SOURCE-DATA-SOURCE-MT5-API
+# 4.16 FEAT-DATA-SOURCE-DATA-SOURCE-MT5-API - DataSourceMt5Api.jar
 
 ## 1. Objective
 
@@ -756,7 +756,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_mt5_api.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceSQEquityData.jar — FEAT-DATA-SOURCE-DATA-SOURCE-SQ-EQUITY-DATA
+# 4.17 FEAT-DATA-SOURCE-DATA-SOURCE-SQ-EQUITY-DATA - DataSourceSQEquityData.jar
 
 ## 1. Objective
 
@@ -803,7 +803,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_sq_equity_data.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceSQFuturesData.jar — FEAT-DATA-SOURCE-DATA-SOURCE-SQ-FUTURES-DATA
+# 4.18 FEAT-DATA-SOURCE-DATA-SOURCE-SQ-FUTURES-DATA - DataSourceSQFuturesData.jar
 
 ## 1. Objective
 
@@ -850,7 +850,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_sq_futures_data.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceTD.jar — FEAT-DATA-SOURCE-DATA-SOURCE-TD
+# 4.19 FEAT-DATA-SOURCE-DATA-SOURCE-TD - DataSourceTD.jar
 
 ## 1. Objective
 
@@ -897,7 +897,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_td.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataSourceYahoo.jar — FEAT-DATA-SOURCE-DATA-SOURCE-YAHOO
+# 4.20 FEAT-DATA-SOURCE-DATA-SOURCE-YAHOO - DataSourceYahoo.jar
 
 ## 1. Objective
 
@@ -944,7 +944,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_yahoo.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# ServletYahoo.jar — FEAT-DATA-SOURCE-SERVLET-YAHOO
+# 4.21 FEAT-DATA-SOURCE-SERVLET-YAHOO - ServletYahoo.jar
 
 ## 1. Objective
 
@@ -990,7 +990,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_servlet_yahoo.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
 
-# DataManagerLog resource contribution — FEAT-UI-DATA-MANAGER-LOG
+# 4.22 FEAT-UI-DATA-MANAGER-LOG - DataManagerLog resource contribution
 
 ## 1. Objective
 
@@ -1027,7 +1027,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_data_manager_log.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Import a small fixture; start a sandbox download; cancel it; inspect import logs and confirm unavailable providers have explicit states. Inspect the DataManagerLog contribution; an empty or unavailable contribution must remain explicit.
 
-# P04 integration — Import files and download normalized provider data through owned jobs
+# 4.23 P04 integration — Import files and download normalized provider data through owned jobs
 
 ## 1. Objective
 

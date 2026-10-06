@@ -9,7 +9,7 @@
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
 
-# joda-time.jar — FEAT-DATA-JODA-TIME
+# 3.1 FEAT-DATA-JODA-TIME - joda-time.jar
 
 ## 1. Objective
 
@@ -59,7 +59,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_joda_time.py --no-cov`; expect DST gaps/folds, timestamp units and timezone validation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture DST gaps/folds, timestamp units and timezone validation and visible failures.
 
-# SQDataLib.jar — FEAT-DATA-SQ-DATA-LIB
+# 3.2 FEAT-DATA-SQ-DATA-LIB - SQDataLib.jar
 
 ## 1. Objective
 
@@ -109,7 +109,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_sq_data_lib.py --no-cov`; expect bar precision, data ordering, reader bounds and metadata preservation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture bar precision, data ordering, reader bounds and metadata preservation and visible failures.
 
-# AppDataManager.jar — FEAT-DATA-APP-DATA-MANAGER
+# 3.3 FEAT-DATA-APP-DATA-MANAGER - AppDataManager.jar
 
 ## 1. Objective
 
@@ -157,7 +157,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_app_data_manager.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
 
-# DataManagerBasket.jar — FEAT-DATA-DATA-MANAGER-BASKET
+# 3.4 FEAT-DATA-DATA-MANAGER-BASKET - DataManagerBasket.jar
 
 ## 1. Objective
 
@@ -204,7 +204,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_basket.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
 
-# DataManagerBroker.jar — FEAT-DATA-DATA-MANAGER-BROKER
+# 3.5 FEAT-DATA-DATA-MANAGER-BROKER - DataManagerBroker.jar
 
 ## 1. Objective
 
@@ -251,7 +251,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_broker.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
 
-# DataManagerCustomData.jar — FEAT-DATA-DATA-MANAGER-CUSTOM-DATA
+# 3.6 FEAT-DATA-DATA-MANAGER-CUSTOM-DATA - DataManagerCustomData.jar
 
 ## 1. Objective
 
@@ -298,7 +298,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_custom_data.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
 
-# DataManagerData.jar — FEAT-DATA-DATA-MANAGER-DATA
+# 3.7 FEAT-DATA-DATA-MANAGER-DATA - DataManagerData.jar
 
 ## 1. Objective
 
@@ -345,7 +345,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_data.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
 
-# DataManagerHome.jar — FEAT-DATA-DATA-MANAGER-HOME
+# 3.8 FEAT-DATA-DATA-MANAGER-HOME - DataManagerHome.jar
 
 ## 1. Objective
 
@@ -392,7 +392,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_home.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
 
-# DataManagerInstruments.jar — FEAT-DATA-DATA-MANAGER-INSTRUMENTS
+# 3.9 FEAT-DATA-DATA-MANAGER-INSTRUMENTS - DataManagerInstruments.jar
 
 ## 1. Objective
 
@@ -439,7 +439,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_instruments.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
 
-# DataManagerSessions.jar — FEAT-DATA-DATA-MANAGER-SESSIONS
+# 3.10 FEAT-DATA-DATA-MANAGER-SESSIONS - DataManagerSessions.jar
 
 ## 1. Objective
 
@@ -486,7 +486,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_sessions.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
 
-# SettingsData.jar — FEAT-DATA-SETTINGS-DATA
+# 3.11 FEAT-DATA-SETTINGS-DATA - SettingsData.jar
 
 ## 1. Objective
 
@@ -532,7 +532,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_settings_data.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
 
-# DataManagerActions resource contribution — FEAT-UI-DATA-MANAGER-ACTIONS
+# 3.12 FEAT-UI-DATA-MANAGER-ACTIONS - DataManagerActions resource contribution
 
 ## 1. Objective
 
@@ -569,7 +569,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_data_manager_actions.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Create a fixture dataset and session; edit instrument precision; reload the page; confirm persisted values and visible invalid-input errors. Inspect the DataManagerActions contribution; an empty or unavailable contribution must remain explicit.
 
-# DataManagerHelp resource contribution — FEAT-UI-DATA-MANAGER-HELP
+# 3.13 FEAT-UI-DATA-MANAGER-HELP - DataManagerHelp resource contribution
 
 ## 1. Objective
 
@@ -606,7 +606,7 @@
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_data_manager_help.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Create a fixture dataset and session; edit instrument precision; reload the page; confirm persisted values and visible invalid-input errors. Inspect the DataManagerHelp contribution; an empty or unavailable contribution must remain explicit.
 
-# P03 integration — Manage authoritative datasets, instruments, sessions and custom bars
+# 3.14 P03 integration — Manage authoritative datasets, instruments, sessions and custom bars
 
 ## 1. Objective
 
