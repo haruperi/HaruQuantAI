@@ -98,3 +98,22 @@ That shared donor directive is outside this plugin inventory; matching this
 wrapper does not claim shared-directive or advanced settings parity. The JAR is
 excluded backend scope. No XML requests, new persistence, metric formulas or
 backend functionality were introduced. Historical parity claims remain qualified.
+
+## DatabankRename structural ownership (2026-10-06)
+
+DEC-UI-DATABANK-RENAME-STRUCTURAL-OWNERSHIP maps
+SQX_REFERENCE_ROOT/internal/plugins/DatabankRename to
+HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankRename, preserving ui/ nesting.
+FEAT-UI-DATABANK_BUILDER owns this existing frontend responsibility under
+FR-UI-DATABANK-source-mapping, FR-UI-DATABANK-workflow-preservation and
+FR-UI-DATABANK-clean-room. Status: structurally extracted; verification and
+limitations recorded in its walkthrough.
+
+ui/module.ts exports RenameStrategiesDialog; ui/databankRenamePopup.tsx owns its
+presentation and ui/DatabankRenamePopupCtrl.ts owns input state/confirmation.
+Existing ProjectDatabanks/DatabankDialogs.tsx retains shared SqxModal/SqxButton
+and sibling dialogs. Toolbar registration, selection guard and host mock rename
+callback remain existing pane dependencies. Backend/project artifacts are
+excluded. The donor running/loading guard and backend rename progress/request
+are not qualified or added here. Shared modal focus restoration/trapping remains
+unqualified. Matching structure does not establish runtime or algorithm parity.

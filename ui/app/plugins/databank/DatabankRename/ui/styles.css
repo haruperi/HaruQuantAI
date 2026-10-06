@@ -1,0 +1,12 @@
+.hq-databank-rename-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.hq-databank-rename-row label {
+  font-size: 11px;
+  color: var(--sqx-text-muted);
+  min-width: 52px;
+}

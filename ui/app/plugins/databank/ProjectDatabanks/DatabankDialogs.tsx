@@ -48,7 +48,7 @@ export function SqxModal({
   );
 }
 
-function SqxButton({
+export function SqxButton({
   children,
   onClick,
   primary,
@@ -198,56 +198,6 @@ export function SaveRecordsDialog({
         Selected strategies will be saved to a directory of your choice with given prefix and sufix.
         If file with the same name already exists, it will be overwritten!
       </p>
-    </SqxModal>
-  );
-}
-
-/** Donor Rename popup: one selection edits the name; many edit prefix/postfix. */
-export function RenameStrategiesDialog({
-  count,
-  currentName,
-  onRename,
-  onClose,
-}: {
-  count: number;
-  currentName: string;
-  onRename: (value: { name?: string; prefix?: string; postfix?: string }) => void;
-  onClose: () => void;
-}) {
-  const [name, setName] = useState(currentName);
-  const [prefix, setPrefix] = useState('');
-  const [postfix, setPostfix] = useState('');
-  return (
-    <SqxModal title={`Rename selected strategies (${count})`} onClose={onClose} width={470}
-      footer={
-        <>
-          <button type="button" className="sqx-link-button" onClick={onClose}>Close</button>
-          <SqxButton
-            primary
-            onClick={() => {
-              onRename(count === 1 ? { name: name.trim() || currentName } : { prefix: prefix.trim(), postfix: postfix.trim() });
-              onClose();
-            }}
-          >
-            Rename
-          </SqxButton>
-        </>
-      }
-    >
-      {count === 1 ? (
-        <div className="sqx-form-row">
-          <label>Name</label>
-          <input className="sqx-input grow" value={name} onChange={e => setName(e.target.value)} autoFocus />
-        </div>
-      ) : (
-        <div className="sqx-form-row">
-          <label>Prefix</label>
-          <input className="sqx-input" value={prefix} onChange={e => setPrefix(e.target.value)} autoFocus />
-          <span className="sqx-form-hint">Original</span>
-          <label>Postfix</label>
-          <input className="sqx-input" value={postfix} onChange={e => setPostfix(e.target.value)} />
-        </div>
-      )}
     </SqxModal>
   );
 }

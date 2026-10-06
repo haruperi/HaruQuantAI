@@ -1,0 +1,1 @@
+export { RenameStrategiesDialog } from './databankRenamePopup';

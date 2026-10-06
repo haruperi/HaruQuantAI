@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only DatabankRename structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankRename",
+  "source_head": "a15014d17cf37f26ac538f75712a0b527e886274",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_145052_databank-rename-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-RENAME-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-databankrename-plugin",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename",
+      "family": "installed plugin frontend and excluded backend/project inventory"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/.classpath",
+      "relative_path": ".classpath",
+      "location": "whole artifact; inventory only",
+      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "relation": "backend/build/project artifact excluded from frontend scope",
+      "access_date": "2026-10-06",
+      "sha256": "1e44ef762bff236b874f02bb57e79c487b58fc9ce69c9a85016e1bf25147b845",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/.gitignore",
+      "relative_path": ".gitignore",
+      "location": "whole artifact; inventory only",
+      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "relation": "backend/build/project artifact excluded from frontend scope",
+      "access_date": "2026-10-06",
+      "sha256": "ad45b21204ee76ec1f14ac437ba3291614e677e500f9efb969463376ae333d33",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/.project",
+      "relative_path": ".project",
+      "location": "whole artifact; inventory only",
+      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "relation": "backend/build/project artifact excluded from frontend scope",
+      "access_date": "2026-10-06",
+      "sha256": "c9146206a9966f61ea102307e1cb23404857fb853a8697a10c698683f0c496e0",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/DatabankRename.jar",
+      "relative_path": "DatabankRename.jar",
+      "location": "whole artifact; inventory only",
+      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "relation": "backend/build/project artifact excluded from frontend scope",
+      "access_date": "2026-10-06",
+      "sha256": "f3fa6e90b8a222f61a608081bec6d71ba3d6b234099cb37064299441b8a08b84",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.java",
+      "relative_path": "src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenamePlugin.java",
+      "location": "whole artifact; inventory only",
+      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "relation": "backend/build/project artifact excluded from frontend scope",
+      "access_date": "2026-10-06",
+      "sha256": "a1ecb1387345029c149be0b3543a4aa0efcc265e94568d4713c39f9e6c93fe9b",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.java",
+      "relative_path": "src/com/strategyquant/plugin/Databank/impl/Rename/DatabankRenameServlet.java",
+      "location": "whole artifact; inventory only",
+      "inspection_method": "local inventory and SHA-256; backend/project excluded; no algorithm inspection",
+      "relation": "backend/build/project artifact excluded from frontend scope",
+      "access_date": "2026-10-06",
+      "sha256": "d30276b7940fc85fdefe7c9d395983957008b23e5e83a523775cc206cc51239f",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/project excluded; no frontend implementation or behavior established"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/databankRenamePopup.html",
+      "relative_path": "ui/databankRenamePopup.html",
+      "location": "lines 1-41; frontend responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "70ae8b256ba2a4c17a6706266723eba314f04dd505ab56cb3037aeff04b8b541",
+      "target": "ui/databankRenamePopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/DatabankRenamePopupCtrl.js",
+      "relative_path": "ui/DatabankRenamePopupCtrl.js",
+      "location": "lines 1-55; frontend responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "a2ca3e71fb99f9075d9aeba51aa3ca3a2d683cdd4dc52fb539e26c99260758a2",
+      "target": "ui/DatabankRenamePopupCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js",
+      "relative_path": "ui/module.js",
+      "location": "lines 1-39; frontend responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "6b28e6a3634bf8de18e8fb56c70042e9f5ed53f97fa14ea129ea858463085a4f",
+      "target": "ui/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+    },
+    {
+      "catalog_id": "sqx-databankrename-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/styles.css",
+      "relative_path": "ui/styles.css",
+      "location": "lines 1-11; frontend responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; frontend text responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "6b2b11bf618067eb8613241ab78fd94be89ff967c5785c958dc2c902238578ae",
+      "target": "ui/styles.css",
+      "classification": "counterpart",
+      "limitation": "Structure only; donor runtime/requests/running guard unqualified"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest; not behavioral ledger"
+    }
+  ]
+}

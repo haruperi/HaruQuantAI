@@ -136,7 +136,7 @@
     },
     {
       "path": "DatabankDialogs.tsx",
-      "reason": "Retained aggregated action/rename/confirm dialogs and modal helper; separate future cohorts"
+      "reason": "Retained action/confirm/note dialogs and shared modal/button; rename presentation extracted to DatabankRename/ui/module.ts"
     },
     {
       "path": "databankStore.ts",
@@ -163,10 +163,14 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankViews/module.ts",
       "relation": "Relocated view editor; existing store and metric dependencies remain here."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankRename/ui/module.ts",
+      "relation": "Extracted rename presentation; host mock callback remains in pane."
     }
   ],
   "inventory_review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_144023_results-databank-views-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_145052_databank-rename-alignment/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   }
