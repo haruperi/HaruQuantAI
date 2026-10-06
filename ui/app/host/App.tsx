@@ -4,7 +4,7 @@ import { Activity, Bell, BrainCircuit, BriefcaseBusiness, ChartNoAxesCombined, C
 import type { ModuleId } from './types';
 import { useAppStore } from './store';
 import { getPathForModule, useRouteSync } from './router';
-import { DatabankSplitter } from '../plugins/databank/ProjectDatabanks/DatabankSplitter';
+import { DatabankSplitter } from '../plugins/databank/ProjectDatabanks/module';
 import { HomeScreen } from '../workspace/Home/HomeScreen';
 import { DataManager } from '../workspace/DataManager/DataManager';
 import { ChartWorkspace } from '../workspace/Chart/ChartWorkspace';

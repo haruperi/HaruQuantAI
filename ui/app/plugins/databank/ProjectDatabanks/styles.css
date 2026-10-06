@@ -1,0 +1,23 @@
+/* SQX-parity databanks splitter (donor evidence SQX144-EV-000025..027) */
+.sq-splitter{flex:1;min-height:0;display:flex;flex-direction:column}
+.sq-splitter-top{position:relative;flex:1 1 auto;min-width:0;display:flex;flex-direction:column;overflow:hidden}
+.sq-splitter-top>.module-area{flex:1;min-height:0}
+.sq-splitter.maximised .sq-splitter-top{display:none}
+.sqn-databanks{position:relative;flex:0 0 auto;min-width:0;background:var(--sqx-panel-bg,#3b3b3b)}
+.sq-splitter.active .sqn-databanks{flex:1 1 auto;min-height:100px;display:flex;flex-direction:column}
+.sqn-databanks-header{display:flex;text-align:center;font-size:11px;color:var(--sqx-bar-text,#cccccc);line-height:19px;height:19px;position:relative;z-index:13;background:var(--sqx-bar-bg,#292929);border-top:1px solid #4ea2f0}
+.sqn-databanks-header>div:first-child{flex:1 1 50%;text-align:right;padding-right:30px}
+.sqn-databanks-header>div:last-child{flex:1 1 50%;text-align:left;padding-left:30px}
+.sq-splitter.active .sqn-databanks-header{height:9px;line-height:9px;font-size:0;overflow:hidden;background:var(--sqx-bar-active-bg,#292929);border-top:1px solid #a5d3f9}
+.databanks-body{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+.databanks-body-hidden{display:none}
+.resizer-container{position:absolute;left:50%;width:200px;margin-left:-100px;text-align:center;top:3px;height:11px;z-index:100}
+.sq-splitter.active .resizer-container{top:0;height:9px}
+.resizer-container .ctl{display:inline-block;padding:0 2px;background:transparent;border:0;cursor:pointer;vertical-align:top;line-height:0}
+.resizer-container .ctl:focus-visible{outline:1px solid #2b7cd3;outline-offset:-1px}
+.resizer-container .resizer{display:none;cursor:row-resize;touch-action:none}
+.resizer-container .maximizer,.resizer-container .normalizer{display:none}
+.sq-splitter.active .resizer-container .resizer{display:inline-block}
+.sq-splitter.active .resizer-container .maximizer{display:inline-block}
+.sq-splitter.maximised .resizer-container .resizer,.sq-splitter.maximised .resizer-container .maximizer,.sq-splitter.maximised .resizer-container .opener{display:none}
+.sq-splitter.maximised .resizer-container .normalizer{display:inline-block}

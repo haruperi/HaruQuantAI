@@ -6,7 +6,7 @@ import {
   TOOLBAR_BUTTON_ORDER,
 } from '../../../../app/plugins/databank/ProjectDatabanks/DatabankToolbar';
 import { DEFAULT_VIEW_PRESETS } from '../../../../app/plugins/databank/ProjectDatabanks/databankColumns';
-import { strategyPassesMockChecks } from '../../../../app/plugins/databank/ProjectDatabanks/DatabankPanel';
+import { strategyPassesMockChecks } from '../../../../app/plugins/databank/ProjectDatabanks/DatabankCtrl';
 
 describe('Databanks toolbar inventory (donor SQX144-EV-000028)', () => {
   it('orders toolbar buttons exactly as the donor plugin positions', () => {

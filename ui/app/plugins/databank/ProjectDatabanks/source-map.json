@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ProjectDatabanks pane structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ProjectDatabanks",
+  "source_head": "44810150b8257909b0149e5c9b3372c95ebd7d97",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_142122_project-databanks-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-projectdatabanks-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks",
+      "family": "installed plugin UI artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-projectdatabanks-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankCtrl.js",
+      "relative_path": "DatabankCtrl.js",
+      "location": "lines 1-733; named controller pane/grid composition",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "relation": "independently authored target counterpart; current composition preserved",
+      "access_date": "2026-10-06",
+      "sha256": "a11653b3ad6cfd068ecf87f09ab399fc707197c4913bad9e94f8afcf8593fb94",
+      "target": "DatabankCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+    },
+    {
+      "catalog_id": "sqx-projectdatabanks-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabanksCtrl.js",
+      "relative_path": "DatabanksCtrl.js",
+      "location": "lines 1-666; named controller pane/grid composition",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "relation": "independently authored target counterpart; current composition preserved",
+      "access_date": "2026-10-06",
+      "sha256": "9c5d0eb2c98f12a0804d2c37cea2069902b340d0e564fa383b1b68b95c071cd0",
+      "target": "DatabanksCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+    },
+    {
+      "catalog_id": "sqx-projectdatabanks-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankService.js",
+      "relative_path": "DatabankService.js",
+      "location": "lines 1-1120; pane/grid service declarations",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "relation": "independently authored target counterpart; current composition preserved",
+      "access_date": "2026-10-06",
+      "sha256": "92fa6885bd1ec6e3549087d5f1439e34e870580c05a4b151f5f58d15b4cbf618",
+      "target": "DatabankService.ts",
+      "classification": "counterpart",
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+    },
+    {
+      "catalog_id": "sqx-projectdatabanks-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-14; module event registration",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "relation": "independently authored target counterpart; current composition preserved",
+      "access_date": "2026-10-06",
+      "sha256": "5d087bc1330091602de0a2b90f82b3e0ca7edc6e55d0bea5230a6670b27f4269",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+    },
+    {
+      "catalog_id": "sqx-projectdatabanks-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/styles.css",
+      "relative_path": "styles.css",
+      "location": "lines 1-171; pane stylesheet declarations",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "relation": "independently authored target counterpart; current composition preserved",
+      "access_date": "2026-10-06",
+      "sha256": "09ab526e3e80059aa2ddf59158eb5a8a1de75fcd365a97219ea7438a2f63179c",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+    },
+    {
+      "catalog_id": "sqx-projectdatabanks-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databank.html",
+      "relative_path": "views/databank.html",
+      "location": "lines 1-15; pane/header/grid template",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "relation": "independently authored target counterpart; current composition preserved",
+      "access_date": "2026-10-06",
+      "sha256": "a3c3d2eddafa1f161adfb1bf524baa87cfd6f0814d1268fd055a55b512c890b0",
+      "target": "views/databank.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+    },
+    {
+      "catalog_id": "sqx-projectdatabanks-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/views/databanks.html",
+      "relative_path": "views/databanks.html",
+      "location": "lines 1-112; pane/header/grid template",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection",
+      "relation": "independently authored target counterpart; current composition preserved",
+      "access_date": "2026-10-06",
+      "sha256": "c5fcf2668bb1961359c709d68178b56307a683665d2f5b0e9a28368acac6ea95",
+      "target": "views/databanks.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural correspondence only; donor runtime parity and backend behavior unverified."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "CompareStrategiesModal.tsx",
+      "reason": "Retained ResultsDatabankActions/tools/compareStrategies presentation dependency; separate future cohort"
+    },
+    {
+      "path": "databankColumns.ts",
+      "reason": "Existing shared target catalogue/view rules; related ResultsDatabankViews ownership pending audit"
+    },
+    {
+      "path": "DatabankDialogs.tsx",
+      "reason": "Retained aggregated action/rename/confirm dialogs and modal helper; separate future cohorts"
+    },
+    {
+      "path": "databankStore.ts",
+      "reason": "Existing view persistence authority; related ResultsDatabankViews future cohort"
+    },
+    {
+      "path": "DatabankToolbar.tsx",
+      "reason": "Retained aggregated actions/view options contribution; separate future cohorts"
+    },
+    {
+      "path": "FilterByCorrelationModal.tsx",
+      "reason": "Retained DatabankFilterByCorrelation presentation and shared quantitative mock helpers; separate cohort"
+    },
+    {
+      "path": "ManageViewsDialog.tsx",
+      "reason": "Retained ResultsDatabankViews presentation; separate future cohort"
+    },
+    {
+      "path": "StrategyTable.tsx",
+      "reason": "Existing target grid virtualization/rendering dependency; declared exception until finer grid audit"
+    },
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest, not behavioral ledger"
+    }
+  ]
+}
