@@ -4,7 +4,7 @@ import { mkdtemp, writeFile, readFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const csv = 'Date,Open,High,Low,Close,Volume\n2026-09-18,1,3,0,2,4\n2026-09-19,2,4,1,3,5';
-async function launch(page: Page) { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).click(); }
+async function launch(page: Page) { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click(); }
 async function command(page: Page, name: string) { await page.getByRole('button', { name: 'File import', exact: true }).click(); await page.getByRole('menuitem', { name, exact: true }).click(); }
 async function single(page: Page) { await page.getByRole('checkbox', { name: 'Select XAUUSD', exact: true }).check(); await command(page, 'Import one data file'); return page.getByRole('dialog', { name: "Data import for 'XAUUSD'" }); }
 async function load(page: Page, text = csv) { await page.getByLabel('Choose data file', { exact: true }).setInputFiles({ name: 'history.csv', mimeType: 'text/csv', buffer: Buffer.from(text) }); await expect(page.getByLabel('Data file', { exact: true })).toHaveValue('history.csv'); }

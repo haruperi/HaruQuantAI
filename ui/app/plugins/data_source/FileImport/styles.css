@@ -20,3 +20,18 @@
 
 .import-bar-postfix { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; }
 @media(max-width:600px) { .import-bar-postfix { grid-template-columns: 1fr; } }
+
+.file-symbol-flow fieldset{border:1px solid var(--line);border-radius:3px;padding:12px;margin:0}
+.file-symbol-flow legend{font-weight:600;padding:0 6px}
+.file-symbol-flow fieldset p{color:var(--muted);line-height:1.6;margin-bottom:8px}
+.file-symbol-flow select{background:var(--bg);color:var(--text);border:1px solid var(--line);padding:5px;width:100%;min-width:0}
+.file-symbol-flow .file-symbol-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px}
+.file-symbol-flow .file-symbol-chooser{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+.file-symbol-flow input[type=radio],.file-symbol-flow input[type=checkbox]{accent-color:var(--accent)}
+.file-symbol-flow h3{font-size:12px;margin:14px 0 8px}
+.file-symbol-flow .file-symbol-radios{display:flex;flex-direction:column;gap:10px}
+.file-symbol-flow .file-symbol-error{color:var(--bad)}
+.file-symbol-flow .file-symbol-help{line-height:1.7;display:flex;flex-direction:column;gap:14px}
+.file-symbol-flow .modal>header,.file-symbol-flow .modal>footer{flex-shrink:0}
+.file-symbol-flow .modal-content{min-height:0}
+@media(max-width:600px){.file-symbol-flow .file-symbol-chooser,.file-symbol-flow .file-symbol-grid{grid-template-columns:1fr}}

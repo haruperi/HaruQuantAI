@@ -1,3 +1,4 @@
+import { filesProvider } from '../FileImport/module';
 import { darwinexProvider } from '../Darwinex/module';
 import { cryptoProvider } from '../Crypto/module';
 import { dukascopyProvider } from '../Dukascopy/module';
@@ -85,15 +86,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
     label: 'TickDownloader import',
     commands: [{ id: 'tickdownloader-import', label: 'Import TickDownloader data', icon: 'folder-import', dialog: 'tickdownloader-import' }],
   },
-  {
-    id: 'file-import',
-    label: 'File import',
-    commands: [
-      { id: 'file-add', label: 'Add symbol', icon: 'add', dialog: 'file-add' },
-      { id: 'file-import', label: 'Import one data file', icon: 'file-import', dialog: 'file-import' },
-      { id: 'file-mass-import', label: 'Import multiple files from a folder', icon: 'mass-import', dialog: 'file-mass-import' },
-    ],
-  },
+  filesProvider,
   {
     id: 'sq-equity',
     label: 'Equity data',

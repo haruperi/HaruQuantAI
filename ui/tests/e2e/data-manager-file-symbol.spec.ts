@@ -5,7 +5,7 @@ async function open(page: Page) {
   await page.getByRole('menuitem', { name: 'Add symbol', exact: true }).click();
   return page.getByRole('dialog', { name: 'Add symbol', exact: true });
 }
-async function launch(page: Page) { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).click(); }
+async function launch(page: Page) { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click(); }
 test('file symbol validation, both bar conventions, cancellation and persistence', async ({ page }) => {
   await launch(page);
   let dialog = await open(page);

@@ -1,0 +1,284 @@
+{
+  "schema_version": 1,
+  "scope": "UI-only FileImport structural traceability with unsupported application import excluded",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/FileImport",
+  "source_head": "f2746536411cb532db460b8885bc12edc1207733",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_131808_data-source-files-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "feature": "FEAT-UI-FILEIMPORT-TRACEABILITY",
+    "decision": "DEC-UI-FILEIMPORT-TRACEABILITY",
+    "requirements": [
+      "FR-UI-FILEIMPORT-source-mapping",
+      "FR-UI-FILEIMPORT-workflow-preservation",
+      "FR-UI-FILEIMPORT-clean-room"
+    ],
+    "domain": "plugins/data_source/FileImport"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles",
+      "id": "sqx-files-ui",
+      "family": "installed plugin UI artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/addPopup.html",
+      "relative_path": "add/addPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "c2d2a1cb7fc093d8d3b9e9cd4fb78956004098dac921a454136624a5d214f3a6",
+      "target": "add/addPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/DataSourceFilesAddCtrl.js",
+      "relative_path": "add/DataSourceFilesAddCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "222817a52518adbe297bde50c68ef05c47782ffa6f5316a6f0b41af229a7f0e2",
+      "target": "add/DataSourceFilesAddCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/module.js",
+      "relative_path": "add/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "bc552529031cb4ef93bc3d5873c4ab73595f9d5392ae62bb931f57547710b22f",
+      "target": "add/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/appImportPopup.html",
+      "relative_path": "appImport/appImportPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope.",
+      "access_date": "2026-10-06",
+      "sha256": "5a49a72e552520d0ee89002de2b3998a5e0f0a973ded83acd858ef089f9d13d5",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/DataSourceFilesAppImportCtrl.js",
+      "relative_path": "appImport/DataSourceFilesAppImportCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope.",
+      "access_date": "2026-10-06",
+      "sha256": "ef95c5afdd3bc37da6831d8500833791307a27bab07adafbf74aeae710247a81",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/module.js",
+      "relative_path": "appImport/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope.",
+      "access_date": "2026-10-06",
+      "sha256": "876a22c718fcdc41903e574c9bbddbb30eb31420f7f10d5e92c95a05d113de6c",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Unsupported installation-folder/license import has no current target capability; new behavior outside approved scope."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFiles.jar",
+      "relative_path": "DataSourceFiles.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "Backend binary outside frontend scope.",
+      "access_date": "2026-10-06",
+      "sha256": "9a92311be05e36e7cdf68dfc0b916751e0ed2bac7302c465db60d2d75eaaf686",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary outside frontend scope."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFilesService.js",
+      "relative_path": "DataSourceFilesService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "9731953ed361fa2656c12a4e31a851dfd2e31cc10813c79f719dd96c05071772",
+      "target": "DataSourceFilesService.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/DataSourceFilesImportCtrl.js",
+      "relative_path": "import/DataSourceFilesImportCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "161b1f76cfcd433dc3fbdf88f4749b7f5167608a69e9e679ccaa1408331b7bc5",
+      "target": "import/DataSourceFilesImportCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/importPopup.html",
+      "relative_path": "import/importPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "1d4c85703a0d734398e5248e9793e57fa719e8b5b8017d8f95171cc7fca697ba",
+      "target": "import/importPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/module.js",
+      "relative_path": "import/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "d089376f7031ae3923e17110bd5686fd656f8cddae64404955c347df98c2344e",
+      "target": "import/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/import/newFormatPopup.html",
+      "relative_path": "import/newFormatPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "7810b7211d087248af7c42d5bdb47fe05b1c3a936beb18c2b28d13504b077b47",
+      "target": "import/newFormatPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/DataSourceFilesMassImportCtrl.js",
+      "relative_path": "massImport/DataSourceFilesMassImportCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "3a92219c4e4954ae03b7889ee6239c66c169fd5d7db6a4d4a2e8ca20075a7c11",
+      "target": "massImport/DataSourceFilesMassImportCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/massImportPopup.html",
+      "relative_path": "massImport/massImportPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "da09447bf30eaff0ccfd8f462b424243f30bfe84f50249265504420eb993b5fc",
+      "target": "massImport/massImportPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/massImport/module.js",
+      "relative_path": "massImport/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "7d33926fbd6e6cc8039e03a72985e23fe299ede93243161104bfbbee7388e231",
+      "target": "massImport/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "bc497c4e2dedf6245549056590bec60e688a94fc0f5a28eb41b97cf3a4a58e2e",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    },
+    {
+      "catalog_id": "sqx-files-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "091530480960d55f1cb542da994f9530d404ccd021a9374ddb99ce4eec0669b9",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; installation import and backend remain gaps."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "fileSymbols.ts",
+      "reason": "Existing shared rules/types, retained unchanged for audited siblings."
+    },
+    {
+      "path": "fileSymbolsStore.ts",
+      "reason": "Existing shared symbol/instrument persistence capability, retained unchanged."
+    },
+    {
+      "path": "fileImport.ts",
+      "reason": "Existing parser/format/range rules, retained unchanged."
+    },
+    {
+      "path": "fileImportStore.ts",
+      "reason": "Existing browser import persistence/simulation capability, retained unchanged."
+    },
+    {
+      "path": "README.md",
+      "reason": "Target ownership registry and status."
+    },
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest, not behavioral evidence ledger."
+    }
+  ]
+}
