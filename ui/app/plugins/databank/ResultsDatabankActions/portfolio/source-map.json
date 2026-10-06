@@ -1,0 +1,67 @@
+{
+    "schema_version":  1,
+    "scope":  "Frontend-only Portfolio menu/deferred dispatch bounded structural traceability",
+    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio",
+    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio",
+    "source_head":  "b40279a5994d284d5b2b2c94536552ddd654eec0",
+    "review":  {
+                   "state":  "owner-approved-plan",
+                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+                   "version":  1
+               },
+    "owner":  {
+                  "domain":  "plugins/databank",
+                  "feature":  "FEAT-UI-DATABANK_BUILDER",
+                  "decision":  "DEC-UI-DATABANK-PORTFOLIO-STRUCTURAL-OWNERSHIP",
+                  "requirements":  [
+                                       "FR-UI-DATABANK-source-mapping",
+                                       "FR-UI-DATABANK-workflow-preservation",
+                                       "FR-UI-DATABANK-clean-room"
+                                   ]
+              },
+    "clean_room":  {
+                       "contains_proprietary_source":  false,
+                       "contains_sensitive_data":  false,
+                       "contains_personal_data":  false,
+                       "paraphrased_behavior_only":  true
+                   },
+    "source_catalog":  [
+                           {
+                               "id":  "sqx-resultsdatabankactions-portfolio-ui",
+                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio",
+                               "family":  "bounded direct Portfolio menu artifact; child inventories separate"
+                           }
+                       ],
+    "sources":  [
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-portfolio-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/module.js",
+                        "relative_path":  "module.js",
+                        "location":  "whole-file structural inventory and scoped responsibility inspection",
+                        "inspection_method":  "local SHA-256 inventory and independent target responsibility audit",
+                        "relation":  "Existing independently authored menu/deferred dispatch aggregate",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "d2de852558982ecec9eadd1f2d9fbdd3cabcd96529cb505c8c4d4ae5a1335bf3",
+                        "target":  "module.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "All five actions remain deferred-only. No merge popup, native merge/split/transfer or selection validation."
+                    }
+                ],
+    "target_only":  [
+                        {
+                            "path":  "source-map.json",
+                            "reason":  "Bounded structural manifest; not behavioral ledger"
+                        },
+                        {
+                            "path":  "README.md",
+                            "reason":  "Coordinator-owned bounded presentation documentation"
+                        }
+                    ],
+    "child_manifests":  [
+                            "merge/source-map.json",
+                            "split/source-map.json",
+                            "mergeWF/source-map.json",
+                            "moveToPC/source-map.json",
+                            "moveToPM/source-map.json"
+                        ]
+}

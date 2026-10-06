@@ -1,3 +1,4 @@
+import { PORTFOLIO_MENU } from '../ResultsDatabankActions/portfolio/module';
 import { SAVE_MENU } from '../ResultsDatabankActions/save/module';
 import { TOOLS_MENU } from '../ResultsDatabankActions/tools/module';
 export { TOOLS_MENU } from '../ResultsDatabankActions/tools/module';
@@ -39,13 +40,7 @@ export const TOOLBAR_BUTTON_ORDER: { id: ToolbarAction; label: string; destructi
 
 export { SAVE_MENU } from '../ResultsDatabankActions/save/module';
 
-export const PORTFOLIO_MENU: string[] = [
-  'Merge strategies',
-  'Split strategies',
-  'Merge WF results',
-  'Move to Portfolio Composer',
-  'Move to Portfolio Master',
-];
+export { PORTFOLIO_MENU } from '../ResultsDatabankActions/portfolio/module';
 
 export interface ToolsMenuItem {
   label: string;

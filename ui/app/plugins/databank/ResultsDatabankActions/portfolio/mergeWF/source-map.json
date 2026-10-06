@@ -1,0 +1,61 @@
+{
+    "schema_version":  1,
+    "scope":  "Frontend-only portfolio/mergeWF bounded structural traceability",
+    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/mergeWF",
+    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/mergeWF",
+    "source_head":  "b40279a5994d284d5b2b2c94536552ddd654eec0",
+    "review":  {
+                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+                   "state":  "owner-approved-plan",
+                   "version":  1
+               },
+    "owner":  {
+                  "domain":  "plugins/databank",
+                  "feature":  "FEAT-UI-DATABANK_BUILDER",
+                  "decision":  "DEC-UI-DATABANK-PORTFOLIO-MERGEWF-STRUCTURAL-OWNERSHIP",
+                  "requirements":  [
+                                       "FR-UI-DATABANK-source-mapping",
+                                       "FR-UI-DATABANK-workflow-preservation",
+                                       "FR-UI-DATABANK-clean-room"
+                                   ]
+              },
+    "clean_room":  {
+                       "paraphrased_behavior_only":  true,
+                       "contains_personal_data":  false,
+                       "contains_sensitive_data":  false,
+                       "contains_proprietary_source":  false
+                   },
+    "source_catalog":  [
+                           {
+                               "id":  "sqx-resultsdatabankactions-portfolio-mergewf-ui",
+                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/mergeWF",
+                               "family":  "bounded installed portfolio composition-action frontend artifacts"
+                           }
+                       ],
+    "sources":  [
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-portfolio-mergewf-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/mergeWF/module.js",
+                        "relative_path":  "module.js",
+                        "location":  "whole-file structural identity and scoped menu/dispatch responsibility",
+                        "inspection_method":  "local inventory, SHA-256 and frontend responsibility inspection",
+                        "relation":  "independently authored target menu/deferred-dispatch counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "f0e8f1b33d6d30d93cc68dd8a896141e4f1d06bbc41a1afbcea161e202041c35",
+                        "target":  "module.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Existing action remains a generic deferred notice, without donor guards/selection semantics/backend execution; no runtime parity."
+                    }
+                ],
+    "target_only":  [
+                        {
+                            "path":  "source-map.json",
+                            "reason":  "Bounded structural manifest, not behavioral ledger."
+                        }
+                    ],
+    "limitations":  [
+                        "Canonical behavioral ledger/schema absent; no new evidence IDs or runtime parity claims.",
+                        "Action only sends its existing deferred label; no selection/running guard, dialog, portfolio mutation or quantitative algorithm.",
+                        "Coordinator parent aggregation/consumer/registry integration pending."
+                    ]
+}

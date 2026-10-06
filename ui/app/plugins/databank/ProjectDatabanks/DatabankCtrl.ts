@@ -1,3 +1,4 @@
+import { dispatchPortfolioAction } from '../ResultsDatabankActions/portfolio/module';
 import { openSimulatedSave } from '../ResultsDatabankActions/save/module';
 import { requestCompareStrategies } from '../ResultsDatabankActions/tools/compareStrategies/module';
 import { handleEditItem } from '../ResultsDatabankActions/tools/edit/module';
@@ -81,7 +82,7 @@ export function useDatabankPanel() {
         setIsFilterCorrelationOpen(true);
         break;
       case 'portfolio':
-        deferred(`Portfolio: ${menuItem}`);
+        dispatchPortfolioAction(menuItem, deferred);
         break;
       case 'tools':
         handleToolsItem(menuItem || '');

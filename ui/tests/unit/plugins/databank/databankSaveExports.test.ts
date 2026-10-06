@@ -1,10 +1,20 @@
 import { describe, expect, it, vi } from "vitest";
 import {
+  label as sourceCodeLabel,
+  openSave,
+} from "../../../../app/plugins/databank/ResultsDatabankActions/save/sourceCode/module";
+import {
   SAVE_MENU,
   openSimulatedSave,
   completeSimulatedSave,
 } from "../../../../app/plugins/databank/ResultsDatabankActions/save/module";
 describe("retained simulated Save boundary", () => {
+  it("routes the flat Source code descriptor through the existing generic opener", () => {
+    const open = vi.fn();
+    openSave(open);
+    expect(sourceCodeLabel).toBe("Source code");
+    expect(open).toHaveBeenCalledExactlyOnceWith("Source code");
+  });
   it.each(["", "HTML report", "PDF report", "Source code", "  custom  "])(
     "preserves exact format %j without added guard or export",
     (format) => {

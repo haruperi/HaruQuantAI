@@ -1,0 +1,83 @@
+{
+    "schema_version":  1,
+    "scope":  "Frontend-only portfolio/moveToPC bounded structural traceability",
+    "donor_root":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/moveToPC",
+    "target_root":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/moveToPC",
+    "source_head":  "b40279a5994d284d5b2b2c94536552ddd654eec0",
+    "review":  {
+                   "reference":  "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+                   "state":  "owner-approved-plan",
+                   "version":  1
+               },
+    "owner":  {
+                  "domain":  "plugins/databank",
+                  "feature":  "FEAT-UI-DATABANK_BUILDER",
+                  "decision":  "DEC-UI-DATABANK-PORTFOLIO-TRANSFERS-STRUCTURAL-OWNERSHIP",
+                  "requirements":  [
+                                       "FR-UI-DATABANK-source-mapping",
+                                       "FR-UI-DATABANK-workflow-preservation",
+                                       "FR-UI-DATABANK-clean-room"
+                                   ]
+              },
+    "clean_room":  {
+                       "contains_proprietary_source":  false,
+                       "contains_sensitive_data":  false,
+                       "contains_personal_data":  false,
+                       "paraphrased_behavior_only":  true
+                   },
+    "source_catalog":  [
+                           {
+                               "id":  "sqx-resultsdatabankactions-movetopc-ui",
+                               "locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/moveToPC",
+                               "family":  "bounded installed portfolio transfer action artifact"
+                           }
+                       ],
+    "sources":  [
+                    {
+                        "catalog_id":  "sqx-resultsdatabankactions-movetopc-ui",
+                        "artifact_locator":  "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/portfolio/moveToPC/module.js",
+                        "relative_path":  "module.js",
+                        "location":  "whole-file structural action identity",
+                        "inspection_method":  "recursive leaf inventory, SHA-256 and scoped action responsibility inspection",
+                        "relation":  "independently authored menu/deferred action counterpart",
+                        "access_date":  "2026-10-06",
+                        "sha256":  "d5821c449fb2df450890221207dab40beea534ec2d5b3216b2a919b9cde8e1e0",
+                        "target":  "module.ts",
+                        "classification":  "counterpart",
+                        "limitation":  "Target only preserves existing menu/deferred notice. Donor selection/loading/running guards, confirmation, backend transfer and error handling are not implemented; no navigation or membership mutation added."
+                    }
+                ],
+    "target_only":  [
+                        {
+                            "path":  "source-map.json",
+                            "reason":  "Structural manifest, not behavioral ledger"
+                        },
+                        {
+                            "path":  "README.md",
+                            "reason":  "Coordinator-owned scope ownership and limitations"
+                        }
+                    ],
+    "retained_support":  [
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/module.ts",
+                                 "reason":  "Coordinator-integrated parent menu order/delegation and unknown-label fallback"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ProjectDatabanks/DatabankCtrl.ts",
+                                 "reason":  "Shared host-backed deferred-notice callback remains authority boundary"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/plugins/databank/ProjectDatabanks/DatabankToolbar.tsx",
+                                 "reason":  "Shared toolbar/dropdown/rendering and close behavior"
+                             },
+                             {
+                                 "locator":  "HARUQUANTAI_ROOT/ui/app/workspace/PortfolioComposer",
+                                 "reason":  "Distinct existing destination capability remains unchanged and is not invoked by this deferred action"
+                             }
+                         ],
+    "limitations":  [
+                        "No destination transfer, membership mutation, navigation, backend or persistence change.",
+                        "Canonical behavioral ledger/schema absent; no replacement ledger or new EV IDs.",
+                        "Filename/menu responsibility identity does not establish SQX runtime parity."
+                    ]
+}

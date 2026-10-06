@@ -195,6 +195,10 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/save/module.ts",
       "relation": "Existing generic Save popup/draft and deferred format completion delegate to bounded Save modules; no real export."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/portfolio/module.ts",
+      "relation": "Five existing deferred-only portfolio descriptors/actions; rows, members, route and mocks unchanged."
     }
   ],
   "inventory_review": {
