@@ -1,3 +1,5 @@
+import { dukascopyProvider } from '../Dukascopy/module';
+
 export type DataSourceDialogId =
   | 'new-instrument'
   | 'dukascopy-add'
@@ -84,15 +86,7 @@ const cryptoExchanges = [
 ] as const;
 
 export const dataSourceProviders: readonly DataSourceProvider[] = [
-  {
-    id: 'dukascopy',
-    label: 'Dukascopy data',
-    commands: [
-      { id: 'dukascopy-add', label: 'Add new Dukascopy symbol', icon: 'add', dialog: 'dukascopy-add' },
-      { id: 'dukascopy-download', label: 'Download data for existing symbol', icon: 'download', dialog: 'dukascopy-download' },
-      { id: 'dukascopy-information', label: 'Dukascopy Data Disclaimer', icon: 'information', dialog: 'dukascopy-information' },
-    ],
-  },
+  dukascopyProvider,
   {
     id: 'tickdownloader',
     label: 'TickDownloader import',

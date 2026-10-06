@@ -1,7 +1,10 @@
 import { expect, test, type Page } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  await page.route('**/*', route => { const url = new URL(route.request().url()); return ['127.0.0.1', 'localhost'].includes(url.hostname) && !url.pathname.startsWith('/api/') ? route.continue() : route.abort(); });
+});
 async function launch(page: Page) {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
+  await page.goto('/datamanager');
 }
 async function open(page: Page) {
   await page.getByRole('button', { name: 'Dukascopy data', exact: true }).click();
@@ -9,7 +12,7 @@ async function open(page: Page) {
   return page.getByRole('dialog', { name: /Download Dukascopy data for/ });
 }
 test('selection, presets, disclaimer, simulated lifecycle and persistence', async ({ page }) => {
-  await page.route('**/*', route => ['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort());
+  await page.route('**/*', route => ['127.0.0.1','localhost'].includes(new URL(route.request().url()).hostname) && !new URL(route.request().url()).pathname.startsWith('/api/') ? route.continue() : route.abort());
   await launch(page);
   await open(page);
   await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -47,8 +50,9 @@ test('selection, presets, disclaimer, simulated lifecycle and persistence', asyn
 });
 test('trial confirmation, date errors, stopping, light and small layout', async ({ page }) => {
   await launch(page);
-  await page.evaluate(() => { const saved = JSON.parse(localStorage.getItem('sqx-recreation-v1')!); saved.state.settings.profile = 'Starter'; saved.state.settings.theme = 'light'; localStorage.setItem('sqx-recreation-v1', JSON.stringify(saved)); });
-  await page.reload();
+  await page.evaluate(async () => { const modulePath = '/app/host/store.ts'; const { useAppStore } = await import(modulePath); useAppStore.getState().updateSettings({ profile: 'Starter', theme: 'light' }); });
+  await expect(page.locator('html')).toHaveAttribute('data-profile', 'Starter');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).check();
   await page.getByRole('checkbox', { name: 'Select GBPJPY', exact: true }).check();
   const dialog = await open(page);
@@ -125,6 +129,7 @@ test('fast warning cancels safely, traps focus and confirms persisted standard f
   await warning.getByRole('button', { name: 'OK', exact: true }).click();
   await page.getByRole('button', { name: 'Pause all', exact: true }).click();
   await page.reload();
+  await expect(page.getByLabel('Data Manager progress')).toContainText('paused');
   const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('sqx-data-download-v1')!));
   expect(saved.job.request.downloadType).toBe('cdn-cn');
   expect(saved.job.resolvedModes).toEqual({ d1: 'standard' });

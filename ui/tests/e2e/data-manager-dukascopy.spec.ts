@@ -1,14 +1,17 @@
 import { expect, test, type Page } from '@playwright/test';
-import { selectLightSkin } from './shellTestUtils';
+
+test.beforeEach(async ({ page }) => {
+  await page.route('**/*', route => { const url = new URL(route.request().url()); return ['127.0.0.1', 'localhost'].includes(url.hostname) && !url.pathname.startsWith('/api/') ? route.continue() : route.abort(); });
+});
+
 async function open(page: Page) {
-  await page.goto('/');
-  await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
+  await page.goto('/datamanager');
   await page.getByRole('button', { name: 'Dukascopy data', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Add new Dukascopy symbol', exact: true }).click();
   return page.getByRole('dialog', { name: 'Add Dukascopy data', exact: true });
 }
 test('catalogue controls, validation, save and reload remain offline', async ({ page }) => {
-  await page.route('**/*', route => ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort());
+  await page.route('**/*', route => ['127.0.0.1', 'localhost'].includes(new URL(route.request().url()).hostname) && !new URL(route.request().url()).pathname.startsWith('/api/') ? route.continue() : route.abort());
   const dialog = await open(page);
   await expect(dialog.getByRole('checkbox', { name: /^Select symbol / })).toHaveCount(725);
   await expect(dialog.getByRole('radio', { name: 'Tick data', exact: true })).toBeChecked();
@@ -97,7 +100,8 @@ test('popup follows HaruQuantAI dark and light themes', async ({ page }) => {
   const darkBackground = await dialog.evaluate(node => getComputedStyle(node).backgroundColor);
   await expect(dialog).toHaveCSS('background-color', 'rgb(32, 37, 45)');
   await dialog.getByRole('button', { name: 'Close', exact: true }).first().click();
-  await selectLightSkin(page);
+  await page.evaluate(async () => { const modulePath = '/app/host/store.ts'; const { useAppStore } = await import(modulePath); useAppStore.getState().updateSettings({ theme: 'light' }); });
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
   await page.getByRole('button', { name: 'Dukascopy data', exact: true }).click();
   await page.getByRole('menuitem', { name: 'Add new Dukascopy symbol', exact: true }).click();
   await expect(dialog).toHaveCSS('background-color', 'rgb(255, 255, 255)');
