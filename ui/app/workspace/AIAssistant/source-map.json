@@ -1,0 +1,45 @@
+{
+  "referenceRoot": "C:/SQX-145/internal/web/SQAI",
+  "deliveryCohort": "native-ui-only",
+  "referenceExecuted": false,
+  "sources": [
+    {
+      "path": "chat/assets/index-DbWeULv9.js",
+      "sha256": "cb29e935f851919fd5d6285653d55cce6ce67f447b2f492c87314cf133497ae3",
+      "role": "Compiled component structures and labels"
+    },
+    {
+      "path": "chat/assets/index-BfdqFDsP.css",
+      "sha256": "9a1abe6d2ae3be4204c4c26482eb31feccdcd9f296f370eea4ddb9caa6ff7cc8",
+      "role": "Header and starter styling evidence"
+    },
+    {
+      "path": "features/sqx/en.json",
+      "sha256": "52f621f98bbaa6a644bc3c0cded96e77748bd3cb4d1972b1e0b6f9a0acdd44f6",
+      "role": "All eight capability entries and starters; product branding adapted"
+    },
+    {
+      "path": "workspace-panel.js",
+      "role": "Brain presentation and unavailable endpoint boundaries"
+    },
+    {
+      "path": "ai-guide.html",
+      "role": "User flows; catalog overrides stale six-tile count"
+    }
+  ],
+  "unavailableServices": [
+    "chat",
+    "models",
+    "credits",
+    "reports",
+    "strategy-actions",
+    "workspace-files",
+    "skills"
+  ],
+  "persistentState": false,
+  "limitations": [
+    "No donor runtime visual comparison",
+    "No AI backend parity",
+    "No cross-workspace docking"
+  ]
+}

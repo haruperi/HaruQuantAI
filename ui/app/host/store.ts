@@ -191,7 +191,7 @@ export const useAppStore = create<AppState>()(persist((set) => ({
   extensionFiles, activeFileId: extensionFiles[0].id, openFileIds: [extensionFiles[0].id],
   compileOutput: '[info] Compiler ready. Select an extension and click Compile to run AST validation.',
   computeNodes, businessConfig,
-  setModule: module => set({ module, tab: ['datamanager', 'algowizard', 'composer', 'codeeditor', 'business', 'home', 'debugconsole', 'gridcontrol'].includes(module) ? 'settings' : 'progress' }),
+  setModule: module => set({ module, tab: ['datamanager', 'algowizard', 'composer', 'codeeditor', 'business', 'home', 'aiassistant', 'debugconsole', 'gridcontrol'].includes(module) ? 'settings' : 'progress' }),
   setTab: tab => set({ tab }), selectStrategy: selectedStrategyId => set({ selectedStrategyId }), setResultView: resultView => set({ resultView }),
   setBank: selectedBankId => set({ selectedBankId, selectedRows: [] }), setRows: selectedRows => set({ selectedRows }),
   updateSettings: patch => set(s => ({ settings: { ...s.settings, ...patch } })), updateBuilder: patch => set(s => ({ builder: { ...s.builder, ...patch } })),

@@ -1,5 +1,6 @@
 export type ModuleId =
   | 'home'
+  | 'aiassistant'
   | 'builder'
   | 'retester'
   | 'optimizer'

@@ -6,6 +6,7 @@ import { useAppStore } from './store';
 import { getPathForModule, useRouteSync } from './router';
 import { DatabankSplitter } from '../plugins/databank/ProjectDatabanks/module';
 import { HomeScreen } from '../workspace/Home/HomeScreen';
+import { AIAssistantWorkspace } from '../workspace/AIAssistant/AIAssistantWorkspace';
 import { DataManager } from '../workspace/DataManager/DataManager';
 import { ChartWorkspace } from '../workspace/Chart/ChartWorkspace';
 import { BuilderWorkspace } from '../workspace/Builder/BuilderWorkspace';
@@ -29,6 +30,7 @@ import { HostConnectionProvider, useHostConnection } from './HostConnection';
 
 const nav: { id: ModuleId; label: string; icon: typeof ChartNoAxesCombined; group?: string }[] = [
   { id: 'home', label: 'HaruQuantAI', icon: ChartNoAxesCombined },
+  { id: 'aiassistant', label: 'AI Assistant', icon: BrainCircuit },
   { id: 'datamanager', label: 'Data Manager', icon: Database, group: 'Fundamentals' },
   { id: 'chart', label: 'Chart', icon: LineChart },
   { id: 'business', label: 'Business', icon: BriefcaseBusiness },
@@ -105,6 +107,7 @@ function AppShell() {
             <Routes>
             <Route path="/" element={<HomeScreen />} />
             <Route path="/home" element={<HomeScreen />} />
+            <Route path="/aiassistant" element={<AIAssistantWorkspace />} />
             <Route path="/datamanager" element={<DataManager />} />
             <Route path="/chart" element={<ChartWorkspace />} />
             <Route path="/business" element={<BusinessWorkspace />} />

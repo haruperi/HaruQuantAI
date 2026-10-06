@@ -1,0 +1,405 @@
+[
+  {
+    "id": "strategy",
+    "icon": "wand",
+    "title": "Text to Strategy",
+    "shortDescription": "Turn your trading idea into a ready-to-test strategy.",
+    "description": "Describe your trading idea in plain words — or paste pseudocode, or pull in the strategy open in the AlgoWizard editor or selected in the app. The assistant builds it, shows it back as AlgoWizard-style pseudocode you can correct line by line, and backtests it right here. Say what to change and it rebuilds — then save it to a databank, send it to AlgoWizard, or take the MetaTrader or C# code.",
+    "backend": "sqai",
+    "inputPlaceholder": "Describe your trading idea…",
+    "starters": [
+      {
+        "key": "ema-cross",
+        "label": "Create an EMA(12/26) cross strategy for EURUSD H1 with a 30-pip stop and 60-pip target",
+        "prompt": "Create an EMA(12/26) cross strategy for EURUSD H1 with a 30-pip stop and 60-pip target"
+      },
+      {
+        "key": "rsi-mean-reversion",
+        "label": "Build me a simple RSI(14) mean-reversion strategy: buy below 30, exit after 10 bars",
+        "prompt": "Build me a simple RSI(14) mean-reversion strategy: buy below 30, exit after 10 bars"
+      },
+      {
+        "key": "london-breakout",
+        "label": "Create a breakout strategy for EURUSD H1 that trades only the London session, with an ATR stop loss",
+        "prompt": "Create a breakout strategy for EURUSD H1 that trades only the London session, with an ATR stop loss"
+      },
+      {
+        "key": "paste-pseudocode",
+        "label": "Turn my pseudocode into a strategy",
+        "prompt": "I will paste my pseudocode in the next message — turn it into a strategy, backtest it and show me the result"
+      },
+      {
+        "key": "load-selected",
+        "label": "Load the selected strategy",
+        "prompt": "Load the strategy currently selected in the app into the chat and show it as pseudocode. Keep it loaded so I can ask for changes."
+      },
+      {
+        "key": "load-from-aw",
+        "label": "Load strategy from AlgoWizard editor",
+        "action": "import-aw-strategy"
+      },
+      {
+        "key": "backtest-built",
+        "label": "Backtest the strategy we built",
+        "prompt": "Backtest the strategy we have loaded on EURUSD H1 over the last 5 years and show me the report"
+      }
+    ]
+  },
+  {
+    "id": "analyze",
+    "icon": "chart",
+    "title": "Analyze & Research",
+    "shortDescription": "Explain results, compare strategies, run research loops.",
+    "description": "Explain, audit and compare your strategies and databanks in plain language — from the app's current selection, a databank or a saved file — or hand the assistant longer research: robustness screens, experiments and overnight loops it drives itself.",
+    "backend": "sqai",
+    "inputPlaceholder": "Ask about your strategies, or describe the research to run…",
+    "starters": [
+      {
+        "key": "explain-best",
+        "label": "Explain what the best strategy in my databank is actually doing",
+        "prompt": "Explain what the best strategy in my databank is actually doing"
+      },
+      {
+        "key": "top-by-return-dd",
+        "label": "Show me the 5 best strategies by Return/DD, with Net profit and number of trades",
+        "prompt": "Show me the 5 best strategies by Return/DD, with Net profit and number of trades"
+      },
+      {
+        "key": "summarize-databanks",
+        "label": "Summarize the databanks in this project",
+        "prompt": "Summarize the databanks in this project"
+      },
+      {
+        "key": "really-different",
+        "label": "Are my top 10 strategies really different ideas, or one idea with different parameters?",
+        "prompt": "Are my top 10 strategies really different ideas, or one idea with different parameters?"
+      },
+      {
+        "key": "report-databank-python",
+        "label": "Visual report: analyze a databank in Python",
+        "prompt": "Analyze my databank: export the data, use Python to find patterns (day-of-week and hour edges, volatility regimes, correlations) and create a visual AI report with KPIs, tables and charts"
+      },
+      {
+        "key": "report-market-regime",
+        "label": "Visual report: market regime analysis",
+        "prompt": "Analyze the market EURUSD H1 — is it trending or mean-reverting, how volatile, which sessions matter? Use Python and create a visual AI report with the findings and a recommended strategy style"
+      },
+      {
+        "key": "mql5-of-best",
+        "label": "Give me the MQL5 code of the best strategy",
+        "prompt": "Give me the MQL5 code of the best strategy"
+      }
+    ]
+  },
+  {
+    "id": "projects",
+    "icon": "package",
+    "title": "Build & Automate Workflows",
+    "shortDescription": "Build, test and optimize strategies — or create complete automated workflows.",
+    "description": "Set up and run HaruQuantAI projects using plain language. Configure Builder, Retester, Optimizer and Portfolio Master, or combine multiple steps into automated workflows.",
+    "backend": "sqai",
+    "inputPlaceholder": "Describe what to build, test or automate...",
+    "starters": [
+      {
+        "key": "build-eurusd-pf",
+        "label": "Build strategies for EURUSD H1 from 2015–2020 and keep only those with Profit Factor above 1.3",
+        "prompt": "Build strategies for EURUSD H1 from 2015–2020 and keep only those with Profit Factor above 1.3"
+      },
+      {
+        "key": "show-builder-setup",
+        "label": "Show me my current Builder setup",
+        "prompt": "Show me my current Builder setup"
+      },
+      {
+        "key": "set-builder-gbpusd",
+        "label": "Set Builder to GBPUSD H1, 2018–2023, with 25% OOS and stop after finding 50 strategies",
+        "prompt": "Set Builder to GBPUSD H1, 2018–2023, with 25% OOS and stop after finding 50 strategies"
+      },
+      {
+        "key": "add-monte-carlo",
+        "label": "Add Monte Carlo testing to my build",
+        "prompt": "Add Monte Carlo testing to my build"
+      },
+      {
+        "key": "retest-and-filter",
+        "label": "Retest my strategies on EURUSD and GBPUSD and remove weak results",
+        "prompt": "Retest my strategies on EURUSD and GBPUSD and remove weak results"
+      },
+      {
+        "key": "optimize-wfm",
+        "label": "Optimize this strategy using Walk-Forward Matrix",
+        "prompt": "Optimize this strategy using Walk-Forward Matrix"
+      },
+      {
+        "key": "workflow-build-retest-filter",
+        "label": "Create a workflow that builds, retests and filters strategies automatically",
+        "prompt": "Create a workflow that builds, retests and filters strategies automatically"
+      },
+      {
+        "key": "workflow-keep-pf",
+        "label": "Build a workflow that keeps only strategies with Profit Factor above 1.5",
+        "prompt": "Build a workflow that keeps only strategies with Profit Factor above 1.5"
+      },
+      {
+        "key": "run-builder",
+        "label": "Run my Builder",
+        "prompt": "Run my Builder"
+      }
+    ]
+  },
+  {
+    "id": "market",
+    "icon": "monitor",
+    "title": "Market & Data Analysis",
+    "shortDescription": "OHLC bars, COT, regimes — real computation.",
+    "description": "Analyze the market itself, not just your strategies: read OHLC bars on any timeframe, export the full series and run Python over it, pull in COT positioning — then let the analysis pick the strategy style to build. Note: licensed SQ Equities/Futures data (the @ symbols, e.g. @NQ) may not leave HaruQuantAI, so the assistant cannot analyze those symbols at all — use them in Builder and backtests instead.",
+    "backend": "sqai",
+    "inputPlaceholder": "Name a symbol and what you want to know about it…",
+    "starters": [
+      {
+        "key": "peek-bars",
+        "label": "Peek at the bars (D1 + H1)",
+        "prompt": "Show me the last 20 daily EURUSD bars as an OHLC + volume table, then the H1 bars for the last week"
+      },
+      {
+        "key": "intraday-edge-scan",
+        "label": "Intraday edge scan in Python",
+        "prompt": "Export EURUSD H1 to CSV and analyze the market in Python: average daily range (ATR), volatility by hour of day, and the return distribution by day of week. Show the results visually and tell me what they imply for an intraday strategy"
+      },
+      {
+        "key": "regimes-and-cot",
+        "label": "Regimes + COT across M1/H1/D1",
+        "prompt": "Analyze EURUSD on M1, H1 and D1: export each timeframe to CSV (last 3 years for M1) plus the COT data, then write ONE Python script that computes market regimes (trend vs mean-reversion), session and day-of-week edges and joins the COT positioning — save full results to files, print only the aggregated summary tables. Interpret the aggregates and recommend a strategy type to build"
+      },
+      {
+        "key": "regime-dependence",
+        "label": "Do my strategies depend on the regime?",
+        "prompt": "Analyze the EURUSD H1 strategies from the Results databank of my current project — does their performance depend on market regime, day of week and volatility? Use Python and create an interactive report"
+      },
+      {
+        "key": "market-to-builder",
+        "label": "Market analysis → Builder template",
+        "prompt": "Analyze the EURUSD market — H1 and D1 data plus COT positioning: is it trending or mean-reverting, which sessions move most, does COT give a directional bias? Then set up a Builder template justified by that analysis: timeframe, trading sessions, building block types and exit methods"
+      },
+      {
+        "key": "update-cot",
+        "label": "Update COT data and show EUR positioning",
+        "prompt": "What external indicators do I have? Update the COT data and show me the current EUR positioning"
+      },
+      {
+        "key": "update-dukascopy",
+        "label": "Update my Dukascopy data",
+        "prompt": "Update all my Dukascopy symbols to today. Run it in the background, wait for it to finish and then show me the new date ranges"
+      },
+      {
+        "key": "add-gbpjpy",
+        "label": "Add GBPJPY from Dukascopy as M1 data",
+        "prompt": "Add GBPJPY from Dukascopy as M1 data with the default broker profile and download the last 5 years. Let me know when the data is ready"
+      },
+      {
+        "key": "download-stock-group",
+        "label": "Download a stock group (S&P 500)",
+        "prompt": "Update the data of the S&P 500 stock group in the background and tell me when it is done"
+      }
+    ]
+  },
+  {
+    "id": "code",
+    "icon": "code",
+    "title": "Custom Analysis Tabs & Code",
+    "shortDescription": "Create your own results tab, plugins, blocks.",
+    "description": "Build your own custom analysis result tab — and any other code: result plugins, indicators, custom blocks. The assistant writes, deploys and reloads them for you.",
+    "backend": "sqai",
+    "inputPlaceholder": "Describe the tab or code you want to build…",
+    "starters": [
+      {
+        "key": "tab-profit-by-hour",
+        "label": "Create an analysis tab showing profit by hour of day",
+        "prompt": "Create an analysis tab showing profit by hour of day"
+      },
+      {
+        "key": "tab-equity-stability-guard",
+        "label": "Analysis tab: Equity Stability Guard",
+        "prompt": "Create a custom results tab called 'Equity Stability Guard' — a robustness scorecard for the selected strategy. Give it an overall 0-100 stability score and red/amber/green flags for: trade concentration (few trades carrying most of the profit), stagnation (StagnationPeriodPct — long flat stretches), drawdown (PctDrawdown), monthly consistency (percentage of positive months) and too few trades (NumberOfTrades). Read the strategy stats and the trade list, show each flag with its value and a one-line explanation, and style it for the HaruQuantAI dark UI."
+      },
+      {
+        "key": "tab-add-symbol-filter",
+        "label": "Open my existing analysis tab and add a symbol filter",
+        "prompt": "Open my existing analysis tab and add a symbol filter"
+      },
+      {
+        "key": "tab-explain-with-ai",
+        "label": "Build a results tab with an 'Explain with AI' button for the selected strategy",
+        "prompt": "Build a results tab with an 'Explain with AI' button for the selected strategy"
+      },
+      {
+        "key": "block-above-yesterday-high",
+        "label": "Create a custom block: price closes above yesterday's high",
+        "prompt": "Create a custom block: price closes above yesterday's high"
+      },
+      {
+        "key": "random-group-of-blocks",
+        "label": "Build a random group pooling my custom blocks for the Builder",
+        "prompt": "Build a random group pooling my custom blocks for the Builder"
+      },
+      {
+        "key": "indicator-price-zscore",
+        "label": "Custom indicator: Price Z-Score",
+        "prompt": "Create a custom indicator called PriceZScore: how many standard deviations the current price is from its simple moving average — (Close − SMA(Period)) / StdDev(Period), Period default 20. Make it an oscillator centered at 0, compile it and confirm it appears as a building block."
+      },
+      {
+        "key": "column-avg-trade-duration",
+        "label": "Add a custom databank column AvgTradeDurationHours",
+        "prompt": "Add a custom databank column AvgTradeDurationHours — the average time from a trade's open to its close in hours, excluding balance orders like deposits and withdrawals. Compile it and confirm I can add it to my databank views."
+      },
+      {
+        "key": "indicator-triple-ema-mt4",
+        "label": "Create a custom Triple EMA indicator and translate it to MT4",
+        "prompt": "Create a simple custom indicator called TripleEMA: three exponential moving averages of the close with periods Fast, Medium and Slow (defaults 8, 21, 55), one output line each. Compile it and confirm it appears as a building block. Then translate it to MQL4 and prove that the MT4 values match the HaruQuantAI values."
+      }
+    ]
+  },
+  {
+    "id": "skills",
+    "icon": "puzzle",
+    "title": "Plugins & Skills",
+    "shortDescription": "Browse and run skills — or save your own.",
+    "description": "Browse and run the installed skills, agents and AI plugins — each with an example message, invoked by asking for it or typing its /command. Or paste your own workflow, checklist or trading protocol and the assistant turns it into a permanent plugin with a /command of its own.",
+    "backend": "sqai",
+    "inputPlaceholder": "Ask what the assistant can do, or paste a workflow to save…",
+    "starters": [
+      {
+        "key": "list-skills",
+        "label": "List installed skills",
+        "prompt": "/skills"
+      },
+      {
+        "key": "list-agents",
+        "label": "List agents",
+        "prompt": "/agents"
+      },
+      {
+        "key": "list-tools",
+        "label": "List the tools of this chat",
+        "prompt": "/tools"
+      },
+      {
+        "key": "list-plugins",
+        "label": "List installed AI plugins",
+        "prompt": "/plugins"
+      },
+      {
+        "key": "make-plugin",
+        "label": "Turn the workflow I paste next into a permanent plugin (/make-plugin)",
+        "prompt": "Turn the workflow I paste next into a permanent plugin (/make-plugin)"
+      },
+      {
+        "key": "how-plugins-work",
+        "label": "How do AI plugins work, and how do I create my own?",
+        "prompt": "How do AI plugins work, and how do I create my own?"
+      }
+    ]
+  },
+  {
+    "id": "algocloud",
+    "icon": "/SQAI/algocloud.png",
+    "title": "AlgoCloud",
+    "shortDescription": "Stockpicker & single-asset strategies.",
+    "description": "Work with AlgoCloud strategies right in the chat: create stockpicker strategies that rank a stock group, or single-asset strategies for one instrument — then backtest the saved .sqx files on their own settings and read the results.",
+    "backend": "sqai",
+    "inputPlaceholder": "Describe the stockpicker or single-asset strategy you want…",
+    "starters": [
+      {
+        "key": "breakout-new-highs",
+        "label": "Breakout — buy new highs on rising volume",
+        "prompt": "Create a stockpicker strategy on the S&P 500 that buys stocks breaking out above their 50-day high on volume above its 20-day average, with an 8% stop loss and a 20% profit target, max 10 open positions. Backtest it and show me the results."
+      },
+      {
+        "key": "momentum-top-10",
+        "label": "Momentum — hold the 10 strongest stocks",
+        "prompt": "Create a stockpicker strategy on the Nasdaq 100 that ranks stocks by their 6-month rate of change and buys the strongest ones while they trade above their 50-day average and QQQ is above its 200-day average, max 10 open positions, exit when a stock closes below its 50-day average or hits a 10% stop loss. Backtest it and show me the equity curve."
+      },
+      {
+        "key": "mean-reversion-oversold",
+        "label": "Mean reversion — buy oversold dips for a snap-back",
+        "prompt": "Create a stockpicker strategy on the S&P 500 that buys severely oversold stocks with a limit order below the previous close, and exits when price snaps back or after a few days. Backtest it and show me the results."
+      },
+      {
+        "key": "pullback-20dma",
+        "label": "Pullback — buy the dip to the 20-day average in uptrends",
+        "prompt": "Create a stockpicker strategy on the Nasdaq 100 that buys at market when a stock trading above its 200-day average closes below its 20-day average after being above it, ranked by 6-month rate of change, exits when the close makes a new 20-day high or after 15 bars, with a 7% stop loss, max 10 positions. Backtest it and show me the results."
+      },
+      {
+        "key": "gap-fade",
+        "label": "Gap — fade the opening gap down in strong stocks",
+        "prompt": "Create a stockpicker strategy on the S&P 500 that buys a stock when it opens at least 3% below the previous close while still trading above its 100-day average, exits at the close of the next day or on a 5% stop loss, max 10 positions. Backtest it and show me the results."
+      },
+      {
+        "key": "weekly-trend-rsi2",
+        "label": "Weekly trend — buy daily dips in weekly uptrends",
+        "prompt": "Create a stockpicker strategy on the S&P 500 that buys a stock when its weekly close is above its weekly 10-period average and the daily RSI(2) drops below 10, exits when RSI(2) rises above 70 or after 10 bars, with a 5% stop loss, max 10 positions. Backtest it and show me the results."
+      },
+      {
+        "key": "single-asset",
+        "label": "Create a single asset strategy",
+        "prompt": "Create a single-asset stockpicker strategy for one stock: buy when RSI(14) drops below 30, sell when it rises above 70"
+      },
+      {
+        "key": "backtest-sqx-file",
+        "label": "Backtest an AlgoCloud strategy file",
+        "prompt": "Backtest my AlgoCloud strategy .sqx file on its own saved settings and show me the report"
+      },
+      {
+        "key": "explain-stockpicker",
+        "label": "Explain what my stockpicker strategy is actually doing",
+        "prompt": "Explain what my stockpicker strategy is actually doing"
+      },
+      {
+        "key": "stockpicker-vs-single",
+        "label": "What is the difference between a stockpicker and a single-asset strategy?",
+        "prompt": "What is the difference between a stockpicker and a single-asset strategy?"
+      }
+    ]
+  },
+  {
+    "id": "learn",
+    "icon": "/SQAI/sqx.png",
+    "title": "Learn HaruQuantAI & Trading",
+    "shortDescription": "Ask anything about HaruQuantAI and trading.",
+    "description": "Ask anything about HaruQuantAI — features, settings, workflows, answered from the built-in documentation — or about trading in general: concepts, indicators, robustness testing, portfolio building.",
+    "backend": "sqai",
+    "inputPlaceholder": "Ask anything about HaruQuantAI…",
+    "starters": [
+      {
+        "key": "what-is-wfm",
+        "label": "What does the Walk-Forward Matrix actually test?",
+        "prompt": "What does the Walk-Forward Matrix actually test?"
+      },
+      {
+        "key": "import-own-data",
+        "label": "How do I import my own data?",
+        "prompt": "How do I import my own data?"
+      },
+      {
+        "key": "monte-carlo-methods",
+        "label": "What is the difference between the Monte Carlo methods in Retester?",
+        "prompt": "What is the difference between the Monte Carlo methods in Retester?"
+      },
+      {
+        "key": "first-builder-project",
+        "label": "How should I set up my first Builder project?",
+        "prompt": "How should I set up my first Builder project?"
+      },
+      {
+        "key": "open-monte-carlo-screen",
+        "label": "Where do I set the Monte Carlo confidence level? Open that screen for me",
+        "prompt": "/drive-ui Where do I set the Monte Carlo confidence level? Open that screen for me"
+      },
+      {
+        "key": "what-data-downloaded",
+        "label": "What market data do I have downloaded, and what date ranges?",
+        "prompt": "What market data do I have downloaded, and what date ranges?"
+      }
+    ]
+  }
+]
