@@ -1,0 +1,105 @@
+{
+  "timestamp": "2026-10-06T11:03:39.576208+00:00",
+  "scope": "Read-only donor-family structural inventory; no behavioral parity assertion",
+  "donors": [
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Crypto",
+      "artifacts": 10,
+      "counterparts": 9,
+      "exclusions": 1,
+      "target_files": 13,
+      "exceptions": 4,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Darwinex",
+      "artifacts": 19,
+      "counterparts": 17,
+      "exclusions": 2,
+      "target_files": 21,
+      "exceptions": 4,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Dukascopy",
+      "artifacts": 19,
+      "counterparts": 16,
+      "exclusions": 3,
+      "target_files": 20,
+      "exceptions": 4,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/FileImport",
+      "artifacts": 17,
+      "counterparts": 13,
+      "exclusions": 4,
+      "target_files": 19,
+      "exceptions": 6,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/MetaTrader",
+      "artifacts": 7,
+      "counterparts": 6,
+      "exclusions": 1,
+      "target_files": 10,
+      "exceptions": 4,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData/Equity",
+      "artifacts": 11,
+      "counterparts": 9,
+      "exclusions": 2,
+      "target_files": 10,
+      "exceptions": 1,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/SQData/Futures",
+      "artifacts": 11,
+      "counterparts": 9,
+      "exclusions": 2,
+      "target_files": 10,
+      "exceptions": 1,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/TickDownloader",
+      "artifacts": 7,
+      "counterparts": 6,
+      "exclusions": 1,
+      "target_files": 9,
+      "exceptions": 3,
+      "issues": []
+    },
+    {
+      "donor": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo",
+      "target": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Yahoo",
+      "artifacts": 10,
+      "counterparts": 9,
+      "exclusions": 1,
+      "target_files": 13,
+      "exceptions": 4,
+      "issues": []
+    }
+  ],
+  "missing_donors": [],
+  "unexpected_donors": [],
+  "totals": {
+    "donor_artifacts": 111,
+    "counterparts": 94,
+    "exclusions": 17,
+    "target_files": 129,
+    "exceptions": 35
+  }
+}

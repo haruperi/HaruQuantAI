@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { selectLightSkin } from './shellTestUtils';
 
-async function launch(page: Page) { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).click(); }
+async function launch(page: Page) { await page.goto('/'); await page.getByRole('button', { name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click(); }
 async function openAdd(page: Page) { await page.getByRole('button', { name: 'Yahoo', exact: true }).click(); await page.getByRole('menu', { name: 'Yahoo actions' }).getByRole('menuitem', { name: 'Add Yahoo symbols', exact: true }).click(); return page.getByRole('dialog', { name: 'Add Yahoo data' }); }
 async function openDownload(page: Page) { await page.getByRole('button', { name: 'Yahoo', exact: true }).click(); await page.getByRole('menu', { name: 'Yahoo actions' }).getByRole('menuitem', { name: 'Download data for existing symbol', exact: true }).click(); return page.getByRole('dialog'); }
 async function addSymbols(page: Page, symbols = 'AAPL', postfix = '_Y') { const dialog = await openAdd(page); await dialog.getByRole('textbox', { name: 'Yahoo symbols' }).fill(symbols); await dialog.getByRole('textbox', { name: 'Data postfix' }).fill(postfix); await dialog.getByRole('button', { name: 'Save', exact: true }).click(); }

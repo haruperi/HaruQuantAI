@@ -7,8 +7,8 @@ import { AddPopup as CryptoAddDialog } from '../../plugins/data_source/Crypto/ad
 import { ImportPopup as CryptoDownloadDialog } from '../../plugins/data_source/Crypto/import/module';
 import { cryptoActive, useCrypto } from '../../plugins/data_source/Crypto/cryptoStore';
 import { cryptoTargets, type CryptoDefinition, type CryptoExchangeId } from '../../plugins/data_source/Crypto/crypto';
-import { YahooAddDialog } from '../../plugins/data_source/Yahoo/YahooAddDialog';
-import { YahooDownloadDialog } from '../../plugins/data_source/Yahoo/YahooDownloadDialog';
+import { YahooAddDialog } from '../../plugins/data_source/Yahoo/add/module';
+import { YahooDownloadDialog } from '../../plugins/data_source/Yahoo/download/module';
 import { useYahoo, yahooActive } from '../../plugins/data_source/Yahoo/yahooStore';
 import { yahooTargets, type YahooDefinition } from '../../plugins/data_source/Yahoo/yahoo';
 import { ImportPopup as Mt5ImportDialog } from '../../plugins/data_source/MetaTrader/import/module';

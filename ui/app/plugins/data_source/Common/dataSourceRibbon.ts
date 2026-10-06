@@ -1,3 +1,4 @@
+import { yahooProvider } from '../Yahoo/module';
 import { tdProvider } from '../TickDownloader/module';
 import { equityProvider } from '../SQData/Equity/module';
 import { futuresProvider } from '../SQData/Futures/module';
@@ -91,14 +92,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
   futuresProvider,
   darwinexProvider,
   cryptoProvider,
-  {
-    id: 'yahoo',
-    label: 'Yahoo',
-    commands: [
-      { id: 'yahoo-add', label: 'Add Yahoo symbols', icon: 'symbol-list', dialog: 'yahoo-add' },
-      { id: 'yahoo-download', label: 'Download data for existing symbol', icon: 'download', dialog: 'yahoo-download' },
-    ],
-  },
+  yahooProvider,
   mt5Provider,
 ] as const;
 

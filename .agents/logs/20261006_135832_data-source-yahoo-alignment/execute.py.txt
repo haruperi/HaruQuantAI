@@ -1,0 +1,99 @@
+from pathlib import Path
+import json
+import hashlib
+
+r = Path.cwd()
+b = r / 'ui/app/plugins/data_source/Yahoo'
+log = r / '.agents/logs/20261006_135832_data-source-yahoo-alignment'
+def write(p, t):
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(t, encoding='utf-8')
+write(log / 'baseline.json', json.dumps({p.relative_to(r / 'ui/app').as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in (r / 'ui/app').rglob('*') if p.is_file()}, indent=2) + '\n')
+p = log / 'implementation-plan.md'
+write(p, p.read_text().replace('Status: PROPOSED.', 'Status: APPROVED.').replace('Owner approval reference: pending for this version.', 'Owner approval reference: explicit APPROVED: EXECUTE user reply on 2026-10-06 for version 1.'))
+add = (b / 'YahooAddDialog.tsx').read_text(encoding='utf-8')
+download = (b / 'YahooDownloadDialog.tsx').read_text(encoding='utf-8')
+context = add[add.index('export function yahooContext'):add.index('export function YahooModal')].replace('yahooContext() {', 'yahooContext(): { existing: string[]; active: boolean } {')
+imports = add[add.index('import { datasets'):add.index("import './yahoo.css'")].replace("import { yahooDefinitions } from './yahoo';", "import { yahooDefinitions, type YahooDownload } from './yahoo';")
+write(b / 'YahooService.ts', imports + '\n' + context + """/** Attach independent UI workflows to existing mock persistence authority. */
+export const yahooService = {
+  add(symbols: string, postfix: string): void { const context = yahooContext(); useYahoo.getState().startAdd(yahooDefinitions(symbols, postfix, context.existing), context.active); },
+  importData(request: YahooDownload): void { useYahoo.getState().startDownload(request, yahooContext().active); },
+  importDataAction(action: 'pause' | 'resume' | 'stop'): void { useYahoo.getState().action(action); },
+};
+""")
+state = add[add.index('  const store ='):add.index('  return <YahooModal wide')].replace('const context = yahooContext(); store.startAdd(yahooDefinitions(symbols, postfix, context.existing), context.active);', 'yahooService.add(symbols, postfix);')
+write(b / 'add/addPopupCtrl.ts', """import { useState } from 'react';
+import { useYahoo } from '../yahooStore';
+import { yahooService } from '../YahooService';
+export interface YahooCallbacks { onClose: () => void; onStarted: () => void }
+export function useYahooAdd({ onClose, onStarted }: YahooCallbacks) {
+""" + state + '  return { store, symbols, setSymbols, postfix, setPostfix, error, setError, save };\n}\n')
+modal = add[add.index('export function YahooModal'):add.index('export function YahooAddDialog')]
+write(b / 'add/addPopup.tsx', """import type { ReactNode } from 'react';
+import { Button, Modal, TextInput } from '../../../../components/ui';
+import { useYahooAdd, type YahooCallbacks } from './addPopupCtrl';
+import '../style.css';
+
+""" + modal + """export function YahooAddDialog(props: YahooCallbacks) {
+  const { onClose } = props;
+  const { store, symbols, setSymbols, postfix, setPostfix, error, setError, save } = useYahooAdd(props);
+""" + add[add.index('  return <YahooModal wide'):])
+state = download[download.index('  const store'):download.index('  const presetButton')].replace('store.startDownload({ targets, dateFrom: from, dateTo: to, dateType: preset, overwrite }, yahooContext().active);', 'yahooService.importData({ targets, dateFrom: from, dateTo: to, dateType: preset, overwrite });')
+write(b / 'download/downloadPopupCtrl.ts', """import { useState } from 'react';
+import { presetRange, today, type Preset } from '../../Dukascopy/dukascopyDownload';
+import { yahooStart, type YahooDefinition } from '../yahoo';
+import { useYahoo } from '../yahooStore';
+import { yahooService } from '../YahooService';
+import type { YahooCallbacks } from '../add/addPopupCtrl';
+export interface YahooDownloadProps extends YahooCallbacks { targets: YahooDefinition[] }
+export function useYahooDownload({ targets, onClose, onStarted }: YahooDownloadProps) {
+""" + state + '  return { store, minimum, now, from, setFrom, to, setTo, preset, setPreset, overwrite, setOverwrite, error, setError, choose, start };\n}\n')
+write(b / 'download/downloadPopup.tsx', """import { Button, TextInput } from '../../../../components/ui';
+import type { Preset } from '../../Dukascopy/dukascopyDownload';
+import { YahooModal } from '../add/addPopup';
+import { useYahooDownload, type YahooDownloadProps } from './downloadPopupCtrl';
+export function YahooDownloadDialog(props: YahooDownloadProps) {
+  const { targets, onClose } = props;
+  const { store, minimum, now, from, setFrom, to, setTo, preset, setPreset, overwrite, setOverwrite, error, setError, choose, start } = useYahooDownload(props);
+""" + download[download.index('  const presetButton'):])
+for folder, comp, label, icon in [('add', 'YahooAddDialog', 'Add Yahoo symbols', 'symbol-list'), ('download', 'YahooDownloadDialog', 'Download data for existing symbol', 'download')]:
+    write(b / folder / 'module.ts', f"export {{ {comp} }} from './{folder}Popup';\nexport const yahoo{folder.title()}Command = {{ id: 'yahoo-{folder}', label: '{label}', icon: '{icon}', dialog: 'yahoo-{folder}' }} as const;\n")
+write(b / 'module.ts', """import type { DataSourceProvider } from '../Common/dataSourceRibbon';
+import { yahooAddCommand } from './add/module';
+import { yahooDownloadCommand } from './download/module';
+export { YahooAddDialog } from './add/module';
+export { YahooDownloadDialog } from './download/module';
+export const yahooProvider: DataSourceProvider = { id: 'yahoo', label: 'Yahoo', commands: [yahooAddCommand, yahooDownloadCommand] };
+""")
+(b / 'yahoo.css').rename(b / 'style.css')
+(b / 'YahooAddDialog.tsx').unlink()
+(b / 'YahooDownloadDialog.tsx').unlink()
+p = r / 'ui/app/workspace/DataManager/DataManager.tsx'
+write(p, p.read_text(encoding='utf-8').replace('Yahoo/YahooAddDialog', 'Yahoo/add/module').replace('Yahoo/YahooDownloadDialog', 'Yahoo/download/module'))
+p = r / 'ui/app/plugins/data_source/Common/dataSourceRibbon.ts'
+t = p.read_text(encoding='utf-8')
+start = t.index("  {\n    id: 'yahoo'")
+end = t.index('  mt5Provider,', start)
+write(p, "import { yahooProvider } from '../Yahoo/module';\n" + t[:start] + '  yahooProvider,\n' + t[end:])
+write(b / 'README.md', """# Yahoo frontend ownership
+
+Status: structurally aligned; qualification recorded in cohort walkthrough. No SQX parity claim.
+
+FEAT-UI-YAHOO-TRACEABILITY owns mapped Yahoo add/download UI.
+
+- FR-UI-YAHOO-source-mapping: exact structure, filenames/casing and provenance.
+- FR-UI-YAHOO-workflow-preservation: existing offline catalogue, validation, mock add/download, focus and persistence.
+- FR-UI-YAHOO-clean-room: no copied donor implementation or backend code.
+
+DEC-UI-YAHOO-TRACEABILITY: map SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo to HARUQUANTAI_ROOT/ui/app/plugins/data_source/Yahoo. Shared YahooModal presentation lives in mapped add/addPopup.tsx, consumed by mapped download view. Service adapts existing rules/store authority; controllers own state/actions. Preserve singular donor style.css.
+
+Exceptions: yahoo.ts and yahooStore.ts retain sibling contracts; README.md owns registry/status; source-map.json records structure/provenance. Backend JAR excluded. Real Yahoo requests, market bars and donor runtime behavior remain unverified. Canonical ledger/schema absent; structural manifest is not behavioral evidence.
+""")
+tests = r / 'ui/tests/unit/plugins/data_source/Yahoo'
+v = (r / 'ui/tests/unit/plugins/data_source/MetaTrader/sourceMappingValidation.ts').read_text().replace('MetaTrader', 'Yahoo').replace('DataSourceMt5Api', 'DataSourceYahoo').replace('counts.html !== 1 || counts.js !== 4', 'counts.html !== 2 || counts.js !== 6')
+write(tests / 'sourceMappingValidation.ts', v)
+t = (r / 'ui/tests/unit/plugins/data_source/MetaTrader/sourceMapping.test.ts').read_text().replace('MetaTrader', 'Yahoo').replace('mt5Provider', 'yahooProvider').replace('useMt5ApiImport', 'useYahooAdd').replace('import/DataSourceMt5ApiImportCtrl', 'add/addPopupCtrl').replace('ImportPopup', 'YahooAddDialog').replace('Yahoo/import/module', 'Yahoo/add/module').replace('import/importPopup', 'add/addPopup').replace('import/ImportPopup', 'add/AddPopup').replace('DataSourceMt5Api.ts', 'YahooService.ts').replace("'mt5-import'", "'yahoo-add', 'yahoo-download'").replace('HaveLength(6)', 'HaveLength(9)')
+write(tests / 'sourceMapping.test.ts', t)
+p = r / 'ui/tests/e2e/data-manager-yahoo.spec.ts'
+write(p, p.read_text(encoding='utf-8').replace("{ name: 'Data Manager', exact: true }).click()", "{ name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click()"))

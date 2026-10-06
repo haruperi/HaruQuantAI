@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only Yahoo structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Yahoo",
+  "source_head": "69c24c148be9693a2c300f88c179b3ef2e832ddc",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_135832_data-source-yahoo-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/data_source/Yahoo",
+    "feature": "FEAT-UI-YAHOO-TRACEABILITY",
+    "decision": "DEC-UI-YAHOO-TRACEABILITY",
+    "requirements": [
+      "FR-UI-YAHOO-source-mapping",
+      "FR-UI-YAHOO-workflow-preservation",
+      "FR-UI-YAHOO-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-yahoo-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo",
+      "family": "installed plugin UI artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/addPopup.html",
+      "relative_path": "add/addPopup.html",
+      "location": "lines 1-40; add/download form controls",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "750a66d6e32474b97e8756dc6f5cffc44d6523c0b5a61cabe9a7c06d3da1173d",
+      "target": "add/addPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/addPopupCtrl.js",
+      "relative_path": "add/addPopupCtrl.js",
+      "location": "lines 1-29; controller form state/actions",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "79d2c7b45328d653b32ab1541ec3cd0ca2d827d94e21eab2b9e27a92cb4b3fe5",
+      "target": "add/addPopupCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/module.js",
+      "relative_path": "add/module.js",
+      "location": "lines 1-14; module contribution registration",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "2b096ad9c3bbb28c961b40aff63257f06be7b3e15b471a2655851deacf26adec",
+      "target": "add/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
+      "relative_path": "DataSourceYahoo.jar",
+      "location": "whole-file binary identity",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "backend binary excluded",
+      "access_date": "2026-10-06",
+      "sha256": "30216203401f5014f82d67f53c965c812a83dd1a2dae700550a370698ce6016b",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/downloadPopup.html",
+      "relative_path": "download/downloadPopup.html",
+      "location": "lines 1-57; add/download form controls",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "0fb1c9bbbf41417d4f5d14fc2dac29844a4cbf76c991057ffdcbecbd74f3c805",
+      "target": "download/downloadPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/downloadPopupCtrl.js",
+      "relative_path": "download/downloadPopupCtrl.js",
+      "location": "lines 1-119; controller form state/actions",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "8334846d1c23c717ceee1da049648bf08dde03c6045fd976fb4cad490aef910b",
+      "target": "download/downloadPopupCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/module.js",
+      "relative_path": "download/module.js",
+      "location": "lines 1-10; module contribution registration",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "7fed4d0b40228f3cdd950afe97c42ee3ebfababb470fca58bf9ef93b000afcb3",
+      "target": "download/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-12; module contribution registration",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "4a0ec550bab04b9ece9fdb29f739e6519a23d9039de3c6015e0766175c406a5a",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/style.css",
+      "relative_path": "style.css",
+      "location": "lines 1-108; plugin stylesheet rules",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "f548bd419897f2e872ec3a8b4de4db20274d8693d7622ad75540aa6062f9f7df",
+      "target": "style.css",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    },
+    {
+      "catalog_id": "sqx-yahoo-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/YahooService.js",
+      "relative_path": "YahooService.js",
+      "location": "lines 1-18; service add/import/action bindings",
+      "inspection_method": "local inventory and SHA-256; scoped UI responsibility inspection; binary hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "41f6dcaed4e23c321f123d77240c9817be7cd3b609b56a17f5dd6d1d8a140398",
+      "target": "YahooService.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; real Yahoo download and donor runtime parity unverified."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "yahoo.ts",
+      "reason": "Preserved independent mock catalogue/rules"
+    },
+    {
+      "path": "yahooStore.ts",
+      "reason": "Preserved shared persistence/reservations/progress"
+    },
+    {
+      "path": "README.md",
+      "reason": "Ownership registry/status"
+    },
+    {
+      "path": "source-map.json",
+      "reason": "Structural provenance manifest"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "recorded_at": "2026-10-06T11:04:59.529635+00:00",
+  "source_head": "69c24c148be9693a2c300f88c179b3ef2e832ddc",
+  "focused_unit": {
+    "exit": 0,
+    "files": 2,
+    "tests": 9
+  },
+  "typecheck": {
+    "exit": 0,
+    "final_repeat": true
+  },
+  "full_unit": {
+    "exit": 0,
+    "files": 77,
+    "tests": 345
+  },
+  "build": {
+    "exit": 0,
+    "modules": 2081,
+    "warning": "existing large chunk"
+  },
+  "browser": {
+    "exit": 0,
+    "tests": 3,
+    "seconds": 33.8
+  },
+  "mapping_and_donor_family": "passed; see timestamped verification/coverage JSON",
+  "visual_review": {
+    "download_and_narrow_add": "reviewed; controls fit",
+    "light_skin": "selection exercised; screenshot dark; appearance unverified"
+  },
+  "diff_check": 0,
+  "initial_script_attempt": "syntax error; no writes; corrected execution succeeded"
+}

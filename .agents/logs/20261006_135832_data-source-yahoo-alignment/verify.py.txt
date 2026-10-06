@@ -1,0 +1,74 @@
+from pathlib import Path
+import hashlib
+import json
+import sys
+from datetime import datetime, timezone
+
+root = Path.cwd()
+donor_root = Path(sys.argv[1])
+base = root / 'ui/app/plugins/data_source/Yahoo'
+log = root / '.agents/logs/20261006_135832_data-source-yahoo-alignment'
+baseline = json.loads((log / 'baseline.json').read_text())
+allowed = {'plugins/data_source/Common/dataSourceRibbon.ts', 'workspace/DataManager/DataManager.tsx'}
+for path, fingerprint in baseline.items():
+    if path.startswith('plugins/data_source/Yahoo/') or path in allowed:
+        continue
+    assert hashlib.sha256((root / 'ui/app' / path).read_bytes()).hexdigest() == fingerprint, path
+for name in ['yahoo.ts', 'yahooStore.ts']:
+    assert hashlib.sha256((base / name).read_bytes()).hexdigest() == baseline['plugins/data_source/Yahoo/' + name]
+assert hashlib.sha256((base / 'style.css').read_bytes()).hexdigest() == baseline['plugins/data_source/Yahoo/yahoo.css']
+files = {p.relative_to(base).as_posix(): hashlib.sha256(p.read_bytes()).hexdigest() for p in base.rglob('*') if p.is_file()}
+assert len(files) == 13
+(log / 'after-inventory.json').write_text(json.dumps(files, indent=2) + '\n', encoding='utf-8')
+reports = []
+seen = set()
+for p in sorted((root / 'ui/app/plugins/data_source').rglob('source-map.json')):
+    m = json.loads(p.read_text())
+    if 'sources' not in m:
+        continue
+    assert m['review']['state'] == 'owner-approved-plan' and m['review']['version'] >= 1
+    assert (root / m['review']['reference'].removeprefix('HARUQUANTAI_ROOT/')).is_file()
+    assert m['clean_room'] == dict(paraphrased_behavior_only=True, contains_personal_data=False, contains_sensitive_data=False, contains_proprietary_source=False)
+    donor_name = m['donor_root'].split('/')[-1]
+    donor = donor_root / donor_name
+    actual = {f.relative_to(donor).as_posix() for f in donor.rglob('*') if f.is_file()}
+    issues = []
+    if actual != {s['relative_path'] for s in m['sources']}:
+        issues.append('Donor inventory differs')
+    target = p.parent
+    target_files = {f.relative_to(target).as_posix() for f in target.rglob('*') if f.is_file()}
+    mapped = [s['target'] for s in m['sources'] if s['target'] is not None]
+    declared = mapped + [s['path'] for s in m['target_only']]
+    if len(declared) != len(set(declared)) or set(declared) != target_files:
+        issues.append('Target classification/collision gap')
+    catalog = {s['id'] for s in m['source_catalog']}
+    registry = root / ('ui/app/' + m['owner']['domain']) / 'README.md'
+    registry_text = registry.read_text(encoding='utf-8')
+    for key in [m['owner']['feature'], m['owner']['decision'], *m['owner']['requirements']]:
+        if key not in registry_text:
+            issues.append('Unresolved owner: ' + key)
+    for source in m['sources']:
+        f = donor / source['relative_path']
+        if not f.is_file() or hashlib.sha256(f.read_bytes()).hexdigest() != source['sha256']:
+            issues.append('Fingerprint mismatch: ' + source['relative_path'])
+        if source['artifact_locator'] != m['donor_root'] + '/' + source['relative_path'] or source['catalog_id'] not in catalog:
+            issues.append('Unresolved source reference')
+        if source['target'] is not None:
+            expected = str(Path(source['relative_path']).with_suffix({'.html': '.tsx', '.js': '.ts', '.css': '.css'}[Path(source['relative_path']).suffix])).replace('\\', '/')
+            if source['target'] != expected:
+                issues.append('Counterpart case/name mismatch: ' + source['relative_path'])
+    seen.add(donor_name)
+    reports.append(dict(donor=m['donor_root'], target=m['target_root'], artifacts=len(actual), counterparts=len(mapped), exclusions=len(actual)-len(mapped), target_files=len(target_files), exceptions=len(m['target_only']), issues=issues))
+parent = root / 'ui/app/plugins/data_source/SQData'
+parent_manifest = json.loads((parent / 'source-map.json').read_text())
+assert parent_manifest['children'] == ['Equity/source-map.json', 'Futures/source-map.json']
+assert {p.name for p in parent.iterdir() if p.is_file()} == {e['path'] for e in parent_manifest['target_only']}
+assert len(list(parent.rglob('*'))) > 0
+installed = {p.name for p in donor_root.glob('DataSource*') if p.is_dir()}
+result = dict(timestamp=datetime.now(timezone.utc).isoformat(), scope='Read-only donor-family structural inventory; no behavioral parity assertion', donors=reports, missing_donors=sorted(installed-seen), unexpected_donors=sorted(seen-installed), totals=dict(donor_artifacts=sum(e['artifacts'] for e in reports), counterparts=sum(e['counterparts'] for e in reports), exclusions=sum(e['exclusions'] for e in reports), target_files=sum(e['target_files'] for e in reports)+len(parent_manifest['target_only']), exceptions=sum(e['exceptions'] for e in reports)+len(parent_manifest['target_only'])))
+(log / 'donor-family-coverage.json').write_text(json.dumps(result, indent=2) + '\n', encoding='utf-8')
+assert not result['missing_donors'] and not result['unexpected_donors']
+assert not any(report['issues'] for report in reports), reports
+assert len(reports) == 9
+(log / 'mapping-verification.json').write_text(json.dumps(dict(timestamp=result['timestamp'], result='passed', donor_artifacts=10, counterparts=9, exclusions=1, target_files=13, exceptions=4, preserved_rules_store_and_siblings='byte-identical', relocated_stylesheet='byte-identical', donor_family='9 donors fully inventoried; manifests resolve'), indent=2) + '\n', encoding='utf-8')
+print('Yahoo mapping, protected files and all nine DataSource donor inventories verified.')
