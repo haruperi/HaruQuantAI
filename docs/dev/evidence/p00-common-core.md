@@ -4,7 +4,7 @@
 - 26 selected structurally referenced symbols have no definition in the 289 inspected standalone archives; current consumer-set recheck matches the captured list. Three are foundational host symbols; 23 belong to AI research.
 - Selection: StrategyQuant MainApp/AppSettings/CpuInfo and ailib referenced symbols; other absent data/trading/engine callees still require feature-level research.
 - Constant-pool references identify consumers, not runtime calls or available hidden bodies. No guessed SQX algorithm/default fallback is allowed. The approved limited host-source disposition permits explicitly specified HaruQuantAI universal host services; it grants no SQX behavior/parity claim.
-- [Complete consumers](sqx145/common-core.json); [archive references](../../sqx/README.md); [P00 gate](../phases/phase-01-host-foundation.md#11-p00-prerequisites--evidence-ownership-and-missing-common-core).
+- [Complete consumers](sqx145/common-core.json); [archive references](../V1/sqx/README.md); [P00 gate](../V1/phase-01-host-foundation.md#11-p00-prerequisites--evidence-ownership-and-missing-common-core).
 
 | Missing symbol | Current consumer classes | Archives |
 | --- | ---: | --- |
@@ -39,7 +39,7 @@
 
 - [P00 review](sqx145/p00-review.json) records current checks, source hashes, timestamps and structural names. Existing selected-symbol JSON/table is retained unchanged.
 - Previous reassessment requirement (superseded policy): recover `MainApp`, `AppSettings`, `CpuInfo` bodies and consumed host semantics. The current bounded research and approved target-contract disposition are recorded below; no body recovery is claimed.
-- AI body obligations: [P19.1](../phases/phase-19-agentic-research.md#191-q-prerequisites---core-packaging-contracts-and-source-authority); declare actual feature dependencies rather than blocking unrelated library work by name alone.
+- AI body obligations: [P19.1](../V1/phase-19-agentic-research.md#191-q-prerequisites---core-packaging-contracts-and-source-authority); declare actual feature dependencies rather than blocking unrelated library work by name alone.
 - Wider scope: 669 distinct literal `com/strategyquant/` constant-pool type names lack a matching standalone declaration in the current member corpus. This is not 669 proven missing runtime functions, actual callsites or automatic blockers.
 - Native/embedded/encrypted/alternate/runtime provision is unverified. The exact `internal/SQLib.dat` locator is absent; filtered launcher config inspection did not establish a current classpath/core container. No alternate donor or runtime was used.
 - P00 reference tooling and static proposal/fixture integrity are requalified. Source-unavailable universal host services follow the approved target-contract disposition. Application registrations and applicable independent runtime observations are assigned to owning feature/release plans; unknown domain algorithms remain evidence-gated.

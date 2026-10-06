@@ -2,7 +2,7 @@
 
 - Donor informs; specification owns. Sole donor `SQX_145_REFERENCE_ROOT`; target `HARUQUANTAI_ROOT`. Never publish machine-specific paths.
 - Current ledger/schema are `reimplementation.json` / `reimplementation.schema.json`, schema version 4. Read both in full before approved edits.
-- One atomic independently testable claim per record. Allocate `SQX145-EV-NNNNNN` as highest allocated suffix + 1; current high-water mark 195; never reuse an ID.
+- One atomic independently testable claim per record. Allocate `SQX145-EV-NNNNNN` as highest allocated suffix + 1; current high-water mark 196; never reuse an ID.
 - Observed = inspected support; inferred = bounded reasoning; normative = target decision; unverified = open hypothesis. Confidence: confirmed/high/medium/low/unverified; confidence never grants runtime authority.
 - Sources require catalog ID, exact locator, narrow location, method, relation, access date and SHA-256 for stable local artifacts. Add a catalog only for a new source family.
 - Map to actual owning domain and registered FEAT/FR/DEC IDs. Explicit proposals state owner/registration gaps and cannot qualify application implementation. Domain README owns status.
@@ -21,3 +21,10 @@
 - P00 completion qualifies reference readiness and explicit dispositions. Application registration, implementation, applicable runtime observations and backend/UI acceptance belong to owning feature plans.
 - Missing MainApp/AppSettings/CpuInfo bodies receive the limited target-owned universal host disposition in the owning [host README](../../../app/host/README.md). Unsupported semantics are normative target choices, never inferred SQX facts.
 - Missing AI, numerical, trading and other domain behavior remains evidence-gated. Installed-product activation and runtime parity remain unqualified.
+
+## V1 documentation relocation, 2026-10-07
+
+- Old phase/roadmap/reference documentation is now in [V1](../V1/README.md); active inventory/ownership/member tooling stays here.
+- [Relocation audit](sqx145/v1-relocation.json) records source/destination hashes and active bindings. Administrative record SQX145-EV-000196 records this change; it qualifies no runtime behavior.
+- [Original inventory capture](sqx145/p00-inventory-capture-20261006.json) retains exact repository bytes supporting dated static observations. It is the same 145-dev1 cohort, not an alternate donor root or active-manifest fallback. The active manifest remains [p00-inventory.json](p00-inventory.json).
+- Historical review/research pins and executed commands remain historical. Their source commits and the relocation audit explain old paths; do not rewrite capture dates or pass outcomes during administrative moves.

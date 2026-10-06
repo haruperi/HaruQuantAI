@@ -3,7 +3,7 @@
   "reference_cohort": "145-dev1",
   "manifest": {
     "locator": "docs/dev/evidence/p00-inventory.json",
-    "sha256": "7e7bbf37e688f3b79d7c5b8c62a9fe276cbdb1e3dd9cc5ffe1d2c551ffa4f1f3"
+    "sha256": "770cea570c1d9a0fe34cf66bc522218ea29ff329337b15db79f9fc537abfd115"
   },
   "class_indices": [
     {

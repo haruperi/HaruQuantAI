@@ -42,7 +42,7 @@ def repository(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
             target.parent.mkdir(parents=True, exist_ok=True)
             target.write_bytes(path.read_bytes())
     for locator in (
-        "docs/dev/sqx-full-application-roadmap.md",
+        "docs/dev/V1/sqx-full-application-roadmap.md",
         "app/host/README.md",
         "tests/reference/p00-fixtures.json",
     ):

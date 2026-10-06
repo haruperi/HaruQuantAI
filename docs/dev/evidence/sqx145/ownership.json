@@ -18,7 +18,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/activation-1.1.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/activation-1.1.1.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-AFFINITY",
@@ -37,7 +37,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/affinity-3.23.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/affinity-3.23.3.md"
     },
     {
       "feature_id": "FEAT-AGENTIC-AGENTSCOPE-CORE",
@@ -53,7 +53,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/agentscope-core-2.0.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/agentscope-core-2.0.3.md"
     },
     {
       "feature_id": "FEAT-AGENTIC-AGENTSCOPE-HARNESS",
@@ -69,7 +69,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/agentscope-harness-2.0.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/agentscope-harness-2.0.3.md"
     },
     {
       "feature_id": "FEAT-HOST-ANIMAL-SNIFFER-ANNOTATIONS",
@@ -85,7 +85,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/animal-sniffer-annotations-1.14.md"
+      "reference": "docs/dev/V1/sqx/Libraries/animal-sniffer-annotations-1.14.md"
     },
     {
       "feature_id": "FEAT-HOST-ANNOTATIONS",
@@ -101,7 +101,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/annotations-13.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/annotations-13.0.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-ARTEMIS-COMMONS",
@@ -120,7 +120,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/artemis-commons-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-commons-1.5.0.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-ARTEMIS-CORE-CLIENT",
@@ -139,7 +139,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/artemis-core-client-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-core-client-1.5.0.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-ARTEMIS-JMS-CLIENT",
@@ -158,7 +158,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/artemis-jms-client-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-jms-client-1.5.0.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-ARTEMIS-SELECTOR",
@@ -177,7 +177,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/artemis-selector-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-selector-1.5.0.md"
     },
     {
       "feature_id": "FEAT-HOST-CAFFEINE-2-8-5",
@@ -194,7 +194,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/caffeine-2.8.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/caffeine-2.8.5.md"
     },
     {
       "feature_id": "FEAT-HOST-CHECKER-QUAL",
@@ -210,7 +210,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/checker-qual-3.4.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/checker-qual-3.4.1.md"
     },
     {
       "feature_id": "FEAT-HOST-CLASSMATE",
@@ -226,7 +226,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/classmate-1.7.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/classmate-1.7.0.md"
     },
     {
       "feature_id": "FEAT-HOST-COMMONS-BEANUTILS",
@@ -243,7 +243,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-beanutils-1.9.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-beanutils-1.9.2.md"
     },
     {
       "feature_id": "FEAT-HOST-COMMONS-CODEC",
@@ -260,7 +260,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-codec-1.17.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-codec-1.17.1.md"
     },
     {
       "feature_id": "FEAT-HOST-COMMONS-COLLECTIONS",
@@ -277,7 +277,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-collections-3.2.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-collections-3.2.1.md"
     },
     {
       "feature_id": "FEAT-HOST-COMMONS-COMPRESS",
@@ -293,7 +293,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-compress-1.27.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-compress-1.27.1.md"
     },
     {
       "feature_id": "FEAT-PROJECT-COMMONS-EMAIL",
@@ -310,7 +310,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-email-1.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-email-1.4.md"
     },
     {
       "feature_id": "FEAT-PROJECT-COMMONS-EXEC",
@@ -327,7 +327,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-exec-1.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-exec-1.3.md"
     },
     {
       "feature_id": "FEAT-RESULTS-COMMONS-IMAGING",
@@ -346,7 +346,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-imaging-1.0-alpha1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-imaging-1.0-alpha1.md"
     },
     {
       "feature_id": "FEAT-HOST-COMMONS-IO",
@@ -363,7 +363,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-io-2.16.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-io-2.16.1.md"
     },
     {
       "feature_id": "FEAT-HOST-COMMONS-LANG3",
@@ -380,7 +380,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-lang3-3.16.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-lang3-3.16.0.md"
     },
     {
       "feature_id": "FEAT-HOST-COMMONS-LOGGING",
@@ -398,7 +398,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-logging-1.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-logging-1.2.md"
     },
     {
       "feature_id": "FEAT-BUILDER-COMMONS-MATH3-3-6-1",
@@ -416,7 +416,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/commons-math3-3.6.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-math3-3.6.1.md"
     },
     {
       "feature_id": "FEAT-HOST-ERROR-PRONE-ANNOTATIONS",
@@ -432,7 +432,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/error_prone_annotations-2.4.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/error_prone_annotations-2.4.0.md"
     },
     {
       "feature_id": "FEAT-HOST-FASTUTIL",
@@ -449,7 +449,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/fastutil-8.3.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/fastutil-8.3.0.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-FILTERS",
@@ -465,7 +465,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/filters-2.0.235.md"
+      "reference": "docs/dev/V1/sqx/Libraries/filters-2.0.235.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-FREEMARKER",
@@ -484,7 +484,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/freemarker-2.3.28.md"
+      "reference": "docs/dev/V1/sqx/Libraries/freemarker-2.3.28.md"
     },
     {
       "feature_id": "FEAT-HOST-FST",
@@ -503,7 +503,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/fst-2.57.md"
+      "reference": "docs/dev/V1/sqx/Libraries/fst-2.57.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-GERONIMO-JMS",
@@ -522,7 +522,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/geronimo-jms_2.0_spec-1.0-alpha-2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/geronimo-jms_2.0_spec-1.0-alpha-2.md"
     },
     {
       "feature_id": "FEAT-HOST-GERONIMO-JSON",
@@ -540,7 +540,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/geronimo-json_1.0_spec-1.0-alpha-1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/geronimo-json_1.0_spec-1.0-alpha-1.md"
     },
     {
       "feature_id": "FEAT-HOST-GUAVA",
@@ -557,7 +557,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/guava-26.0-jre.md"
+      "reference": "docs/dev/V1/sqx/Libraries/guava-26.0-jre.md"
     },
     {
       "feature_id": "FEAT-HOST-H2",
@@ -576,7 +576,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/h2-1.3.149.md"
+      "reference": "docs/dev/V1/sqx/Libraries/h2-1.3.149.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-HTTPASYNCCLIENT",
@@ -594,7 +594,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/httpasyncclient-4.1.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpasyncclient-4.1.4.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-HTTPCLIENT",
@@ -612,7 +612,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/httpclient-4.5.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpclient-4.5.13.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-HTTPCLIENT-CACHE",
@@ -630,7 +630,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/httpclient-cache-4.5.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpclient-cache-4.5.13.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-HTTPCORE",
@@ -648,7 +648,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/httpcore-4.4.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpcore-4.4.13.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-HTTPCORE-NIO",
@@ -666,7 +666,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/httpcore-nio-4.4.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpcore-nio-4.4.13.md"
     },
     {
       "feature_id": "FEAT-RESULTS-IMAGE4J",
@@ -685,7 +685,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/image4j-0.7.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/image4j-0.7.2.md"
     },
     {
       "feature_id": "FEAT-HOST-ITU",
@@ -701,7 +701,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/itu-1.14.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/itu-1.14.0.md"
     },
     {
       "feature_id": "FEAT-HOST-J2OBJC-ANNOTATIONS",
@@ -717,7 +717,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/j2objc-annotations-1.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/j2objc-annotations-1.1.md"
     },
     {
       "feature_id": "FEAT-HOST-JACKSON-ANNOTATIONS",
@@ -735,7 +735,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jackson-annotations-2.21.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-annotations-2.21.md"
     },
     {
       "feature_id": "FEAT-HOST-JACKSON-CORE",
@@ -753,7 +753,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jackson-core-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-core-2.21.1.md"
     },
     {
       "feature_id": "FEAT-HOST-JACKSON-DATABIND",
@@ -771,7 +771,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jackson-databind-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-databind-2.21.1.md"
     },
     {
       "feature_id": "FEAT-HOST-JACKSON-DATAFORMAT-YAML",
@@ -787,7 +787,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jackson-dataformat-yaml-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-dataformat-yaml-2.21.1.md"
     },
     {
       "feature_id": "FEAT-HOST-JACKSON-DATATYPE-JSR310",
@@ -803,7 +803,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jackson-datatype-jsr310-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-datatype-jsr310-2.21.1.md"
     },
     {
       "feature_id": "FEAT-RESULTS-JAVA-IMAGE-SCALING-0-8-6",
@@ -822,7 +822,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/java-image-scaling-0.8.6.md"
+      "reference": "docs/dev/V1/sqx/Libraries/java-image-scaling-0.8.6.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-JAVASSIST",
@@ -841,7 +841,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/javassist-3.21.0-GA.md"
+      "reference": "docs/dev/V1/sqx/Libraries/javassist-3.21.0-GA.md"
     },
     {
       "feature_id": "FEAT-PROJECT-JAVAX-MAIL",
@@ -858,7 +858,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/javax.mail-1.5.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/javax.mail-1.5.2.md"
     },
     {
       "feature_id": "FEAT-HOST-JBOSS-LOGGING",
@@ -874,7 +874,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jboss-logging-3.3.0.Final.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jboss-logging-3.3.0.Final.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-JCOMMON",
@@ -890,7 +890,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jcommon-1.0.12.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jcommon-1.0.12.md"
     },
     {
       "feature_id": "FEAT-HOST-JDOM",
@@ -908,7 +908,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jdom-2.0.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jdom-2.0.0.md"
     },
     {
       "feature_id": "FEAT-HOST-JERICHO-HTML",
@@ -924,7 +924,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jericho-html-3.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jericho-html-3.3.md"
     },
     {
       "feature_id": "FEAT-HOST-JETTY-ALL-UBER",
@@ -943,7 +943,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jetty-all-uber.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jetty-all-uber.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-JFREECHART",
@@ -959,7 +959,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jfreechart-1.0.8a.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jfreechart-1.0.8a.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-JFX-2-4-9-SQ",
@@ -976,7 +976,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jfx_2.4.9_sq.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jfx_2.4.9_sq.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-JGROUPS",
@@ -992,7 +992,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jgroups-3.6.9.Final.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jgroups-3.6.9.Final.md"
     },
     {
       "feature_id": "FEAT-HOST-JLINE",
@@ -1008,7 +1008,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jline-3.25.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jline-3.25.1.md"
     },
     {
       "feature_id": "FEAT-HOST-JNA",
@@ -1025,7 +1025,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jna-5.13.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jna-5.13.0.md"
     },
     {
       "feature_id": "FEAT-HOST-JNA-PLATFORM",
@@ -1042,7 +1042,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jna-platform-5.13.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jna-platform-5.13.0.md"
     },
     {
       "feature_id": "FEAT-DATA-JODA-TIME",
@@ -1061,7 +1061,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/joda-time-2.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/joda-time-2.3.md"
     },
     {
       "feature_id": "FEAT-HOST-JOHNZON-CORE",
@@ -1077,7 +1077,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/johnzon-core-0.9.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/johnzon-core-0.9.5.md"
     },
     {
       "feature_id": "FEAT-HOST-JPOWERSHELL",
@@ -1093,7 +1093,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jPowerShell-3.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jPowerShell-3.0.md"
     },
     {
       "feature_id": "FEAT-HOST-J-PROCESSES",
@@ -1110,7 +1110,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jProcesses-1.6.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jProcesses-1.6.5.md"
     },
     {
       "feature_id": "FEAT-HOST-JSON",
@@ -1128,7 +1128,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/json-20150729.md"
+      "reference": "docs/dev/V1/sqx/Libraries/json-20150729.md"
     },
     {
       "feature_id": "FEAT-HOST-JSON-SCHEMA-VALIDATOR",
@@ -1146,7 +1146,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/json-schema-validator-2.0.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/json-schema-validator-2.0.0.md"
     },
     {
       "feature_id": "FEAT-HOST-JSONSCHEMA-GENERATOR",
@@ -1162,7 +1162,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jsonschema-generator-4.38.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jsonschema-generator-4.38.0.md"
     },
     {
       "feature_id": "FEAT-HOST-JSONSCHEMA-MODULE-JACKSON",
@@ -1178,7 +1178,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jsonschema-module-jackson-4.38.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jsonschema-module-jackson-4.38.0.md"
     },
     {
       "feature_id": "FEAT-HOST-JSPECIFY",
@@ -1194,7 +1194,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jspecify-1.0.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jspecify-1.0.0.md"
     },
     {
       "feature_id": "FEAT-HOST-JSPF-CORE",
@@ -1212,7 +1212,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jspf.core.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jspf.core.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-JSPF-REMOTE",
@@ -1231,7 +1231,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jspf.remote.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jspf.remote.md"
     },
     {
       "feature_id": "FEAT-HOST-JSR305",
@@ -1247,7 +1247,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/jsr305-3.0.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jsr305-3.0.2.md"
     },
     {
       "feature_id": "FEAT-HOST-KOTLIN-STDLIB",
@@ -1263,7 +1263,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/kotlin-stdlib-2.2.21.md"
+      "reference": "docs/dev/V1/sqx/Libraries/kotlin-stdlib-2.2.21.md"
     },
     {
       "feature_id": "FEAT-HOST-LOGBACK-CLASSIC",
@@ -1281,7 +1281,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/logback-classic-1.4.14.md"
+      "reference": "docs/dev/V1/sqx/Libraries/logback-classic-1.4.14.md"
     },
     {
       "feature_id": "FEAT-HOST-LOGBACK-CORE",
@@ -1299,7 +1299,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/logback-core-1.4.14.md"
+      "reference": "docs/dev/V1/sqx/Libraries/logback-core-1.4.14.md"
     },
     {
       "feature_id": "FEAT-HOST-MCP",
@@ -1315,7 +1315,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/mcp-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-0.17.2.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-MCP-CORE-145",
@@ -1331,7 +1331,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/mcp-core-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-core-0.17.2.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-MCP-CORE",
@@ -1349,7 +1349,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/mcp-core.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-core.md"
     },
     {
       "feature_id": "FEAT-HOST-MCP-JSON",
@@ -1365,7 +1365,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/mcp-json-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-json-0.17.2.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-MCP-JSON-JACKSON2-145",
@@ -1381,7 +1381,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/mcp-json-jackson2-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-json-jackson2-0.17.2.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-MCP-JSON-JACKSON2",
@@ -1399,7 +1399,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/mcp-json-jackson2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-json-jackson2.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-NETTY-ALL",
@@ -1415,7 +1415,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/netty-all-4.1.5.Final.md"
+      "reference": "docs/dev/V1/sqx/Libraries/netty-all-4.1.5.Final.md"
     },
     {
       "feature_id": "FEAT-HOST-OBJENESIS",
@@ -1434,7 +1434,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/objenesis-2.5.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/objenesis-2.5.1.md"
     },
     {
       "feature_id": "FEAT-HOST-OKHTTP-JVM",
@@ -1450,7 +1450,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/okhttp-jvm-5.3.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/okhttp-jvm-5.3.2.md"
     },
     {
       "feature_id": "FEAT-HOST-OKIO-JVM",
@@ -1466,7 +1466,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/okio-jvm-3.16.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/okio-jvm-3.16.4.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-API",
@@ -1482,7 +1482,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-api-1.61.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-api-1.61.0.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-API-INCUBATOR",
@@ -1498,7 +1498,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-api-incubator-1.61.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-api-incubator-1.61.0-alpha.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-COMMON",
@@ -1514,7 +1514,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-common-1.61.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-common-1.61.0.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-CONTEXT",
@@ -1530,7 +1530,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-context-1.61.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-context-1.61.0.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-INSTRUMENTATION-ANNOTATIONS-SUPPORT",
@@ -1546,7 +1546,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-INSTRUMENTATION-API",
@@ -1562,7 +1562,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-instrumentation-api-2.27.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-api-2.27.0.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-INSTRUMENTATION-API-INCUBATOR",
@@ -1578,7 +1578,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-REACTOR",
@@ -1594,7 +1594,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-reactor-3.1-2.27.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-reactor-3.1-2.27.0-alpha.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-SEMCONV",
@@ -1610,7 +1610,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-semconv-1.40.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-semconv-1.40.0.md"
     },
     {
       "feature_id": "FEAT-HOST-OPENTELEMETRY-SEMCONV-INCUBATING",
@@ -1626,7 +1626,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/opentelemetry-semconv-incubating-1.40.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-semconv-incubating-1.40.0-alpha.md"
     },
     {
       "feature_id": "FEAT-HOST-OSHI-CORE",
@@ -1643,7 +1643,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/oshi-core-5.8.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/oshi-core-5.8.5.md"
     },
     {
       "feature_id": "FEAT-RESULTS-PD4ML",
@@ -1662,7 +1662,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/pd4ml.md"
+      "reference": "docs/dev/V1/sqx/Libraries/pd4ml.md"
     },
     {
       "feature_id": "FEAT-RESULTS-PNGJ",
@@ -1681,7 +1681,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/pngj.md"
+      "reference": "docs/dev/V1/sqx/Libraries/pngj.md"
     },
     {
       "feature_id": "FEAT-RESULTS-POI",
@@ -1700,7 +1700,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/poi-3.11.md"
+      "reference": "docs/dev/V1/sqx/Libraries/poi-3.11.md"
     },
     {
       "feature_id": "FEAT-RESULTS-POI-OOXML",
@@ -1719,7 +1719,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/poi-ooxml-3.11.md"
+      "reference": "docs/dev/V1/sqx/Libraries/poi-ooxml-3.11.md"
     },
     {
       "feature_id": "FEAT-RESULTS-POI-OOXML-SCHEMAS",
@@ -1738,7 +1738,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/poi-ooxml-schemas-3.11.md"
+      "reference": "docs/dev/V1/sqx/Libraries/poi-ooxml-schemas-3.11.md"
     },
     {
       "feature_id": "FEAT-HOST-PS-UTILS",
@@ -1755,7 +1755,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/PSUtils.md"
+      "reference": "docs/dev/V1/sqx/Libraries/PSUtils.md"
     },
     {
       "feature_id": "FEAT-HOST-REACTIVE-STREAMS",
@@ -1773,7 +1773,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/reactive-streams-1.0.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/reactive-streams-1.0.4.md"
     },
     {
       "feature_id": "FEAT-HOST-REACTOR-CORE",
@@ -1791,7 +1791,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/reactor-core-3.8.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/reactor-core-3.8.2.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-RSYNTAXTEXTAREA",
@@ -1807,7 +1807,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/rsyntaxtextarea-2.6.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/rsyntaxtextarea-2.6.0.md"
     },
     {
       "feature_id": "FEAT-HOST-SLF4J-API",
@@ -1825,7 +1825,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/slf4j-api-2.0.17.md"
+      "reference": "docs/dev/V1/sqx/Libraries/slf4j-api-2.0.17.md"
     },
     {
       "feature_id": "FEAT-HOST-SNAKEYAML",
@@ -1841,7 +1841,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/snakeyaml-2.6.md"
+      "reference": "docs/dev/V1/sqx/Libraries/snakeyaml-2.6.md"
     },
     {
       "feature_id": "FEAT-SHARED-SNIPPETS",
@@ -1860,7 +1860,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/Snippets.md"
+      "reference": "docs/dev/V1/sqx/Libraries/Snippets.md"
     },
     {
       "feature_id": "FEAT-HOST-SQLITE-JDBC",
@@ -1879,7 +1879,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/sqlite-jdbc-3.51.2.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/sqlite-jdbc-3.51.2.0.md"
     },
     {
       "feature_id": "FEAT-HOST-STAX-API",
@@ -1895,7 +1895,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/stax-api-1.0.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/stax-api-1.0.1.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-SVG-SALAMANDER",
@@ -1911,7 +1911,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/svg-salamander-1.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/svg-salamander-1.0.md"
     },
     {
       "feature_id": "FEAT-STRATEGY-TA-LIB",
@@ -1930,7 +1930,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/ta-lib-0.4.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/ta-lib-0.4.0.md"
     },
     {
       "feature_id": "FEAT-AGENTIC-TREE-SITTER",
@@ -1946,7 +1946,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/tree-sitter-0.24.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/tree-sitter-0.24.4.md"
     },
     {
       "feature_id": "FEAT-AGENTIC-TREE-SITTER-BASH",
@@ -1962,7 +1962,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/tree-sitter-bash-0.23.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/tree-sitter-bash-0.23.3.md"
     },
     {
       "feature_id": "FEAT-BUILDER-UNCOMMONS-MATHS",
@@ -1980,7 +1980,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/uncommons-maths-1.2.2a.md"
+      "reference": "docs/dev/V1/sqx/Libraries/uncommons-maths-1.2.2a.md"
     },
     {
       "feature_id": "FEAT-BUILDER-WATCHMAKER-FRAMEWORK",
@@ -1998,7 +1998,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/watchmaker-framework-0.7.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/watchmaker-framework-0.7.1.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-WEBLAF-CORE",
@@ -2014,7 +2014,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/weblaf-core-1.2.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/weblaf-core-1.2.9.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-WEBLAF-UI",
@@ -2030,7 +2030,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/weblaf-ui-1.2.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/weblaf-ui-1.2.9.md"
     },
     {
       "feature_id": "FEAT-HOST-WMI4JAVA",
@@ -2046,7 +2046,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/WMI4Java-1.6.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/WMI4Java-1.6.3.md"
     },
     {
       "feature_id": "FEAT-RESULTS-XMLBEANS",
@@ -2065,7 +2065,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/xmlbeans-2.6.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/xmlbeans-2.6.0.md"
     },
     {
       "feature_id": "FEAT-HOST-XSTREAM",
@@ -2081,7 +2081,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/xstream-1.4.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/xstream-1.4.9.md"
     },
     {
       "feature_id": "FEAT-HOST-XZ",
@@ -2097,7 +2097,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/xz-1.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/xz-1.9.md"
     },
     {
       "feature_id": "FEAT-HOST-ZIP4J",
@@ -2116,7 +2116,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Libraries/zip4j-1.3.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/zip4j-1.3.2.md"
     },
     {
       "feature_id": "FEAT-BUILDER-APP-BUILDER",
@@ -2134,7 +2134,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Builder/AppBuilder.md"
+      "reference": "docs/dev/V1/sqx/Builder/AppBuilder.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-APP-CODE-EDITOR",
@@ -2152,7 +2152,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CodeEditor/AppCodeEditor.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/AppCodeEditor.md"
     },
     {
       "feature_id": "FEAT-DATA-APP-DATA-MANAGER",
@@ -2170,7 +2170,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/AppDataManager.md"
+      "reference": "docs/dev/V1/sqx/DataManager/AppDataManager.md"
     },
     {
       "feature_id": "FEAT-HOST-APP-DEBUG-CONSOLE",
@@ -2188,7 +2188,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DebugConsole/AppDebugConsole.md"
+      "reference": "docs/dev/V1/sqx/DebugConsole/AppDebugConsole.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-APP-GRID-CONTROL",
@@ -2206,7 +2206,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/GridControl/AppGridControl.md"
+      "reference": "docs/dev/V1/sqx/GridControl/AppGridControl.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-APP-GRID-TEST",
@@ -2224,7 +2224,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/GridTest/AppGridTest.md"
+      "reference": "docs/dev/V1/sqx/GridTest/AppGridTest.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-APP-MARKETPLACE",
@@ -2241,7 +2241,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Plugins/AppMarketplace.md"
+      "reference": "docs/dev/V1/sqx/Plugins/AppMarketplace.md"
     },
     {
       "feature_id": "FEAT-NEURAL-APP-NEURAL-NETWORK",
@@ -2259,7 +2259,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/NeuralNetworkTrainer/AppNeuralNetwork.md"
+      "reference": "docs/dev/V1/sqx/NeuralNetworkTrainer/AppNeuralNetwork.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-APP-OPTIMIZER",
@@ -2277,7 +2277,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Optimizer/AppOptimizer.md"
+      "reference": "docs/dev/V1/sqx/Optimizer/AppOptimizer.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-APP-PORTFOLIO-COMPOSER",
@@ -2295,7 +2295,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/PortfolioComposer/AppPortfolioComposer.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/AppPortfolioComposer.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-APP-PORTFOLIO-MASTER",
@@ -2313,7 +2313,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/PortfolioMaster/AppPortfolioMaster.md"
+      "reference": "docs/dev/V1/sqx/PortfolioMaster/AppPortfolioMaster.md"
     },
     {
       "feature_id": "FEAT-RESULTS-APP-RESULTS",
@@ -2331,7 +2331,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/AppResults.md"
+      "reference": "docs/dev/V1/sqx/Results/AppResults.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-APP-RETESTER",
@@ -2349,7 +2349,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Retester/AppRetester.md"
+      "reference": "docs/dev/V1/sqx/Retester/AppRetester.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-APP-SQX-BUSINESS",
@@ -2367,7 +2367,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/SQXBusiness/AppSQXBusiness.md"
+      "reference": "docs/dev/V1/sqx/SQXBusiness/AppSQXBusiness.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-APP-SQX-HOME",
@@ -2385,7 +2385,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/GettingStarted/AppSQXHome.md"
+      "reference": "docs/dev/V1/sqx/GettingStarted/AppSQXHome.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-APP-STRATEGY-QUANT",
@@ -2403,7 +2403,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/ProductShells/AppStrategyQuant.md"
+      "reference": "docs/dev/V1/sqx/ProductShells/AppStrategyQuant.md"
     },
     {
       "feature_id": "FEAT-PROJECT-APP-TASK-MANAGER",
@@ -2421,7 +2421,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/AppTaskManager.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/AppTaskManager.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-APP-WIZARD",
@@ -2439,7 +2439,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/AlgoWizard/AppWizard.md"
+      "reference": "docs/dev/V1/sqx/AlgoWizard/AppWizard.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT",
@@ -2457,7 +2457,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CodeEditor/CodeEditorImportExport.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/CodeEditorImportExport.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-CODE-EDITOR-INDICATOR-TESTER",
@@ -2475,7 +2475,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CodeEditor/CodeEditorIndicatorTester.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/CodeEditorIndicatorTester.md"
     },
     {
       "feature_id": "FEAT-CONNECTION-CONNECTION-LIVE-TEST",
@@ -2493,7 +2493,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ConnectionLiveTest.md"
+      "reference": "docs/dev/V1/sqx/Shared/ConnectionLiveTest.md"
     },
     {
       "feature_id": "FEAT-CONNECTION-CONNECTION-MT4",
@@ -2511,7 +2511,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ConnectionMT4.md"
+      "reference": "docs/dev/V1/sqx/Shared/ConnectionMT4.md"
     },
     {
       "feature_id": "FEAT-CONNECTION-CONNECTION-TEST",
@@ -2529,7 +2529,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ConnectionTest.md"
+      "reference": "docs/dev/V1/sqx/Shared/ConnectionTest.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-MANIPULATION",
@@ -2546,7 +2546,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckMonteCarloManipulation.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckMonteCarloManipulation.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-RETEST",
@@ -2563,7 +2563,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckMonteCarloRetest.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckMonteCarloRetest.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-OPT-PROFILE-SYS-PARAM-PERMUTATION",
@@ -2580,7 +2580,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckOptProfileSysParamPermutation.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckOptProfileSysParamPermutation.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-ON-ADDITIONAL-MARKETS",
@@ -2597,7 +2597,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckRetestOnAdditionalMarkets.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckRetestOnAdditionalMarkets.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-WITH-HIGHER-PRECISION",
@@ -2614,7 +2614,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckRetestWithHigherPrecision.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckRetestWithHigherPrecision.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-SEQUENTIAL-OPTIMIZATION",
@@ -2631,7 +2631,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckSequentialOptimization.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckSequentialOptimization.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-MATRIX",
@@ -2648,7 +2648,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckWalkForwardMatrix.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckWalkForwardMatrix.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-OPTIMIZATION",
@@ -2665,7 +2665,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckWalkForwardOptimization.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckWalkForwardOptimization.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-CROSS-CHECK-WHAT-IF",
@@ -2682,7 +2682,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/CrossCheckWhatIf.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckWhatIf.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE",
@@ -2699,7 +2699,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBinance.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinance.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-COIN-M",
@@ -2716,7 +2716,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBinanceCoinM.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinanceCoinM.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-USDT-M",
@@ -2733,7 +2733,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBinanceUsdtM.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinanceUsdtM.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BITFINEX",
@@ -2750,7 +2750,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBitfinex.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBitfinex.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-COINBASE-PRO",
@@ -2767,7 +2767,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/CryptoExchangeCoinbasePro.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeCoinbasePro.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-POLONIEX",
@@ -2784,7 +2784,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/CryptoExchangePoloniex.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangePoloniex.md"
     },
     {
       "feature_id": "FEAT-BUILDER-DASHBOARD-RESULTS",
@@ -2801,7 +2801,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/DashboardResults.md"
+      "reference": "docs/dev/V1/sqx/Results/DashboardResults.md"
     },
     {
       "feature_id": "FEAT-RESULTS-DATABANK-FILTER-BY-CORRELATION",
@@ -2819,7 +2819,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/DatabankFilterByCorrelation.md"
+      "reference": "docs/dev/V1/sqx/Results/DatabankFilterByCorrelation.md"
     },
     {
       "feature_id": "FEAT-RESULTS-DATABANK-RENAME",
@@ -2837,7 +2837,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/DatabankRename.md"
+      "reference": "docs/dev/V1/sqx/Results/DatabankRename.md"
     },
     {
       "feature_id": "FEAT-DATA-DATA-MANAGER-BASKET",
@@ -2855,7 +2855,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerBasket.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerBasket.md"
     },
     {
       "feature_id": "FEAT-DATA-DATA-MANAGER-BROKER",
@@ -2873,7 +2873,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerBroker.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerBroker.md"
     },
     {
       "feature_id": "FEAT-CONNECTION-DATA-MANAGER-CONNECTIONS",
@@ -2891,7 +2891,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerConnections.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerConnections.md"
     },
     {
       "feature_id": "FEAT-DATA-DATA-MANAGER-CUSTOM-DATA",
@@ -2909,7 +2909,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerCustomData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerCustomData.md"
     },
     {
       "feature_id": "FEAT-DATA-DATA-MANAGER-DATA",
@@ -2927,7 +2927,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerData.md"
     },
     {
       "feature_id": "FEAT-DATA-DATA-MANAGER-HOME",
@@ -2945,7 +2945,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerHome.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerHome.md"
     },
     {
       "feature_id": "FEAT-DATA-DATA-MANAGER-INSTRUMENTS",
@@ -2963,7 +2963,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerInstruments.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerInstruments.md"
     },
     {
       "feature_id": "FEAT-DATA-DATA-MANAGER-SESSIONS",
@@ -2981,7 +2981,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataManagerSessions.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerSessions.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-CRYPTO",
@@ -2999,7 +2999,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceCrypto.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceCrypto.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-DARWINEX",
@@ -3017,7 +3017,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceDarwinex.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceDarwinex.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY",
@@ -3035,7 +3035,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceDukascopy.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceDukascopy.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-FILES",
@@ -3053,7 +3053,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceFiles.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceFiles.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-MT5-API",
@@ -3071,7 +3071,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceMt5Api.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceMt5Api.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-SQ-EQUITY-DATA",
@@ -3089,7 +3089,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceSQEquityData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceSQEquityData.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-SQ-FUTURES-DATA",
@@ -3107,7 +3107,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceSQFuturesData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceSQFuturesData.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-TD",
@@ -3125,7 +3125,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceTD.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceTD.md"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-DATA-SOURCE-YAHOO",
@@ -3143,7 +3143,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/DataManager/DataSourceYahoo.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceYahoo.md"
     },
     {
       "feature_id": "FEAT-BUILDER-ENGINE-PANEL",
@@ -3160,7 +3160,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/GridControl/EnginePanel.md"
+      "reference": "docs/dev/V1/sqx/GridControl/EnginePanel.md"
     },
     {
       "feature_id": "FEAT-RESULTS-EQUITY-CHART-BENCHMARK",
@@ -3177,7 +3177,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/EquityChartBenchmark.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartBenchmark.md"
     },
     {
       "feature_id": "FEAT-RESULTS-EQUITY-CHART-DAILY-CHART",
@@ -3194,7 +3194,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/EquityChartDailyChart.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartDailyChart.md"
     },
     {
       "feature_id": "FEAT-RESULTS-EQUITY-CHART-DRAWDOWN",
@@ -3211,7 +3211,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/EquityChartDrawdown.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartDrawdown.md"
     },
     {
       "feature_id": "FEAT-RESULTS-EQUITY-CHART-VOLATILITY",
@@ -3228,7 +3228,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/EquityChartVolatility.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartVolatility.md"
     },
     {
       "feature_id": "FEAT-RESULTS-EQUITY-CHART-VOLUME",
@@ -3245,7 +3245,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/EquityChartVolume.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartVolume.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-FITNESS-METHOD-EXISTING-PORTFOLIO",
@@ -3262,7 +3262,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/FitnessMethodExistingPortfolio.md"
+      "reference": "docs/dev/V1/sqx/Shared/FitnessMethodExistingPortfolio.md"
     },
     {
       "feature_id": "FEAT-BUILDER-FITNESS-METHOD-STRATEGY-RESULT",
@@ -3279,7 +3279,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/FitnessMethodStrategyResult.md"
+      "reference": "docs/dev/V1/sqx/Shared/FitnessMethodStrategyResult.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-FITNESS-METHOD-WF-RESULT",
@@ -3297,7 +3297,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/FitnessMethodWFResult.md"
+      "reference": "docs/dev/V1/sqx/Shared/FitnessMethodWFResult.md"
     },
     {
       "feature_id": "FEAT-PRODUCT-HOME-ABOUT",
@@ -3313,7 +3313,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/HomeAbout.md"
+      "reference": "docs/dev/V1/sqx/Shared/HomeAbout.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-LOADER-SQ3",
@@ -3331,7 +3331,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/LoaderSQ3.md"
+      "reference": "docs/dev/V1/sqx/Shared/LoaderSQ3.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-LOADER-SQ4",
@@ -3349,7 +3349,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/LoaderSQ4.md"
+      "reference": "docs/dev/V1/sqx/Shared/LoaderSQ4.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-PORTFOLIO-COMPOSER",
@@ -3366,7 +3366,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/PortfolioComposer/PortfolioComposer.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/PortfolioComposer.md"
     },
     {
       "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-CYCLES-COUNT",
@@ -3384,7 +3384,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ProjectConditionCyclesCount.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionCyclesCount.md"
     },
     {
       "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-GO-TO-ACTIVATED",
@@ -3402,7 +3402,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ProjectConditionGoToActivated.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionGoToActivated.md"
     },
     {
       "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-GO-TO-EVALUATED",
@@ -3420,7 +3420,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ProjectConditionGoToEvaluated.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionGoToEvaluated.md"
     },
     {
       "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-RESULTS-COUNT",
@@ -3438,7 +3438,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ProjectConditionResultsCount.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionResultsCount.md"
     },
     {
       "feature_id": "FEAT-PROJECT-PROJECT-CONDITION-RUN-TIME",
@@ -3456,7 +3456,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ProjectConditionRunTime.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionRunTime.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-CHART",
@@ -3474,7 +3474,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsChart.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsChart.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-DATABANK-ACTIONS",
@@ -3492,7 +3492,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsDatabankActions.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsDatabankActions.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-DATABANK-VIEWS",
@@ -3510,7 +3510,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsDatabankViews.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsDatabankViews.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-EQUITY-CHART",
@@ -3528,7 +3528,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsEquityChart.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsEquityChart.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-EXPLORE",
@@ -3546,7 +3546,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsExplore.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsExplore.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-RESULTS-OPTIMIZATION-PROFILE",
@@ -3564,7 +3564,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsOptimizationProfile.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsOptimizationProfile.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-OVERVIEW",
@@ -3582,7 +3582,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsOverview.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsOverview.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-PLUGINS",
@@ -3600,7 +3600,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsPlugins.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsPlugins.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-CHART",
@@ -3617,7 +3617,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/PortfolioComposer/ResultsPortfolioComposerChart.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/ResultsPortfolioComposerChart.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-LOG",
@@ -3634,7 +3634,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/PortfolioComposer/ResultsPortfolioComposerLog.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/ResultsPortfolioComposerLog.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION",
@@ -3651,7 +3651,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsPortfolioCorrelation.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsPortfolioCorrelation.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-RESULTS-PROFILE-CHART",
@@ -3669,7 +3669,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsProfileChart.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsProfileChart.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-RESULTS-ROBUSTNESS-TESTS",
@@ -3686,7 +3686,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsRobustnessTests.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsRobustnessTests.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-RESULTS-SEQUENTIAL-OPTIMIZATION",
@@ -3704,7 +3704,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsSequentialOptimization.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSequentialOptimization.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-RESULTS-SOURCE-CODE",
@@ -3721,7 +3721,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsSourceCode.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSourceCode.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-SP-OVERVIEW",
@@ -3739,7 +3739,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsSPOverview.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSPOverview.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-STOCKPICKER",
@@ -3757,7 +3757,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsStockpicker.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsStockpicker.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-STRATEGY-CONFIG",
@@ -3775,7 +3775,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsStrategyConfig.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsStrategyConfig.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-RESULTS-SYS-PARAM-PERMUTATION",
@@ -3793,7 +3793,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsSysParamPermutation.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSysParamPermutation.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-TRADE-ANALYSIS",
@@ -3811,7 +3811,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsTradeAnalysis.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsTradeAnalysis.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-TRADE-LIST",
@@ -3829,7 +3829,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsTradeList.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsTradeList.md"
     },
     {
       "feature_id": "FEAT-RESULTS-RESULTS-TRADELIST-VIEWS",
@@ -3847,7 +3847,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsTradelistViews.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsTradelistViews.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-RESULTS-WALK-FORWARD",
@@ -3865,7 +3865,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Results/ResultsWalkForward.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsWalkForward.md"
     },
     {
       "feature_id": "FEAT-RESULTS-SAVER-HTML",
@@ -3882,7 +3882,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SaverHTML.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverHTML.md"
     },
     {
       "feature_id": "FEAT-RESULTS-SAVER-PDF",
@@ -3899,7 +3899,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SaverPDF.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverPDF.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-SAVER-SQ3",
@@ -3917,7 +3917,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SaverSQ3.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverSQ3.md"
     },
     {
       "feature_id": "FEAT-RESULTS-SAVER-STRATEGY-TRADES",
@@ -3934,7 +3934,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SaverStrategyTrades.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverStrategyTrades.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-SERVLET-ALGO-CLOUD",
@@ -3950,7 +3950,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Plugins/ServletAlgoCloud.md"
+      "reference": "docs/dev/V1/sqx/Plugins/ServletAlgoCloud.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-SERVLET-ALGO-WIZARD",
@@ -3968,7 +3968,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/AlgoWizard/ServletAlgoWizard.md"
+      "reference": "docs/dev/V1/sqx/AlgoWizard/ServletAlgoWizard.md"
     },
     {
       "feature_id": "FEAT-BUILDER-SERVLET-BUILDER",
@@ -3985,7 +3985,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Builder/ServletBuilder.md"
+      "reference": "docs/dev/V1/sqx/Builder/ServletBuilder.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-SERVLET-CODE-EDITOR",
@@ -4003,7 +4003,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CodeEditor/ServletCodeEditor.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/ServletCodeEditor.md"
     },
     {
       "feature_id": "FEAT-CONNECTION-SERVLET-CONNECTION",
@@ -4021,7 +4021,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ServletConnection.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletConnection.md"
     },
     {
       "feature_id": "FEAT-STRATEGY-SERVLET-CONSTANTS",
@@ -4039,7 +4039,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ServletConstants.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletConstants.md"
     },
     {
       "feature_id": "FEAT-COMPUTE-SERVLET-GRID-CONTROL",
@@ -4056,7 +4056,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/GridControl/ServletGridControl.md"
+      "reference": "docs/dev/V1/sqx/GridControl/ServletGridControl.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SERVLET-PROJECT",
@@ -4074,7 +4074,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/ServletProject.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/ServletProject.md"
     },
     {
       "feature_id": "FEAT-RESULTS-SERVLET-RENAME-TOOL",
@@ -4092,7 +4092,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ServletRenameTool.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletRenameTool.md"
     },
     {
       "feature_id": "FEAT-AGENTIC-SERVLET-SQAI",
@@ -4108,7 +4108,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Plugins/ServletSQAI.md"
+      "reference": "docs/dev/V1/sqx/Plugins/ServletSQAI.md"
     },
     {
       "feature_id": "FEAT-AUTHORING-SERVLET-STRATEGY",
@@ -4126,7 +4126,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/ServletStrategy.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletStrategy.md"
     },
     {
       "feature_id": "FEAT-SIMULATOR-SETTINGS-ADVANCED-TM",
@@ -4144,7 +4144,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsAdvancedTM.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsAdvancedTM.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-APPLY-MASS-CONFIG",
@@ -4161,7 +4161,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsApplyMassConfig.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsApplyMassConfig.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-SETTINGS-AUTOMATIC-PORTFOLIO-BUILDER",
@@ -4178,7 +4178,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/PortfolioMaster/SettingsAutomaticPortfolioBuilder.md"
+      "reference": "docs/dev/V1/sqx/PortfolioMaster/SettingsAutomaticPortfolioBuilder.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-SETTINGS-AUTO-RETEST-DATA",
@@ -4196,7 +4196,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsAutoRetestData.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsAutoRetestData.md"
     },
     {
       "feature_id": "FEAT-STRATEGY-SETTINGS-BLOCKS",
@@ -4214,7 +4214,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsBlocks.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsBlocks.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT",
@@ -4231,7 +4231,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsCallExternalScript.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCallExternalScript.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-CLEAR-DATABANKS",
@@ -4248,7 +4248,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsClearDatabanks.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsClearDatabanks.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-SETTINGS-CREATE-PORTFOLIO",
@@ -4265,7 +4265,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsCreatePortfolio.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCreatePortfolio.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-SETTINGS-CROSS-CHECKS",
@@ -4282,7 +4282,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsCrossChecks.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCrossChecks.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-CUSTOM-ANALYSIS",
@@ -4299,7 +4299,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsCustomAnalysis.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCustomAnalysis.md"
     },
     {
       "feature_id": "FEAT-DATA-SETTINGS-DATA",
@@ -4316,7 +4316,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsData.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsData.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-DELETE-FILE",
@@ -4333,7 +4333,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsDeleteFile.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsDeleteFile.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-FILTERING",
@@ -4350,7 +4350,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsFiltering.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsFiltering.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-GO-TO-TASK",
@@ -4367,7 +4367,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsGoToTask.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsGoToTask.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-LOAD-FROM-FILES",
@@ -4384,7 +4384,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsLoadFromFiles.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsLoadFromFiles.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-LOG-DATABANK-STATS",
@@ -4401,7 +4401,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsLogDatabankStats.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsLogDatabankStats.md"
     },
     {
       "feature_id": "FEAT-SIMULATOR-SETTINGS-MONEY-MANAGEMENT",
@@ -4419,7 +4419,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsMoneyManagement.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsMoneyManagement.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-NOTES",
@@ -4436,7 +4436,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsNotes.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsNotes.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-NOTIFICATION",
@@ -4453,7 +4453,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsNotification.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsNotification.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-SETTINGS-OPTIMIZATION",
@@ -4471,7 +4471,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsOptimization.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsOptimization.md"
     },
     {
       "feature_id": "FEAT-SIMULATOR-SETTINGS-OPTIONS",
@@ -4489,7 +4489,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsOptions.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsOptions.md"
     },
     {
       "feature_id": "FEAT-BUILDER-SETTINGS-PARTS-TO-IMPROVE",
@@ -4507,7 +4507,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsPartsToImprove.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsPartsToImprove.md"
     },
     {
       "feature_id": "FEAT-BUILDER-SETTINGS-RANKINGS",
@@ -4525,7 +4525,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsRankings.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsRankings.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-SAVE-TO-FILES",
@@ -4542,7 +4542,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsSaveToFiles.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsSaveToFiles.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-STOP-AND-START",
@@ -4559,7 +4559,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsStopAndStart.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsStopAndStart.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-UPDATE-DATA",
@@ -4576,7 +4576,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsUpdateData.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsUpdateData.md"
     },
     {
       "feature_id": "FEAT-PROJECT-SETTINGS-WAIT-FOR",
@@ -4593,7 +4593,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsWaitFor.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsWaitFor.md"
     },
     {
       "feature_id": "FEAT-BUILDER-SETTINGS-WHAT-TO-BUILD",
@@ -4611,7 +4611,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsWhatToBuild.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsWhatToBuild.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-SETTINGS-WHAT-TO-RETEST",
@@ -4629,7 +4629,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Shared/SettingsWhatToRetest.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsWhatToRetest.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-APPLY-MASS-CONFIG",
@@ -4646,7 +4646,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskApplyMassConfig.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskApplyMassConfig.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-TASK-AUTOMATIC-PORTFOLIO-BUILDER",
@@ -4663,7 +4663,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/PortfolioMaster/TaskAutomaticPortfolioBuilder.md"
+      "reference": "docs/dev/V1/sqx/PortfolioMaster/TaskAutomaticPortfolioBuilder.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-TASK-AUTOMATIC-RETEST",
@@ -4681,7 +4681,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Retester/TaskAutomaticRetest.md"
+      "reference": "docs/dev/V1/sqx/Retester/TaskAutomaticRetest.md"
     },
     {
       "feature_id": "FEAT-BUILDER-TASK-BUILD",
@@ -4699,7 +4699,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Builder/TaskBuild.md"
+      "reference": "docs/dev/V1/sqx/Builder/TaskBuild.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-CALL-EXTERNAL-SCRIPT",
@@ -4716,7 +4716,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskCallExternalScript.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskCallExternalScript.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-CLEAR-DATABANKS",
@@ -4733,7 +4733,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskClearDatabanks.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskClearDatabanks.md"
     },
     {
       "feature_id": "FEAT-PORTFOLIO-TASK-CREATE-PORTFOLIO",
@@ -4750,7 +4750,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskCreatePortfolio.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskCreatePortfolio.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-CUSTOM-ANALYSIS",
@@ -4767,7 +4767,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskCustomAnalysis.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskCustomAnalysis.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-DELETE-FILE",
@@ -4784,7 +4784,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskDeleteFile.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskDeleteFile.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-FILTERING",
@@ -4801,7 +4801,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskFiltering.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskFiltering.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-GO-TO-TASK",
@@ -4818,7 +4818,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskGoToTask.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskGoToTask.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-LOAD-FROM-FILES",
@@ -4835,7 +4835,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskLoadFromFiles.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskLoadFromFiles.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-LOG-DATABANK-STATS",
@@ -4852,7 +4852,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskLogDatabankStats.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskLogDatabankStats.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-MANAGER-PROJECTS",
@@ -4870,7 +4870,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskManagerProjects.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskManagerProjects.md"
     },
     {
       "feature_id": "FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER",
@@ -4887,7 +4887,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md"
+      "reference": "docs/dev/V1/sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-NOTIFICATION",
@@ -4904,7 +4904,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskNotification.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskNotification.md"
     },
     {
       "feature_id": "FEAT-OPTIMIZER-TASK-OPTIMIZE",
@@ -4922,7 +4922,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Optimizer/TaskOptimize.md"
+      "reference": "docs/dev/V1/sqx/Optimizer/TaskOptimize.md"
     },
     {
       "feature_id": "FEAT-ROBUSTNESS-TASK-RETEST",
@@ -4940,7 +4940,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Retester/TaskRetest.md"
+      "reference": "docs/dev/V1/sqx/Retester/TaskRetest.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-SAVE-TO-FILES",
@@ -4957,7 +4957,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskSaveToFiles.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskSaveToFiles.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-STOP-AND-START",
@@ -4974,7 +4974,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskStopAndStart.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskStopAndStart.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-UPDATE-DATA",
@@ -4991,7 +4991,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskUpdateData.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskUpdateData.md"
     },
     {
       "feature_id": "FEAT-PROJECT-TASK-WAIT-FOR",
@@ -5008,7 +5008,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/CustomProjects/TaskWaitFor.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskWaitFor.md"
     },
     {
       "feature_id": "FEAT-HOST-JRT-FS",
@@ -5023,7 +5023,7 @@
       ],
       "registration_status": "proposed",
       "disposition": "behavior_research_required",
-      "reference": "docs/sqx/Runtime/jrt-fs.md"
+      "reference": "docs/dev/V1/sqx/Runtime/jrt-fs.md"
     }
   ],
   "requirement_seeds": [
@@ -14030,295 +14030,295 @@
     {
       "feature_id": "FEAT-UI-DATA-MANAGER-ACTIONS",
       "phase": "P03",
-      "phase_file": "docs/dev/phases/phase-03-data-manager.md",
+      "phase_file": "docs/dev/V1/phase-03-data-manager.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-DATA-MANAGER-HELP",
       "phase": "P03",
-      "phase_file": "docs/dev/phases/phase-03-data-manager.md",
+      "phase_file": "docs/dev/V1/phase-03-data-manager.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-DATA-COT-CATALOG",
       "phase": "P03",
-      "phase_file": "docs/dev/phases/phase-03-data-manager.md",
+      "phase_file": "docs/dev/V1/phase-03-data-manager.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-DATA-MANAGER-LOG",
       "phase": "P04",
-      "phase_file": "docs/dev/phases/phase-04-data-ingestion.md",
+      "phase_file": "docs/dev/V1/phase-04-data-ingestion.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-DATA-SOURCE-COT",
       "phase": "P04",
-      "phase_file": "docs/dev/phases/phase-04-data-ingestion.md",
+      "phase_file": "docs/dev/V1/phase-04-data-ingestion.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-INDICATOR-COT-BLOCKS",
       "phase": "P05",
-      "phase_file": "docs/dev/phases/phase-05-strategy-primitives.md",
+      "phase_file": "docs/dev/V1/phase-05-strategy-primitives.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-INDICATOR-PROFILE-BLOCKS",
       "phase": "P05",
-      "phase_file": "docs/dev/phases/phase-05-strategy-primitives.md",
+      "phase_file": "docs/dev/V1/phase-05-strategy-primitives.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-SIMULATOR-NINJATRADER-ENGINE",
       "phase": "P06",
-      "phase_file": "docs/dev/phases/phase-06-simulation-engine.md",
+      "phase_file": "docs/dev/V1/phase-06-simulation-engine.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-PROJECT-RESOURCES",
       "phase": "P07",
-      "phase_file": "docs/dev/phases/phase-07-authoring-code-generation.md",
+      "phase_file": "docs/dev/V1/phase-07-authoring-code-generation.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AUTHORING-NINJATRADER-EXPORT",
       "phase": "P07",
-      "phase_file": "docs/dev/phases/phase-07-authoring-code-generation.md",
+      "phase_file": "docs/dev/V1/phase-07-authoring-code-generation.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AUTHORING-NINJATRADER-INDICATORS",
       "phase": "P07",
-      "phase_file": "docs/dev/phases/phase-07-authoring-code-generation.md",
+      "phase_file": "docs/dev/V1/phase-07-authoring-code-generation.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-CUSTOM-DATABANK-ACTIONS",
       "phase": "P08",
-      "phase_file": "docs/dev/phases/phase-08-results-databanks-exports.md",
+      "phase_file": "docs/dev/V1/phase-08-results-databanks-exports.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-CUSTOM-RESULTS-PLUGIN-ACTIONS",
       "phase": "P08",
-      "phase_file": "docs/dev/phases/phase-08-results-databanks-exports.md",
+      "phase_file": "docs/dev/V1/phase-08-results-databanks-exports.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-PROJECT-DATABANKS",
       "phase": "P08",
-      "phase_file": "docs/dev/phases/phase-08-results-databanks-exports.md",
+      "phase_file": "docs/dev/V1/phase-08-results-databanks-exports.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-PROJECT-RESULTS",
       "phase": "P08",
-      "phase_file": "docs/dev/phases/phase-08-results-databanks-exports.md",
+      "phase_file": "docs/dev/V1/phase-08-results-databanks-exports.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-RESULTS-REPORT",
       "phase": "P08",
-      "phase_file": "docs/dev/phases/phase-08-results-databanks-exports.md",
+      "phase_file": "docs/dev/V1/phase-08-results-databanks-exports.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-DASHBOARD-PANEL",
       "phase": "P09",
-      "phase_file": "docs/dev/phases/phase-09-builder-generation.md",
+      "phase_file": "docs/dev/V1/phase-09-builder-generation.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-SETTINGS-GENETIC-OPTIONS",
       "phase": "P09",
-      "phase_file": "docs/dev/phases/phase-09-builder-generation.md",
+      "phase_file": "docs/dev/V1/phase-09-builder-generation.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-SETTINGS-AUTOMATIC-RETEST",
       "phase": "P11",
-      "phase_file": "docs/dev/phases/phase-11-retester-robustness.md",
+      "phase_file": "docs/dev/V1/phase-11-retester-robustness.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-PROJECT-SETTINGS",
       "phase": "P13",
-      "phase_file": "docs/dev/phases/phase-13-custom-projects-tasks.md",
+      "phase_file": "docs/dev/V1/phase-13-custom-projects-tasks.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-SETTINGS-PANEL",
       "phase": "P13",
-      "phase_file": "docs/dev/phases/phase-13-custom-projects-tasks.md",
+      "phase_file": "docs/dev/V1/phase-13-custom-projects-tasks.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-TASK-MANAGER-TASKS",
       "phase": "P13",
-      "phase_file": "docs/dev/phases/phase-13-custom-projects-tasks.md",
+      "phase_file": "docs/dev/V1/phase-13-custom-projects-tasks.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-PROJECT-Q-RESEARCH-WORKFLOWS",
       "phase": "P13",
-      "phase_file": "docs/dev/phases/phase-13-custom-projects-tasks.md",
+      "phase_file": "docs/dev/V1/phase-13-custom-projects-tasks.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-SKIN-DARK",
       "phase": "P17",
-      "phase_file": "docs/dev/phases/phase-17-product-distribution.md",
+      "phase_file": "docs/dev/V1/phase-17-product-distribution.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-UI-SKIN-LIGHT",
       "phase": "P17",
-      "phase_file": "docs/dev/phases/phase-17-product-distribution.md",
+      "phase_file": "docs/dev/V1/phase-17-product-distribution.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-Q-CHAT",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-Q-MEMORY",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-Q-SCHEDULING",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-Q-PYTHON",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-Q-EXTENSIONS",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-Q-COMPLETION",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-AC-STRATEGY",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-ALGOWIZARD-LAB",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-ANALYSIS-TABS",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-AUTO-RESEARCH",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-BREAKOUT-PROJECT-FACTORY",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-CUSTOM-PAGE",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-MARKET-ANALYST",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-PLUGIN-MAKER",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-QUANT-RESEARCH",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-SQX-INDICATOR-BUILDER",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-SQX-PROJECT",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-SQX-REPORTS",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-SQX-SNIPPETS",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-SQX-STRATEGY",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-STRATEGY-ANALYST",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-STRATEGY-ARCHITECT",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-TRADING-MEMORY",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     },
     {
       "feature_id": "FEAT-AGENTIC-PLUGIN-UI-PILOT",
       "phase": "P19",
-      "phase_file": "docs/dev/phases/phase-19-agentic-research.md",
+      "phase_file": "docs/dev/V1/phase-19-agentic-research.md",
       "registration_status": "proposed"
     }
   ],

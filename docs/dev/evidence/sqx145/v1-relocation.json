@@ -1,0 +1,2479 @@
+{
+  "schema_version": 1,
+  "reference_cohort": "145-dev1",
+  "source_head": "6ac87d2a4dfb111ef8ca03632aeffb9a8de7edec",
+  "approved_at_date": "2026-10-07",
+  "scope": "Documentation relocation only; preserves same-cohort source identities and historical observations. No donor runtime qualification.",
+  "moves": [
+    [
+      "docs/dev/phases",
+      "docs/dev/V1"
+    ],
+    [
+      "docs/dev/sqx-full-application-roadmap.md",
+      "docs/dev/V1/sqx-full-application-roadmap.md"
+    ],
+    [
+      "docs/dev/sqx-implementation-prompts.md",
+      "docs/dev/V1/sqx-implementation-prompts.md"
+    ],
+    [
+      "docs/dev/sqx145-baseline-audit.md",
+      "docs/dev/V1/sqx145-baseline-audit.md"
+    ],
+    [
+      "docs/sqx",
+      "docs/dev/V1/sqx"
+    ]
+  ],
+  "file_count": 334,
+  "files": [
+    {
+      "source": "docs/dev/phases/implementation_checklist.md",
+      "destination": "docs/dev/V1/implementation_checklist.md",
+      "bytes": 57047,
+      "source_sha256": "da9857a6214eeb6ef85a83672c362fe421c91f51650bd5335816d4f7ae187b67",
+      "destination_sha256": "da9857a6214eeb6ef85a83672c362fe421c91f51650bd5335816d4f7ae187b67"
+    },
+    {
+      "source": "docs/dev/phases/phase-01-host-foundation.md",
+      "destination": "docs/dev/V1/phase-01-host-foundation.md",
+      "bytes": 172632,
+      "source_sha256": "068913663afc59a631e25e5b1ffdc962dd8ee06441a4dab4eea54e17838d7711",
+      "destination_sha256": "58d14805d6fb5b17cbaabaf357b323d147351a03a95077e76f5e936c14bcdec5"
+    },
+    {
+      "source": "docs/dev/phases/phase-02-host-services.md",
+      "destination": "docs/dev/V1/phase-02-host-services.md",
+      "bytes": 168487,
+      "source_sha256": "6be8d61e5ee21fddb64be350e88edf1a0497593e19250c677bad86887d40424e",
+      "destination_sha256": "20489bae97208c55f5987dfd2a3657b04d2c35f4e643b8681332de203304cfd0"
+    },
+    {
+      "source": "docs/dev/phases/phase-03-data-manager.md",
+      "destination": "docs/dev/V1/phase-03-data-manager.md",
+      "bytes": 98195,
+      "source_sha256": "f262a9b922081599005975651159304ec5fad091bba416371a6e543ceb5ff0b0",
+      "destination_sha256": "74efeab8c82dc9e326d714362c58d7328c38ef31c9b3b24e5595b748774f7a13"
+    },
+    {
+      "source": "docs/dev/phases/phase-04-data-ingestion.md",
+      "destination": "docs/dev/V1/phase-04-data-ingestion.md",
+      "bytes": 159900,
+      "source_sha256": "856b8d1c7d9fb17d3e0fa166ef88eaaac4aa003bcf78065a836cab1abe1705ee",
+      "destination_sha256": "893f26b3d2e6b44b956d3cd8d70bed0b1d36068d38d3ba1705e64b94078478f9"
+    },
+    {
+      "source": "docs/dev/phases/phase-05-strategy-primitives.md",
+      "destination": "docs/dev/V1/phase-05-strategy-primitives.md",
+      "bytes": 46507,
+      "source_sha256": "efeff24690af44d6bad547fd45160c35687b7a9e1c6cb2f4cab751f5433bc2be",
+      "destination_sha256": "0562762e12d2aee73e2ed8726ba36fb01ea350dad0adf3f21f653deb2e0993a9"
+    },
+    {
+      "source": "docs/dev/phases/phase-06-simulation-engine.md",
+      "destination": "docs/dev/V1/phase-06-simulation-engine.md",
+      "bytes": 40771,
+      "source_sha256": "7c2ed64e8634793d042b036acb2f9d84620a77a527c3314ed1757a8477e73ac6",
+      "destination_sha256": "6263926a04e0bd18ca75ff9eb4afb75a296eff73dbb578a6915db14df91729d3"
+    },
+    {
+      "source": "docs/dev/phases/phase-07-authoring-code-generation.md",
+      "destination": "docs/dev/V1/phase-07-authoring-code-generation.md",
+      "bytes": 124248,
+      "source_sha256": "b70deec4cf7f0d82e0338872d5e92aa15af9dfe71564a5296fe9406aa0286edc",
+      "destination_sha256": "5266c2d6f20eb87dfc6f9c2c7b169dbf1e8ef83dde261d837d55cd6ea4a79e88"
+    },
+    {
+      "source": "docs/dev/phases/phase-08-results-databanks-exports.md",
+      "destination": "docs/dev/V1/phase-08-results-databanks-exports.md",
+      "bytes": 271252,
+      "source_sha256": "c866aa0894698dc25acde6ea556c892dcfe236009110ecba211a29e3a4a02614",
+      "destination_sha256": "a3fbe5da0c492ce55974a27ad37b02038dfb536caea515c814152c24c622ba6b"
+    },
+    {
+      "source": "docs/dev/phases/phase-09-builder-generation.md",
+      "destination": "docs/dev/V1/phase-09-builder-generation.md",
+      "bytes": 107724,
+      "source_sha256": "393804a31d13cfec6323ab8c6a3af4f24e3eb5a65ba78ec338caf41faada68af",
+      "destination_sha256": "0fa19f91320c68d452b7c74033ab07f702949c2401e226a00d4955adc2f6cddd"
+    },
+    {
+      "source": "docs/dev/phases/phase-10-optimizer-walk-forward.md",
+      "destination": "docs/dev/V1/phase-10-optimizer-walk-forward.md",
+      "bytes": 82930,
+      "source_sha256": "591976fcb03c93b3079600ac940442aeeabc1564c3692aadaca34b52c2fa91ff",
+      "destination_sha256": "c6862cb39eca2fd87182138cc2945bbd98a0198cb63cac92f0d477b31b0b21a0"
+    },
+    {
+      "source": "docs/dev/phases/phase-11-retester-robustness.md",
+      "destination": "docs/dev/V1/phase-11-retester-robustness.md",
+      "bytes": 140576,
+      "source_sha256": "5863f1da8644afe986d30690b7e0c47ee93429954f4e4e65b5a81d202aa018fa",
+      "destination_sha256": "0a96f4f39c38df38e54ee76efe8589710acd0310600cc79f9f2b0ecb82902964"
+    },
+    {
+      "source": "docs/dev/phases/phase-12-portfolio-workflows.md",
+      "destination": "docs/dev/V1/phase-12-portfolio-workflows.md",
+      "bytes": 98775,
+      "source_sha256": "6ee043c93377e0f17d3e964c7ade1aba0df070f5e7ad94e3e93f6333aec27a72",
+      "destination_sha256": "49f2e14fd7e4adba3df0d5e632453d9b0bf5c33d9acc4d5d7fbf4c1e5e0c5d8b"
+    },
+    {
+      "source": "docs/dev/phases/phase-13-custom-projects-tasks.md",
+      "destination": "docs/dev/V1/phase-13-custom-projects-tasks.md",
+      "bytes": 334229,
+      "source_sha256": "46da8091e82da54f8de4bbdab85bc684e66e6d8675f3b63a94bdccebafd3d802",
+      "destination_sha256": "ad7f8234aebb5b21fe0b2ab3129ec6af2982ff60791f01c69b2e1f47bd1bc0d8"
+    },
+    {
+      "source": "docs/dev/phases/phase-14-grid-compute.md",
+      "destination": "docs/dev/V1/phase-14-grid-compute.md",
+      "bytes": 72668,
+      "source_sha256": "1ecf664b31c69579f5f46d2204116e4601b2b1b2cacbc047c06558389db33aea",
+      "destination_sha256": "a658649d5a666ac4a92d35423b2ffcabd90b57ca42d12305c1c815a5cedd9d97"
+    },
+    {
+      "source": "docs/dev/phases/phase-15-neural-network.md",
+      "destination": "docs/dev/V1/phase-15-neural-network.md",
+      "bytes": 24357,
+      "source_sha256": "4cf77b563fb385c05ace78726fdea9094563e788fe13a205ab3d16033853fab3",
+      "destination_sha256": "ccf536a5412184dde1174cdc89bf5ac7716cb213160f74b3ced4e1a5e78c07ba"
+    },
+    {
+      "source": "docs/dev/phases/phase-16-connections-trading.md",
+      "destination": "docs/dev/V1/phase-16-connections-trading.md",
+      "bytes": 50256,
+      "source_sha256": "11714a29d355e7a5eaeec8decc5cb0662bd13733c994f7c38401ef3161dd46e7",
+      "destination_sha256": "be27d8f22b29ae2f0f6ed603b9dd50b60f34ed5f42269042d2118ced007d37ef"
+    },
+    {
+      "source": "docs/dev/phases/phase-17-product-distribution.md",
+      "destination": "docs/dev/V1/phase-17-product-distribution.md",
+      "bytes": 123449,
+      "source_sha256": "48734f64ab573ca8437cc9c8a67054f1e91ac560ca031a0b02f191a8fb2bc5f0",
+      "destination_sha256": "df0828b5c5974c154d7f917a36d06db185dcaee6b35dc9a47274ad0f3c169fd1"
+    },
+    {
+      "source": "docs/dev/phases/phase-18-release-qualification.md",
+      "destination": "docs/dev/V1/phase-18-release-qualification.md",
+      "bytes": 36845,
+      "source_sha256": "42630c886d35fb622895451a3a30e876ade9e06de9dca3b0ebabf05626321fa7",
+      "destination_sha256": "e283e16806a97b3d9609c1cdbe37c45d1d7540b9626d890a6a7516502563e7db"
+    },
+    {
+      "source": "docs/dev/phases/phase-19-agentic-research.md",
+      "destination": "docs/dev/V1/phase-19-agentic-research.md",
+      "bytes": 148967,
+      "source_sha256": "57b6690dbe14b78208ca806f27aa3d655ce013ea74207df6c95abfdd95fd2a6c",
+      "destination_sha256": "85235327f5a39826a4fced76323ac96288ff8345ee7882fb3fc5cb5c6e309676"
+    },
+    {
+      "source": "docs/dev/sqx-full-application-roadmap.md",
+      "destination": "docs/dev/V1/sqx-full-application-roadmap.md",
+      "bytes": 298286,
+      "source_sha256": "10e2663568fffc854efbc5ba0241c8baa60d98d1edb8dcb591f534c0614cecb7",
+      "destination_sha256": "cd8be5cea9212039f01ac13a08684521c911cb6bf9ed530ee019d18ac99c76f8"
+    },
+    {
+      "source": "docs/dev/sqx-implementation-prompts.md",
+      "destination": "docs/dev/V1/sqx-implementation-prompts.md",
+      "bytes": 9248,
+      "source_sha256": "8729973f98d85935220fcf0f1d7a434d0ca608f90c344d2852699eeae7501705",
+      "destination_sha256": "c243d2f42e955fcb277e6c2a6de23c0fd95988d9feab84eef57c697f6e64ec58"
+    },
+    {
+      "source": "docs/dev/sqx145-baseline-audit.md",
+      "destination": "docs/dev/V1/sqx145-baseline-audit.md",
+      "bytes": 3689,
+      "source_sha256": "030a1a8511d1fbc4b835e0d2fffbc417509de388f1623924e5509bd31cd573ce",
+      "destination_sha256": "815d075a2cf7d765f812603196e7f2fe48a076603d8562917b1c8ef2b663047d"
+    },
+    {
+      "source": "docs/sqx/AlgoWizard/AppWizard.md",
+      "destination": "docs/dev/V1/sqx/AlgoWizard/AppWizard.md",
+      "bytes": 2270,
+      "source_sha256": "6a01acb8664e036325453f0800b7d0fd56b265a41264f3e109984ce5a71d2ecc",
+      "destination_sha256": "de2359c2f5df8b3bf679311a401ad8cdd22527cfdf83db3e42ef9b475be52c44"
+    },
+    {
+      "source": "docs/sqx/AlgoWizard/README.md",
+      "destination": "docs/dev/V1/sqx/AlgoWizard/README.md",
+      "bytes": 318,
+      "source_sha256": "8195a4cc9b9fa0af30b21d101ca334ffaa3c7d83b2d39d35671f9e2fcea2ce66",
+      "destination_sha256": "8195a4cc9b9fa0af30b21d101ca334ffaa3c7d83b2d39d35671f9e2fcea2ce66"
+    },
+    {
+      "source": "docs/sqx/AlgoWizard/ServletAlgoWizard.md",
+      "destination": "docs/dev/V1/sqx/AlgoWizard/ServletAlgoWizard.md",
+      "bytes": 2991,
+      "source_sha256": "a3cfb0a68ca488a6ec3b1405d00bd5ccc8ee00113ac864f1a08233b58de1d377",
+      "destination_sha256": "9a105ae42f6ece9298bd3d056befc143a3d4b0f31953824c69360306e246623c"
+    },
+    {
+      "source": "docs/sqx/Builder/AppBuilder.md",
+      "destination": "docs/dev/V1/sqx/Builder/AppBuilder.md",
+      "bytes": 2275,
+      "source_sha256": "a84ff1f5f43109ff33b4b5d9bcad4981048f1745f21c5388eae5ddaa35136631",
+      "destination_sha256": "029ff20d7c30b7a8fccfb41e3e28acd4e65cf4ce4b6fc72247f7cc9ac71518aa"
+    },
+    {
+      "source": "docs/sqx/Builder/README.md",
+      "destination": "docs/dev/V1/sqx/Builder/README.md",
+      "bytes": 376,
+      "source_sha256": "090c788db9d0917f2ae118023295a9636c9f2ec8290d4a6e09c1d02749ae46e9",
+      "destination_sha256": "090c788db9d0917f2ae118023295a9636c9f2ec8290d4a6e09c1d02749ae46e9"
+    },
+    {
+      "source": "docs/sqx/Builder/ServletBuilder.md",
+      "destination": "docs/dev/V1/sqx/Builder/ServletBuilder.md",
+      "bytes": 2538,
+      "source_sha256": "aaf65dcbdf0400bad5f9633b000f6d35040748174e55f5b907291c53f7cbc3d0",
+      "destination_sha256": "c0bc95e67af1934df8a052174e80f545f5f7b6b4f20ae3045a9effeee40b0961"
+    },
+    {
+      "source": "docs/sqx/Builder/TaskBuild.md",
+      "destination": "docs/dev/V1/sqx/Builder/TaskBuild.md",
+      "bytes": 4302,
+      "source_sha256": "79dc7dea106232e7b0cfe826c02a3f9d01e22124505780131c9f260a0a631a1b",
+      "destination_sha256": "439eada4d4d6a5d348bd3775c55c328d1754ebf30457d5aed691b8cf2102feb1"
+    },
+    {
+      "source": "docs/sqx/CodeEditor/AppCodeEditor.md",
+      "destination": "docs/dev/V1/sqx/CodeEditor/AppCodeEditor.md",
+      "bytes": 2752,
+      "source_sha256": "22246a906d7f5f79b28655c0812faaa2554ae7566356e5f9876146298b0cb22b",
+      "destination_sha256": "f84143e41bdef9ae4a6762ff51f709a6800ea877447c99cea98af2aaccf6f1af"
+    },
+    {
+      "source": "docs/sqx/CodeEditor/CodeEditorImportExport.md",
+      "destination": "docs/dev/V1/sqx/CodeEditor/CodeEditorImportExport.md",
+      "bytes": 3163,
+      "source_sha256": "bb12cda46a8dd0207dda8191103a4f28bc267ee677fa650046c847783a8c5c5e",
+      "destination_sha256": "ed30d6ea60da69366a59fd1274331a9189e69987f4dc4e94050d7385219f4697"
+    },
+    {
+      "source": "docs/sqx/CodeEditor/CodeEditorIndicatorTester.md",
+      "destination": "docs/dev/V1/sqx/CodeEditor/CodeEditorIndicatorTester.md",
+      "bytes": 3751,
+      "source_sha256": "377454f6bd8198380770061478cb0416bbf1a2696ca29a36a8f8121d5b09107f",
+      "destination_sha256": "9ef9feeb238bd04b8e85a3c97af6a4a0da78361ae16c2bba9fd7868f7b105df4"
+    },
+    {
+      "source": "docs/sqx/CodeEditor/README.md",
+      "destination": "docs/dev/V1/sqx/CodeEditor/README.md",
+      "bytes": 569,
+      "source_sha256": "49c2733552354649c714a6792c4d3671480eb3f1d89eae0431cf53e335ae3daa",
+      "destination_sha256": "49c2733552354649c714a6792c4d3671480eb3f1d89eae0431cf53e335ae3daa"
+    },
+    {
+      "source": "docs/sqx/CodeEditor/ServletCodeEditor.md",
+      "destination": "docs/dev/V1/sqx/CodeEditor/ServletCodeEditor.md",
+      "bytes": 4921,
+      "source_sha256": "fa611ea427f396fdaf116f565c95599e2c9e4ad9bfd7c087c939041c0b115264",
+      "destination_sha256": "bd37e02de9b89003b8cd3b9e311ac4cc46b7cd6a5563cd313aa33d3c79c5e7ee"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/AppTaskManager.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/AppTaskManager.md",
+      "bytes": 2579,
+      "source_sha256": "03990af8651ef4bf86e4779410017e9f5f5bea3ac968f4655d81aa95650fc727",
+      "destination_sha256": "79e5e7a954216f32fb9fe65ef40dd49a6f1c6d8f8abcf6137d51b5c363aac20a"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/README.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/README.md",
+      "bytes": 1841,
+      "source_sha256": "d6f947db506f2e4625607ce24fe66a5935bb74f6199799eeed6d6ce4ee2718b4",
+      "destination_sha256": "d6f947db506f2e4625607ce24fe66a5935bb74f6199799eeed6d6ce4ee2718b4"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/ServletProject.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/ServletProject.md",
+      "bytes": 4331,
+      "source_sha256": "4e4473974170662654fe1516a144552c644da5787b578dfda31597257a6a8832",
+      "destination_sha256": "6aacfb2fae3286cfa60f68947670775d6c7b46deca18aad4aeb38754ea01ba87"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskApplyMassConfig.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskApplyMassConfig.md",
+      "bytes": 2330,
+      "source_sha256": "a238bc17f5bf48ee46b6b890fe6d99a16e340a00ca70d8c2975330f46bfa4d93",
+      "destination_sha256": "a77222878f452df13bb3327119c68b255d7fcd3230c91c76a0b7de85508e1122"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskCallExternalScript.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskCallExternalScript.md",
+      "bytes": 2511,
+      "source_sha256": "07fa63cb97ab0446820a0daaa388cfa80d7277fffa3030bae623d27f4f9fe4a5",
+      "destination_sha256": "c704e40ece8c9fa4237886d51842cbee9bdaa64fd632697ea85eb333aa1868a7"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskClearDatabanks.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskClearDatabanks.md",
+      "bytes": 2322,
+      "source_sha256": "303b0d647d91c602aa47e90bbfac7fe9c0a5ffa445b0dfe627cc104c9fe35e7c",
+      "destination_sha256": "8f201f922c54c1a9a2f4a2af92bbe172d1f98dc08fd5d70251340d86531f0670"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskCreatePortfolio.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskCreatePortfolio.md",
+      "bytes": 2323,
+      "source_sha256": "14010de6a390b97cf92169ee46d1c807cdd60bab8df9db2cafde1706c419c9d8",
+      "destination_sha256": "5aa83293ea537f82998e446ab768012cd70aa7dc3a253dce1b445595bd270e44"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskCustomAnalysis.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskCustomAnalysis.md",
+      "bytes": 2322,
+      "source_sha256": "d5ab6c2503c9fc1ba4381dbaf6e70646cb380a0a688554eefffcd98f112a0fb1",
+      "destination_sha256": "21a11242a42fb30a5ab68585f44c5b42748d3136b99129b2e6874bf3d2cacedc"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskDeleteFile.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskDeleteFile.md",
+      "bytes": 2294,
+      "source_sha256": "7d012dfb5725917f95df02e481dedf9226b94d77b445393d894232fbe3b4cecf",
+      "destination_sha256": "667658109de0482286a553092d6838b6251c7cc94e647e89f10040545b6693a9"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskFiltering.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskFiltering.md",
+      "bytes": 2287,
+      "source_sha256": "91ebbfa8822a37b2349b7d6c06412663eb4f458824a099456917d12819974727",
+      "destination_sha256": "b00331fe379cc7d593fc075bc78aaf6ba389d81e7bdc9efe64bda393598507e3"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskGoToTask.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskGoToTask.md",
+      "bytes": 2273,
+      "source_sha256": "44e004197edbf9b83e7d358defd1c21b21c43d367e39eead33fd16764d12adb7",
+      "destination_sha256": "4bce025d0224979b9f5e2c374779709556cea98595c6ed4e89c6bf504fcd9206"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskLoadFromFiles.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskLoadFromFiles.md",
+      "bytes": 2308,
+      "source_sha256": "83eec0a095e69f6ef289343832e6d14fe4785847368182020b383664ff5394ae",
+      "destination_sha256": "53337fb010aad21a9c3a35a8686e1b081c80bd4d98f7c3c5ece4a36b67448fff"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskLogDatabankStats.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskLogDatabankStats.md",
+      "bytes": 2337,
+      "source_sha256": "683b9e87c1f5147e594ed83075ae2f48c9bffb3fd9df6c0be4b761a0b3bc0143",
+      "destination_sha256": "447710fbfaa03634ba653498144a4f61c41f0b0be478add5120cdf1ea8566a83"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskManagerProjects.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskManagerProjects.md",
+      "bytes": 2649,
+      "source_sha256": "51d1d7bd798d7e24affece91817191039bf42de969712c989cec3ef9486e97ec",
+      "destination_sha256": "c82e35d83a9c186623c4a0833af9a30f55a9f69035b0195903f23f774e4ec66c"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskNotification.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskNotification.md",
+      "bytes": 2308,
+      "source_sha256": "50545fce3bb021811ba1a33164f217bbd605a5501d094be2aae016489efb9419",
+      "destination_sha256": "0a190171b34bb8c211bc4e1574f1dfacdbb7b77c0ff4bc460e8c535982e6ba18"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskSaveToFiles.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskSaveToFiles.md",
+      "bytes": 2295,
+      "source_sha256": "d4c714d54b62681f83cf837bd884dd360c4ef3f7d20efd431899783266b82429",
+      "destination_sha256": "f5a32cf3883bc5c61cdbac05567e79d01bdbad78104e1c2652ede747faec25c2"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskStopAndStart.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskStopAndStart.md",
+      "bytes": 2309,
+      "source_sha256": "3e0b2b1ee07fd3b4610f35ca025f34840be85f7fee9a21f7a7b873c8b7633274",
+      "destination_sha256": "5ab04a8dbfa511b8918bf6fdc8165a89f47b491af80629d9b2b259785854b539"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskUpdateData.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskUpdateData.md",
+      "bytes": 2450,
+      "source_sha256": "57a5135874cb766622538c5292166ba49681961db174a3856c481f932ba6242a",
+      "destination_sha256": "33a3b4d08f1e36f6441a1fa2ee5f344070962622185086315fefc1f299334af9"
+    },
+    {
+      "source": "docs/sqx/CustomProjects/TaskWaitFor.md",
+      "destination": "docs/dev/V1/sqx/CustomProjects/TaskWaitFor.md",
+      "bytes": 2423,
+      "source_sha256": "9b8eef026f9906ff9a0673068d9492098c225df3cbc852199148ef22d2b0fa95",
+      "destination_sha256": "4d443e1bb00124c8fce6ad3e32e932bbd6efaaad3fdfe5c35c09df1d50ec16e9"
+    },
+    {
+      "source": "docs/sqx/DataManager/AppDataManager.md",
+      "destination": "docs/dev/V1/sqx/DataManager/AppDataManager.md",
+      "bytes": 2301,
+      "source_sha256": "6dbdb8150bb9a9e85e2d463f6ffae7c0b930f0d6dac861895a244d3c8ad641d0",
+      "destination_sha256": "0b437922491e9db6893c916c4bae48d5214534c176306512b7790c3d1a17884f"
+    },
+    {
+      "source": "docs/sqx/DataManager/CryptoExchangeBinance.md",
+      "destination": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinance.md",
+      "bytes": 2355,
+      "source_sha256": "929254d81fb647377c96148de468f33dae2c3ed2d8f1670bc0c90781044f4152",
+      "destination_sha256": "584622d528aa91ac3ecdeb176e8471b07972dd3048a7de666dd32500e7483464"
+    },
+    {
+      "source": "docs/sqx/DataManager/CryptoExchangeBinanceCoinM.md",
+      "destination": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinanceCoinM.md",
+      "bytes": 2392,
+      "source_sha256": "967ff4f78541953ca28b7ce805d9fa81e6e02208714d4150a33220d026cab4e5",
+      "destination_sha256": "ba8fb12a14bad7064d8c49872872a910795cbcdad6725eaa05e6cd7b2541daf9"
+    },
+    {
+      "source": "docs/sqx/DataManager/CryptoExchangeBinanceUsdtM.md",
+      "destination": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinanceUsdtM.md",
+      "bytes": 2392,
+      "source_sha256": "453e034b9e6fc56a0e84effdc338f2caac8a104f41b9563191eb14eade897795",
+      "destination_sha256": "f29b02f800e2b9dd51c0c228c809618a9aacbfe7bda08be670eda4f5741a3226"
+    },
+    {
+      "source": "docs/sqx/DataManager/CryptoExchangeBitfinex.md",
+      "destination": "docs/dev/V1/sqx/DataManager/CryptoExchangeBitfinex.md",
+      "bytes": 2362,
+      "source_sha256": "b5011cf8cac9c34f8cfcbf8b27019bd9b2030390beb1a22cb3114a149b813dd5",
+      "destination_sha256": "a1649a2a6d932e139efc48c4cb83530839c1f4473b90d3bd54c7daa661de76dd"
+    },
+    {
+      "source": "docs/sqx/DataManager/CryptoExchangeCoinbasePro.md",
+      "destination": "docs/dev/V1/sqx/DataManager/CryptoExchangeCoinbasePro.md",
+      "bytes": 2384,
+      "source_sha256": "614e165f42868cd9d9cbe14d3abba48aeb05ca96c30254551d24c30cd6f9a388",
+      "destination_sha256": "9465620093d91f0e973276ad95d79280a0e70acef7ddd72552108d4d11b9a309"
+    },
+    {
+      "source": "docs/sqx/DataManager/CryptoExchangePoloniex.md",
+      "destination": "docs/dev/V1/sqx/DataManager/CryptoExchangePoloniex.md",
+      "bytes": 2362,
+      "source_sha256": "bb1066ba529647654cac2026fc0f7c9358c408d45bf46abe17b4e97e794ce638",
+      "destination_sha256": "966e49d74773abbb2c7a28151d15183cbf69c8b7b07527361b82451a81dbb5ee"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerBasket.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerBasket.md",
+      "bytes": 2749,
+      "source_sha256": "063c470f93fe66eb54fc31d84a8b78aa4aac17ed5bd4651062c85f0450b12a06",
+      "destination_sha256": "8c14564101cfeff1778152b4e32bf544c71475b0c7ffaa0b6887fc6fd4cbf212"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerBroker.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerBroker.md",
+      "bytes": 3259,
+      "source_sha256": "4889aade9114bd6725a3039521821338e8bdfb25873231318d834f6c297e384c",
+      "destination_sha256": "dfe855157851235d04b4a1609bf5689beaaf8ad56b2867635d8541b10a13fbd0"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerConnections.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerConnections.md",
+      "bytes": 2870,
+      "source_sha256": "4d5b1288e2bc80aa58566b00e3080dba4a97494ac48b92bd79b021d34e9b0706",
+      "destination_sha256": "171c60a1b89c711127024106d6581d26140e4e2ed315f1931776af8a1c9d87f9"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerCustomData.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerCustomData.md",
+      "bytes": 3511,
+      "source_sha256": "2baa1423cdc0ab383eff6da897ea3900e4a9a13a815121b46c44f72b4b9ad557",
+      "destination_sha256": "12a37e93839736c51ca1ba8ded79ee8e556cf2bb29062b0b103eaf8a4cfd81ca"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerData.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerData.md",
+      "bytes": 8378,
+      "source_sha256": "0b626404f7be5e2ced4eef5911145ef8963b3d2a67348a9efe4f5297b9b447b2",
+      "destination_sha256": "4eda95df51877bbcd5f521eecf8449cbfe791942f44628d90e627cc7940126b1"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerHome.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerHome.md",
+      "bytes": 2570,
+      "source_sha256": "e4df66464a8b308c1aaa4b7f6e859ad2489e03c3cf29ac6ae51dd7b635407768",
+      "destination_sha256": "f92dbc38ea3a2b742ad82f3bd268765604132e542edfb733d7e9d53b7bfa9012"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerInstruments.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerInstruments.md",
+      "bytes": 2809,
+      "source_sha256": "28569e8613cf9bbdb900cc088de40c2e79ccb522feefadc59f1b3ef763caf992",
+      "destination_sha256": "7202a852ce7b2d15ddd57a59abba504c1cd92965f426c550a64921de790bc115"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataManagerSessions.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataManagerSessions.md",
+      "bytes": 2773,
+      "source_sha256": "fdb46ed7e5b6d67b950fb263cbef5af63456c5e2d173ffe18aa5adb4cad32fdb",
+      "destination_sha256": "db7e50b87ab7620fd3e920575bb51dd13641970d2ced1b0a2f4bd1e57121932d"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceCrypto.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceCrypto.md",
+      "bytes": 2785,
+      "source_sha256": "b71f70e6f549993bbcb462c4442abdb03b05cd26fbab59854976dbf988db613a",
+      "destination_sha256": "5bc9fcf78b1b4e05663f7a00683573ac08dca703e51b0f24b23d23f223b1630e"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceDarwinex.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceDarwinex.md",
+      "bytes": 3729,
+      "source_sha256": "381eea799e305ec1a60b9a4bc63373fa19c15825df75ee8f18f9f74d7ddeb48a",
+      "destination_sha256": "befab9d551bdd97c4310fd3ad0470a21d972f9ea72b60f5fb14070a09f2ea5ec"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceDukascopy.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceDukascopy.md",
+      "bytes": 3345,
+      "source_sha256": "2dce1c6e9945ece7e53e31d5c03b3dd6720b2b4420737e59e67e078a2777dbc0",
+      "destination_sha256": "46f890db655eb96f78a488f0b0a39a6736b84124a1916d11663c83b346c58fe1"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceFiles.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceFiles.md",
+      "bytes": 4239,
+      "source_sha256": "cc064d641efb447dd889106db0c520281b88adf39a633f415578663a9a463e0a",
+      "destination_sha256": "de807c203700c9f612e6255786e1ac2f12f65985b346e36bb7e87633744c996e"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceMt5Api.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceMt5Api.md",
+      "bytes": 2953,
+      "source_sha256": "807110329c75cec1aaacce57d0ca36d80b3e7d3024d18fbd8cafb75ea95716b0",
+      "destination_sha256": "5acd3369a12abaf1ece7e7ddbe50511d27f99be3e2e5b6f327e6d4a1843d8cde"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceSQEquityData.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceSQEquityData.md",
+      "bytes": 3147,
+      "source_sha256": "e11fe2e38ef8444abdacad8673d53cbaef1c6f9eb2a811ccc03351563b15d0a5",
+      "destination_sha256": "5e5b85a91588a978a654d38d1ae553866f5e694f0d1ffc8dd65a0471bec13bcd"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceSQFuturesData.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceSQFuturesData.md",
+      "bytes": 3163,
+      "source_sha256": "bfb78574dabdfb8e80a086bc207f523f743b71c9e654e44d4936213c5141fd30",
+      "destination_sha256": "9c3bdd6f1cdd8397864d309721fb2b154d3e3362f5b591ef4e0910c9256fa816"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceTD.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceTD.md",
+      "bytes": 3101,
+      "source_sha256": "5f9e63242062b4f8c69f0ec1a5d57b3aae343408d2c7f5715925d475d0a18b07",
+      "destination_sha256": "f75632bede711e4393edae36a9144449d3065b36d9c8348992fd603b77f7ab96"
+    },
+    {
+      "source": "docs/sqx/DataManager/DataSourceYahoo.md",
+      "destination": "docs/dev/V1/sqx/DataManager/DataSourceYahoo.md",
+      "bytes": 3143,
+      "source_sha256": "0cde3b1010bbd696e0866499351d3d4814e345b36300479870e58ef153ea3bc6",
+      "destination_sha256": "ca9fc04815ee0061976787e2606058441a5972bd76ebbfac0d19362f9bf90fb5"
+    },
+    {
+      "source": "docs/sqx/DataManager/README.md",
+      "destination": "docs/dev/V1/sqx/DataManager/README.md",
+      "bytes": 2660,
+      "source_sha256": "2a7251922c61655729eb4fbf34c7a6c597604091888fe59cb8d866135b466390",
+      "destination_sha256": "2a7251922c61655729eb4fbf34c7a6c597604091888fe59cb8d866135b466390"
+    },
+    {
+      "source": "docs/sqx/DebugConsole/AppDebugConsole.md",
+      "destination": "docs/dev/V1/sqx/DebugConsole/AppDebugConsole.md",
+      "bytes": 2348,
+      "source_sha256": "0a133daedd87212a180d2ead4d0d60be37c29565c107c379beb5a3a4b976579a",
+      "destination_sha256": "6f9c7f6a586025ffde8da068494dafb13e367553919860297fc3b07e21ca7f27"
+    },
+    {
+      "source": "docs/sqx/DebugConsole/README.md",
+      "destination": "docs/dev/V1/sqx/DebugConsole/README.md",
+      "bytes": 236,
+      "source_sha256": "6631fd4cdcbe7aba3b74a62e6db8b88d1cfe6bcb8a0f043b05eca2dcca86e5bc",
+      "destination_sha256": "6631fd4cdcbe7aba3b74a62e6db8b88d1cfe6bcb8a0f043b05eca2dcca86e5bc"
+    },
+    {
+      "source": "docs/sqx/GettingStarted/AppSQXHome.md",
+      "destination": "docs/dev/V1/sqx/GettingStarted/AppSQXHome.md",
+      "bytes": 2544,
+      "source_sha256": "d8cedf1bdfb82335e0b77bc225cadca911476a8879b74ebf4b89dd59414b4b50",
+      "destination_sha256": "87c37ff363a7eff2e62c409a45fd815753f1a849c7ea23d3d571ac3da7023398"
+    },
+    {
+      "source": "docs/sqx/GettingStarted/README.md",
+      "destination": "docs/dev/V1/sqx/GettingStarted/README.md",
+      "bytes": 226,
+      "source_sha256": "e91f098698d40185e1eb390199dc7342a139c46028fb33057b8b08d08f8852bb",
+      "destination_sha256": "e91f098698d40185e1eb390199dc7342a139c46028fb33057b8b08d08f8852bb"
+    },
+    {
+      "source": "docs/sqx/GridControl/AppGridControl.md",
+      "destination": "docs/dev/V1/sqx/GridControl/AppGridControl.md",
+      "bytes": 2304,
+      "source_sha256": "0fe0d8d74d3bc1d93dd943043159ec8f7239c00d28e04b8a4629f3dad7e8095d",
+      "destination_sha256": "a85e5f3e8691643b98b3d7a5205d709ed28636d3d9262d84894fd733cc693656"
+    },
+    {
+      "source": "docs/sqx/GridControl/EnginePanel.md",
+      "destination": "docs/dev/V1/sqx/GridControl/EnginePanel.md",
+      "bytes": 2877,
+      "source_sha256": "549afd6abe6078f896ff6a26045c5b872096491edb737ef7164c5a828e2ef519",
+      "destination_sha256": "83a2ae7737f9b2ce51d32ce847382d693ea43c9c31e9279a70043bc15fea5e1f"
+    },
+    {
+      "source": "docs/sqx/GridControl/README.md",
+      "destination": "docs/dev/V1/sqx/GridControl/README.md",
+      "bytes": 411,
+      "source_sha256": "7aeb5d4c9975e530a57dc2eb7b8c727a4e1d14dff528cb61d7b49e388652b778",
+      "destination_sha256": "7aeb5d4c9975e530a57dc2eb7b8c727a4e1d14dff528cb61d7b49e388652b778"
+    },
+    {
+      "source": "docs/sqx/GridControl/ServletGridControl.md",
+      "destination": "docs/dev/V1/sqx/GridControl/ServletGridControl.md",
+      "bytes": 2579,
+      "source_sha256": "3d7d4a3e413d00c7b0e3a969cc1d8890e4e2bba1be41264020ba8bf64931e945",
+      "destination_sha256": "f9f6f700059c7ce6b226ac06e3c310b3b6d476a6621ba0ddbba0d3acd4f23632"
+    },
+    {
+      "source": "docs/sqx/GridTest/AppGridTest.md",
+      "destination": "docs/dev/V1/sqx/GridTest/AppGridTest.md",
+      "bytes": 2283,
+      "source_sha256": "5b9edd52913dc745400e22fafdc40971164d4a4be08f53988f2e4487d3f398ba",
+      "destination_sha256": "6c8ebf72f5d0f209224f707489b2f7e87e402a3e6c9cd71ea713deccfc50c91e"
+    },
+    {
+      "source": "docs/sqx/GridTest/README.md",
+      "destination": "docs/dev/V1/sqx/GridTest/README.md",
+      "bytes": 223,
+      "source_sha256": "aab55b46a6ce56bcf64ce00b0c9d4e09c813145a0f33dacfb870fc941f7787ca",
+      "destination_sha256": "aab55b46a6ce56bcf64ce00b0c9d4e09c813145a0f33dacfb870fc941f7787ca"
+    },
+    {
+      "source": "docs/sqx/Libraries/PSUtils.md",
+      "destination": "docs/dev/V1/sqx/Libraries/PSUtils.md",
+      "bytes": 2161,
+      "source_sha256": "ae2d7509d410667ec45df8ddae2f9978e220cd88b9c944e5ee55a9d4286084ca",
+      "destination_sha256": "5756702bf1b49242d189945333453b19ed6aaea9771ac784419af92df6231095"
+    },
+    {
+      "source": "docs/sqx/Libraries/README.md",
+      "destination": "docs/dev/V1/sqx/Libraries/README.md",
+      "bytes": 11809,
+      "source_sha256": "8b4e2b03d6a475867f1c6893291638a85e6d11900257c097e0ff73e958d05ab9",
+      "destination_sha256": "8b4e2b03d6a475867f1c6893291638a85e6d11900257c097e0ff73e958d05ab9"
+    },
+    {
+      "source": "docs/sqx/Libraries/Snippets.md",
+      "destination": "docs/dev/V1/sqx/Libraries/Snippets.md",
+      "bytes": 147032,
+      "source_sha256": "7520f03221c99c58702840531dc6a70a84be6882f87733a8ddf55f9fd8b76602",
+      "destination_sha256": "80a7e394c31fcf08f21e33149f12162a37a9a068ed27228802e3eac914710fff"
+    },
+    {
+      "source": "docs/sqx/Libraries/WMI4Java-1.6.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/WMI4Java-1.6.3.md",
+      "bytes": 3267,
+      "source_sha256": "598f443508aa8e8f05c2b616a41983ec128d2aafab8e9dc90a96fe650340485f",
+      "destination_sha256": "7fe5d3bf10df5079f1c99629a03ef9d0b5252b565052e4136d5901732876d753"
+    },
+    {
+      "source": "docs/sqx/Libraries/activation-1.1.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/activation-1.1.1.md",
+      "bytes": 7691,
+      "source_sha256": "e4d16e3a878890a4ae822d30918190b8b073fb11af43fbc30d37e953a3689b62",
+      "destination_sha256": "03ee2213f60de529179c306f6af003b81d238463254bafc3bbac8b6fc2e88383"
+    },
+    {
+      "source": "docs/sqx/Libraries/affinity-3.23.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/affinity-3.23.3.md",
+      "bytes": 9244,
+      "source_sha256": "49c6229cf977050bde97ce3bcf1947cd5083ec8aa984fd19e4034ea75da8d3f0",
+      "destination_sha256": "f569f20c74ad6dbbdc101cb49381bba4426059f7abfe51a8e78385a313ff0140"
+    },
+    {
+      "source": "docs/sqx/Libraries/agentscope-core-2.0.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/agentscope-core-2.0.3.md",
+      "bytes": 65174,
+      "source_sha256": "1c2b6b7149dab96d411768a17247f2430f5e1ee5d83f4704b36fc1273d7ab842",
+      "destination_sha256": "a2f47c2a14cfd9bf91961f7adc45c19a46c50ebbea68cf18b219388765388cab"
+    },
+    {
+      "source": "docs/sqx/Libraries/agentscope-harness-2.0.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/agentscope-harness-2.0.3.md",
+      "bytes": 64106,
+      "source_sha256": "5c21bb496aeb1a63eb5614d141f05652026920f5857e79a096385660c8804fae",
+      "destination_sha256": "4c5f16f601bcbe17defe04d2da2ec23388309f0de9635d5b8a58818c91d767c6"
+    },
+    {
+      "source": "docs/sqx/Libraries/animal-sniffer-annotations-1.14.md",
+      "destination": "docs/dev/V1/sqx/Libraries/animal-sniffer-annotations-1.14.md",
+      "bytes": 2313,
+      "source_sha256": "893c6934e9a8f35f564c4675c1d2943b812a0767cf25f00a494fefaa487353b5",
+      "destination_sha256": "a635af491442623bab714a3d1ca0acc18bb06bdad17d7ce8dc790fe861a6ad54"
+    },
+    {
+      "source": "docs/sqx/Libraries/annotations-13.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/annotations-13.0.md",
+      "bytes": 7055,
+      "source_sha256": "0b4de2032da54d7dadc5f79286af08b18aca7d720e8a47a345ca4dcc7a75538c",
+      "destination_sha256": "030c4d6432130230b7cc0bfd75569dcdd1847825189728b07853e9bf202f2dc6"
+    },
+    {
+      "source": "docs/sqx/Libraries/artemis-commons-1.5.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/artemis-commons-1.5.0.md",
+      "bytes": 26440,
+      "source_sha256": "2dbce4fbd9d9a02e71ecd8122ceb87cbb415aea0b50c60ce0500c352e2ea7224",
+      "destination_sha256": "0eb775e01aa8d5bccb1396193c2500eb47ec9c7cd4edf5145ac943629556f460"
+    },
+    {
+      "source": "docs/sqx/Libraries/artemis-core-client-1.5.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/artemis-core-client-1.5.0.md",
+      "bytes": 62455,
+      "source_sha256": "85e2a285e4a1a33e3485d5fcfc14c3c76eced52e7a2c393602f537ac7e8c0998",
+      "destination_sha256": "d52ae081869b34ed8f233bd21dfdd9e3ab536f816269900ec4ee5794c4298498"
+    },
+    {
+      "source": "docs/sqx/Libraries/artemis-jms-client-1.5.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/artemis-jms-client-1.5.0.md",
+      "bytes": 17093,
+      "source_sha256": "e25dec6fe13f9c3ee6951709caaf68cedee844e08eaef1c1af5ad5d37239ef16",
+      "destination_sha256": "49058787ed763cba4cd791db055c4124e60901d7a00380042dc339a4df7f17e4"
+    },
+    {
+      "source": "docs/sqx/Libraries/artemis-selector-1.5.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/artemis-selector-1.5.0.md",
+      "bytes": 11579,
+      "source_sha256": "f95da5a4fd7287a638d50910e5a1af58bd7d1076ef7b632634b30401e3b72885",
+      "destination_sha256": "25c2d36acbabaa3668cce4874714c90a6e1bdba366349971d4e57c0f5fecae2a"
+    },
+    {
+      "source": "docs/sqx/Libraries/caffeine-2.8.5.md",
+      "destination": "docs/dev/V1/sqx/Libraries/caffeine-2.8.5.md",
+      "bytes": 99933,
+      "source_sha256": "280994b5246ee5f46d558ef712470d29056202268db6707bd31f5817dfcbb3f2",
+      "destination_sha256": "a9225e54de3f8d97fd6bf552e3cdef5a2c3bbd01ea8b20132104bc21406e9ca4"
+    },
+    {
+      "source": "docs/sqx/Libraries/checker-qual-3.4.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/checker-qual-3.4.1.md",
+      "bytes": 49840,
+      "source_sha256": "6b73bdf375627d95a146045a95557eea3be0e5c5f931392e6d7060c0f5c2da63",
+      "destination_sha256": "c3b46d522b750ab15049eee5a15875fadad5a744c30c7ff69440ddf0ab05e411"
+    },
+    {
+      "source": "docs/sqx/Libraries/classmate-1.7.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/classmate-1.7.0.md",
+      "bytes": 8736,
+      "source_sha256": "5ccc2ad8527d4a17ba45a923cc778f17448d684438c710a470dd43dc5a34d7e6",
+      "destination_sha256": "407a89edef7150956a19c06202d3c5813fdd64d0d62ae21b0c8c5173d8d177fc"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-beanutils-1.9.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-beanutils-1.9.2.md",
+      "bytes": 23294,
+      "source_sha256": "48922d5b2f42ad470c3edc192550c99182e761cde15a967569e3d8ff4d592db8",
+      "destination_sha256": "725c5277a71c481a3c7cafcb6aaf08858cd4df9e3b93cbbce6521a0c237f5aeb"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-codec-1.17.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-codec-1.17.1.md",
+      "bytes": 18863,
+      "source_sha256": "39570d6e6608a42d70ba9354dd7ea0b5b820e928c4e3a54ff05e1c993c87d4fc",
+      "destination_sha256": "afa46b9d0387b9b73a68d23aa873437aefdac5dc802bbfcfdf9ac2908731e31e"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-collections-3.2.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-collections-3.2.1.md",
+      "bytes": 72432,
+      "source_sha256": "462593e3ba1c9a1f1c3c2efca4f98054dee43a882c8728e703f9751288704870",
+      "destination_sha256": "0b4dd533398fa0538f920203ee9ad836003a7fa3981a6e8631fa77c43f9e4876"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-compress-1.27.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-compress-1.27.1.md",
+      "bytes": 95065,
+      "source_sha256": "f82717fee04aca404b27a89c645dc264d90a7bf2c95ba73ded657c069b398cde",
+      "destination_sha256": "42fa47b050fb8a23a9f91191d336b869fb1f01d8e3108f70e9f01947f3c9bee3"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-email-1.4.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-email-1.4.md",
+      "bytes": 5465,
+      "source_sha256": "6db50466f1d987494baa8f0a9fedd136e7404f4592f6e8522fdffe3d30208132",
+      "destination_sha256": "aa699bfb232fe5a479d5273d1c5c371dac63edd8f0530eb161d6fa9fdd967088"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-exec-1.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-exec-1.3.md",
+      "bytes": 7793,
+      "source_sha256": "b0cbbbc39103b29aea3faf0aa0eb217c7c735a93bc2b98fe7146bafe4cf6e853",
+      "destination_sha256": "965276acdb527d04840ec88e4448ca9a6fb2cdabf35596bdf9ba050964211f02"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-imaging-1.0-alpha1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-imaging-1.0-alpha1.md",
+      "bytes": 69425,
+      "source_sha256": "b02667d144e32344d2fc88ab9a32e5d8d1aebae670b73710a13e15b1afe61105",
+      "destination_sha256": "b47ea20d1e6c5ee2e01bb6c8166ce79a8f0799d36af5b3ef1bf20bf79912c7d4"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-io-2.16.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-io-2.16.1.md",
+      "bytes": 52823,
+      "source_sha256": "6a54d4064526012de66265efef138176b2e50dc2b3a75f1d3b691f5d02c31fb1",
+      "destination_sha256": "0818b6e206916aec73a48f575efb9d6c8e46acf160021e0d78fdbc3e72811e03"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-lang3-3.16.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-lang3-3.16.0.md",
+      "bytes": 60734,
+      "source_sha256": "a114b91eecf32425b80239bb2bc26df48106c64bcd809d7895ba9f66c1524b26",
+      "destination_sha256": "f453a5601aed8ef330655f388f58f2c57f5544b1811cfb0750d2977f31699c6d"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-logging-1.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-logging-1.2.md",
+      "bytes": 6735,
+      "source_sha256": "2d043069ac41768527763c1b8b5db92eaf7659613eb4d9f9043e6de86db3bae6",
+      "destination_sha256": "0b3a282ae2b3eec7d08620284e22493e732bdc97f34d7c025ea372c42336cb9b"
+    },
+    {
+      "source": "docs/sqx/Libraries/commons-math3-3.6.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/commons-math3-3.6.1.md",
+      "bytes": 206863,
+      "source_sha256": "14256e83dbb4bdf220c7b2445d35fc1f393fe0de0f6ae9e7394a2ab1f926b0b2",
+      "destination_sha256": "468321a6fdafef2a6d1ca6c759f12bf88c0cdf61995a2a771dec12fd7922afc8"
+    },
+    {
+      "source": "docs/sqx/Libraries/error_prone_annotations-2.4.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/error_prone_annotations-2.4.0.md",
+      "bytes": 5837,
+      "source_sha256": "0ff1940236b2385ba6538c6f47a36fe9ef3d6b6821ac2d5a23d8e0f025b538b1",
+      "destination_sha256": "5a7b0bc08a26f1f8ea32faa7ce83f36d8455d75f297c23fffdbf342f0a99b0e6"
+    },
+    {
+      "source": "docs/sqx/Libraries/fastutil-8.3.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/fastutil-8.3.0.md",
+      "bytes": 1688810,
+      "source_sha256": "0855c676e8f4c3b615310f941858528b0b97d60620acd233263b33ac7756c05c",
+      "destination_sha256": "a2add0aa975aa0b139b23773495af786b662ba75ef82534a6ad4e1654f50f2ad"
+    },
+    {
+      "source": "docs/sqx/Libraries/filters-2.0.235.md",
+      "destination": "docs/dev/V1/sqx/Libraries/filters-2.0.235.md",
+      "bytes": 33691,
+      "source_sha256": "b4ec7d261ff08fadd58928551103402504e7177cf5736fd64ea8e0a6acc20458",
+      "destination_sha256": "b33ba81aec54b2f45a033d9899cd81029a8875cd3bc3a8c4de5ea87631371538"
+    },
+    {
+      "source": "docs/sqx/Libraries/freemarker-2.3.28.md",
+      "destination": "docs/dev/V1/sqx/Libraries/freemarker-2.3.28.md",
+      "bytes": 160745,
+      "source_sha256": "1a912e2d757cd766941a96cb6fdf01513020063f6cd0ce7f33b91ee0a9e63e61",
+      "destination_sha256": "c85b00b460b3902b9ca241d0b026f33cb6014b81616e016b291c1983bbc4a182"
+    },
+    {
+      "source": "docs/sqx/Libraries/fst-2.57.md",
+      "destination": "docs/dev/V1/sqx/Libraries/fst-2.57.md",
+      "bytes": 34089,
+      "source_sha256": "37e10e2cfde7d6624b3c469dbef2e458e967cae7ce0531ff3f5c0d498a149335",
+      "destination_sha256": "fd6dd4f81cc396e7e9bcac76452ba87f89712e758cde509f835c356aa4e42381"
+    },
+    {
+      "source": "docs/sqx/Libraries/geronimo-jms_2.0_spec-1.0-alpha-2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/geronimo-jms_2.0_spec-1.0-alpha-2.md",
+      "bytes": 12778,
+      "source_sha256": "72fab20297b512dff5e7262cafebcfe7ac4aeea7846794859e078311744be025",
+      "destination_sha256": "f36ac13b0a9cd447c693fca691efe8669230499ceda41add32d26bba1c844149"
+    },
+    {
+      "source": "docs/sqx/Libraries/geronimo-json_1.0_spec-1.0-alpha-1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/geronimo-json_1.0_spec-1.0-alpha-1.md",
+      "bytes": 6210,
+      "source_sha256": "9d2208b387bc6fae03a82165d727dca2eaf24449dd8e682ab30b9668cc17b718",
+      "destination_sha256": "6951a5455fd0f91146a99e71217ab5b19825ddfbfb1b00ff83c4bfdd4b75d5e1"
+    },
+    {
+      "source": "docs/sqx/Libraries/guava-26.0-jre.md",
+      "destination": "docs/dev/V1/sqx/Libraries/guava-26.0-jre.md",
+      "bytes": 286817,
+      "source_sha256": "c0b81cb678a157ef4806ff2a5fbe740d9b5eb2a5d8b18817b92d07e2a53c1a23",
+      "destination_sha256": "30796b69f4ef7ec230364366065fbe25a80fce2c7677db20e474ef783f36f8b3"
+    },
+    {
+      "source": "docs/sqx/Libraries/h2-1.3.149.md",
+      "destination": "docs/dev/V1/sqx/Libraries/h2-1.3.149.md",
+      "bytes": 64190,
+      "source_sha256": "d30fe8ebb652be62f3efb173e63692658fd4e6cf8f3eda3ebe94cae035b624e7",
+      "destination_sha256": "e28f5a5799c48ea888f47c9f2f1ca37bc5c657b15c4401db7452755ed86d0b3a"
+    },
+    {
+      "source": "docs/sqx/Libraries/httpasyncclient-4.1.4.md",
+      "destination": "docs/dev/V1/sqx/Libraries/httpasyncclient-4.1.4.md",
+      "bytes": 15830,
+      "source_sha256": "9208fe91f27bebb15417c30ed446b8bbee97af483581a27260f1e425b0186adc",
+      "destination_sha256": "6558c77cc4a304d9ac9fcc3456e576f88d88e261a951281c5d0483c78e77256a"
+    },
+    {
+      "source": "docs/sqx/Libraries/httpclient-4.5.13.md",
+      "destination": "docs/dev/V1/sqx/Libraries/httpclient-4.5.13.md",
+      "bytes": 70232,
+      "source_sha256": "05c6737b500e98a817711993cfb3d631867606c364891e76e232248fcd76c486",
+      "destination_sha256": "4fc68564c542ab4faf95a33a0c9984767c9dc024edf553734ec9d699e3424363"
+    },
+    {
+      "source": "docs/sqx/Libraries/httpclient-cache-4.5.13.md",
+      "destination": "docs/dev/V1/sqx/Libraries/httpclient-cache-4.5.13.md",
+      "bytes": 15321,
+      "source_sha256": "bc0e62cafcf281c4cca940292a51d03c97bb96f8e8d72b9348aa26a0cf3b5db7",
+      "destination_sha256": "d95a14487fcd77d2df3db459cd5f0913ca36a78316707a5c706e214c1f600d24"
+    },
+    {
+      "source": "docs/sqx/Libraries/httpcore-4.4.13.md",
+      "destination": "docs/dev/V1/sqx/Libraries/httpcore-4.4.13.md",
+      "bytes": 37185,
+      "source_sha256": "4b82ba30cb2d606a52b8af0ee6baa6458e6244165c8d237ebde6f088b73340f7",
+      "destination_sha256": "5e4e0f259f020d7dcaa3fdeb37a4edfc77cdd8775ec2fa8e891110a077da0e55"
+    },
+    {
+      "source": "docs/sqx/Libraries/httpcore-nio-4.4.13.md",
+      "destination": "docs/dev/V1/sqx/Libraries/httpcore-nio-4.4.13.md",
+      "bytes": 38861,
+      "source_sha256": "584cf8da8732614add1a9206be9152de1e9b2d3ce8648facbb79d7bbf0add532",
+      "destination_sha256": "4040dac792df2f76e81542563300950ae1310d52f1018cb421b617a16c3d755b"
+    },
+    {
+      "source": "docs/sqx/Libraries/image4j-0.7.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/image4j-0.7.2.md",
+      "bytes": 5634,
+      "source_sha256": "37593b30f46b0b890028a9c75131b65dcd2655eff95ce1c49f0026d1ad67d74f",
+      "destination_sha256": "f326dd9c6b1698b89658f764610b52fb1f7eaf8ad4d1b6523fb30bdd7cfd8fde"
+    },
+    {
+      "source": "docs/sqx/Libraries/itu-1.14.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/itu-1.14.0.md",
+      "bytes": 7004,
+      "source_sha256": "7df66548328512735be378ec541503ab6325f204412dec7f9406978b27a4a6e7",
+      "destination_sha256": "06bb2c0919512f317a02d7f2f51b2474c68f67c86886b7ad4d97faa9f6773808"
+    },
+    {
+      "source": "docs/sqx/Libraries/j2objc-annotations-1.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/j2objc-annotations-1.1.md",
+      "bytes": 4202,
+      "source_sha256": "c676486056886b59ab87b37d04e51c090ebae9da78d1c629b8b8a9eacd83d5ef",
+      "destination_sha256": "8633734d929990cec23972086de91cba3bb795c1b9e6bd5ee0f339897344e510"
+    },
+    {
+      "source": "docs/sqx/Libraries/jPowerShell-3.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jPowerShell-3.0.md",
+      "bytes": 3619,
+      "source_sha256": "938864feac2f780365172ea26e0618d2acb8ca3236d25a4c43fe6d44b03970a0",
+      "destination_sha256": "2025098c58a6d2274bcda0da5547379854abcf55e28e67285316753eca16b977"
+    },
+    {
+      "source": "docs/sqx/Libraries/jProcesses-1.6.5.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jProcesses-1.6.5.md",
+      "bytes": 4135,
+      "source_sha256": "d081898f50cca1c1e225992098767803173521c7a9571ff5e1cba5738d1e674a",
+      "destination_sha256": "842b5161357ef5f43e8c28d8fb105908441a9bde723f5a9714ebc99d78ab546c"
+    },
+    {
+      "source": "docs/sqx/Libraries/jackson-annotations-2.21.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jackson-annotations-2.21.md",
+      "bytes": 13568,
+      "source_sha256": "1007021d79722f9e6b4145f5e192985e3c334ead7febd595d61993ed2c87ccce",
+      "destination_sha256": "92aecc6236d9103b945d4e97a0cb5a9e209b1260a77989074023c284a8fae3bc"
+    },
+    {
+      "source": "docs/sqx/Libraries/jackson-core-2.21.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jackson-core-2.21.1.md",
+      "bytes": 36333,
+      "source_sha256": "7b49550b4063c3ca56e690779c1eef2e1f559433f02170c760c47f4439bd6430",
+      "destination_sha256": "cfcd30d9bced51374586448917a521e0cf99f9efaebc81f2f25cbfba5c54a4d7"
+    },
+    {
+      "source": "docs/sqx/Libraries/jackson-databind-2.21.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jackson-databind-2.21.1.md",
+      "bytes": 131444,
+      "source_sha256": "c7e786ed71d693ef6958f513a798ca02dc2a3fc022bd82f6d4548ed4d5ed878b",
+      "destination_sha256": "ac615399bdde83f462c40f63eb68795540f5cf2cb6cb748d7c5365b5fefad628"
+    },
+    {
+      "source": "docs/sqx/Libraries/jackson-dataformat-yaml-2.21.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jackson-dataformat-yaml-2.21.1.md",
+      "bytes": 6532,
+      "source_sha256": "ca232a2b2bb08c7ef6799fadd1f4ea2736711a78a95a8d9c35ec1e9bbb8100ef",
+      "destination_sha256": "54bc8cfccf0575ed65bf873f0e50336a9fdd58fd2ace0c19c81e1ca45add1fd5"
+    },
+    {
+      "source": "docs/sqx/Libraries/jackson-datatype-jsr310-2.21.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jackson-datatype-jsr310-2.21.1.md",
+      "bytes": 13403,
+      "source_sha256": "99a24d3f89fbb021d0d7b0f5a61e395115c6c64141b781fa9979b79b89d06065",
+      "destination_sha256": "d20da153c7eb281157bb066d4467e86473b11d562634b7171bb10f8795bb9fe5"
+    },
+    {
+      "source": "docs/sqx/Libraries/java-image-scaling-0.8.6.md",
+      "destination": "docs/dev/V1/sqx/Libraries/java-image-scaling-0.8.6.md",
+      "bytes": 7112,
+      "source_sha256": "000f8f26d39b0dfc1db3c4144c1f0b62fd27a933c51344ff15e5333d974235e3",
+      "destination_sha256": "00739c98f245cba5bf914c92015935ce23015866cead1ba4602a9a5ed29eeb90"
+    },
+    {
+      "source": "docs/sqx/Libraries/javassist-3.21.0-GA.md",
+      "destination": "docs/dev/V1/sqx/Libraries/javassist-3.21.0-GA.md",
+      "bytes": 55017,
+      "source_sha256": "ba82fd5e3f5267dde4b866d17dc736359001354cf360c5a0687c64bb12b58e17",
+      "destination_sha256": "9fbbfae83599e0ae34e52b402951107b4136687b461dc154c18bb05efdd0c987"
+    },
+    {
+      "source": "docs/sqx/Libraries/javax.mail-1.5.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/javax.mail-1.5.2.md",
+      "bytes": 43685,
+      "source_sha256": "9a5eadd62f68f52304ba36f41b75e0ac707f5638270bb206707713ea6c1b619d",
+      "destination_sha256": "873fba6906c7d998aae7640c9d4601010f19aeb728631207859303d2e031e128"
+    },
+    {
+      "source": "docs/sqx/Libraries/jboss-logging-3.3.0.Final.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jboss-logging-3.3.0.Final.md",
+      "bytes": 8801,
+      "source_sha256": "404e072fa95d48623658756c4ee54cf5f00fed4680091c3e046d560c7bd725ea",
+      "destination_sha256": "16510594a11ad92be09e29be58d797e3d8f240bced9ed17e5d2d4b6080d7540c"
+    },
+    {
+      "source": "docs/sqx/Libraries/jcommon-1.0.12.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jcommon-1.0.12.md",
+      "bytes": 29577,
+      "source_sha256": "0607f1aa1a1afb480bb85eb62d93e4a93bb2cb0325154a0d26fc5bc8c455e8df",
+      "destination_sha256": "776a45a9c4bf56efb89fe3832697c540098c80e90d04b35d025e018a5adfd5bd"
+    },
+    {
+      "source": "docs/sqx/Libraries/jdom-2.0.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jdom-2.0.0.md",
+      "bytes": 27225,
+      "source_sha256": "29e80986981c28d208227ded5c0bab8085724c3988a8768e559624a4cf2ef27e",
+      "destination_sha256": "69edb4c4286bf3a104985345bb21448e88dc30a219c5fd2246891f42ee42ede7"
+    },
+    {
+      "source": "docs/sqx/Libraries/jericho-html-3.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jericho-html-3.3.md",
+      "bytes": 24933,
+      "source_sha256": "de42267ceb289d33eb09da4f231d39213e6b0cf5913e9b78520d166c29e3ae61",
+      "destination_sha256": "b2a95db9fb12708c43022ac8e1a05c9cf8c9fa9cd02449aa8d3c0757778b2905"
+    },
+    {
+      "source": "docs/sqx/Libraries/jetty-all-uber.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jetty-all-uber.md",
+      "bytes": 250871,
+      "source_sha256": "db167a38fe6f3e42a4015ca29b74673dbb9a28fdbba59ef51b88656671891dd9",
+      "destination_sha256": "74bc7affa2aefa9584d42decf2808dd855bdb74e084fc573292d2aa5532f2dd7"
+    },
+    {
+      "source": "docs/sqx/Libraries/jfreechart-1.0.8a.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jfreechart-1.0.8a.md",
+      "bytes": 79353,
+      "source_sha256": "18197f95af0a177e81bfdee10652b2db2b27abe2ba01d2915e09c2881602f3ff",
+      "destination_sha256": "b35d35b867ca1368232ca77926deebcf188482029825988e80d519e3820f5337"
+    },
+    {
+      "source": "docs/sqx/Libraries/jfx_2.4.9_sq.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jfx_2.4.9_sq.md",
+      "bytes": 35182,
+      "source_sha256": "7a711889eb655f88ac2a4d157c79395af488909392a58137334e5dfbeaed513e",
+      "destination_sha256": "7166ff0232dad948badaabdcbdd12938aa44fa7f89dd8167aca9406de529a109"
+    },
+    {
+      "source": "docs/sqx/Libraries/jgroups-3.6.9.Final.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jgroups-3.6.9.Final.md",
+      "bytes": 143944,
+      "source_sha256": "7a2004b84c78984c0dfa39f7ea67abd244edf37dd4d349bce6b119cdc9f2528c",
+      "destination_sha256": "5a4d9ad48018086bcca2163278e7f97793bd53c0f855324acec9476217006471"
+    },
+    {
+      "source": "docs/sqx/Libraries/jline-3.25.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jline-3.25.1.md",
+      "bytes": 69254,
+      "source_sha256": "4cf1ae6bb54a3817b87271b0e6a503fceac5d157de7befcc6ed67b155b06a5b4",
+      "destination_sha256": "49d99fa3a40d42a1e628f93c2fb78f870885e50ffd291f9bea56a42acbe4573f"
+    },
+    {
+      "source": "docs/sqx/Libraries/jna-5.13.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jna-5.13.0.md",
+      "bytes": 18404,
+      "source_sha256": "fed99022d1bb6dffd2cd688310ffe322c36ca6b8c2f1949c4879d01694495c3c",
+      "destination_sha256": "e153eb0556de5846c0610e1cc5213cbbe37f2596459777f19c588deca541982d"
+    },
+    {
+      "source": "docs/sqx/Libraries/jna-platform-5.13.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jna-platform-5.13.0.md",
+      "bytes": 189635,
+      "source_sha256": "e793f9ae5ab627e4d4baee0a03cf0069e968f13cebd852e49cf51f88129fc2e2",
+      "destination_sha256": "2d989c86ed8e530e07c0264b4fb69a44db1942b63ac75ae4dd82e6ecc90eba5e"
+    },
+    {
+      "source": "docs/sqx/Libraries/joda-time-2.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/joda-time-2.3.md",
+      "bytes": 34328,
+      "source_sha256": "c0b63fe305b5ffd5587a680a5b65b9a68d5323df31fad8d7e88f363d304caf7f",
+      "destination_sha256": "72d0bc6e90b7b5d8c27d16c19fa5f562c318ad705ce1b6004cf5b27b6e634e4f"
+    },
+    {
+      "source": "docs/sqx/Libraries/johnzon-core-0.9.5.md",
+      "destination": "docs/dev/V1/sqx/Libraries/johnzon-core-0.9.5.md",
+      "bytes": 11386,
+      "source_sha256": "ddbc3f49a2cd38f56e17c2e306b64c3908c1ee9329110cafd3d73f9096602643",
+      "destination_sha256": "23cbea6ccbb87cce00aa02c855c22bae8f42675775ff3ec43846e40ba77c956a"
+    },
+    {
+      "source": "docs/sqx/Libraries/json-20150729.md",
+      "destination": "docs/dev/V1/sqx/Libraries/json-20150729.md",
+      "bytes": 4511,
+      "source_sha256": "58fe211f46ffaa69448b9f6837ff45b67ce1b18a47e53cb4e31544232d861e93",
+      "destination_sha256": "3f38708596c807ca0a8b9efdbafb5dbba1e3137f91ff9faead6ddc55c6633686"
+    },
+    {
+      "source": "docs/sqx/Libraries/json-schema-validator-2.0.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/json-schema-validator-2.0.0.md",
+      "bytes": 47539,
+      "source_sha256": "6c187da83e44902d530e09b2fda1d84b037b8e0e0ff1a8fc41ff4f68164f39ba",
+      "destination_sha256": "0accfb8b03389a9d051fd9db6e3907326940d364a55344fcdabfc49121d15b5c"
+    },
+    {
+      "source": "docs/sqx/Libraries/jsonschema-generator-4.38.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jsonschema-generator-4.38.0.md",
+      "bytes": 13856,
+      "source_sha256": "f471df3d24a9fb8ad1f05da2294eabe84e7856564dfd71403554eb3babbfd819",
+      "destination_sha256": "517f71a57843b01a183550ae0ea4790af28c14faaa739d6e403a5f552a676bb0"
+    },
+    {
+      "source": "docs/sqx/Libraries/jsonschema-module-jackson-4.38.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jsonschema-module-jackson-4.38.0.md",
+      "bytes": 4254,
+      "source_sha256": "41440be3dd55f38ee72db62f2b31ef7ea634715411fa072c47158727866af110",
+      "destination_sha256": "f0dadc82d102dbfd949ac8d54c9aeb35d8406c7549ab80092616b36b97a383f7"
+    },
+    {
+      "source": "docs/sqx/Libraries/jspecify-1.0.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jspecify-1.0.0.md",
+      "bytes": 2865,
+      "source_sha256": "acaef6be1f798ba1702486f95df96615e22f5e2c4f7c423f195c8f0acac136a0",
+      "destination_sha256": "6a895662ce46001e77f1ffac643edaa1a1ea7ef35faeab8270e1deb44c9ed2f2"
+    },
+    {
+      "source": "docs/sqx/Libraries/jspf.core.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jspf.core.md",
+      "bytes": 43387,
+      "source_sha256": "a5e7cc8e1b867c3b664bac50231c3aa47fff40336f6f30a2c1e5a136361cb80e",
+      "destination_sha256": "1b602ed0068151b5c5c3ded777f6f0b45e1a0677904262f408e4a12c2ae69c1d"
+    },
+    {
+      "source": "docs/sqx/Libraries/jspf.remote.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jspf.remote.md",
+      "bytes": 3123,
+      "source_sha256": "f725eefe5107264e79fbd522600aed81c246c238f7e835292896b5cc61b46083",
+      "destination_sha256": "9abac33ca080768626d4bf7306df93d4fbfdcca05a3b1a7f15ca833f345a86e3"
+    },
+    {
+      "source": "docs/sqx/Libraries/jsr305-3.0.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/jsr305-3.0.2.md",
+      "bytes": 7023,
+      "source_sha256": "4e4634082880556270558c2f2d6371f308b43d157a16eec1f3ffa050f26975bb",
+      "destination_sha256": "880be80f6169fc9ddb6e8427cc4458f524012acf6e6957531528d8d632dfc1d9"
+    },
+    {
+      "source": "docs/sqx/Libraries/kotlin-stdlib-2.2.21.md",
+      "destination": "docs/dev/V1/sqx/Libraries/kotlin-stdlib-2.2.21.md",
+      "bytes": 132376,
+      "source_sha256": "40923db0ae8afc29d6206affeb929ec422124e130a73628b720b7ee49dd88dd1",
+      "destination_sha256": "7885d0a85fb4d081407224d3498943e52feaaf73662e3f6921f0970cb0cf444a"
+    },
+    {
+      "source": "docs/sqx/Libraries/logback-classic-1.4.14.md",
+      "destination": "docs/dev/V1/sqx/Libraries/logback-classic-1.4.14.md",
+      "bytes": 29094,
+      "source_sha256": "d780c0b7af6f51a147f0594718f60f2a7239f56ef5e2e32b368d7ad30eeb410c",
+      "destination_sha256": "75d69a1f1099dc3cb6b1c9bc6a4277b08781a68b4601a637f68f53cf1b0805e0"
+    },
+    {
+      "source": "docs/sqx/Libraries/logback-core-1.4.14.md",
+      "destination": "docs/dev/V1/sqx/Libraries/logback-core-1.4.14.md",
+      "bytes": 67857,
+      "source_sha256": "cadfc85a40c093216e05525fd11e3f7c551b7a25fcbdecbd4f69f8ade05a9908",
+      "destination_sha256": "c3040e9fc255878f76dd838c3788d4c920f33b951bbf74f08c1124e1596ed863"
+    },
+    {
+      "source": "docs/sqx/Libraries/mcp-0.17.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/mcp-0.17.2.md",
+      "bytes": 1957,
+      "source_sha256": "1bc7776bc3051534aaab1eac6346b96850f322b76ba15d38ffac0fff6f73142f",
+      "destination_sha256": "a6c0ca3e1ef08b9b5819b9909f198881521cd794216e98fb1ee15be6c69da78f"
+    },
+    {
+      "source": "docs/sqx/Libraries/mcp-core-0.17.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/mcp-core-0.17.2.md",
+      "bytes": 48420,
+      "source_sha256": "7c8a335c18211e7930370c9a743283e90538ea455934fdb5ad97b03bdaab1577",
+      "destination_sha256": "bb0ba8b42b837d3315308ed7c5164d6f4193d5ed276132b9d67b8371ce0f058a"
+    },
+    {
+      "source": "docs/sqx/Libraries/mcp-core.md",
+      "destination": "docs/dev/V1/sqx/Libraries/mcp-core.md",
+      "bytes": 49939,
+      "source_sha256": "bb98335577847af00e981c7782e7e3c1b804c79773bc8086c21ef3a7aebcde98",
+      "destination_sha256": "e692947864b066a1023dc5c5f4657f02fe7d342bfc83a60372227812a3f81683"
+    },
+    {
+      "source": "docs/sqx/Libraries/mcp-json-0.17.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/mcp-json-0.17.2.md",
+      "bytes": 3502,
+      "source_sha256": "6cc573c36b29df8ae03f950e862539b3ea954f43fa692b71fbbe9e3307d068b5",
+      "destination_sha256": "cd5794691fce98f9ac3bfd9b667769bf2ed6e3e800ff74050e0579620fbf7a99"
+    },
+    {
+      "source": "docs/sqx/Libraries/mcp-json-jackson2-0.17.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/mcp-json-jackson2-0.17.2.md",
+      "bytes": 3268,
+      "source_sha256": "726514f430a41aea4bb4f9a037de435e5946fe480ff328db9eb80710facc8169",
+      "destination_sha256": "ba3ed78908c11104d52b1ba83c4b43168f4d56974ef07d3790811512a00d653c"
+    },
+    {
+      "source": "docs/sqx/Libraries/mcp-json-jackson2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/mcp-json-jackson2.md",
+      "bytes": 3255,
+      "source_sha256": "44b41f7469668b81522de124637285f875bc7a8054bbd4e866ee1b87289f0f51",
+      "destination_sha256": "ae1757aa991e10be5c0499401c29dec151b3ce9033280739d196264f3f440b58"
+    },
+    {
+      "source": "docs/sqx/Libraries/netty-all-4.1.5.Final.md",
+      "destination": "docs/dev/V1/sqx/Libraries/netty-all-4.1.5.Final.md",
+      "bytes": 338839,
+      "source_sha256": "d2a156f1110bcf2d8640bfe20270d816a7eead9ba9465a79fa7535133e0f2b11",
+      "destination_sha256": "bd3e8a2849ef74896d91a51fde86d34286e983f8667a99dc4209b955165f27c7"
+    },
+    {
+      "source": "docs/sqx/Libraries/objenesis-2.5.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/objenesis-2.5.1.md",
+      "bytes": 8996,
+      "source_sha256": "b806e824ab4d08db5644ddc19fb7b3555eb09cb6b396cb16dc586540fa493b9d",
+      "destination_sha256": "3ca3af73df2047bab58844635e55037c51b111a5584d23318aa70de3986b3d77"
+    },
+    {
+      "source": "docs/sqx/Libraries/okhttp-jvm-5.3.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/okhttp-jvm-5.3.2.md",
+      "bytes": 47789,
+      "source_sha256": "7a2bb47e56aa2303451dd6f712cf57ea70623c9596d20475f54866721b81c785",
+      "destination_sha256": "912426e4d402826e84aa79d2f1c40206373957b68539276fa843d3c023b1d8ce"
+    },
+    {
+      "source": "docs/sqx/Libraries/okio-jvm-3.16.4.md",
+      "destination": "docs/dev/V1/sqx/Libraries/okio-jvm-3.16.4.md",
+      "bytes": 16596,
+      "source_sha256": "02c8f457df232a199867d164057c43f6c62cc7efbc089de41e08165cfa1cb3df",
+      "destination_sha256": "9b6803b08071f5195d7c63353bf5767b761def4927f569fdb8c4e1e66e3d55da"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-api-1.61.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-api-1.61.0.md",
+      "bytes": 27577,
+      "source_sha256": "635b2b2ac077ed02f86dc5e9b55a46eebfeba8433b15384709e85899ab9ab4cb",
+      "destination_sha256": "8ceab7117880b437e92f6af36c11505384752b54f149c13bf60329da19d27f2d"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-api-incubator-1.61.0-alpha.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-api-incubator-1.61.0-alpha.md",
+      "bytes": 17268,
+      "source_sha256": "afc32581a7a8992cc4ee21c9d9eb9919a44982f1825664b2ebdaeedf63b3d0e9",
+      "destination_sha256": "70476e412bc133648b64f1fe513d92346d01a61c72a22ac9e26856387fc012b2"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-common-1.61.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-common-1.61.0.md",
+      "bytes": 2444,
+      "source_sha256": "113f36378d3b2ae21305be1f7c1b4d406ddbfff1e2ca61a70652cbf10a824142",
+      "destination_sha256": "ce2736714bd6582253f8d7c41fb5bc6899f2c35f9811dec08a9caf563a087d2e"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-context-1.61.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-context-1.61.0.md",
+      "bytes": 8986,
+      "source_sha256": "d80c92574f955fee88ed5228d81734ffd3b70965d06ca6c70db5b763c876bcba",
+      "destination_sha256": "da6adefbf736b480ed4c1ce12fc8fc67f8fe37e5bfb095908389df09301e16c7"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.md",
+      "bytes": 7560,
+      "source_sha256": "eca65d10d937059a55141c31054cbd5f7e29fcf4da29ce16f82daecf66fa2e95",
+      "destination_sha256": "339648916b5d19e816b3709883fc5fe45e373658e728c552c14cdb4f37cf86e2"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-instrumentation-api-2.27.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-api-2.27.0.md",
+      "bytes": 37229,
+      "source_sha256": "871b1bf43272ea07eeca55230edbde920e67dfbdb88d5a19c9bfa55c75451a6c",
+      "destination_sha256": "6b37aa2ffecdc52d1c4d6f9a4fb40c5b3be0eee3bb4bbc295bcd23365eda4eb8"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.md",
+      "bytes": 30983,
+      "source_sha256": "1a8402e82447210443ef664f9511ff410ba37f386de8e8c13a1ae34f4e814974",
+      "destination_sha256": "bc6705c70c34eada4cd7f932476ce2738616309b0b2d20d7c5ee1790338407c7"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-reactor-3.1-2.27.0-alpha.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-reactor-3.1-2.27.0-alpha.md",
+      "bytes": 4750,
+      "source_sha256": "6215249e361ebd81c5b980406fd633b3c21c43f4389c195dbb6774b399d0cdb0",
+      "destination_sha256": "9928c0355ede1bed4ce55ea4fb46e65f465e18bc444b9ddf85f77952a0090882"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-semconv-1.40.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-semconv-1.40.0.md",
+      "bytes": 6014,
+      "source_sha256": "9c4745c3313f7311521bcd541aef7ba6a42c85f17d8461aeae7aa119118cc3e2",
+      "destination_sha256": "e1d5061129f37bcf556b5516e415219ebddec7d10b686e81a7fb594eea77876d"
+    },
+    {
+      "source": "docs/sqx/Libraries/opentelemetry-semconv-incubating-1.40.0-alpha.md",
+      "destination": "docs/dev/V1/sqx/Libraries/opentelemetry-semconv-incubating-1.40.0-alpha.md",
+      "bytes": 43232,
+      "source_sha256": "e417c7b975bda14af4b7bbd02576d8496ad66de6c4c8eadd05579ab5d721c64b",
+      "destination_sha256": "a03c0d09a170092baa0b17f851eca3206417d3285bd9d34e9c60b577781ca49c"
+    },
+    {
+      "source": "docs/sqx/Libraries/oshi-core-5.8.5.md",
+      "destination": "docs/dev/V1/sqx/Libraries/oshi-core-5.8.5.md",
+      "bytes": 70194,
+      "source_sha256": "5c0352cbc33052d4b64ff9f82d32e154236235219fbf11a0b4e4e060012fb4a1",
+      "destination_sha256": "f59e66651aa55462c3c1ef3f838bcaf549119f1540308d748cb2d3d80f1b4be3"
+    },
+    {
+      "source": "docs/sqx/Libraries/pd4ml.md",
+      "destination": "docs/dev/V1/sqx/Libraries/pd4ml.md",
+      "bytes": 50513,
+      "source_sha256": "89fbdb7220f79e907084763b2f892dbdaa799b4145008b5abd2ed112c219de8d",
+      "destination_sha256": "2397fe522dbe106c091f1196e8a4693cd18c3345dfa0feaf43c485c750a43276"
+    },
+    {
+      "source": "docs/sqx/Libraries/pngj.md",
+      "destination": "docs/dev/V1/sqx/Libraries/pngj.md",
+      "bytes": 17309,
+      "source_sha256": "b2005de997967af24a96f9df4e03097f34bb23a56d12acb52f23fd8537157e72",
+      "destination_sha256": "26130ca8429d6542d297193df790dc1261aa007f92b27eef78a5182e90e9df6a"
+    },
+    {
+      "source": "docs/sqx/Libraries/poi-3.11.md",
+      "destination": "docs/dev/V1/sqx/Libraries/poi-3.11.md",
+      "bytes": 195200,
+      "source_sha256": "c355276b8a402243de1cfb3202194d916659658d1d1ce6eee4f63ccc751ce348",
+      "destination_sha256": "3b741ccf3d0c09c7975a82447839b48e2d1ccc6259e6c6baf3be47371a01fc58"
+    },
+    {
+      "source": "docs/sqx/Libraries/poi-ooxml-3.11.md",
+      "destination": "docs/dev/V1/sqx/Libraries/poi-ooxml-3.11.md",
+      "bytes": 83198,
+      "source_sha256": "93f073b2a5bcb7d59f28f5b38789c3cc9a4ba179a3afc00de2ada507126e6273",
+      "destination_sha256": "866667e291afe6c4b4b1e495cb7fe4cfc4f7da0b7e2222ccb239a3247bbb928c"
+    },
+    {
+      "source": "docs/sqx/Libraries/poi-ooxml-schemas-3.11.md",
+      "destination": "docs/dev/V1/sqx/Libraries/poi-ooxml-schemas-3.11.md",
+      "bytes": 396450,
+      "source_sha256": "b147ae3b9d256355771b5c09a011150d50970acdcfc8c5a2fd4e5285d201e718",
+      "destination_sha256": "43ab26e9d01010755f2c00119ef25c1cc9e6dd2e1c6c72e237cbc4a49c8e0842"
+    },
+    {
+      "source": "docs/sqx/Libraries/reactive-streams-1.0.4.md",
+      "destination": "docs/dev/V1/sqx/Libraries/reactive-streams-1.0.4.md",
+      "bytes": 4062,
+      "source_sha256": "6088cd38a752f8e63295133bf35f514f494967b3ec80cdcffa004db34f78e591",
+      "destination_sha256": "85f2d12da6f719de57c8182de38edae042bd412f825d9f924564fb98ca558296"
+    },
+    {
+      "source": "docs/sqx/Libraries/reactor-core-3.8.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/reactor-core-3.8.2.md",
+      "bytes": 138795,
+      "source_sha256": "92fd417ea9c2c2f533635e789c7c06593072e3048ec60ce8d789ed51387bbba6",
+      "destination_sha256": "c4180512b6ec005d21dd9b6006072e0b8b61f1ee79bb12317f5181830ffaed3e"
+    },
+    {
+      "source": "docs/sqx/Libraries/rsyntaxtextarea-2.6.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/rsyntaxtextarea-2.6.0.md",
+      "bytes": 53249,
+      "source_sha256": "8dbfd19af98eda51d976e1741f7bb4122583c08dd3823578e3f8f0b165b3b20c",
+      "destination_sha256": "c3733586b81e860326fd40f173db62fe2d037e258a77e7f72ee629d53d2a8cad"
+    },
+    {
+      "source": "docs/sqx/Libraries/slf4j-api-2.0.17.md",
+      "destination": "docs/dev/V1/sqx/Libraries/slf4j-api-2.0.17.md",
+      "bytes": 9586,
+      "source_sha256": "94614b766f725b96ea579dddef5e9401d422b8c9b39f4d5dc69b5cad597e5e1b",
+      "destination_sha256": "c7155e04d269cdfdff0c70d2c1754fd500ff516a606f871e6e627baccf7b9305"
+    },
+    {
+      "source": "docs/sqx/Libraries/snakeyaml-2.6.md",
+      "destination": "docs/dev/V1/sqx/Libraries/snakeyaml-2.6.md",
+      "bytes": 36649,
+      "source_sha256": "6a45ce3861f27660d125fb6fdc02438da02204c2d3951835709e753be8e1d9a5",
+      "destination_sha256": "ab102694071f2f79403acad7ec6f36820e7c4efb1f1996f9ce2e4af97601154b"
+    },
+    {
+      "source": "docs/sqx/Libraries/sqlite-jdbc-3.51.2.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/sqlite-jdbc-3.51.2.0.md",
+      "bytes": 19944,
+      "source_sha256": "82b82dcff24eb5f0c0da1774252b4b5d744a8e2678a06f94dc76b422d5227895",
+      "destination_sha256": "51baeb98175c7b023b5d25bb286a3c5b47688a38705a30d430d85b19c8dfffd3"
+    },
+    {
+      "source": "docs/sqx/Libraries/stax-api-1.0.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/stax-api-1.0.1.md",
+      "bytes": 7742,
+      "source_sha256": "eba46747eddc27565147aaf79e465aa20c21b638be68b34031f128ec73264ae6",
+      "destination_sha256": "2c375bc9a50bd7b96c41ea510d9798bf2e9ef0d18085edaaa7bfe16478a16a5c"
+    },
+    {
+      "source": "docs/sqx/Libraries/svg-salamander-1.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/svg-salamander-1.0.md",
+      "bytes": 27198,
+      "source_sha256": "6ce62e404adba648d58256447c233ad7c6aeb763a9cd962e7cd605c5c4e05739",
+      "destination_sha256": "70707e704942e1e826582c01830cc95854aea656edcd326a846147fec14534fb"
+    },
+    {
+      "source": "docs/sqx/Libraries/ta-lib-0.4.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/ta-lib-0.4.0.md",
+      "bytes": 7715,
+      "source_sha256": "a02f04951404c71264e7723be31d059091c888c20c777752570738db1d4583ac",
+      "destination_sha256": "c97e494f4008c71ff64f78e33809ebce9dfca50ebf5e9d5f33f32222af1c1ea5"
+    },
+    {
+      "source": "docs/sqx/Libraries/tree-sitter-0.24.4.md",
+      "destination": "docs/dev/V1/sqx/Libraries/tree-sitter-0.24.4.md",
+      "bytes": 6796,
+      "source_sha256": "e4ef1a1e7c37b81e44f67b6c8a73a6fbc8d085d2893b69ef62234ac78d9c5795",
+      "destination_sha256": "e5acee8876892fc446c1e5f38c7c8fe36c45a8b8ec40cfb67625e613478519e0"
+    },
+    {
+      "source": "docs/sqx/Libraries/tree-sitter-bash-0.23.3.md",
+      "destination": "docs/dev/V1/sqx/Libraries/tree-sitter-bash-0.23.3.md",
+      "bytes": 2260,
+      "source_sha256": "1199bc206b1466e2d49f19ab4a199af64952ec415639ae00618341e8556bd74f",
+      "destination_sha256": "cefdbb81542a278a9047822c86783d0af25a0bc3e98627fe7b6200558ee0deec"
+    },
+    {
+      "source": "docs/sqx/Libraries/uncommons-maths-1.2.2a.md",
+      "destination": "docs/dev/V1/sqx/Libraries/uncommons-maths-1.2.2a.md",
+      "bytes": 8482,
+      "source_sha256": "f46e84c1e7b096a267b14f3226abea1652260da9783e50da407135432534ec0f",
+      "destination_sha256": "4c17ab727b6231334c65382b5b39ccfddb33f56c30b1865e8718c6e9cd4af106"
+    },
+    {
+      "source": "docs/sqx/Libraries/watchmaker-framework-0.7.1.md",
+      "destination": "docs/dev/V1/sqx/Libraries/watchmaker-framework-0.7.1.md",
+      "bytes": 14036,
+      "source_sha256": "2b9046c826a5d91552568e7821ad295b8b410173dd236b29dd5b22dd0aaf5ed3",
+      "destination_sha256": "427273d4796093fc05e398999c09d0217417fac67092f54bd3eaacd8fde30876"
+    },
+    {
+      "source": "docs/sqx/Libraries/weblaf-core-1.2.9.md",
+      "destination": "docs/dev/V1/sqx/Libraries/weblaf-core-1.2.9.md",
+      "bytes": 48163,
+      "source_sha256": "ebd6992e7809e61f0b03c028519b57def795771f7da7555eff3bfe346724ed36",
+      "destination_sha256": "bab5a79f87e63f532d3dfb1a10e55f517a2fd31f9d4d2a552b30f3aec8ac4d69"
+    },
+    {
+      "source": "docs/sqx/Libraries/weblaf-ui-1.2.9.md",
+      "destination": "docs/dev/V1/sqx/Libraries/weblaf-ui-1.2.9.md",
+      "bytes": 343213,
+      "source_sha256": "25c19a2a51e0cd190855eb81de3d25e979790918085662f32ce367082fd0dce6",
+      "destination_sha256": "95f1daa7d64b8cbea0cfaeae4c997639091e37d3d97a609c77aaba8a0b1c28a4"
+    },
+    {
+      "source": "docs/sqx/Libraries/xmlbeans-2.6.0.md",
+      "destination": "docs/dev/V1/sqx/Libraries/xmlbeans-2.6.0.md",
+      "bytes": 231937,
+      "source_sha256": "8a7a8642508eb105f0f9c090059762f27de114739a35cdadba0cd593f97b0109",
+      "destination_sha256": "fcee16e32a9152aa3ca128a3fa066c3285651099733cbae0c5dfe6a5e7f04777"
+    },
+    {
+      "source": "docs/sqx/Libraries/xstream-1.4.9.md",
+      "destination": "docs/dev/V1/sqx/Libraries/xstream-1.4.9.md",
+      "bytes": 71017,
+      "source_sha256": "6e6b011b18f81c7b30347abe945bca9dc0e4dbea5fba96945ca3dc99b0054751",
+      "destination_sha256": "64895c13a1dfef2758e812e7032390ef1432c250249ceb6196c30df41189692c"
+    },
+    {
+      "source": "docs/sqx/Libraries/xz-1.9.md",
+      "destination": "docs/dev/V1/sqx/Libraries/xz-1.9.md",
+      "bytes": 17813,
+      "source_sha256": "1a9e8c549d2a1f1bfd2a7d0561b094cd4d58afc52d7e54a10a2c5e09c53eee9e",
+      "destination_sha256": "2bfdd3ea441abf64a70d20ba7cd343e77bdeb5774329942898cc58cc9059799d"
+    },
+    {
+      "source": "docs/sqx/Libraries/zip4j-1.3.2.md",
+      "destination": "docs/dev/V1/sqx/Libraries/zip4j-1.3.2.md",
+      "bytes": 10424,
+      "source_sha256": "0c967891b5b4f558206a48cb7b061e46e874f380ff65f04c04b7c256898b677e",
+      "destination_sha256": "6240e6759c796c92eeb42d76da53f7c48df7e36bbe9d1343b9879969b58a8a29"
+    },
+    {
+      "source": "docs/sqx/NeuralNetworkTrainer/AppNeuralNetwork.md",
+      "destination": "docs/dev/V1/sqx/NeuralNetworkTrainer/AppNeuralNetwork.md",
+      "bytes": 2317,
+      "source_sha256": "9a1a4ab265e6ce5cf0e6462605c1805867d24a47a3d1d180dbc71d2b0059bcdb",
+      "destination_sha256": "99421826483f4e82dbfdd5693985401b40818982cc31e01867e0bb2f5675bf6c"
+    },
+    {
+      "source": "docs/sqx/NeuralNetworkTrainer/README.md",
+      "destination": "docs/dev/V1/sqx/NeuralNetworkTrainer/README.md",
+      "bytes": 366,
+      "source_sha256": "4d05a13efee63a04db857e703bc17082ca995bc002174c3567a0da1304b70926",
+      "destination_sha256": "4d05a13efee63a04db857e703bc17082ca995bc002174c3567a0da1304b70926"
+    },
+    {
+      "source": "docs/sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md",
+      "destination": "docs/dev/V1/sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md",
+      "bytes": 2364,
+      "source_sha256": "6bf3485139a56a17acecc6397e8d3969d781f7afee98360c7088182b7b2963f1",
+      "destination_sha256": "650d3480b4ffbd1c55d91579455d9983e153d84ca2b456b648f49b41acac03df"
+    },
+    {
+      "source": "docs/sqx/Optimizer/AppOptimizer.md",
+      "destination": "docs/dev/V1/sqx/Optimizer/AppOptimizer.md",
+      "bytes": 2291,
+      "source_sha256": "8e660682d79867478037437b1a31e65d77d70dd40930cc4b07eeed3c7d22c1b5",
+      "destination_sha256": "61f43c8bf259f9a49090f4ac82d1f88fe013bdb20e25a48373585d805ed94931"
+    },
+    {
+      "source": "docs/sqx/Optimizer/README.md",
+      "destination": "docs/dev/V1/sqx/Optimizer/README.md",
+      "bytes": 311,
+      "source_sha256": "12a277f7e9cbfff9b148697edae2e36f683d73beeeafb337409815964303c991",
+      "destination_sha256": "12a277f7e9cbfff9b148697edae2e36f683d73beeeafb337409815964303c991"
+    },
+    {
+      "source": "docs/sqx/Optimizer/TaskOptimize.md",
+      "destination": "docs/dev/V1/sqx/Optimizer/TaskOptimize.md",
+      "bytes": 3744,
+      "source_sha256": "f4321a15643fc0d13532b5962dea6a5852996d569f372850bbf73423de1d61fb",
+      "destination_sha256": "ab5a8090f8a01da6d5740bd0c54fe45f52a4d30ef2ea7d400093995b36ee3cbc"
+    },
+    {
+      "source": "docs/sqx/Plugins/AppMarketplace.md",
+      "destination": "docs/dev/V1/sqx/Plugins/AppMarketplace.md",
+      "bytes": 3685,
+      "source_sha256": "99d4e9da9557ed2934bc23f64fbf8c88d94934603afde330963959ae11b39dcd",
+      "destination_sha256": "8a78c06e7e9a4cad69ad25d605c0f9a0c49e2b935f367ebabc6a1509eaa9c76e"
+    },
+    {
+      "source": "docs/sqx/Plugins/README.md",
+      "destination": "docs/dev/V1/sqx/Plugins/README.md",
+      "bytes": 402,
+      "source_sha256": "48412b4440e690e9ef9d63513aab2aa34e43c72dfac6ce43ddd80e5f8537bdb3",
+      "destination_sha256": "48412b4440e690e9ef9d63513aab2aa34e43c72dfac6ce43ddd80e5f8537bdb3"
+    },
+    {
+      "source": "docs/sqx/Plugins/ServletAlgoCloud.md",
+      "destination": "docs/dev/V1/sqx/Plugins/ServletAlgoCloud.md",
+      "bytes": 2609,
+      "source_sha256": "ba1be8a1d2c7b53abf20bda5edf68733c9987d77e265452c133fdb7a51848de8",
+      "destination_sha256": "5c8c1358154df5f9b84d9bce1bfa9804c9de4c76de189053acefed2074d62412"
+    },
+    {
+      "source": "docs/sqx/Plugins/ServletSQAI.md",
+      "destination": "docs/dev/V1/sqx/Plugins/ServletSQAI.md",
+      "bytes": 2495,
+      "source_sha256": "7a1318653d3f18464f85311e0147a8faed816b4e7f855ae2c324419f56acd899",
+      "destination_sha256": "09130a4d52a8b77b3a43c8498ae155f09cc7f178160dcc4637a7d947bef917b2"
+    },
+    {
+      "source": "docs/sqx/PortfolioComposer/AppPortfolioComposer.md",
+      "destination": "docs/dev/V1/sqx/PortfolioComposer/AppPortfolioComposer.md",
+      "bytes": 2348,
+      "source_sha256": "90dcf1a089f806dfe7d74e38eda9c9f453adb980e7907ba6021e2a54847b3d4f",
+      "destination_sha256": "755c5b689b36a785fc6aced69652f0d04c00338ae87ba1c2633abb4a233bbdcd"
+    },
+    {
+      "source": "docs/sqx/PortfolioComposer/PortfolioComposer.md",
+      "destination": "docs/dev/V1/sqx/PortfolioComposer/PortfolioComposer.md",
+      "bytes": 5208,
+      "source_sha256": "368bb88f842e1d2a6cafeabbab644bd5b7892aa5df1c06dd377173a1f0c702bb",
+      "destination_sha256": "75ce8118c70b88ded4c4e96b7f2d650fc333ddb5888edc88f879d7515456be48"
+    },
+    {
+      "source": "docs/sqx/PortfolioComposer/README.md",
+      "destination": "docs/dev/V1/sqx/PortfolioComposer/README.md",
+      "bytes": 623,
+      "source_sha256": "300a3344e2976fc4d41876801094a654d8d950bcd462318dd23472a82a96406e",
+      "destination_sha256": "300a3344e2976fc4d41876801094a654d8d950bcd462318dd23472a82a96406e"
+    },
+    {
+      "source": "docs/sqx/PortfolioComposer/ResultsPortfolioComposerChart.md",
+      "destination": "docs/dev/V1/sqx/PortfolioComposer/ResultsPortfolioComposerChart.md",
+      "bytes": 2685,
+      "source_sha256": "a093ee27acb3bdf608a2f8f702626afecd1d52d048c4ed1b8f87e76c07a8839c",
+      "destination_sha256": "f1b5ddbe7a0d2f7525f0f9845dd57cf27ee8210f93b1597ef2273fffea7c0c16"
+    },
+    {
+      "source": "docs/sqx/PortfolioComposer/ResultsPortfolioComposerLog.md",
+      "destination": "docs/dev/V1/sqx/PortfolioComposer/ResultsPortfolioComposerLog.md",
+      "bytes": 2665,
+      "source_sha256": "4b94f469cdded809cc55797cd314d4cd17bbed40c16bead21d90358ac9bc8340",
+      "destination_sha256": "6f3a6888291efd484b9146def86f081787302ecff7666fe25a4e12cbff036013"
+    },
+    {
+      "source": "docs/sqx/PortfolioMaster/AppPortfolioMaster.md",
+      "destination": "docs/dev/V1/sqx/PortfolioMaster/AppPortfolioMaster.md",
+      "bytes": 2334,
+      "source_sha256": "f9aa58fb5e299ce10f46a72705d19a5575ab6f7f79b9b7309b6515628d66d379",
+      "destination_sha256": "3b34d763976917f0f14e66c6bb28f93ddacd294cce07402731451479cfbfa840"
+    },
+    {
+      "source": "docs/sqx/PortfolioMaster/README.md",
+      "destination": "docs/dev/V1/sqx/PortfolioMaster/README.md",
+      "bytes": 536,
+      "source_sha256": "38052d40063010c27c1eccba33b80341d3e85461e548dd01f235393b7d50f5c3",
+      "destination_sha256": "38052d40063010c27c1eccba33b80341d3e85461e548dd01f235393b7d50f5c3"
+    },
+    {
+      "source": "docs/sqx/PortfolioMaster/SettingsAutomaticPortfolioBuilder.md",
+      "destination": "docs/dev/V1/sqx/PortfolioMaster/SettingsAutomaticPortfolioBuilder.md",
+      "bytes": 2796,
+      "source_sha256": "6b136680762b3f1d1c2a4472e2e6856f0deae726b9375c09b90e51168f481a69",
+      "destination_sha256": "778f22671ac1dfc53264a04017dbc438b108c9a3c26c4ce0a86f448f96393188"
+    },
+    {
+      "source": "docs/sqx/PortfolioMaster/TaskAutomaticPortfolioBuilder.md",
+      "destination": "docs/dev/V1/sqx/PortfolioMaster/TaskAutomaticPortfolioBuilder.md",
+      "bytes": 7840,
+      "source_sha256": "8ffa95f23587cf6bdbb0234a002ca0f9dfbfae3dbb7947b701d50e7211fed739",
+      "destination_sha256": "9834f35e294b3a508879c16cba2f71f0d0737ea270b948d21330ffac183292af"
+    },
+    {
+      "source": "docs/sqx/ProductShells/AppStrategyQuant.md",
+      "destination": "docs/dev/V1/sqx/ProductShells/AppStrategyQuant.md",
+      "bytes": 2318,
+      "source_sha256": "9a8c2de78eed839eee6efd97017ad5804575d01b83a8633c628db1d6d73cdf04",
+      "destination_sha256": "6903f986ff0e38b9d8aebcb23c7a14f3c8dde2d555020769b570da5b5f9ab71b"
+    },
+    {
+      "source": "docs/sqx/ProductShells/README.md",
+      "destination": "docs/dev/V1/sqx/ProductShells/README.md",
+      "bytes": 243,
+      "source_sha256": "10b90b94445bfb2853e34af95da0095a450b779d7b82ca3886e334fed9818ba4",
+      "destination_sha256": "10b90b94445bfb2853e34af95da0095a450b779d7b82ca3886e334fed9818ba4"
+    },
+    {
+      "source": "docs/sqx/README.md",
+      "destination": "docs/dev/V1/sqx/README.md",
+      "bytes": 2121,
+      "source_sha256": "b60f9e4258e464b62f24c09b1532048df9142579eb055d08bec35dc323a84c6c",
+      "destination_sha256": "22199e4c88191519edda5f3f8d9295800ecc6d82e65dffa63af21fc641e2268b"
+    },
+    {
+      "source": "docs/sqx/Results/AppResults.md",
+      "destination": "docs/dev/V1/sqx/Results/AppResults.md",
+      "bytes": 2275,
+      "source_sha256": "1d3aafb92d90899768995ea55d2a9eab6f3aa14f7c73663c32e1cd74a5e620e2",
+      "destination_sha256": "8727cc347034d821f4c1367263afe448b9942381f6ef9f1392a6a0a4d75c9895"
+    },
+    {
+      "source": "docs/sqx/Results/DashboardResults.md",
+      "destination": "docs/dev/V1/sqx/Results/DashboardResults.md",
+      "bytes": 2572,
+      "source_sha256": "e82470de8a2daf152f7587555865c586ab92e8fe900b3de2bc43dc3aa8d18fc8",
+      "destination_sha256": "fe0e965b697afb026072c3f9ceeb1c9189fd39537cad30ba846b824796f4bd60"
+    },
+    {
+      "source": "docs/sqx/Results/DatabankFilterByCorrelation.md",
+      "destination": "docs/dev/V1/sqx/Results/DatabankFilterByCorrelation.md",
+      "bytes": 2684,
+      "source_sha256": "6608de50e761e059075178c9f10b4c7fbe8dc79cc74fc4a30e096162e6840820",
+      "destination_sha256": "615753ff09751b05d786760e7238ef2dc179d0eede3a2ce26d72688f51028715"
+    },
+    {
+      "source": "docs/sqx/Results/DatabankRename.md",
+      "destination": "docs/dev/V1/sqx/Results/DatabankRename.md",
+      "bytes": 2593,
+      "source_sha256": "c029af538c1768b804604f322742b289ff14b7bb6c62f73e831c13c13454283d",
+      "destination_sha256": "0ea30387b89a8c208d970c882f5012f3219eb1f4a88f7581d70d4d2ce3eda010"
+    },
+    {
+      "source": "docs/sqx/Results/EquityChartBenchmark.md",
+      "destination": "docs/dev/V1/sqx/Results/EquityChartBenchmark.md",
+      "bytes": 2647,
+      "source_sha256": "0e30e477e3f02692556e4f13abfbad8b9ea22d3249674a15011ba6c2e8b23a82",
+      "destination_sha256": "3763dfc1dfa22db576a938f0b25abf6a9f6fb6c124376475e5c837990facd87c"
+    },
+    {
+      "source": "docs/sqx/Results/EquityChartDailyChart.md",
+      "destination": "docs/dev/V1/sqx/Results/EquityChartDailyChart.md",
+      "bytes": 2326,
+      "source_sha256": "ba47c3af8ce48b69537452c1dc8cb558904cb02840c771be50c4648334b86fac",
+      "destination_sha256": "adf81cc7eb151913740a00527997f503b8f7cbd1545c4fec4fe71e8b0c593485"
+    },
+    {
+      "source": "docs/sqx/Results/EquityChartDrawdown.md",
+      "destination": "docs/dev/V1/sqx/Results/EquityChartDrawdown.md",
+      "bytes": 2333,
+      "source_sha256": "2c557d7b1859ce3d1eafd868a7649369908d00bb6118e0f8fd7c0b20ce51b3c3",
+      "destination_sha256": "407e888959bb0b767283f0aacc6ab889e6c54d70c7c22c146a6f93fa0dec6c9f"
+    },
+    {
+      "source": "docs/sqx/Results/EquityChartVolatility.md",
+      "destination": "docs/dev/V1/sqx/Results/EquityChartVolatility.md",
+      "bytes": 2325,
+      "source_sha256": "4a0b06216c740098cb8dd62d3e14e6d6e925fc1113ab593f25e20c6148fa6214",
+      "destination_sha256": "0d588aa76cbddec59f0cd69e9c2e8f574b6a638d87883aff1801e99f9fefb335"
+    },
+    {
+      "source": "docs/sqx/Results/EquityChartVolume.md",
+      "destination": "docs/dev/V1/sqx/Results/EquityChartVolume.md",
+      "bytes": 2320,
+      "source_sha256": "caa163506f46315dc8a097a2b63f890630b431907eb4cf610c94ca842d895236",
+      "destination_sha256": "fa28a077a1ff6fe3ab634d067536fbc0edfd476a40a128b0427b221def6d0b31"
+    },
+    {
+      "source": "docs/sqx/Results/README.md",
+      "destination": "docs/dev/V1/sqx/Results/README.md",
+      "bytes": 3239,
+      "source_sha256": "be95f5f681d8d3999cc7b8f2cb6407bda3a6d53938702beaf8051f6d958dedfe",
+      "destination_sha256": "be95f5f681d8d3999cc7b8f2cb6407bda3a6d53938702beaf8051f6d958dedfe"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsChart.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsChart.md",
+      "bytes": 2525,
+      "source_sha256": "a208c3b0e7d1edb3ba1f040b25a6c283127ea687dcd5015a07908cbbf3988f09",
+      "destination_sha256": "01c653d69d0b9769941dec244d362227736a439403d64249cccad2559b64a220"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsDatabankActions.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsDatabankActions.md",
+      "bytes": 2818,
+      "source_sha256": "176ebde935fffddbd9738b0d2eb95ab1699f8dd5b4b3ad1e4bc484ee2abc6d53",
+      "destination_sha256": "f1e7edb152268bfc1c94a5e7a4b51eb2af412d166632f1c24a15ba353d46ac18"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsDatabankViews.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsDatabankViews.md",
+      "bytes": 2586,
+      "source_sha256": "284f25ce20ebb9f5a483b28933398e1d60067ba7107a20cc014abe5bcdd7ee16",
+      "destination_sha256": "b528087a49016e78bebddb50b18e5431820370e9757a60de17b2e643935d55b8"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsEquityChart.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsEquityChart.md",
+      "bytes": 2614,
+      "source_sha256": "6819b387cb4eed9451ed34736f3d4e83769136e915970f46e8aa01f0b197e293",
+      "destination_sha256": "bb071f88b1e55a791bc3c51482f1a82198e1af43aa5075db5555dfb4c48abd0d"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsExplore.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsExplore.md",
+      "bytes": 2696,
+      "source_sha256": "59d5d4b49b533e2501220bde431de9dbbdd605ce4088330e92a4b76b9be1935c",
+      "destination_sha256": "7e2968817453485af5bbf170978716f6781bdaee540fca377e1ffc935ec41a38"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsOptimizationProfile.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsOptimizationProfile.md",
+      "bytes": 4771,
+      "source_sha256": "5a9ad3c149ca58b4dbd52bf207b7972943f430f9eb4726fae591cf7f56adafde",
+      "destination_sha256": "648567e0a4ee4be66a7f5947d011da7e9127ce746a36b04cd0187c5d97afc974"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsOverview.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsOverview.md",
+      "bytes": 2555,
+      "source_sha256": "0aa2ea2e27767319ff7077f88709e66032ab54b0d462855e4f3d322c78366996",
+      "destination_sha256": "b9c5ed7e93d289ad70845246894f8ba12fc54c0d3ae05609aef7e5a135c6e5d7"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsPlugins.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsPlugins.md",
+      "bytes": 2574,
+      "source_sha256": "9fe7be98d0148ae0cdb289fd525cceeed01e154810d6667ec1c72454d23dd1cd",
+      "destination_sha256": "b12d2776b5883cc064c27e0f1811da7246482137fdf65f9ea1d2d78cf9dae78d"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsPortfolioCorrelation.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsPortfolioCorrelation.md",
+      "bytes": 5309,
+      "source_sha256": "078f0cab05f68b3604d8481780ca4ceaadbe6211710828506d3ca780f8df1ba5",
+      "destination_sha256": "1ed23cc5cd420f4a21b9f7938ee00fceda64062aec9a338c4f4ba5049ff1dc34"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsProfileChart.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsProfileChart.md",
+      "bytes": 2584,
+      "source_sha256": "8b20c8e0a482e72d871937159f0eaddc6e12a076f9d4d8ffe5077181403d79a8",
+      "destination_sha256": "81296edf8e4d4f0aafc02a3552a339577067773d7a338da480adcb3d60a77690"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsRobustnessTests.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsRobustnessTests.md",
+      "bytes": 3578,
+      "source_sha256": "177bb88502c660aa7679f8b7b8041ae27d11118e9bb6ee46adf0ce42bd106de1",
+      "destination_sha256": "79e32906fa426c3636d9e2607e202308bd628b47f3f5d81c0f0a325756e7fd2f"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsSPOverview.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsSPOverview.md",
+      "bytes": 3094,
+      "source_sha256": "76f59dcb327961bcc139f05ae542a1db70fc556ceff1e5691e85006264ac8c2a",
+      "destination_sha256": "f21a10912e98d001ca916556807331974f5aa4bf2429c5620def7333587e8f77"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsSequentialOptimization.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsSequentialOptimization.md",
+      "bytes": 2684,
+      "source_sha256": "ebe44d6034ce9dafcd1ede5f30bf9799c2becaf65ed7ba66363dd8f9870bf06f",
+      "destination_sha256": "eb2bd15ef586c2d578539f0410bc4360fd1ca2f7e06217d74b8ae20242ba4f02"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsSourceCode.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsSourceCode.md",
+      "bytes": 2606,
+      "source_sha256": "71e1b3afda412dde34f04585ad4835831a1a4943a0ee32b55e87b952a8e53443",
+      "destination_sha256": "6b9f68c0ba9eb186cfa9043efd4230e0d1ae2c2e542ec8b18fac2fa5ed805c1e"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsStockpicker.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsStockpicker.md",
+      "bytes": 2571,
+      "source_sha256": "f27eef09f8e7b0dd54abfb065691c21502e0b2c9c7d811d96531a0634c02be1b",
+      "destination_sha256": "b06cbbade0a83ecb1799ac441aad35b5b3db23435c78ad31f0b869fbbd0b483b"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsStrategyConfig.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsStrategyConfig.md",
+      "bytes": 2602,
+      "source_sha256": "3f1c77eefb4e685834f0a98b9f97d2ccebd92dac9ec3616cc743c48d764c4895",
+      "destination_sha256": "1ac6d6b557244d7d146422fee53bb1d28862b54dd45a6c4e6321251fcbd0326d"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsSysParamPermutation.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsSysParamPermutation.md",
+      "bytes": 2655,
+      "source_sha256": "e42dc4257b87d46d416c613a235827955b645da24bcfedcc1258d0eefc39208e",
+      "destination_sha256": "e864bf6ddb690237f0061c8ab2f4841b513a6fe4ff7fb22f38830e2611b56380"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsTradeAnalysis.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsTradeAnalysis.md",
+      "bytes": 2833,
+      "source_sha256": "a7735a1ff84dee4585eb700b2c47b428de7e4158463f975db401e8687a250aa6",
+      "destination_sha256": "2916d0c8ff7eba07635ad48f032ea01b03b05e4d294cc1f2838d33ccd197cc4c"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsTradeList.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsTradeList.md",
+      "bytes": 2568,
+      "source_sha256": "19f252040b44f4a31c3229542ef5d54b4434672664a3044231484a0c01ebe79c",
+      "destination_sha256": "e06ef69af354878e2bb910c856cf17d1a6c853ca7a602e393a784b4d9944ad8e"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsTradelistViews.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsTradelistViews.md",
+      "bytes": 2596,
+      "source_sha256": "1bc2b093765bfcf5a9ccb97ede356f22822174271744efe7df302bef99de3a08",
+      "destination_sha256": "847a0569af6b0254419d663b9d171c6014afa7528a206a8cbb0029d25ad0c4e3"
+    },
+    {
+      "source": "docs/sqx/Results/ResultsWalkForward.md",
+      "destination": "docs/dev/V1/sqx/Results/ResultsWalkForward.md",
+      "bytes": 3142,
+      "source_sha256": "0b5fad1669a9617c30d017db6bacdec69b1169954b7d27f8faf07197982f8bec",
+      "destination_sha256": "10a8fb59778abb4638c41fa5490f40f8fb16ee5851d8015610bc0b6c30942e5b"
+    },
+    {
+      "source": "docs/sqx/Retester/AppRetester.md",
+      "destination": "docs/dev/V1/sqx/Retester/AppRetester.md",
+      "bytes": 2285,
+      "source_sha256": "27a3cfb09870daaf9768c03cb5f819cf186549cde72f8d47c4c46844e81de717",
+      "destination_sha256": "25551b2e028f8150bf199bc4c1b7065919cc4a96ad142f4dbcb11e16b3d282d1"
+    },
+    {
+      "source": "docs/sqx/Retester/README.md",
+      "destination": "docs/dev/V1/sqx/Retester/README.md",
+      "bytes": 407,
+      "source_sha256": "6ab71949751365abaeba57e1406af430877007d3ddb1551376d17a497c05235b",
+      "destination_sha256": "6ab71949751365abaeba57e1406af430877007d3ddb1551376d17a497c05235b"
+    },
+    {
+      "source": "docs/sqx/Retester/TaskAutomaticRetest.md",
+      "destination": "docs/dev/V1/sqx/Retester/TaskAutomaticRetest.md",
+      "bytes": 3378,
+      "source_sha256": "2ab9ab704933ce094bb3488b3c01b4651ce841444b09170a363e48bf43d3355a",
+      "destination_sha256": "281a61c96664c84d3765e892d1c5111df6f8e2a2f4bb31e28061cc8d3f8eb35d"
+    },
+    {
+      "source": "docs/sqx/Retester/TaskRetest.md",
+      "destination": "docs/dev/V1/sqx/Retester/TaskRetest.md",
+      "bytes": 2880,
+      "source_sha256": "e8ec568205d55526ea82b8d6c4f1781a6761e3c14738c039285c7063fe14b008",
+      "destination_sha256": "1334dcc7e903947395e136f944de54cb7db3670e72e2a0a0e43e747db4e65e89"
+    },
+    {
+      "source": "docs/sqx/Runtime/README.md",
+      "destination": "docs/dev/V1/sqx/Runtime/README.md",
+      "bytes": 203,
+      "source_sha256": "839edc361c46ac88d0cca7ffed2772f02c60bbcaa3119794216f0892acf9ad85",
+      "destination_sha256": "839edc361c46ac88d0cca7ffed2772f02c60bbcaa3119794216f0892acf9ad85"
+    },
+    {
+      "source": "docs/sqx/Runtime/jrt-fs.md",
+      "destination": "docs/dev/V1/sqx/Runtime/jrt-fs.md",
+      "bytes": 10219,
+      "source_sha256": "78b5410f043a5e52bae23f5373a29a7c5bbd31149b2166c913e6fbc8bd064cf1",
+      "destination_sha256": "cad67ebd976da509ef479daa902f562a6d2f8d3a5697cba694ec84970a346a37"
+    },
+    {
+      "source": "docs/sqx/SQXBusiness/AppSQXBusiness.md",
+      "destination": "docs/dev/V1/sqx/SQXBusiness/AppSQXBusiness.md",
+      "bytes": 4206,
+      "source_sha256": "faf1c2b2fe0237c3c8ee14a2e5d72db66f9afb3294bd111ea6ad3edf2ebae99f",
+      "destination_sha256": "55e9860b57111a1605ee850cbbcb1736338643d1b9c3a97c385e0aa0b18a3e4f"
+    },
+    {
+      "source": "docs/sqx/SQXBusiness/README.md",
+      "destination": "docs/dev/V1/sqx/SQXBusiness/README.md",
+      "bytes": 236,
+      "source_sha256": "47cf460dee64bda60499c1e90a7425a6f426d35444278d8ab6b6735637ab4356",
+      "destination_sha256": "47cf460dee64bda60499c1e90a7425a6f426d35444278d8ab6b6735637ab4356"
+    },
+    {
+      "source": "docs/sqx/Shared/ConnectionLiveTest.md",
+      "destination": "docs/dev/V1/sqx/Shared/ConnectionLiveTest.md",
+      "bytes": 2834,
+      "source_sha256": "26bd1a66a6e91f973101ec219bdeb6def631c55959a1f79afba11526c5fa27d0",
+      "destination_sha256": "eb3623eba2436a296f67ad7aba893cde58a4b52835249abceec424eda30b7fcd"
+    },
+    {
+      "source": "docs/sqx/Shared/ConnectionMT4.md",
+      "destination": "docs/dev/V1/sqx/Shared/ConnectionMT4.md",
+      "bytes": 3553,
+      "source_sha256": "fff6833f77a5a8e2a06d6c93a2091142c6ab8393b2b9a70bfc7ac53e4dea76f9",
+      "destination_sha256": "c93420b7f2016e3f14e216a214277a234278925e5a2a322a9a1ef1e52f390ff5"
+    },
+    {
+      "source": "docs/sqx/Shared/ConnectionTest.md",
+      "destination": "docs/dev/V1/sqx/Shared/ConnectionTest.md",
+      "bytes": 2785,
+      "source_sha256": "a9a4356457d956239794e38f03b529a3d50f1df37f9d8546fa2a8ef640be8a32",
+      "destination_sha256": "70ba86bdf38a9ad2f521bc3e9cae00e802280ac1faa095ce375b949306077ac1"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckMonteCarloManipulation.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckMonteCarloManipulation.md",
+      "bytes": 2757,
+      "source_sha256": "6df9d0488e9bb2b36749a76d9c6db2c164758f055977d13551c2846760cef341",
+      "destination_sha256": "ad9f9804c7f463dd678488c76a7504f7ad9e713ce9f04654129ab66f6d3351b6"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckMonteCarloRetest.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckMonteCarloRetest.md",
+      "bytes": 3670,
+      "source_sha256": "126f11dc5de0f302092e7fc90e850766631fe04f02d8ec41fda8a7e6805ba39e",
+      "destination_sha256": "d5fb025ecca1b4f4ba94eddc545a9c85f5e39798c86f7d925d439ce9b6b9fef7"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckOptProfileSysParamPermutation.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckOptProfileSysParamPermutation.md",
+      "bytes": 2818,
+      "source_sha256": "f59083b06ee5329a048ea269919b052828bbec8a3990f97087b322e142222b36",
+      "destination_sha256": "068b89a258de4adefb5b6f91188d2880a2bf0c5166e14e7b0fac7894e5b18a02"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckRetestOnAdditionalMarkets.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckRetestOnAdditionalMarkets.md",
+      "bytes": 3194,
+      "source_sha256": "d8caf61de1e5e23c21bed122a8eaac0dc2a42f12223853a8bd3b0dcf411fb76c",
+      "destination_sha256": "8d8bc7f74ae3865e48ca221c4cb5ed6f86928d62dc4a60c644a75c3c7b1d56ac"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckRetestWithHigherPrecision.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckRetestWithHigherPrecision.md",
+      "bytes": 3193,
+      "source_sha256": "cf5fe25894c40f3e111145e55413bcc36301c1b81a00be2277e4e4f60242f9f9",
+      "destination_sha256": "82c70714c50c60924318a62ea0aaf90c27c3f86c603f6cd355fa745203796981"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckSequentialOptimization.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckSequentialOptimization.md",
+      "bytes": 2651,
+      "source_sha256": "3fc21daffead5ce11da9c30ca6e92dd4918f30c08058bdcfb182da7342a61aac",
+      "destination_sha256": "665e1457e88213a5001daa9aafc85940a5e23fce76d8a0ca3e122d3cab7e9af0"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckWalkForwardMatrix.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckWalkForwardMatrix.md",
+      "bytes": 2385,
+      "source_sha256": "e999566f2b19453de717d8aa57ee0ad71eba7d4e4880c0d21493b6ff5f552e8f",
+      "destination_sha256": "d0c1134e5b5efef27d96f02d31889fb17d7df93276f7f76bf235b545d8f18c1a"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckWalkForwardOptimization.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckWalkForwardOptimization.md",
+      "bytes": 2427,
+      "source_sha256": "5c3000cfd29c94b0336f23e7f7476083574530f8fcfe473007ede849044e3659",
+      "destination_sha256": "51d0111667fdae5f3ab1ccaa22a19482a63c2104bc3cc80844449752c3587284"
+    },
+    {
+      "source": "docs/sqx/Shared/CrossCheckWhatIf.md",
+      "destination": "docs/dev/V1/sqx/Shared/CrossCheckWhatIf.md",
+      "bytes": 2586,
+      "source_sha256": "5405a253e8ce476e04670457b4e2ef79c52b5aaeb151cf6bafa6d97a5cc69373",
+      "destination_sha256": "3cf26d4a8c4683019867abdb234457f4528d2cb1c7c3ef15cc4e6063eaf5c3a8"
+    },
+    {
+      "source": "docs/sqx/Shared/FitnessMethodExistingPortfolio.md",
+      "destination": "docs/dev/V1/sqx/Shared/FitnessMethodExistingPortfolio.md",
+      "bytes": 3096,
+      "source_sha256": "4c2277c3efe3b1f19fe18f44f849fcf2395f1fe6018d8f271906e594cae16436",
+      "destination_sha256": "7eac5dddb00a21a1521ab835767017b465e2d7cefb61d2091bb08a54119083c2"
+    },
+    {
+      "source": "docs/sqx/Shared/FitnessMethodStrategyResult.md",
+      "destination": "docs/dev/V1/sqx/Shared/FitnessMethodStrategyResult.md",
+      "bytes": 3088,
+      "source_sha256": "4fcfb8eebfb1c9dc9490f139297ed530832d59c281dd0f90304e4a2489f68363",
+      "destination_sha256": "0fd3edd66c702fd7faaf53124fca4d2c0141bb4701b017926ee3eca1fb79fafd"
+    },
+    {
+      "source": "docs/sqx/Shared/FitnessMethodWFResult.md",
+      "destination": "docs/dev/V1/sqx/Shared/FitnessMethodWFResult.md",
+      "bytes": 2693,
+      "source_sha256": "e775e1b99a28913e9fd45f51a12a1a68291a4052236ff1fd40ef07ff40c91276",
+      "destination_sha256": "515a29c8d087177f73d1643dba1cf21ccb3fc265fbc1928e0edf4560d32a74e9"
+    },
+    {
+      "source": "docs/sqx/Shared/HomeAbout.md",
+      "destination": "docs/dev/V1/sqx/Shared/HomeAbout.md",
+      "bytes": 2486,
+      "source_sha256": "feceb1da46c87dc2c1242ea9d0269f98eb12c9842c50e13ab16d35f5d69fff3b",
+      "destination_sha256": "0f8b5698086b2e73f4ca88a751c177091a07b589ab79677aac89e78de06f3eff"
+    },
+    {
+      "source": "docs/sqx/Shared/LoaderSQ3.md",
+      "destination": "docs/dev/V1/sqx/Shared/LoaderSQ3.md",
+      "bytes": 3003,
+      "source_sha256": "315cb9316a64ffb0b91211cf2ad28bcc7d478d9cbcc3b5b0c9b7ed6ccaf5368a",
+      "destination_sha256": "d684f3c3cc4cf7508796feb5ec2bf13fd420bb49ba194dfb5b9fe46ab045b719"
+    },
+    {
+      "source": "docs/sqx/Shared/LoaderSQ4.md",
+      "destination": "docs/dev/V1/sqx/Shared/LoaderSQ4.md",
+      "bytes": 2273,
+      "source_sha256": "e2255c04bfb1813b0db31f63bb1a312fee364102232aadf8fb93deb03647241e",
+      "destination_sha256": "9cecfd5c1e4c24ce4fff36fcbd47793399fb4b952a720829eb5d4b3ae0c58352"
+    },
+    {
+      "source": "docs/sqx/Shared/ProjectConditionCyclesCount.md",
+      "destination": "docs/dev/V1/sqx/Shared/ProjectConditionCyclesCount.md",
+      "bytes": 2389,
+      "source_sha256": "0a725611c1fffa2bc002499dd24af2da970e3998562f39853f17f2635f5c9f7c",
+      "destination_sha256": "2303a689e4f400732fbf5ec636b7103848b373257c5b7eb30b3fd4d468e5ff08"
+    },
+    {
+      "source": "docs/sqx/Shared/ProjectConditionGoToActivated.md",
+      "destination": "docs/dev/V1/sqx/Shared/ProjectConditionGoToActivated.md",
+      "bytes": 2404,
+      "source_sha256": "44ef8391f19d29f7bb208ce8e8b0b4b7fc547096c432d3a52937faa8231bc27c",
+      "destination_sha256": "097d460871226b1b7b91e08a83e99937d933705ae63d3fd0aec6e1072224b716"
+    },
+    {
+      "source": "docs/sqx/Shared/ProjectConditionGoToEvaluated.md",
+      "destination": "docs/dev/V1/sqx/Shared/ProjectConditionGoToEvaluated.md",
+      "bytes": 2404,
+      "source_sha256": "6feb248ae65cf2c3fe7ddbe3c3373eb1c5307b8ef7eecdc559b7f138bcb54459",
+      "destination_sha256": "1328cc8477602aa44ec41affab44b9b9cc7915ff9f179fee64e9b4626a711b2a"
+    },
+    {
+      "source": "docs/sqx/Shared/ProjectConditionResultsCount.md",
+      "destination": "docs/dev/V1/sqx/Shared/ProjectConditionResultsCount.md",
+      "bytes": 2396,
+      "source_sha256": "e900c4b6cd02d1d2e36c25d5e51d0788b2e0b8c78b873dac93c1dea2e8987cc9",
+      "destination_sha256": "f8532d7ae5df73cb0f54f3bc293508428a98be4d56be24c6cbe053c79289c9a0"
+    },
+    {
+      "source": "docs/sqx/Shared/ProjectConditionRunTime.md",
+      "destination": "docs/dev/V1/sqx/Shared/ProjectConditionRunTime.md",
+      "bytes": 2361,
+      "source_sha256": "bf7789f22c5b17784d9f949ba3f35d68e08c430997361717e810ed1abd2239bb",
+      "destination_sha256": "49abed4c95f402835459e3e8e349fb8cd7650d7d36273fd255b273ddef93759f"
+    },
+    {
+      "source": "docs/sqx/Shared/README.md",
+      "destination": "docs/dev/V1/sqx/Shared/README.md",
+      "bytes": 6510,
+      "source_sha256": "708a82405830da5bf2eb28b39d1e02f96891076571d6cf7c950cae45ff17068b",
+      "destination_sha256": "708a82405830da5bf2eb28b39d1e02f96891076571d6cf7c950cae45ff17068b"
+    },
+    {
+      "source": "docs/sqx/Shared/SaverHTML.md",
+      "destination": "docs/dev/V1/sqx/Shared/SaverHTML.md",
+      "bytes": 2359,
+      "source_sha256": "06bdb323f8e5703a18dc042ce853ba9e5ccc0d1908367360041b83ddaae01380",
+      "destination_sha256": "59ef4d485bec047fb85f7de1e07b3968270d52ed5a3460e1335d9196d52bd725"
+    },
+    {
+      "source": "docs/sqx/Shared/SaverPDF.md",
+      "destination": "docs/dev/V1/sqx/Shared/SaverPDF.md",
+      "bytes": 2352,
+      "source_sha256": "33c2c14ff16e0dfa1f690343a43c117e70f51817e56e3172caf4dcd0070302d2",
+      "destination_sha256": "a9366e8d3bbeebc9e8f948f8a01130d95b6a2d53e8077aa4ea549fe0f75f32e8"
+    },
+    {
+      "source": "docs/sqx/Shared/SaverSQ3.md",
+      "destination": "docs/dev/V1/sqx/Shared/SaverSQ3.md",
+      "bytes": 2440,
+      "source_sha256": "3e99f8f0c2743e3735900ab90d960f7c3bb687d8ba71dda49fc279e0d1ebcfc5",
+      "destination_sha256": "1f32929bb33f750729e1dc9b57c065498ae2b6605d615653792b696b1c6e7bf3"
+    },
+    {
+      "source": "docs/sqx/Shared/SaverStrategyTrades.md",
+      "destination": "docs/dev/V1/sqx/Shared/SaverStrategyTrades.md",
+      "bytes": 2381,
+      "source_sha256": "2b146d15cacd36572c575fe99f2720bd69c8184126a90e36b8556b71d8dcf466",
+      "destination_sha256": "ea357e2dcebb553c7616bbe65e5b046db00f1d1cdb272ac7f20731aeec1e5833"
+    },
+    {
+      "source": "docs/sqx/Shared/ServletConnection.md",
+      "destination": "docs/dev/V1/sqx/Shared/ServletConnection.md",
+      "bytes": 2572,
+      "source_sha256": "30bd748871c8c4c77f74560a6ce20a3af8bd19e911db39c1e7787928f4d097ec",
+      "destination_sha256": "696b4932b5620888555413502b3c38035c940c5891a9ebf70d15814b8a0a70e0"
+    },
+    {
+      "source": "docs/sqx/Shared/ServletConstants.md",
+      "destination": "docs/dev/V1/sqx/Shared/ServletConstants.md",
+      "bytes": 2559,
+      "source_sha256": "04ff7ee76cefb949ebff58c1c6948d57f8b675877de74a675e0315b9c474d392",
+      "destination_sha256": "6fafbf951e4b46b9b6591604dae54a49c425cf93510adca7ba02101fa9b7aec1"
+    },
+    {
+      "source": "docs/sqx/Shared/ServletRenameTool.md",
+      "destination": "docs/dev/V1/sqx/Shared/ServletRenameTool.md",
+      "bytes": 2963,
+      "source_sha256": "4068df29bdaafdced86fe1f5042a80eb159252b041b762cc52167606ee2fbaac",
+      "destination_sha256": "70e9687f6089ac3c778cabed2ab4cef0e05282aa7ba021838ecaa2ab0091ce5d"
+    },
+    {
+      "source": "docs/sqx/Shared/ServletStrategy.md",
+      "destination": "docs/dev/V1/sqx/Shared/ServletStrategy.md",
+      "bytes": 2772,
+      "source_sha256": "3f3f50128ad59e02fcd49fb8a30592bb9c81e94273bf5e5c8a802637f5b7bdc5",
+      "destination_sha256": "f94d5538e890f72d840d2c49bd18792e0dcf39109e9f434e89ba5a00a670cd3d"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsAdvancedTM.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsAdvancedTM.md",
+      "bytes": 2613,
+      "source_sha256": "ac56739bb3b1b255a1df539efc332bf9f8d9c9bc6be88528acd93042fcb50650",
+      "destination_sha256": "075dba98486b9bd473e2b1d26f529e271a32debd93972f38988d535de7e4a2e6"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsApplyMassConfig.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsApplyMassConfig.md",
+      "bytes": 2363,
+      "source_sha256": "d053d66d6095be7f6b1de9036065608b5b08d93e1644b4f9740770db7043ea50",
+      "destination_sha256": "6f0f78b053a5a6b7eb7ad3fdc67511888c0faeac0cd08107cc7ee0832bcb27eb"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsAutoRetestData.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsAutoRetestData.md",
+      "bytes": 2409,
+      "source_sha256": "679197c76a4cd2419308c616b4cb57e175f7db88a150127aabe544c75fc24b17",
+      "destination_sha256": "e346ab5fba7b63c4e6546c78b47aceb89bf8158e203cd82e01340a7bc6a1c885"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsBlocks.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsBlocks.md",
+      "bytes": 2628,
+      "source_sha256": "ebdc4e051a9704eb221cd6945e7775884ed1f49f5d473522c1fe84f3557a4ebf",
+      "destination_sha256": "56319f4919074649853771efd0871beb48f23e120600524224c326268ed0a161"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsCallExternalScript.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsCallExternalScript.md",
+      "bytes": 2383,
+      "source_sha256": "98182b084a1ac10f934222ea762a204cd0bb8eb0783dd4c8f839d9c3e2cbc76b",
+      "destination_sha256": "3d7006c897c196231e1274c249a871e6c0eb75a9a5f8b15aebb6c49e5177cb3a"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsClearDatabanks.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsClearDatabanks.md",
+      "bytes": 2356,
+      "source_sha256": "5c9deef52c4a6539e29cf6a072dd8fdcbf7b9e490b7ae8cb001a35924ea37b59",
+      "destination_sha256": "b3a18494063c998552765d76f193450ddcc27cc7fe6f1bffc04d4152d430f837"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsCreatePortfolio.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsCreatePortfolio.md",
+      "bytes": 2363,
+      "source_sha256": "dc405d0829491b1b561126167f089112d792003e05e4b675adda1e600953bd72",
+      "destination_sha256": "dfaaf3675a7f9fa6259e449824fc584e5a2b3fed3a7b013e546b36b279ecdc11"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsCrossChecks.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsCrossChecks.md",
+      "bytes": 2624,
+      "source_sha256": "aa251f90ec9449e1dd847af63307ea961ef37d5c10c62ae6a36857aa9ee86de4",
+      "destination_sha256": "20d0ab6749dd827c026cf9dd8e81eda6efe5fb61fb9197be23e961a0b6521b68"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsCustomAnalysis.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsCustomAnalysis.md",
+      "bytes": 2350,
+      "source_sha256": "5eb771bac2fde98d40dc67afe19e132c6146dcf3ab7ceed986f14f4f6e35608d",
+      "destination_sha256": "193274035906526c150047348beb152f9fe4bcafe8036eb4de578678fc108d33"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsData.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsData.md",
+      "bytes": 2339,
+      "source_sha256": "88d05d516173873ebc30084dc624463fc3a344fa4e9b39c3fee0ab3edab4f743",
+      "destination_sha256": "3caaad79db4152e6fae4f434807b7e1ff23c4066668666dd377e9b009e2c4593"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsDeleteFile.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsDeleteFile.md",
+      "bytes": 2326,
+      "source_sha256": "b0645f8c7271dc026bcf191aa8b63eb08a14020770f78af8bffc7a40be5f9f90",
+      "destination_sha256": "41d38fe4b9f82375b6f9191045945ef77f2f0586267db8fa391fefee791c2300"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsFiltering.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsFiltering.md",
+      "bytes": 2330,
+      "source_sha256": "337eb68e744d56cba43908be4f346533e569de868da5fc3c834834c5abc060fd",
+      "destination_sha256": "84ee1f8a5fe96e3e7b184bd3e37815154e109bfe0eb50919cf91c03c7bcffa6f"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsGoToTask.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsGoToTask.md",
+      "bytes": 2325,
+      "source_sha256": "b3bbd9685e2a08de2d2b0a5d57046dc30c66dba51dd95d25c90b9caf5a97c935",
+      "destination_sha256": "fd5ac201e9aa251a3cf1ec6053712763dd267690908669bd875e5c2812c01c1f"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsLoadFromFiles.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsLoadFromFiles.md",
+      "bytes": 2348,
+      "source_sha256": "ae83fc22560e82a74e3263aae8cf06b312423cc5ab1881455803b86b2a936ec0",
+      "destination_sha256": "7a894db36811ddc02bc11c8f19dc34c270c881abd2659a0a81696c8b1ccd9fbd"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsLogDatabankStats.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsLogDatabankStats.md",
+      "bytes": 2370,
+      "source_sha256": "fe69da0d3522445cd469083c157de8d074ca0a22c1c700b6b8e23e0323c22b7b",
+      "destination_sha256": "874fb83878a33022f17e7127bfb909e791746dd00dff3d6edfccd9d497ed402e"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsMoneyManagement.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsMoneyManagement.md",
+      "bytes": 2422,
+      "source_sha256": "90e5dcf0e26511fa610b7d9cff205587ef96c72245f696656b80b657a5ac7afb",
+      "destination_sha256": "f4eba300d2a96b8b216a4d6980087c6caaf4c6c097c6f81c477c115c973178fe"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsNotes.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsNotes.md",
+      "bytes": 2303,
+      "source_sha256": "6c1a9bfc0d4d6ea37cc93b1011499e7e37a224762f5426ce366beb40ad83d74b",
+      "destination_sha256": "75581e7d23e916c445827bac69ec9d2bea7e0869d0a7b7e399c3a61fec770e65"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsNotification.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsNotification.md",
+      "bytes": 2827,
+      "source_sha256": "68499100ccf61b8c7ab95f472adc08d41acea401345dbd0d2620b331c2ed5c78",
+      "destination_sha256": "88fb53798a5287758ce8de79f64fa99ef6cf2fc9fc04362a4de09477ab1cfecc"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsOptimization.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsOptimization.md",
+      "bytes": 2649,
+      "source_sha256": "86f4320990c1a871b2f9697f23b6af6561884cad5c5d94180eb1acd6423d7503",
+      "destination_sha256": "94ad59f91ebef9f533681b6520971e792da1bbaa0e645830bafd20eb1dba85eb"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsOptions.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsOptions.md",
+      "bytes": 2614,
+      "source_sha256": "c1c5399fb385e348f7bd72913b80ed845191f748728d0f3db250af341714d2b0",
+      "destination_sha256": "16dfa70d6c38ecfec70e2b014d8b45518a9a2ee21b1dbd8a407c6fec3552d215"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsPartsToImprove.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsPartsToImprove.md",
+      "bytes": 2368,
+      "source_sha256": "c1d33f7718cd51b6b716a32d916b77b041a8c853efe3120b174318a3dd3ea018",
+      "destination_sha256": "13b23e5961a2a2e7ef71786a245e3e9371cbb0afb3c66f1e4f59ceecfe5b3eb9"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsRankings.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsRankings.md",
+      "bytes": 2622,
+      "source_sha256": "083a3d12e48364a948e13b71ad675d2a88ee7c9025258a9277b43bd345f54f7b",
+      "destination_sha256": "64fe553f69912641e256fe23cbb4c11252751bb056d87f469444f4ca23673c57"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsSaveToFiles.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsSaveToFiles.md",
+      "bytes": 2334,
+      "source_sha256": "c05da31ff37aa898cfc42cc415b22c1b7de2ed6b84d648808288f0d2f6d15e64",
+      "destination_sha256": "a150855f7a91028e26c0dd912cf3333b17e718751dfc851595d21abb0fe2863b"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsStopAndStart.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsStopAndStart.md",
+      "bytes": 2400,
+      "source_sha256": "f615bda9676c4882b828886cccb5fa092cf7ebe370bf8817b999992c32bdc1eb",
+      "destination_sha256": "35bd82b66ea3c308fe5252f6778a9e17e509127b209a7ca8473598f4853928fd"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsUpdateData.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsUpdateData.md",
+      "bytes": 2326,
+      "source_sha256": "875c2059794fd699f5a299520a92038b44bb2f1506b8b7509ed281340fda5fb5",
+      "destination_sha256": "3cb5e4beab2b7851287106b24459fe37ec38f0942712742b644cf062602b757b"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsWaitFor.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsWaitFor.md",
+      "bytes": 2305,
+      "source_sha256": "2475308f52c30b472c261eae24076cfec1571a266bb4278eba1999b4baaef3aa",
+      "destination_sha256": "cba45d56f8258136bf36ed2d3a1c9c2fb4c7b3ee6ab40c84fdf6903d1e157344"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsWhatToBuild.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsWhatToBuild.md",
+      "bytes": 2638,
+      "source_sha256": "fd65208effd04737aae7d49207306b59cac48a655e2d5fd359feef349dc90c5e",
+      "destination_sha256": "fd93f9b42bd20c87580b863893876a98ea207d8405205227a9237a8c89e495ed"
+    },
+    {
+      "source": "docs/sqx/Shared/SettingsWhatToRetest.md",
+      "destination": "docs/dev/V1/sqx/Shared/SettingsWhatToRetest.md",
+      "bytes": 2357,
+      "source_sha256": "1b67756af9cc4acb6e51bb3e9c4a0c331c47587df7155041d44abc686d2793d9",
+      "destination_sha256": "1b516203d0c0dbf1681447b1e4077ea7b3c464afb0cba810478a96bca1627345"
+    }
+  ],
+  "historical_inventory_capture": {
+    "locator": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
+    "sha256": "7e7bbf37e688f3b79d7c5b8c62a9fe276cbdb1e3dd9cc5ffe1d2c551ffa4f1f3",
+    "original_locator": "docs/dev/evidence/p00-inventory.json",
+    "bound_records": [
+      "SQX145-EV-000132",
+      "SQX145-EV-000133",
+      "SQX145-EV-000134",
+      "SQX145-EV-000181"
+    ]
+  },
+  "historical_path_exceptions": [
+    {
+      "locator": "docs/dev/evidence/sqx145/p00-review.json",
+      "reason": "Dated capture pins and commands remain unchanged; repository_commit identifies original source versions."
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/host-core-research.json",
+      "reason": "Historical source pins and exact executed verification commands remain unchanged."
+    },
+    {
+      "locator": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
+      "reason": "Exact original 2026-10-06 inventory capture; only the active manifest has relocated roadmap bindings."
+    }
+  ],
+  "protected_hashes": {
+    "docs/dev/evidence/sqx145/p00-review.json": "3d805399dba0e28f7063b02750130a4f7079bb0e1826cdea9a432f81e41f1797",
+    "docs/dev/evidence/sqx145/host-core-research.json": "81df7fbfa3e6814a62997df7e24701d9bafdcb00331c1ed6796e243be756be71",
+    "docs/dev/evidence/reimplementation.schema.json": "5cd168b152bfe8dda49763b1121bc15e4bafb1ff0f4f3ce0bf43c72243339d50",
+    "docs/dev/V2/architecture.md": "8b3a81140098c9dd9819efb3154c5f1511a8f75115f2cda31387780f53874b97",
+    "docs/dev/V2/host-foundation.md": "ce4a9d02affcfc3455c1f7b43b26788c5bfd44a1cf81dff66192530138b3b511",
+    "docs/dev/V2/product-features.md": "de6a5faafe1e9ac5befd1037fa7fdb9d9f521f9e888034f0776d2487a629f3a1"
+  },
+  "active_bindings": {
+    "roadmap": {
+      "locator": "docs/dev/V1/sqx-full-application-roadmap.md",
+      "sha256": "cd8be5cea9212039f01ac13a08684521c911cb6bf9ed530ee019d18ac99c76f8"
+    },
+    "inventory": {
+      "locator": "docs/dev/evidence/p00-inventory.json",
+      "sha256": "770cea570c1d9a0fe34cf66bc522218ea29ff329337b15db79f9fc537abfd115"
+    }
+  },
+  "validation": {
+    "state": "passed",
+    "executed_at": "2026-10-06T23:35:40.619Z",
+    "commands": [
+      {
+        "command": "uv run pytest tests/unit/test_reference_manifest.py tests/unit/test_reference_fixtures.py tests/unit/test_reference_validation.py --no-cov",
+        "exit_code": 0,
+        "result": "109 passed in 37.41s"
+      },
+      {
+        "command": "uv run python -m tests.reference.validate",
+        "exit_code": 0,
+        "result": "Static baseline valid; runtime blocked as expected"
+      },
+      {
+        "command": "uv run ruff check tests/unit/test_reference_validation.py",
+        "exit_code": 0,
+        "result": "All checks passed"
+      },
+      {
+        "command": "uv run ruff format --check tests/unit/test_reference_validation.py",
+        "exit_code": 0,
+        "result": "1 file already formatted"
+      },
+      {
+        "command": "uv run mypy tests/unit/test_reference_validation.py",
+        "exit_code": 0,
+        "result": "No issues in 1 source file"
+      },
+      {
+        "command": "node .agents/logs/20261007_022109_v2-phase-plans-v1-archive/audit-documentation.mjs",
+        "exit_code": 0,
+        "result": "13 phases, 72 tasks, 366 legacy rows, 289 archives, 49 resource features, 334 moves; 4504 links and 820 fragments valid"
+      },
+      {
+        "command": "git diff --check",
+        "exit_code": 0,
+        "result": "No whitespace errors"
+      }
+    ],
+    "documentation_checks": {
+      "phase_files": 13,
+      "tasks": 72,
+      "legacy_rows": 366,
+      "archive_features": 289,
+      "resource_features": 49,
+      "relocated_files": 334,
+      "checked_links": 4504,
+      "checked_markdown_fragments": 820,
+      "issues": [],
+      "passed": true
+    },
+    "coverage_checks": {
+      "unchangedLegacyColumns": true,
+      "archiveProposals": 289,
+      "resourceProposals": 49,
+      "exactFeatureSet": true,
+      "oldClaimsAndOutcomesPreserved": true,
+      "inventorySemanticsPreserved": true,
+      "classMemberBindingsPreserved": true,
+      "ownershipSemanticsPreserved": true,
+      "qContributionNames": 18,
+      "qContributionCoverage": true,
+      "scopedResourceRoots": 17
+    }
+  }
+}

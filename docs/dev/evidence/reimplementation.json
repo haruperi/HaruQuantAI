@@ -43,7 +43,7 @@
       "locators": [
         "app/host/README.md",
         "docs/dev/evidence",
-        "docs/dev/sqx-full-application-roadmap.md",
+        "docs/dev/V1/sqx-full-application-roadmap.md",
         "docs/PROJECT.md",
         "docs/ARCHITECTURE.md"
       ],
@@ -99,14 +99,14 @@
       "sources": [
         {
           "catalog_id": "E-R02",
-          "artifact_locator": "docs/dev/evidence/p00-inventory.json",
+          "artifact_locator": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
           "location": {
             "section": null,
             "symbol": null,
             "line_range": null,
             "json_pointer": "/totals/archives",
             "xpath": null,
-            "notes": null
+            "notes": "Administrative relocation on 2026-10-07 preserves the exact 2026-10-06 repository capture bytes; donor observation and access date are unchanged."
           },
           "inspection_method": "repository_audit",
           "relation": "supports",
@@ -142,7 +142,7 @@
         "expected_observation": "Independent ZIP enumeration observed 289 archives.",
         "actual_observation": "Independent ZIP enumeration observed 289 archives.",
         "artifact_paths": [
-          "docs/dev/evidence/p00-inventory.json"
+          "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json"
         ],
         "executed_at": "2026-10-06T18:54:51.906614+00:00"
       },
@@ -155,7 +155,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -195,14 +195,14 @@
       "sources": [
         {
           "catalog_id": "E-R02",
-          "artifact_locator": "docs/dev/evidence/p00-inventory.json",
+          "artifact_locator": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
           "location": {
             "section": null,
             "symbol": null,
             "line_range": null,
             "json_pointer": "/totals/resources",
             "xpath": null,
-            "notes": null
+            "notes": "Administrative relocation on 2026-10-07 preserves the exact 2026-10-06 repository capture bytes; donor observation and access date are unchanged."
           },
           "inspection_method": "repository_audit",
           "relation": "supports",
@@ -238,7 +238,7 @@
         "expected_observation": "Fresh directory enumeration observed 17 resource-only immediate plugin directories.",
         "actual_observation": "Fresh directory enumeration observed 17 resource-only immediate plugin directories.",
         "artifact_paths": [
-          "docs/dev/evidence/p00-inventory.json"
+          "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json"
         ],
         "executed_at": "2026-10-06T18:54:51.906614+00:00"
       },
@@ -251,7 +251,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -291,14 +291,14 @@
       "sources": [
         {
           "catalog_id": "E-R02",
-          "artifact_locator": "docs/dev/evidence/p00-inventory.json",
+          "artifact_locator": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
           "location": {
             "section": null,
             "symbol": null,
             "line_range": null,
             "json_pointer": "/totals/classes",
             "xpath": null,
-            "notes": null
+            "notes": "Administrative relocation on 2026-10-07 preserves the exact 2026-10-06 repository capture bytes; donor observation and access date are unchanged."
           },
           "inspection_method": "repository_audit",
           "relation": "supports",
@@ -334,7 +334,7 @@
         "expected_observation": "Independent ZIP enumeration observed 51,713 raw class entries.",
         "actual_observation": "Independent ZIP enumeration observed 51,713 raw class entries.",
         "artifact_paths": [
-          "docs/dev/evidence/p00-inventory.json"
+          "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json"
         ],
         "executed_at": "2026-10-06T18:54:51.906614+00:00"
       },
@@ -347,7 +347,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -2860,7 +2860,7 @@
           "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
           "location": {
             "section": null,
-            "symbol": "CustomDataServlet.notNaN; offsets 0\u201312",
+            "symbol": "CustomDataServlet.notNaN; offsets 0–12",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -2883,7 +2883,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -2907,7 +2907,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -2950,7 +2950,7 @@
           "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
           "location": {
             "section": null,
-            "symbol": "CustomDataServlet.onUpdateCot; offsets 58\u201388",
+            "symbol": "CustomDataServlet.onUpdateCot; offsets 58–88",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -2973,7 +2973,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -2997,7 +2997,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3040,7 +3040,7 @@
           "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
           "location": {
             "section": null,
-            "symbol": "CustomDataServlet.onUpdateCot; offsets 89\u2013171",
+            "symbol": "CustomDataServlet.onUpdateCot; offsets 89–171",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -3063,7 +3063,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3087,7 +3087,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3130,7 +3130,7 @@
           "artifact_locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
           "location": {
             "section": null,
-            "symbol": "SessionsServlet.onImportNinjaTraderTemplates; offsets 38\u201376",
+            "symbol": "SessionsServlet.onImportNinjaTraderTemplates; offsets 38–76",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -3153,7 +3153,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3177,7 +3177,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3220,7 +3220,7 @@
           "artifact_locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
           "location": {
             "section": null,
-            "symbol": "SessionsServlet.onImportNinjaTraderTemplates; offsets 220\u2013259",
+            "symbol": "SessionsServlet.onImportNinjaTraderTemplates; offsets 220–259",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -3243,7 +3243,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3267,7 +3267,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3310,7 +3310,7 @@
           "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
           "location": {
             "section": null,
-            "symbol": "MarketplaceManager.verifyChecksum; offsets 7\u201341",
+            "symbol": "MarketplaceManager.verifyChecksum; offsets 7–41",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -3333,7 +3333,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3357,7 +3357,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3400,7 +3400,7 @@
           "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
           "location": {
             "section": null,
-            "symbol": "MarketplaceManager.normalizeEntryName; offsets 0\u201331",
+            "symbol": "MarketplaceManager.normalizeEntryName; offsets 0–31",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -3423,7 +3423,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3447,7 +3447,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3490,7 +3490,7 @@
           "artifact_locator": "internal/extend/Code/NinjaTrader/Main.tpl",
           "location": {
             "section": null,
-            "symbol": "rule validation; lines 71\u201372",
+            "symbol": "rule validation; lines 71–72",
             "line_range": null,
             "json_pointer": null,
             "xpath": null,
@@ -3513,7 +3513,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3537,7 +3537,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3603,7 +3603,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3627,7 +3627,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -3693,7 +3693,7 @@
         "requirement_ids": [],
         "decision_ids": [],
         "documentation_targets": [
-          "docs/dev/sqx-full-application-roadmap.md"
+          "docs/dev/V1/sqx-full-application-roadmap.md"
         ],
         "registration_status": "proposed",
         "registration_gap": "Owning README must ratify complete descriptive FR/DEC contracts before application implementation; current observed claim remains a proposal mapping.",
@@ -3717,7 +3717,7 @@
       "provenance": {
         "repository_commit": "01067f00031428613c6394064ca1bcadc1ba00ee",
         "created_at": "2026-10-06T19:04:15.848666+00:00",
-        "updated_at": "2026-10-06T19:04:15.848666+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -4889,14 +4889,14 @@
       "sources": [
         {
           "catalog_id": "E-R02",
-          "artifact_locator": "docs/dev/evidence/p00-inventory.json",
+          "artifact_locator": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
           "location": {
             "section": null,
             "symbol": null,
             "line_range": null,
             "json_pointer": "/artifacts",
             "xpath": null,
-            "notes": null
+            "notes": "Administrative relocation on 2026-10-07 preserves the exact 2026-10-06 repository capture bytes; donor observation and access date are unchanged."
           },
           "inspection_method": "archive_inventory",
           "relation": "supports",
@@ -4964,7 +4964,7 @@
       "provenance": {
         "repository_commit": "d4e0ed8bbd46e47e44d6072a4edfc1652491b904",
         "created_at": "2026-10-06T20:53:39.187903+00:00",
-        "updated_at": "2026-10-06T21:00:52.185010+00:00",
+        "updated_at": "2026-10-06T23:32:43.042Z",
         "review_state": "unreviewed"
       },
       "clean_room": {
@@ -7916,8 +7916,105 @@
         "normative",
         "p00_closure"
       ]
+    },
+    "SQX145-EV-000196": {
+      "topic": "reference.documentation.v1_relocation",
+      "title": "V1 documentation locators preserve captured source identities",
+      "question": "Does the V1 documentation relocation preserve source identities and resolve active references?",
+      "record_status": "active",
+      "reference_scope": {
+        "build": "145-dev1",
+        "application_areas": [
+          "reference_tooling"
+        ],
+        "conditions": [
+          "Same 145-dev1 donor cohort; repository documentation and active reference bindings only."
+        ]
+      },
+      "claim": {
+        "classification": "normative",
+        "statement": "Archive V1 documentation under docs/dev/V1 while preserving donor identity and truthful dated repository captures.",
+        "confidence": "high",
+        "limitations": [
+          "Administrative documentation migration only; no application implementation or runtime/numerical parity qualification."
+        ]
+      },
+      "sources": [
+        {
+          "catalog_id": "E-R02",
+          "artifact_locator": "docs/dev/evidence/sqx145/v1-relocation.json",
+          "location": {
+            "section": null,
+            "symbol": null,
+            "line_range": null,
+            "json_pointer": "/files",
+            "xpath": null,
+            "notes": "Owner-approved documentation relocation and SHA-256 mapping; old timestamps describe original observations."
+          },
+          "inspection_method": "repository_audit",
+          "relation": "supports",
+          "fingerprint": {
+            "algorithm": "sha256",
+            "value": "bf6089c29d26502884cc578c77638d660053c16656bb56b6f502b663d1bfb661"
+          },
+          "accessed_at": "2026-10-07"
+        }
+      ],
+      "target_mapping": {
+        "domain": "host",
+        "feature_ids": [
+          "FEAT-HOST-EVIDENCE"
+        ],
+        "requirement_ids": [
+          "FR-HOST-EVIDENCE-INVENTORY-RECONCILIATION"
+        ],
+        "decision_ids": [
+          "DEC-HOST-SQX145-REFERENCE"
+        ],
+        "documentation_targets": [
+          "app/host/README.md"
+        ],
+        "registration_status": "registered",
+        "registration_gap": null,
+        "proposed_owner_readme": null
+      },
+      "validation": {
+        "state": "passed",
+        "kind": "static",
+        "procedure": "Verify all 334 moves, links, unchanged donor hashes/captures, and focused reference checks against the relocation audit.",
+        "expected_observation": "All relocated documentation resolves, original observation bytes are preserved and current static validation passes.",
+        "actual_observation": "Verified 334 relocated files with path-only changes, 4504 links and 820 Markdown fragments; 366 legacy rows preserve 289 archive and 49 resource-feature allocations; original observations/captures preserved; 109 focused tests and current static validation pass.",
+        "artifact_paths": [
+          "docs/dev/evidence/sqx145/v1-relocation.json"
+        ],
+        "executed_at": "2026-10-06T23:35:40.619Z"
+      },
+      "relationships": {
+        "supports_records": [],
+        "contradicts_records": [],
+        "supersedes_records": [],
+        "superseded_by": null
+      },
+      "provenance": {
+        "repository_commit": "6ac87d2a4dfb111ef8ca03632aeffb9a8de7edec",
+        "created_at": "2026-10-06T23:32:43.042Z",
+        "updated_at": "2026-10-06T23:35:40.621Z",
+        "review_state": "unreviewed"
+      },
+      "clean_room": {
+        "contains_proprietary_source": false,
+        "contains_sensitive_data": false,
+        "contains_personal_data": false,
+        "paraphrased_behavior_only": true,
+        "notes": "Behavioral paraphrase and structural metadata only; no proprietary method-body or personal payload."
+      },
+      "tags": [
+        "documentation_relocation",
+        "static",
+        "same_cohort"
+      ]
     }
   },
   "minimum_record_number": 132,
-  "allocation_high_water_mark": 195
+  "allocation_high_water_mark": 196
 }

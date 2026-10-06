@@ -14,13 +14,13 @@
       "evidence_ids": [
         "SQX145-EV-000132"
       ],
-      "artifact": "docs/dev/evidence/p00-inventory.json",
+      "artifact": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
       "artifact_sha256": "7e7bbf37e688f3b79d7c5b8c62a9fe276cbdb1e3dd9cc5ffe1d2c551ffa4f1f3",
       "location": "/totals/archives",
       "observation_kind": "static",
       "inspection_method": "archive_inventory",
       "captured_at": "2026-10-06T18:54:51.906614+00:00",
-      "capture_artifact": "docs/dev/evidence/p00-inventory.json",
+      "capture_artifact": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
       "input": {
         "scope": "current scoped read-only ZIP/directory inventory"
       },
@@ -44,13 +44,13 @@
       "evidence_ids": [
         "SQX145-EV-000133"
       ],
-      "artifact": "docs/dev/evidence/p00-inventory.json",
+      "artifact": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
       "artifact_sha256": "7e7bbf37e688f3b79d7c5b8c62a9fe276cbdb1e3dd9cc5ffe1d2c551ffa4f1f3",
       "location": "/totals/resources",
       "observation_kind": "static",
       "inspection_method": "archive_inventory",
       "captured_at": "2026-10-06T18:54:51.906614+00:00",
-      "capture_artifact": "docs/dev/evidence/p00-inventory.json",
+      "capture_artifact": "docs/dev/evidence/sqx145/p00-inventory-capture-20261006.json",
       "input": {
         "scope": "current scoped read-only ZIP/directory inventory"
       },

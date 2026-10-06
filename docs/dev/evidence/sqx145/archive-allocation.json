@@ -11,7 +11,7 @@
       "phase": "P13",
       "artifact_locator": "internal/libs/activation-1.1.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/activation-1.1.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/activation-1.1.1.md"
     },
     {
       "locator": "internal/libs/affinity-3.23.3.jar",
@@ -22,7 +22,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/affinity-3.23.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/affinity-3.23.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/affinity-3.23.3.md"
     },
     {
       "locator": "internal/libs/agentscope-core-2.0.3.jar",
@@ -33,7 +33,7 @@
       "phase": "P19",
       "artifact_locator": "internal/libs/agentscope-core-2.0.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/agentscope-core-2.0.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/agentscope-core-2.0.3.md"
     },
     {
       "locator": "internal/libs/agentscope-harness-2.0.3.jar",
@@ -44,7 +44,7 @@
       "phase": "P19",
       "artifact_locator": "internal/libs/agentscope-harness-2.0.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/agentscope-harness-2.0.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/agentscope-harness-2.0.3.md"
     },
     {
       "locator": "internal/libs/animal-sniffer-annotations-1.14.jar",
@@ -55,7 +55,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/animal-sniffer-annotations-1.14.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/animal-sniffer-annotations-1.14.md"
+      "reference": "docs/dev/V1/sqx/Libraries/animal-sniffer-annotations-1.14.md"
     },
     {
       "locator": "internal/libs/annotations-13.0.jar",
@@ -66,7 +66,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/annotations-13.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/annotations-13.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/annotations-13.0.md"
     },
     {
       "locator": "internal/libs/artemis-commons-1.5.0.jar",
@@ -77,7 +77,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/artemis-commons-1.5.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/artemis-commons-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-commons-1.5.0.md"
     },
     {
       "locator": "internal/libs/artemis-core-client-1.5.0.jar",
@@ -88,7 +88,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/artemis-core-client-1.5.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/artemis-core-client-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-core-client-1.5.0.md"
     },
     {
       "locator": "internal/libs/artemis-jms-client-1.5.0.jar",
@@ -99,7 +99,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/artemis-jms-client-1.5.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/artemis-jms-client-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-jms-client-1.5.0.md"
     },
     {
       "locator": "internal/libs/artemis-selector-1.5.0.jar",
@@ -110,7 +110,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/artemis-selector-1.5.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/artemis-selector-1.5.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/artemis-selector-1.5.0.md"
     },
     {
       "locator": "internal/libs/caffeine-2.8.5.jar",
@@ -121,7 +121,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/caffeine-2.8.5.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/caffeine-2.8.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/caffeine-2.8.5.md"
     },
     {
       "locator": "internal/libs/checker-qual-3.4.1.jar",
@@ -132,7 +132,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/checker-qual-3.4.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/checker-qual-3.4.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/checker-qual-3.4.1.md"
     },
     {
       "locator": "internal/libs/classmate-1.7.0.jar",
@@ -143,7 +143,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/classmate-1.7.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/classmate-1.7.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/classmate-1.7.0.md"
     },
     {
       "locator": "internal/libs/commons-beanutils-1.9.2.jar",
@@ -154,7 +154,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/commons-beanutils-1.9.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-beanutils-1.9.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-beanutils-1.9.2.md"
     },
     {
       "locator": "internal/libs/commons-codec-1.17.1.jar",
@@ -165,7 +165,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/commons-codec-1.17.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-codec-1.17.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-codec-1.17.1.md"
     },
     {
       "locator": "internal/libs/commons-collections-3.2.1.jar",
@@ -176,7 +176,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/commons-collections-3.2.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-collections-3.2.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-collections-3.2.1.md"
     },
     {
       "locator": "internal/libs/commons-compress-1.27.1.jar",
@@ -187,7 +187,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/commons-compress-1.27.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-compress-1.27.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-compress-1.27.1.md"
     },
     {
       "locator": "internal/libs/commons-email-1.4.jar",
@@ -198,7 +198,7 @@
       "phase": "P13",
       "artifact_locator": "internal/libs/commons-email-1.4.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-email-1.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-email-1.4.md"
     },
     {
       "locator": "internal/libs/commons-exec-1.3.jar",
@@ -209,7 +209,7 @@
       "phase": "P13",
       "artifact_locator": "internal/libs/commons-exec-1.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-exec-1.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-exec-1.3.md"
     },
     {
       "locator": "internal/libs/commons-imaging-1.0-alpha1.jar",
@@ -220,7 +220,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/commons-imaging-1.0-alpha1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-imaging-1.0-alpha1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-imaging-1.0-alpha1.md"
     },
     {
       "locator": "internal/libs/commons-io-2.16.1.jar",
@@ -231,7 +231,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/commons-io-2.16.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-io-2.16.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-io-2.16.1.md"
     },
     {
       "locator": "internal/libs/commons-lang3-3.16.0.jar",
@@ -242,7 +242,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/commons-lang3-3.16.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-lang3-3.16.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-lang3-3.16.0.md"
     },
     {
       "locator": "internal/libs/commons-logging-1.2.jar",
@@ -253,7 +253,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/commons-logging-1.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-logging-1.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-logging-1.2.md"
     },
     {
       "locator": "internal/libs/commons-math3-3.6.1.jar",
@@ -264,7 +264,7 @@
       "phase": "P09",
       "artifact_locator": "internal/libs/commons-math3-3.6.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/commons-math3-3.6.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/commons-math3-3.6.1.md"
     },
     {
       "locator": "internal/libs/error_prone_annotations-2.4.0.jar",
@@ -275,7 +275,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/error_prone_annotations-2.4.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/error_prone_annotations-2.4.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/error_prone_annotations-2.4.0.md"
     },
     {
       "locator": "internal/libs/fastutil-8.3.0.jar",
@@ -286,7 +286,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/fastutil-8.3.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/fastutil-8.3.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/fastutil-8.3.0.md"
     },
     {
       "locator": "internal/libs/filters-2.0.235.jar",
@@ -297,7 +297,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/filters-2.0.235.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/filters-2.0.235.md"
+      "reference": "docs/dev/V1/sqx/Libraries/filters-2.0.235.md"
     },
     {
       "locator": "internal/libs/freemarker-2.3.28.jar",
@@ -308,7 +308,7 @@
       "phase": "P07",
       "artifact_locator": "internal/libs/freemarker-2.3.28.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/freemarker-2.3.28.md"
+      "reference": "docs/dev/V1/sqx/Libraries/freemarker-2.3.28.md"
     },
     {
       "locator": "internal/libs/fst-2.57.jar",
@@ -319,7 +319,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/fst-2.57.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/fst-2.57.md"
+      "reference": "docs/dev/V1/sqx/Libraries/fst-2.57.md"
     },
     {
       "locator": "internal/libs/geronimo-jms_2.0_spec-1.0-alpha-2.jar",
@@ -330,7 +330,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/geronimo-jms_2.0_spec-1.0-alpha-2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/geronimo-jms_2.0_spec-1.0-alpha-2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/geronimo-jms_2.0_spec-1.0-alpha-2.md"
     },
     {
       "locator": "internal/libs/geronimo-json_1.0_spec-1.0-alpha-1.jar",
@@ -341,7 +341,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/geronimo-json_1.0_spec-1.0-alpha-1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/geronimo-json_1.0_spec-1.0-alpha-1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/geronimo-json_1.0_spec-1.0-alpha-1.md"
     },
     {
       "locator": "internal/libs/guava-26.0-jre.jar",
@@ -352,7 +352,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/guava-26.0-jre.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/guava-26.0-jre.md"
+      "reference": "docs/dev/V1/sqx/Libraries/guava-26.0-jre.md"
     },
     {
       "locator": "internal/libs/h2-1.3.149.jar",
@@ -363,7 +363,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/h2-1.3.149.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/h2-1.3.149.md"
+      "reference": "docs/dev/V1/sqx/Libraries/h2-1.3.149.md"
     },
     {
       "locator": "internal/libs/httpasyncclient-4.1.4.jar",
@@ -374,7 +374,7 @@
       "phase": "P04",
       "artifact_locator": "internal/libs/httpasyncclient-4.1.4.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/httpasyncclient-4.1.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpasyncclient-4.1.4.md"
     },
     {
       "locator": "internal/libs/httpclient-4.5.13.jar",
@@ -385,7 +385,7 @@
       "phase": "P04",
       "artifact_locator": "internal/libs/httpclient-4.5.13.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/httpclient-4.5.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpclient-4.5.13.md"
     },
     {
       "locator": "internal/libs/httpclient-cache-4.5.13.jar",
@@ -396,7 +396,7 @@
       "phase": "P04",
       "artifact_locator": "internal/libs/httpclient-cache-4.5.13.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/httpclient-cache-4.5.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpclient-cache-4.5.13.md"
     },
     {
       "locator": "internal/libs/httpcore-4.4.13.jar",
@@ -407,7 +407,7 @@
       "phase": "P04",
       "artifact_locator": "internal/libs/httpcore-4.4.13.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/httpcore-4.4.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpcore-4.4.13.md"
     },
     {
       "locator": "internal/libs/httpcore-nio-4.4.13.jar",
@@ -418,7 +418,7 @@
       "phase": "P04",
       "artifact_locator": "internal/libs/httpcore-nio-4.4.13.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/httpcore-nio-4.4.13.md"
+      "reference": "docs/dev/V1/sqx/Libraries/httpcore-nio-4.4.13.md"
     },
     {
       "locator": "internal/libs/image4j-0.7.2.jar",
@@ -429,7 +429,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/image4j-0.7.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/image4j-0.7.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/image4j-0.7.2.md"
     },
     {
       "locator": "internal/libs/itu-1.14.0.jar",
@@ -440,7 +440,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/itu-1.14.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/itu-1.14.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/itu-1.14.0.md"
     },
     {
       "locator": "internal/libs/j2objc-annotations-1.1.jar",
@@ -451,7 +451,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/j2objc-annotations-1.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/j2objc-annotations-1.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/j2objc-annotations-1.1.md"
     },
     {
       "locator": "internal/libs/jackson-annotations-2.21.jar",
@@ -462,7 +462,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jackson-annotations-2.21.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jackson-annotations-2.21.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-annotations-2.21.md"
     },
     {
       "locator": "internal/libs/jackson-core-2.21.1.jar",
@@ -473,7 +473,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jackson-core-2.21.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jackson-core-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-core-2.21.1.md"
     },
     {
       "locator": "internal/libs/jackson-databind-2.21.1.jar",
@@ -484,7 +484,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jackson-databind-2.21.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jackson-databind-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-databind-2.21.1.md"
     },
     {
       "locator": "internal/libs/jackson-dataformat-yaml-2.21.1.jar",
@@ -495,7 +495,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jackson-dataformat-yaml-2.21.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jackson-dataformat-yaml-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-dataformat-yaml-2.21.1.md"
     },
     {
       "locator": "internal/libs/jackson-datatype-jsr310-2.21.1.jar",
@@ -506,7 +506,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jackson-datatype-jsr310-2.21.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jackson-datatype-jsr310-2.21.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jackson-datatype-jsr310-2.21.1.md"
     },
     {
       "locator": "internal/libs/java-image-scaling-0.8.6.jar",
@@ -517,7 +517,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/java-image-scaling-0.8.6.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/java-image-scaling-0.8.6.md"
+      "reference": "docs/dev/V1/sqx/Libraries/java-image-scaling-0.8.6.md"
     },
     {
       "locator": "internal/libs/javassist-3.21.0-GA.jar",
@@ -528,7 +528,7 @@
       "phase": "P07",
       "artifact_locator": "internal/libs/javassist-3.21.0-GA.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/javassist-3.21.0-GA.md"
+      "reference": "docs/dev/V1/sqx/Libraries/javassist-3.21.0-GA.md"
     },
     {
       "locator": "internal/libs/javax.mail-1.5.2.jar",
@@ -539,7 +539,7 @@
       "phase": "P13",
       "artifact_locator": "internal/libs/javax.mail-1.5.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/javax.mail-1.5.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/javax.mail-1.5.2.md"
     },
     {
       "locator": "internal/libs/jboss-logging-3.3.0.Final.jar",
@@ -550,7 +550,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/jboss-logging-3.3.0.Final.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jboss-logging-3.3.0.Final.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jboss-logging-3.3.0.Final.md"
     },
     {
       "locator": "internal/libs/jcommon-1.0.12.jar",
@@ -561,7 +561,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/jcommon-1.0.12.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jcommon-1.0.12.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jcommon-1.0.12.md"
     },
     {
       "locator": "internal/libs/jdom-2.0.0.jar",
@@ -572,7 +572,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jdom-2.0.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jdom-2.0.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jdom-2.0.0.md"
     },
     {
       "locator": "internal/libs/jericho-html-3.3.jar",
@@ -583,7 +583,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jericho-html-3.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jericho-html-3.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jericho-html-3.3.md"
     },
     {
       "locator": "internal/libs/jetty-all-uber.jar",
@@ -594,7 +594,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jetty-all-uber.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jetty-all-uber.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jetty-all-uber.md"
     },
     {
       "locator": "internal/libs/jfreechart-1.0.8a.jar",
@@ -605,7 +605,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/jfreechart-1.0.8a.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jfreechart-1.0.8a.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jfreechart-1.0.8a.md"
     },
     {
       "locator": "internal/libs/jfx_2.4.9_sq.jar",
@@ -616,7 +616,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/jfx_2.4.9_sq.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jfx_2.4.9_sq.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jfx_2.4.9_sq.md"
     },
     {
       "locator": "internal/libs/jgroups-3.6.9.Final.jar",
@@ -627,7 +627,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/jgroups-3.6.9.Final.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jgroups-3.6.9.Final.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jgroups-3.6.9.Final.md"
     },
     {
       "locator": "internal/libs/jline-3.25.1.jar",
@@ -638,7 +638,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/jline-3.25.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jline-3.25.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jline-3.25.1.md"
     },
     {
       "locator": "internal/libs/jna-5.13.0.jar",
@@ -649,7 +649,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/jna-5.13.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jna-5.13.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jna-5.13.0.md"
     },
     {
       "locator": "internal/libs/jna-platform-5.13.0.jar",
@@ -660,7 +660,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/jna-platform-5.13.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jna-platform-5.13.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jna-platform-5.13.0.md"
     },
     {
       "locator": "internal/libs/joda-time-2.3.jar",
@@ -671,7 +671,7 @@
       "phase": "P03",
       "artifact_locator": "internal/libs/joda-time-2.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/joda-time-2.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/joda-time-2.3.md"
     },
     {
       "locator": "internal/libs/johnzon-core-0.9.5.jar",
@@ -682,7 +682,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/johnzon-core-0.9.5.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/johnzon-core-0.9.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/johnzon-core-0.9.5.md"
     },
     {
       "locator": "internal/libs/jPowerShell-3.0.jar",
@@ -693,7 +693,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/jPowerShell-3.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jPowerShell-3.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jPowerShell-3.0.md"
     },
     {
       "locator": "internal/libs/jProcesses-1.6.5.jar",
@@ -704,7 +704,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/jProcesses-1.6.5.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jProcesses-1.6.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jProcesses-1.6.5.md"
     },
     {
       "locator": "internal/libs/json-20150729.jar",
@@ -715,7 +715,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/json-20150729.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/json-20150729.md"
+      "reference": "docs/dev/V1/sqx/Libraries/json-20150729.md"
     },
     {
       "locator": "internal/libs/json-schema-validator-2.0.0.jar",
@@ -726,7 +726,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/json-schema-validator-2.0.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/json-schema-validator-2.0.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/json-schema-validator-2.0.0.md"
     },
     {
       "locator": "internal/libs/jsonschema-generator-4.38.0.jar",
@@ -737,7 +737,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jsonschema-generator-4.38.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jsonschema-generator-4.38.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jsonschema-generator-4.38.0.md"
     },
     {
       "locator": "internal/libs/jsonschema-module-jackson-4.38.0.jar",
@@ -748,7 +748,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jsonschema-module-jackson-4.38.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jsonschema-module-jackson-4.38.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jsonschema-module-jackson-4.38.0.md"
     },
     {
       "locator": "internal/libs/jspecify-1.0.0.jar",
@@ -759,7 +759,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/jspecify-1.0.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jspecify-1.0.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jspecify-1.0.0.md"
     },
     {
       "locator": "internal/libs/jspf.core.jar",
@@ -770,7 +770,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/jspf.core.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jspf.core.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jspf.core.md"
     },
     {
       "locator": "internal/libs/jspf.remote.jar",
@@ -781,7 +781,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/jspf.remote.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jspf.remote.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jspf.remote.md"
     },
     {
       "locator": "internal/libs/jsr305-3.0.2.jar",
@@ -792,7 +792,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/jsr305-3.0.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/jsr305-3.0.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/jsr305-3.0.2.md"
     },
     {
       "locator": "internal/libs/kotlin-stdlib-2.2.21.jar",
@@ -803,7 +803,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/kotlin-stdlib-2.2.21.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/kotlin-stdlib-2.2.21.md"
+      "reference": "docs/dev/V1/sqx/Libraries/kotlin-stdlib-2.2.21.md"
     },
     {
       "locator": "internal/libs/logback-classic-1.4.14.jar",
@@ -814,7 +814,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/logback-classic-1.4.14.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/logback-classic-1.4.14.md"
+      "reference": "docs/dev/V1/sqx/Libraries/logback-classic-1.4.14.md"
     },
     {
       "locator": "internal/libs/logback-core-1.4.14.jar",
@@ -825,7 +825,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/logback-core-1.4.14.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/logback-core-1.4.14.md"
+      "reference": "docs/dev/V1/sqx/Libraries/logback-core-1.4.14.md"
     },
     {
       "locator": "internal/libs/mcp-0.17.2.jar",
@@ -836,7 +836,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/mcp-0.17.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/mcp-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-0.17.2.md"
     },
     {
       "locator": "internal/libs/mcp-core-0.17.2.jar",
@@ -847,7 +847,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/mcp-core-0.17.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/mcp-core-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-core-0.17.2.md"
     },
     {
       "locator": "internal/libs/mcp-core.jar",
@@ -858,7 +858,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/mcp-core.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/mcp-core.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-core.md"
     },
     {
       "locator": "internal/libs/mcp-json-0.17.2.jar",
@@ -869,7 +869,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/mcp-json-0.17.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/mcp-json-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-json-0.17.2.md"
     },
     {
       "locator": "internal/libs/mcp-json-jackson2-0.17.2.jar",
@@ -880,7 +880,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/mcp-json-jackson2-0.17.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/mcp-json-jackson2-0.17.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-json-jackson2-0.17.2.md"
     },
     {
       "locator": "internal/libs/mcp-json-jackson2.jar",
@@ -891,7 +891,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/mcp-json-jackson2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/mcp-json-jackson2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/mcp-json-jackson2.md"
     },
     {
       "locator": "internal/libs/netty-all-4.1.5.Final.jar",
@@ -902,7 +902,7 @@
       "phase": "P14",
       "artifact_locator": "internal/libs/netty-all-4.1.5.Final.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/netty-all-4.1.5.Final.md"
+      "reference": "docs/dev/V1/sqx/Libraries/netty-all-4.1.5.Final.md"
     },
     {
       "locator": "internal/libs/objenesis-2.5.1.jar",
@@ -913,7 +913,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/objenesis-2.5.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/objenesis-2.5.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/objenesis-2.5.1.md"
     },
     {
       "locator": "internal/libs/okhttp-jvm-5.3.2.jar",
@@ -924,7 +924,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/okhttp-jvm-5.3.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/okhttp-jvm-5.3.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/okhttp-jvm-5.3.2.md"
     },
     {
       "locator": "internal/libs/okio-jvm-3.16.4.jar",
@@ -935,7 +935,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/okio-jvm-3.16.4.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/okio-jvm-3.16.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/okio-jvm-3.16.4.md"
     },
     {
       "locator": "internal/libs/opentelemetry-api-1.61.0.jar",
@@ -946,7 +946,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-api-1.61.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-api-1.61.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-api-1.61.0.md"
     },
     {
       "locator": "internal/libs/opentelemetry-api-incubator-1.61.0-alpha.jar",
@@ -957,7 +957,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-api-incubator-1.61.0-alpha.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-api-incubator-1.61.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-api-incubator-1.61.0-alpha.md"
     },
     {
       "locator": "internal/libs/opentelemetry-common-1.61.0.jar",
@@ -968,7 +968,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-common-1.61.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-common-1.61.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-common-1.61.0.md"
     },
     {
       "locator": "internal/libs/opentelemetry-context-1.61.0.jar",
@@ -979,7 +979,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-context-1.61.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-context-1.61.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-context-1.61.0.md"
     },
     {
       "locator": "internal/libs/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.jar",
@@ -990,7 +990,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-annotations-support-2.27.0-alpha.md"
     },
     {
       "locator": "internal/libs/opentelemetry-instrumentation-api-2.27.0.jar",
@@ -1001,7 +1001,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-instrumentation-api-2.27.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-instrumentation-api-2.27.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-api-2.27.0.md"
     },
     {
       "locator": "internal/libs/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.jar",
@@ -1012,7 +1012,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-instrumentation-api-incubator-2.27.0-alpha.md"
     },
     {
       "locator": "internal/libs/opentelemetry-reactor-3.1-2.27.0-alpha.jar",
@@ -1023,7 +1023,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-reactor-3.1-2.27.0-alpha.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-reactor-3.1-2.27.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-reactor-3.1-2.27.0-alpha.md"
     },
     {
       "locator": "internal/libs/opentelemetry-semconv-1.40.0.jar",
@@ -1034,7 +1034,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-semconv-1.40.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-semconv-1.40.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-semconv-1.40.0.md"
     },
     {
       "locator": "internal/libs/opentelemetry-semconv-incubating-1.40.0-alpha.jar",
@@ -1045,7 +1045,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/opentelemetry-semconv-incubating-1.40.0-alpha.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/opentelemetry-semconv-incubating-1.40.0-alpha.md"
+      "reference": "docs/dev/V1/sqx/Libraries/opentelemetry-semconv-incubating-1.40.0-alpha.md"
     },
     {
       "locator": "internal/libs/oshi-core-5.8.5.jar",
@@ -1056,7 +1056,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/oshi-core-5.8.5.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/oshi-core-5.8.5.md"
+      "reference": "docs/dev/V1/sqx/Libraries/oshi-core-5.8.5.md"
     },
     {
       "locator": "internal/libs/pd4ml.jar",
@@ -1067,7 +1067,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/pd4ml.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/pd4ml.md"
+      "reference": "docs/dev/V1/sqx/Libraries/pd4ml.md"
     },
     {
       "locator": "internal/libs/pngj.jar",
@@ -1078,7 +1078,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/pngj.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/pngj.md"
+      "reference": "docs/dev/V1/sqx/Libraries/pngj.md"
     },
     {
       "locator": "internal/libs/poi-3.11.jar",
@@ -1089,7 +1089,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/poi-3.11.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/poi-3.11.md"
+      "reference": "docs/dev/V1/sqx/Libraries/poi-3.11.md"
     },
     {
       "locator": "internal/libs/poi-ooxml-3.11.jar",
@@ -1100,7 +1100,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/poi-ooxml-3.11.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/poi-ooxml-3.11.md"
+      "reference": "docs/dev/V1/sqx/Libraries/poi-ooxml-3.11.md"
     },
     {
       "locator": "internal/libs/poi-ooxml-schemas-3.11.jar",
@@ -1111,7 +1111,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/poi-ooxml-schemas-3.11.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/poi-ooxml-schemas-3.11.md"
+      "reference": "docs/dev/V1/sqx/Libraries/poi-ooxml-schemas-3.11.md"
     },
     {
       "locator": "internal/libs/PSUtils.jar",
@@ -1122,7 +1122,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/PSUtils.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/PSUtils.md"
+      "reference": "docs/dev/V1/sqx/Libraries/PSUtils.md"
     },
     {
       "locator": "internal/libs/reactive-streams-1.0.4.jar",
@@ -1133,7 +1133,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/reactive-streams-1.0.4.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/reactive-streams-1.0.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/reactive-streams-1.0.4.md"
     },
     {
       "locator": "internal/libs/reactor-core-3.8.2.jar",
@@ -1144,7 +1144,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/reactor-core-3.8.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/reactor-core-3.8.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/reactor-core-3.8.2.md"
     },
     {
       "locator": "internal/libs/rsyntaxtextarea-2.6.0.jar",
@@ -1155,7 +1155,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/rsyntaxtextarea-2.6.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/rsyntaxtextarea-2.6.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/rsyntaxtextarea-2.6.0.md"
     },
     {
       "locator": "internal/libs/slf4j-api-2.0.17.jar",
@@ -1166,7 +1166,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/slf4j-api-2.0.17.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/slf4j-api-2.0.17.md"
+      "reference": "docs/dev/V1/sqx/Libraries/slf4j-api-2.0.17.md"
     },
     {
       "locator": "internal/libs/snakeyaml-2.6.jar",
@@ -1177,7 +1177,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/snakeyaml-2.6.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/snakeyaml-2.6.md"
+      "reference": "docs/dev/V1/sqx/Libraries/snakeyaml-2.6.md"
     },
     {
       "locator": "internal/libs/Snippets.jar",
@@ -1188,7 +1188,7 @@
       "phase": "P05",
       "artifact_locator": "internal/libs/Snippets.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/Snippets.md"
+      "reference": "docs/dev/V1/sqx/Libraries/Snippets.md"
     },
     {
       "locator": "internal/libs/sqlite-jdbc-3.51.2.0.jar",
@@ -1199,7 +1199,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/sqlite-jdbc-3.51.2.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/sqlite-jdbc-3.51.2.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/sqlite-jdbc-3.51.2.0.md"
     },
     {
       "locator": "internal/libs/stax-api-1.0.1.jar",
@@ -1210,7 +1210,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/stax-api-1.0.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/stax-api-1.0.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/stax-api-1.0.1.md"
     },
     {
       "locator": "internal/libs/svg-salamander-1.0.jar",
@@ -1221,7 +1221,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/svg-salamander-1.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/svg-salamander-1.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/svg-salamander-1.0.md"
     },
     {
       "locator": "internal/libs/ta-lib-0.4.0.jar",
@@ -1232,7 +1232,7 @@
       "phase": "P05",
       "artifact_locator": "internal/libs/ta-lib-0.4.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/ta-lib-0.4.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/ta-lib-0.4.0.md"
     },
     {
       "locator": "internal/libs/tree-sitter-0.24.4.jar",
@@ -1243,7 +1243,7 @@
       "phase": "P19",
       "artifact_locator": "internal/libs/tree-sitter-0.24.4.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/tree-sitter-0.24.4.md"
+      "reference": "docs/dev/V1/sqx/Libraries/tree-sitter-0.24.4.md"
     },
     {
       "locator": "internal/libs/tree-sitter-bash-0.23.3.jar",
@@ -1254,7 +1254,7 @@
       "phase": "P19",
       "artifact_locator": "internal/libs/tree-sitter-bash-0.23.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/tree-sitter-bash-0.23.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/tree-sitter-bash-0.23.3.md"
     },
     {
       "locator": "internal/libs/uncommons-maths-1.2.2a.jar",
@@ -1265,7 +1265,7 @@
       "phase": "P09",
       "artifact_locator": "internal/libs/uncommons-maths-1.2.2a.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/uncommons-maths-1.2.2a.md"
+      "reference": "docs/dev/V1/sqx/Libraries/uncommons-maths-1.2.2a.md"
     },
     {
       "locator": "internal/libs/watchmaker-framework-0.7.1.jar",
@@ -1276,7 +1276,7 @@
       "phase": "P09",
       "artifact_locator": "internal/libs/watchmaker-framework-0.7.1.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/watchmaker-framework-0.7.1.md"
+      "reference": "docs/dev/V1/sqx/Libraries/watchmaker-framework-0.7.1.md"
     },
     {
       "locator": "internal/libs/weblaf-core-1.2.9.jar",
@@ -1287,7 +1287,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/weblaf-core-1.2.9.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/weblaf-core-1.2.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/weblaf-core-1.2.9.md"
     },
     {
       "locator": "internal/libs/weblaf-ui-1.2.9.jar",
@@ -1298,7 +1298,7 @@
       "phase": "P17",
       "artifact_locator": "internal/libs/weblaf-ui-1.2.9.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/weblaf-ui-1.2.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/weblaf-ui-1.2.9.md"
     },
     {
       "locator": "internal/libs/WMI4Java-1.6.3.jar",
@@ -1309,7 +1309,7 @@
       "phase": "P01",
       "artifact_locator": "internal/libs/WMI4Java-1.6.3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/WMI4Java-1.6.3.md"
+      "reference": "docs/dev/V1/sqx/Libraries/WMI4Java-1.6.3.md"
     },
     {
       "locator": "internal/libs/xmlbeans-2.6.0.jar",
@@ -1320,7 +1320,7 @@
       "phase": "P08",
       "artifact_locator": "internal/libs/xmlbeans-2.6.0.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/xmlbeans-2.6.0.md"
+      "reference": "docs/dev/V1/sqx/Libraries/xmlbeans-2.6.0.md"
     },
     {
       "locator": "internal/libs/xstream-1.4.9.jar",
@@ -1331,7 +1331,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/xstream-1.4.9.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/xstream-1.4.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/xstream-1.4.9.md"
     },
     {
       "locator": "internal/libs/xz-1.9.jar",
@@ -1342,7 +1342,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/xz-1.9.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/xz-1.9.md"
+      "reference": "docs/dev/V1/sqx/Libraries/xz-1.9.md"
     },
     {
       "locator": "internal/libs/zip4j-1.3.2.jar",
@@ -1353,7 +1353,7 @@
       "phase": "P02",
       "artifact_locator": "internal/libs/zip4j-1.3.2.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Libraries/zip4j-1.3.2.md"
+      "reference": "docs/dev/V1/sqx/Libraries/zip4j-1.3.2.md"
     },
     {
       "locator": "internal/plugins/AppBuilder/AppBuilder.jar",
@@ -1364,7 +1364,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/AppBuilder/AppBuilder.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Builder/AppBuilder.md"
+      "reference": "docs/dev/V1/sqx/Builder/AppBuilder.md"
     },
     {
       "locator": "internal/plugins/AppCodeEditor/AppCodeEditor.jar",
@@ -1375,7 +1375,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/AppCodeEditor/AppCodeEditor.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CodeEditor/AppCodeEditor.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/AppCodeEditor.md"
     },
     {
       "locator": "internal/plugins/AppDataManager/AppDataManager.jar",
@@ -1386,7 +1386,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/AppDataManager/AppDataManager.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/AppDataManager.md"
+      "reference": "docs/dev/V1/sqx/DataManager/AppDataManager.md"
     },
     {
       "locator": "internal/plugins/AppDebugConsole/AppDebugConsole.jar",
@@ -1397,7 +1397,7 @@
       "phase": "P01",
       "artifact_locator": "internal/plugins/AppDebugConsole/AppDebugConsole.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DebugConsole/AppDebugConsole.md"
+      "reference": "docs/dev/V1/sqx/DebugConsole/AppDebugConsole.md"
     },
     {
       "locator": "internal/plugins/AppGridControl/AppGridControl.jar",
@@ -1408,7 +1408,7 @@
       "phase": "P14",
       "artifact_locator": "internal/plugins/AppGridControl/AppGridControl.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/GridControl/AppGridControl.md"
+      "reference": "docs/dev/V1/sqx/GridControl/AppGridControl.md"
     },
     {
       "locator": "internal/plugins/AppGridTest/AppGridTest.jar",
@@ -1419,7 +1419,7 @@
       "phase": "P14",
       "artifact_locator": "internal/plugins/AppGridTest/AppGridTest.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/GridTest/AppGridTest.md"
+      "reference": "docs/dev/V1/sqx/GridTest/AppGridTest.md"
     },
     {
       "locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
@@ -1430,7 +1430,7 @@
       "phase": "P17",
       "artifact_locator": "internal/plugins/AppMarketplace/AppMarketplace.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Plugins/AppMarketplace.md"
+      "reference": "docs/dev/V1/sqx/Plugins/AppMarketplace.md"
     },
     {
       "locator": "internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar",
@@ -1441,7 +1441,7 @@
       "phase": "P15",
       "artifact_locator": "internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/NeuralNetworkTrainer/AppNeuralNetwork.md"
+      "reference": "docs/dev/V1/sqx/NeuralNetworkTrainer/AppNeuralNetwork.md"
     },
     {
       "locator": "internal/plugins/AppOptimizer/AppOptimizer.jar",
@@ -1452,7 +1452,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/AppOptimizer/AppOptimizer.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Optimizer/AppOptimizer.md"
+      "reference": "docs/dev/V1/sqx/Optimizer/AppOptimizer.md"
     },
     {
       "locator": "internal/plugins/AppPortfolioComposer/AppPortfolioComposer.jar",
@@ -1463,7 +1463,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/AppPortfolioComposer/AppPortfolioComposer.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/PortfolioComposer/AppPortfolioComposer.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/AppPortfolioComposer.md"
     },
     {
       "locator": "internal/plugins/AppPortfolioMaster/AppPortfolioMaster.jar",
@@ -1474,7 +1474,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/AppPortfolioMaster/AppPortfolioMaster.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/PortfolioMaster/AppPortfolioMaster.md"
+      "reference": "docs/dev/V1/sqx/PortfolioMaster/AppPortfolioMaster.md"
     },
     {
       "locator": "internal/plugins/AppResults/AppResults.jar",
@@ -1485,7 +1485,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/AppResults/AppResults.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/AppResults.md"
+      "reference": "docs/dev/V1/sqx/Results/AppResults.md"
     },
     {
       "locator": "internal/plugins/AppRetester/AppRetester.jar",
@@ -1496,7 +1496,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/AppRetester/AppRetester.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Retester/AppRetester.md"
+      "reference": "docs/dev/V1/sqx/Retester/AppRetester.md"
     },
     {
       "locator": "internal/plugins/AppSQXBusiness/AppSQXBusiness.jar",
@@ -1507,7 +1507,7 @@
       "phase": "P17",
       "artifact_locator": "internal/plugins/AppSQXBusiness/AppSQXBusiness.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/SQXBusiness/AppSQXBusiness.md"
+      "reference": "docs/dev/V1/sqx/SQXBusiness/AppSQXBusiness.md"
     },
     {
       "locator": "internal/plugins/AppSQXHome/AppSQXHome.jar",
@@ -1518,7 +1518,7 @@
       "phase": "P17",
       "artifact_locator": "internal/plugins/AppSQXHome/AppSQXHome.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/GettingStarted/AppSQXHome.md"
+      "reference": "docs/dev/V1/sqx/GettingStarted/AppSQXHome.md"
     },
     {
       "locator": "internal/plugins/AppStrategyQuant/AppStrategyQuant.jar",
@@ -1529,7 +1529,7 @@
       "phase": "P17",
       "artifact_locator": "internal/plugins/AppStrategyQuant/AppStrategyQuant.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/ProductShells/AppStrategyQuant.md"
+      "reference": "docs/dev/V1/sqx/ProductShells/AppStrategyQuant.md"
     },
     {
       "locator": "internal/plugins/AppTaskManager/AppTaskManager.jar",
@@ -1540,7 +1540,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/AppTaskManager/AppTaskManager.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/AppTaskManager.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/AppTaskManager.md"
     },
     {
       "locator": "internal/plugins/AppWizard/AppWizard.jar",
@@ -1551,7 +1551,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/AppWizard/AppWizard.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/AlgoWizard/AppWizard.md"
+      "reference": "docs/dev/V1/sqx/AlgoWizard/AppWizard.md"
     },
     {
       "locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
@@ -1562,7 +1562,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CodeEditor/CodeEditorImportExport.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/CodeEditorImportExport.md"
     },
     {
       "locator": "internal/plugins/CodeEditorIndicatorTester/CodeEditorIndicatorTester.jar",
@@ -1573,7 +1573,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/CodeEditorIndicatorTester/CodeEditorIndicatorTester.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CodeEditor/CodeEditorIndicatorTester.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/CodeEditorIndicatorTester.md"
     },
     {
       "locator": "internal/plugins/ConnectionLiveTest/ConnectionLiveTest.jar",
@@ -1584,7 +1584,7 @@
       "phase": "P16",
       "artifact_locator": "internal/plugins/ConnectionLiveTest/ConnectionLiveTest.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ConnectionLiveTest.md"
+      "reference": "docs/dev/V1/sqx/Shared/ConnectionLiveTest.md"
     },
     {
       "locator": "internal/plugins/ConnectionMT4/ConnectionMT4.jar",
@@ -1595,7 +1595,7 @@
       "phase": "P16",
       "artifact_locator": "internal/plugins/ConnectionMT4/ConnectionMT4.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ConnectionMT4.md"
+      "reference": "docs/dev/V1/sqx/Shared/ConnectionMT4.md"
     },
     {
       "locator": "internal/plugins/ConnectionTest/ConnectionTest.jar",
@@ -1606,7 +1606,7 @@
       "phase": "P16",
       "artifact_locator": "internal/plugins/ConnectionTest/ConnectionTest.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ConnectionTest.md"
+      "reference": "docs/dev/V1/sqx/Shared/ConnectionTest.md"
     },
     {
       "locator": "internal/plugins/CrossCheckMonteCarloManipulation/CrossCheckMonteCarloManipulation.jar",
@@ -1617,7 +1617,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckMonteCarloManipulation/CrossCheckMonteCarloManipulation.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckMonteCarloManipulation.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckMonteCarloManipulation.md"
     },
     {
       "locator": "internal/plugins/CrossCheckMonteCarloRetest/CrossCheckMonteCarloRetest.jar",
@@ -1628,7 +1628,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckMonteCarloRetest/CrossCheckMonteCarloRetest.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckMonteCarloRetest.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckMonteCarloRetest.md"
     },
     {
       "locator": "internal/plugins/CrossCheckOptProfileSysParamPermutation/CrossCheckOptProfileSysParamPermutation.jar",
@@ -1639,7 +1639,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckOptProfileSysParamPermutation/CrossCheckOptProfileSysParamPermutation.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckOptProfileSysParamPermutation.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckOptProfileSysParamPermutation.md"
     },
     {
       "locator": "internal/plugins/CrossCheckRetestOnAdditionalMarkets/CrossCheckRetestOnAdditionalMarkets.jar",
@@ -1650,7 +1650,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckRetestOnAdditionalMarkets/CrossCheckRetestOnAdditionalMarkets.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckRetestOnAdditionalMarkets.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckRetestOnAdditionalMarkets.md"
     },
     {
       "locator": "internal/plugins/CrossCheckRetestWithHigherPrecision/CrossCheckRetestWithHigherPrecision.jar",
@@ -1661,7 +1661,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckRetestWithHigherPrecision/CrossCheckRetestWithHigherPrecision.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckRetestWithHigherPrecision.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckRetestWithHigherPrecision.md"
     },
     {
       "locator": "internal/plugins/CrossCheckSequentialOptimization/CrossCheckSequentialOptimization.jar",
@@ -1672,7 +1672,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckSequentialOptimization/CrossCheckSequentialOptimization.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckSequentialOptimization.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckSequentialOptimization.md"
     },
     {
       "locator": "internal/plugins/CrossCheckWalkForwardMatrix/CrossCheckWalkForwardMatrix.jar",
@@ -1683,7 +1683,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckWalkForwardMatrix/CrossCheckWalkForwardMatrix.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckWalkForwardMatrix.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckWalkForwardMatrix.md"
     },
     {
       "locator": "internal/plugins/CrossCheckWalkForwardOptimization/CrossCheckWalkForwardOptimization.jar",
@@ -1694,7 +1694,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckWalkForwardOptimization/CrossCheckWalkForwardOptimization.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckWalkForwardOptimization.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckWalkForwardOptimization.md"
     },
     {
       "locator": "internal/plugins/CrossCheckWhatIf/CrossCheckWhatIf.jar",
@@ -1705,7 +1705,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/CrossCheckWhatIf/CrossCheckWhatIf.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/CrossCheckWhatIf.md"
+      "reference": "docs/dev/V1/sqx/Shared/CrossCheckWhatIf.md"
     },
     {
       "locator": "internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar",
@@ -1716,7 +1716,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBinance.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinance.md"
     },
     {
       "locator": "internal/plugins/CryptoExchangeBinanceCoinM/CryptoExchangeBinanceCoinM.jar",
@@ -1727,7 +1727,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/CryptoExchangeBinanceCoinM/CryptoExchangeBinanceCoinM.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBinanceCoinM.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinanceCoinM.md"
     },
     {
       "locator": "internal/plugins/CryptoExchangeBinanceUsdtM/CryptoExchangeBinanceUsdtM.jar",
@@ -1738,7 +1738,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/CryptoExchangeBinanceUsdtM/CryptoExchangeBinanceUsdtM.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBinanceUsdtM.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBinanceUsdtM.md"
     },
     {
       "locator": "internal/plugins/CryptoExchangeBitfinex/CryptoExchangeBitfinex.jar",
@@ -1749,7 +1749,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/CryptoExchangeBitfinex/CryptoExchangeBitfinex.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/CryptoExchangeBitfinex.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeBitfinex.md"
     },
     {
       "locator": "internal/plugins/CryptoExchangeCoinbasePro/CryptoExchangeCoinbasePro.jar",
@@ -1760,7 +1760,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/CryptoExchangeCoinbasePro/CryptoExchangeCoinbasePro.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/CryptoExchangeCoinbasePro.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangeCoinbasePro.md"
     },
     {
       "locator": "internal/plugins/CryptoExchangePoloniex/CryptoExchangePoloniex.jar",
@@ -1771,7 +1771,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/CryptoExchangePoloniex/CryptoExchangePoloniex.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/CryptoExchangePoloniex.md"
+      "reference": "docs/dev/V1/sqx/DataManager/CryptoExchangePoloniex.md"
     },
     {
       "locator": "internal/plugins/DashboardResults/DashboardResults.jar",
@@ -1782,7 +1782,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/DashboardResults/DashboardResults.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/DashboardResults.md"
+      "reference": "docs/dev/V1/sqx/Results/DashboardResults.md"
     },
     {
       "locator": "internal/plugins/DatabankFilterByCorrelation/DatabankFilterByCorrelation.jar",
@@ -1793,7 +1793,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/DatabankFilterByCorrelation/DatabankFilterByCorrelation.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/DatabankFilterByCorrelation.md"
+      "reference": "docs/dev/V1/sqx/Results/DatabankFilterByCorrelation.md"
     },
     {
       "locator": "internal/plugins/DatabankRename/DatabankRename.jar",
@@ -1804,7 +1804,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/DatabankRename/DatabankRename.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/DatabankRename.md"
+      "reference": "docs/dev/V1/sqx/Results/DatabankRename.md"
     },
     {
       "locator": "internal/plugins/DataManagerBasket/DataManagerBasket.jar",
@@ -1815,7 +1815,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/DataManagerBasket/DataManagerBasket.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerBasket.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerBasket.md"
     },
     {
       "locator": "internal/plugins/DataManagerBroker/DataManagerBroker.jar",
@@ -1826,7 +1826,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/DataManagerBroker/DataManagerBroker.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerBroker.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerBroker.md"
     },
     {
       "locator": "internal/plugins/DataManagerConnections/DataManagerConnections.jar",
@@ -1837,7 +1837,7 @@
       "phase": "P16",
       "artifact_locator": "internal/plugins/DataManagerConnections/DataManagerConnections.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerConnections.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerConnections.md"
     },
     {
       "locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
@@ -1848,7 +1848,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/DataManagerCustomData/DataManagerCustomData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerCustomData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerCustomData.md"
     },
     {
       "locator": "internal/plugins/DataManagerData/DataManagerData.jar",
@@ -1859,7 +1859,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/DataManagerData/DataManagerData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerData.md"
     },
     {
       "locator": "internal/plugins/DataManagerHome/DataManagerHome.jar",
@@ -1870,7 +1870,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/DataManagerHome/DataManagerHome.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerHome.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerHome.md"
     },
     {
       "locator": "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar",
@@ -1881,7 +1881,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/DataManagerInstruments/DataManagerInstruments.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerInstruments.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerInstruments.md"
     },
     {
       "locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
@@ -1892,7 +1892,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/DataManagerSessions/DataManagerSessions.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataManagerSessions.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataManagerSessions.md"
     },
     {
       "locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
@@ -1903,7 +1903,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceCrypto.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceCrypto.md"
     },
     {
       "locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
@@ -1914,7 +1914,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceDarwinex/DataSourceDarwinex.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceDarwinex.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceDarwinex.md"
     },
     {
       "locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
@@ -1925,7 +1925,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceDukascopy/DataSourceDukascopy.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceDukascopy.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceDukascopy.md"
     },
     {
       "locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
@@ -1936,7 +1936,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceFiles/DataSourceFiles.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceFiles.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceFiles.md"
     },
     {
       "locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
@@ -1947,7 +1947,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceMt5Api.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceMt5Api.md"
     },
     {
       "locator": "internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
@@ -1958,7 +1958,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceSQEquityData/DataSourceSQEquityData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceSQEquityData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceSQEquityData.md"
     },
     {
       "locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
@@ -1969,7 +1969,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceSQFuturesData/DataSourceSQFuturesData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceSQFuturesData.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceSQFuturesData.md"
     },
     {
       "locator": "internal/plugins/DataSourceTD/DataSourceTD.jar",
@@ -1980,7 +1980,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceTD/DataSourceTD.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceTD.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceTD.md"
     },
     {
       "locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
@@ -1991,7 +1991,7 @@
       "phase": "P04",
       "artifact_locator": "internal/plugins/DataSourceYahoo/DataSourceYahoo.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/DataManager/DataSourceYahoo.md"
+      "reference": "docs/dev/V1/sqx/DataManager/DataSourceYahoo.md"
     },
     {
       "locator": "internal/plugins/EnginePanel/EnginePanel.jar",
@@ -2002,7 +2002,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/EnginePanel/EnginePanel.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/GridControl/EnginePanel.md"
+      "reference": "docs/dev/V1/sqx/GridControl/EnginePanel.md"
     },
     {
       "locator": "internal/plugins/EquityChartBenchmark/EquityChartBenchmark.jar",
@@ -2013,7 +2013,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/EquityChartBenchmark/EquityChartBenchmark.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/EquityChartBenchmark.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartBenchmark.md"
     },
     {
       "locator": "internal/plugins/EquityChartDailyChart/EquityChartDailyChart.jar",
@@ -2024,7 +2024,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/EquityChartDailyChart/EquityChartDailyChart.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/EquityChartDailyChart.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartDailyChart.md"
     },
     {
       "locator": "internal/plugins/EquityChartDrawdown/EquityChartDrawdown.jar",
@@ -2035,7 +2035,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/EquityChartDrawdown/EquityChartDrawdown.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/EquityChartDrawdown.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartDrawdown.md"
     },
     {
       "locator": "internal/plugins/EquityChartVolatility/EquityChartVolatility.jar",
@@ -2046,7 +2046,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/EquityChartVolatility/EquityChartVolatility.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/EquityChartVolatility.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartVolatility.md"
     },
     {
       "locator": "internal/plugins/EquityChartVolume/EquityChartVolume.jar",
@@ -2057,7 +2057,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/EquityChartVolume/EquityChartVolume.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/EquityChartVolume.md"
+      "reference": "docs/dev/V1/sqx/Results/EquityChartVolume.md"
     },
     {
       "locator": "internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolio.jar",
@@ -2068,7 +2068,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolio.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/FitnessMethodExistingPortfolio.md"
+      "reference": "docs/dev/V1/sqx/Shared/FitnessMethodExistingPortfolio.md"
     },
     {
       "locator": "internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar",
@@ -2079,7 +2079,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResult.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/FitnessMethodStrategyResult.md"
+      "reference": "docs/dev/V1/sqx/Shared/FitnessMethodStrategyResult.md"
     },
     {
       "locator": "internal/plugins/FitnessMethodWFResult/FitnessMethodWFResult.jar",
@@ -2090,7 +2090,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/FitnessMethodWFResult/FitnessMethodWFResult.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/FitnessMethodWFResult.md"
+      "reference": "docs/dev/V1/sqx/Shared/FitnessMethodWFResult.md"
     },
     {
       "locator": "internal/plugins/HomeAbout/HomeAbout.jar",
@@ -2101,7 +2101,7 @@
       "phase": "P17",
       "artifact_locator": "internal/plugins/HomeAbout/HomeAbout.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/HomeAbout.md"
+      "reference": "docs/dev/V1/sqx/Shared/HomeAbout.md"
     },
     {
       "locator": "internal/plugins/LoaderSQ3/LoaderSQ3.jar",
@@ -2112,7 +2112,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/LoaderSQ3/LoaderSQ3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/LoaderSQ3.md"
+      "reference": "docs/dev/V1/sqx/Shared/LoaderSQ3.md"
     },
     {
       "locator": "internal/plugins/LoaderSQ4/LoaderSQ4.jar",
@@ -2123,7 +2123,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/LoaderSQ4/LoaderSQ4.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/LoaderSQ4.md"
+      "reference": "docs/dev/V1/sqx/Shared/LoaderSQ4.md"
     },
     {
       "locator": "internal/plugins/PortfolioComposer/PortfolioComposer.jar",
@@ -2134,7 +2134,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/PortfolioComposer/PortfolioComposer.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/PortfolioComposer/PortfolioComposer.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/PortfolioComposer.md"
     },
     {
       "locator": "internal/plugins/ProjectConditionCyclesCount/ProjectConditionCyclesCount.jar",
@@ -2145,7 +2145,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/ProjectConditionCyclesCount/ProjectConditionCyclesCount.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ProjectConditionCyclesCount.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionCyclesCount.md"
     },
     {
       "locator": "internal/plugins/ProjectConditionGoToActivated/ProjectConditionGoToActivated.jar",
@@ -2156,7 +2156,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/ProjectConditionGoToActivated/ProjectConditionGoToActivated.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ProjectConditionGoToActivated.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionGoToActivated.md"
     },
     {
       "locator": "internal/plugins/ProjectConditionGoToEvaluated/ProjectConditionGoToEvaluated.jar",
@@ -2167,7 +2167,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/ProjectConditionGoToEvaluated/ProjectConditionGoToEvaluated.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ProjectConditionGoToEvaluated.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionGoToEvaluated.md"
     },
     {
       "locator": "internal/plugins/ProjectConditionResultsCount/ProjectConditionResultsCount.jar",
@@ -2178,7 +2178,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/ProjectConditionResultsCount/ProjectConditionResultsCount.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ProjectConditionResultsCount.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionResultsCount.md"
     },
     {
       "locator": "internal/plugins/ProjectConditionRunTime/ProjectConditionRunTime.jar",
@@ -2189,7 +2189,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/ProjectConditionRunTime/ProjectConditionRunTime.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ProjectConditionRunTime.md"
+      "reference": "docs/dev/V1/sqx/Shared/ProjectConditionRunTime.md"
     },
     {
       "locator": "internal/plugins/ResultsChart/ResultsChart.jar",
@@ -2200,7 +2200,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsChart/ResultsChart.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsChart.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsChart.md"
     },
     {
       "locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
@@ -2211,7 +2211,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsDatabankActions.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsDatabankActions.md"
     },
     {
       "locator": "internal/plugins/ResultsDatabankViews/ResultsDatabankViews.jar",
@@ -2222,7 +2222,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsDatabankViews/ResultsDatabankViews.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsDatabankViews.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsDatabankViews.md"
     },
     {
       "locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
@@ -2233,7 +2233,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsEquityChart.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsEquityChart.md"
     },
     {
       "locator": "internal/plugins/ResultsExplore/ResultsExplore.jar",
@@ -2244,7 +2244,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsExplore/ResultsExplore.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsExplore.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsExplore.md"
     },
     {
       "locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
@@ -2255,7 +2255,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsOptimizationProfile.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsOptimizationProfile.md"
     },
     {
       "locator": "internal/plugins/ResultsOverview/ResultsOverview.jar",
@@ -2266,7 +2266,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsOverview/ResultsOverview.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsOverview.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsOverview.md"
     },
     {
       "locator": "internal/plugins/ResultsPlugins/ResultsPlugins.jar",
@@ -2277,7 +2277,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsPlugins/ResultsPlugins.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsPlugins.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsPlugins.md"
     },
     {
       "locator": "internal/plugins/ResultsPortfolioComposerChart/ResultsPortfolioComposerChart.jar",
@@ -2288,7 +2288,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/ResultsPortfolioComposerChart/ResultsPortfolioComposerChart.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/PortfolioComposer/ResultsPortfolioComposerChart.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/ResultsPortfolioComposerChart.md"
     },
     {
       "locator": "internal/plugins/ResultsPortfolioComposerLog/ResultsPortfolioComposerLog.jar",
@@ -2299,7 +2299,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/ResultsPortfolioComposerLog/ResultsPortfolioComposerLog.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/PortfolioComposer/ResultsPortfolioComposerLog.md"
+      "reference": "docs/dev/V1/sqx/PortfolioComposer/ResultsPortfolioComposerLog.md"
     },
     {
       "locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
@@ -2310,7 +2310,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/ResultsPortfolioCorrelation/ResultsPortfolioCorrelation.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsPortfolioCorrelation.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsPortfolioCorrelation.md"
     },
     {
       "locator": "internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
@@ -2321,7 +2321,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/ResultsProfileChart/ResultsProfileChart.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsProfileChart.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsProfileChart.md"
     },
     {
       "locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
@@ -2332,7 +2332,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/ResultsRobustnessTests/ResultsRobustnessTests.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsRobustnessTests.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsRobustnessTests.md"
     },
     {
       "locator": "internal/plugins/ResultsSequentialOptimization/ResultsSequentialOptimization.jar",
@@ -2343,7 +2343,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/ResultsSequentialOptimization/ResultsSequentialOptimization.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsSequentialOptimization.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSequentialOptimization.md"
     },
     {
       "locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
@@ -2354,7 +2354,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/ResultsSourceCode/ResultsSourceCode.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsSourceCode.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSourceCode.md"
     },
     {
       "locator": "internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
@@ -2365,7 +2365,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsSPOverview/ResultsSPOverview.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsSPOverview.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSPOverview.md"
     },
     {
       "locator": "internal/plugins/ResultsStockpicker/ResultsStockpicker.jar",
@@ -2376,7 +2376,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsStockpicker/ResultsStockpicker.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsStockpicker.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsStockpicker.md"
     },
     {
       "locator": "internal/plugins/ResultsStrategyConfig/ResultsStrategyConfig.jar",
@@ -2387,7 +2387,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsStrategyConfig/ResultsStrategyConfig.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsStrategyConfig.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsStrategyConfig.md"
     },
     {
       "locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
@@ -2398,7 +2398,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/ResultsSysParamPermutation/ResultsSysParamPermutation.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsSysParamPermutation.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsSysParamPermutation.md"
     },
     {
       "locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
@@ -2409,7 +2409,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsTradeAnalysis/ResultsTradeAnalysis.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsTradeAnalysis.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsTradeAnalysis.md"
     },
     {
       "locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
@@ -2420,7 +2420,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsTradeList/ResultsTradeList.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsTradeList.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsTradeList.md"
     },
     {
       "locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
@@ -2431,7 +2431,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ResultsTradelistViews/ResultsTradelistViews.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsTradelistViews.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsTradelistViews.md"
     },
     {
       "locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
@@ -2442,7 +2442,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/ResultsWalkForward/ResultsWalkForward.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Results/ResultsWalkForward.md"
+      "reference": "docs/dev/V1/sqx/Results/ResultsWalkForward.md"
     },
     {
       "locator": "internal/plugins/SaverHTML/SaverHTML.jar",
@@ -2453,7 +2453,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/SaverHTML/SaverHTML.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SaverHTML.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverHTML.md"
     },
     {
       "locator": "internal/plugins/SaverPDF/SaverPDF.jar",
@@ -2464,7 +2464,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/SaverPDF/SaverPDF.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SaverPDF.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverPDF.md"
     },
     {
       "locator": "internal/plugins/SaverSQ3/SaverSQ3.jar",
@@ -2475,7 +2475,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/SaverSQ3/SaverSQ3.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SaverSQ3.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverSQ3.md"
     },
     {
       "locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
@@ -2486,7 +2486,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SaverStrategyTrades.md"
+      "reference": "docs/dev/V1/sqx/Shared/SaverStrategyTrades.md"
     },
     {
       "locator": "internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar",
@@ -2497,7 +2497,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Plugins/ServletAlgoCloud.md"
+      "reference": "docs/dev/V1/sqx/Plugins/ServletAlgoCloud.md"
     },
     {
       "locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
@@ -2508,7 +2508,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/AlgoWizard/ServletAlgoWizard.md"
+      "reference": "docs/dev/V1/sqx/AlgoWizard/ServletAlgoWizard.md"
     },
     {
       "locator": "internal/plugins/ServletBuilder/ServletBuilder.jar",
@@ -2519,7 +2519,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/ServletBuilder/ServletBuilder.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Builder/ServletBuilder.md"
+      "reference": "docs/dev/V1/sqx/Builder/ServletBuilder.md"
     },
     {
       "locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
@@ -2530,7 +2530,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/ServletCodeEditor/ServletCodeEditor.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CodeEditor/ServletCodeEditor.md"
+      "reference": "docs/dev/V1/sqx/CodeEditor/ServletCodeEditor.md"
     },
     {
       "locator": "internal/plugins/ServletConnection/ServletConnection.jar",
@@ -2541,7 +2541,7 @@
       "phase": "P16",
       "artifact_locator": "internal/plugins/ServletConnection/ServletConnection.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ServletConnection.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletConnection.md"
     },
     {
       "locator": "internal/plugins/ServletConstants/ServletConstants.jar",
@@ -2552,7 +2552,7 @@
       "phase": "P05",
       "artifact_locator": "internal/plugins/ServletConstants/ServletConstants.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ServletConstants.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletConstants.md"
     },
     {
       "locator": "internal/plugins/ServletGridControl/ServletGridControl.jar",
@@ -2563,7 +2563,7 @@
       "phase": "P14",
       "artifact_locator": "internal/plugins/ServletGridControl/ServletGridControl.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/GridControl/ServletGridControl.md"
+      "reference": "docs/dev/V1/sqx/GridControl/ServletGridControl.md"
     },
     {
       "locator": "internal/plugins/ServletProject/ServletProject.jar",
@@ -2574,7 +2574,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/ServletProject/ServletProject.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/ServletProject.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/ServletProject.md"
     },
     {
       "locator": "internal/plugins/ServletRenameTool/ServletRenameTool.jar",
@@ -2585,7 +2585,7 @@
       "phase": "P08",
       "artifact_locator": "internal/plugins/ServletRenameTool/ServletRenameTool.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ServletRenameTool.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletRenameTool.md"
     },
     {
       "locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
@@ -2596,7 +2596,7 @@
       "phase": "P19",
       "artifact_locator": "internal/plugins/ServletSQAI/ServletSQAI.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Plugins/ServletSQAI.md"
+      "reference": "docs/dev/V1/sqx/Plugins/ServletSQAI.md"
     },
     {
       "locator": "internal/plugins/ServletStrategy/ServletStrategy.jar",
@@ -2607,7 +2607,7 @@
       "phase": "P07",
       "artifact_locator": "internal/plugins/ServletStrategy/ServletStrategy.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/ServletStrategy.md"
+      "reference": "docs/dev/V1/sqx/Shared/ServletStrategy.md"
     },
     {
       "locator": "internal/plugins/SettingsAdvancedTM/SettingsAdvancedTM.jar",
@@ -2618,7 +2618,7 @@
       "phase": "P06",
       "artifact_locator": "internal/plugins/SettingsAdvancedTM/SettingsAdvancedTM.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsAdvancedTM.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsAdvancedTM.md"
     },
     {
       "locator": "internal/plugins/SettingsApplyMassConfig/SettingsApplyMassConfig.jar",
@@ -2629,7 +2629,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsApplyMassConfig/SettingsApplyMassConfig.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsApplyMassConfig.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsApplyMassConfig.md"
     },
     {
       "locator": "internal/plugins/SettingsAutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilder.jar",
@@ -2640,7 +2640,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/SettingsAutomaticPortfolioBuilder/SettingsAutomaticPortfolioBuilder.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/PortfolioMaster/SettingsAutomaticPortfolioBuilder.md"
+      "reference": "docs/dev/V1/sqx/PortfolioMaster/SettingsAutomaticPortfolioBuilder.md"
     },
     {
       "locator": "internal/plugins/SettingsAutoRetestData/SettingsAutoRetestData.jar",
@@ -2651,7 +2651,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/SettingsAutoRetestData/SettingsAutoRetestData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsAutoRetestData.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsAutoRetestData.md"
     },
     {
       "locator": "internal/plugins/SettingsBlocks/SettingsBlocks.jar",
@@ -2662,7 +2662,7 @@
       "phase": "P05",
       "artifact_locator": "internal/plugins/SettingsBlocks/SettingsBlocks.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsBlocks.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsBlocks.md"
     },
     {
       "locator": "internal/plugins/SettingsCallExternalScript/SettingsCallExternalScript.jar",
@@ -2673,7 +2673,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsCallExternalScript/SettingsCallExternalScript.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsCallExternalScript.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCallExternalScript.md"
     },
     {
       "locator": "internal/plugins/SettingsClearDatabanks/SettingsClearDatabanks.jar",
@@ -2684,7 +2684,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsClearDatabanks/SettingsClearDatabanks.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsClearDatabanks.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsClearDatabanks.md"
     },
     {
       "locator": "internal/plugins/SettingsCreatePortfolio/SettingsCreatePortfolio.jar",
@@ -2695,7 +2695,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/SettingsCreatePortfolio/SettingsCreatePortfolio.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsCreatePortfolio.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCreatePortfolio.md"
     },
     {
       "locator": "internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
@@ -2706,7 +2706,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/SettingsCrossChecks/SettingsCrossChecks.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsCrossChecks.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCrossChecks.md"
     },
     {
       "locator": "internal/plugins/SettingsCustomAnalysis/SettingsCustomAnalysis.jar",
@@ -2717,7 +2717,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsCustomAnalysis/SettingsCustomAnalysis.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsCustomAnalysis.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsCustomAnalysis.md"
     },
     {
       "locator": "internal/plugins/SettingsData/SettingsData.jar",
@@ -2728,7 +2728,7 @@
       "phase": "P03",
       "artifact_locator": "internal/plugins/SettingsData/SettingsData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsData.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsData.md"
     },
     {
       "locator": "internal/plugins/SettingsDeleteFile/SettingsDeleteFile.jar",
@@ -2739,7 +2739,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsDeleteFile/SettingsDeleteFile.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsDeleteFile.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsDeleteFile.md"
     },
     {
       "locator": "internal/plugins/SettingsFiltering/SettingsFiltering.jar",
@@ -2750,7 +2750,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsFiltering/SettingsFiltering.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsFiltering.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsFiltering.md"
     },
     {
       "locator": "internal/plugins/SettingsGoToTask/SettingsGoToTask.jar",
@@ -2761,7 +2761,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsGoToTask/SettingsGoToTask.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsGoToTask.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsGoToTask.md"
     },
     {
       "locator": "internal/plugins/SettingsLoadFromFiles/SettingsLoadFromFiles.jar",
@@ -2772,7 +2772,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsLoadFromFiles/SettingsLoadFromFiles.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsLoadFromFiles.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsLoadFromFiles.md"
     },
     {
       "locator": "internal/plugins/SettingsLogDatabankStats/SettingsLogDatabankStats.jar",
@@ -2783,7 +2783,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsLogDatabankStats/SettingsLogDatabankStats.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsLogDatabankStats.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsLogDatabankStats.md"
     },
     {
       "locator": "internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
@@ -2794,7 +2794,7 @@
       "phase": "P06",
       "artifact_locator": "internal/plugins/SettingsMoneyManagement/SettingsMoneyManagement.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsMoneyManagement.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsMoneyManagement.md"
     },
     {
       "locator": "internal/plugins/SettingsNotes/SettingsNotes.jar",
@@ -2805,7 +2805,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsNotes/SettingsNotes.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsNotes.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsNotes.md"
     },
     {
       "locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
@@ -2816,7 +2816,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsNotification/SettingsNotification.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsNotification.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsNotification.md"
     },
     {
       "locator": "internal/plugins/SettingsOptimization/SettingsOptimization.jar",
@@ -2827,7 +2827,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/SettingsOptimization/SettingsOptimization.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsOptimization.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsOptimization.md"
     },
     {
       "locator": "internal/plugins/SettingsOptions/SettingsOptions.jar",
@@ -2838,7 +2838,7 @@
       "phase": "P06",
       "artifact_locator": "internal/plugins/SettingsOptions/SettingsOptions.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsOptions.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsOptions.md"
     },
     {
       "locator": "internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar",
@@ -2849,7 +2849,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/SettingsPartsToImprove/SettingsPartsToImprove.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsPartsToImprove.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsPartsToImprove.md"
     },
     {
       "locator": "internal/plugins/SettingsRankings/SettingsRankings.jar",
@@ -2860,7 +2860,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/SettingsRankings/SettingsRankings.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsRankings.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsRankings.md"
     },
     {
       "locator": "internal/plugins/SettingsSaveToFiles/SettingsSaveToFiles.jar",
@@ -2871,7 +2871,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsSaveToFiles/SettingsSaveToFiles.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsSaveToFiles.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsSaveToFiles.md"
     },
     {
       "locator": "internal/plugins/SettingsStopAndStart/SettingsStopAndStart.jar",
@@ -2882,7 +2882,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsStopAndStart/SettingsStopAndStart.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsStopAndStart.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsStopAndStart.md"
     },
     {
       "locator": "internal/plugins/SettingsUpdateData/SettingsUpdateData.jar",
@@ -2893,7 +2893,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsUpdateData/SettingsUpdateData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsUpdateData.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsUpdateData.md"
     },
     {
       "locator": "internal/plugins/SettingsWaitFor/SettingsWaitFor.jar",
@@ -2904,7 +2904,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/SettingsWaitFor/SettingsWaitFor.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsWaitFor.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsWaitFor.md"
     },
     {
       "locator": "internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar",
@@ -2915,7 +2915,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/SettingsWhatToBuild/SettingsWhatToBuild.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsWhatToBuild.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsWhatToBuild.md"
     },
     {
       "locator": "internal/plugins/SettingsWhatToRetest/SettingsWhatToRetest.jar",
@@ -2926,7 +2926,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/SettingsWhatToRetest/SettingsWhatToRetest.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Shared/SettingsWhatToRetest.md"
+      "reference": "docs/dev/V1/sqx/Shared/SettingsWhatToRetest.md"
     },
     {
       "locator": "internal/plugins/TaskApplyMassConfig/TaskApplyMassConfig.jar",
@@ -2937,7 +2937,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskApplyMassConfig/TaskApplyMassConfig.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskApplyMassConfig.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskApplyMassConfig.md"
     },
     {
       "locator": "internal/plugins/TaskAutomaticPortfolioBuilder/TaskAutomaticPortfolioBuilder.jar",
@@ -2948,7 +2948,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/TaskAutomaticPortfolioBuilder/TaskAutomaticPortfolioBuilder.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/PortfolioMaster/TaskAutomaticPortfolioBuilder.md"
+      "reference": "docs/dev/V1/sqx/PortfolioMaster/TaskAutomaticPortfolioBuilder.md"
     },
     {
       "locator": "internal/plugins/TaskAutomaticRetest/TaskAutomaticRetest.jar",
@@ -2959,7 +2959,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/TaskAutomaticRetest/TaskAutomaticRetest.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Retester/TaskAutomaticRetest.md"
+      "reference": "docs/dev/V1/sqx/Retester/TaskAutomaticRetest.md"
     },
     {
       "locator": "internal/plugins/TaskBuild/TaskBuild.jar",
@@ -2970,7 +2970,7 @@
       "phase": "P09",
       "artifact_locator": "internal/plugins/TaskBuild/TaskBuild.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Builder/TaskBuild.md"
+      "reference": "docs/dev/V1/sqx/Builder/TaskBuild.md"
     },
     {
       "locator": "internal/plugins/TaskCallExternalScript/TaskCallExternalScript.jar",
@@ -2981,7 +2981,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskCallExternalScript/TaskCallExternalScript.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskCallExternalScript.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskCallExternalScript.md"
     },
     {
       "locator": "internal/plugins/TaskClearDatabanks/TaskClearDatabanks.jar",
@@ -2992,7 +2992,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskClearDatabanks/TaskClearDatabanks.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskClearDatabanks.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskClearDatabanks.md"
     },
     {
       "locator": "internal/plugins/TaskCreatePortfolio/TaskCreatePortfolio.jar",
@@ -3003,7 +3003,7 @@
       "phase": "P12",
       "artifact_locator": "internal/plugins/TaskCreatePortfolio/TaskCreatePortfolio.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskCreatePortfolio.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskCreatePortfolio.md"
     },
     {
       "locator": "internal/plugins/TaskCustomAnalysis/TaskCustomAnalysis.jar",
@@ -3014,7 +3014,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskCustomAnalysis/TaskCustomAnalysis.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskCustomAnalysis.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskCustomAnalysis.md"
     },
     {
       "locator": "internal/plugins/TaskDeleteFile/TaskDeleteFile.jar",
@@ -3025,7 +3025,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskDeleteFile/TaskDeleteFile.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskDeleteFile.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskDeleteFile.md"
     },
     {
       "locator": "internal/plugins/TaskFiltering/TaskFiltering.jar",
@@ -3036,7 +3036,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskFiltering/TaskFiltering.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskFiltering.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskFiltering.md"
     },
     {
       "locator": "internal/plugins/TaskGoToTask/TaskGoToTask.jar",
@@ -3047,7 +3047,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskGoToTask/TaskGoToTask.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskGoToTask.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskGoToTask.md"
     },
     {
       "locator": "internal/plugins/TaskLoadFromFiles/TaskLoadFromFiles.jar",
@@ -3058,7 +3058,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskLoadFromFiles/TaskLoadFromFiles.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskLoadFromFiles.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskLoadFromFiles.md"
     },
     {
       "locator": "internal/plugins/TaskLogDatabankStats/TaskLogDatabankStats.jar",
@@ -3069,7 +3069,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskLogDatabankStats/TaskLogDatabankStats.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskLogDatabankStats.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskLogDatabankStats.md"
     },
     {
       "locator": "internal/plugins/TaskManagerProjects/TaskManagerProjects.jar",
@@ -3080,7 +3080,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskManagerProjects/TaskManagerProjects.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskManagerProjects.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskManagerProjects.md"
     },
     {
       "locator": "internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar",
@@ -3091,7 +3091,7 @@
       "phase": "P15",
       "artifact_locator": "internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md"
+      "reference": "docs/dev/V1/sqx/NeuralNetworkTrainer/TaskNeuralNetworkTrainer.md"
     },
     {
       "locator": "internal/plugins/TaskNotification/TaskNotification.jar",
@@ -3102,7 +3102,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskNotification/TaskNotification.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskNotification.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskNotification.md"
     },
     {
       "locator": "internal/plugins/TaskOptimize/TaskOptimize.jar",
@@ -3113,7 +3113,7 @@
       "phase": "P10",
       "artifact_locator": "internal/plugins/TaskOptimize/TaskOptimize.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Optimizer/TaskOptimize.md"
+      "reference": "docs/dev/V1/sqx/Optimizer/TaskOptimize.md"
     },
     {
       "locator": "internal/plugins/TaskRetest/TaskRetest.jar",
@@ -3124,7 +3124,7 @@
       "phase": "P11",
       "artifact_locator": "internal/plugins/TaskRetest/TaskRetest.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Retester/TaskRetest.md"
+      "reference": "docs/dev/V1/sqx/Retester/TaskRetest.md"
     },
     {
       "locator": "internal/plugins/TaskSaveToFiles/TaskSaveToFiles.jar",
@@ -3135,7 +3135,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskSaveToFiles/TaskSaveToFiles.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskSaveToFiles.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskSaveToFiles.md"
     },
     {
       "locator": "internal/plugins/TaskStopAndStart/TaskStopAndStart.jar",
@@ -3146,7 +3146,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskStopAndStart/TaskStopAndStart.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskStopAndStart.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskStopAndStart.md"
     },
     {
       "locator": "internal/plugins/TaskUpdateData/TaskUpdateData.jar",
@@ -3157,7 +3157,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskUpdateData/TaskUpdateData.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskUpdateData.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskUpdateData.md"
     },
     {
       "locator": "internal/plugins/TaskWaitFor/TaskWaitFor.jar",
@@ -3168,7 +3168,7 @@
       "phase": "P13",
       "artifact_locator": "internal/plugins/TaskWaitFor/TaskWaitFor.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/CustomProjects/TaskWaitFor.md"
+      "reference": "docs/dev/V1/sqx/CustomProjects/TaskWaitFor.md"
     },
     {
       "locator": "j64/lib/jrt-fs.jar",
@@ -3179,7 +3179,7 @@
       "phase": "P00",
       "artifact_locator": "j64/lib/jrt-fs.jar",
       "registration_status": "proposed",
-      "reference": "docs/sqx/Runtime/jrt-fs.md"
+      "reference": "docs/dev/V1/sqx/Runtime/jrt-fs.md"
     }
   ]
 }

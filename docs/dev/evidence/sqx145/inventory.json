@@ -6,8 +6,8 @@
   "activation_status": "unverified",
   "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
   "roadmap": {
-    "locator": "docs/dev/sqx-full-application-roadmap.md",
-    "sha256": "10e2663568fffc854efbc5ba0241c8baa60d98d1edb8dcb591f534c0614cecb7"
+    "locator": "docs/dev/V1/sqx-full-application-roadmap.md",
+    "sha256": "cd8be5cea9212039f01ac13a08684521c911cb6bf9ed530ee019d18ac99c76f8"
   },
   "artifacts": [
     {
