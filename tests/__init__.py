@@ -1,1 +1,0 @@
-"""HaruQuantAI backend verification suite."""

@@ -1,1 +1,0 @@
-"""HaruQuantAI application root package."""
