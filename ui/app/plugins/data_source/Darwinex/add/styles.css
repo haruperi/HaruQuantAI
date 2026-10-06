@@ -1,0 +1,4 @@
+.darwinex-wide .modal { height:90dvh; }
+.darwinex-wide .modal-content { flex:1; }.darwinex-catalogue { flex:1; min-height:350px; }.darwinex-catalogue>.text-input { width:220px; max-width:100%; }
+.darwinex-flow th button { color:inherit; font:inherit; border:0; padding:0; background:none; cursor:pointer; }
+@media(max-width:650px) { .darwinex-details { grid-template-columns:1fr; gap:12px; }.darwinex-date-row { grid-template-columns:repeat(3,1fr); }.darwinex-date-row label { grid-column:1/-1; }.darwinex-wide .modal { height:96dvh; }.darwinex-folder label { width:100%; } }

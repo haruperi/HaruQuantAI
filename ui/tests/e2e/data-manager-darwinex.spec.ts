@@ -1,9 +1,19 @@
 import { expect, test, type Page } from '@playwright/test';
-import { selectLightSkin, setFeatureProfileFixture } from './shellTestUtils';
+import { selectLightSkin } from './shellTestUtils';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import path from 'node:path';
+/** Settings are intentionally not persisted by the current host. */
+async function setFeatureProfileFixture(page: Page, profile: 'Full' | 'Starter'): Promise<void> {
+  await page.evaluate(async nextProfile => {
+    const modulePath = '/app/host/store.ts';
+    const { useAppStore } = await import(/* @vite-ignore */ modulePath);
+    const state = useAppStore.getState();
+    useAppStore.setState({ settings: { ...state.settings, profile: nextProfile } });
+  }, profile);
+  await page.waitForFunction(expected => document.documentElement.dataset.profile === expected, profile);
+}
 async function open(page:Page, command='Add Darwinex data') { await page.getByRole('button',{name:'Darwinex Tick Data',exact:true}).click(); await page.getByRole('menuitem',{name:command,exact:true}).click(); return page.getByRole('dialog'); }
-async function launch(page:Page) { await page.goto('/');await page.getByRole('button',{name:'Data Manager',exact:true}).click(); }
+async function launch(page:Page) { await page.goto('/');await page.getByRole('button',{name:'Data Manager',exact:true}).and(page.locator('[aria-label]')).click(); }
 async function add(page:Page) { const dialog=await open(page);await dialog.getByRole('textbox',{name:'Filter items',exact:true}).fill('AUDUSD');await dialog.getByRole('checkbox',{name:'Select symbol AUDUSD',exact:true}).check();await dialog.getByRole('checkbox',{name:/I confirm/}).check();await dialog.getByRole('textbox',{name:'Data postfix',exact:true}).fill('_D');await dialog.getByRole('button',{name:'Save',exact:true}).click();await expect(page.getByLabel('Status for AUDUSD_D',{exact:true})).toHaveText('Completed',{timeout:10000}); }
 test('catalogue validation, filtering, selection, persistence and shared job recovery',async({page},info)=>{
  await launch(page);const dialog=await open(page);await expect(dialog.getByRole('checkbox',{name:/^Select symbol /})).toHaveCount(328);

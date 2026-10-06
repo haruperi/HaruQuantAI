@@ -4,17 +4,13 @@
 .darwinex-flow .modal-content { min-height:0; overflow:auto; }
 .darwinex-flow fieldset { border:1px solid var(--line); padding:14px; min-width:0; margin:0; display:flex; flex-direction:column; gap:14px; }
 .darwinex-flow legend { padding:0 5px; font-weight:600; }
-.darwinex-wide .modal { height:90dvh; }
-.darwinex-wide .modal-content { flex:1; }.darwinex-catalogue { flex:1; min-height:350px; }.darwinex-catalogue>.text-input { width:220px; max-width:100%; }
 .darwinex-grid { height:300px; overflow:auto; border:1px solid var(--line); min-height:150px; }.darwinex-catalogue>.darwinex-grid { flex:1; }
 .darwinex-flow .plain-table th { background:var(--panel3); color:var(--text); border-color:var(--line); }.darwinex-flow .plain-table tr:nth-child(even) { background:var(--panel2); }.darwinex-flow .plain-table tr:hover { background:var(--panel3); }.darwinex-flow .plain-table tr.selected { background:color-mix(in srgb,var(--accent) 18%,var(--panel)); }
-.darwinex-flow th button { color:inherit; font:inherit; border:0; padding:0; background:none; cursor:pointer; }
 .darwinex-flow select { color:var(--text); background:var(--bg); border:1px solid var(--line); min-width:0; padding:6px; }
 .darwinex-flow input[type=checkbox],.darwinex-flow input[type=radio] { accent-color:var(--accent); }
 .darwinex-details { display:grid; grid-template-columns:1fr 1fr; gap:25px; }.darwinex-details label,.darwinex-postfix { display:flex; flex-direction:column; gap:6px; }.darwinex-details small,.darwinex-postfix small { color:var(--muted); font-style:italic; }
 .darwinex-consent { width:100%; line-height:1.65; }.darwinex-error { color:var(--bad); }.darwinex-folder,.darwinex-mass { display:flex; gap:12px; align-items:center; flex-wrap:wrap; }.darwinex-folder .text-input { flex:1; }.darwinex-postfix .text-input { max-width:280px; }
 .darwinex-date-row { display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:8px; }.darwinex-date-row label { display:flex; gap:8px; align-items:center; }.darwinex-date-row input { width:100%; }.darwinex-restricted { text-align:center; line-height:2; }
-@media(max-width:650px) { .darwinex-details { grid-template-columns:1fr; gap:12px; }.darwinex-date-row { grid-template-columns:repeat(3,1fr); }.darwinex-date-row label { grid-column:1/-1; }.darwinex-wide .modal { height:96dvh; }.darwinex-folder label { width:100%; } }
 .darwinex-grid th:has(input[type=checkbox]) { width:28px; }
 .darwinex-flow { color-scheme:dark; }
 :root[data-theme=light] .darwinex-flow { color-scheme:light; }

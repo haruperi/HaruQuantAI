@@ -1,6 +1,6 @@
-import { DarwinexAddDialog } from '../../plugins/data_source/Darwinex/DarwinexAddDialog';
-import { DarwinexImportDialog } from '../../plugins/data_source/Darwinex/DarwinexImportDialog';
-import { DarwinexDownloadDialog } from '../../plugins/data_source/Darwinex/DarwinexDownloadDialog';
+import { AddPopup as DarwinexAddDialog } from '../../plugins/data_source/Darwinex/add/module';
+import { ImportPopup as DarwinexImportDialog } from '../../plugins/data_source/Darwinex/import/module';
+import { DownloadPopup as DarwinexDownloadDialog } from '../../plugins/data_source/Darwinex/download/module';
 import { useDarwinex, darwinexActive } from '../../plugins/data_source/Darwinex/darwinexStore';
 import { darwinexTargets, type DarwinexDefinition } from '../../plugins/data_source/Darwinex/darwinex';
 import { AddPopup as CryptoAddDialog } from '../../plugins/data_source/Crypto/add/module';

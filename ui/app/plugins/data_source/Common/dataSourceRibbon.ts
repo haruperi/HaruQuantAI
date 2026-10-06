@@ -1,3 +1,4 @@
+import { darwinexProvider } from '../Darwinex/module';
 import { cryptoProvider } from '../Crypto/module';
 import { dukascopyProvider } from '../Dukascopy/module';
 
@@ -109,15 +110,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
       { id: 'sq-futures-update', label: 'Update Futures datasets', icon: 'refresh', action: 'sq-futures-update' },
     ],
   },
-  {
-    id: 'darwinex',
-    label: 'Darwinex Tick Data',
-    commands: [
-      { id: 'darwinex-add', label: 'Add Darwinex data', icon: 'add', dialog: 'darwinex-add' },
-      { id: 'darwinex-import', label: 'Import data from a Darwinex folder', icon: 'folder-import', dialog: 'darwinex-import' },
-      { id: 'darwinex-download', label: 'Download data for existing symbols', icon: 'download', dialog: 'darwinex-download' },
-    ],
-  },
+  darwinexProvider,
   cryptoProvider,
   {
     id: 'yahoo',

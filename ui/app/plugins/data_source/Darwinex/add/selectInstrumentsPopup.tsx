@@ -1,0 +1,7 @@
+import { Button } from '../../../../components/ui';
+import type { useAddPopup } from './addPopupCtrl';
+type MappingState = Pick<ReturnType<typeof useAddPopup>, 'broker' | 'selected' | 'mappings' | 'setMappings' | 'mass'>;
+
+export function SelectInstrumentsPopup({ broker, selected, mappings, setMappings, mass }: MappingState) {
+  return <fieldset><legend>You have chosen broker profile {broker?.name}</legend><p>Downloaded data will be recomputed to this broker timezone.</p><h3>Please select corresponding instrument for added data</h3><p>Select a corresponding broker profile instrument for every added symbol. If it is not defined, skip the symbol or use the Default instrument.</p><div className="darwinex-mass">Mass action: Set all unconfigured symbols to <Button onClick={() => mass('-1')}>Default instrument</Button><Button onClick={() => mass('-1000')}>Skip adding the symbol</Button></div><div className="darwinex-grid"><table className="plain-table"><thead><tr><th>Symbol</th><th>Instrument</th></tr></thead><tbody>{selected.map(symbol => <tr key={symbol}><td>{symbol}</td><td><select aria-label={`Instrument for ${symbol}`} value={mappings[symbol]} onChange={event => setMappings(current => ({ ...current, [symbol]: event.target.value }))}><option value="-1001">choose instrument</option>{broker?.instruments.filter(item => !item.startsWith('[')).map(item => <option key={item}>{item}</option>)}<option value="-1">Default</option><option value="-1000">Skip adding this symbol</option></select></td></tr>)}</tbody></table></div></fieldset>;
+}

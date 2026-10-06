@@ -1,16 +1,11 @@
-import { useState } from 'react';
-import { Button, TextInput } from '../../../components/ui';
-import { useAppStore } from '../../../host/store';
-import { DarwinexModal, darwinexContext } from './DarwinexAddDialog';
-import { darwinexStart, type DarwinexDefinition } from './darwinex';
-import { useDarwinex } from './darwinexStore';
-import { today, presetRange, type Preset } from '../Dukascopy/dukascopyDownload';
-export function DarwinexDownloadDialog({ targets, onClose, onStarted }: { targets: DarwinexDefinition[]; onClose: () => void; onStarted: () => void }) {
-  const full = useAppStore(state => state.settings.profile) === 'Full'; const notify = useAppStore(state => state.notify); const store = useDarwinex();
-  const minimum = darwinexStart(targets[0]), last = targets[0].to || minimum;
-  const [from, setFrom] = useState(last), [to, setTo] = useState(today()), [preset, setPreset] = useState<Preset>('sinceLast'), [overwrite, setOverwrite] = useState(false), [error, setError] = useState('');
-  function choose(value: Preset) { const range = presetRange(value, last, minimum, from, to); setFrom(range.from); setTo(range.to); setPreset(value); setError(''); }
-  function start() { try { store.download({ targets, dateFrom: from, dateTo: to, dateType: preset, overwrite }, useAppStore.getState().settings.profile === 'Full', darwinexContext().active); onStarted(); onClose(); } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to start download.'); } }
+import { Button, TextInput } from '../../../../components/ui';
+import { DarwinexModal } from '../add/addPopup';
+import type { DarwinexDefinition } from '../darwinex';
+import { today, type Preset } from '../../Dukascopy/dukascopyDownload';
+import { useDownloadPopup } from './downloadPopupCtrl';
+
+export function DownloadPopup({ targets, onClose, onStarted }: { targets: DarwinexDefinition[]; onClose: () => void; onStarted: () => void }) {
+  const { full, notify, store, minimum, from, setFrom, to, setTo, preset, setPreset, overwrite, setOverwrite, error, setError, choose, start } = useDownloadPopup(targets, onClose, onStarted);
   const button = (value: Preset, label: string) => <Button aria-pressed={preset === value} className={preset === value ? 'primary' : ''} onClick={() => choose(value)}>{label}</Button>;
   return <DarwinexModal title={`Download Darwinex data for ${targets.length > 1 ? 'multiple' : `'${targets[0].symbol}'`}`} onClose={onClose} footer={<><Button onClick={onClose}>Close</Button>{full && <Button className="primary" onClick={start}>Start download</Button>}</>}>
     {(error || store.storageError) && <p role="alert" className="darwinex-error">{error || store.storageError}</p>}
