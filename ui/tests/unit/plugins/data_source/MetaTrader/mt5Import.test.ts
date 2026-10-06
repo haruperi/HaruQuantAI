@@ -7,7 +7,7 @@ import {
   mt5Preset,
   mt5Symbols,
   type Mt5ImportRequest,
-} from '../../../../../src/plugins/data_source/MetaTrader/mt5Import';
+} from '../../../../../app/plugins/data_source/MetaTrader/mt5Import';
 
 const request: Mt5ImportRequest = {
   folder: 'MockMT5',
@@ -58,7 +58,7 @@ async function isolated() {
     setItem: (key: string, value: string) => { memory.set(key, value); },
   };
   vi.stubGlobal('localStorage', storage);
-  const store = (await import('../../../../../src/plugins/data_source/MetaTrader/mt5ImportStore')).useMt5Import;
+  const store = (await import('../../../../../app/plugins/data_source/MetaTrader/mt5ImportStore')).useMt5Import;
   return { store, memory, storage };
 }
 
@@ -71,7 +71,7 @@ it('persists partial imports, restores active work paused and completes coherent
   for (let index = 0; index < 10; index += 1) store.getState().advance();
   expect(store.getState().definitions).toHaveLength(1);
   vi.resetModules();
-  const restored = (await import('../../../../../src/plugins/data_source/MetaTrader/mt5ImportStore')).useMt5Import;
+  const restored = (await import('../../../../../app/plugins/data_source/MetaTrader/mt5ImportStore')).useMt5Import;
   expect(restored.getState().job?.state).toBe('paused');
   restored.getState().action('resume');
   for (let index = 0; index < 20; index += 1) restored.getState().advance();
@@ -92,7 +92,7 @@ it('fails closed for active work, quota errors and corrupt storage', async () =>
   expect(memory.get('sqx-mt5-import-v1')).toBe(prior);
   memory.set('sqx-mt5-import-v1', 'bad');
   vi.resetModules();
-  const corrupt = (await import('../../../../../src/plugins/data_source/MetaTrader/mt5ImportStore')).useMt5Import;
+  const corrupt = (await import('../../../../../app/plugins/data_source/MetaTrader/mt5ImportStore')).useMt5Import;
   expect(corrupt.getState().storageError).toContain('preserved');
   expect(memory.get('sqx-mt5-import-v1')).toBe('bad');
 });

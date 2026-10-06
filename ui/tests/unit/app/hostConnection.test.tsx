@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
-import { connectHost } from '../../../src/app/HostConnection';
-import { getAuthToken, setAuthToken } from '../../../src/app/transport';
-import { createInitialAppSettings } from '../../../src/app/globalSettings';
-import { shellPreferences } from '../../../src/app/hostSettings';
+import { connectHost } from '../../../app/host/HostConnection';
+import { getAuthToken, setAuthToken } from '../../../app/host/transport';
+import { createInitialAppSettings } from '../../../app/host/globalSettings';
+import { shellPreferences } from '../../../app/host/hostSettings';
 
 const asFetch = (fn: unknown) => fn as unknown as typeof fetch;
 const shell = { ...shellPreferences(createInitialAppSettings()), theme: 'light', zoom: 1.1 };

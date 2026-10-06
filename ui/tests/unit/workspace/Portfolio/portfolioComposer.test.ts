@@ -9,7 +9,7 @@ import {
   computeStrategyVolatility,
   normalizeWeights,
   simulatePortfolio,
-} from '../../../../src/workspace/PortfolioComposer/portfolioOptimization';
+} from '../../../../app/workspace/PortfolioComposer/portfolioOptimization';
 
 describe('Portfolio Optimization & Weighting Algorithms', () => {
   it('normalizes weights array to sum precisely to 100%', () => {

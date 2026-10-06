@@ -1,11 +1,11 @@
 import { it, expect } from 'vitest';
-import { createChartStore } from '../../../../src/workspace/Chart/src/store/chartStore';
+import { createChartStore } from '../../../../app/workspace/Chart/src/store/chartStore';
 import {
   decode,
   persisted,
   connectPersistence,
   storageKey,
-} from '../../../../src/workspace/Chart/src/store/persistence';
+} from '../../../../app/workspace/Chart/src/store/persistence';
 it('round-trips the chart document and rejects malformed/future versions', () => {
   const s = createChartStore(),
     state = persisted(s);

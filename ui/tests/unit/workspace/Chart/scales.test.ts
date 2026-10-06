@@ -5,7 +5,7 @@ import {
   zoomAt,
   xToTime,
   niceTicks,
-} from '../../../../src/workspace/Chart/src/engine/scales';
+} from '../../../../app/workspace/Chart/src/engine/scales';
 describe('chart coordinates', () => {
   it('round trips all price scales and direction', () => {
     for (const mode of ['linear', 'log', 'percent', 'indexed'] as const)

@@ -13,7 +13,7 @@ import {
   safeRemoteSettings,
   safeSmtpSettings,
   validateConfiguration,
-} from '../../../src/app/globalSettings';
+} from '../../../app/host/globalSettings';
 
 describe('global settings contracts', () => {
   it('matches the audited HaruQuantAI menu groups and configuration tabs', () => {

@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach } from 'vitest';
-import { useTradingStore } from '../../../../src/workspace/Trading/tradingStore';
+import { useTradingStore } from '../../../../app/workspace/Trading/tradingStore';
 
 describe('Live Trading Workspace Store (FEAT-UI-TRADING)', () => {
   beforeEach(() => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { dataSourceContextActions, dataSourceProviders } from '../../../../../src/plugins/data_source/Common/dataSourceRibbon';
+import { dataSourceContextActions, dataSourceProviders } from '../../../../../app/plugins/data_source/Common/dataSourceRibbon';
 
 describe('Data sources control inventory', () => {
   it('keeps the nine provider controls in their documented order', () => {

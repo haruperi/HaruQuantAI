@@ -8,7 +8,7 @@ import {
   hasLegacyVisibleBranding,
   normalizeLegacyBranding,
   normalizeLegacyUiText,
-} from '../../../src/app/branding';
+} from '../../../app/host/branding';
 
 describe('HaruQuantAI branding', () => {
   it('defines the current product and unprefixed data labels', () => {

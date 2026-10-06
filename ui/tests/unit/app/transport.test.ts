@@ -6,7 +6,7 @@ import {
   login,
   setAuthToken,
   subscribeAuthExpired,
-} from '../../../src/app/transport';
+} from '../../../app/host/transport';
 
 const asFetch = (fn: unknown) => fn as unknown as typeof fetch;
 

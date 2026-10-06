@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { databanks, strategies } from '../../../../src/plugins/databank/fixtures';
+import { databanks, strategies } from '../../../../app/plugins/databank/fixtures';
 
 describe('deterministic databank fixtures', () => {
   it('keeps headline metrics consistent with linked trade and equity records', () => {

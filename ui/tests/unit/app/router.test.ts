@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
-import { MODULE_ROUTES, getModuleFromPath, getPathForModule } from '../../../src/app/router';
-import { useAppStore } from '../../../src/app/store';
-import type { ModuleId } from '../../../src/app/types';
+import { MODULE_ROUTES, getModuleFromPath, getPathForModule } from '../../../app/host/router';
+import { useAppStore } from '../../../app/host/store';
+import type { ModuleId } from '../../../app/host/types';
 
 describe('HaruQuantAI React Router & Path Routing', () => {
   beforeEach(() => {

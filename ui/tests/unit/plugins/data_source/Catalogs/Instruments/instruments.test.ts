@@ -6,7 +6,7 @@ import {
   parseInstrumentsJson,
   serializeInstrumentsJson,
   type InstrumentBroker,
-} from '../../../../../../src/plugins/data_source/Catalogs/Instruments/instruments';
+} from '../../../../../../app/plugins/data_source/Catalogs/Instruments/instruments';
 
 const brokers: InstrumentBroker[] = [
   { id: '-1', name: 'Default', postfix: '', timezone: 'UTC' },

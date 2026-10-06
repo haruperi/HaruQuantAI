@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
-import { STRATEGY_TEMPLATES } from '../../../../src/workspace/AlgoWizard/algoWizardTemplates';
+import { STRATEGY_TEMPLATES } from '../../../../app/workspace/AlgoWizard/algoWizardTemplates';
 import {
   generateEasyLanguageCode,
   generateMql5Code,
   generatePythonCode,
-} from '../../../../src/workspace/AlgoWizard/StrategyCodeExportModal';
+} from '../../../../app/workspace/AlgoWizard/StrategyCodeExportModal';
 
 describe('AlgoWizard Strategy Templates & Rules', () => {
   it('contains 5 pre-seeded StrategyQuant X strategy templates with complete rule trees', () => {

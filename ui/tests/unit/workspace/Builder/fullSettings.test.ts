@@ -19,7 +19,7 @@ import {
   visibleSettingsTabs,
   tradingOptionsDefaults,
   whatToBuildDefaults,
-} from '../../../../src/workspace/Builder/settings/settingsFixtures';
+} from '../../../../app/workspace/Builder/settings/settingsFixtures';
 
 describe('Full settings fixtures (donor SQX144-EV-000038..043)', () => {
   it('registers the eleven eligible Build tabs in the donor strip order', () => {

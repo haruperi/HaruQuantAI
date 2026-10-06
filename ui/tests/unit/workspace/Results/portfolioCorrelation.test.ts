@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   calculatePearsonCorrelation,
   extractReturnsSeries,
-} from '../../../../src/plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
-import { strategies } from '../../../../src/plugins/databank/fixtures';
+} from '../../../../app/plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
+import { strategies } from '../../../../app/plugins/databank/fixtures';
 
 describe('Portfolio Correlation Engine & Overlapping Trades', () => {
   it('generates a valid symmetric correlation matrix with 1.0 on diagonal', () => {

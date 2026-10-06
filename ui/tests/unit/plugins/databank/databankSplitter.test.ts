@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 import {
   computeDraggedHeight,
   nextSplitterState,
-} from '../../../../src/plugins/databank/ProjectDatabanks/DatabankSplitter';
-import type { SplitterAction, SplitterState } from '../../../../src/plugins/databank/ProjectDatabanks/DatabankSplitter';
-import { databanks, strategies } from '../../../../src/plugins/databank/fixtures';
+} from '../../../../app/plugins/databank/ProjectDatabanks/DatabankSplitter';
+import type { SplitterAction, SplitterState } from '../../../../app/plugins/databank/ProjectDatabanks/DatabankSplitter';
+import { databanks, strategies } from '../../../../app/plugins/databank/fixtures';
 
 const ALL_STATES: SplitterState[] = ['collapsed', 'active', 'maximised'];
 

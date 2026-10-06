@@ -1,6 +1,6 @@
 import {describe,it,expect} from 'vitest';
-import {retestRouting,retestDataDefaults} from '../../../../src/workspace/Retester/retesterFixtures';
-import {dataTabDefaults} from '../../../../src/plugins/project/ProjectWorkbench/settings/sharedSettingsFixtures';
+import {retestRouting,retestDataDefaults} from '../../../../app/workspace/Retester/retesterFixtures';
+import {dataTabDefaults} from '../../../../app/plugins/project/ProjectWorkbench/settings/sharedSettingsFixtures';
 describe('FEAT-UI-RETESTER_WORKSPACE preview',()=>{
  it('distinguishes copy and overwrite wording without mutating data',()=>{
   expect(retestRouting('Results','Retest')).toBe('copy');

@@ -3,8 +3,8 @@ import {
   calculatePearsonCorrelation,
   extractReturnsSeries,
   filterStrategiesByCorrelation,
-} from '../../../../src/plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
-import { strategies } from '../../../../src/plugins/databank/fixtures';
+} from '../../../../app/plugins/databank/ProjectDatabanks/FilterByCorrelationModal';
+import { strategies } from '../../../../app/plugins/databank/fixtures';
 
 describe('Databank Filter By Correlation Math & Logic', () => {
   it('calculates Pearson correlation coefficient accurately', () => {

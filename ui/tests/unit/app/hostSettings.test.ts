@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
-import { parseHostPreferences, readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences } from '../../../src/app/hostSettings';
-import { createInitialAppSettings } from '../../../src/app/globalSettings';
-import { setAuthToken } from '../../../src/app/transport';
+import { parseHostPreferences, readHostPreferences, shellPreferences, watchSettingsChanges, writeHostPreferences } from '../../../app/host/hostSettings';
+import { createInitialAppSettings } from '../../../app/host/globalSettings';
+import { setAuthToken } from '../../../app/host/transport';
 
 const shell = { ...shellPreferences(createInitialAppSettings()), theme: 'light' as const, zoom: 1.2 };
 const snapshot = { revision: 1, values: { 'app.general': { theme: 'light', language: 'en', zoom: 1.2 } } };

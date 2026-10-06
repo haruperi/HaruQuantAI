@@ -3,8 +3,8 @@ import {
   advancePosition,
   pnl,
   validateOrder,
-} from '../../../../src/workspace/Chart/src/store/positions';
-import type { Position } from '../../../../src/workspace/Chart/src/types';
+} from '../../../../app/workspace/Chart/src/store/positions';
+import type { Position } from '../../../../app/workspace/Chart/src/types';
 const p: Position = {
   id: '1',
   symbol: 'XAUUSD',

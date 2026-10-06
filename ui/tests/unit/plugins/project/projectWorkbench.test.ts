@@ -1,5 +1,5 @@
 import {describe,it,expect} from 'vitest';
-import {nextRunStatus} from '../../../../src/plugins/project/ProjectWorkbench/contracts';
+import {nextRunStatus} from '../../../../app/plugins/project/ProjectWorkbench/contracts';
 describe('FEAT-UI-PROJECT_WORKBENCH preview lifecycle',()=>{
  it('supports pause/resume, cancellation and restart',()=>{
   expect(nextRunStatus('idle','pause')).toBe('idle');

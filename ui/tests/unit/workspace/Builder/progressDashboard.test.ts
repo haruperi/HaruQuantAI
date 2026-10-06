@@ -12,7 +12,7 @@ import {
   resultRankTitle,
   runFrameAt,
   toggleCrossCheck,
-} from '../../../../src/workspace/Builder/fixtures';
+} from '../../../../app/workspace/Builder/fixtures';
 
 describe('Progress tab fixtures (donor SQX144-EV-000032..037)', () => {
   it('keeps the idle stats snapshot at the donor idle values', () => {

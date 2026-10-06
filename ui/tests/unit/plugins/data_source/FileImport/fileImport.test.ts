@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { builtInFormats, detectFormat, emptyFileRecord, importedRecord, massSymbol, parseDate, parseImport, previewRows, splitRows, validateFormat } from '../../../../../src/plugins/data_source/FileImport/fileImport';
-import { newInstrument } from '../../../../../src/plugins/data_source/FileImport/fileSymbols';
+import { builtInFormats, detectFormat, emptyFileRecord, importedRecord, massSymbol, parseDate, parseImport, previewRows, splitRows, validateFormat } from '../../../../../app/plugins/data_source/FileImport/fileImport';
+import { newInstrument } from '../../../../../app/plugins/data_source/FileImport/fileSymbols';
 const csv = 'Date,Open,High,Low,Close,Volume\n2026-09-18,1,3,0,2,4\n2026-09-19,2,4,1,3,5';
 describe('file import rules', () => {
   it('detects headers and delimiters; handles quoted fields, CRLF and malformed quotes', () => {
@@ -57,7 +57,7 @@ describe('file import persistence and lifecycle', () => {
     const memory = new Map<string, string>();
     const storage = { getItem: (key: string) => memory.get(key) ?? null, setItem: (key: string, value: string) => { memory.set(key, value); }, removeItem: (key: string) => { memory.delete(key); } };
     vi.stubGlobal('localStorage', storage);
-    const store = (await import('../../../../../src/plugins/data_source/FileImport/fileImportStore')).useFileImports;
+    const store = (await import('../../../../../app/plugins/data_source/FileImport/fileImportStore')).useFileImports;
     const result = parseImport(csv, detectFormat(csv), 'D1', false);
     const task = (symbol: string) => ({ filename: symbol + '.csv', ignored: 0, record: importedRecord(emptyFileRecord(symbol, { ...newInstrument(), symbol: 'EURUSD' }, 'start'), result, 'UTC') });
     return { store, memory, storage, task, vi };
@@ -79,7 +79,7 @@ describe('file import persistence and lifecycle', () => {
     store.getState().saveFormat({ ...builtInFormats[0], name: 'Saved', predefined: false });
     expect(() => store.getState().saveFormat({ ...builtInFormats[0], name: 'Saved' })).toThrow('already exists');
     store.getState().start([task('ONE')], 'UTC', '', 0, false);
-    vi.resetModules(); const restored = (await import('../../../../../src/plugins/data_source/FileImport/fileImportStore')).useFileImports;
+    vi.resetModules(); const restored = (await import('../../../../../app/plugins/data_source/FileImport/fileImportStore')).useFileImports;
     expect(restored.getState().job?.state).toBe('paused'); expect(restored.getState().formats[0].name).toBe('Saved');
     restored.getState().action('resume'); for (let i = 0; i < 20; i++) restored.getState().advance();
     expect(restored.getState().job?.state).toBe('completed'); expect(restored.getState().records[0].bars).toBe(2);
@@ -98,7 +98,7 @@ describe('file import persistence and lifecycle', () => {
     expect(() => store.getState().start([task('ONE')], 'UTC', '', 0, false)).toThrow('Unable to save');
     expect(store.getState().job).toBeNull(); expect(store.getState().records).toEqual([]);
     memory.set('sqx-file-import-v1', '{bad'); vi.resetModules();
-    const restored = (await import('../../../../../src/plugins/data_source/FileImport/fileImportStore')).useFileImports;
+    const restored = (await import('../../../../../app/plugins/data_source/FileImport/fileImportStore')).useFileImports;
     expect(restored.getState().storageError).toContain('preserved');
     expect(() => restored.getState().start([task('ONE')], 'UTC', '', 0, false)).toThrow('preserved');
     expect(memory.get('sqx-file-import-v1')).toBe('{bad');

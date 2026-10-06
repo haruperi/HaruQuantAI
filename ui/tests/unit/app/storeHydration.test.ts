@@ -23,7 +23,7 @@ describe('saved Builder settings hydration', () => {
     };
     vi.stubGlobal('window', { localStorage: storage });
 
-    const { useAppStore } = await import('../../../src/app/store');
+    const { useAppStore } = await import('../../../app/host/store');
     await useAppStore.persist.rehydrate();
     const { builder } = useAppStore.getState();
 

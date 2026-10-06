@@ -9,8 +9,8 @@
     "typecheck": "tsc -b --pretty false",
     "test": "vitest run",
     "test:ui": "playwright test",
-    "lint:chart": "eslint --config eslint.chart.config.mjs src/workspace/Chart tests/unit/workspace/Chart tests/e2e/chart-*.spec.ts",
-    "format:chart:check": "prettier --config .prettier.chart.json --check \"src/workspace/Chart/**/*.{ts,tsx,css}\" \"tests/unit/workspace/Chart/**/*.ts\" \"tests/e2e/chart-*.spec.ts\""
+    "lint:chart": "eslint --config eslint.chart.config.mjs app/workspace/Chart tests/unit/workspace/Chart tests/e2e/chart-*.spec.ts",
+    "format:chart:check": "prettier --config .prettier.chart.json --check \"app/workspace/Chart/**/*.{ts,tsx,css}\" \"tests/unit/workspace/Chart/**/*.ts\" \"tests/e2e/chart-*.spec.ts\""
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",

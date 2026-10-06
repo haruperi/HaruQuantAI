@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { HEADER_APPLICATION_ACTIONS, VOLUME_PROFILE_ACTIONS } from '../../../src/app/HeaderApplications';
+import { HEADER_APPLICATION_ACTIONS, VOLUME_PROFILE_ACTIONS } from '../../../app/host/HeaderApplications';
 
 describe('HaruQuantAI header applications', () => {
   it('keeps the requested non-Code-Editor actions in reference order', () => {
