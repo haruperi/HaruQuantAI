@@ -148,7 +148,7 @@
     },
     {
       "path": "FilterByCorrelationModal.tsx",
-      "reason": "Retained DatabankFilterByCorrelation presentation and shared quantitative mock helpers; separate cohort"
+      "reason": "Retained shared correlation math/types consumed by Results and tests; modal presentation relocated to DatabankFilterByCorrelation/module.ts"
     },
     {
       "path": "StrategyTable.tsx",
@@ -167,10 +167,14 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankRename/ui/module.ts",
       "relation": "Extracted rename presentation; host mock callback remains in pane."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankFilterByCorrelation/module.ts",
+      "relation": "Relocated correlation modal; shared math utilities and host callback retained."
     }
   ],
   "inventory_review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_145052_databank-rename-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_145744_databank-filter-correlation-alignment/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   }

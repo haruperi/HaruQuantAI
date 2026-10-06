@@ -9,7 +9,7 @@ import {
 } from '../DatabankDialogs';
 import { StrategyTable } from '../StrategyTable';
 import { ManageViewsDialog } from '../../ResultsDatabankViews/module';
-import { FilterByCorrelationModal } from '../FilterByCorrelationModal';
+import { FilterByCorrelationModal } from '../../DatabankFilterByCorrelation/module';
 import { CompareStrategiesModal } from '../CompareStrategiesModal';
 
 import { useDatabankPanel } from '../DatabankCtrl';

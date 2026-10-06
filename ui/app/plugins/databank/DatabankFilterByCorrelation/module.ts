@@ -1,0 +1,1 @@
+export { FilterByCorrelationModal } from './databankFilterByCorrelationPopup';

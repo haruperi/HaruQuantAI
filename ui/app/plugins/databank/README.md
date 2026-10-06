@@ -117,3 +117,22 @@ callback remain existing pane dependencies. Backend/project artifacts are
 excluded. The donor running/loading guard and backend rename progress/request
 are not qualified or added here. Shared modal focus restoration/trapping remains
 unqualified. Matching structure does not establish runtime or algorithm parity.
+
+## DatabankFilterByCorrelation structural ownership (2026-10-06)
+
+DEC-UI-DATABANK-CORRELATION-STRUCTURAL-OWNERSHIP maps
+SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation to
+HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankFilterByCorrelation.
+FEAT-UI-DATABANK_BUILDER owns this existing frontend responsibility under
+FR-UI-DATABANK-source-mapping, FR-UI-DATABANK-workflow-preservation and
+FR-UI-DATABANK-clean-room. Status: structurally relocated; qualification and
+limits recorded in its walkthrough.
+
+module.ts exports the modal from databankFilterByCorrelationPopup.tsx. Existing
+ProjectDatabanks/FilterByCorrelationModal.tsx remains a shared utility/type
+exception consumed by Results and tests; its independent mock formulas are
+unchanged. Inline target presentation and shared Modal remain existing capabilities.
+The donor JAR is excluded; no backend request or quantitative algorithm parity
+is established. Existing index-stride aggregation and net-profit ordering are
+target mock behavior. Current preview wording says bigger-than, while the retained
+helper compares greater-than-or-equal; this existing mismatch is preserved.

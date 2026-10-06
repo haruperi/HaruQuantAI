@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only correlation-filter structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankFilterByCorrelation",
+  "source_head": "3a501e6591257a75800bebe94c62f95fde2863f0",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_145744_databank-filter-correlation-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-CORRELATION-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-databankfilterbycorrelation-plugin",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation",
+      "family": "installed frontend plugin and excluded backend inventory"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-databankfilterbycorrelation-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/DatabankFilterByCorrelation.jar",
+      "relative_path": "DatabankFilterByCorrelation.jar",
+      "location": "whole archive; inventory only",
+      "inspection_method": "local inventory and SHA-256; backend excluded",
+      "relation": "excluded backend binary",
+      "access_date": "2026-10-06",
+      "sha256": "e2dcd26a6e9046a16eba7654b1c090ae2087cf1eb2b4ecc1fd22c25541c8bd26",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No runtime/algorithm inspection"
+    },
+    {
+      "catalog_id": "sqx-databankfilterbycorrelation-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/databankFilterByCorrelationPopup.html",
+      "relative_path": "databankFilterByCorrelationPopup.html",
+      "location": "lines 1-82; frontend composition boundary",
+      "inspection_method": "local inventory and SHA-256; frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "5fdbe8e73de3632c610221311ac09931d1fdc10df4adf8e168654a9bc669524c",
+      "target": "databankFilterByCorrelationPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural only; target mock computation differs from donor request workflow"
+    },
+    {
+      "catalog_id": "sqx-databankfilterbycorrelation-plugin",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-23; frontend composition boundary",
+      "inspection_method": "local inventory and SHA-256; frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "494b906f91404fef203f14d820c3284fa667068064e7fe16de18a690ea5bca8b",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural only; target mock computation differs from donor request workflow"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest; not behavioral ledger"
+    }
+  ]
+}
