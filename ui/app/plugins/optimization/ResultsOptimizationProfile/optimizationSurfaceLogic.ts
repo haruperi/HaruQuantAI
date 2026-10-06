@@ -1,4 +1,4 @@
-import type { SurfacePoint, PlateauCluster } from '../../host/types';
+import type { SurfacePoint, PlateauCluster } from '../../../host/types';
 
 export interface OptimizationGridResult {
   points: SurfacePoint[];

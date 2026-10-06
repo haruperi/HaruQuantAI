@@ -1,6 +1,6 @@
 export * from './contracts';
 export * from './ProjectFrame';
-export * from './ProjectSettings';
+export * from '../ProjectSettings/module';
 export * from './ProjectResults';
 export * from './ProjectModal';
 export * from './settings/SettingsControls';
@@ -14,5 +14,5 @@ export * from './settings/RankingTab';
 export * from './settings/NotesTab';
 export * from './results/resultsModel';
 export * from './results/ResultsCharts';
-export * from './ProjectProgress';
+export * from '../EnginePanel/module';
 export * from './projectFixtures';

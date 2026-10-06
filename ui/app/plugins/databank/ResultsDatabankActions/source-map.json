@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsDatabankActions bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions",
+  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "review": {
+    "state": "owner-approved-plan",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-CORE-ACTIONS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions",
+      "id": "sqx-resultsdatabankactions-root-ui",
+      "family": "bounded installed core action artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-root-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js",
+      "relative_path": "DatabankActionsService.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "independently authored existing frontend counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "b07ee4aaeb71a369d3411d55f5423e83aec87cf85666363219e4e3bdfeb2795c",
+      "target": "DatabankActionsService.ts",
+      "classification": "counterpart",
+      "limitation": "Independent extraction of existing frontend responsibility; no donor source copied"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-root-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "independently authored existing frontend counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "92692fcdcbb5b017b538485ab2f825edafb18259c32f3869b547cbffa06216bf",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Independent extraction of existing frontend responsibility; no donor source copied"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-root-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/ResultsDatabankActions.jar",
+      "relative_path": "ResultsDatabankActions.jar",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "justified unsupported-scope exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "2542b663f56004be15797da27f223903b78eea4a0208a28754d741737755cc74",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Compiled proprietary backend excluded"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    }
+  ]
+}

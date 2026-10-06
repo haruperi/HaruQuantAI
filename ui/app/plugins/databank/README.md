@@ -191,3 +191,13 @@ host deleteStrategies retains in-memory mutation authority. Global selectedRows
 semantics are unchanged. Donor running/loading/Builder distinctions, all-token
 selection, removal progress and backend behavior remain unqualified. No real
 persistence or runtime parity is established; other action folders are out of scope.
+
+## Approved structural ownership
+
+- `DEC-UI-DATABANK-CORE-ACTIONS-STRUCTURAL-OWNERSHIP`
+- `FEAT-UI-DATABANK_BUILDER`
+- `FR-UI-DATABANK-clean-room`
+- `FR-UI-DATABANK-source-mapping`
+- `FR-UI-DATABANK-workflow-preservation`
+
+Bounded inventories preserve existing mock and deferred behavior. No new backend capability or parity claim.

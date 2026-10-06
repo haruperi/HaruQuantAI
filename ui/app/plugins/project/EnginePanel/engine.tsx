@@ -1,18 +1,18 @@
 import {CircleStop,CirclePause,CirclePlay} from 'lucide-react';
-import { useState, type ReactNode } from 'react';
-import { SqdModal } from './ProjectModal';
-import { ResultsChart } from './results/ResultsCharts';
-import { downloadText, type ResultDocument } from './results/resultsModel';
-import type { usePreviewRun } from './projectFixtures';
+import type { ReactNode } from 'react';
+import { useEnginePanel } from './EngineCtrl';
+import { ProjectConfigHelpPopup } from './projectConfigHelpPopup';
+import { EngineChartPanel } from './directives/engineChartPanel/engineChartPanel';
+import { ResultsChart } from '../ProjectWorkbench/results/ResultsCharts';
+import { downloadText, type ResultDocument } from '../ProjectWorkbench/results/resultsModel';
+import type { usePreviewRun } from '../ProjectWorkbench/projectFixtures';
 
 export function ProjectProgress({title, run, stats, summary, result, onOpenResults, onSettings, startError}: {
   title:string; run:ReturnType<typeof usePreviewRun>; stats:[string,string][];
   summary:ReactNode; result:ResultDocument|null; onOpenResults:()=>void;
   onSettings:()=>void; startError?:string;
 }) {
-  const [detail,setDetail]=useState<string|null>(null);
-  const [sample,setSample]=useState('Full');
-  const running=run.status==='running';
+  const { detail, setDetail, sample, setSample, running } = useEnginePanel(run);
   return <div className="sqd-dashboard"><div className="sqd-flex pw-progress">
     <section className="pw-engine">
       <div className="sqd-card pw-controls">
@@ -32,13 +32,13 @@ export function ProjectProgress({title, run, stats, summary, result, onOpenResul
           <button className="sqd-btn" onClick={()=>downloadText(`${title.toLowerCase()}-preview.log`,run.log.join('\n'))}>Save log</button></div>
       </div>
       <div className="sqd-card sqd-stats-card"><table className="sqd-stats-table"><tbody>{stats.map(([label,value])=><tr key={label}><td>{label}:</td><td>{value}</td><td><button className="sqd-link-button" aria-label={`${label} details`} onClick={()=>setDetail(label)}>Detailed</button></td></tr>)}</tbody></table></div>
-      <ResultsChart values={[0,2,3,2,5,4,6,8,7,10].slice(0,Math.max(1,run.step))} title="Task progress / local preview"/>
+      <EngineChartPanel step={run.step}/>
     </section>
     <section className="pw-summary"><h3>Settings summary</h3><div inert={running||run.status==='paused'}>{summary}</div><button className="sqd-btn" onClick={()=>onSettings()}>Full settings</button></section>
     <section className="sqd-results-wrap pw-results"><div className="sqd-result-card"><button className="sqd-result-title" onClick={onOpenResults} disabled={!result}>{result?`Selected strategy: ${result.name}`:'No results so far'}</button>
       {result&&<div className="sqd-result-body"><div className="sqd-btn-group">{['Full','IS','OOS'].map(s=><button key={s} className={sample===s?'active':''} onClick={()=>setSample(s)}>{s}</button>)}</div>
         <ResultsChart values={sample==='Full'?result.equity:sample==='IS'?result.equity.slice(0,16):result.equity.slice(16)} title={`Equity / ${sample}`}/><button className="sqd-btn" onClick={onOpenResults}>Open Results</button></div>}
     </div></section>
-    {detail&&<SqdModal title={detail} onClose={()=>setDetail(null)}><p>Local {title} preview</p><table className="sqr-data-table"><tbody>{stats.map(([k,v])=><tr key={k}><th>{k}</th><td>{v}</td></tr>)}</tbody></table><button className="sqd-btn" onClick={()=>{setDetail(null);onSettings();}}>Open Full settings</button></SqdModal>}
+    {detail&&<ProjectConfigHelpPopup detail={detail} title={title} stats={stats} onClose={()=>setDetail(null)} onSettings={onSettings}/>}
   </div></div>;
 }

@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only SettingsPanel bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/SettingsPanel",
+  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "decision": "DEC-UI-PROJECT-SHELL-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ],
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH"
+  },
+  "clean_room": {
+    "contains_personal_data": false,
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed frontend plugin artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel",
+      "id": "sqx-settingspanel-ui"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-settingspanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "bdef8c12d95a6bce81b3ac3b01ef9c303e4e8b1383045f0dfb2c92126b88a37e",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-settingspanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/settings.html",
+      "relative_path": "settings.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "9cd0333c2f30730712c1dd21fc4a4f2b46ff5c12a4cb0b310bba1930f75daaef",
+      "target": "settings.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-settingspanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/SettingsPanelCtrl.js",
+      "relative_path": "SettingsPanelCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "d399231bff1d1188f5dc521dcec7bd2d4fd3335e87e4a886fc91148874831ddb",
+      "target": "SettingsPanelCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-settingspanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "8b653192ce55feb16beea7aa0e821f66633549935ec4007fbefaab38ba67546d",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Existing settings selectors are shared with Builder FullSettingsView; retained coordinator-owned host styles."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope ownership/limitations documentation"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/contracts.ts",
+      "reason": "Shared explicit typed presentation contracts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectFrame.tsx",
+      "reason": "Shared project panel frame has no exact donor-family counterpart"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectModal.tsx",
+      "reason": "Shared modal focus/Escape implementation"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/projectFixtures.ts",
+      "reason": "Independent bounded local preview clock retained"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+      "reason": "Shared independently authored synthetic charts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/host/styles.css",
+      "reason": "Shared coordinator-owned settings/workspace rules retained"
+    }
+  ],
+  "limitations": [
+    "No backend, database mutation, live engine capability, new route or SQX parity claim.",
+    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence."
+  ]
+}

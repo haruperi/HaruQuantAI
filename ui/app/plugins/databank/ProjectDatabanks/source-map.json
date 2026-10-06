@@ -183,6 +183,10 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/delete/module.ts",
       "relation": "Extracted Delete dispatch; shared confirmation and host mutation retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/module.ts",
+      "relation": "Core selection fallback, clear confirmation and notification-only refresh delegate to bounded independently authored action modules."
     }
   ],
   "inventory_review": {

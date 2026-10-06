@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only EnginePanel bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/EnginePanel",
+  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "decision": "DEC-UI-PROJECT-SHELL-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ],
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH"
+  },
+  "clean_room": {
+    "contains_personal_data": false,
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed frontend plugin artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel",
+      "id": "sqx-enginepanel-ui"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/acceptedStatsPopup.html",
+      "relative_path": "acceptedStatsPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "7c21581980dab600cc538df660d66aa8c2a62c75c593999d6bcad85906a97b5f",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/engineChartPanel.html",
+      "relative_path": "directives/engineChartPanel/engineChartPanel.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "9e13472b5b3fbf9745b7e1240933caca2a8e1a5190b8f415dc1640355e07a6a9",
+      "target": "directives/engineChartPanel/engineChartPanel.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanel.js",
+      "relative_path": "directives/engineChartPanel/EngineChartPanel.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "b48ee0231235bcc204fd5e028bde61918870a33fedf064ce6ac47d87678073d8",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/engineChartPanel/EngineChartPanelCtrl.js",
+      "relative_path": "directives/engineChartPanel/EngineChartPanelCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "3125dc300775449b887fbc67ad08054243ccff4b8d4fbe252d8656864694eb51",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/fitnessEvolution.html",
+      "relative_path": "directives/fitnessEvolution/fitnessEvolution.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "c7f4b06cd05cb03f8e6a3bd32363ab444b4b38ce50478ca36fad7df0cb937f2a",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionCtrl.js",
+      "relative_path": "directives/fitnessEvolution/FitnessEvolutionCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "be589143539021a3f1aa4baf0bb8a2abc74f9e9b5a6e53b5e9b56edb89ff4eb3",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/FitnessEvolutionService.js",
+      "relative_path": "directives/fitnessEvolution/FitnessEvolutionService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "b772bb24cd38c64f31a16b4f9680b931c03ef290d5635de8252b36a40d48af1f",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/directives/fitnessEvolution/module.js",
+      "relative_path": "directives/fitnessEvolution/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "f387f31b58558bee497fb23d9396e7da26bc6f709e73cfece0b73908ddcea9f3",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Existing Builder-private fitness preview is outside assigned ProjectWorkbench scope and remains preserved."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/dismissalStatsPopup.html",
+      "relative_path": "dismissalStatsPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "f3b8c1a27f295160b24c2e2a08ed9161d0464a1aa4f55e0e132445c1f96fce68",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/durationStatsPopup.html",
+      "relative_path": "durationStatsPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "05dc18c7cda9ed176ab562350901e0a7fc1e5fc6afb7974b4081521fc89a96e6",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/engine.html",
+      "relative_path": "engine.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "8fe8e966ae58b0ab0619792f2fe2bc96cfae5a7bde8d9cb35818ea17f211feeb",
+      "target": "engine.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineCtrl.js",
+      "relative_path": "EngineCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "622538c488af5def8729a7030c5268415bd8da4f2b520cce672ccee18e40c268",
+      "target": "EngineCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.css",
+      "relative_path": "EnginePanel.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "b8610fd0c4a6b348236d554657cedfc406b59df5fbac5912bed08d23f04e03d2",
+      "target": "EnginePanel.css",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.db",
+      "relative_path": "EnginePanel.db",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "0285714c5f5761562746673fc3314123330985bc910d50fe583fbd7bb574d741",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary/database outside frontend scope; fingerprinted only."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EnginePanel.jar",
+      "relative_path": "EnginePanel.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "e10c17face0f953e75b3e36bdbc23c81941592665b0c7329eb9494bb1f2f45e1",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary/database outside frontend scope; fingerprinted only."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/EngineService.js",
+      "relative_path": "EngineService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "950f1cf46fa2be840f6571dd9603aad5d7f609bdaebb9d1135e9d025b0032fba",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "a8b0662c2c7438fb09eb72e6aaad1b706131e4467665b5e5f47d303b5c1379be",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/projectConfigHelpPopup.html",
+      "relative_path": "projectConfigHelpPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "fb31f323fa76ce47e90fcd261b29ce0815299dee8a57c2c0a542a163c14d6f44",
+      "target": "projectConfigHelpPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/textLogPopup.html",
+      "relative_path": "textLogPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "025839bdfd58ffcdbacf37e26d8fbd0ea91db0d1cee9fd2c61ae18daa75a2ba1",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+    },
+    {
+      "catalog_id": "sqx-enginepanel-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/EnginePanel/visualLogPopup.html",
+      "relative_path": "visualLogPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "58c8005c5577e1b327ea5763460b0b57071b0c5edcc90e44b79af3c9880c8635",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Dedicated donor popup/directive/live chart lifecycle absent from existing shared preview; no placeholder introduced."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope ownership/limitations documentation"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/contracts.ts",
+      "reason": "Shared explicit typed presentation contracts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectFrame.tsx",
+      "reason": "Shared project panel frame has no exact donor-family counterpart"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectModal.tsx",
+      "reason": "Shared modal focus/Escape implementation"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/projectFixtures.ts",
+      "reason": "Independent bounded local preview clock retained"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+      "reason": "Shared independently authored synthetic charts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/host/styles.css",
+      "reason": "Shared coordinator-owned settings/workspace rules retained"
+    }
+  ],
+  "limitations": [
+    "No backend, database mutation, live engine capability, new route or SQX parity claim.",
+    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence."
+  ]
+}

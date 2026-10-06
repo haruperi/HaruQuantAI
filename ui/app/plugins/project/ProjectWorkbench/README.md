@@ -43,3 +43,7 @@ optional embedded layout, standard-tab IDs and empty-state text; defaults retain
 existing Builder/Retester/Optimizer behavior. Additional result slots remain explicit.
 These inputs define presentation only; they do not infer plugin eligibility or calculate
 portfolio metrics. Workspace READMEs own their task-specific status and limitations.
+
+## Structural module boundaries
+
+The stable index forwards ProjectSettings to ../ProjectSettings/module and ProjectProgress to ../EnginePanel/module. SettingsPanel owns shared settings presentation. Contracts, project frame, modal lifecycle, local preview clock and result charts remain shared support.

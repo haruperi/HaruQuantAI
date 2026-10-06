@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test';
+import {test,expect} from './frontendStructureFixtures';
 import {resolve} from 'node:path';
 const evidence=resolve(process.cwd(),'../../.agents/logs/2026-09-25T160123_retester-optimizer-ui-plan/verification');
 test('Retester lifecycle, locking, settings retention and local-only actions',async({page})=>{

@@ -4,7 +4,7 @@ import { DockviewReact, type DockviewReadyEvent } from 'dockview';
 import { useAppStore } from '../../host/store';
 import { Button, Section, Stat } from '../../components/ui';
 import { EquityChart } from './EquityChart';
-import { OptimizationSurface } from '../../plugins/optimization/OptimizationSurface';
+import { OptimizationSurface } from '../../plugins/optimization/ResultsOptimizationProfile/module';
 import { PortfolioCorrelationView } from './views/PortfolioCorrelationView';
 
 const views = [

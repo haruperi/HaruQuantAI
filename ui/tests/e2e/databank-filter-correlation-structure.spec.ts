@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page } from './frontendStructureFixtures';
 async function openFilter(page: Page) {
   await page.goto('/builder');
   await page.getByRole('button', { name: 'Expand databanks', exact: true }).click();

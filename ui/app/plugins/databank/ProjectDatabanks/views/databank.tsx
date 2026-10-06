@@ -1,3 +1,4 @@
+import { confirmClearAll } from '../../ResultsDatabankActions/module';
 import { confirmDelete } from '../../ResultsDatabankActions/delete/module';
 import { RenameStrategiesDialog } from '../../DatabankRename/ui/module';
 import { RetestDialog } from '../../ResultsDatabankActions/retest/module';
@@ -92,10 +93,7 @@ export function DatabankPanel() {
       {dialog.kind === 'clearAll' && bank && (
         <RemovingReportsConfirm
           message="Are you sure you want to clear all the reports from this databank?"
-          onConfirm={() => {
-            store.deleteStrategies(bank.strategyIds);
-            store.notify('Databank cleared');
-          }}
+          onConfirm={() => confirmClearAll(bank.strategyIds, store.deleteStrategies, store.notify)}
           onClose={() => setDialog({ kind: 'none' })}
         />
       )}

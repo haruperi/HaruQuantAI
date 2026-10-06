@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsDatabankActions/sync bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/sync",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/sync",
+  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "review": {
+    "state": "owner-approved-plan",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-CORE-ACTIONS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/sync",
+      "id": "sqx-resultsdatabankactions-sync-ui",
+      "family": "bounded installed core action artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-sync-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/sync/DatabankSyncService.js",
+      "relative_path": "DatabankSyncService.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "justified unsupported-scope exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "0158c43730fe3db01ede497483d35a8f81f59fea3e71635fc9e57c5fad56d071",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing per-bank synchronization control/service; host global settings are distinct ownership"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-sync-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/sync/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "justified unsupported-scope exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "11f9ad5f1b921881bf5e6d575d9d3240544f3766e95137c9720c804524aa7907",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing per-bank synchronization control/service; host global settings are distinct ownership"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-sync-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/sync/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural inventory and scoped responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target responsibility audit",
+      "relation": "justified unsupported-scope exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "179ae8a305ac96f9f577e1d48e28938c154694e9a6a3b0c06de6f54d26b92541",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing per-bank synchronization control/service; host global settings are distinct ownership"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    }
+  ]
+}

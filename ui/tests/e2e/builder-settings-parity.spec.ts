@@ -1,4 +1,4 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './frontendStructureFixtures';
 import { resolve } from 'node:path';
 const evidence = resolve(process.cwd(), '../../.agents/logs/2026-09-25T145329_builder-settings-visual-correction/verification');
 const titles = ['What to build', 'Genetic options', 'Data', 'Trading options', 'Building blocks', 'ATM', 'Money management', 'Cross checks (robustness)', 'Ranking', 'Notes'];

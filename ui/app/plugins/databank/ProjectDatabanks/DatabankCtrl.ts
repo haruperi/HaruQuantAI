@@ -1,3 +1,4 @@
+import { getCurrentDatabankStrategy, requestClearAllConfirmation, refreshDatabank } from '../ResultsDatabankActions/module';
 import { requestDeleteConfirmation } from '../ResultsDatabankActions/delete/module';
 import { openMockLoad } from '../ResultsDatabankActions/load/module';
 import { useMemo, useState } from 'react';
@@ -41,7 +42,7 @@ export function useDatabankPanel() {
     [bankStrategies, store.selectedRows]
   );
 
-  const current = store.strategies.find(s => s.id === store.selectedStrategyId) || selectedInBank[0];
+  const current = getCurrentDatabankStrategy(store.strategies, store.selectedStrategyId, selectedInBank);
   const activeView = databankStore.getActiveView();
 
   const deferred = (label: string) =>
@@ -59,7 +60,7 @@ export function useDatabankPanel() {
         requestDeleteConfirmation(store.selectedRows, store.notify, () => setDialog({ kind: 'delete' }));
         break;
       case 'clearAll':
-        setDialog({ kind: 'clearAll' });
+        requestClearAllConfirmation(() => setDialog({ kind: 'clearAll' }));
         break;
       case 'retest':
         if (!store.selectedRows.length) {
@@ -85,7 +86,7 @@ export function useDatabankPanel() {
         handleToolsItem(menuItem || '');
         break;
       case 'refresh':
-        store.notify('Databank reloaded');
+        refreshDatabank(store.notify);
         break;
       case 'manageViews':
         setIsManageViewsOpen(true);

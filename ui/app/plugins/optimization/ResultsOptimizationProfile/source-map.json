@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsOptimizationProfile recursive bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/optimization/ResultsOptimizationProfile",
+  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/optimization",
+    "feature": "FEAT-UI-3DSURFACE",
+    "decision": "DEC-UI-OPTIMIZATION-PROFILE-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-OPTIMIZATION-source-mapping",
+      "FR-UI-OPTIMIZATION-workflow-preservation",
+      "FR-UI-OPTIMIZATION-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsoptimizationprofile-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile",
+      "family": "bounded installed optimization-profile frontend artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "3f2753acccba0f400b004eef12f2249f57ad00e8b4bd1b4539b97e22388c14d0",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/optimizationProfile.html",
+      "relative_path": "optimizationProfile.html",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "d18bc958b15587d887299934a9031c49dc33257ad06dfb390f83fec0e0e39be7",
+      "target": "optimizationProfile.tsx",
+      "classification": "counterpart",
+      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileCtrl.js",
+      "relative_path": "OptimizationProfileCtrl.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "eb07997ce42c3460de1138b0471250b9b07d83c9a6dbf2071c9e6194db2a278b",
+      "target": "OptimizationProfileCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Filename and responsibility alignment only; independently authored synthetic presentation is not donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js",
+      "relative_path": "OptimizationProfileService.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "f3c538b8658d235e09f63ecb5b63fa1655e0142ca7fae86a592222a629a21379",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Remote optimization-result, parameter, chart and export service is absent. Independent synthetic logic is explicitly target-only."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/optimProfileLevelsPopup.html",
+      "relative_path": "optimProfileLevelsPopup.html",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "92070923ee145aba6c99dbdebf420d4ec2ce7d2e3fa69f33b7b5ea1ec1a40ddb",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "The current surface has no configurable-checks-level dialog; adding it would enable new functionality."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/ResultsOptimizationProfile.jar",
+      "relative_path": "ResultsOptimizationProfile.jar",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "f3fbf5808631df75cf45cdac71080efb9b1c05dfb5d0d800b4fd56a56cd4c62f",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary is outside the approved frontend-only scope."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "884fd27ed580152b44b5b9ce6a670bdc7bcacf431ebfdadf13d8fd96d1b7d276",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing donor-class stylesheet is owned by this surface; retained target utility classes and inline canvas colors stay in its independent view."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/manageviews.html",
+      "relative_path": "directives/manageviews/manageviews.html",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "acaecb3037500baf2922516377c3db52e4f2fe266c4391367286aa920e5968c3",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No optimization-results table view-selection or management workflow exists in the assigned target."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViews.js",
+      "relative_path": "directives/manageviews/ManageViews.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "84984a9ca12481c11dfdc0284a3c02f2fdd2165533955513c0f0f64cba1bdc20",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing optimization-specific view-management component registration responsibility."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js",
+      "relative_path": "directives/manageviews/ManageViewsService.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "44925f3e388ac8eb362821bca0e8aa9c213c063b61f90e2f51551f5a2b875ac4",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing optimization-view persistence or remote-management service; backend behavior is excluded."
+    },
+    {
+      "catalog_id": "sqx-resultsoptimizationprofile-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/OptManageViewsCtrl.js",
+      "relative_path": "directives/manageviews/OptManageViewsCtrl.js",
+      "location": "whole-file structural identity and scoped frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "justified exclusion from existing target responsibilities",
+      "access_date": "2026-10-06",
+      "sha256": "019dfcc667531e6f90ae14ec5b48d10a746bb43ebf25ea812cd5d88f4338d453",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No existing optimization-specific view-selection/editor state to relocate."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "optimizationSurfaceLogic.ts",
+      "reason": "Retained independently written deterministic synthetic grid, preset clusters and projection utility; no donor numerical implementation claim."
+    },
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not a behavioral evidence ledger."
+    }
+  ],
+  "external_dependencies": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/host/types.ts",
+      "reason": "Shared SurfacePoint and PlateauCluster contracts retained unchanged."
+    }
+  ],
+  "limitations": [
+    "Canonical reimplementation ledger/schema absent; no new behavioral evidence IDs or parity claims.",
+    "Current synthetic grid, fixed canvas, hardcoded dark styling, mouse-only orbit and reset/remount behavior retained.",
+    "Owning registry integration and shared import rewiring are coordinator responsibilities."
+  ]
+}

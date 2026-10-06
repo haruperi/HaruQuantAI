@@ -1,0 +1,5 @@
+.pw-engine{flex:0 0 556px;min-width:360px;padding:0 12px}
+.pw-controls{display:flex;gap:7px;padding:12px}
+.pw-controls{margin-bottom:10px}
+.pw-engine .sqd-log-buttons{display:flex;gap:12px;align-items:center;height:auto}
+.pw-engine .sqd-stats-table td:nth-child(2){color:var(--sqx-text)}

@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   generateOptimizationGrid,
   projectCoordinate,
-} from '../../../../app/plugins/optimization/optimizationSurfaceLogic';
+} from '../../../../app/plugins/optimization/ResultsOptimizationProfile/optimizationSurfaceLogic';
 
 describe('3D Optimization Surface & Plateau Stability (FEAT-UI-3DSURFACE)', () => {
   it('generates a 15x15 parameter optimization grid with 225 surface points', () => {

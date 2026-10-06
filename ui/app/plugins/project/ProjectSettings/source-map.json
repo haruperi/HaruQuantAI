@@ -1,0 +1,142 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ProjectSettings bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectSettings",
+  "source_head": "f82996508a33b4f9994da16705140e64e1e2d2f2",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "decision": "DEC-UI-PROJECT-SHELL-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ],
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH"
+  },
+  "clean_room": {
+    "contains_personal_data": false,
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed frontend plugin artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings",
+      "id": "sqx-projectsettings-ui"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "771b6aa5a998912cddc55a7ed273b2eb7103c5ea8c4a3e2678ec779650709c77",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsCtrl.js",
+      "relative_path": "SettingsCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "ff5f1ee9f03f23f8d1777721a6f9cb098e1984c194b9b04ecb208f763fe8242a",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Donor simple-task/event/config lifecycle has no exact shared advanced-settings controller counterpart."
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsService.js",
+      "relative_path": "SettingsService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "12d730406524f61b500e73980fd8f75b8fc2709e2e9d7de875874d34d7fe4d7a",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation."
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "e77c42c662ce1842f6df9b2fb2e4336f558f5948afedc5bea1fa5f9c5e1cda28",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Existing settings selectors are shared with Builder FullSettingsView; retained coordinator-owned host styles."
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/views/settings.html",
+      "relative_path": "views/settings.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "d6495f228c2c40f1099859194150fe11625fafa849799323e209d1df10177eb4",
+      "target": "views/settings.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope ownership/limitations documentation"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/contracts.ts",
+      "reason": "Shared explicit typed presentation contracts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectFrame.tsx",
+      "reason": "Shared project panel frame has no exact donor-family counterpart"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectModal.tsx",
+      "reason": "Shared modal focus/Escape implementation"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/projectFixtures.ts",
+      "reason": "Independent bounded local preview clock retained"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx",
+      "reason": "Shared independently authored synthetic charts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/host/styles.css",
+      "reason": "Shared coordinator-owned settings/workspace rules retained"
+    }
+  ],
+  "limitations": [
+    "No backend, database mutation, live engine capability, new route or SQX parity claim.",
+    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence."
+  ]
+}

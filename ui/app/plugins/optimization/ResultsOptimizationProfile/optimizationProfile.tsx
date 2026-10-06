@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import {
   Rotate3d,
   Layers,
@@ -10,10 +10,10 @@ import {
   Info,
   RefreshCw,
 } from 'lucide-react';
-import type { SurfacePoint, PlateauCluster } from '../../host/types';
-import { generateOptimizationGrid, projectCoordinate } from './optimizationSurfaceLogic';
+import type { SurfacePoint } from '../../../host/types';
+import { useOptimizationProfileController } from './OptimizationProfileCtrl';
 
-interface OptimizationSurfaceProps {
+export interface OptimizationSurfaceProps {
   strategyName?: string;
   initialXParam?: string;
   initialYParam?: string;
@@ -26,31 +26,12 @@ export const OptimizationSurface: React.FC<OptimizationSurfaceProps> = ({
   initialYParam = 'SlowPeriod',
   initialZMetric = 'Net Profit',
 }) => {
-  const [paramX, setParamX] = useState<string>(initialXParam);
-  const [paramY, setParamY] = useState<string>(initialYParam);
-  const [metricZ, setMetricZ] = useState<string>(initialZMetric);
-  const [displayMode, setDisplayMode] = useState<'3d' | 'contour' | 'scatter'>('3d');
-
-  // 3D Orbit & Perspective state
-  const [rotX, setRotX] = useState<number>(35); // Elevation
-  const [rotY, setRotY] = useState<number>(45); // Azimuth
-  const [zoom, setZoom] = useState<number>(1.0);
-  const [isDragging, setIsDragging] = useState<boolean>(false);
-  const [dragStart, setDragStart] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [hoveredPoint, setHoveredPoint] = useState<SurfacePoint | null>(null);
-
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // Available parameters and metrics
-  const availableParams = ['FastPeriod', 'SlowPeriod', 'ATRPeriod', 'StopLoss', 'TargetMultiplier'];
-  const availableMetrics = ['Net Profit', 'Profit Factor', 'Sharpe Ratio', 'Return / DD'];
-
-  // Generate 2D grid matrix of surface points
-  const gridSize = 15;
-  const { points, grid, clusters, stats } = useMemo(() => {
-    return generateOptimizationGrid(paramX, paramY, metricZ, gridSize);
-  }, [gridSize, paramX, paramY, metricZ]);
-
+  const {
+    paramX, setParamX, paramY, setParamY, metricZ, setMetricZ,
+    displayMode, setDisplayMode, rotX, setRotX, rotY, setRotY, zoom, setZoom,
+    canvasRef, availableParams, availableMetrics, gridSize,
+    points, grid, clusters, stats, handleMouseDown, handleMouseMove, handleMouseUp,
+  } = useOptimizationProfileController(initialXParam, initialYParam, initialZMetric);
 
   // Color mapping helper based on normalized height
   const getColor = useCallback((z: number, minZ: number, maxZ: number) => {
@@ -259,26 +240,6 @@ export const OptimizationSurface: React.FC<OptimizationSurfaceProps> = ({
   useEffect(() => {
     renderCanvas();
   }, [renderCanvas]);
-
-  // Mouse drag handlers for 3D rotation
-  const handleMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    setIsDragging(true);
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - dragStart.x;
-    const deltaY = e.clientY - dragStart.y;
-
-    setRotY((prev) => (prev + deltaX * 0.8) % 360);
-    setRotX((prev) => Math.max(5, Math.min(85, prev - deltaY * 0.8)));
-    setDragStart({ x: e.clientX, y: e.clientY });
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-  };
 
   return (
     <div className="flex flex-col h-full bg-slate-950 text-slate-100 rounded-xl overflow-hidden border border-slate-800">
