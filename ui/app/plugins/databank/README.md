@@ -77,3 +77,24 @@ management, rename, correlation and compare remain retained target dependencies
 until their own bounded donor cohorts. Shared CSS remains a host dependency;
 pane-specific stylesheet is mapped. Existing view persistence and mock fixtures
 remain unchanged. No quantitative service or backend databank is introduced.
+
+## ResultsDatabankViews structural ownership (2026-10-06)
+
+DEC-UI-DATABANK-VIEWS-STRUCTURAL-OWNERSHIP: map
+SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews to
+HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankViews.
+FEAT-UI-DATABANK_BUILDER owns this existing frontend view editor;
+FR-UI-DATABANK-source-mapping also covers this plugin, with the existing
+FR-UI-DATABANK-workflow-preservation and FR-UI-DATABANK-clean-room requirements.
+Status: structurally relocated; qualification and limits recorded in its walkthrough.
+
+module.ts exports ManageViewsDialog from databankViews.tsx. DatabankViewsCtrl.ts
+owns existing editing state; DatabankViewsService.ts attaches the existing
+ProjectDatabanks/databankStore.ts authority. ProjectDatabanks/databankColumns.ts
+remains shared by metrics, table and editor; toolbar view selection stays in the
+pane. The target view composes independently authored editor presentation where
+the donor HTML delegates to internal/web/app/directives/manageViewsDialog.
+That shared donor directive is outside this plugin inventory; matching this
+wrapper does not claim shared-directive or advanced settings parity. The JAR is
+excluded backend scope. No XML requests, new persistence, metric formulas or
+backend functionality were introduced. Historical parity claims remain qualified.

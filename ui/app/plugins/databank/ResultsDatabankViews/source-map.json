@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsDatabankViews structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankViews",
+  "source_head": "1096e3dcb7bcdbdbf33a7aed22a5cfa4f6dc9e8e",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_144023_results-databank-views-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-VIEWS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankviews-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews",
+      "family": "installed plugin artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/databankViews.html",
+      "relative_path": "databankViews.html",
+      "location": "lines 1-2; plugin responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; text responsibility inspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "564fd6fa616ebb479e0f14c33ff10650be45e59f2aba690d84d57061a5498c56",
+      "target": "databankViews.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsCtrl.js",
+      "relative_path": "DatabankViewsCtrl.js",
+      "location": "lines 1-77; plugin responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; text responsibility inspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "ea0c65b628eceec28d7dec41bd3f1129bc8b8d6756cab0cb561af8b07db7225d",
+      "target": "DatabankViewsCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js",
+      "relative_path": "DatabankViewsService.js",
+      "location": "lines 1-131; plugin responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; text responsibility inspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "c18460ea9aeb6f7ebb7b97b047658761b484c8d2b9f220958d3fd3591f7edaec",
+      "target": "DatabankViewsService.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-87; plugin responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; text responsibility inspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "2c5ac941fb02b2e91134e70f7057d03c15f62c5ff7e3e8b33b91f8fbe07440e3",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/ResultsDatabankViews.jar",
+      "relative_path": "ResultsDatabankViews.jar",
+      "location": "whole archive; inventory only",
+      "inspection_method": "local inventory and SHA-256",
+      "relation": "excluded backend binary",
+      "access_date": "2026-10-06",
+      "sha256": "22fe5655735ae9dda9226304966ea67c38f47b1ef7244d5dfed0c9249a61ed20",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend excluded; no runtime inspection"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/styles.css",
+      "relative_path": "styles.css",
+      "location": "lines 1-94; plugin responsibility boundary",
+      "inspection_method": "local inventory and SHA-256; text responsibility inspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "1944282ba7511a56f5e073c3ff412695f37f2704326f59054b0beebd864ba6a3",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural provenance manifest; not behavioral ledger"
+    }
+  ]
+}

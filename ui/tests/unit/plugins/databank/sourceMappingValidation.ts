@@ -1,12 +1,13 @@
 import sourceMap from '../../../../app/plugins/databank/ProjectDatabanks/source-map.json';
 
-export type SourceMapping = typeof sourceMap;
+export type SourceMapping = Omit<typeof sourceMap, "sources" | "external_dependencies" | "inventory_review"> & { sources: (Omit<(typeof sourceMap.sources)[number], "target"> & { target: string | null })[] };
 
 /** Validate the pilot's bounded structural contract, independently of rendering. */
 export function validateSourceMapping(
   mapping: SourceMapping,
   targetFiles: readonly string[],
   registry: string,
+  scope = { plugin: "ProjectDatabanks", html: 2, js: 4, css: 1, excluded: 0 },
 ): string[] {
   const errors: string[] = [];
   const fail = (message: string): void => {
@@ -20,8 +21,8 @@ export function validateSourceMapping(
     !path.split('/').some((part) => part === '..' || part === '.' || part === '');
   if (mapping.schema_version !== 1) fail('Unsupported mapping version');
   if (
-    mapping.donor_root !== 'SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks' ||
-    mapping.target_root !== 'HARUQUANTAI_ROOT/ui/app/plugins/databank/ProjectDatabanks'
+    mapping.donor_root !== `SQX_REFERENCE_ROOT/internal/plugins/${scope.plugin}` ||
+    mapping.target_root !== `HARUQUANTAI_ROOT/ui/app/plugins/databank/${scope.plugin}`
   )
     fail('Invalid logical roots');
   if (!/^[a-f0-9]{40}$/.test(mapping.source_head)) fail('Invalid source commit');
@@ -90,7 +91,7 @@ export function validateSourceMapping(
   for (const file of files) {
     if (!targets.has(file)) fail(`Unclassified target file: ${file}`);
   }
-  if (counts.html !== 2 || counts.js !== 4 || counts.css !== 1 || counts.excluded !== 0)
+  if (counts.html !== scope.html || counts.js !== scope.js || counts.css !== scope.css || counts.excluded !== scope.excluded)
     fail('Incomplete scoped donor inventory');
   return errors;
 }

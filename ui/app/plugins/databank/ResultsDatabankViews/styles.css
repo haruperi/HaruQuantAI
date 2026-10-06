@@ -1,0 +1,18 @@
+.hq-databank-views-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  min-width: 0;
+  max-height: 540px;
+}
+
+.hq-databank-views-selector {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr;
+  gap: 12px;
+  padding: 12px;
+  background: var(--sqx-chrome-bg);
+  border-radius: 4px;
+  border: 1px solid var(--sqx-fieldset-border);
+}

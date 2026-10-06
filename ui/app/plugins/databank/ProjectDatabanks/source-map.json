@@ -151,10 +151,6 @@
       "reason": "Retained DatabankFilterByCorrelation presentation and shared quantitative mock helpers; separate cohort"
     },
     {
-      "path": "ManageViewsDialog.tsx",
-      "reason": "Retained ResultsDatabankViews presentation; separate future cohort"
-    },
-    {
       "path": "StrategyTable.tsx",
       "reason": "Existing target grid virtualization/rendering dependency; declared exception until finer grid audit"
     },
@@ -162,5 +158,16 @@
       "path": "source-map.json",
       "reason": "Structural manifest, not behavioral ledger"
     }
-  ]
+  ],
+  "external_dependencies": [
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankViews/module.ts",
+      "relation": "Relocated view editor; existing store and metric dependencies remain here."
+    }
+  ],
+  "inventory_review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_144023_results-databank-views-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  }
 }

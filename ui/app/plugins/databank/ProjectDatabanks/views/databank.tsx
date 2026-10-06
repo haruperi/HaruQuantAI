@@ -8,7 +8,7 @@ import {
   SetNoteDialog,
 } from '../DatabankDialogs';
 import { StrategyTable } from '../StrategyTable';
-import { ManageViewsDialog } from '../ManageViewsDialog';
+import { ManageViewsDialog } from '../../ResultsDatabankViews/module';
 import { FilterByCorrelationModal } from '../FilterByCorrelationModal';
 import { CompareStrategiesModal } from '../CompareStrategiesModal';
 
