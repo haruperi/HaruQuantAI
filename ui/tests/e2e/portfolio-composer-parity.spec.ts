@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test';
+import {test,expect} from './frontendStructureFixtures';
 import {resolve} from 'node:path';
 const evidence=resolve(process.cwd(),'../../.agents/logs/2026-09-25T164633_portfolio-master-composer-ui-plan/verification');
 test('Composer members, independent weights, dialogs and preview serialization',async({page})=>{

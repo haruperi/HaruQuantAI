@@ -1,1 +1,1 @@
-export * from '../../../../plugins/project/ProjectWorkbench/results/tabs/EquityChartTab';
+export * from '../../../../plugins/project/ResultsEquityChart/module';

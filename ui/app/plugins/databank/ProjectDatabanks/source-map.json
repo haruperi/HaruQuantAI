@@ -136,7 +136,7 @@
     },
     {
       "path": "DatabankDialogs.tsx",
-      "reason": "Retained save/confirm/note dialogs and shared modal/button; load, rename and retest extracted to mapped owners"
+      "reason": "Retained save/confirm dialogs and shared modal/button; note presentation extracted to bounded tools/setNote owner"
     },
     {
       "path": "databankStore.ts",
@@ -187,6 +187,10 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/module.ts",
       "relation": "Core selection fallback, clear confirmation and notification-only refresh delegate to bounded independently authored action modules."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/module.ts",
+      "relation": "Mapped Tools descriptors, existing metric-based selection and latent note guards/application; childless menu rendering stays inactive."
     }
   ],
   "inventory_review": {

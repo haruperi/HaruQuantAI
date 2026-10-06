@@ -1,5 +1,5 @@
 import { basename } from "node:path";
-import { test as base } from "@playwright/test";
+import { test as base, type Locator } from "@playwright/test";
 export { expect } from "@playwright/test";
 export type { Page } from "@playwright/test";
 
@@ -70,6 +70,20 @@ export const test = base.extend({
           ? { path: info.outputPath(basename(options.path)) }
           : {}),
       });
-    await use(page);
+    const locatorPrototype = Object.getPrototypeOf(page.locator('body')) as {
+      screenshot: Locator['screenshot'];
+    };
+    const locatorScreenshot = locatorPrototype.screenshot;
+    locatorPrototype.screenshot = function (this: Locator, options) {
+      return locatorScreenshot.call(this, {
+        ...options,
+        ...(options?.path ? { path: info.outputPath(basename(options.path)) } : {}),
+      });
+    };
+    try {
+      await use(page);
+    } finally {
+      locatorPrototype.screenshot = locatorScreenshot;
+    }
   },
 });

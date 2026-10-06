@@ -1,24 +1,15 @@
-import { ResultsChart } from '../ResultsCharts';
-import { resultSnapshot, type ResultDocument } from '../resultsModel';
-import { useState } from 'react';
+import { ResultsChart } from '../ProjectWorkbench/results/ResultsCharts';
+import { type ResultDocument } from '../ProjectWorkbench/results/resultsModel';
+import { useEquityChart } from './EquityChartCtrl';
+import { Benchmark } from './benchmark/Benchmark';
 import { Menu, RefreshCw } from 'lucide-react';
-import { ResultsToolbar, SqrDropdown, SegmentedButtons } from '../ResultsChrome';
-import { SqdCheckbox } from '../../settings/SettingsControls';
-import { benchmarkNormalizations, equityChartDefaults, type Direction, type EquityChartFilter, type SampleType, } from '../resultsFixtures';
+import { ResultsToolbar, SqrDropdown, SegmentedButtons } from '../ProjectWorkbench/results/ResultsChrome';
+import { SqdCheckbox } from '../ProjectWorkbench/settings/SettingsControls';
 /** Equity chart tab: X Axis, Benchmark, refresh, Subcharts settings, empty state. */
 export function EquityChartTab({ result }: {
     result: ResultDocument | null;
 }) {
-    const [dataKey, setDataKey] = useState("Main backtest");
-    const [direction, setDirection] = useState<Direction>('both');
-    const [sampleType, setSampleType] = useState<SampleType>('full');
-    const [filter, setFilter] = useState<EquityChartFilter>(equityChartDefaults);
-    const [benchOpen, setBenchOpen] = useState(false);
-    const [settingsOpen, setSettingsOpen] = useState(false);
-    const set = <K extends keyof EquityChartFilter>(key: K, value: EquityChartFilter[K]) => setFilter(f => ({ ...f, [key]: value }));
-    const [revision, setRevision] = useState(0);
-    const snapshot = resultSnapshot(direction, sampleType, dataKey);
-    const xAxisIsTime = filter.xaxis === 'time';
+    const { dataKey, setDataKey, direction, setDirection, sampleType, setSampleType, filter, set, settingsOpen, setSettingsOpen, revision, setRevision, snapshot, xAxisIsTime } = useEquityChart();
     return (<div className="sqr-tab">
       <div className="sqr-toolbar-row">
         <ResultsToolbar dataKey={dataKey} dataItems={result?.markets} onDataChange={setDataKey} direction={direction} sampleType={sampleType} onDirectionChange={setDirection} onSampleTypeChange={setSampleType}>
@@ -27,57 +18,7 @@ export function EquityChartTab({ result }: {
             { value: 'trade' as const, label: 'Trade' },
             { value: 'time' as const, label: 'Time' },
         ]} value={filter.xaxis} onChange={v => set('xaxis', v)}/>
-          <div className="sqr-benchmark-dd">
-            <button type="button" className={`sqd-btn sqr-benchmark-btn${benchOpen ? ' open' : ''}`} onClick={() => setBenchOpen(v => !v)}>
-              Benchmark: {filter.benchmarkOn ? 'On' : 'Off'}
-            </button>
-            <SqrDropdown open={benchOpen} onClose={() => setBenchOpen(false)} className="sqr-benchmark-menu">
-              <table className="sqr-benchmark-table">
-                <tbody>
-                  <tr>
-                    <td>
-                      <label><input type="checkbox" checked={filter.benchmarkOn} onChange={e => set("benchmarkOn", e.target.checked)}/> Benchmark</label>
-                    </td>
-                    <td>
-                      <input type="text" className="sqd-input sqr-text-input" aria-label="Benchmark symbol" value={filter.benchmarkSymbol} onChange={e => set('benchmarkSymbol', e.target.value)} style={{ width: 200 }}/>
-                    </td>
-                  </tr>
-                  <tr>
-                    <td>
-                      <label>Normalization</label>
-                    </td>
-                    <td>
-                      <span className="sqd-select" style={{ width: 200 }}>
-                        <span>
-                          {benchmarkNormalizations.find(n => n.value === filter.benchmarkNormalization)
-            ?.label ?? filter.benchmarkNormalization}
-                        </span>
-                        <select aria-label="Normalization" value={filter.benchmarkNormalization} onChange={e => set('benchmarkNormalization', e.target.value)}>
-                          {benchmarkNormalizations.map(n => (<option key={n.value} value={n.value}>{n.label}</option>))}
-                        </select>
-                      </span>
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="sqr-benchmark-text">
-                <span>
-                  Normalization means that we&apos;ll recompute real performance of
-                  benchmark asset as if it would have the same exposure / drawdown as
-                  your strategy.
-                </span>
-                <br />
-                <span>
-                  This allows you to compare how would the benchmark look like with the
-                  same risk or invested capital in time.
-                </span>
-                <br />
-                <a role="button" tabIndex={0} href="https://strategyquant.com/doc/strategyquant/results-equity-chart/" target="_blank" rel="noreferrer">
-                  Learn more
-                </a>
-              </div>
-            </SqrDropdown>
-          </div>
+          <Benchmark filter={filter} set={set}/>
           <button type="button" className="sqd-btn sqr-icon-btn" title="Refresh chart" aria-label="Refresh chart" onClick={() => setRevision(v => v + 1)}>
             <RefreshCw size={12}/>
           </button>

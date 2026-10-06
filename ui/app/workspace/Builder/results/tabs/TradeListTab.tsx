@@ -1,1 +1,1 @@
-export * from '../../../../plugins/project/ProjectWorkbench/results/tabs/TradeListTab';
+export * from '../../../../plugins/project/ResultsTradeList/module';

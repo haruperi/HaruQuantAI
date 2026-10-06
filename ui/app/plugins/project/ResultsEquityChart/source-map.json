@@ -1,0 +1,195 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsEquityChart bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsEquityChart",
+  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "review": {
+    "version": 1,
+    "state": "owner-approved-plan",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md"
+  },
+  "owner": {
+    "feature": "FEAT-UI-PROJECT_WORKBENCH",
+    "domain": "plugins/project",
+    "decision": "DEC-UI-PROJECT-RESULTS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed frontend plugin artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart",
+      "id": "sqx-resultsequitychart-ui"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/benchmark.html",
+      "relative_path": "benchmark/benchmark.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "ca3bf0a2b4d0c88be50c0509e8dfabed481460305b0d308edcab779a3677ff00",
+      "target": "benchmark/benchmark.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/Benchmark.js",
+      "relative_path": "benchmark/Benchmark.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "a2475d9df11dbc90be5594ec6367bda3fdffb9be7b04bd7f393d8370ba61ffa1",
+      "target": "benchmark/Benchmark.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/BenchmarkCtrl.js",
+      "relative_path": "benchmark/BenchmarkCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "d702f4464e5266abbee0c2be4e143e321fa1353c3010c949e04cba494d704cac",
+      "target": "benchmark/BenchmarkCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/equityChart.html",
+      "relative_path": "equityChart.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "36a9ec3b239c61a492104d32a863427c69c82c3ab28af91723824d63f1023139",
+      "target": "equityChart.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartCtrl.js",
+      "relative_path": "EquityChartCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "7a5e380a6a463682290737181d065a66cce6277e9d84edf5307c1d8517f06285",
+      "target": "EquityChartCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js",
+      "relative_path": "EquityChartService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "0f72cac89cb2a6dc28bdb5640da9d1551bed8582965cfdfc08ff9417cb19eb48",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "9c0baca2f50be624d2f85ae0806a584673448170c16a4e4d8f3a7f8aba9340e4",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/ResultsEquityChart.jar",
+      "relative_path": "ResultsEquityChart.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "d13f1ffdd75ec94f33d7c383b5a8239f3f1a28700b4aed2303041cbd936e4645",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary excluded from frontend-only scope."
+    },
+    {
+      "catalog_id": "sqx-resultsequitychart-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "3cd3c3eed4ab6f1cad46aaa2ba6cb19b92d78aa5efa352c2c362923d73b62bb5",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope documentation and ownership"
+    }
+  ],
+  "retained_support": [
+    {
+      "reason": "Shared toolbar/dropdown/segmented controls",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsChrome.tsx"
+    },
+    {
+      "reason": "Independent shared synthetic chart primitive",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx"
+    },
+    {
+      "reason": "Shared result contracts/mock snapshots/download helpers",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts"
+    },
+    {
+      "reason": "Shared defaults/menus/analysis fixtures retained",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts"
+    },
+    {
+      "reason": "Shared rename/delete/export modal behavior and NewAnalysisModal compatibility re-export",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx"
+    },
+    {
+      "reason": "Shared focus/Escape modal behavior",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectModal.tsx"
+    }
+  ],
+  "limitations": [
+    "No backend, persistence migration, real generated reports/benchmark feeds or SQX runtime parity claim.",
+    "Views/analyses remain session-only; reports/charts are precomputed approximations.",
+    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence."
+  ]
+}

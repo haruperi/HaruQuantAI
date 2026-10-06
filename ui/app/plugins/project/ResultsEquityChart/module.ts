@@ -1,0 +1,1 @@
+export { EquityChartTab } from './equityChart';

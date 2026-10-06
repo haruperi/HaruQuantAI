@@ -1,0 +1,2 @@
+.sqr-grid-content{border-top:1px solid var(--sqx-tab-border,#777777)}
+:is(.builder-workspace,.project-workspace) .sqr-grid-content .sqr-data-table td,:is(.builder-workspace,.project-workspace) .sqr-grid-content .sqr-data-table th{padding:4px 9px;height:24px;box-sizing:border-box}

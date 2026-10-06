@@ -1,17 +1,13 @@
-import { ResultsChart } from '../ResultsCharts';
-import { resultSnapshot, type ResultDocument } from '../resultsModel';
-import { useState } from 'react';
-import { ResultsToolbar } from '../ResultsChrome';
-import { overviewTemplates, type Direction, type SampleType } from '../resultsFixtures';
+import { ResultsChart } from '../ProjectWorkbench/results/ResultsCharts';
+import { type ResultDocument } from '../ProjectWorkbench/results/resultsModel';
+import { useResultsOverview } from './ResultsOverviewCtrl';
+import { ResultsToolbar } from '../ProjectWorkbench/results/ResultsChrome';
+import { overviewTemplates } from '../ProjectWorkbench/results/resultsFixtures';
 /** Overview results tab: toolbar + Template select + empty overview area. */
 export function OverviewTab({ result }: {
     result: ResultDocument | null;
 }) {
-    const [dataKey, setDataKey] = useState("Main backtest");
-    const [direction, setDirection] = useState<Direction>('both');
-    const [sampleType, setSampleType] = useState<SampleType>('full');
-    const [template, setTemplate] = useState('SQDefault');
-    const snapshot = resultSnapshot(direction, sampleType, dataKey);
+    const { dataKey, setDataKey, direction, setDirection, sampleType, setSampleType, template, setTemplate, snapshot } = useResultsOverview();
     return (<div className="sqr-tab">
       <div className="sqr-toolbar-row">
         <ResultsToolbar dataKey={dataKey} dataItems={result?.markets} onDataChange={setDataKey} direction={direction} sampleType={sampleType} onDirectionChange={setDirection} onSampleTypeChange={setSampleType} extendedSample>

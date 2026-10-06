@@ -47,3 +47,5 @@ portfolio metrics. Workspace READMEs own their task-specific status and limitati
 ## Structural module boundaries
 
 The stable index forwards ProjectSettings to ../ProjectSettings/module and ProjectProgress to ../EnginePanel/module. SettingsPanel owns shared settings presentation. Contracts, project frame, modal lifecycle, local preview clock and result charts remain shared support.
+
+Wave2 forwards DataTab and ProjectResults to bounded SettingsData and ProjectResults modules; primary reports and trade-view drafts keep shared fixtures/charts/model/modal dependencies.

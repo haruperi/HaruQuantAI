@@ -201,3 +201,11 @@ persistence or runtime parity is established; other action folders are out of sc
 - `FR-UI-DATABANK-workflow-preservation`
 
 Bounded inventories preserve existing mock and deferred behavior. No new backend capability or parity claim.
+
+## Wave2 structural ownership
+
+- `DEC-UI-DATABANK-SELECTION-NOTES-STRUCTURAL-OWNERSHIP`
+- `FEAT-UI-DATABANK_BUILDER`
+- `FR-UI-DATABANK-clean-room`
+- `FR-UI-DATABANK-source-mapping`
+- `FR-UI-DATABANK-workflow-preservation`

@@ -1,3 +1,5 @@
+import { TOOLS_MENU } from '../ResultsDatabankActions/tools/module';
+export { TOOLS_MENU } from '../ResultsDatabankActions/tools/module';
 import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 
@@ -56,14 +58,6 @@ export interface ToolsMenuItem {
   label: string;
   children?: string[];
 }
-
-export const TOOLS_MENU: ToolsMenuItem[] = [
-  { label: 'Edit', children: ['Parameters', 'Strategy'] },
-  { label: 'Select', children: ['Passed', 'Failed'] },
-  { label: 'Set note' },
-  { label: 'Compare' },
-  { label: 'Run CA' },
-];
 
 function useOutsideClose(onClose: () => void) {
   const ref = useRef<HTMLDivElement | null>(null);

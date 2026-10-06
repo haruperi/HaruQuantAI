@@ -1,4 +1,4 @@
-import {test,expect} from '@playwright/test';
+import {test,expect} from './frontendStructureFixtures';
 import {resolve} from 'node:path';
 const evidence=resolve(process.cwd(),'../../.agents/logs/2026-09-25T151716_builder-results-ui-correction/verification');
 test.beforeEach(async({page})=>{await page.goto('/builder');await page.getByRole('tab',{name:'Results',exact:true}).click();});

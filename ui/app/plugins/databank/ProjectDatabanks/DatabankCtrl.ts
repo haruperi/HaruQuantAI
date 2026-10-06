@@ -1,3 +1,5 @@
+import { handleSelectItem, requestSetNote } from '../ResultsDatabankActions/tools/module';
+export { strategyPassesMockChecks } from '../ResultsDatabankActions/tools/module';
 import { getCurrentDatabankStrategy, requestClearAllConfirmation, refreshDatabank } from '../ResultsDatabankActions/module';
 import { requestDeleteConfirmation } from '../ResultsDatabankActions/delete/module';
 import { openMockLoad } from '../ResultsDatabankActions/load/module';
@@ -15,11 +17,6 @@ type DialogState =
   | { kind: 'rename' }
   | { kind: 'save'; format: string }
   | { kind: 'setNote' };
-
-/** Mock cross-check rule used by Tools > Select > Passed/Failed. */
-export function strategyPassesMockChecks(netProfit: number, trades: number, maxDrawdown: number): boolean {
-  return netProfit > 0 && trades >= 80 && maxDrawdown < 30000;
-}
 
 export function useDatabankPanel() {
   const { store, databankStore } = useDatabankContext();
@@ -95,21 +92,9 @@ export function useDatabankPanel() {
   };
 
   const handleToolsItem = (item: string) => {
-    if (item === 'Select:Passed' || item === 'Select:Failed') {
-      const passed = item === 'Select:Passed';
-      const ids = bankStrategies
-        .filter(s => strategyPassesMockChecks(s.metrics.netProfit, s.metrics.trades, s.metrics.maxDrawdown) === passed)
-        .map(s => s.id);
-      store.setRows(ids);
-      store.notify(`${passed ? 'Passed' : 'Failed'} strategies selected (${ids.length})`);
-      return;
-    }
+    if (handleSelectItem(item, bankStrategies, store.setRows, store.notify)) return;
     if (item === 'Set note') {
-      if (!selectedInBank.length) {
-        store.notify('You have to select at least one strategy');
-        return;
-      }
-      setDialog({ kind: 'setNote' });
+      requestSetNote(selectedInBank.length, store.notify, () => setDialog({ kind: 'setNote' }));
       return;
     }
     if (item === 'Compare') {

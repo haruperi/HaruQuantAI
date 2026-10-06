@@ -1,0 +1,108 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only Tools/setNote bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/setNote",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/setNote",
+  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "decision": "DEC-UI-DATABANK-SELECTION-NOTES-STRUCTURAL-OWNERSHIP",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "domain": "plugins/databank"
+  },
+  "clean_room": {
+    "contains_sensitive_data": false,
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed Tools artifacts",
+      "id": "sqx-resultsdatabankactions-tools-setnote-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/setNote"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-setnote-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/setNote/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target audit",
+      "relation": "Independent frontend mapping or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "6bfc704f5c13fb20a6450d51e6608538b37f9a92bfac019af79545c9ba57407e",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock/menu responsibilities only; inactive menu behavior preserved"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-setnote-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/setNote/setNote.html",
+      "relative_path": "setNote.html",
+      "location": "whole-file structural inventory and responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target audit",
+      "relation": "Independent frontend mapping or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "9cfdd2f1f1dda58c81d7e2cba6ceb88cea456f2ec80fd18f10df63f8bc4236ff",
+      "target": "setNote.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock/menu responsibilities only; inactive menu behavior preserved"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-setnote-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/setNote/SetNoteCtrl.js",
+      "relative_path": "SetNoteCtrl.js",
+      "location": "whole-file structural inventory and responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target audit",
+      "relation": "Independent frontend mapping or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "ed56f31d87f2c7483d82aaaf527fc7109bb895a4cf8e764e52ea6fa28cbf998f",
+      "target": "SetNoteCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock/menu responsibilities only; inactive menu behavior preserved"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-setnote-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/setNote/SetNotePopupCtrl.js",
+      "relative_path": "SetNotePopupCtrl.js",
+      "location": "whole-file structural inventory and responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target audit",
+      "relation": "Independent frontend mapping or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "9def361f091e65584c00e96050ad348dfbace881f1244afcfc81a5f66f8795d6",
+      "target": "SetNotePopupCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock/menu responsibilities only; inactive menu behavior preserved"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-setnote-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/setNote/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural inventory and responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target audit",
+      "relation": "Independent frontend mapping or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "f237e4e9c420ac1f063881df849e57baad4470bd87848f18786e32672912dbce",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "No note-specific target styling; shared modal/input styles remain shared"
+    }
+  ],
+  "target_only": [
+    {
+      "reason": "Structural manifest; not behavioral ledger",
+      "path": "source-map.json"
+    }
+  ]
+}

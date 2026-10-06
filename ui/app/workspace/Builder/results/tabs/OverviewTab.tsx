@@ -1,1 +1,1 @@
-export * from '../../../../plugins/project/ProjectWorkbench/results/tabs/OverviewTab';
+export * from '../../../../plugins/project/ResultsOverview/module';

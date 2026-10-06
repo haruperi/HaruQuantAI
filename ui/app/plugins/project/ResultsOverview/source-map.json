@@ -1,0 +1,234 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsOverview bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/project/ResultsOverview",
+  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "review": {
+    "version": 1,
+    "state": "owner-approved-plan",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md"
+  },
+  "owner": {
+    "feature": "FEAT-UI-PROJECT_WORKBENCH",
+    "domain": "plugins/project",
+    "decision": "DEC-UI-PROJECT-RESULTS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ]
+  },
+  "clean_room": {
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false,
+    "contains_personal_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed frontend plugin artifacts",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview",
+      "id": "sqx-resultsoverview-ui"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "b743615092006c157f85c03e972a77cf4b9c65065ef87243ef80f26cc7ada5dc",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/overview.html",
+      "relative_path": "overview.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "356523627db3c8abb7ecdbc7226af1597a48c4b7ae8f87c23f9580bce0b30b8c",
+      "target": "overview.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverview.jar",
+      "relative_path": "ResultsOverview.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "9a97ec7cf2324e744f87a5e5039e7365cb162713ca4ff5b0cc324a6bf7dcfa23",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend binary excluded from frontend-only scope."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js",
+      "relative_path": "ResultsOverviewCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "14717fa23229c7c2dceef6b2e0be7572117d6e8c34a56ff7d9c0e9e78012bd3d",
+      "target": "ResultsOverviewCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js",
+      "relative_path": "ResultsOverviewService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "0298e264f725fa5c8ff7541cf47da7397bf14904981cdce7aa90c29cb04fe8f1",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Donor backend/persistence/report transport absent; existing local utilities are retained support, not services."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "1c8d6cd9fd82e19da27d6f390749e8df7ef397ea4a815c29ab47d193e3856911",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored mock presentation only; structural identity does not establish donor runtime parity."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/awshareddefault_template.htm",
+      "relative_path": "templates/awshareddefault_template.htm",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "ea2efd63467eb5e2f6e5766d07764473a3c9f9847ceaec79f4aadc7706fa244e",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_screenshot_portfolio.jpg",
+      "relative_path": "templates/sqdefault_screenshot_portfolio.jpg",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "39500c62559b9211b88ead8cdc3300a2b1b3d07c13a4b8c44416f46fcdab3f3f",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_screenshot.jpg",
+      "relative_path": "templates/sqdefault_screenshot.jpg",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "b8d3f88166971b9b80620a608e89aa7cfca6b86c12604b396e708fb6c0a736e3",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/sqdefault_template.htm",
+      "relative_path": "templates/sqdefault_template.htm",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "92462712adad1f6107bc864ae10958e98066efd3dcc571df4ac7316b43fc7815",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/ts_screenshot.jpg",
+      "relative_path": "templates/ts_screenshot.jpg",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "0a1c0399609fde4b14f732e1bfb79d98174aa952bf91bb3220a6b71ed23cf6bc",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+    },
+    {
+      "catalog_id": "sqx-resultsoverview-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/templates/ts_template.htm",
+      "relative_path": "templates/ts_template.htm",
+      "location": "whole-file structural identity",
+      "inspection_method": "local recursive inventory, SHA-256 and scoped responsibility inspection",
+      "relation": "explicit artifact exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "d38f4341d95946b1738d5eb25d91c04ec547ac53d925be3f9e872c5cf4716a75",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Proprietary report templates/preview media have no separately existing target layouts and are excluded; current precomputed report remains unchanged."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest, not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope documentation and ownership"
+    }
+  ],
+  "retained_support": [
+    {
+      "reason": "Shared toolbar/dropdown/segmented controls",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsChrome.tsx"
+    },
+    {
+      "reason": "Independent shared synthetic chart primitive",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsCharts.tsx"
+    },
+    {
+      "reason": "Shared result contracts/mock snapshots/download helpers",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts"
+    },
+    {
+      "reason": "Shared defaults/menus/analysis fixtures retained",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/resultsFixtures.ts"
+    },
+    {
+      "reason": "Shared rename/delete/export modal behavior and NewAnalysisModal compatibility re-export",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/results/ResultsModals.tsx"
+    },
+    {
+      "reason": "Shared focus/Escape modal behavior",
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/project/ProjectWorkbench/ProjectModal.tsx"
+    }
+  ],
+  "limitations": [
+    "No backend, persistence migration, real generated reports/benchmark feeds or SQX runtime parity claim.",
+    "Views/analyses remain session-only; reports/charts are precomputed approximations.",
+    "Canonical behavioral ledger/schema absent; structural manifests are not behavioral ledger evidence."
+  ]
+}

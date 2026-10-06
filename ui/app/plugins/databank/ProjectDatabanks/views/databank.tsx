@@ -1,3 +1,4 @@
+import { SetNoteDialog, applySetNote } from '../../ResultsDatabankActions/tools/module';
 import { confirmClearAll } from '../../ResultsDatabankActions/module';
 import { confirmDelete } from '../../ResultsDatabankActions/delete/module';
 import { RenameStrategiesDialog } from '../../DatabankRename/ui/module';
@@ -7,7 +8,6 @@ import { DatabankToolbar } from '../DatabankToolbar';
 import {
   RemovingReportsConfirm,
   SaveRecordsDialog,
-  SetNoteDialog,
 } from '../DatabankDialogs';
 import { StrategyTable } from '../StrategyTable';
 import { ManageViewsDialog } from '../../ResultsDatabankViews/module';
@@ -138,10 +138,7 @@ export function DatabankPanel() {
       {dialog.kind === 'setNote' && (
         <SetNoteDialog
           currentNote={selectedInBank[0]?.note ?? ''}
-          onSetNote={note => {
-            for (const s of selectedInBank) store.renameStrategy(s.id, s.name, note);
-            store.notify(`Note set on ${selectedInBank.length} strateg${selectedInBank.length === 1 ? 'y' : 'ies'}`);
-          }}
+          onSetNote={note => applySetNote(selectedInBank, note, store.renameStrategy, store.notify)}
           onClose={() => setDialog({ kind: 'none' })}
         />
       )}

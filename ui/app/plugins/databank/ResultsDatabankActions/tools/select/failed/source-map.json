@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only Tools/select/failed bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/failed",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/tools/select/failed",
+  "source_head": "dd44398218fd0f742a80cb150c00e23fe923cf78",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_155446_frontend-structural-five-waves/implementation-plan.md",
+    "version": 1,
+    "state": "owner-approved-plan"
+  },
+  "owner": {
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ],
+    "decision": "DEC-UI-DATABANK-SELECTION-NOTES-STRUCTURAL-OWNERSHIP",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "domain": "plugins/databank"
+  },
+  "clean_room": {
+    "contains_sensitive_data": false,
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed Tools artifacts",
+      "id": "sqx-resultsdatabankactions-tools-select-failed-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/failed"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-tools-select-failed-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/tools/select/failed/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural inventory and responsibility inspection",
+      "inspection_method": "local SHA-256 inventory and independent target audit",
+      "relation": "Independent frontend mapping or justified exclusion",
+      "access_date": "2026-10-06",
+      "sha256": "918eb51ee735bba7cb08242560b1af4e72244ce9d41af82fd36390a4556d7e95",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independent mock/menu responsibilities only; inactive menu behavior preserved"
+    }
+  ],
+  "target_only": [
+    {
+      "reason": "Structural manifest; not behavioral ledger",
+      "path": "source-map.json"
+    }
+  ]
+}
