@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 3.1 FEAT-DATA-JODA-TIME - joda-time.jar
 
@@ -25,6 +27,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/joda-time.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/joda-time.jar" org.joda.time.Chronology`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Data Manager through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -54,6 +58,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_joda_time.py --no-cov`; expect DST gaps/folds, timestamp units and timezone validation; use temporary resources.
@@ -75,6 +81,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/SQDataLib.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/SQDataLib.jar" com.strategyquant.datalib.instrument.AliasManager`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Data Manager through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -104,6 +112,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_sq_data_lib.py --no-cov`; expect bar precision, data ordering, reader bounds and metadata preservation; use temporary resources.
@@ -126,6 +136,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager/module.js`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/workspace.py`
@@ -141,6 +155,18 @@
 - **Create:** `tests/reference/sqx_features/data_app_data_manager.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display dataset/catalog load and mutation, server resource IDs and authoritative row counts from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-app-data-manager.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -152,10 +178,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_app_data_manager.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-app-data-manager.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-DATA-APP-DATA-MANAGER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.4 FEAT-DATA-DATA-MANAGER-BASKET - DataManagerBasket.jar
 
@@ -174,6 +205,11 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBasket`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBasket/service/BasketService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBasket/controllers/BasketsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBasket/views/addBasketModal.html`.
+- **Existing UI connection:** stock groups/baskets; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Catalogs/StockGroups/stockGroupsStore.ts`; wire stock-group/basket membership load/save and update status.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+- **Retained UI limit:** Stock-group dialogs are a candidate consumer; equivalence to donor baskets is unverified. Ratify semantics and required controls before binding.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/DataManagerBasket/service.py`
@@ -189,6 +225,20 @@
 - **Create:** `tests/reference/sqx_features/data_data_manager_basket.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Catalogs/StockGroups/stockGroupsStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Catalogs/StockGroups/StockGroupEditorDialog.tsx`
+  - Display stock-group/basket membership load/save and update status from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display stock-group/basket membership load/save and update status from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-data-manager-basket.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -199,10 +249,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind stock-group/basket membership load/save and update status to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_basket.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-data-manager-basket.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise stock groups/baskets for FEAT-DATA-DATA-MANAGER-BASKET; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.5 FEAT-DATA-DATA-MANAGER-BROKER - DataManagerBroker.jar
 
@@ -221,6 +276,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBroker`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBroker/service/BrokerService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBroker/controllers/BrokersCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerBroker/views/addBrokerModal.html`.
+- **Existing UI connection:** broker profiles; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfileEditorDialog.tsx`; wire broker-profile load/save/import and server-owned update jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/DataManagerBroker/service.py`
@@ -236,6 +295,22 @@
 - **Create:** `tests/reference/sqx_features/data_data_manager_broker.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/BrokerProfileEditorDialog.tsx`
+  - Display broker-profile load/save/import and server-owned update jobs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Catalogs/BrokerProfiles/brokerProfiles.ts`
+  - Display broker-profile load/save/import and server-owned update jobs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display broker-profile load/save/import and server-owned update jobs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-data-manager-broker.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -246,10 +321,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind broker-profile load/save/import and server-owned update jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_broker.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-data-manager-broker.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise broker profiles for FEAT-DATA-DATA-MANAGER-BROKER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.6 FEAT-DATA-DATA-MANAGER-CUSTOM-DATA - DataManagerCustomData.jar
 
@@ -268,6 +348,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerCustomData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerCustomData/DMCustomDataService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerCustomData/DMCustomDataCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerCustomData/add/CustomDataAddCtrl.js`.
+- **Existing UI connection:** custom data; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Indicators/externalIndicatorsStore.ts`; wire custom-data/indicator import, normalized values and error reporting.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/DataManagerCustomData/service.py`
@@ -283,6 +367,18 @@
 - **Create:** `tests/reference/sqx_features/data_data_manager_custom_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Indicators/externalIndicatorsStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display custom-data/indicator import, normalized values and error reporting from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-data-manager-custom-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -293,10 +389,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind custom-data/indicator import, normalized values and error reporting to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_custom_data.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-data-manager-custom-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise custom data for FEAT-DATA-DATA-MANAGER-CUSTOM-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.7 FEAT-DATA-DATA-MANAGER-DATA - DataManagerData.jar
 
@@ -315,6 +416,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData/DMDataService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData/DMDataCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData/addBrPopup.html`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/DataManagerData/service.py`
@@ -330,6 +435,18 @@
 - **Create:** `tests/reference/sqx_features/data_data_manager_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display dataset/catalog load and mutation, server resource IDs and authoritative row counts from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-data-manager-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -340,10 +457,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_data.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-data-manager-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-DATA-DATA-MANAGER-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.8 FEAT-DATA-DATA-MANAGER-HOME - DataManagerHome.jar
 
@@ -362,6 +484,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHome`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHome/DMHomeService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHome/DMHomeCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHome/home.html`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/DataManagerHome/service.py`
@@ -377,6 +503,18 @@
 - **Create:** `tests/reference/sqx_features/data_data_manager_home.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display dataset/catalog load and mutation, server resource IDs and authoritative row counts from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-data-manager-home.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -387,10 +525,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_home.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-data-manager-home.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-DATA-DATA-MANAGER-HOME; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.9 FEAT-DATA-DATA-MANAGER-INSTRUMENTS - DataManagerInstruments.jar
 
@@ -409,6 +552,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerInstruments`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerInstruments/services/InstrumentService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerInstruments/controllers/InstrumentsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerInstruments/actions/clone/CloneInstrumentCtrl.js`.
+- **Existing UI connection:** instruments; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Catalogs/Instruments/instruments.ts`; wire instrument catalog load/save, units and broker/session references.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/DataManagerInstruments/service.py`
@@ -424,6 +571,20 @@
 - **Create:** `tests/reference/sqx_features/data_data_manager_instruments.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Catalogs/Instruments/instruments.ts`
+  - Display instrument catalog load/save, units and broker/session references from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Catalogs/Instruments/InstrumentEditorDialog.tsx`
+  - Display instrument catalog load/save, units and broker/session references from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display instrument catalog load/save, units and broker/session references from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-data-manager-instruments.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -434,10 +595,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind instrument catalog load/save, units and broker/session references to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_instruments.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-data-manager-instruments.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise instruments for FEAT-DATA-DATA-MANAGER-INSTRUMENTS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.10 FEAT-DATA-DATA-MANAGER-SESSIONS - DataManagerSessions.jar
 
@@ -456,6 +622,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerSessions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerSessions/services/SessionService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerSessions/controllers/SessionsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerSessions/actions/clone/CloneSessionCtrl.js`.
+- **Existing UI connection:** sessions; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Catalogs/Sessions/sessionStore.ts`; wire session templates/elements, timezone validation and persisted revisions.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/DataManagerSessions/service.py`
@@ -471,6 +641,20 @@
 - **Create:** `tests/reference/sqx_features/data_data_manager_sessions.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Catalogs/Sessions/sessionStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Catalogs/Sessions/SessionElementDialog.tsx`
+  - Display session templates/elements, timezone validation and persisted revisions from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display session templates/elements, timezone validation and persisted revisions from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-data-manager-sessions.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -481,10 +665,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind session templates/elements, timezone validation and persisted revisions to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_data_manager_sessions.py --no-cov`; expect stable identity, units, validation, isolated persistence and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture stable identity, units, validation, isolated persistence and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-data-manager-sessions.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise sessions for FEAT-DATA-DATA-MANAGER-SESSIONS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.11 FEAT-DATA-SETTINGS-DATA - SettingsData.jar
 
@@ -503,6 +692,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsData`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsData/ComplexitiesService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsData/DataService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsData/DataCtrl.js`.
+- **Existing UI connection:** Data Manager; exact retained source-map `ui/app/plugins/project/SettingsData/source-map.json`. Target `ui/app/plugins/project/SettingsData/DataCtrl.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data/selection.py`
@@ -516,6 +709,24 @@
 - **Create:** `tests/reference/sqx_features/data_settings_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/SettingsData/DataCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/SettingsData/views/data.tsx`
+  - Display dataset/catalog load and mutation, server resource IDs and authoritative row counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/SettingsData/module.ts`
+  - Display dataset/catalog load and mutation, server resource IDs and authoritative row counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display dataset/catalog load and mutation, server resource IDs and authoritative row counts from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/SettingsData/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-settings-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -527,10 +738,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_settings_data.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-settings-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-DATA-SETTINGS-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.12 FEAT-UI-DATA-MANAGER-ACTIONS - DataManagerActions resource contribution
 
@@ -546,6 +762,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerActions`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerActions/exportToCsv/ExportToCsvService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerActions/exportToMT4/ExportToMT4Service.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerActions/exportToMT5/ExportToMT5Service.js`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DataManager/resource_contributions.py`
@@ -557,6 +777,16 @@
 - **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-data-manager-actions.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -564,10 +794,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_data_manager_actions.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Create a fixture dataset and session; edit instrument precision; reload the page; confirm persisted values and visible invalid-input errors. Inspect the DataManagerActions contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-data-manager-actions.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-UI-DATA-MANAGER-ACTIONS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.13 FEAT-UI-DATA-MANAGER-HELP - DataManagerHelp resource contribution
 
@@ -583,6 +818,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHelp`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHelp/help.html`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHelp/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerHelp/styles.css`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/DataManager/resource_contributions.py` (proposed earlier in FEAT-UI-DATA-MANAGER-ACTIONS)
@@ -594,6 +833,16 @@
 - **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-data-manager-help.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -601,10 +850,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_data_manager_help.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Create a fixture dataset and session; edit instrument precision; reload the page; confirm persisted values and visible invalid-input errors. Inspect the DataManagerHelp contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-data-manager-help.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-UI-DATA-MANAGER-HELP; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 3.14 P03 integration — Manage authoritative datasets, instruments, sessions and custom bars
 
@@ -621,6 +875,10 @@
 - **Existing tests:** No audited phase backend suite; create the integration tests below.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/web/QDM/layout/QDMService.js`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData/DMDataService.js`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -649,6 +907,12 @@
 - **Create:** `ui/tests/e2e/sqx-data-manager-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/task-3-14.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -659,12 +923,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_data_manager_workflow.py --no-cov`; `npm --prefix ui run test:ui -- tests/e2e/sqx-data-manager-backend.spec.ts`. Assert dataset reload, instrument precision, basket membership and DST/session boundaries; reject duplicate/out-of-order bars, invalid timezone and unauthorized dataset deletion.
 - **Manual / Browser Verification:** Create a fixture dataset and session; edit instrument precision; reload the page; confirm persisted values and visible invalid-input errors.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-3-14.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-manager-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for 3.14; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

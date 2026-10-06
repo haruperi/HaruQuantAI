@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 6.1 FEAT-SHARED-SQ-TRADING-LIB - SQTradingLib.jar
 
@@ -26,6 +28,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/index.html`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/simulator/engine.py`
@@ -43,6 +49,20 @@
 - **Create:** `tests/reference/sqx_features/shared_sq_trading_lib.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-shared-sq-trading-lib.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-simulation-engine-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -54,10 +74,15 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_shared_sq_trading_lib.py --no-cov`; expect event order, same-bar precedence, costs, rounding and reconciled equity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture event order, same-bar precedence, costs, rounding and reconciled equity and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-shared-sq-trading-lib.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-simulation-engine-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-SHARED-SQ-TRADING-LIB; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 6.2 FEAT-SIMULATOR-SETTINGS-ADVANCED-TM - SettingsAdvancedTM.jar
 
@@ -76,6 +101,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptions`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/AdvancedTMService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/AdvancedTMCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM/addNewExitPopup.html`.
+- **Existing UI connection:** project simulation settings; exact retained source-map `ui/app/plugins/project/SettingsAdvancedTM/source-map.json`. Target `ui/app/plugins/project/SettingsAdvancedTM/AdvancedTMCtrl.ts`; wire server-owned trading/money-management settings, validation, run submission and reconciled execution output.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/simulator/management.py`
@@ -91,6 +120,24 @@
 - **Create:** `tests/reference/sqx_features/simulator_settings_advanced_tm.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/SettingsAdvancedTM/AdvancedTMCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/SettingsAdvancedTM/addNewExitPopup.tsx`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/SettingsAdvancedTM/advancedTM.tsx`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Builder/builderClient.ts`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Builder/FullSettingsView.tsx`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/SettingsAdvancedTM/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-simulator-settings-advanced-tm.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-simulation-engine-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -101,10 +148,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind server-owned trading/money-management settings, validation, run submission and reconciled execution output to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_simulator_settings_advanced_tm.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-simulator-settings-advanced-tm.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-simulation-engine-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise project simulation settings for FEAT-SIMULATOR-SETTINGS-ADVANCED-TM; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 6.3 FEAT-SIMULATOR-SETTINGS-MONEY-MANAGEMENT - SettingsMoneyManagement.jar
 
@@ -123,6 +175,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptions`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/MoneyManagementService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/MoneyManagementCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement/views/moneyManagement.html`.
+- **Existing UI connection:** project simulation settings; exact retained source-map `ui/app/plugins/project/SettingsMoneyManagement/source-map.json`. Target `ui/app/plugins/project/SettingsMoneyManagement/MoneyManagementCtrl.ts`; wire server-owned trading/money-management settings, validation, run submission and reconciled execution output.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/plugins/simulator/management.py` (proposed earlier in FEAT-SIMULATOR-SETTINGS-ADVANCED-TM)
@@ -138,6 +194,24 @@
 - **Create:** `tests/reference/sqx_features/simulator_settings_money_management.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/SettingsMoneyManagement/MoneyManagementCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/SettingsMoneyManagement/views/moneyManagement.tsx`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/SettingsMoneyManagement/module.ts`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Builder/builderClient.ts`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Builder/FullSettingsView.tsx`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/SettingsMoneyManagement/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-simulator-settings-money-management.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-simulation-engine-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -149,10 +223,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind server-owned trading/money-management settings, validation, run submission and reconciled execution output to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_simulator_settings_money_management.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-simulator-settings-money-management.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-simulation-engine-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise project simulation settings for FEAT-SIMULATOR-SETTINGS-MONEY-MANAGEMENT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 6.4 FEAT-SIMULATOR-SETTINGS-OPTIONS - SettingsOptions.jar
 
@@ -171,6 +250,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptions`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsMoneyManagement`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAdvancedTM`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptions/OptionsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptions/OptionsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptions/views/options.html`.
+- **Existing UI connection:** project simulation settings; exact retained source-map `ui/app/plugins/project/SettingsOptions/source-map.json`. Target `ui/app/plugins/project/SettingsOptions/OptionsCtrl.ts`; wire server-owned trading/money-management settings, validation, run submission and reconciled execution output.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/plugins/simulator/management.py` (proposed earlier in FEAT-SIMULATOR-SETTINGS-ADVANCED-TM)
@@ -186,6 +269,24 @@
 - **Create:** `tests/reference/sqx_features/simulator_settings_options.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/SettingsOptions/OptionsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/SettingsOptions/views/options.tsx`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/SettingsOptions/module.ts`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Builder/builderClient.ts`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Builder/FullSettingsView.tsx`
+  - Display server-owned trading/money-management settings, validation, run submission and reconciled execution output from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/SettingsOptions/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-simulator-settings-options.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-simulation-engine-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -196,10 +297,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind server-owned trading/money-management settings, validation, run submission and reconciled execution output to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_simulator_settings_options.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-simulator-settings-options.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-simulation-engine-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise project simulation settings for FEAT-SIMULATOR-SETTINGS-OPTIONS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 6.5 P06 integration — Execute deterministic strategies and produce reconciled trade/account ledgers
 
@@ -216,6 +322,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/Builder/fullSettings.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/index.html`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -252,6 +362,18 @@
 - **Create:** `ui/tests/e2e/sqx-simulation-engine-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/task-6-5.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -262,12 +384,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_simulation_engine_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/Builder/fullSettings.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-simulation-engine-backend.spec.ts`. Assert donor event traces, fills, position sizing, costs and reconciled PnL; reject same-bar ambiguity, session gap, missing price, invalid size and cancellation.
 - **Manual / Browser Verification:** Run one saved fixture strategy; inspect orders/trades/equity; rerun the same configuration and compare traces under ratified tolerances.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-6-5.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-simulation-engine-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for 6.5; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

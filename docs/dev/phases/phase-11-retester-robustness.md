@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 11.1 FEAT-ROBUSTNESS-APP-RETESTER - AppRetester.jar
 
@@ -26,6 +28,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppRetester`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppRetester/module.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Retester/workspace.py`
@@ -41,6 +47,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_app_retester.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-app-retester.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -52,10 +70,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_app_retester.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-app-retester.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-APP-RETESTER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.2 FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-MANIPULATION - CrossCheckMonteCarloManipulation.jar
 
@@ -74,6 +97,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/MonteCarloManipulationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/FitnessFunction/MCManipulationFitnessService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/MonteCarloManipulationCtrl.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckMonteCarloManipulation/check.py`
@@ -87,6 +114,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_monte_carlo_manipulation.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-monte-carlo-manipulation.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -97,10 +136,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_monte_carlo_manipulation.py --no-cov`; expect seeded sampling, replacement rules, thresholds and rejected scenarios; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seeded sampling, replacement rules, thresholds and rejected scenarios and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-monte-carlo-manipulation.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-MANIPULATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.3 FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-RETEST - CrossCheckMonteCarloRetest.jar
 
@@ -119,6 +163,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/MonteCarloRetestService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/FitnessFunction/MCRetestFitnessService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/MonteCarloRetestCtrl.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckMonteCarloRetest/check.py`
@@ -132,6 +180,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_monte_carlo_retest.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-monte-carlo-retest.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -142,10 +202,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_monte_carlo_retest.py --no-cov`; expect seeded sampling, replacement rules, thresholds and rejected scenarios; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture seeded sampling, replacement rules, thresholds and rejected scenarios and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-monte-carlo-retest.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-MONTE-CARLO-RETEST; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.4 FEAT-ROBUSTNESS-CROSS-CHECK-OPT-PROFILE-SYS-PARAM-PERMUTATION - CrossCheckOptProfileSysParamPermutation.jar
 
@@ -164,6 +229,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/OptProfileSysParamPermutationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/OptProfileSysParamPermutationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/filtering.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckOptProfileSysParamPermutation/check.py`
@@ -177,6 +246,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_opt_profile_sys_param_permutation.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-opt-profile-sys-param-permutation.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -187,10 +268,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_opt_profile_sys_param_permutation.py --no-cov`; expect range endpoints, enumeration order and matrix/result reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture range endpoints, enumeration order and matrix/result reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-opt-profile-sys-param-permutation.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-OPT-PROFILE-SYS-PARAM-PERMUTATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.5 FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-ON-ADDITIONAL-MARKETS - CrossCheckRetestOnAdditionalMarkets.jar
 
@@ -209,6 +295,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/RetestOnAdditionalMarketsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/FitnessFunction/PortfolioFitnessService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/RetestOnAdditionalMarketsCtrl.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckRetestOnAdditionalMarkets/check.py`
@@ -222,6 +312,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_retest_on_additional_markets.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-retest-on-additional-markets.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -232,10 +334,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_retest_on_additional_markets.py --no-cov`; expect symbol/data selection, missing market and aggregate check decisions; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol/data selection, missing market and aggregate check decisions and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-retest-on-additional-markets.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-ON-ADDITIONAL-MARKETS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.6 FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-WITH-HIGHER-PRECISION - CrossCheckRetestWithHigherPrecision.jar
 
@@ -254,6 +361,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/RetestWithHigherPrecisionService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/FitnessFunction/CCHigherPrecisionService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/RetestWithHigherPrecisionCtrl.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckRetestWithHigherPrecision/check.py`
@@ -267,6 +378,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_retest_with_higher_precision.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-retest-with-higher-precision.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -277,10 +400,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_retest_with_higher_precision.py --no-cov`; expect precision availability, event alignment and result comparison; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture precision availability, event alignment and result comparison and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-retest-with-higher-precision.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-RETEST-WITH-HIGHER-PRECISION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.7 FEAT-ROBUSTNESS-CROSS-CHECK-SEQUENTIAL-OPTIMIZATION - CrossCheckSequentialOptimization.jar
 
@@ -299,6 +427,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/SequentialOptimizationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/SequentialOptimizationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/filtering.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckSequentialOptimization/check.py`
@@ -312,6 +444,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_sequential_optimization.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-sequential-optimization.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -323,10 +467,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_sequential_optimization.py --no-cov`; expect candidate dependencies, repeated passes, stopping and score ordering; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture candidate dependencies, repeated passes, stopping and score ordering and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-sequential-optimization.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-SEQUENTIAL-OPTIMIZATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.8 FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-MATRIX - CrossCheckWalkForwardMatrix.jar
 
@@ -345,6 +494,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/WalkForwardMatrixService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/WalkForwardMatrixCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/filtering.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckWalkForwardMatrix/check.py`
@@ -358,6 +511,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_walk_forward_matrix.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-walk-forward-matrix.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -369,10 +534,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_walk_forward_matrix.py --no-cov`; expect in/out-of-sample boundaries, leakage rejection, aggregation and tie rules; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture in/out-of-sample boundaries, leakage rejection, aggregation and tie rules and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-walk-forward-matrix.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-MATRIX; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.9 FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-OPTIMIZATION - CrossCheckWalkForwardOptimization.jar
 
@@ -391,6 +561,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/WalkForwardOptimizationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/WalkForwardOptimizationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/filtering.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckWalkForwardOptimization/check.py`
@@ -404,6 +578,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_walk_forward_optimization.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-walk-forward-optimization.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -415,10 +601,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_walk_forward_optimization.py --no-cov`; expect in/out-of-sample boundaries, leakage rejection, aggregation and tie rules; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture in/out-of-sample boundaries, leakage rejection, aggregation and tie rules and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-walk-forward-optimization.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-WALK-FORWARD-OPTIMIZATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.10 FEAT-ROBUSTNESS-CROSS-CHECK-WHAT-IF - CrossCheckWhatIf.jar
 
@@ -437,6 +628,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/WhatIfService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/WhatIfCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/settings.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/CrossCheckWhatIf/check.py`
@@ -450,6 +645,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_cross_check_what_if.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-cross-check-what-if.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -460,10 +667,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_cross_check_what_if.py --no-cov`; expect scenario composition, excluded trades and denominator/totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture scenario composition, excluded trades and denominator/totals reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-cross-check-what-if.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-CROSS-CHECK-WHAT-IF; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.11 FEAT-ROBUSTNESS-PROJECT-RETESTER - ProjectRetester.jar
 
@@ -482,6 +694,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectRetester`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/web/RETESTER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Retester/ProjectRetester/service.py`
@@ -497,6 +713,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_project_retester.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-project-retester.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -506,10 +734,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_project_retester.py --no-cov`; expect project revisions, input/output contracts, failed transitions and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture project revisions, input/output contracts, failed transitions and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-project-retester.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-PROJECT-RETESTER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.12 FEAT-ROBUSTNESS-RESULTS-ROBUSTNESS-TESTS - ResultsRobustnessTests.jar
 
@@ -528,6 +761,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/services/RTService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/RobustnessTestsResultsCtrl.js`.
+- **Existing UI connection:** Retester; exact retained source-map `ui/app/plugins/project/ResultsRobustnessTests/source-map.json`. Target `ui/app/plugins/project/ResultsRobustnessTests/RobustnessTestsResultsCtrl.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsRobustnessTests/service.py`
@@ -541,6 +778,26 @@
 - **Create:** `tests/reference/sqx_features/robustness_results_robustness_tests.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsRobustnessTests/RobustnessTestsResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsRobustnessTests/robustnessTests.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsRobustnessTests/directives/robustnessAnalysis/robustnessAnalysis.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsRobustnessTests/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-results-robustness-tests.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -551,10 +808,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_results_robustness_tests.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-results-robustness-tests.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-RESULTS-ROBUSTNESS-TESTS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.13 FEAT-ROBUSTNESS-SETTINGS-AUTO-RETEST-DATA - SettingsAutoRetestData.jar
 
@@ -573,6 +835,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/AutoRetestDataService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/AutoRetestDataCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/views/autoRetestData.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Retester/SettingsAutoRetestData/service.py`
@@ -588,6 +854,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_settings_auto_retest_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-settings-auto-retest-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -599,10 +877,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_settings_auto_retest_data.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-settings-auto-retest-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-SETTINGS-AUTO-RETEST-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.14 FEAT-ROBUSTNESS-SETTINGS-CROSS-CHECKS - SettingsCrossChecks.jar
 
@@ -621,6 +904,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsCtrl.js`.
+- **Existing UI connection:** Retester; exact retained source-map `ui/app/plugins/project/SettingsCrossChecks/source-map.json`. Target `ui/app/plugins/project/SettingsCrossChecks/CrossChecksCtrl.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/cross_checks/catalog.py`
@@ -634,6 +921,26 @@
 - **Create:** `tests/reference/sqx_features/robustness_settings_cross_checks.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/SettingsCrossChecks/CrossChecksCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/SettingsCrossChecks/crossCheckSettingsDialog.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/SettingsCrossChecks/crossChecks.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/SettingsCrossChecks/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-settings-cross-checks.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -645,10 +952,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_settings_cross_checks.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-settings-cross-checks.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-SETTINGS-CROSS-CHECKS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.15 FEAT-ROBUSTNESS-SETTINGS-WHAT-TO-RETEST - SettingsWhatToRetest.jar
 
@@ -667,6 +979,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/SettingsWhatToRetestService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/SettingsWhatToRetestCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/whatToRetest.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Retester/SettingsWhatToRetest/service.py`
@@ -682,6 +998,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_settings_what_to_retest.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-settings-what-to-retest.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -693,10 +1021,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_settings_what_to_retest.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-settings-what-to-retest.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-SETTINGS-WHAT-TO-RETEST; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.16 FEAT-ROBUSTNESS-TASK-AUTOMATIC-RETEST - TaskAutomaticRetest.jar
 
@@ -715,6 +1048,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticRetest`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticRetest/TaskAutoRetestService.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticRetest/simpleSettings/SimpleAutoRetestSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticRetest/simpleSettings/simpleSettings.html`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Retester/TaskAutomaticRetest/service.py`
@@ -730,6 +1067,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_task_automatic_retest.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-task-automatic-retest.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -741,10 +1090,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_task_automatic_retest.py --no-cov`; expect child-job ownership, threshold evaluation, cancellation and result retention; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture child-job ownership, threshold evaluation, cancellation and result retention and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-task-automatic-retest.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-TASK-AUTOMATIC-RETEST; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.17 FEAT-ROBUSTNESS-TASK-RETEST - TaskRetest.jar
 
@@ -763,6 +1117,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskRetest`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskRetest/simpleSettings/SimpleRetestSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskRetest/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskRetest/module.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Retester/TaskRetest/service.py`
@@ -778,6 +1136,18 @@
 - **Create:** `tests/reference/sqx_features/robustness_task_retest.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-robustness-task-retest.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -789,10 +1159,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_robustness_task_retest.py --no-cov`; expect child-job ownership, threshold evaluation, cancellation and result retention; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture child-job ownership, threshold evaluation, cancellation and result retention and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-robustness-task-retest.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-ROBUSTNESS-TASK-RETEST; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.18 FEAT-UI-SETTINGS-AUTOMATIC-RETEST - SettingsAutomaticRetest resource contribution
 
@@ -808,6 +1183,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticRetest`; `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticRetest/SettingsAutomaticRetestCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticRetest/automaticRetest.html`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticRetest/module.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Retester/resource_contributions.py`
@@ -819,6 +1198,16 @@
 - **Modify:** `ui/app/workspace/Retester/RetesterWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/retesterClient.ts`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-settings-automatic-retest.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -826,10 +1215,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_settings_automatic_retest.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Retest one saved strategy with a fixed seed; inspect scenario inputs and thresholds; cancel a check and verify consistent status. Inspect the SettingsAutomaticRetest contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-settings-automatic-retest.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for FEAT-UI-SETTINGS-AUTOMATIC-RETEST; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 11.19 P11 integration — Run reproducible robustness checks and publish actual retest outcomes
 
@@ -846,6 +1240,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/Retester/retesterWorkflow.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/RETESTER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`. Inspect `SQX_REFERENCE_ROOT/internal/web/RETESTER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js`.
+- **Existing UI connection:** Retester; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Retester/retesterClient.ts`; wire selected strategy/check configuration, retest jobs and actual robustness results.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -870,6 +1268,12 @@
 - **Create:** `ui/tests/e2e/sqx-retester-robustness-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Retester/RetesterProgress.tsx`
+  - Display selected strategy/check configuration, retest jobs and actual robustness results from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/task-11-19.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -880,12 +1284,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/check configuration, retest jobs and actual robustness results to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_retester_robustness_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/Retester/retesterWorkflow.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-retester-robustness-backend.spec.ts`. Assert fixed-seed perturbations, cross-check thresholds and additional-market retests; reject missing market, unsupported precision, invalid scenario and interrupted child job.
 - **Manual / Browser Verification:** Retest one saved strategy with a fixed seed; inspect scenario inputs and thresholds; cancel a check and verify consistent status.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-11-19.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-retester-robustness-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Retester for 11.19; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

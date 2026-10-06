@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 8.1 FEAT-RESULTS-COMMONS-IMAGING - commons-imaging.jar
 
@@ -25,6 +27,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-imaging.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-imaging.jar" org.apache.commons.imaging.ColorTools`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -54,6 +58,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_commons_imaging.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
@@ -75,6 +81,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/image4j.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/image4j.jar" net.sf.image4j.codec.bmp.BMPConstants`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -102,6 +110,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_image4j.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
@@ -123,6 +133,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/java-image-scaling-0.8.6.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/java-image-scaling-0.8.6.jar" com.mortennobel.imagescaling.AdvancedResizeOp`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -152,6 +164,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_java_image_scaling_0_8_6.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
@@ -173,6 +187,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/pd4ml.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/pd4ml.jar" org.zefer.pd4ml.PD4PageMark`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -200,6 +216,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_pd4ml.py --no-cov`; expect page layout, fonts, metadata and totals matching result artifacts; use temporary resources.
@@ -221,6 +239,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/pngj.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/pngj.jar" ar.com.hjg.pngj.BufferedStreamFeeder`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -250,6 +270,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_pngj.py --no-cov`; expect dimensions, scaling, supported encodings and malformed image handling; use temporary resources.
@@ -271,6 +293,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/poi-ooxml-schemas.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/poi-ooxml-schemas.jar" com.microsoft.schemas.office.x2006.digsig.CTSignatureInfoV1`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -300,6 +324,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_poi_ooxml_schemas.py --no-cov`; expect sheet types, formula/value policy, units and totals matching artifacts; use temporary resources.
@@ -321,6 +347,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/poi-ooxml.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/poi-ooxml.jar" org.apache.poi.POIXMLDocument`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -350,6 +378,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_poi_ooxml.py --no-cov`; expect sheet types, formula/value policy, units and totals matching artifacts; use temporary resources.
@@ -371,6 +401,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/poi.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/poi.jar" org.apache.poi.EncryptedDocumentException`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -398,6 +430,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_poi.py --no-cov`; expect sheet types, formula/value policy, units and totals matching artifacts; use temporary resources.
@@ -419,6 +453,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/xmlbeans.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/xmlbeans.jar" org.apache.xmlbeans.BindingConfig`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Results through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -448,6 +484,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_xmlbeans.py --no-cov`; expect namespaces, encoding, rejected unsafe constructs and lossless unknown fields; use temporary resources.
@@ -470,6 +508,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppResults`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppResults/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/AppResults/SQResultsData.js`.
+- **Existing UI connection:** Results; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Results/ResultsWorkspace.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Results/workspace.py`
@@ -485,6 +527,20 @@
 - **Create:** `tests/reference/sqx_features/results_app_results.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-app-results.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -496,10 +552,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_app_results.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-app-results.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-APP-RESULTS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.11 FEAT-RESULTS-DATABANK-FILTER-BY-CORRELATION - DatabankFilterByCorrelation.jar
 
@@ -518,6 +579,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/databankFilterByCorrelationPopup.html`; `SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js`.
+- **Existing UI connection:** databanks; exact retained source-map `ui/app/plugins/databank/DatabankFilterByCorrelation/source-map.json`. Target `ui/app/plugins/databank/DatabankFilterByCorrelation/databankFilterByCorrelationPopup.tsx`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/databank/DatabankFilterByCorrelation/service.py`
@@ -533,6 +598,18 @@
 - **Create:** `tests/reference/sqx_features/results_databank_filter_by_correlation.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/DatabankFilterByCorrelation/databankFilterByCorrelationPopup.tsx`
+  - Display databank selection, actual resource mutations and saved/exported artifact IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/databank/DatabankFilterByCorrelation/module.ts`
+  - Display databank selection, actual resource mutations and saved/exported artifact IDs from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/databank/DatabankFilterByCorrelation/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-databank-filter-by-correlation.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -543,10 +620,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_databank_filter_by_correlation.py --no-cov`; expect alignment, sample basis, undefined correlation and threshold equality; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture alignment, sample basis, undefined correlation and threshold equality and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-databank-filter-by-correlation.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-RESULTS-DATABANK-FILTER-BY-CORRELATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.12 FEAT-RESULTS-DATABANK-RENAME - DatabankRename.jar
 
@@ -565,6 +647,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DatabankRename`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/DatabankRenamePopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/databankRenamePopup.html`; `SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js`.
+- **Existing UI connection:** databanks; exact retained source-map `ui/app/plugins/databank/DatabankRename/source-map.json`. Target `ui/app/plugins/databank/DatabankRename/ui/DatabankRenamePopupCtrl.ts`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/databank/DatabankRename/service.py`
@@ -580,6 +666,20 @@
 - **Create:** `tests/reference/sqx_features/results_databank_rename.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/DatabankRename/ui/DatabankRenamePopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/DatabankRename/ui/databankRenamePopup.tsx`
+  - Display databank selection, actual resource mutations and saved/exported artifact IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/databank/DatabankRename/ui/module.ts`
+  - Display databank selection, actual resource mutations and saved/exported artifact IDs from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/databank/DatabankRename/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-databank-rename.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -590,10 +690,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_databank_rename.py --no-cov`; expect collision, stable IDs, history and permission rejection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture collision, stable IDs, history and permission rejection and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-databank-rename.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-RESULTS-DATABANK-RENAME; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.13 FEAT-RESULTS-EQUITY-CHART-BENCHMARK - EquityChartBenchmark.jar
 
@@ -612,6 +717,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`.
+- **Existing UI connection:** equity chart; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`; wire selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/EquityChartBenchmark/series.py`
@@ -625,6 +734,20 @@
 - **Create:** `tests/reference/sqx_features/results_equity_chart_benchmark.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/benchmark/BenchmarkCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts`
+  - Display selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-equity-chart-benchmark.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -636,10 +759,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_benchmark.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-equity-chart-benchmark.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise equity chart for FEAT-RESULTS-EQUITY-CHART-BENCHMARK; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.14 FEAT-RESULTS-EQUITY-CHART-DAILY-CHART - EquityChartDailyChart.jar
 
@@ -658,6 +786,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`.
+- **Existing UI connection:** equity chart; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`; wire selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/EquityChartDailyChart/series.py`
@@ -671,6 +803,20 @@
 - **Create:** `tests/reference/sqx_features/results_equity_chart_daily_chart.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/benchmark/BenchmarkCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts`
+  - Display selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-equity-chart-daily-chart.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -682,10 +828,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_daily_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-equity-chart-daily-chart.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise equity chart for FEAT-RESULTS-EQUITY-CHART-DAILY-CHART; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.15 FEAT-RESULTS-EQUITY-CHART-DRAWDOWN - EquityChartDrawdown.jar
 
@@ -704,6 +855,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`.
+- **Existing UI connection:** equity chart; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`; wire selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/EquityChartDrawdown/series.py`
@@ -717,6 +872,20 @@
 - **Create:** `tests/reference/sqx_features/results_equity_chart_drawdown.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/benchmark/BenchmarkCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts`
+  - Display selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-equity-chart-drawdown.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -728,10 +897,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_drawdown.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-equity-chart-drawdown.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise equity chart for FEAT-RESULTS-EQUITY-CHART-DRAWDOWN; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.16 FEAT-RESULTS-EQUITY-CHART-VOLATILITY - EquityChartVolatility.jar
 
@@ -750,6 +924,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartVolatility`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`.
+- **Existing UI connection:** equity chart; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`; wire selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/EquityChartVolatility/series.py`
@@ -763,6 +941,20 @@
 - **Create:** `tests/reference/sqx_features/results_equity_chart_volatility.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/benchmark/BenchmarkCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts`
+  - Display selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-equity-chart-volatility.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -774,10 +966,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_volatility.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-equity-chart-volatility.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise equity chart for FEAT-RESULTS-EQUITY-CHART-VOLATILITY; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.17 FEAT-RESULTS-EQUITY-CHART-VOLUME - EquityChartVolume.jar
 
@@ -796,6 +993,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartVolume`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`.
+- **Existing UI connection:** equity chart; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`; wire selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/EquityChartVolume/series.py`
@@ -809,6 +1010,20 @@
 - **Create:** `tests/reference/sqx_features/results_equity_chart_volume.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/benchmark/BenchmarkCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ProjectWorkbench/results/resultsModel.ts`
+  - Display selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-equity-chart-volume.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -820,10 +1035,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected result/sample, actual equity series and backend-computed benchmark/drawdown/volatility/volume overlays to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_equity_chart_volume.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-equity-chart-volume.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise equity chart for FEAT-RESULTS-EQUITY-CHART-VOLUME; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.18 FEAT-RESULTS-RESULTS-CHART - ResultsChart.jar
 
@@ -842,6 +1062,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsChart`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/chart.html`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsChart/source-map.json`. Target `ui/app/plugins/project/ResultsChart/chart.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsChart/service.py`
@@ -857,6 +1081,20 @@
 - **Create:** `tests/reference/sqx_features/results_results_chart.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsChart/chart.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsChart/module.ts`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsChart/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-chart.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -867,10 +1105,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-chart.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-CHART; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.19 FEAT-RESULTS-RESULTS-DATABANK-ACTIONS - ResultsDatabankActions.jar
 
@@ -889,6 +1132,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/save/SaveButtonService.js`.
+- **Existing UI connection:** databanks; exact retained source-map `ui/app/plugins/databank/ResultsDatabankActions/source-map.json`. Target `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/databank/ResultsDatabankActions/service.py`
@@ -904,6 +1151,20 @@
 - **Create:** `tests/reference/sqx_features/results_results_databank_actions.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/LoadService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/loadPopup.tsx`
+  - Display databank selection, actual resource mutations and saved/exported artifact IDs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-databank-actions.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -914,10 +1175,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_databank_actions.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-databank-actions.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-RESULTS-RESULTS-DATABANK-ACTIONS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.20 FEAT-RESULTS-RESULTS-DATABANK-VIEWS - ResultsDatabankViews.jar
 
@@ -936,6 +1202,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/databankViews.html`.
+- **Existing UI connection:** databanks; exact retained source-map `ui/app/plugins/databank/ResultsDatabankViews/source-map.json`. Target `ui/app/plugins/databank/ResultsDatabankViews/DatabankViewsService.ts`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/databank/ResultsDatabankViews/service.py`
@@ -951,6 +1221,18 @@
 - **Create:** `tests/reference/sqx_features/results_results_databank_views.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankViews/DatabankViewsService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankViews/DatabankViewsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankViews/databankViews.tsx`
+  - Display databank selection, actual resource mutations and saved/exported artifact IDs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-databank-views.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -961,10 +1243,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_databank_views.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-databank-views.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-RESULTS-RESULTS-DATABANK-VIEWS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.21 FEAT-RESULTS-RESULTS-EQUITY-CHART - ResultsEquityChart.jar
 
@@ -983,6 +1270,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/benchmark/BenchmarkCtrl.js`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsEquityChart/source-map.json`. Target `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsEquityChart/service.py`
@@ -998,6 +1289,22 @@
 - **Create:** `tests/reference/sqx_features/results_results_equity_chart.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/EquityChartCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/benchmark/BenchmarkCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsEquityChart/equityChart.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsEquityChart/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-equity-chart.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1009,10 +1316,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_equity_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-equity-chart.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-EQUITY-CHART; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.22 FEAT-RESULTS-RESULTS-EXPLORE - ResultsExplore.jar
 
@@ -1031,6 +1343,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsExplore`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsExplore/explore.html`.
+- **Existing UI connection:** Results; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Results/ResultsWorkspace.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsExplore/service.py`
@@ -1046,6 +1362,20 @@
 - **Create:** `tests/reference/sqx_features/results_results_explore.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-explore.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1056,10 +1386,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_explore.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-explore.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-EXPLORE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.23 FEAT-RESULTS-RESULTS-OVERVIEW - ResultsOverview.jar
 
@@ -1078,6 +1413,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/overview.html`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsOverview/source-map.json`. Target `ui/app/plugins/project/ResultsOverview/ResultsOverviewCtrl.ts`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsOverview/service.py`
@@ -1093,6 +1432,22 @@
 - **Create:** `tests/reference/sqx_features/results_results_overview.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsOverview/ResultsOverviewCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsOverview/overview.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsOverview/module.ts`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsOverview/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-overview.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1104,10 +1459,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_overview.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-overview.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-OVERVIEW; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.24 FEAT-RESULTS-RESULTS-PLUGINS - ResultsPlugins.jar
 
@@ -1126,6 +1486,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPlugins`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsPlugins/ResultsPluginsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPlugins/PluginIframeCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPlugins/pluginIframe.html`.
+- **Existing UI connection:** Results; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Results/ResultsWorkspace.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsPlugins/service.py`
@@ -1141,6 +1505,20 @@
 - **Create:** `tests/reference/sqx_features/results_results_plugins.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-plugins.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1151,10 +1529,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_plugins.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-plugins.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-PLUGINS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.25 FEAT-RESULTS-RESULTS-SP-OVERVIEW - ResultsSPOverview.jar
 
@@ -1173,6 +1556,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/directives/spOverviewList/SPOverviewListCtrl.js`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsSPOverview/source-map.json`. Target `ui/app/plugins/project/ResultsSPOverview/SPOverviewCtrl.ts`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsSPOverview/service.py`
@@ -1188,6 +1575,22 @@
 - **Create:** `tests/reference/sqx_features/results_results_sp_overview.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsSPOverview/SPOverviewCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsSPOverview/spOverview.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsSPOverview/directives/spOverviewStats/spOverviewStats.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsSPOverview/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-sp-overview.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1198,10 +1601,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_sp_overview.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-sp-overview.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-SP-OVERVIEW; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.26 FEAT-RESULTS-RESULTS-STOCKPICKER - ResultsStockpicker.jar
 
@@ -1220,6 +1628,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/stockpicker.html`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsStockpicker/source-map.json`. Target `ui/app/plugins/project/ResultsStockpicker/stockpicker.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsStockpicker/service.py`
@@ -1235,6 +1647,20 @@
 - **Create:** `tests/reference/sqx_features/results_results_stockpicker.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsStockpicker/stockpicker.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsStockpicker/module.ts`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsStockpicker/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-stockpicker.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1245,10 +1671,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_stockpicker.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-stockpicker.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-STOCKPICKER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.27 FEAT-RESULTS-RESULTS-STRATEGY-CONFIG - ResultsStrategyConfig.jar
 
@@ -1267,6 +1698,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/strategyconfig.html`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsStrategyConfig/source-map.json`. Target `ui/app/plugins/project/ResultsStrategyConfig/strategyconfig.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsStrategyConfig/service.py`
@@ -1282,6 +1717,20 @@
 - **Create:** `tests/reference/sqx_features/results_results_strategy_config.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsStrategyConfig/strategyconfig.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsStrategyConfig/module.ts`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsStrategyConfig/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-strategy-config.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1292,10 +1741,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_strategy_config.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-strategy-config.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-STRATEGY-CONFIG; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.28 FEAT-RESULTS-RESULTS-TRADE-ANALYSIS - ResultsTradeAnalysis.jar
 
@@ -1314,6 +1768,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/directives/TradeAnalysisPanelCtrl.js`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsTradeAnalysis/source-map.json`. Target `ui/app/plugins/project/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.ts`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsTradeAnalysis/service.py`
@@ -1329,6 +1787,22 @@
 - **Create:** `tests/reference/sqx_features/results_results_trade_analysis.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsTradeAnalysis/directives/tradeAnalysisPanel.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsTradeAnalysis/views/tradeAnalysis.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsTradeAnalysis/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-trade-analysis.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1340,10 +1814,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_trade_analysis.py --no-cov`; expect trade identity, filters, aggregation boundaries and empty results; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture trade identity, filters, aggregation boundaries and empty results and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-trade-analysis.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-TRADE-ANALYSIS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.29 FEAT-RESULTS-RESULTS-TRADE-LIST - ResultsTradeList.jar
 
@@ -1362,6 +1841,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeList`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeList/ResultsTradelistCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeList/tradeList.html`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeList/module.js`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsTradeList/source-map.json`. Target `ui/app/plugins/project/ResultsTradeList/ResultsTradelistCtrl.ts`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/results/ResultsTradeList/service.py`
@@ -1377,6 +1860,22 @@
 - **Create:** `tests/reference/sqx_features/results_results_trade_list.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsTradeList/ResultsTradelistCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsTradeList/tradeList.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsTradeList/module.ts`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsTradeList/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-trade-list.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1387,10 +1886,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_trade_list.py --no-cov`; expect trade identity, filters, aggregation boundaries and empty results; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture trade identity, filters, aggregation boundaries and empty results and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-trade-list.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-TRADE-LIST; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.30 FEAT-RESULTS-RESULTS-TRADELIST-VIEWS - ResultsTradelistViews.jar
 
@@ -1409,6 +1913,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/tradelistViews.html`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ResultsTradelistViews/source-map.json`. Target `ui/app/plugins/project/ResultsTradelistViews/TradelistViewsCtrl.ts`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/databank/ResultsTradelistViews/service.py`
@@ -1424,6 +1932,22 @@
 - **Create:** `tests/reference/sqx_features/results_results_tradelist_views.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsTradelistViews/TradelistViewsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsTradelistViews/tradelistViews.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsTradelistViews/module.ts`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsTradelistViews/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-results-tradelist-views.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1434,10 +1958,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_results_tradelist_views.py --no-cov`; expect trade identity, filters, aggregation boundaries and empty results; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture trade identity, filters, aggregation boundaries and empty results and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-results-tradelist-views.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-RESULTS-RESULTS-TRADELIST-VIEWS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.31 FEAT-RESULTS-SAVER-HTML - SaverHTML.jar
 
@@ -1456,6 +1985,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SaverHTML`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`.
+- **Existing UI connection:** databank save/export; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`; wire selected format/strategy export, real generated artifact IDs and verified downloads.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/export/SaverHTML/exporter.py`
@@ -1469,6 +2002,18 @@
 - **Create:** `tests/reference/sqx_features/results_saver_html.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/saveBtnPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/savePopup.tsx`
+  - Display selected format/strategy export, real generated artifact IDs and verified downloads from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-saver-html.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1480,10 +2025,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected format/strategy export, real generated artifact IDs and verified downloads to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_saver_html.py --no-cov`; expect escaping/format, missing output destination and totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture escaping/format, missing output destination and totals reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-saver-html.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databank save/export for FEAT-RESULTS-SAVER-HTML; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.32 FEAT-RESULTS-SAVER-PDF - SaverPDF.jar
 
@@ -1502,6 +2052,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SaverPDF`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`.
+- **Existing UI connection:** databank save/export; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`; wire selected format/strategy export, real generated artifact IDs and verified downloads.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/export/SaverPDF/exporter.py`
@@ -1515,6 +2069,18 @@
 - **Create:** `tests/reference/sqx_features/results_saver_pdf.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/saveBtnPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/savePopup.tsx`
+  - Display selected format/strategy export, real generated artifact IDs and verified downloads from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-saver-pdf.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1526,10 +2092,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected format/strategy export, real generated artifact IDs and verified downloads to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_saver_pdf.py --no-cov`; expect escaping/format, missing output destination and totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture escaping/format, missing output destination and totals reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-saver-pdf.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databank save/export for FEAT-RESULTS-SAVER-PDF; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.33 FEAT-RESULTS-SAVER-STRATEGY-TRADES - SaverStrategyTrades.jar
 
@@ -1548,6 +2119,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`.
+- **Existing UI connection:** databank save/export; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`; wire selected format/strategy export, real generated artifact IDs and verified downloads.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/export/SaverStrategyTrades/exporter.py`
@@ -1561,6 +2136,18 @@
 - **Create:** `tests/reference/sqx_features/results_saver_strategy_trades.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/saveBtnPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/savePopup.tsx`
+  - Display selected format/strategy export, real generated artifact IDs and verified downloads from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-saver-strategy-trades.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1572,10 +2159,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected format/strategy export, real generated artifact IDs and verified downloads to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_saver_strategy_trades.py --no-cov`; expect escaping/format, missing output destination and totals reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture escaping/format, missing output destination and totals reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-saver-strategy-trades.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databank save/export for FEAT-RESULTS-SAVER-STRATEGY-TRADES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.34 FEAT-RESULTS-SERVLET-DATABANK-VIEWS - ServletDatabankViews.jar
 
@@ -1594,6 +2186,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletDatabankViews`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankService.js`.
+- **Existing UI connection:** databanks; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/databank/ServletDatabankViews/service.py`
@@ -1609,6 +2205,18 @@
 - **Create:** `tests/reference/sqx_features/results_servlet_databank_views.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/DatabankService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-servlet-databank-views.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1618,10 +2226,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_servlet_databank_views.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-servlet-databank-views.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-RESULTS-SERVLET-DATABANK-VIEWS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.35 FEAT-RESULTS-SERVLET-RENAME-TOOL - ServletRenameTool.jar
 
@@ -1640,6 +2253,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletRenameTool`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankService.js`.
+- **Existing UI connection:** databanks; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/databank/ServletRenameTool/service.py`
@@ -1655,6 +2272,18 @@
 - **Create:** `tests/reference/sqx_features/results_servlet_rename_tool.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/DatabankService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-results-servlet-rename-tool.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1665,10 +2294,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_results_servlet_rename_tool.py --no-cov`; expect collision, stable IDs, history and permission rejection; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture collision, stable IDs, history and permission rejection and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-results-servlet-rename-tool.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-RESULTS-SERVLET-RENAME-TOOL; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.36 FEAT-UI-CUSTOM-DATABANK-ACTIONS - CustomDatabankActions resource contribution
 
@@ -1684,6 +2318,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/rename/RenameDatabankPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/rename/renameDatabankPopup.html`; `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/delete/module.js`.
+- **Existing UI connection:** databanks; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Results/resource_contributions.py`
@@ -1695,6 +2333,18 @@
 - **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/DatabankActionsService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/DatabankService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-custom-databank-actions.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -1702,10 +2352,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_custom_databank_actions.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the CustomDatabankActions contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-custom-databank-actions.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-UI-CUSTOM-DATABANK-ACTIONS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.37 FEAT-UI-CUSTOM-RESULTS-PLUGIN-ACTIONS - CustomResultsPluginActions resource contribution
 
@@ -1721,6 +2376,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/rename/RenameResultsPluginPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/rename/renameResultsPluginPopup.html`; `SQX_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/delete/module.js`.
+- **Existing UI connection:** Results; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Results/ResultsWorkspace.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/Results/resource_contributions.py` (proposed earlier in FEAT-UI-CUSTOM-DATABANK-ACTIONS)
@@ -1732,6 +2391,18 @@
 - **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-custom-results-plugin-actions.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -1739,10 +2410,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_custom_results_plugin_actions.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the CustomResultsPluginActions contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-custom-results-plugin-actions.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-UI-CUSTOM-RESULTS-PLUGIN-ACTIONS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.38 FEAT-UI-PROJECT-DATABANKS - ProjectDatabanks resource contribution
 
@@ -1758,6 +2434,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabankCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectDatabanks/DatabanksCtrl.js`.
+- **Existing UI connection:** databanks; exact retained source-map `ui/app/plugins/databank/ProjectDatabanks/source-map.json`. Target `ui/app/plugins/databank/ProjectDatabanks/DatabankService.ts`; wire databank selection, actual resource mutations and saved/exported artifact IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/Results/resource_contributions.py` (proposed earlier in FEAT-UI-CUSTOM-DATABANK-ACTIONS)
@@ -1769,6 +2449,22 @@
 - **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/DatabankService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/DatabankCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/DatabanksCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/DatabankDialogs.tsx`
+  - Display databank selection, actual resource mutations and saved/exported artifact IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-project-databanks.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -1776,10 +2472,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind databank selection, actual resource mutations and saved/exported artifact IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_databanks.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the ProjectDatabanks contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-project-databanks.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databanks for FEAT-UI-PROJECT-DATABANKS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.39 FEAT-UI-PROJECT-RESULTS - ProjectResults resource contribution
 
@@ -1795,6 +2496,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/ResultsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/newCustomPluginModal.html`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/results.html`.
+- **Existing UI connection:** Results; exact retained source-map `ui/app/plugins/project/ProjectResults/source-map.json`. Target `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/Results/resource_contributions.py` (proposed earlier in FEAT-UI-CUSTOM-DATABANK-ACTIONS)
@@ -1806,6 +2511,20 @@
 - **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ProjectResults/newCustomPluginModal.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ProjectResults/results.tsx`
+  - Display persisted run/result lookup, selected sample, trades and reconciled metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ProjectResults/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-project-results.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -1813,10 +2532,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_results.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the ProjectResults contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-project-results.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-UI-PROJECT-RESULTS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.40 FEAT-UI-RESULTS-REPORT - ResultsReport resource contribution
 
@@ -1832,6 +2556,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsReport`; `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsReport/ReportCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsReport/report.html`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`.
+- **Existing UI connection:** Results; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Results/ResultsWorkspace.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/Results/resource_contributions.py` (proposed earlier in FEAT-UI-CUSTOM-DATABANK-ACTIONS)
@@ -1843,6 +2571,18 @@
 - **Modify:** `ui/app/workspace/Results/ResultsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/Results/resultsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-results-report.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -1850,10 +2590,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_results_report.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals. Inspect the ResultsReport contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-results-report.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for FEAT-UI-RESULTS-REPORT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 8.41 P08 integration — Render authoritative databanks, result analysis, charts and exports
 
@@ -1870,6 +2615,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/Chart/alerts.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/RESULTS`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults`. Inspect `SQX_REFERENCE_ROOT/internal/web/RESULTS/layout/LayoutService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResults/ResultsCtrl.js`.
+- **Existing UI connection:** Results; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Results/ResultsWorkspace.tsx`; wire persisted run/result lookup, selected sample, trades and reconciled metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -1910,6 +2659,14 @@
 - **Create:** `ui/tests/e2e/sqx-results-databanks-exports-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ProjectResults/ResultsCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ProjectDatabanks/databankStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/task-8-41.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -1920,12 +2677,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind persisted run/result lookup, selected sample, trades and reconciled metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_results_databanks_exports_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/Chart/alerts.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-results-databanks-exports-backend.spec.ts`. Assert stored-result reload, table/chart reconciliation, correlation and exported totals; reject empty result, missing benchmark, invalid filter and denied destructive action.
 - **Manual / Browser Verification:** Open a real simulation result; filter/rename a fixture databank; compare trades/equity; download an export and reconcile totals.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-8-41.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-results-databanks-exports-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Results for 8.41; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

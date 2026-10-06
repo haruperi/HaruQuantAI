@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 13.1 FEAT-PROJECT-ACTIVATION - activation.jar
 
@@ -25,6 +27,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/activation.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/activation.jar" com.sun.activation.registries.LineTokenizer`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Custom Projects through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -50,6 +54,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_activation.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
@@ -71,6 +77,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-email.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-email.jar" org.apache.commons.mail.ByteArrayDataSource`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Custom Projects through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -96,6 +104,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_commons_email.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
@@ -117,6 +127,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-exec.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-exec.jar" org.apache.commons.exec.CommandLine`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Custom Projects through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -142,6 +154,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_commons_exec.py --no-cov`; expect allowlisted invocation, timeout, exit failure, cancellation and redacted output; use temporary resources.
@@ -163,6 +177,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/javax-mail.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/javax-mail.jar" com.sun.mail.auth.MD4`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Custom Projects through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -187,6 +203,8 @@
 - [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_javax_mail.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
@@ -209,6 +227,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppTaskManager`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppTaskManager/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/CustomProjects/workspace.py`
@@ -224,6 +246,20 @@
 - **Create:** `tests/reference/sqx_features/project_app_task_manager.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-app-task-manager.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -235,10 +271,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_app_task_manager.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-app-task-manager.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-APP-TASK-MANAGER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.6 FEAT-PROJECT-PROJECT-CONDITION-CYCLES-COUNT - ProjectConditionCyclesCount.jar
 
@@ -257,6 +298,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectConditionCyclesCount`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ProjectConditionCyclesCount/service.py`
@@ -272,6 +317,20 @@
 - **Create:** `tests/reference/sqx_features/project_project_condition_cycles_count.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-project-condition-cycles-count.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -283,10 +342,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_cycles_count.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-project-condition-cycles-count.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-PROJECT-CONDITION-CYCLES-COUNT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.7 FEAT-PROJECT-PROJECT-CONDITION-DURATION - ProjectConditionDuration.jar
 
@@ -305,6 +369,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectConditionDuration`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ProjectConditionDuration/service.py`
@@ -320,6 +388,20 @@
 - **Create:** `tests/reference/sqx_features/project_project_condition_duration.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-project-condition-duration.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -329,10 +411,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_duration.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-project-condition-duration.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-PROJECT-CONDITION-DURATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.8 FEAT-PROJECT-PROJECT-CONDITION-GO-TO-ACTIVATED - ProjectConditionGoToActivated.jar
 
@@ -351,6 +438,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectConditionGoToActivated`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ProjectConditionGoToActivated/service.py`
@@ -366,6 +457,20 @@
 - **Create:** `tests/reference/sqx_features/project_project_condition_go_to_activated.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-project-condition-go-to-activated.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -377,10 +482,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_go_to_activated.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-project-condition-go-to-activated.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-PROJECT-CONDITION-GO-TO-ACTIVATED; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.9 FEAT-PROJECT-PROJECT-CONDITION-GO-TO-EVALUATED - ProjectConditionGoToEvaluated.jar
 
@@ -399,6 +509,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectConditionGoToEvaluated`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ProjectConditionGoToEvaluated/service.py`
@@ -414,6 +528,20 @@
 - **Create:** `tests/reference/sqx_features/project_project_condition_go_to_evaluated.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-project-condition-go-to-evaluated.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -425,10 +553,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_go_to_evaluated.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-project-condition-go-to-evaluated.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-PROJECT-CONDITION-GO-TO-EVALUATED; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.10 FEAT-PROJECT-PROJECT-CONDITION-RESULTS-COUNT - ProjectConditionResultsCount.jar
 
@@ -447,6 +580,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectConditionResultsCount`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ProjectConditionResultsCount/service.py`
@@ -462,6 +599,20 @@
 - **Create:** `tests/reference/sqx_features/project_project_condition_results_count.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-project-condition-results-count.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -473,10 +624,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_results_count.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-project-condition-results-count.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-PROJECT-CONDITION-RESULTS-COUNT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.11 FEAT-PROJECT-PROJECT-CONDITION-RUN-TIME - ProjectConditionRunTime.jar
 
@@ -495,6 +651,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectConditionRunTime`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ProjectConditionRunTime/service.py`
@@ -510,6 +670,20 @@
 - **Create:** `tests/reference/sqx_features/project_project_condition_run_time.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-project-condition-run-time.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -521,10 +695,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_project_condition_run_time.py --no-cov`; expect comparison equality, counter/time units, disabled condition and loop bound; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture comparison equality, counter/time units, disabled condition and loop bound and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-project-condition-run-time.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-PROJECT-CONDITION-RUN-TIME; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.12 FEAT-PROJECT-SERVLET-PROJECT - ServletProject.jar
 
@@ -543,6 +722,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletProject`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ServletProject/service.py`
@@ -558,6 +741,20 @@
 - **Create:** `tests/reference/sqx_features/project_servlet_project.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-servlet-project.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -568,10 +765,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_servlet_project.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-servlet-project.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SERVLET-PROJECT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.13 FEAT-PROJECT-SERVLET-PROJECT-OLD - ServletProjectOld.jar
 
@@ -590,6 +792,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletProjectOld`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/ServletProjectOld/service.py`
@@ -605,6 +811,20 @@
 - **Create:** `tests/reference/sqx_features/project_servlet_project_old.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-servlet-project-old.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -614,10 +834,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_servlet_project_old.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-servlet-project-old.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SERVLET-PROJECT-OLD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.14 FEAT-PROJECT-SETTINGS-APPLY-MASS-CONFIG - SettingsApplyMassConfig.jar
 
@@ -636,6 +861,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsApplyMassConfig`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsApplyMassConfig/ApplyMassConfigService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsApplyMassConfig/ApplyMassConfigCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsApplyMassConfig/applyMassConfig.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsApplyMassConfig/task.py`
@@ -649,6 +878,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_apply_mass_config.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-apply-mass-config.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -660,10 +903,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_apply_mass_config.py --no-cov`; expect target selection, compatibility, rollback and unaffected settings; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target selection, compatibility, rollback and unaffected settings and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-apply-mass-config.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-APPLY-MASS-CONFIG; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.15 FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT - SettingsCallExternalScript.jar
 
@@ -682,6 +930,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsCallExternalScript`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsCallExternalScript/SettingsCallExternalScriptService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCallExternalScript/SettingsCallExternalScriptCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCallExternalScript/settingsCallExternalScript.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsCallExternalScript/task.py`
@@ -695,6 +947,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_call_external_script.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-call-external-script.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -706,10 +972,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_call_external_script.py --no-cov`; expect allowlisted invocation, timeout, exit failure, cancellation and redacted output; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture allowlisted invocation, timeout, exit failure, cancellation and redacted output and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-call-external-script.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-CALL-EXTERNAL-SCRIPT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.16 FEAT-PROJECT-SETTINGS-CLEAR-DATABANKS - SettingsClearDatabanks.jar
 
@@ -728,6 +999,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsClearDatabanks`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsClearDatabanks/SettingsClearDatabanksCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsClearDatabanks/clearDatabanks.html`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsClearDatabanks/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsClearDatabanks/task.py`
@@ -741,6 +1016,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_clear_databanks.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-clear-databanks.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -752,10 +1041,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_clear_databanks.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-clear-databanks.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-CLEAR-DATABANKS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.17 FEAT-PROJECT-SETTINGS-CUSTOM-ANALYSIS - SettingsCustomAnalysis.jar
 
@@ -774,6 +1068,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsCustomAnalysis`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsCustomAnalysis/SettingsCustomAnalysisService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCustomAnalysis/SettingsCustomAnalysisCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCustomAnalysis/settingsCustomAnalysis.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsCustomAnalysis/task.py`
@@ -787,6 +1085,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_custom_analysis.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-custom-analysis.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -798,10 +1110,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_custom_analysis.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-custom-analysis.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-CUSTOM-ANALYSIS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.18 FEAT-PROJECT-SETTINGS-DATABANKS - SettingsDatabanks.jar
 
@@ -820,6 +1137,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsDatabanks`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsDatabanks/task.py`
@@ -833,6 +1154,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_databanks.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-databanks.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -842,10 +1177,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_databanks.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-databanks.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-DATABANKS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.19 FEAT-PROJECT-SETTINGS-DELETE-FILE - SettingsDeleteFile.jar
 
@@ -864,6 +1204,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsDeleteFile`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsDeleteFile/SettingsDeleteFileService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsDeleteFile/SettingsDeleteFileCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsDeleteFile/settingsDeleteFile.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsDeleteFile/task.py`
@@ -877,6 +1221,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_delete_file.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-delete-file.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -888,10 +1246,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_delete_file.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-delete-file.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-DELETE-FILE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.20 FEAT-PROJECT-SETTINGS-FILTERING - SettingsFiltering.jar
 
@@ -910,6 +1273,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsFiltering`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsFiltering/SettingsFilteringService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsFiltering/SettingsFilteringCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsFiltering/settingsFiltering.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsFiltering/task.py`
@@ -923,6 +1290,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_filtering.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-filtering.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -934,10 +1315,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_filtering.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-filtering.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-FILTERING; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.21 FEAT-PROJECT-SETTINGS-GO-TO-TASK - SettingsGoToTask.jar
 
@@ -956,6 +1342,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsGoToTask`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsGoToTask/SettingsGoToTaskService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsGoToTask/SettingsGoToTaskCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsGoToTask/settingsGoToTask.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsGoToTask/task.py`
@@ -969,6 +1359,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_go_to_task.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-go-to-task.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -980,10 +1384,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_go_to_task.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-go-to-task.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-GO-TO-TASK; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.22 FEAT-PROJECT-SETTINGS-LOAD-FROM-FILES - SettingsLoadFromFiles.jar
 
@@ -1002,6 +1411,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsLoadFromFiles`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsLoadFromFiles/SettingsLoadFromFilesService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsLoadFromFiles/SettingsLoadFromFilesCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsLoadFromFiles/settingsLoadFromFiles.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsLoadFromFiles/task.py`
@@ -1015,6 +1428,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_load_from_files.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-load-from-files.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1026,10 +1453,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_load_from_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-load-from-files.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-LOAD-FROM-FILES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.23 FEAT-PROJECT-SETTINGS-LOG-DATABANK-STATS - SettingsLogDatabankStats.jar
 
@@ -1048,6 +1480,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsLogDatabankStats`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsLogDatabankStats/LogDatabankStatsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsLogDatabankStats/LogDatabankStatsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsLogDatabankStats/directives/LogDatabankStatsTypeCtrl.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsLogDatabankStats/task.py`
@@ -1061,6 +1497,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_log_databank_stats.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-log-databank-stats.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1072,10 +1522,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_log_databank_stats.py --no-cov`; expect sample basis, empty bank, metric provenance and redacted diagnostics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sample basis, empty bank, metric provenance and redacted diagnostics and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-log-databank-stats.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-LOG-DATABANK-STATS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.24 FEAT-PROJECT-SETTINGS-NOTES - SettingsNotes.jar
 
@@ -1094,6 +1549,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/NotesCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/notes.html`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotes/module.js`.
+- **Existing UI connection:** Custom Projects; exact retained source-map `ui/app/plugins/project/SettingsNotes/source-map.json`. Target `ui/app/plugins/project/SettingsNotes/NotesCtrl.ts`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsNotes/task.py`
@@ -1107,6 +1566,26 @@
 - **Create:** `tests/reference/sqx_features/project_settings_notes.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/SettingsNotes/NotesCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/SettingsNotes/notes.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/SettingsNotes/module.ts`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/plugins/project/SettingsNotes/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-notes.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1118,10 +1597,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_notes.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-notes.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-NOTES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.25 FEAT-PROJECT-SETTINGS-NOTIFICATION - SettingsNotification.jar
 
@@ -1140,6 +1624,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotification`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotification/SettingsNotificationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotification/SettingsNotificationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsNotification/settingsNotification.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsNotification/task.py`
@@ -1153,6 +1641,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_notification.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-notification.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1164,10 +1666,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_notification.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture recipient/input validation, redaction, timeout and failed delivery and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-notification.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-NOTIFICATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.26 FEAT-PROJECT-SETTINGS-SAVE-TO-FILES - SettingsSaveToFiles.jar
 
@@ -1186,6 +1693,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsSaveToFiles`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsSaveToFiles/SettingsSaveToFilesService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsSaveToFiles/SettingsSaveToFilesCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsSaveToFiles/settingsSaveToFiles.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsSaveToFiles/task.py`
@@ -1199,6 +1710,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_save_to_files.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-save-to-files.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1210,10 +1735,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_save_to_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-save-to-files.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-SAVE-TO-FILES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.27 FEAT-PROJECT-SETTINGS-STOP-AND-START - SettingsStopAndStart.jar
 
@@ -1232,6 +1762,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsStopAndStart`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsStopAndStart/SettingsStopAndStartService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsStopAndStart/SettingsStopAndStartCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsStopAndStart/settingsStopAndStart.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsStopAndStart/task.py`
@@ -1245,6 +1779,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_stop_and_start.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-stop-and-start.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1256,10 +1804,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_stop_and_start.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-stop-and-start.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-STOP-AND-START; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.28 FEAT-PROJECT-SETTINGS-UPDATE-DATA - SettingsUpdateData.jar
 
@@ -1278,6 +1831,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsUpdateData`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsUpdateData/SettingsUpdateDataService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsUpdateData/SettingsUpdateDataCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsUpdateData/settingsUpdateData.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsUpdateData/task.py`
@@ -1291,6 +1848,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_update_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-update-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1302,10 +1873,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_update_data.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-update-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-UPDATE-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.29 FEAT-PROJECT-SETTINGS-WAIT-FOR - SettingsWaitFor.jar
 
@@ -1324,6 +1900,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsWaitFor`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsWaitFor/SettingsWaitForService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsWaitFor/SettingsWaitForCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsWaitFor/settingsWaitFor.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/SettingsWaitFor/task.py`
@@ -1337,6 +1917,20 @@
 - **Create:** `tests/reference/sqx_features/project_settings_wait_for.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-settings-wait-for.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1348,10 +1942,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_settings_wait_for.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-settings-wait-for.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-SETTINGS-WAIT-FOR; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.30 FEAT-PROJECT-TASK-APPLY-MASS-CONFIG - TaskApplyMassConfig.jar
 
@@ -1370,6 +1969,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskApplyMassConfig`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskApplyMassConfig/simpleSettings/SimpleApplyMassConfigCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskApplyMassConfig/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskApplyMassConfig/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskApplyMassConfig/task.py`
@@ -1383,6 +1986,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_apply_mass_config.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-apply-mass-config.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1394,10 +2011,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_apply_mass_config.py --no-cov`; expect target selection, compatibility, rollback and unaffected settings; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target selection, compatibility, rollback and unaffected settings and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-apply-mass-config.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-APPLY-MASS-CONFIG; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.31 FEAT-PROJECT-TASK-CALL-EXTERNAL-SCRIPT - TaskCallExternalScript.jar
 
@@ -1416,6 +2038,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskCallExternalScript`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskCallExternalScript/simpleSettings/SimpleCallExternalScriptSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskCallExternalScript/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskCallExternalScript/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskCallExternalScript/task.py`
@@ -1429,6 +2055,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_call_external_script.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-call-external-script.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1440,10 +2080,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_call_external_script.py --no-cov`; expect allowlisted invocation, timeout, exit failure, cancellation and redacted output; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture allowlisted invocation, timeout, exit failure, cancellation and redacted output and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-call-external-script.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-CALL-EXTERNAL-SCRIPT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.32 FEAT-PROJECT-TASK-CLEAR-DATABANKS - TaskClearDatabanks.jar
 
@@ -1462,6 +2107,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks/TaskClearDatabanksService.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks/simpleSettings/SimpleClearDatabanksCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks/simpleSettings/simpleSettings.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskClearDatabanks/task.py`
@@ -1475,6 +2124,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_clear_databanks.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-clear-databanks.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1486,10 +2149,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_clear_databanks.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-clear-databanks.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-CLEAR-DATABANKS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.33 FEAT-PROJECT-TASK-CUSTOM-ANALYSIS - TaskCustomAnalysis.jar
 
@@ -1508,6 +2176,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskCustomAnalysis`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskCustomAnalysis/simpleSettings/SimpleSettingsCACtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskCustomAnalysis/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskCustomAnalysis/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskCustomAnalysis/task.py`
@@ -1521,6 +2193,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_custom_analysis.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-custom-analysis.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1532,10 +2218,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_custom_analysis.py --no-cov`; expect resource trust/version, input identity and execution failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource trust/version, input identity and execution failure and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-custom-analysis.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-CUSTOM-ANALYSIS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.34 FEAT-PROJECT-TASK-DELETE-FILE - TaskDeleteFile.jar
 
@@ -1554,6 +2245,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskDeleteFile`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskDeleteFile/simpleSettings/SimpleDeleteFileSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskDeleteFile/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskDeleteFile/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskDeleteFile/task.py`
@@ -1567,6 +2262,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_delete_file.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-delete-file.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1578,10 +2287,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_delete_file.py --no-cov`; expect target resolution, denied action, atomic outcome and unaffected resources; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture target resolution, denied action, atomic outcome and unaffected resources and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-delete-file.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-DELETE-FILE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.35 FEAT-PROJECT-TASK-FILTERING - TaskFiltering.jar
 
@@ -1600,6 +2314,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskFiltering`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskFiltering/simpleSettings/SimpleFilteringSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskFiltering/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskFiltering/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskFiltering/task.py`
@@ -1613,6 +2331,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_filtering.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-filtering.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1624,10 +2356,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_filtering.py --no-cov`; expect input handles, start/stop/clone transitions, failure status and retained outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture input handles, start/stop/clone transitions, failure status and retained outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-filtering.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-FILTERING; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.36 FEAT-PROJECT-TASK-GO-TO-TASK - TaskGoToTask.jar
 
@@ -1646,6 +2383,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskGoToTask`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskGoToTask/simpleSettings/SimpleGoToTaskSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskGoToTask/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskGoToTask/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskGoToTask/task.py`
@@ -1659,6 +2400,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_go_to_task.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-go-to-task.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1670,10 +2425,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_go_to_task.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-go-to-task.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-GO-TO-TASK; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.37 FEAT-PROJECT-TASK-LOAD-FROM-FILES - TaskLoadFromFiles.jar
 
@@ -1692,6 +2452,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskLoadFromFiles`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskLoadFromFiles/simpleSettings/SimpleLoadFromFilesSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskLoadFromFiles/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskLoadFromFiles/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskLoadFromFiles/task.py`
@@ -1705,6 +2469,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_load_from_files.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-load-from-files.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1716,10 +2494,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_load_from_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-load-from-files.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-LOAD-FROM-FILES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.38 FEAT-PROJECT-TASK-LOG-DATABANK-STATS - TaskLogDatabankStats.jar
 
@@ -1738,6 +2521,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskLogDatabankStats`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskLogDatabankStats/simpleSettings/SimpleLogDatabankStatsSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskLogDatabankStats/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskLogDatabankStats/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskLogDatabankStats/task.py`
@@ -1751,6 +2538,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_log_databank_stats.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-log-databank-stats.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1762,10 +2563,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_log_databank_stats.py --no-cov`; expect sample basis, empty bank, metric provenance and redacted diagnostics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture sample basis, empty bank, metric provenance and redacted diagnostics and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-log-databank-stats.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-LOG-DATABANK-STATS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.39 FEAT-PROJECT-TASK-MANAGER-PROJECTS - TaskManagerProjects.jar
 
@@ -1784,6 +2590,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/directives/TMProjectControlCtrl.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/TaskManagerProjects/service.py`
@@ -1799,6 +2609,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_manager_projects.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-manager-projects.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1809,10 +2633,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_manager_projects.py --no-cov`; expect input handles, start/stop/clone transitions, failure status and retained outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture input handles, start/stop/clone transitions, failure status and retained outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-manager-projects.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-MANAGER-PROJECTS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.40 FEAT-PROJECT-TASK-NOTIFICATION - TaskNotification.jar
 
@@ -1831,6 +2660,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskNotification`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskNotification/TaskNotificationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskNotification/simpleSettings/SimpleNotificationSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskNotification/simpleSettings/simpleSettings.html`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskNotification/task.py`
@@ -1844,6 +2677,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_notification.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-notification.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1855,10 +2702,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_notification.py --no-cov`; expect recipient/input validation, redaction, timeout and failed delivery; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture recipient/input validation, redaction, timeout and failed delivery and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-notification.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-NOTIFICATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.41 FEAT-PROJECT-TASK-SAVE-TO-FILES - TaskSaveToFiles.jar
 
@@ -1877,6 +2729,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskSaveToFiles`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskSaveToFiles/simpleSettings/SimpleSaveToFilesSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskSaveToFiles/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskSaveToFiles/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskSaveToFiles/task.py`
@@ -1890,6 +2746,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_save_to_files.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-save-to-files.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1901,10 +2771,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_save_to_files.py --no-cov`; expect format version, path authority, partial write and resource identity; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, path authority, partial write and resource identity and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-save-to-files.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-SAVE-TO-FILES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.42 FEAT-PROJECT-TASK-STOP-AND-START - TaskStopAndStart.jar
 
@@ -1923,6 +2798,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskStopAndStart`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskStopAndStart/simpleSettings/SimpleStopAndStartSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskStopAndStart/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskStopAndStart/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskStopAndStart/task.py`
@@ -1936,6 +2815,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_stop_and_start.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-stop-and-start.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1947,10 +2840,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_stop_and_start.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-stop-and-start.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-STOP-AND-START; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.43 FEAT-PROJECT-TASK-UPDATE-DATA - TaskUpdateData.jar
 
@@ -1969,6 +2867,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskUpdateData`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskUpdateData/simpleSettings/SimpleUpdateDataSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskUpdateData/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskUpdateData/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskUpdateData/task.py`
@@ -1982,6 +2884,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_update_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-update-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -1993,10 +2909,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_update_data.py --no-cov`; expect selected dataset, partial failure, cancellation and updated provenance; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture selected dataset, partial failure, cancellation and updated provenance and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-update-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-UPDATE-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.44 FEAT-PROJECT-TASK-WAIT-FOR - TaskWaitFor.jar
 
@@ -2015,6 +2936,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskWaitFor`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskWaitFor/simpleSettings/SimpleWaitForSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskWaitFor/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskWaitFor/module.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/tasks/TaskWaitFor/task.py`
@@ -2028,6 +2953,20 @@
 - **Create:** `tests/reference/sqx_features/project_task_wait_for.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-project-task-wait-for.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -2039,10 +2978,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_project_task_wait_for.py --no-cov`; expect jump target, time units, cancellation, cycles and invalid transition; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture jump target, time units, cancellation, cycles and invalid transition and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-project-task-wait-for.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-PROJECT-TASK-WAIT-FOR; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.45 FEAT-UI-PROJECT-SETTINGS - ProjectSettings resource contribution
 
@@ -2058,6 +3002,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectSettings/views/settings.html`.
+- **Existing UI connection:** Custom Projects; exact retained source-map `ui/app/plugins/project/ProjectSettings/source-map.json`. Target `ui/app/plugins/project/ProjectSettings/views/settings.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/project/resource_contributions.py`
@@ -2069,6 +3017,22 @@
 - **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ProjectSettings/views/settings.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ProjectSettings/module.ts`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/plugins/project/ProjectSettings/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-project-settings.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -2076,10 +3040,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_settings.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Run a small build→retest→save graph on fixtures; inspect condition transitions; reject a destructive task without authority. Inspect the ProjectSettings contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-project-settings.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-UI-PROJECT-SETTINGS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.46 FEAT-UI-SETTINGS-PANEL - SettingsPanel resource contribution
 
@@ -2095,6 +3064,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/SettingsPanelCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/settings.html`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsPanel/module.js`.
+- **Existing UI connection:** Custom Projects; exact retained source-map `ui/app/plugins/project/SettingsPanel/source-map.json`. Target `ui/app/plugins/project/SettingsPanel/SettingsPanelCtrl.ts`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/plugins/project/resource_contributions.py` (proposed earlier in FEAT-UI-PROJECT-SETTINGS)
@@ -2106,6 +3079,24 @@
 - **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/SettingsPanel/SettingsPanelCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/SettingsPanel/settings.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/SettingsPanel/module.ts`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/plugins/project/SettingsPanel/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-settings-panel.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -2113,10 +3104,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_settings_panel.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Run a small build→retest→save graph on fixtures; inspect condition transitions; reject a destructive task without authority. Inspect the SettingsPanel contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-settings-panel.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-UI-SETTINGS-PANEL; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.47 FEAT-UI-TASK-MANAGER-TASKS - TaskManagerTasks resource contribution
 
@@ -2132,6 +3128,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerTasks`; `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerTasks/TMTasksService.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerTasks/TMTasksCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerTasks/directives/tmtask/TMTaskCtrl.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/plugins/project/resource_contributions.py` (proposed earlier in FEAT-UI-PROJECT-SETTINGS)
@@ -2143,6 +3143,18 @@
 - **Modify:** `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CustomProjects/customProjectsClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-task-manager-tasks.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -2150,10 +3162,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_task_manager_tasks.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Run a small build→retest→save graph on fixtures; inspect condition transitions; reject a destructive task without authority. Inspect the TaskManagerTasks contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-task-manager-tasks.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for FEAT-UI-TASK-MANAGER-TASKS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 13.48 P13 integration — Execute custom-project task graphs with owned conditions and bounded side effects
 
@@ -2170,6 +3187,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/CustomProjects/customProjects.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects`. Inspect `SQX_REFERENCE_ROOT/internal/web/TASKMANAGER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/TMProjectsService.js`.
+- **Existing UI connection:** Custom Projects; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CustomProjects/CustomProjectsWorkspace.tsx`; wire project task/condition configuration, graph execution and server-owned outcomes.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -2196,6 +3217,14 @@
 - **Create:** `ui/tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CustomProjects/NewTaskModal.tsx`
+  - Display project task/condition configuration, graph execution and server-owned outcomes from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CustomProjects/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/tests/unit/backend-connections/task-13-48.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -2206,12 +3235,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind project task/condition configuration, graph execution and server-owned outcomes to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_custom_projects_tasks_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/CustomProjects/customProjects.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-custom-projects-tasks-backend.spec.ts`. Assert graph save/reload, condition boundaries, task ordering and delegated result handles; reject invalid jump, runaway loop, missing capability and denied external/delete action.
 - **Manual / Browser Verification:** Run a small build→retest→save graph on fixtures; inspect condition transitions; reject a destructive task without authority.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-13-48.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-custom-projects-tasks-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Custom Projects for 13.48; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

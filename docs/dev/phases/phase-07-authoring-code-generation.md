@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 7.1 FEAT-AUTHORING-FREEMARKER - freemarker.jar
 
@@ -25,6 +27,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/freemarker.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/freemarker.jar" freemarker.cache.AndMatcher`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds AlgoWizard through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -53,6 +57,8 @@
 - [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_freemarker.py --no-cov`; expect escaping, missing variables, deterministic output and target syntax; use temporary resources.
@@ -74,6 +80,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/javassist.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/javassist.jar" javassist.ByteArrayClassPath`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds AlgoWizard through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -103,6 +111,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_javassist.py --no-cov`; expect trust boundary, version rejection and qualified extension lifecycle; use temporary resources.
@@ -125,6 +135,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/index.html`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/AlgoWizard/service.py` (proposed earlier in FEAT-AUTHORING-FREEMARKER)
@@ -142,6 +156,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_sq_wizard_business.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-sq-wizard-business.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -153,10 +181,15 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_sq_wizard_business.py --no-cov`; expect node types, parameter mapping and save/reload semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture node types, parameter mapping and save/reload semantics and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-sq-wizard-business.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-AUTHORING-SQ-WIZARD-BUSINESS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.4 FEAT-AUTHORING-APP-CODE-EDITOR - AppCodeEditor.jar
 
@@ -175,6 +208,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppCodeEditor`; `SQX_REFERENCE_ROOT/internal/web/SQEDITOR`; `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js`.
+- **Existing UI connection:** Code Editor; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`; wire extension import/export, compilation diagnostics and real indicator test outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/CodeEditor/workspace.py`
@@ -190,6 +227,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_app_code_editor.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-app-code-editor.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -201,10 +252,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind extension import/export, compilation diagnostics and real indicator test outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_app_code_editor.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-app-code-editor.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Code Editor for FEAT-AUTHORING-APP-CODE-EDITOR; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.5 FEAT-AUTHORING-APP-WIZARD - AppWizard.jar
 
@@ -223,6 +279,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppWizard`; `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js`; `SQX_REFERENCE_ROOT/internal/plugins/AppWizard/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/AppWizard/styles.css`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/AlgoWizard/workspace.py`
@@ -238,6 +298,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_app_wizard.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-app-wizard.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -249,10 +323,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_app_wizard.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-app-wizard.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-AUTHORING-APP-WIZARD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.6 FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT - CodeEditorImportExport.jar
 
@@ -271,6 +350,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport`; `SQX_REFERENCE_ROOT/internal/web/SQEDITOR`; `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/export/controllers/CEExportPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/import/controllers/CEImportCtrl.js`.
+- **Existing UI connection:** Code Editor; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`; wire extension import/export, compilation diagnostics and real indicator test outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/CodeEditor/service.py`
@@ -286,6 +369,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_code_editor_import_export.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-code-editor-import-export.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -296,10 +393,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind extension import/export, compilation diagnostics and real indicator test outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_code_editor_import_export.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-code-editor-import-export.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Code Editor for FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.7 FEAT-AUTHORING-CODE-EDITOR-INDICATOR-TESTER - CodeEditorIndicatorTester.jar
 
@@ -318,6 +420,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester`; `SQX_REFERENCE_ROOT/internal/web/SQEDITOR`; `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`; `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/controllers/IndicatorTesterCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/views/editIndyParamsPopup.html`.
+- **Existing UI connection:** Code Editor; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`; wire extension import/export, compilation diagnostics and real indicator test outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/CodeEditor/service.py` (proposed earlier in FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT)
@@ -333,6 +439,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_code_editor_indicator_tester.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-code-editor-indicator-tester.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -344,10 +464,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind extension import/export, compilation diagnostics and real indicator test outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_code_editor_indicator_tester.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-code-editor-indicator-tester.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Code Editor for FEAT-AUTHORING-CODE-EDITOR-INDICATOR-TESTER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.8 FEAT-AUTHORING-LOADER-SQ3 - LoaderSQ3.jar
 
@@ -366,6 +491,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/LoaderSQ3`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`.
+- **Existing UI connection:** databank load; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/load/LoadService.ts`; wire selected archive upload/import, format validation and persisted strategy/databank resources.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/strategy/LoaderSQ3/codec.py`
@@ -381,6 +510,18 @@
 - **Create:** `tests/reference/sqx_features/authoring_loader_sq3.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/LoadService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/LoadPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/loadPopup.tsx`
+  - Display selected archive upload/import, format validation and persisted strategy/databank resources from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-loader-sq3.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -391,10 +532,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected archive upload/import, format validation and persisted strategy/databank resources to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_loader_sq3.py --no-cov`; expect format version, unknown fields, checksum/entry validation and preserved semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, unknown fields, checksum/entry validation and preserved semantics and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-loader-sq3.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databank load for FEAT-AUTHORING-LOADER-SQ3; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.9 FEAT-AUTHORING-LOADER-SQ4 - LoaderSQ4.jar
 
@@ -413,6 +559,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/LoaderSQ4`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`.
+- **Existing UI connection:** databank load; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/load/LoadService.ts`; wire selected archive upload/import, format validation and persisted strategy/databank resources.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/strategy/LoaderSQ4/codec.py`
@@ -428,6 +578,18 @@
 - **Create:** `tests/reference/sqx_features/authoring_loader_sq4.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/LoadService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/LoadPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/load/loadPopup.tsx`
+  - Display selected archive upload/import, format validation and persisted strategy/databank resources from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-loader-sq4.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -439,10 +601,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected archive upload/import, format validation and persisted strategy/databank resources to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_loader_sq4.py --no-cov`; expect format version, unknown fields, checksum/entry validation and preserved semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, unknown fields, checksum/entry validation and preserved semantics and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-loader-sq4.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databank load for FEAT-AUTHORING-LOADER-SQ4; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.10 FEAT-AUTHORING-RESULTS-SOURCE-CODE - ResultsSourceCode.jar
 
@@ -461,6 +628,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode`; `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/customIndicatorsPopup.html`.
+- **Existing UI connection:** AlgoWizard; exact retained source-map `ui/app/plugins/project/ResultsSourceCode/source-map.json`. Target `ui/app/plugins/project/ResultsSourceCode/SourceCodeCtrl.ts`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/code_generation/ResultsSourceCode/service.py`
@@ -474,6 +645,26 @@
 - **Create:** `tests/reference/sqx_features/authoring_results_source_code.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsSourceCode/SourceCodeCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsSourceCode/sourceCode.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsSourceCode/module.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsSourceCode/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-results-source-code.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -485,10 +676,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_results_source_code.py --no-cov`; expect metric provenance, result identity, empty/error state and stored-value reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture metric provenance, result identity, empty/error state and stored-value reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-results-source-code.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-AUTHORING-RESULTS-SOURCE-CODE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.11 FEAT-AUTHORING-SAVER-SQ3 - SaverSQ3.jar
 
@@ -507,6 +703,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SaverSQ3`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`.
+- **Existing UI connection:** databank save/export; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`; wire selected format/strategy export, real generated artifact IDs and verified downloads.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/strategy/SaverSQ3/codec.py`
@@ -522,6 +722,18 @@
 - **Create:** `tests/reference/sqx_features/authoring_saver_sq3.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/SaveButtonService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/saveBtnPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/databank/ResultsDatabankActions/save/savePopup.tsx`
+  - Display selected format/strategy export, real generated artifact IDs and verified downloads from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-saver-sq3.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -533,10 +745,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected format/strategy export, real generated artifact IDs and verified downloads to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_saver_sq3.py --no-cov`; expect format version, unknown fields, checksum/entry validation and preserved semantics; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture format version, unknown fields, checksum/entry validation and preserved semantics and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-saver-sq3.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise databank save/export for FEAT-AUTHORING-SAVER-SQ3; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.12 FEAT-AUTHORING-SERVLET-ALGO-WIZARD - ServletAlgoWizard.jar
 
@@ -555,6 +772,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`; `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/index.html`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/strategy/ServletAlgoWizard/codec.py`
@@ -570,6 +791,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_servlet_algo_wizard.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-servlet-algo-wizard.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -581,10 +816,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_algo_wizard.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-servlet-algo-wizard.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-AUTHORING-SERVLET-ALGO-WIZARD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.13 FEAT-AUTHORING-SERVLET-CODE-EDITOR - ServletCodeEditor.jar
 
@@ -603,6 +843,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`; `SQX_REFERENCE_ROOT/internal/web/SQEDITOR`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/directives/bottomtabs/BottomTabsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/directives/maintabs/MainTabsCtrl.js`.
+- **Existing UI connection:** Code Editor; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`; wire extension import/export, compilation diagnostics and real indicator test outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/CodeEditor/service.py` (proposed earlier in FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT)
@@ -618,6 +862,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_servlet_code_editor.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-servlet-code-editor.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -629,10 +887,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind extension import/export, compilation diagnostics and real indicator test outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_code_editor.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-servlet-code-editor.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Code Editor for FEAT-AUTHORING-SERVLET-CODE-EDITOR; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.14 FEAT-AUTHORING-SERVLET-INDICATOR-TESTER - ServletIndicatorTester.jar
 
@@ -651,6 +914,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletIndicatorTester`; `SQX_REFERENCE_ROOT/internal/web/SQEDITOR`; `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`. Inspect `SQX_REFERENCE_ROOT/internal/web/SQEDITOR/layout/CodeEditorCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js`.
+- **Existing UI connection:** Code Editor; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`; wire extension import/export, compilation diagnostics and real indicator test outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/CodeEditor/service.py` (proposed earlier in FEAT-AUTHORING-CODE-EDITOR-IMPORT-EXPORT)
@@ -666,6 +933,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_servlet_indicator_tester.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/IndicatorTesterModal.tsx`
+  - Display extension import/export, compilation diagnostics and real indicator test outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/CodeEditor/fixtures.ts`
+  - Keep fixtures explicit for tests/demo; production consumers read backend projections.
+- **Create:** `ui/app/workspace/CodeEditor/codeEditorClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-servlet-indicator-tester.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -675,10 +956,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind extension import/export, compilation diagnostics and real indicator test outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_indicator_tester.py --no-cov`; expect resource validation, compile/qualification errors and fixture outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture resource validation, compile/qualification errors and fixture outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-servlet-indicator-tester.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Code Editor for FEAT-AUTHORING-SERVLET-INDICATOR-TESTER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.15 FEAT-AUTHORING-SERVLET-STRATEGY - ServletStrategy.jar
 
@@ -697,6 +983,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletStrategy`; `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/index.html`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/strategy/ServletStrategy/codec.py`
@@ -712,6 +1002,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_servlet_strategy.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-servlet-strategy.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -723,10 +1027,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_strategy.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-servlet-strategy.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-AUTHORING-SERVLET-STRATEGY; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.16 FEAT-AUTHORING-SERVLET-WIZARD - ServletWizard.jar
 
@@ -745,6 +1054,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletWizard`; `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/index.html`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/strategy/ServletWizard/codec.py`
@@ -760,6 +1073,20 @@
 - **Create:** `tests/reference/sqx_features/authoring_servlet_wizard.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-authoring-servlet-wizard.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -770,10 +1097,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_authoring_servlet_wizard.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-authoring-servlet-wizard.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-AUTHORING-SERVLET-WIZARD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.17 FEAT-UI-PROJECT-RESOURCES - ProjectResources resource contribution
 
@@ -789,6 +1121,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectResources`; `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ProjectResources/AddedResourcesPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResources/ResolveCustomResourcesPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ProjectResources/ResolveResourcesPopupCtrl.js`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/AlgoWizard/resource_contributions.py`
@@ -800,6 +1136,18 @@
 - **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-project-resources.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -807,10 +1155,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_project_resources.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Author a fixture strategy; save/reload/run it; test an indicator in CodeEditor; export each promised target and qualify its syntax. Inspect the ProjectResources contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-project-resources.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for FEAT-UI-PROJECT-RESOURCES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 7.18 P07 integration — Save, validate and execute authored strategies and generated platform code
 
@@ -827,6 +1180,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/AlgoWizard/algoWizardModel.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/AlgoWizard`; `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`. Inspect `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/index.html`.
+- **Existing UI connection:** AlgoWizard; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/AlgoWizard/AlgoWizardWorkspace.tsx`; wire strategy document load/save/validation, actual run inputs and result IDs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -867,6 +1224,14 @@
 - **Create:** `ui/tests/e2e/sqx-authoring-code-generation-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardResults.tsx`
+  - Display strategy document load/save/validation, actual run inputs and result IDs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/task-7-18.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -877,12 +1242,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind strategy document load/save/validation, actual run inputs and result IDs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_authoring_code_generation_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/AlgoWizard/algoWizardModel.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-authoring-code-generation-backend.spec.ts`. Assert author/save/reload/run semantics, archive preservation and target compilation; reject malformed archive, unresolved resource, extension rejection and template failure.
 - **Manual / Browser Verification:** Author a fixture strategy; save/reload/run it; test an indicator in CodeEditor; export each promised target and qualify its syntax.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-7-18.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-authoring-code-generation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise AlgoWizard for 7.18; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

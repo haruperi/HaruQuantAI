@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 4.1 FEAT-DATA-SOURCE-HTTPASYNCCLIENT - httpasyncclient.jar
 
@@ -25,6 +27,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/httpasyncclient.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/httpasyncclient.jar" org.apache.http.impl.nio.client.AbstractClientExchangeHandler`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Data Manager through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -52,6 +56,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpasyncclient.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
@@ -73,6 +79,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/httpclient-cache.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/httpclient-cache.jar" org.apache.http.client.cache.CacheResponseStatus`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Data Manager through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -100,6 +108,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpclient_cache.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
@@ -121,6 +131,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/httpclient.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/httpclient.jar" org.apache.http.auth.AUTH`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Data Manager through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -146,6 +158,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpclient.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
@@ -167,6 +181,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/httpcore-nio.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/httpcore-nio.jar" org.apache.http.impl.nio.DefaultClientIOEventDispatch`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Data Manager through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -194,6 +210,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpcore_nio.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
@@ -215,6 +233,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/httpcore.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/httpcore.jar" org.apache.http.ConnectionClosedException`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Data Manager through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -240,6 +260,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_httpcore.py --no-cov`; expect timeout, status mapping, cache revalidation and connection release; use temporary resources.
@@ -262,6 +284,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinance`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`.
+- **Existing UI connection:** crypto provider; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`; wire exchange/symbol catalog, provider capability selection and backend download jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/Crypto/CryptoExchangeBinance/client.py`
@@ -275,6 +301,20 @@
 - **Create:** `tests/reference/sqx_features/data_source_crypto_exchange_binance.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Crypto/cryptoStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-crypto-exchange-binance.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -286,10 +326,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind exchange/symbol catalog, provider capability selection and backend download jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_binance.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-crypto-exchange-binance.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise crypto provider for FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.7 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-COIN-M - CryptoExchangeBinanceCoinM.jar
 
@@ -308,6 +353,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinanceCoinM`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`.
+- **Existing UI connection:** crypto provider; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`; wire exchange/symbol catalog, provider capability selection and backend download jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/Crypto/CryptoExchangeBinanceCoinM/client.py`
@@ -321,6 +370,20 @@
 - **Create:** `tests/reference/sqx_features/data_source_crypto_exchange_binance_coin_m.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Crypto/cryptoStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-crypto-exchange-binance-coin-m.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -332,10 +395,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind exchange/symbol catalog, provider capability selection and backend download jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_binance_coin_m.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-crypto-exchange-binance-coin-m.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise crypto provider for FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-COIN-M; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.8 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-USDT-M - CryptoExchangeBinanceUsdtM.jar
 
@@ -354,6 +422,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinanceUsdtM`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`.
+- **Existing UI connection:** crypto provider; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`; wire exchange/symbol catalog, provider capability selection and backend download jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/Crypto/CryptoExchangeBinanceUsdtM/client.py`
@@ -367,6 +439,20 @@
 - **Create:** `tests/reference/sqx_features/data_source_crypto_exchange_binance_usdt_m.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Crypto/cryptoStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-crypto-exchange-binance-usdt-m.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -378,10 +464,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind exchange/symbol catalog, provider capability selection and backend download jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_binance_usdt_m.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-crypto-exchange-binance-usdt-m.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise crypto provider for FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BINANCE-USDT-M; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.9 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BITFINEX - CryptoExchangeBitfinex.jar
 
@@ -400,6 +491,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CryptoExchangeBitfinex`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`.
+- **Existing UI connection:** crypto provider; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`; wire exchange/symbol catalog, provider capability selection and backend download jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/Crypto/CryptoExchangeBitfinex/client.py`
@@ -413,6 +508,20 @@
 - **Create:** `tests/reference/sqx_features/data_source_crypto_exchange_bitfinex.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Crypto/cryptoStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-crypto-exchange-bitfinex.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -424,10 +533,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind exchange/symbol catalog, provider capability selection and backend download jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_bitfinex.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-crypto-exchange-bitfinex.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise crypto provider for FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-BITFINEX; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.10 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-COINBASE-PRO - CryptoExchangeCoinbasePro.jar
 
@@ -446,6 +560,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CryptoExchangeCoinbasePro`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`.
+- **Existing UI connection:** crypto provider; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`; wire exchange/symbol catalog, provider capability selection and backend download jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/Crypto/CryptoExchangeCoinbasePro/client.py`
@@ -459,6 +577,20 @@
 - **Create:** `tests/reference/sqx_features/data_source_crypto_exchange_coinbase_pro.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Crypto/cryptoStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-crypto-exchange-coinbase-pro.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -470,10 +602,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind exchange/symbol catalog, provider capability selection and backend download jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_coinbase_pro.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-crypto-exchange-coinbase-pro.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise crypto provider for FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-COINBASE-PRO; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.11 FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-POLONIEX - CryptoExchangePoloniex.jar
 
@@ -492,6 +629,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/CryptoExchangePoloniex`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`.
+- **Existing UI connection:** crypto provider; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`; wire exchange/symbol catalog, provider capability selection and backend download jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/Crypto/CryptoExchangePoloniex/client.py`
@@ -505,6 +646,20 @@
 - **Create:** `tests/reference/sqx_features/data_source_crypto_exchange_poloniex.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Crypto/cryptoStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-crypto-exchange-poloniex.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -516,10 +671,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind exchange/symbol catalog, provider capability selection and backend download jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_crypto_exchange_poloniex.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-crypto-exchange-poloniex.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise crypto provider for FEAT-DATA-SOURCE-CRYPTO-EXCHANGE-POLONIEX; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.12 FEAT-DATA-SOURCE-DATA-SOURCE-CRYPTO - DataSourceCrypto.jar
 
@@ -538,6 +698,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/add/addPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/import/importPopupCtrl.js`.
+- **Existing UI connection:** crypto provider; exact retained source-map `ui/app/plugins/data_source/Crypto/source-map.json`. Target `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`; wire exchange/symbol catalog, provider capability selection and backend download jobs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceCrypto/service.py`
@@ -553,6 +717,24 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_crypto.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Crypto/DataSourceCryptoService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Crypto/cryptoStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Crypto/import/importPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Crypto/add/addPopup.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display exchange/symbol catalog, provider capability selection and backend download jobs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-crypto.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -563,10 +745,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind exchange/symbol catalog, provider capability selection and backend download jobs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_crypto.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-crypto.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise crypto provider for FEAT-DATA-SOURCE-DATA-SOURCE-CRYPTO; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.13 FEAT-DATA-SOURCE-DATA-SOURCE-DARWINEX - DataSourceDarwinex.jar
 
@@ -585,6 +772,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/DarwinexService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/add/addPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/download/downloadPopupCtrl.js`.
+- **Existing UI connection:** Darwinex provider; exact retained source-map `ui/app/plugins/data_source/Darwinex/source-map.json`. Target `ui/app/plugins/data_source/Darwinex/DarwinexService.ts`; wire provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceDarwinex/service.py`
@@ -600,6 +791,26 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_darwinex.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Darwinex/DarwinexService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Darwinex/darwinexStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Darwinex/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Darwinex/download/downloadPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Darwinex/add/addPopup.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-darwinex.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -610,10 +821,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_darwinex.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-darwinex.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Darwinex provider for FEAT-DATA-SOURCE-DATA-SOURCE-DARWINEX; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.14 FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY - DataSourceDukascopy.jar
 
@@ -632,6 +848,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DukascopyService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/add/addPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/import/importPopupCtrl.js`.
+- **Existing UI connection:** Dukascopy provider; exact retained source-map `ui/app/plugins/data_source/Dukascopy/source-map.json`. Target `ui/app/plugins/data_source/Dukascopy/DukascopyService.ts`; wire provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceDukascopy/service.py`
@@ -647,6 +867,24 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_dukascopy.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Dukascopy/DukascopyService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Dukascopy/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Dukascopy/import/importPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Dukascopy/add/addPopup.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-dukascopy.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -657,10 +895,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_dukascopy.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-dukascopy.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Dukascopy provider for FEAT-DATA-SOURCE-DATA-SOURCE-DUKASCOPY; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.15 FEAT-DATA-SOURCE-DATA-SOURCE-FILES - DataSourceFiles.jar
 
@@ -679,6 +922,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFilesService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/add/DataSourceFilesAddCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceFiles/appImport/DataSourceFilesAppImportCtrl.js`.
+- **Existing UI connection:** FileImport provider; exact retained source-map `ui/app/plugins/data_source/FileImport/source-map.json`. Target `ui/app/plugins/data_source/FileImport/DataSourceFilesService.ts`; wire provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceFiles/service.py`
@@ -694,6 +941,26 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_files.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/FileImport/DataSourceFilesService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/FileImport/fileImportStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/FileImport/fileSymbolsStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/FileImport/add/DataSourceFilesAddCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/FileImport/add/addPopup.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-files.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -704,10 +971,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_files.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-files.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise FileImport provider for FEAT-DATA-SOURCE-DATA-SOURCE-FILES; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.16 FEAT-DATA-SOURCE-DATA-SOURCE-MT5-API - DataSourceMt5Api.jar
 
@@ -726,6 +998,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/DataSourceMt5ApiImportCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/importPopup.html`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/module.js`.
+- **Existing UI connection:** MetaTrader provider; exact retained source-map `ui/app/plugins/data_source/MetaTrader/source-map.json`. Target `ui/app/plugins/data_source/MetaTrader/mt5ImportStore.ts`; wire provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceMt5Api/service.py`
@@ -741,6 +1017,24 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_mt5_api.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/MetaTrader/mt5ImportStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/MetaTrader/import/DataSourceMt5ApiImportCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/MetaTrader/import/importPopup.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/plugins/data_source/MetaTrader/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-mt5-api.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -751,10 +1045,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_mt5_api.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-mt5-api.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise MetaTrader provider for FEAT-DATA-SOURCE-DATA-SOURCE-MT5-API; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.17 FEAT-DATA-SOURCE-DATA-SOURCE-SQ-EQUITY-DATA - DataSourceSQEquityData.jar
 
@@ -773,6 +1072,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/SQEquityDataService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/add/SQEquityDataAddCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/update/SQEquityDataUpdateCtrl.js`.
+- **Existing UI connection:** SQ Equity data; exact retained source-map `ui/app/plugins/data_source/SQData/Equity/source-map.json`. Target `ui/app/plugins/data_source/SQData/Equity/SQEquityDataService.ts`; wire equity catalog/availability, add/update requests, backend job status and persisted dataset resources.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceSQEquityData/service.py`
@@ -788,6 +1091,22 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_sq_equity_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/SQData/Equity/SQEquityDataService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/SQData/Equity/add/SQEquityDataAddCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/SQData/Equity/update/SQEquityDataUpdateCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/SQData/Equity/add/addPopup.tsx`
+  - Display equity catalog/availability, add/update requests, backend job status and persisted dataset resources from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display equity catalog/availability, add/update requests, backend job status and persisted dataset resources from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-sq-equity-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -798,10 +1117,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind equity catalog/availability, add/update requests, backend job status and persisted dataset resources to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_sq_equity_data.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-sq-equity-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise SQ Equity data for FEAT-DATA-SOURCE-DATA-SOURCE-SQ-EQUITY-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.18 FEAT-DATA-SOURCE-DATA-SOURCE-SQ-FUTURES-DATA - DataSourceSQFuturesData.jar
 
@@ -820,6 +1144,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/SQFuturesDataService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/add/SQFuturesDataAddCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/update/SQFuturesDataUpdateCtrl.js`.
+- **Existing UI connection:** SQ Futures data; exact retained source-map `ui/app/plugins/data_source/SQData/Futures/source-map.json`. Target `ui/app/plugins/data_source/SQData/Futures/SQFuturesDataService.ts`; wire futures catalog/availability, add/update requests, backend job status and persisted dataset resources.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceSQFuturesData/service.py`
@@ -835,6 +1163,22 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_sq_futures_data.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/SQData/Futures/SQFuturesDataService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/SQData/Futures/add/SQFuturesDataAddCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/SQData/Futures/update/SQFuturesDataUpdateCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/SQData/Futures/add/addPopup.tsx`
+  - Display futures catalog/availability, add/update requests, backend job status and persisted dataset resources from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display futures catalog/availability, add/update requests, backend job status and persisted dataset resources from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-sq-futures-data.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -845,10 +1189,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind futures catalog/availability, add/update requests, backend job status and persisted dataset resources to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_sq_futures_data.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-sq-futures-data.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise SQ Futures data for FEAT-DATA-SOURCE-DATA-SOURCE-SQ-FUTURES-DATA; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.19 FEAT-DATA-SOURCE-DATA-SOURCE-TD - DataSourceTD.jar
 
@@ -867,6 +1216,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTDService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/DataSourceTDImportCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/importPopup.html`.
+- **Existing UI connection:** TickDownloader provider; exact retained source-map `ui/app/plugins/data_source/TickDownloader/source-map.json`. Target `ui/app/plugins/data_source/TickDownloader/DataSourceTDService.ts`; wire provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceTD/service.py`
@@ -882,6 +1235,22 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_td.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/TickDownloader/DataSourceTDService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/TickDownloader/import/DataSourceTDImportCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/TickDownloader/import/importPopup.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-td.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -892,10 +1261,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_td.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-td.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise TickDownloader provider for FEAT-DATA-SOURCE-DATA-SOURCE-TD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.20 FEAT-DATA-SOURCE-DATA-SOURCE-YAHOO - DataSourceYahoo.jar
 
@@ -914,6 +1288,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/YahooService.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/add/addPopupCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/download/downloadPopupCtrl.js`.
+- **Existing UI connection:** Yahoo provider; exact retained source-map `ui/app/plugins/data_source/Yahoo/source-map.json`. Target `ui/app/plugins/data_source/Yahoo/YahooService.ts`; wire provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/DataSourceYahoo/service.py`
@@ -929,6 +1307,26 @@
 - **Create:** `tests/reference/sqx_features/data_source_data_source_yahoo.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Yahoo/YahooService.ts`
+  - Call owned typed commands; map responses/errors to current dialogs.
+- **Modify:** `ui/app/plugins/data_source/Yahoo/yahooStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/plugins/data_source/Yahoo/add/addPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Yahoo/download/downloadPopupCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/data_source/Yahoo/add/addPopup.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-data-source-yahoo.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -939,10 +1337,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind provider catalog/symbol availability, add/import/download commands, backend job progress/cancellation and persisted dataset counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_data_source_yahoo.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-data-source-yahoo.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Yahoo provider for FEAT-DATA-SOURCE-DATA-SOURCE-YAHOO; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.21 FEAT-DATA-SOURCE-SERVLET-YAHOO - ServletYahoo.jar
 
@@ -961,6 +1364,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletYahoo`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/web/QDM/layout/QDMService.js`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData/DMDataService.js`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/ServletYahoo/service.py`
@@ -976,6 +1383,18 @@
 - **Create:** `tests/reference/sqx_features/data_source_servlet_yahoo.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
+  - Display dataset/catalog load and mutation, server resource IDs and authoritative row counts from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-data-source-servlet-yahoo.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -985,10 +1404,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_data_source_servlet_yahoo.py --no-cov`; expect symbol mapping, pagination, timestamp units, rate limits and unavailable API; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture symbol mapping, pagination, timestamp units, rate limits and unavailable API and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-data-source-servlet-yahoo.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-DATA-SOURCE-SERVLET-YAHOO; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.22 FEAT-UI-DATA-MANAGER-LOG - DataManagerLog resource contribution
 
@@ -1004,6 +1428,10 @@
 - **Research:** inspect resource/module/config declarations and consuming registrations; fingerprint stable files and trace action routes.
 - **Gap:** directory/resource presence does not prove an enabled workflow; empty contributions need explicit dispositions.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/DataManagerLog`; `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/DataManagerLog/DMDataLogCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerLog/dataLog.html`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerLog/module.js`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/data_source/resource_contributions.py`
@@ -1015,6 +1443,16 @@
 - **Modify:** `ui/app/workspace/DataManager/DataManager.tsx`
   - Bind the verified resource workflow to real capability state.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/DataManager/dataManagerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-ui-data-manager-log.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Inspect and specify resource/action declarations, defaults, route consumers and active registration; approve the resulting FR contract.
@@ -1022,10 +1460,15 @@
 - [ ] **Step 3:** Bind verified UI controls to host/domain capabilities; define disabled, denied and unavailable states.
 - [ ] **Step 4:** Test mount/unmount, missing resources, action authority and FR logs; retain versioned donor observations.
 
+- [ ] **Step 5:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 6:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_ui_data_manager_log.py --no-cov`; assert resource availability, owned lifecycle and denied/missing actions.
 - **Manual / Browser Verification:** Import a small fixture; start a sandbox download; cancel it; inspect import logs and confirm unavailable providers have explicit states. Inspect the DataManagerLog contribution; an empty or unavailable contribution must remain explicit.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-ui-data-manager-log.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for FEAT-UI-DATA-MANAGER-LOG; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 4.23 P04 integration — Import files and download normalized provider data through owned jobs
 
@@ -1042,6 +1485,10 @@
 - **Existing tests:** No audited phase backend suite; create the integration tests below.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/QDM`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData`. Inspect `SQX_REFERENCE_ROOT/internal/web/QDM/layout/QDMService.js`; `SQX_REFERENCE_ROOT/internal/plugins/AppDataManager/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/DataManagerData/DMDataService.js`.
+- **Existing UI connection:** Data Manager; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/plugins/data_source/Common/dataManagerStore.ts`; wire dataset/catalog load and mutation, server resource IDs and authoritative row counts.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -1062,6 +1509,12 @@
 - **Create:** `ui/tests/e2e/sqx-data-ingestion-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/data_source/Common/dataManagerStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/tests/unit/backend-connections/task-4-23.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -1072,12 +1525,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/catalog load and mutation, server resource IDs and authoritative row counts to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_data_ingestion_workflow.py --no-cov`; `npm --prefix ui run test:ui -- tests/e2e/sqx-data-ingestion-backend.spec.ts`. Assert fixture-file import, pagination and normalized OHLCV/time metadata; reject rate limit, timeout, corrupt row, partial download and cancellation.
 - **Manual / Browser Verification:** Import a small fixture; start a sandbox download; cancel it; inspect import logs and confirm unavailable providers have explicit states.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-4-23.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-data-ingestion-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Data Manager for 4.23; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

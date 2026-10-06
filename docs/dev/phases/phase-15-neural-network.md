@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 15.1 FEAT-NEURAL-APP-NEURAL-NETWORK - AppNeuralNetwork.jar
 
@@ -26,6 +28,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork`; `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK`; `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`.
+- **Existing UI connection:** Neural Network; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`; wire dataset/training selection, server training job and saved model resource.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/NeuralNetwork/workspace.py`
@@ -41,6 +47,18 @@
 - **Create:** `tests/reference/sqx_features/neural_app_neural_network.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`
+  - Display dataset/training selection, server training job and saved model resource from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/NeuralNetwork/neuralClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-neural-app-neural-network.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-neural-network-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -52,10 +70,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/training selection, server training job and saved model resource to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_neural_app_neural_network.py --no-cov`; expect feature scaling, seed/split policy, model version and finite inference; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture feature scaling, seed/split policy, model version and finite inference and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-neural-app-neural-network.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-neural-network-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Neural Network for FEAT-NEURAL-APP-NEURAL-NETWORK; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 15.2 FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER - TaskNeuralNetworkTrainer.jar
 
@@ -74,6 +97,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`; `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK`. Inspect `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK/layout/LayoutCtrl.js`.
+- **Existing UI connection:** Neural Network; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`; wire dataset/training selection, server training job and saved model resource.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/NeuralNetwork/training.py`
@@ -87,6 +114,18 @@
 - **Create:** `tests/reference/sqx_features/neural_task_neural_network_trainer.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`
+  - Display dataset/training selection, server training job and saved model resource from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/NeuralNetwork/neuralClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-neural-task-neural-network-trainer.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-neural-network-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -98,10 +137,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/training selection, server training job and saved model resource to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_neural_task_neural_network_trainer.py --no-cov`; expect feature scaling, seed/split policy, model version and finite inference; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture feature scaling, seed/split policy, model version and finite inference and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-neural-task-neural-network-trainer.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-neural-network-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Neural Network for FEAT-NEURAL-TASK-NEURAL-NETWORK-TRAINER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 15.3 P15 integration — Train, persist and consume qualified neural model resources
 
@@ -118,6 +162,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK`; `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer`. Inspect `SQX_REFERENCE_ROOT/internal/web/NEURALNETWORK/layout/LayoutCtrl.js`.
+- **Existing UI connection:** Neural Network; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx`; wire dataset/training selection, server training job and saved model resource.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -144,6 +192,14 @@
 - **Create:** `ui/tests/e2e/sqx-neural-network-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/NeuralNetwork/neuralNetStore.ts`
+  - Replace affected mock job/resource authority with server projections; preserve selection/view state.
+- **Create:** `ui/app/workspace/NeuralNetwork/neuralClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/task-15-3.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -154,12 +210,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind dataset/training selection, server training job and saved model resource to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_neural_network_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/NeuralNetwork/neuralNet.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-neural-network-backend.spec.ts`. Assert fixed-seed training, no split leakage, model save/reload and inference vectors; reject invalid features, unsupported model version, nonfinite loss and interrupted training.
 - **Manual / Browser Verification:** Train a small fixture model; inspect real loss; save/reload it; compare predictions; reject an incompatible model artifact.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-15-3.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-neural-network-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Neural Network for 15.3; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

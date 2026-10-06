@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 1.1 P00 prerequisites — evidence, ownership and missing common core
 
@@ -24,6 +26,8 @@
 - **Conflict resolved:** docs/templates/PYTHON_MODULE.md now uses the constitutional `Key Capabilities:` sample heading under `DEC-HOST-P00-MODULE-HEADING`.
 - **Gap:** MainApp/AppSettings and launcher SQLib.jar packaging remain unresolved; manifest/class lookup and runtime validation must establish the owner.
 - **Commands:** `git status --short`; `rg --files docs ui scripts`; inspect StrategyQuantX.config/sqcli.config and `jar tf` using logical-root variables.
+
+- **UI readiness research:** `ui/app/host/transport.ts`, `ui/README.md` and current workspace/plugin source maps; distinguish retained mock screens from qualified backend consumers.
 
 ## 3. File Changes
 
@@ -52,6 +56,8 @@
 - **Remaining Step 4:** A 182-class/58-archive structural consumer index and selected body-derived traces extend the seeds. Initial fixtures record actual static count/order observations. Complete consumed-method closure and independent donor runtime outputs remain unavailable.
 - **Remaining Step 7:** P00 evidence-only release, exact static comparisons, two dev validation dependencies, tooling logging adapter and exact writes were approved. Future numerical policies, runtime contracts, external/destructive effects and P01 write paths require their own decisions/plans. No blanket tolerance or operational store activation was ratified.
 
+- [ ] **Step 8:** Record UI prerequisites: Reconcile feature-to-retained-screen ownership, transport/session dependencies and missing controls before execution; do not register completion from a mock screen.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** Inventory reconciliation and registry/schema checks after restoration; no runtime or ledger pass is claimed before actual recorded observations.
@@ -73,6 +79,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-beanutils.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-beanutils.jar" org.apache.commons.beanutils.BaseDynaBeanMapDecorator`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -98,6 +106,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_beanutils.py --no-cov`; expect coercion, missing properties and rejected unknown fields; use temporary resources.
@@ -119,6 +129,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-codec.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-codec.jar" org.apache.commons.codec.BinaryDecoder`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -143,6 +155,8 @@
 - [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_codec.py --no-cov`; expect encoding vectors, malformed input and byte/text boundary; use temporary resources.
@@ -164,6 +178,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-collections.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-collections.jar" org.apache.commons.collections.ArrayStack`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -189,6 +205,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_collections.py --no-cov`; expect ordering, duplicate/null handling and bounded collection behavior; use temporary resources.
@@ -210,6 +228,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-io-icm.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-io-icm.jar" org.apache.commons.io.ByteOrderMark`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -235,6 +255,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_io_icm.py --no-cov`; expect encoding, path containment, interrupted write and closed handle; use temporary resources.
@@ -256,6 +278,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-io.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-io.jar" org.apache.commons.io.ByteOrderMark`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -281,6 +305,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_io.py --no-cov`; expect encoding, path containment, interrupted write and closed handle; use temporary resources.
@@ -302,6 +328,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-lang3.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-lang3.jar" org.apache.commons.lang3.AnnotationUtils`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -326,6 +354,8 @@
 - [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_lang3.py --no-cov`; expect ordering, duplicate/null handling and bounded collection behavior; use temporary resources.
@@ -347,6 +377,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/commons-logging.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/commons-logging.jar" org.apache.commons.logging.Log`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -374,6 +406,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_commons_logging.py --no-cov`; expect logger identity, level filtering and exception/redaction projection; use temporary resources.
@@ -395,6 +429,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/guava.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/guava.jar" com.google.common.annotations.Beta`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -418,6 +454,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_guava.py --no-cov`; expect ordering, duplicate/null handling and bounded collection behavior; use temporary resources.
@@ -439,6 +477,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/jna-platform.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/jna-platform.jar" com.sun.jna.platform.DesktopWindow`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -464,6 +504,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jna_platform.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
@@ -485,6 +527,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/jna.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/jna.jar" com.sun.jna.AltCallingConvention`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -508,6 +552,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jna.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
@@ -529,6 +575,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/jProcesses.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/jProcesses.jar" org.jutils.jprocesses.JProcesses`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -554,6 +602,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_j_processes.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
@@ -575,6 +625,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/logback-classic.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/logback-classic.jar" ch.qos.logback.classic.Logger`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -602,6 +654,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_logback_classic.py --no-cov`; expect inheritance, context isolation and sanitized exception records; use temporary resources.
@@ -623,6 +677,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/logback-core.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/logback-core.jar" ch.qos.logback.core.Appender`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -650,6 +706,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_logback_core.py --no-cov`; expect sink failure, rotation limits, flush ordering and shutdown; use temporary resources.
@@ -671,6 +729,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/oshi-core.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/oshi-core.jar" oshi.PlatformEnum`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -696,6 +756,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_oshi_core.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
@@ -717,6 +779,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/PSUtils.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/PSUtils.jar" com.jfx.ts.io.PSUtils`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -742,6 +806,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_ps_utils.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
@@ -763,6 +829,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/slf4j-api.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/slf4j-api.jar" org.slf4j.Logger`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -790,6 +858,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_slf4j_api.py --no-cov`; expect logger identity, level filtering and exception/redaction projection; use temporary resources.
@@ -812,6 +882,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppDebugConsole`; `SQX_REFERENCE_ROOT/internal/web/DEBUGCONSOLE`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppDebugConsole/module.js`.
+- **Existing UI connection:** Debug Console; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx`; wire redacted backend diagnostics/log query and live log lifecycle.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/DebugConsole/workspace.py`
@@ -827,6 +901,16 @@
 - **Create:** `tests/reference/sqx_features/host_app_debug_console.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx`
+  - Display redacted backend diagnostics/log query and live log lifecycle from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/DebugConsole/debugConsoleClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-host-app-debug-console.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-host-foundation-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -838,10 +922,16 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind redacted backend diagnostics/log query and live log lifecycle to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- **UI prerequisite:** P02 host transport/session/envelope capability is a dependency; ratify prerequisite ordering and keep this UI task open until the connection can execute.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_app_debug_console.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-host-app-debug-console.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-host-foundation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Debug Console for FEAT-HOST-APP-DEBUG-CONSOLE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 1.19 FEAT-HOST-JRT-FS - jrt-fs.jar
 
@@ -859,6 +949,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/j64/lib/jrt-fs.jar"`; inspect manifest/resources and target runtime requirements.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Debug Console through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -880,6 +972,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_host_jrt_fs.py --no-cov`; expect fresh-process boot/shutdown, deterministic settings and sanitized logs; use temporary resources.
@@ -900,6 +994,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/DebugConsole/debugConsole.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/DEBUGCONSOLE`. Inspect `SQX_REFERENCE_ROOT/internal/web/DEBUGCONSOLE/index.html`.
+- **Existing UI connection:** Debug Console; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/DebugConsole/DebugConsoleWorkspace.tsx`; wire redacted backend diagnostics/log query and live log lifecycle.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -926,6 +1024,10 @@
 - **Create:** `ui/tests/e2e/sqx-host-foundation-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Create:** `ui/tests/unit/backend-connections/task-1-20.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -936,12 +1038,21 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind redacted backend diagnostics/log query and live log lifecycle to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+- **UI prerequisite:** P02 host transport/session/envelope capability is a dependency; ratify prerequisite ordering and keep this UI task open until the connection can execute.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_host_foundation_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/DebugConsole/debugConsole.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-host-foundation-backend.spec.ts`. Assert fresh-process boot/shutdown, deterministic settings and sanitized logs; reject invalid configuration, failed log sink and unavailable platform probe.
 - **Manual / Browser Verification:** Launch a fresh process; open DebugConsole; trigger a configuration error; confirm actionable redacted logs and clean exit.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-1-20.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-host-foundation-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Debug Console for 1.20; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

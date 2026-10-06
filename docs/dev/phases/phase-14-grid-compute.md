@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 14.1 FEAT-COMPUTE-AFFINITY - affinity.jar
 
@@ -25,6 +27,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/affinity.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/affinity.jar" net.openhft.affinity.Affinity`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Grid Control/Test through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -54,6 +58,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_affinity.py --no-cov`; expect unsupported probe, process lifetime and bounded sampling; use temporary resources.
@@ -75,6 +81,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/artemis-commons.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/artemis-commons.jar" org.apache.activemq.artemis.ArtemisConstants`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Grid Control/Test through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -102,6 +110,8 @@
 - [ ] **Step 5:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_commons.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
@@ -123,6 +133,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/artemis-core-client.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/artemis-core-client.jar" org.apache.activemq.artemis.api.config.ActiveMQDefaultConfiguration`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Grid Control/Test through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -152,6 +164,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_core_client.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
@@ -173,6 +187,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/artemis-jms-client.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/artemis-jms-client.jar" org.apache.activemq.artemis.api.jms.ActiveMQJMSClient`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Grid Control/Test through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -202,6 +218,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_jms_client.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
@@ -223,6 +241,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/artemis-selector.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/artemis-selector.jar" org.apache.activemq.artemis.selector.filter.ArithmeticExpression`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Grid Control/Test through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -252,6 +272,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_artemis_selector.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
@@ -273,6 +295,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/geronimo-jms.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/geronimo-jms.jar" javax.jms.BytesMessage`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Grid Control/Test through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -302,6 +326,8 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_geronimo_jms.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
@@ -323,6 +349,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/jspf.remote.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/jspf.remote.jar" net.xeoh.plugins.remote.ExportResult`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds Grid Control/Test through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -351,6 +379,8 @@
 - [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_jspf_remote.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
@@ -373,6 +403,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST`; `SQX_REFERENCE_ROOT/internal/plugins/ServletGridControl`. Inspect `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js`.
+- **Existing UI connection:** Grid Control/Test; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/GridControl/GridControlWorkspace.tsx`; wire worker compatibility/discovery, real grid job progress and bounded failure status.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/plugins/compute/workers.py` (proposed earlier in FEAT-COMPUTE-AFFINITY)
@@ -390,6 +424,18 @@
 - **Create:** `tests/reference/sqx_features/compute_sq_grid_lib2.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/GridTest/GridTestWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/GridControl/gridControlClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-compute-sq-grid-lib2.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-grid-compute-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -401,10 +447,15 @@
 - [ ] **Step 7:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind worker compatibility/discovery, real grid job progress and bounded failure status to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_sq_grid_lib2.py --no-cov`; expect delivery identity, stale lease, retry, backpressure and remote failure; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture delivery identity, stale lease, retry, backpressure and remote failure and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-compute-sq-grid-lib2.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-grid-compute-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Grid Control/Test for FEAT-COMPUTE-SQ-GRID-LIB2; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 14.9 FEAT-COMPUTE-APP-GRID-CONTROL - AppGridControl.jar
 
@@ -423,6 +474,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppGridControl`; `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST`; `SQX_REFERENCE_ROOT/internal/plugins/ServletGridControl`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppGridControl/module.js`.
+- **Existing UI connection:** Grid Control/Test; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/GridControl/GridControlWorkspace.tsx`; wire worker compatibility/discovery, real grid job progress and bounded failure status.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/GridControl/workspace.py`
@@ -438,6 +493,18 @@
 - **Create:** `tests/reference/sqx_features/compute_app_grid_control.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/GridTest/GridTestWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/GridControl/gridControlClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-compute-app-grid-control.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-grid-compute-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -449,10 +516,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind worker compatibility/discovery, real grid job progress and bounded failure status to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_app_grid_control.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-compute-app-grid-control.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-grid-compute-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Grid Control/Test for FEAT-COMPUTE-APP-GRID-CONTROL; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 14.10 FEAT-COMPUTE-APP-GRID-TEST - AppGridTest.jar
 
@@ -471,6 +543,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppGridTest`; `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST`; `SQX_REFERENCE_ROOT/internal/plugins/ServletGridControl`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppGridTest/module.js`.
+- **Existing UI connection:** Grid Control/Test; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/GridControl/GridControlWorkspace.tsx`; wire worker compatibility/discovery, real grid job progress and bounded failure status.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/GridTest/workspace.py`
@@ -486,6 +562,18 @@
 - **Create:** `tests/reference/sqx_features/compute_app_grid_test.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/GridTest/GridTestWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/GridControl/gridControlClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-compute-app-grid-test.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-grid-compute-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -497,10 +585,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind worker compatibility/discovery, real grid job progress and bounded failure status to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_app_grid_test.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-compute-app-grid-test.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-grid-compute-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Grid Control/Test for FEAT-COMPUTE-APP-GRID-TEST; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 14.11 FEAT-COMPUTE-SERVLET-GRID-CONTROL - ServletGridControl.jar
 
@@ -519,6 +612,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletGridControl`; `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST`. Inspect `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js`.
+- **Existing UI connection:** Grid Control/Test; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/GridControl/GridControlWorkspace.tsx`; wire worker compatibility/discovery, real grid job progress and bounded failure status.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/workspace/GridControl/routes.py` (proposed earlier in FEAT-COMPUTE-APP-GRID-CONTROL)
@@ -532,6 +629,18 @@
 - **Create:** `tests/reference/sqx_features/compute_servlet_grid_control.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/GridControl/GridControlWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/GridTest/GridTestWorkspace.tsx`
+  - Display worker compatibility/discovery, real grid job progress and bounded failure status from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/GridControl/gridControlClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-compute-servlet-grid-control.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-grid-compute-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -542,10 +651,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind worker compatibility/discovery, real grid job progress and bounded failure status to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_compute_servlet_grid_control.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-compute-servlet-grid-control.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-grid-compute-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Grid Control/Test for FEAT-COMPUTE-SERVLET-GRID-CONTROL; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 14.12 P14 integration — Run owned distributed jobs with compatible workers and bounded messaging
 
@@ -562,6 +676,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/GridControl/gridControl.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST`; `SQX_REFERENCE_ROOT/internal/plugins/ServletGridControl`. Inspect `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js`.
+- **Existing UI connection:** Grid Control/Test; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/GridControl/GridControlWorkspace.tsx`; wire worker compatibility/discovery, real grid job progress and bounded failure status.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -592,6 +710,10 @@
 - **Create:** `ui/tests/e2e/sqx-grid-compute-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Create:** `ui/tests/unit/backend-connections/task-14-12.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -602,12 +724,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind worker compatibility/discovery, real grid job progress and bounded failure status to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_grid_compute_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/GridControl/gridControl.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-grid-compute-backend.spec.ts`. Assert local/remote result equivalence, worker admission and placement/benchmark accounting; reject lost worker, stale lease, duplicate result, incompatible version and queue overload.
 - **Manual / Browser Verification:** Register a test worker; dispatch a fixture job; disconnect it; verify bounded recovery; run GridTest and reconcile completed counts.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-14-12.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-grid-compute-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Grid Control/Test for 14.12; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

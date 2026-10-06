@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 10.1 FEAT-OPTIMIZER-APP-OPTIMIZER - AppOptimizer.jar
 
@@ -26,6 +28,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppOptimizer`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppOptimizer/module.js`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/Optimizer/workspace.py`
@@ -41,6 +47,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_app_optimizer.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-app-optimizer.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -52,10 +72,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_app_optimizer.py --no-cov`; expect discovery, workspace readiness, job/resource ownership and unmount cleanup; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture discovery, workspace readiness, job/resource ownership and unmount cleanup and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-app-optimizer.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-APP-OPTIMIZER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.2 FEAT-OPTIMIZER-FITNESS-METHOD-WF-RESULT - FitnessMethodWFResult.jar
 
@@ -74,6 +99,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/FitnessMethodWFResult/service.py`
@@ -89,6 +118,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_fitness_method_wf_result.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-fitness-method-wf-result.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -100,10 +143,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_fitness_method_wf_result.py --no-cov`; expect objective direction, ties, missing metrics and nonfinite scores; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture objective direction, ties, missing metrics and nonfinite scores and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-fitness-method-wf-result.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-FITNESS-METHOD-WF-RESULT; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.3 FEAT-OPTIMIZER-PROJECT-OPTIMIZER - ProjectOptimizer.jar
 
@@ -122,6 +170,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ProjectOptimizer`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/ProjectOptimizer/service.py`
@@ -137,6 +189,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_project_optimizer.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-project-optimizer.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -146,10 +212,15 @@
 - [ ] **Step 5:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 6:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 7:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 8:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_project_optimizer.py --no-cov`; expect project revisions, input/output contracts, failed transitions and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture project revisions, input/output contracts, failed transitions and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-project-optimizer.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-PROJECT-OPTIMIZER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.4 FEAT-OPTIMIZER-RESULTS-OPTIMIZATION-PROFILE - ResultsOptimizationProfile.jar
 
@@ -168,6 +239,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileCtrl.js`.
+- **Existing UI connection:** Optimizer; exact retained source-map `ui/app/plugins/optimization/ResultsOptimizationProfile/source-map.json`. Target `ui/app/plugins/optimization/ResultsOptimizationProfile/OptimizationProfileCtrl.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/ResultsOptimizationProfile/service.py`
@@ -183,6 +258,28 @@
 - **Create:** `tests/reference/sqx_features/optimizer_results_optimization_profile.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/optimization/ResultsOptimizationProfile/OptimizationProfileCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/optimization/ResultsOptimizationProfile/optimizationProfile.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/optimization/ResultsOptimizationProfile/module.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/optimization/ResultsOptimizationProfile/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-results-optimization-profile.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -193,10 +290,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_optimization_profile.py --no-cov`; expect range endpoints, enumeration order and matrix/result reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture range endpoints, enumeration order and matrix/result reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-results-optimization-profile.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-RESULTS-OPTIMIZATION-PROFILE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.5 FEAT-OPTIMIZER-RESULTS-PROFILE-CHART - ResultsProfileChart.jar
 
@@ -215,6 +317,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/profileChart.html`.
+- **Existing UI connection:** Optimizer; exact retained source-map `ui/app/plugins/project/ResultsProfileChart/source-map.json`. Target `ui/app/plugins/project/ResultsProfileChart/ProfileChartCtrl.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/ResultsProfileChart/service.py`
@@ -230,6 +336,28 @@
 - **Create:** `tests/reference/sqx_features/optimizer_results_profile_chart.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsProfileChart/ProfileChartCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsProfileChart/profileChart.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsProfileChart/module.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsProfileChart/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-results-profile-chart.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -241,10 +369,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_profile_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-results-profile-chart.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-RESULTS-PROFILE-CHART; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.6 FEAT-OPTIMIZER-RESULTS-SEQUENTIAL-OPTIMIZATION - ResultsSequentialOptimization.jar
 
@@ -263,6 +396,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/ResultsSequentialOptimizationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/directives/ChainParamChartCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/sequentialOptimization.html`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/ResultsSequentialOptimization/service.py`
@@ -278,6 +415,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_results_sequential_optimization.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-results-sequential-optimization.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -288,10 +439,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_sequential_optimization.py --no-cov`; expect candidate dependencies, repeated passes, stopping and score ordering; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture candidate dependencies, repeated passes, stopping and score ordering and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-results-sequential-optimization.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-RESULTS-SEQUENTIAL-OPTIMIZATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.7 FEAT-OPTIMIZER-RESULTS-SYS-PARAM-PERMUTATION - ResultsSysParamPermutation.jar
 
@@ -310,6 +466,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/services/SysParamPermutationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/controllers/SysParamPermutationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/directives/SPPPanelCtrl.js`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/ResultsSysParamPermutation/service.py`
@@ -325,6 +485,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_results_sys_param_permutation.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-results-sys-param-permutation.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -336,10 +510,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_sys_param_permutation.py --no-cov`; expect range endpoints, enumeration order and matrix/result reconciliation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture range endpoints, enumeration order and matrix/result reconciliation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-results-sys-param-permutation.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-RESULTS-SYS-PARAM-PERMUTATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.8 FEAT-OPTIMIZER-RESULTS-WALK-FORWARD - ResultsWalkForward.jar
 
@@ -358,6 +537,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsWalkForward`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/WFResultsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/WFResultsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/directives/manageviews/ManageViewsCtrlWF.js`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/ResultsWalkForward/service.py`
@@ -373,6 +556,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_results_walk_forward.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-results-walk-forward.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -384,10 +581,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_results_walk_forward.py --no-cov`; expect in/out-of-sample boundaries, leakage rejection, aggregation and tie rules; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture in/out-of-sample boundaries, leakage rejection, aggregation and tie rules and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-results-walk-forward.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-RESULTS-WALK-FORWARD; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.9 FEAT-OPTIMIZER-SETTINGS-OPTIMIZATION - SettingsOptimization.jar
 
@@ -406,6 +608,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization/views/autoPresetPopup.html`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/SettingsOptimization/service.py`
@@ -421,6 +627,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_settings_optimization.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-settings-optimization.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -432,10 +652,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_settings_optimization.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-settings-optimization.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-SETTINGS-OPTIMIZATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.10 FEAT-OPTIMIZER-TASK-OPTIMIZE - TaskOptimize.jar
 
@@ -454,6 +679,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskOptimize`; `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskOptimize/simpleSettings/SimpleOptimizeSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskOptimize/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskOptimize/module.js`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/optimization/TaskOptimize/service.py`
@@ -469,6 +698,20 @@
 - **Create:** `tests/reference/sqx_features/optimizer_task_optimize.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/optimizerClient.ts`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/feat-optimizer-task-optimize.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -480,10 +723,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_optimizer_task_optimize.py --no-cov`; expect input handles, start/stop/clone transitions, failure status and retained outputs; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture input handles, start/stop/clone transitions, failure status and retained outputs and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-optimizer-task-optimize.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for FEAT-OPTIMIZER-TASK-OPTIMIZE; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 10.11 P10 integration — Optimize strategy parameters and calculate walk-forward/profile results
 
@@ -500,6 +748,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/Optimizer/optimizerModes.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization`. Inspect `SQX_REFERENCE_ROOT/internal/web/OPTIMIZER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`.
+- **Existing UI connection:** Optimizer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Optimizer/optimizerClient.ts`; wire selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -526,6 +778,14 @@
 - **Create:** `ui/tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Optimizer/OptimizerProgress.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx`
+  - Display selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/task-10-11.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -536,12 +796,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected strategy/settings execution, optimization/WF jobs and actual profile/matrix outputs to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_optimizer_walk_forward_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/Optimizer/optimizerModes.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts`. Assert candidate enumeration, objective ordering, WF window boundaries and matrix reconciliation; reject empty range, invalid partition, data leakage, tied score and cancellation.
 - **Manual / Browser Verification:** Run a small parameter grid; inspect each candidate; run a WF matrix; confirm out-of-sample rows and repeatability.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-10-11.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-optimizer-walk-forward-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Optimizer for 10.11; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

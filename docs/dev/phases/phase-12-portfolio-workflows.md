@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 12.1 FEAT-PORTFOLIO-APP-PORTFOLIO-COMPOSER - AppPortfolioComposer.jar
 
@@ -26,6 +28,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/module.js`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/PortfolioComposer/workspace.py`
@@ -41,6 +47,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_app_portfolio_composer.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioComposer/portfolioComposerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-app-portfolio-composer.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -52,10 +72,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_app_portfolio_composer.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-app-portfolio-composer.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-APP-PORTFOLIO-COMPOSER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.2 FEAT-PORTFOLIO-APP-PORTFOLIO-MASTER - AppPortfolioMaster.jar
 
@@ -74,6 +99,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOMASTER`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`.
+- **Existing UI connection:** Portfolio Master; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`; wire portfolio search settings, real search jobs and persisted accepted portfolios.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/workspace/PortfolioMaster/workspace.py`
@@ -89,6 +118,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_app_portfolio_master.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioMaster/PortfolioMasterProgress.tsx`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioMaster/portfolioMasterModel.ts`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioMaster/portfolioMasterClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-app-portfolio-master.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -100,10 +143,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind portfolio search settings, real search jobs and persisted accepted portfolios to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_app_portfolio_master.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-app-portfolio-master.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Master for FEAT-PORTFOLIO-APP-PORTFOLIO-MASTER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.3 FEAT-PORTFOLIO-FITNESS-METHOD-EXISTING-PORTFOLIO - FitnessMethodExistingPortfolio.jar
 
@@ -122,6 +170,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioService.js`; `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/fitnessMethodExistingPortfolio.html`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/FitnessMethodExistingPortfolio/service.py`
@@ -135,6 +187,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_fitness_method_existing_portfolio.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioComposer/portfolioComposerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-fitness-method-existing-portfolio.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -145,10 +211,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_fitness_method_existing_portfolio.py --no-cov`; expect objective direction, ties, missing metrics and nonfinite scores; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture objective direction, ties, missing metrics and nonfinite scores and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-fitness-method-existing-portfolio.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-FITNESS-METHOD-EXISTING-PORTFOLIO; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.4 FEAT-PORTFOLIO-PORTFOLIO-COMPOSER - PortfolioComposer.jar
 
@@ -167,6 +238,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/results/PCResultsCtrl.js`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/PortfolioComposer/service.py`
@@ -180,6 +255,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_portfolio_composer.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioComposer/portfolioComposerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-portfolio-composer.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -190,10 +279,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_portfolio_composer.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-portfolio-composer.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-PORTFOLIO-COMPOSER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.5 FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-CHART - ResultsPortfolioComposerChart.jar
 
@@ -212,6 +306,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/PortfolioComposerChartService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/PortfolioComposerChartCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/portfolioComposerChart.html`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/ResultsPortfolioComposerChart/service.py`
@@ -225,6 +323,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_results_portfolio_composer_chart.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioComposer/portfolioComposerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-results-portfolio-composer-chart.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -235,10 +347,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_results_portfolio_composer_chart.py --no-cov`; expect units, timestamp alignment, missing samples and reconciled source totals; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture units, timestamp alignment, missing samples and reconciled source totals and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-results-portfolio-composer-chart.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-CHART; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.6 FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-LOG - ResultsPortfolioComposerLog.jar
 
@@ -257,6 +374,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/PortfolioComposerLogService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/PortfolioComposerLogCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/portfolioComposerLog.html`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/ResultsPortfolioComposerLog/service.py`
@@ -270,6 +391,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_results_portfolio_composer_log.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioComposer/portfolioComposerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-results-portfolio-composer-log.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -280,10 +415,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_results_portfolio_composer_log.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-results-portfolio-composer-log.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-RESULTS-PORTFOLIO-COMPOSER-LOG; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.7 FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION - ResultsPortfolioCorrelation.jar
 
@@ -302,6 +442,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/tabs/correlationMatrix/CorrelationMatrixCtrl.js`.
+- **Existing UI connection:** Portfolio Composer; exact retained source-map `ui/app/plugins/project/ResultsPortfolioCorrelation/source-map.json`. Target `ui/app/plugins/project/ResultsPortfolioCorrelation/PortfolioCorrelationCtrl.ts`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/ResultsPortfolioCorrelation/service.py`
@@ -315,6 +459,26 @@
 - **Create:** `tests/reference/sqx_features/portfolio_results_portfolio_correlation.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/plugins/project/ResultsPortfolioCorrelation/PortfolioCorrelationCtrl.ts`
+  - Await backend validation/commands; bind actual result and job states to existing controls.
+- **Modify:** `ui/app/plugins/project/ResultsPortfolioCorrelation/portfolioCorrelation.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/plugins/project/ResultsPortfolioCorrelation/tabs/correlationMatrix/correlationMatrix.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/plugins/project/ResultsPortfolioCorrelation/backendClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-results-portfolio-correlation.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -325,10 +489,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_results_portfolio_correlation.py --no-cov`; expect alignment, sample basis, undefined correlation and threshold equality; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture alignment, sample basis, undefined correlation and threshold equality and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-results-portfolio-correlation.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-RESULTS-PORTFOLIO-CORRELATION; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.8 FEAT-PORTFOLIO-SETTINGS-AUTOMATIC-PORTFOLIO-BUILDER - SettingsAutomaticPortfolioBuilder.jar
 
@@ -347,6 +516,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticPortfolioBuilder`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOMASTER`; `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticPortfolioBuilder/AutomaticPortfolioBuilderService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticPortfolioBuilder/AutomaticPortfolioBuilderCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsAutomaticPortfolioBuilder/automaticPortfolioBuilder.html`.
+- **Existing UI connection:** Portfolio Master; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`; wire portfolio search settings, real search jobs and persisted accepted portfolios.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/SettingsAutomaticPortfolioBuilder/service.py`
@@ -360,6 +533,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_settings_automatic_portfolio_builder.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioMaster/PortfolioMasterProgress.tsx`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioMaster/portfolioMasterModel.ts`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioMaster/portfolioMasterClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-settings-automatic-portfolio-builder.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -371,10 +558,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind portfolio search settings, real search jobs and persisted accepted portfolios to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_settings_automatic_portfolio_builder.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-settings-automatic-portfolio-builder.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Master for FEAT-PORTFOLIO-SETTINGS-AUTOMATIC-PORTFOLIO-BUILDER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.9 FEAT-PORTFOLIO-SETTINGS-CREATE-PORTFOLIO - SettingsCreatePortfolio.jar
 
@@ -393,6 +585,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsCreatePortfolio`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsCreatePortfolio/SettingsCreatePortfolioService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCreatePortfolio/SettingsCreatePortfolioCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsCreatePortfolio/settingsCreatePortfolio.html`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/SettingsCreatePortfolio/service.py`
@@ -406,6 +602,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_settings_create_portfolio.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioComposer/portfolioComposerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-settings-create-portfolio.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -417,10 +627,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_settings_create_portfolio.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-settings-create-portfolio.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-SETTINGS-CREATE-PORTFOLIO; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.10 FEAT-PORTFOLIO-TASK-AUTOMATIC-PORTFOLIO-BUILDER - TaskAutomaticPortfolioBuilder.jar
 
@@ -439,6 +654,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticPortfolioBuilder`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOMASTER`; `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticPortfolioBuilder/simpleSettings/SimpleAutoPortfolioBuilderCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticPortfolioBuilder/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskAutomaticPortfolioBuilder/module.js`.
+- **Existing UI connection:** Portfolio Master; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`; wire portfolio search settings, real search jobs and persisted accepted portfolios.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/TaskAutomaticPortfolioBuilder/service.py`
@@ -452,6 +671,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_task_automatic_portfolio_builder.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioMaster/PortfolioMasterProgress.tsx`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioMaster/portfolioMasterModel.ts`
+  - Display portfolio search settings, real search jobs and persisted accepted portfolios from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioMaster/portfolioMasterClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-task-automatic-portfolio-builder.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -462,10 +695,15 @@
 - [ ] **Step 6:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind portfolio search settings, real search jobs and persisted accepted portfolios to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_task_automatic_portfolio_builder.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-task-automatic-portfolio-builder.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Master for FEAT-PORTFOLIO-TASK-AUTOMATIC-PORTFOLIO-BUILDER; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.11 FEAT-PORTFOLIO-TASK-CREATE-PORTFOLIO - TaskCreatePortfolio.jar
 
@@ -484,6 +722,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/TaskCreatePortfolio`; `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/TaskCreatePortfolio/simpleSettings/SimpleCreatePortfolioSettingsCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/TaskCreatePortfolio/simpleSettings/simpleSettings.html`; `SQX_REFERENCE_ROOT/internal/plugins/TaskCreatePortfolio/module.js`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/portfolio/TaskCreatePortfolio/service.py`
@@ -497,6 +739,20 @@
 - **Create:** `tests/reference/sqx_features/portfolio_task_create_portfolio.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/PortfolioComposer/portfolioComposerClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-portfolio-task-create-portfolio.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -508,10 +764,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_portfolio_task_create_portfolio.py --no-cov`; expect member identity, weights, alignment, aggregate accounting and search bounds; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture member identity, weights, alignment, aggregate accounting and search bounds and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-portfolio-task-create-portfolio.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for FEAT-PORTFOLIO-TASK-CREATE-PORTFOLIO; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 12.12 P12 integration — Compose and search portfolios with reconciled aggregate metrics
 
@@ -528,6 +789,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/PortfolioComposer/composerDraft.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer`. Inspect `SQX_REFERENCE_ROOT/internal/web/PORTFOLIOCOMPOSER/layout/LayoutCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js`.
+- **Existing UI connection:** Portfolio Composer; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/PortfolioComposer/PortfolioComposerWorkspace.tsx`; wire selected portfolio inputs, composition jobs and reconciled aggregate metrics.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -558,6 +823,14 @@
 - **Create:** `ui/tests/e2e/sqx-portfolio-workflows-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/PortfolioComposer/PortfolioComposerResults.tsx`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/PortfolioComposer/composerModel.ts`
+  - Display selected portfolio inputs, composition jobs and reconciled aggregate metrics from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/task-12-12.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -568,12 +841,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind selected portfolio inputs, composition jobs and reconciled aggregate metrics to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_portfolio_workflows_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/PortfolioComposer/composerDraft.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-portfolio-workflows-backend.spec.ts`. Assert member/weight round trips, aggregate equity, correlation and deterministic selection; reject missing member, nonaligned calendars, duplicate strategy and invalid weight.
 - **Manual / Browser Verification:** Compose two fixture strategies; change weights; reload; run automatic search; reconcile portfolio totals with member ledgers.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-12-12.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-portfolio-workflows-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise Portfolio Composer for 12.12; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.

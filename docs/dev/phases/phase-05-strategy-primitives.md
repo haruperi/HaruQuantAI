@@ -8,6 +8,8 @@
 - **Execution standard:** AGENTS.md plan → approval → implementation → tests → walkthrough; canonical Python docstrings, typed public APIs and explicit FR logs.
 - **Clean room:** donor signatures guide behavioral research; independently written implementations; no proprietary source in evidence; no parity claim without independent validation.
 - **Verification:** commands below are future tasks, not reported passes; isolated stores only; no live-store schema change/restore or Git mutation.
+- **UI completion:** Applicable features finish with backend + retained UI connected; preserve layouts. Production mocks cannot substitute for capability execution; keep a task unchecked while transport/contracts or required controls are unresolved.
+- **Connected verification:** Use an isolated real host and temporary data. Existing mock-only/browser-API-blocking suites are UI regressions, not connected acceptance. Run `npm --prefix ui run typecheck`, `npm --prefix ui run test`, `npm --prefix ui run build` after actual UI source changes.
 
 # 5.1 FEAT-SHARED-SNIPPETS - Snippets.jar
 
@@ -26,6 +28,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks`; `SQX_REFERENCE_ROOT/internal/plugins/ServletConstants`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`.
+- **Existing UI connection:** strategy block selectors; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`; wire backend block/constant schemas, typed ports, parameters and availability.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Create:** `app/plugins/indicators/catalog.py`
@@ -43,6 +49,20 @@
 - **Create:** `tests/reference/sqx_features/shared_snippets.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardBlockEditor.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-shared-snippets.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-strategy-primitives-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -53,10 +73,15 @@
 - [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind backend block/constant schemas, typed ports, parameters and availability to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_shared_snippets.py --no-cov`; expect all 948 class dispositions, defaults, warm-up, formulas and boundary vectors; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture all 948 class dispositions, defaults, warm-up, formulas and boundary vectors and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-shared-snippets.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-strategy-primitives-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise strategy block selectors for FEAT-SHARED-SNIPPETS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 5.2 FEAT-STRATEGY-TA-LIB - ta-lib.jar
 
@@ -74,6 +99,8 @@
 - **Research command:** `jar tf "$SQX_REFERENCE_ROOT/internal/libs/ta-lib.jar"`; `javap -public -classpath "$SQX_REFERENCE_ROOT/internal/libs/ta-lib.jar" com.tictactec.ta.lib.CandleSetting`.
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Dependency:** qualify stdlib/declared packages; approve additions; classify JVM-only internals.
+
+- **UI disposition:** Infrastructure only; no standalone UI component found in this library allocation. Its owned backend consumer feeds strategy block selectors through the phase integration gate; do not invent a library screen or direct plugin route.
 
 ## 3. File Changes
 
@@ -102,6 +129,8 @@
 - [ ] **Step 6:** Wire qualified adapters to consumers; release resources on failure/shutdown.
 - [ ] **Step 7:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 8:** Verify UI-facing consumer contract: Test this infrastructure through its declared backend/host consumer; expose failures through the owning domain envelope. The phase's connected UI gate verifies the observable workflow.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_strategy_ta_lib.py --no-cov`; expect lookback, output alignment, missing values and numerical tolerances; use temporary resources.
@@ -124,6 +153,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/ServletConstants`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`.
+- **Existing UI connection:** strategy block selectors; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`; wire backend block/constant schemas, typed ports, parameters and availability.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/plugins/indicators/catalog.py` (proposed earlier in FEAT-SHARED-SNIPPETS)
@@ -139,6 +172,20 @@
 - **Create:** `tests/reference/sqx_features/strategy_servlet_constants.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardBlockEditor.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-strategy-servlet-constants.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-strategy-primitives-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -150,10 +197,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind backend block/constant schemas, typed ports, parameters and availability to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_strategy_servlet_constants.py --no-cov`; expect command parsing, typed outputs, authority, validation errors and cancellation; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture command parsing, typed outputs, authority, validation errors and cancellation and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-strategy-servlet-constants.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-strategy-primitives-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise strategy block selectors for FEAT-STRATEGY-SERVLET-CONSTANTS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 5.4 FEAT-STRATEGY-SETTINGS-BLOCKS - SettingsBlocks.jar
 
@@ -172,6 +224,10 @@
 - **Gap:** seeds are incomplete; inspect remaining consumed symbols and official docs.
 - **Boundary:** domain contracts; host-owned jobs/resources/storage.
 
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks`; `SQX_REFERENCE_ROOT/internal/plugins/ServletConstants`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks/BlocksCtrl.js`; `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks/views/blockParametersPopup.html`.
+- **Existing UI connection:** strategy block selectors; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`; wire backend block/constant schemas, typed ports, parameters and availability.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
+
 ## 3. File Changes
 
 - **Modify:** `app/plugins/indicators/catalog.py` (proposed earlier in FEAT-SHARED-SNIPPETS)
@@ -187,6 +243,20 @@
 - **Create:** `tests/reference/sqx_features/strategy_settings_blocks.json`
   - Store versioned paraphrased donor input/output fixtures.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardBlockEditor.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Create:** `ui/app/workspace/AlgoWizard/algoWizardClient.ts`
+  - Typed domain client over host transport; ratify route/schema/version, errors and cancellation. Reuse this proposed owner if delivered earlier.
+- **Create:** `ui/tests/unit/backend-connections/feat-strategy-settings-blocks.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+- **Create:** `ui/tests/e2e/sqx-strategy-primitives-backend.spec.ts`
+  - Add this feature's case using a real isolated application host; sandbox external dependencies only.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Enumerate/fingerprint classes, consumed calls, resources and registration.
@@ -198,10 +268,15 @@
 - [ ] **Step 7:** Wire owned routes/events/discovery; expose unavailable states.
 - [ ] **Step 8:** Test semantics, failures, FR logs/redaction and qualified donor comparisons.
 
+- [ ] **Step 9:** Connect retained UI: Ratify the feature-owned wire contract; bind backend block/constant schemas, typed ports, parameters and availability to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 10:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/unit/sqx_features/test_strategy_settings_blocks.py --no-cov`; expect observed defaults, dependency validation, unknown fields, update conflicts and reload; use temporary resources.
 - **Manual / Browser Verification:** Use the phase workflow; capture observed defaults, dependency validation, unknown fields, update conflicts and reload and visible failures.
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/feat-strategy-settings-blocks.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-strategy-primitives-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise strategy block selectors for FEAT-STRATEGY-SETTINGS-BLOCKS; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
 
 # 5.5 P05 integration — Expose executable strategy blocks and qualified indicator primitives
 
@@ -218,6 +293,10 @@
 - **Existing tests:** `ui/tests/unit/workspace/AlgoWizard/algoWizardModel.test.ts`; extend actual-backend assertions.
 - **Conflict/gap:** frontend existence does not establish functional backend behavior; route/schema/discovery changes need a task plan and approval.
 - **Cross-feature ownership:** shared files may host multiple features; keep per-FR traces and delegate persistence/jobs to host capabilities.
+
+- **UI donors:** `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks`; `SQX_REFERENCE_ROOT/internal/plugins/ServletConstants`. Inspect `SQX_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`.
+- **Existing UI connection:** strategy block selectors; proposed shared consumer; verify the exact existing control and public contract before implementation. Target `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`; wire backend block/constant schemas, typed ports, parameters and availability.
+- **UI gap:** Ratify routes/schema and inspect mock resource/job authority. Missing retained controls or backend capabilities block completion; resolve them through a scoped plan.
 
 ## 3. File Changes
 
@@ -248,6 +327,16 @@
 - **Create:** `ui/tests/e2e/sqx-strategy-primitives-backend.spec.ts`
   - Use an isolated real host to verify UI state and request/output reconciliation.
 
+- **UI connection files (existing presentation):**
+- **Modify:** `ui/app/workspace/Builder/settings/BuildingBlocksTab.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/AlgoWizardBlockEditor.tsx`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Modify:** `ui/app/workspace/AlgoWizard/algoWizardModel.ts`
+  - Display backend block/constant schemas, typed ports, parameters and availability from backend responses; preserve layout.
+- **Create:** `ui/tests/unit/backend-connections/task-5-5.test.ts`
+  - Verify this feature's client/projection, real-response shapes and explicit failure/unavailable states.
+
 ## 4. Step-by-Step Task Breakdown
 
 - [ ] **Step 1:** Review preceding feature fixtures and owning README registrations; ratify the phase integration contracts and execution plan.
@@ -258,12 +347,20 @@
 - [ ] **Step 6:** Test positive/failure/cancellation paths and observable FR logs; reload/reconnect and reconcile persisted outputs.
 - [ ] **Step 7:** Record exact commands, timestamped artifacts, unresolved gaps and walkthrough; obtain separate owner commit authority.
 
+- [ ] **Step 8:** Connect retained UI: Ratify the feature-owned wire contract; bind backend block/constant schemas, typed ports, parameters and availability to actual backend commands/projections through host transport. Replace only affected production mocks; preserve view state and show loading/empty/unavailable/denied/errors. Use server job/resource IDs and cancellation/reconnect where applicable.
+- [ ] **Step 9:** Verify backend + UI together: Run this feature's contract/UI tests against an isolated real host; reconcile submitted inputs, returned IDs/results and reload behavior. Cover a failure/unavailable path and cancellation for jobs. No application-API mock or fixture fallback counts; leave this task unchecked until both sides work.
+
 ## 5. Verification & Testing
 
 - **Automated Tests:** `uv run pytest tests/integration/test_strategy_primitives_workflow.py --no-cov`; `npm --prefix ui run test -- tests/unit/workspace/AlgoWizard/algoWizardModel.test.ts`; `npm --prefix ui run test:ui -- tests/e2e/sqx-strategy-primitives-backend.spec.ts`. Assert formula vectors, warm-up counts, defaults, input/output types and catalog versioning; reject insufficient samples, nonfinite values, invalid parameter ranges and unknown versions.
 - **Manual / Browser Verification:** Open AlgoWizard; select an indicator; compare its parameter schema and computed fixture values with inspected donor outputs.
 
+- **Connected UI tests:** `npm --prefix ui run test -- tests/unit/backend-connections/task-5-5.test.ts`; `npm --prefix ui run test:ui -- --config playwright.backend.config.ts tests/e2e/sqx-strategy-primitives-backend.spec.ts --workers=1` with an isolated real host/store and approved base URL/proxy. Adapt a dedicated connected harness; retained mock-only tests still verify presentation.
+- **Connected browser acceptance:** Exercise strategy block selectors for 5.5; request/output/resource IDs must match backend observations. Missing host/capability stays visibly unavailable; mock success and API interception fail acceptance.
+
 ## Phase completion gate
+
+- [ ] Every applicable feature passed its own isolated real-host UI/backend case; no production mock fallback or unresolved required UI remains.
 
 - [ ] Reconcile all allocated FEAT/FR dispositions, donor fixtures and ownership gaps.
 - [ ] Run Ruff format/check and strict Mypy on the approved changed Python paths; verify branch-aware coverage ≥80% across retained application source at release.
