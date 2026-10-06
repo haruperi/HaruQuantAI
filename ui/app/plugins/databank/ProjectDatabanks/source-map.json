@@ -136,7 +136,7 @@
     },
     {
       "path": "DatabankDialogs.tsx",
-      "reason": "Retained action/confirm/note dialogs and shared modal/button; rename presentation extracted to DatabankRename/ui/module.ts"
+      "reason": "Retained load/save/confirm/note dialogs and shared modal/button; rename and retest presentation extracted to their mapped owners"
     },
     {
       "path": "databankStore.ts",
@@ -171,10 +171,14 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/DatabankFilterByCorrelation/module.ts",
       "relation": "Relocated correlation modal; shared math utilities and host callback retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/retest/module.ts",
+      "relation": "Extracted retest presentation; existing demo callback retained."
     }
   ],
   "inventory_review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_145744_databank-filter-correlation-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_150404_databank-actions-retest-alignment/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   }

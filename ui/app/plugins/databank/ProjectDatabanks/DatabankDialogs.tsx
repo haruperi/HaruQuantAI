@@ -124,44 +124,6 @@ export function LoadRecordsDialog({ onFinished }: { onFinished: () => void }) {
   );
 }
 
-/**
- * Donor Retest confirm. The title keeps the donor misspelling ("seleted")
- * verbatim for parity; flagged in the task walkthrough.
- */
-export function RetestDialog({
-  onMove,
-  onClose,
-}: {
-  onMove: (removeFromDatabank: boolean) => void;
-  onClose: () => void;
-}) {
-  const [applyConfig, setApplyConfig] = useState(false);
-  return (
-    <SqxModal title="Do you want to copy seleted strategies to Retester?" onClose={onClose} width={450}
-      footer={
-        <>
-          <SqxButton onClick={onClose}>Cancel</SqxButton>
-          <SqxButton primary onClick={() => { onMove(false); onClose(); }}>Copy (keep original)</SqxButton>
-          <SqxButton primary onClick={() => { onMove(true); onClose(); }}>Move (remove from this databank)</SqxButton>
-        </>
-      }
-    >
-      <label className="sqx-check">
-        <input
-          type="checkbox"
-          checked={applyConfig}
-          onChange={e => setApplyConfig(e.target.checked)}
-        />
-        <span>
-          Apply current config
-          <br />
-          This will overwrite your Retester config with this task's one.
-        </span>
-      </label>
-    </SqxModal>
-  );
-}
-
 /** Donor Save popup structure: directory browse, prefix/suffix, format radios. */
 export function SaveRecordsDialog({
   format,

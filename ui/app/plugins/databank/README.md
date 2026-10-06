@@ -136,3 +136,22 @@ The donor JAR is excluded; no backend request or quantitative algorithm parity
 is established. Existing index-stride aggregation and net-profit ordering are
 target mock behavior. Current preview wording says bigger-than, while the retained
 helper compares greater-than-or-equal; this existing mismatch is preserved.
+
+## ResultsDatabankActions/retest structural ownership (2026-10-06)
+
+DEC-UI-DATABANK-RETEST-STRUCTURAL-OWNERSHIP maps
+SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest to
+HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/retest.
+FEAT-UI-DATABANK_BUILDER owns this existing frontend action under
+FR-UI-DATABANK-source-mapping, FR-UI-DATABANK-workflow-preservation and
+FR-UI-DATABANK-clean-room. Status: structurally extracted; verification and
+limits recorded in the cohort walkthrough.
+
+module.ts exports RetestDialog; retestDialog.tsx owns existing presentation and
+RetestDialogCtrl.ts owns the local checkbox and callback/close sequence. Shared
+ProjectDatabanks modal/button and existing pane callbacks remain authorities.
+Apply current config remains presentation-only and defaults false; donor default
+and backend/config/app-switch behavior are not reproduced. Copy only notifies;
+Move deletes selected source fixtures without real destination transfer. No
+runtime parity or backend implementation is claimed. Other action folders/root
+and the plugin JAR are outside this bounded inventory, pending separate cohorts.

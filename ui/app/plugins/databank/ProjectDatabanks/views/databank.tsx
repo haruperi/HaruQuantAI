@@ -1,9 +1,9 @@
 import { RenameStrategiesDialog } from '../../DatabankRename/ui/module';
+import { RetestDialog } from '../../ResultsDatabankActions/retest/module';
 import { DatabankToolbar } from '../DatabankToolbar';
 import {
   LoadRecordsDialog,
   RemovingReportsConfirm,
-  RetestDialog,
   SaveRecordsDialog,
   SetNoteDialog,
 } from '../DatabankDialogs';

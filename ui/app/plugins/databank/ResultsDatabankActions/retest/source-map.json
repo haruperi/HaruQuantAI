@@ -1,0 +1,82 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsDatabankActions/retest subfolder structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/retest",
+  "source_head": "ca545aa12bdea9a8e98006a059749ccf8da1b49f",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_150404_databank-actions-retest-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-RETEST-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-retest-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest",
+      "family": "bounded installed retest action frontend artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-retest-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-47; retest frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "fd1aaf9f51a25edac78067edb343e308c667f869876682208d539250838d66fa",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-retest-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/retestDialog.html",
+      "relative_path": "retestDialog.html",
+      "location": "lines 1-27; retest frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "52502987c719091962a033395f02ef1e202cbe7b6364059c08c3aa54eb865f47",
+      "target": "retestDialog.tsx",
+      "classification": "counterpart",
+      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-retest-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/retest/RetestDialogCtrl.js",
+      "relative_path": "RetestDialogCtrl.js",
+      "location": "lines 1-63; retest frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "081044660413473b4493448cbb3a94a81b2c4576c72e8f9a8ddcb30f90ddb37b",
+      "target": "RetestDialogCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; target demo config/default/request/app-switch differs from donor; other plugin folders outside cohort"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    }
+  ]
+}
