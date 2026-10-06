@@ -1,3 +1,4 @@
+import { requestDeleteConfirmation } from '../ResultsDatabankActions/delete/module';
 import { openMockLoad } from '../ResultsDatabankActions/load/module';
 import { useMemo, useState } from 'react';
 import { useAppNavigate } from '../../../host/router';
@@ -55,11 +56,7 @@ export function useDatabankPanel() {
         setDialog({ kind: 'save', format: menuItem || '' });
         break;
       case 'delete':
-        if (!store.selectedRows.length) {
-          store.notify('You have to select at least one strategy to delete');
-          break;
-        }
-        setDialog({ kind: 'delete' });
+        requestDeleteConfirmation(store.selectedRows, store.notify, () => setDialog({ kind: 'delete' }));
         break;
       case 'clearAll':
         setDialog({ kind: 'clearAll' });

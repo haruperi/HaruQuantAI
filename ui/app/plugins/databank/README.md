@@ -174,3 +174,20 @@ Dismissal still invokes completion; fixture contents remain unchanged. No file
 picker, Ctrl+O, real progress request/channel, instrument aliases or backend
 loading/cancellation is implemented. Root/JAR/sibling artifacts remain outside
 this bounded inventory. Structural matching establishes no runtime parity.
+
+## ResultsDatabankActions/delete structural ownership (2026-10-06)
+
+DEC-UI-DATABANK-DELETE-STRUCTURAL-OWNERSHIP maps
+SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete to
+HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/delete.
+FEAT-UI-DATABANK_BUILDER owns this existing frontend action under
+FR-UI-DATABANK-source-mapping, FR-UI-DATABANK-workflow-preservation and
+FR-UI-DATABANK-clean-room. Status: structurally extracted; verification and
+limits recorded in its walkthrough.
+
+module.ts owns the existing empty-selection/confirmation dispatch and confirmed
+host removal adapter. Shared RemovingReportsConfirm remains in ProjectDatabanks;
+host deleteStrategies retains in-memory mutation authority. Global selectedRows
+semantics are unchanged. Donor running/loading/Builder distinctions, all-token
+selection, removal progress and backend behavior remain unqualified. No real
+persistence or runtime parity is established; other action folders are out of scope.

@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsDatabankActions/delete bounded traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/delete",
+  "source_head": "41932db60c0f4076d1deb1640a981b08e9f25240",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_152853_databank-actions-delete-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-DELETE-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-delete-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete",
+      "family": "bounded installed Delete action frontend artifact"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-delete-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-47; action registration/selection/confirmation boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "9166eb3bed0369c20819e1d4d71e0234109c118287b9869a41970fcba1abc894",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; target mock does not reproduce donor guards/all-token/progress/backend behavior"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    }
+  ]
+}

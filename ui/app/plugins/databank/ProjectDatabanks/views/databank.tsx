@@ -1,3 +1,4 @@
+import { confirmDelete } from '../../ResultsDatabankActions/delete/module';
 import { RenameStrategiesDialog } from '../../DatabankRename/ui/module';
 import { RetestDialog } from '../../ResultsDatabankActions/retest/module';
 import { LoadRecordsDialog } from '../../ResultsDatabankActions/load/module';
@@ -83,7 +84,7 @@ export function DatabankPanel() {
       {dialog.kind === 'delete' && (
         <RemovingReportsConfirm
           message={`Are you sure you want to remove selected reports (${store.selectedRows.length})?`}
-          onConfirm={() => store.deleteStrategies(store.selectedRows)}
+          onConfirm={() => confirmDelete(store.selectedRows, store.deleteStrategies)}
           onClose={() => setDialog({ kind: 'none' })}
         />
       )}
