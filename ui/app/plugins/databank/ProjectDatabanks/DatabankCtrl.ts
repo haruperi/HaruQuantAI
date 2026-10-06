@@ -1,3 +1,4 @@
+import { openMockLoad } from '../ResultsDatabankActions/load/module';
 import { useMemo, useState } from 'react';
 import { useAppNavigate } from '../../../host/router';
 import type { ToolbarAction } from './DatabankToolbar';
@@ -48,7 +49,7 @@ export function useDatabankPanel() {
   const handleAction = (action: ToolbarAction, menuItem?: string) => {
     switch (action) {
       case 'load':
-        setDialog({ kind: 'load' });
+        openMockLoad(() => setDialog({ kind: 'load' }));
         break;
       case 'save':
         setDialog({ kind: 'save', format: menuItem || '' });

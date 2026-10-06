@@ -136,7 +136,7 @@
     },
     {
       "path": "DatabankDialogs.tsx",
-      "reason": "Retained load/save/confirm/note dialogs and shared modal/button; rename and retest presentation extracted to their mapped owners"
+      "reason": "Retained save/confirm/note dialogs and shared modal/button; load, rename and retest extracted to mapped owners"
     },
     {
       "path": "databankStore.ts",
@@ -175,10 +175,14 @@
     {
       "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/retest/module.ts",
       "relation": "Extracted retest presentation; existing demo callback retained."
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/load/module.ts",
+      "relation": "Extracted simulated load popup/button; existing completion callback retained."
     }
   ],
   "inventory_review": {
-    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_150404_databank-actions-retest-alignment/implementation-plan.md",
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_151141_databank-actions-load-alignment/implementation-plan.md",
     "state": "owner-approved-plan",
     "version": 1
   }

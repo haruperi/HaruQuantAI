@@ -90,40 +90,6 @@ export function RemovingReportsConfirm({
   );
 }
 
-/** Donor Load popup: "Loading records" with a striped progress bar. */
-export function LoadRecordsDialog({ onFinished }: { onFinished: () => void }) {
-  const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress(p => {
-        if (p >= 100) {
-          clearInterval(timer);
-          return 100;
-        }
-        return Math.min(100, p + 10);
-      });
-    }, 120);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    if (progress >= 100) {
-      const t = setTimeout(onFinished, 350);
-      return () => clearTimeout(t);
-    }
-  }, [progress, onFinished]);
-
-  return (
-    <SqxModal title="Loading records" onClose={onFinished}>
-      <p className="sqx-dialog-text">Loading selected records into databank...</p>
-      <div className="sqx-progress" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100}>
-        <div className="sqx-progress-bar" style={{ width: `${progress}%` }}>{progress}%</div>
-      </div>
-    </SqxModal>
-  );
-}
-
 /** Donor Save popup structure: directory browse, prefix/suffix, format radios. */
 export function SaveRecordsDialog({
   format,

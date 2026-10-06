@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsDatabankActions/load bounded structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/load",
+  "source_head": "3a9608544c56fbc8f1bb8997b4d3f3a473bb921f",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_151141_databank-actions-load-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-LOAD-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankactions-load-ui",
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load",
+      "family": "bounded installed load-action frontend artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankactions-load-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/loadBtnCtrl.js",
+      "relative_path": "loadBtnCtrl.js",
+      "location": "lines 1-40; frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "689b9f02d1243196ed779726090bdaa8498da5aa29979d2eb70e0b3af421896f",
+      "target": "loadBtnCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-load-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/loadPopup.html",
+      "relative_path": "loadPopup.html",
+      "location": "lines 1-31; frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "f3a4662adc01313e7d526df09b157c6833e197f2819b6681994702ab00656f7e",
+      "target": "loadPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-load-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadPopupCtrl.js",
+      "relative_path": "LoadPopupCtrl.js",
+      "location": "lines 1-107; frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "bd3796997ea8ee5e7137dc875a11ba0a2767d2042d813b998e7c87da8761fe00",
+      "target": "LoadPopupCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-load-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js",
+      "relative_path": "LoadService.js",
+      "location": "lines 1-52; frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "a52c62f5078b992b790cfd165c53c4d8403d43e6e1ae4df2d7eb339dc5df62b4",
+      "target": "LoadService.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-load-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-16; frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "b39d8a4e99ad3b0d8a76740ddd3a46ae404ed66a1f0b389e61d0a6a44508a45e",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankactions-load-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/styles.css",
+      "relative_path": "styles.css",
+      "location": "lines 1-7; frontend responsibility boundary",
+      "inspection_method": "local inventory, SHA-256 and frontend responsibility inspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "00a7dd68b6d3a77b0d79ab3623de7992990f99a5ff2b165ff67913bb996e21d2",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Structure only; target simulates progress and does not implement donor file/alias/backend workflow"
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    }
+  ]
+}

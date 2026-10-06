@@ -155,3 +155,22 @@ and backend/config/app-switch behavior are not reproduced. Copy only notifies;
 Move deletes selected source fixtures without real destination transfer. No
 runtime parity or backend implementation is claimed. Other action folders/root
 and the plugin JAR are outside this bounded inventory, pending separate cohorts.
+
+## ResultsDatabankActions/load structural ownership (2026-10-06)
+
+DEC-UI-DATABANK-LOAD-STRUCTURAL-OWNERSHIP maps
+SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load to
+HARUQUANTAI_ROOT/ui/app/plugins/databank/ResultsDatabankActions/load.
+FEAT-UI-DATABANK_BUILDER owns this existing simulated frontend action under
+FR-UI-DATABANK-source-mapping, FR-UI-DATABANK-workflow-preservation and
+FR-UI-DATABANK-clean-room. Status: structurally extracted; qualification and
+limits recorded in the cohort walkthrough.
+
+module.ts exposes the popup and existing button dispatch adapter. loadPopup.tsx
+owns presentation, LoadPopupCtrl.ts owns state/completion, LoadService.ts owns
+the simulated interval and cleanup, and styles.css owns exclusive progress rules.
+Shared modal/theme and pane completion notification remain existing authorities.
+Dismissal still invokes completion; fixture contents remain unchanged. No file
+picker, Ctrl+O, real progress request/channel, instrument aliases or backend
+loading/cancellation is implemented. Root/JAR/sibling artifacts remain outside
+this bounded inventory. Structural matching establishes no runtime parity.

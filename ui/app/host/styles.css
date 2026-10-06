@@ -213,9 +213,6 @@
 .sqx-link-button:hover{text-decoration:underline}
 .sqx-check{display:flex;align-items:flex-start;gap:7px;cursor:pointer;font-size:11.5px;color:var(--sqx-text)}
 .sqx-check input{accent-color:var(--sqx-accent);margin-top:2px}
-.sqx-progress{height:20px;border:1px solid var(--sqx-grid-border);background:var(--sqx-progress-track);overflow:hidden;border-radius:2px}
-.sqx-progress-bar{height:100%;color:#fff;font-size:10.5px;display:flex;align-items:center;justify-content:center;background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.22) 0 8px,transparent 8px 16px),linear-gradient(to bottom,#4aa3f4,#1c75c8);animation:sqx-stripes 1s linear infinite}
-@keyframes sqx-stripes{from{background-position:0 0,0 0}to{background-position:32px 0,0 0}}
 /* theme-aware overrides for shared controls inside databanks dialogs */
 .sqx-dialog-scope .sq-button,.sqx-dialog-scope .icon-button{border:1px solid var(--sqx-btn-border);background:var(--sqx-btn-bg);color:var(--sqx-btn-text);border-radius:3px}
 .sqx-dialog-scope .sq-button:hover,.sqx-dialog-scope .icon-button:hover{background:var(--sqx-btn-hover)}
