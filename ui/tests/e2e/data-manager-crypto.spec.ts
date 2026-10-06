@@ -1,7 +1,7 @@
 import { expect, test, type Page } from '@playwright/test';
 import { selectLightSkin } from './shellTestUtils';
 
-async function launch(page: Page) { await page.goto('/'); await page.getByRole('button',{name:'Data Manager',exact:true}).click(); }
+async function launch(page: Page) { await page.goto('/'); await page.getByRole('button',{name:'Data Manager',exact:true}).and(page.locator('[aria-label]')).click(); }
 async function openAdd(page: Page, exchange: string) {
   await page.getByRole('button',{name:'Crypto',exact:true}).click();
   await page.getByRole('menu',{name:'Crypto actions'}).getByRole('menuitem',{name:'Add crypto symbol',exact:true}).click();

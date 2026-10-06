@@ -1,0 +1,185 @@
+{
+  "schema_version": 1,
+  "scope": "UI-only Crypto structural traceability",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/Crypto",
+  "source_head": "cbe95f41e6c5952ca3cac8e48ac5234c5e72055c",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_125009_data-source-crypto-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "feature": "FEAT-UI-CRYPTO-TRACEABILITY",
+    "decision": "DEC-UI-CRYPTO-TRACEABILITY",
+    "requirements": [
+      "FR-UI-CRYPTO-source-mapping",
+      "FR-UI-CRYPTO-workflow-preservation",
+      "FR-UI-CRYPTO-clean-room"
+    ],
+    "domain": "plugins/data_source/Crypto"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto",
+      "id": "sqx-crypto-ui",
+      "family": "installed plugin UI artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/add/addPopup.html",
+      "relative_path": "add/addPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "0be05e643429fa29d17e16df722ccacf0fe5d00cd5c781f2ceb919014076e3cd",
+      "target": "add/addPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/add/addPopupCtrl.js",
+      "relative_path": "add/addPopupCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "d19d721db247b1d7d56350bf29fc064d5a8654833672fd530ec47a03dd4bce78",
+      "target": "add/addPopupCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/add/module.js",
+      "relative_path": "add/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "bbb6e2107d65cfda7418b284074c7d98a807b94f5c7a90d568665a435628ffa9",
+      "target": "add/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
+      "relative_path": "DataSourceCrypto.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "non-UI binary excluded",
+      "access_date": "2026-10-06",
+      "sha256": "ffd8a08dd99ea2ffc96b9b107911cafeeeb56866f5d39160d40b2f4d9ea7abe1",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js",
+      "relative_path": "DataSourceCryptoService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "9532ec8c694616a881f3b401b0263c2d569649203ad43d9876ff2b2416162e12",
+      "target": "DataSourceCryptoService.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/import/importPopup.html",
+      "relative_path": "import/importPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "25d334352e58d6a062487d4b8ccf34bfc6eb3eb7def2d3a4fc12dd7e5fb86829",
+      "target": "import/importPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/import/importPopupCtrl.js",
+      "relative_path": "import/importPopupCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "d6b49b016d499bbab80d6d73e2256691647c74e22b6cff4c1edb3c60069126c4",
+      "target": "import/importPopupCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/import/module.js",
+      "relative_path": "import/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "41ef70315599835325c2ff3c51b2dbc964230e08499f341f9c707250f31c385c",
+      "target": "import/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "812aa064009d4cbe0577dfbe816587e20517f5faf1b28439da89aaa999b07f82",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    },
+    {
+      "catalog_id": "sqx-crypto-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/style.css",
+      "relative_path": "style.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "UI counterpart by relative filename; independently written target responsibility",
+      "access_date": "2026-10-06",
+      "sha256": "b6ca5277c1d07c1543ea5d7d4709408dd7b0ee558b7c23a1fb0282a667b0372d",
+      "target": "style.css",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish behavioral parity; backend and exchange connectivity outside scope."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "crypto.ts",
+      "reason": "Existing independent catalogue, rules and provider types; retained unchanged."
+    },
+    {
+      "path": "cryptoStore.ts",
+      "reason": "Existing browser persistence and simulation capability; retained unchanged."
+    },
+    {
+      "path": "README.md",
+      "reason": "Target domain ownership registry and qualified status."
+    },
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest; not the behavioral evidence ledger."
+    }
+  ]
+}

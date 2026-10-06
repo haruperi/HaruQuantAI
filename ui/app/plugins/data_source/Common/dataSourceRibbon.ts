@@ -1,3 +1,4 @@
+import { cryptoProvider } from '../Crypto/module';
 import { dukascopyProvider } from '../Dukascopy/module';
 
 export type DataSourceDialogId =
@@ -76,15 +77,6 @@ export interface DataSourceContextAction {
   requiresSelection?: boolean;
 }
 
-const cryptoExchanges = [
-  ['binance', 'Binance spot', 'binance', 'Binance'],
-  ['binance-coin-m', 'Binance Coin-M', 'coin-m', 'BinanceCoinM'],
-  ['binance-usdt-m', 'Binance USDT-M', 'usdt-m', 'BinanceUsdtM'],
-  ['bitfinex', 'Bitfinex', 'bitfinex', 'Bitfinex'],
-  ['poloniex', 'Poloniex', 'poloniex', 'Poloniex'],
-  ['coinbase-pro', 'Coinbase Pro', 'coinbase', 'Coinbase'],
-] as const;
-
 export const dataSourceProviders: readonly DataSourceProvider[] = [
   dukascopyProvider,
   {
@@ -126,25 +118,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
       { id: 'darwinex-download', label: 'Download data for existing symbols', icon: 'download', dialog: 'darwinex-download' },
     ],
   },
-  {
-    id: 'crypto',
-    label: 'Crypto',
-    commands: [
-      {
-        id: 'crypto-add',
-        label: 'Add crypto symbol',
-        icon: 'crypto',
-        children: cryptoExchanges.map(([id, label, icon, exchange]) => ({
-          id: `crypto-add-${id}`,
-          label,
-          icon,
-          dialog: 'crypto-add' as const,
-          exchange,
-        })),
-      },
-      { id: 'crypto-download', label: 'Download data for existing symbol', icon: 'download', dialog: 'crypto-download' },
-    ],
-  },
+  cryptoProvider,
   {
     id: 'yahoo',
     label: 'Yahoo',

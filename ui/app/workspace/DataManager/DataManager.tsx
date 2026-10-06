@@ -3,8 +3,8 @@ import { DarwinexImportDialog } from '../../plugins/data_source/Darwinex/Darwine
 import { DarwinexDownloadDialog } from '../../plugins/data_source/Darwinex/DarwinexDownloadDialog';
 import { useDarwinex, darwinexActive } from '../../plugins/data_source/Darwinex/darwinexStore';
 import { darwinexTargets, type DarwinexDefinition } from '../../plugins/data_source/Darwinex/darwinex';
-import { CryptoAddDialog } from '../../plugins/data_source/Crypto/CryptoAddDialog';
-import { CryptoDownloadDialog } from '../../plugins/data_source/Crypto/CryptoDownloadDialog';
+import { AddPopup as CryptoAddDialog } from '../../plugins/data_source/Crypto/add/module';
+import { ImportPopup as CryptoDownloadDialog } from '../../plugins/data_source/Crypto/import/module';
 import { cryptoActive, useCrypto } from '../../plugins/data_source/Crypto/cryptoStore';
 import { cryptoTargets, type CryptoDefinition, type CryptoExchangeId } from '../../plugins/data_source/Crypto/crypto';
 import { YahooAddDialog } from '../../plugins/data_source/Yahoo/YahooAddDialog';
