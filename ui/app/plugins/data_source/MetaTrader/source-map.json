@@ -1,0 +1,146 @@
+{
+  "schema_version": 1,
+  "scope": "UI-only MetaTrader structural traceability to DataSourceMt5Api",
+  "donor_root": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api",
+  "target_root": "HARUQUANTAI_ROOT/ui/app/plugins/data_source/MetaTrader",
+  "source_head": "d61d12f39c5ee617894b0f227e12c5dcf63c345d",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_132729_data-source-mt5-alignment/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "feature": "FEAT-UI-MT5-TRACEABILITY",
+    "decision": "DEC-UI-MT5-TRACEABILITY",
+    "requirements": [
+      "FR-UI-MT5-source-mapping",
+      "FR-UI-MT5-workflow-preservation",
+      "FR-UI-MT5-clean-room"
+    ],
+    "domain": "plugins/data_source/MetaTrader"
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api",
+      "id": "sqx-mt5api-ui",
+      "family": "installed plugin UI artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-mt5api-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/DataSourceMt5Api.jar",
+      "relative_path": "DataSourceMt5Api.jar",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "backend binary excluded",
+      "access_date": "2026-10-06",
+      "sha256": "d9868bb340541b513341d0fdef81a76823bb6b8c022face241a4d2de7424d37d",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+    },
+    {
+      "catalog_id": "sqx-mt5api-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/DataSourceMt5Api.js",
+      "relative_path": "DataSourceMt5Api.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "a89027d3586443d105c45a65ba3b2b8f40889f269852551310c253a9fa2a656f",
+      "target": "DataSourceMt5Api.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+    },
+    {
+      "catalog_id": "sqx-mt5api-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/DataSourceMt5ApiImportCtrl.js",
+      "relative_path": "import/DataSourceMt5ApiImportCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "16948d13cea06914114b0ac8eb7e9f2a33f4b4a971b47f02f73607d51afd0ac3",
+      "target": "import/DataSourceMt5ApiImportCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+    },
+    {
+      "catalog_id": "sqx-mt5api-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/importPopup.html",
+      "relative_path": "import/importPopup.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "ab509b08fba2eaf229fd730dcd3903d7f29e8771b46fcec622c14002f0fc534d",
+      "target": "import/importPopup.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+    },
+    {
+      "catalog_id": "sqx-mt5api-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/import/module.js",
+      "relative_path": "import/module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "be83c1440c68759c7cdc15e56a4bca6b555abfebefbbc3f9b4ee3ee2eb120b2b",
+      "target": "import/module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+    },
+    {
+      "catalog_id": "sqx-mt5api-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "dc4ae11253a5aa5ff958570fdd437c1fba754f86c12ea9ecdb095cdfe31c8312",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+    },
+    {
+      "catalog_id": "sqx-mt5api-ui",
+      "artifact_locator": "SQX_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "local inventory, SHA-256 and scoped UI responsibility inspection; binary inventory/hash only",
+      "relation": "independently written target counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "de2b14fb90168a0f3ca4e8c5d11d48faf027fe8c61f115e9d0bce7441e7eee0b",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Structural mapping does not establish SQX behavioral parity; real terminal and backend behavior outside scope."
+    }
+  ],
+  "target_only": [
+    {
+      "path": "mt5Import.ts",
+      "reason": "Existing independent mock catalogue/discovery/date/rule contracts; unchanged."
+    },
+    {
+      "path": "mt5ImportStore.ts",
+      "reason": "Existing browser persistence/simulation capability used by siblings; unchanged."
+    },
+    {
+      "path": "README.md",
+      "reason": "Target domain ownership registry and status."
+    },
+    {
+      "path": "source-map.json",
+      "reason": "Structural manifest, not behavioral evidence ledger."
+    }
+  ]
+}

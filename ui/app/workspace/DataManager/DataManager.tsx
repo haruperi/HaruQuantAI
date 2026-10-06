@@ -11,7 +11,7 @@ import { YahooAddDialog } from '../../plugins/data_source/Yahoo/YahooAddDialog';
 import { YahooDownloadDialog } from '../../plugins/data_source/Yahoo/YahooDownloadDialog';
 import { useYahoo, yahooActive } from '../../plugins/data_source/Yahoo/yahooStore';
 import { yahooTargets, type YahooDefinition } from '../../plugins/data_source/Yahoo/yahoo';
-import { Mt5ImportDialog } from '../../plugins/data_source/MetaTrader/Mt5ImportDialog';
+import { ImportPopup as Mt5ImportDialog } from '../../plugins/data_source/MetaTrader/import/module';
 import { mt5Active, useMt5Import } from '../../plugins/data_source/MetaTrader/mt5ImportStore';
 import { mt5Summary } from '../../plugins/data_source/MetaTrader/mt5Import';
 import { SQDataAddDialog } from '../../plugins/data_source/SQData/SQDataAddDialog';

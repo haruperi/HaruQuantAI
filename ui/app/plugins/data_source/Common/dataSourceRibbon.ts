@@ -1,3 +1,4 @@
+import { mt5Provider } from '../MetaTrader/module';
 import { filesProvider } from '../FileImport/module';
 import { darwinexProvider } from '../Darwinex/module';
 import { cryptoProvider } from '../Crypto/module';
@@ -113,11 +114,7 @@ export const dataSourceProviders: readonly DataSourceProvider[] = [
       { id: 'yahoo-download', label: 'Download data for existing symbol', icon: 'download', dialog: 'yahoo-download' },
     ],
   },
-  {
-    id: 'mt5',
-    label: 'MT5 import',
-    commands: [{ id: 'mt5-import', label: 'Import data', icon: 'terminal-import', dialog: 'mt5-import' }],
-  },
+  mt5Provider,
 ] as const;
 
 export const dataSourceContextActions: readonly DataSourceContextAction[] = [

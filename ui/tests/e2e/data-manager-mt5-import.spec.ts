@@ -5,7 +5,7 @@ import path from 'node:path';
 
 async function launch(page: Page) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Data Manager', exact: true }).click();
+  await page.getByRole('button', { name: 'Data Manager', exact: true }).and(page.locator('[aria-label]')).click();
 }
 
 async function open(page: Page) {
@@ -116,5 +116,38 @@ test('contains work within the browser and reports storage failure', async ({ pa
   await page.evaluate(() => { Storage.prototype.setItem = () => { throw new Error('quota'); }; });
   await dialog.getByRole('button', { name: 'Start import', exact: true }).click();
   await expect(dialog.getByRole('alert')).toContainText('Unable to save MT5');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'MT5 import', exact: true })).toBeFocused();
   expect(requests).toEqual([]);
+});
+
+test('Escape during a pending mock fetch cancels the timer and restores focus', async ({ page }, info) => {
+  const root = await fixture(info.outputPath('MT5'));
+  await launch(page);
+  const dialog = await open(page);
+  await dialog.getByLabel('Select MT5 installation folder', { exact: true }).setInputFiles(root);
+  await page.evaluate(() => {
+    const schedule = window.setTimeout.bind(window);
+    const cancel = window.clearTimeout.bind(window);
+    const pending = new Set<number>();
+    window.setTimeout = ((handler: TimerHandler, delay?: number, ...args: unknown[]) => {
+      const id = schedule(handler, delay === 180 ? 60000 : delay, ...args);
+      if (delay === 180) pending.add(id);
+      document.documentElement.dataset.mockMt5Fetches = String(pending.size);
+      return id;
+    }) as typeof window.setTimeout;
+    window.clearTimeout = id => {
+      if (id !== undefined) pending.delete(id);
+      document.documentElement.dataset.mockMt5Fetches = String(pending.size);
+      cancel(id);
+    };
+  });
+  await dialog.getByRole('button', { name: 'Fetch symbols', exact: true }).click();
+  await expect(dialog.getByRole('button', { name: 'Fetching…', exact: true })).toBeDisabled();
+  await expect(page.locator('html')).toHaveAttribute('data-mock-mt5-fetches', '1');
+  await page.keyboard.press('Escape');
+  await expect(dialog).toHaveCount(0);
+  await expect(page.locator('html')).toHaveAttribute('data-mock-mt5-fetches', '0');
+  await expect(page.getByRole('button', { name: 'MT5 import', exact: true })).toBeFocused();
 });
