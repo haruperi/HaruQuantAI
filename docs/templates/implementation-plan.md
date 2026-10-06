@@ -1,6 +1,6 @@
-# Implementation plan: <task>
+# Implementation plan: <task></task>
 
-Version: <n>. Status: PROPOSED | APPROVED | SUPERSEDED.
+Version: <n></n>. Status: PROPOSED | APPROVED | SUPERSEDED.
 Date, source HEAD/fingerprint, working-tree status, owner approval reference:
 <record evidence; do not infer approval>
 
