@@ -1,9 +1,0 @@
-.sessions-flow .modal{max-height:calc(100dvh - 24px);max-width:calc(100vw - 24px)}
-.sessions-flow .modal-content{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:11px}
-.sessions-flow fieldset{border:1px solid var(--line);padding:11px;min-width:0;display:flex;flex-direction:column;gap:9px}
-.sessions-flow legend{padding:0 5px;font-weight:600}.session-template-fields,.session-element-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
-.session-name-postfix{display:flex;align-items:center;gap:6px}.session-name-postfix input{flex:1}.session-name-postfix span{color:var(--muted)}
-.session-elements-grid{border:1px solid var(--line);max-height:250px;overflow:auto}.session-elements-grid table{width:100%}.session-elements-grid td,.session-elements-grid th{text-align:center}
-.session-elements-grid tbody tr{cursor:pointer}.session-element-actions{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.session-element-actions span{margin-left:auto;color:var(--muted);font-size:10px}
-.session-error{color:var(--bad);border-left:3px solid var(--bad);background:#351d23;padding:9px;margin:0}.session-note{color:var(--muted);margin:0}
-@media(max-width:560px){.session-template-fields,.session-element-fields{grid-template-columns:1fr}.session-element-actions span{width:100%;margin-left:0}}
